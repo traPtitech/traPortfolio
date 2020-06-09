@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: portfolio
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /users:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-users
+      description: ユーザーのリストを入手します。traQ依存
+  '/users/{userid}':
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: 'get-users-:userid'
+      description: ユーザー情報を取得します
+    parameters:
+      - schema:
+          type: string
+        name: userid
+        in: path
+        required: true
+    patch:
+      summary: ''
+      operationId: patch-users-userid
+      responses:
+        '200':
+          description: OK
+      description: ユーザー情報を更新します。
+  /projects:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-projects
+      description: プロジェクトの一覧を取得します。
+    post:
+      summary: ''
+      operationId: post-projects
+      responses:
+        '200':
+          description: OK
+      description: プロジェクトを追加します。
+  '/projects/{projectId}':
+    parameters:
+      - schema:
+          type: string
+        name: projectId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-projects-project_id
+      description: プロジェクト情報を入手します。
+    patch:
+      summary: ''
+      operationId: patch-projects-project_id
+      responses:
+        '200':
+          description: OK
+      description: プロジェクト情報を修正します。
+    delete:
+      summary: ''
+      operationId: delete-projects-project_id
+      responses:
+        '200':
+          description: OK
+      description: プロジェクトを削除します。
+  '/projects/{projectId}/users/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: projectId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-projects-project_id-users-userid
+      responses:
+        '200':
+          description: OK
+      description: プロジェクトにユーザーを追加
+    delete:
+      summary: ''
+      operationId: delete-projects-project_id-users-userid
+      responses:
+        '200':
+          description: OK
+      description: プロジェクトからユーザーを削除
+  /meetings:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-meeting
+      description: 集会のリストの入手。knoQ依存。
+    post:
+      summary: ''
+      operationId: post-meeting
+      responses:
+        '200':
+          description: OK
+      description: 集会の追加。knoQ依存？
+    parameters: []
+  '/meetings/{meetingId}':
+    parameters:
+      - schema:
+          type: string
+        name: meetingId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-meetings-meetingId
+      description: 集会情報の入手。knoQ依存
+    delete:
+      summary: ''
+      operationId: delete-meetings-meetingId
+      responses:
+        '200':
+          description: OK
+      description: 集会情報の削除
+    patch:
+      summary: ''
+      operationId: patch-meetings-meetingId
+      responses:
+        '200':
+          description: OK
+      description: 集会情報の修正。knoQ
+  '/meetings/{meetingId}/users/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: meetingId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-meetings-meetingId-users-userId
+      responses:
+        '200':
+          description: OK
+      description: 集会参加者にユーザーを追加。
+    delete:
+      summary: ''
+      operationId: delete-meetings-meetingId-users-userId
+      responses:
+        '200':
+          description: OK
+      description: 集会参加者からユーザーを削除
+components:
+  schemas: {}
