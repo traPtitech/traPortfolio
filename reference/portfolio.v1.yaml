@@ -2,6 +2,7 @@ openapi: 3.0.0
 info:
   title: portfolio
   version: '1.0'
+  description: 実績
 servers:
   - url: 'http://localhost:3000'
 paths:
@@ -9,14 +10,28 @@ paths:
     get:
       summary: Your GET endpoint
       tags: []
-      responses: {}
       operationId: get-users
       description: ユーザーのリストを入手します。traQ依存
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
   '/users/{userid}':
     get:
       summary: Your GET endpoint
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
       operationId: 'get-users-:userid'
       description: ユーザー情報を取得します
     parameters:
@@ -36,16 +51,31 @@ paths:
     get:
       summary: Your GET endpoint
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
       operationId: get-projects
       description: プロジェクトの一覧を取得します。
     post:
       summary: ''
       operationId: post-projects
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
       description: プロジェクトを追加します。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProjectRequest'
   '/projects/{projectId}':
     parameters:
       - schema:
@@ -56,7 +86,15 @@ paths:
     get:
       summary: Your GET endpoint
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Not Found
       operationId: get-projects-project_id
       description: プロジェクト情報を入手します。
     patch:
@@ -65,13 +103,24 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       description: プロジェクト情報を修正します。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProjectRequest'
     delete:
       summary: ''
       operationId: delete-projects-project_id
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
       description: プロジェクトを削除します。
   '/projects/{projectId}/users/{userId}':
     parameters:
@@ -89,16 +138,24 @@ paths:
       summary: ''
       operationId: post-projects-project_id-users-userid
       responses:
-        '200':
-          description: OK
+        '204':
+          description: |-
+            No Content
+            正常に追加できました
       description: プロジェクトにユーザーを追加
     delete:
       summary: ''
       operationId: delete-projects-project_id-users-userid
-      responses:
-        '200':
-          description: OK
       description: プロジェクトからユーザーを削除
+      responses:
+        '204':
+          description: |-
+            No Content
+            正常に削除できました
+        '404':
+          description: |-
+            Bad Request
+            ユーザーが存在しません
   /meetings:
     get:
       summary: Your GET endpoint
@@ -110,8 +167,8 @@ paths:
       summary: ''
       operationId: post-meeting
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
       description: 集会の追加。knoQ依存？
     parameters: []
   '/meetings/{meetingId}':
@@ -157,8 +214,8 @@ paths:
       summary: ''
       operationId: post-meetings-meetingId-users-userId
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
       description: 集会参加者にユーザーを追加。
     delete:
       summary: ''
@@ -167,5 +224,238 @@ paths:
         '200':
           description: OK
       description: 集会参加者からユーザーを削除
+  /achievements:
+    post:
+      summary: ''
+      operationId: post-achievements
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '409':
+          description: Conflict
+      description: 実績の登録
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAchievementRequest'
+  '/users/{userId}/achievements':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
+      operationId: get-users-userId-achievements
+      description: ユーザーの実績を取得
+    post:
+      summary: ''
+      operationId: post-users-userId-achievements
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+      description: 実績の登録
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                achievement_id:
+                  type: string
+  '/achievements/{achievementId}':
+    parameters:
+      - schema:
+          type: string
+        name: achievementId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Achievement'
+      operationId: get-achievements-achievementId
+      description: 実績の情報を取得
+    patch:
+      summary: ''
+      operationId: patch-achievements-achievementId
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      description: 実績情報の修正
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAchievementRequest'
+    delete:
+      summary: ''
+      operationId: delete-achievements-achievementId
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: 実績情報の削除
+  '/projects/{projectId}/users':
+    parameters:
+      - schema:
+          type: string
+        name: projectId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+      operationId: get-projects-projectId-users
+      description: プロジェクトに所属するユーザーを取得します
 components:
-  schemas: {}
+  schemas:
+    Project:
+      title: Project
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+      description: プロジェクト
+    Achievement:
+      title: Achievement
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+      description: 実績
+    User:
+      title: User
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        check:
+          type: boolean
+      description: ユーザー
+    Account:
+      title: Account
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+        user_id:
+          type: string
+        check:
+          type: boolean
+      description: アカウント
+    AccountType:
+      title: AccountType
+      type: object
+      description: アカウントの種類
+      properties:
+        id:
+          type: string
+        prefix:
+          type: string
+        suffix:
+          type: string
+        url:
+          type: string
+    ProjectMember:
+      title: ProjectMember
+      type: object
+      properties:
+        project_id:
+          type: string
+        user_id:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+      description: プロジェクト参加者
+    AchievementMember:
+      title: AchievementMember
+      type: object
+      description: 実績メンバー
+      properties:
+        achievement_id:
+          type: string
+        user_id:
+          type: string
+    PostProjectRequest:
+      title: PostProjectRequest
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+    PostAchievementRequest:
+      title: PostAchievementRequest
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
