@@ -8,7 +8,7 @@ servers:
 paths:
   /users:
     get:
-      summary: Your GET endpoint
+      summary: 'ユーザーのリストを取得'
       tags:
         - user
       operationId: get-users
@@ -24,7 +24,7 @@ paths:
                   $ref: '#/components/schemas/User'
   '/users/{userId}':
     get:
-      summary: Your GET endpoint
+      summary: 'ユーザー詳細情報の取得'
       tags:
         - user
       responses:
@@ -39,7 +39,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     patch:
-      summary: ''
+      summary: 'ユーザー情報の変更'
       operationId: patch-users-userid
       responses:
         '200':
@@ -49,7 +49,7 @@ paths:
         - user
   /projects:
     get:
-      summary: Your GET endpoint
+      summary: 'プロジェクトのリストの取得'
       tags:
         - project
       responses:
@@ -64,7 +64,7 @@ paths:
       operationId: get-projects
       description: プロジェクトの一覧を取得します。
     post:
-      summary: ''
+      summary: 'プロジェクトの登録'
       operationId: post-projects
       responses:
         '204':
@@ -83,7 +83,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
     get:
-      summary: Your GET endpoint
+      summary: 'プロジェクト詳細情報を取得'
       tags:
         - project
       responses:
@@ -98,7 +98,7 @@ paths:
       operationId: get-projects-project_id
       description: プロジェクト情報を入手します。
     patch:
-      summary: ''
+      summary: 'プロジェクト情報の変更'
       operationId: patch-projects-project_id
       responses:
         '200':
@@ -118,7 +118,7 @@ paths:
       tags:
         - project
     delete:
-      summary: ''
+      summary: 'プロジェクト情報の削除'
       operationId: delete-projects-project_id
       responses:
         '204':
@@ -131,7 +131,7 @@ paths:
       - $ref: '#/components/parameters/projectIdInPath'
       - $ref: '#/components/parameters/userIdInPath'
     post:
-      summary: ''
+      summary: 'プロジェクト参加者の登録'
       operationId: post-projects-project_id-users-userid
       responses:
         '204':
@@ -142,7 +142,7 @@ paths:
       tags:
         - project
     delete:
-      summary: ''
+      summary: 'プロジェクト情報の削除'
       operationId: delete-projects-project_id-users-userid
       description: プロジェクトからユーザーを削除
       responses:
@@ -158,14 +158,14 @@ paths:
         - project
   /meetings:
     get:
-      summary: Your GET endpoint
+      summary: '集会情報のリストの取得'
       tags:
         - meeting
       responses: {}
       operationId: get-meeting
       description: 集会のリストの入手。knoQ依存。
     post:
-      summary: ''
+      summary: '集会情報の投稿'
       operationId: post-meeting
       responses:
         '204':
@@ -178,14 +178,14 @@ paths:
     parameters:
       - $ref: '#/components/parameters/meetingIdInPath'
     get:
-      summary: Your GET endpoint
+      summary: '集会情報の詳細の取得'
       tags:
         - meeting
       responses: {}
       operationId: get-meetings-meetingId
       description: 集会情報の入手。knoQ依存
     delete:
-      summary: ''
+      summary: '集会情報の削除'
       operationId: delete-meetings-meetingId
       responses:
         '200':
@@ -194,7 +194,7 @@ paths:
       tags:
         - meeting
     patch:
-      summary: ''
+      summary: '集会情報の修正'
       operationId: patch-meetings-meetingId
       responses:
         '200':
@@ -207,7 +207,7 @@ paths:
       - $ref: '#/components/parameters/meetingIdInPath'
       - $ref: '#/components/parameters/userIdInPath'
     post:
-      summary: ''
+      summary: '集会参加者の登録'
       operationId: post-meetings-meetingId-users-userId
       responses:
         '204':
@@ -216,7 +216,7 @@ paths:
       tags:
         - meeting
     delete:
-      summary: ''
+      summary: '集会参加者の削除'
       operationId: delete-meetings-meetingId-users-userId
       responses:
         '200':
@@ -226,7 +226,7 @@ paths:
         - meeting
   /achievements:
     post:
-      summary: ''
+      summary: '実績情報の登録'
       operationId: post-achievements
       responses:
         '204':
@@ -247,7 +247,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
-      summary: Your GET endpoint
+      summary: '実績に紐づくユーザーを取得'
       tags:
         - achievement
       responses:
@@ -262,7 +262,7 @@ paths:
       operationId: get-users-userId-achievements
       description: ユーザーの実績を取得
     post:
-      summary: ''
+      summary: '実績に紐づくユーザーを登録'
       operationId: post-users-userId-achievements
       responses:
         '204':
@@ -286,7 +286,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/achievementIdInPath'
     get:
-      summary: Your GET endpoint
+      summary: '実績情報の取得'
       tags:
         - achievement
       responses:
@@ -299,7 +299,7 @@ paths:
       operationId: get-achievements-achievementId
       description: 実績の情報を取得
     patch:
-      summary: ''
+      summary: '実績情報の修正'
       operationId: patch-achievements-achievementId
       responses:
         '204':
@@ -317,7 +317,7 @@ paths:
       tags:
         - achievement
     delete:
-      summary: ''
+      summary: '実績情報の削除'
       operationId: delete-achievements-achievementId
       responses:
         '204':
@@ -333,7 +333,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
     get:
-      summary: Your GET endpoint
+      summary: 'プロジェクト参加者の取得'
       tags:
         - project
       responses:
@@ -349,7 +349,7 @@ paths:
       description: プロジェクトに所属するユーザーを取得します
   /events:
     get:
-      summary: Your GET endpoint
+      summary: 'イベント情報の取得'
       tags:
         - event
       responses:
@@ -364,7 +364,7 @@ paths:
     parameters: []
   /accounts:
     post:
-      summary: ''
+      summary: 'アカウント情報の登録'
       operationId: post-accounts
       responses:
         '204':
@@ -387,7 +387,7 @@ paths:
         in: path
         required: true
     get:
-      summary: Your GET endpoint
+      summary: 'アカウント情報の取得'
       tags:
         - account
       responses:
@@ -404,7 +404,7 @@ paths:
       operationId: get-accounts-accountId
       description: 指定したアカウント情報を取得します
     patch:
-      summary: ''
+      summary: 'アカウント情報の修正'
       operationId: patch-accounts-accountId
       responses:
         '204':
@@ -427,7 +427,7 @@ paths:
       tags:
         - account
     delete:
-      summary: ''
+      summary: 'アカウント情報の削除'
       operationId: delete-accounts-accountId
       responses:
         '204':
@@ -449,7 +449,7 @@ paths:
         in: path
         required: true
     get:
-      summary: Your GET endpoint
+      summary: 'ユーザーのアカウント情報の取得'
       responses:
         '200':
           description: OK
