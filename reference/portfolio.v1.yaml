@@ -8,7 +8,7 @@ servers:
 paths:
   /users:
     get:
-      summary: 'ユーザーのリストを取得'
+      summary: ユーザーのリストを取得
       tags:
         - user
       operationId: get-users
@@ -24,7 +24,7 @@ paths:
                   $ref: '#/components/schemas/User'
   '/users/{userId}':
     get:
-      summary: 'ユーザー詳細情報の取得'
+      summary: ユーザー詳細情報の取得
       tags:
         - user
       responses:
@@ -39,7 +39,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     patch:
-      summary: 'ユーザー情報の変更'
+      summary: ユーザー情報の変更
       operationId: patch-users-userid
       responses:
         '200':
@@ -49,7 +49,7 @@ paths:
         - user
   /projects:
     get:
-      summary: 'プロジェクトのリストの取得'
+      summary: プロジェクトのリストの取得
       tags:
         - project
       responses:
@@ -64,7 +64,7 @@ paths:
       operationId: get-projects
       description: プロジェクトの一覧を取得します。
     post:
-      summary: 'プロジェクトの登録'
+      summary: プロジェクトの登録
       operationId: post-projects
       responses:
         '204':
@@ -83,7 +83,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
     get:
-      summary: 'プロジェクト詳細情報を取得'
+      summary: プロジェクト詳細情報を取得
       tags:
         - project
       responses:
@@ -98,7 +98,7 @@ paths:
       operationId: get-projects-project_id
       description: プロジェクト情報を入手します。
     patch:
-      summary: 'プロジェクト情報の変更'
+      summary: プロジェクト情報の変更
       operationId: patch-projects-project_id
       responses:
         '200':
@@ -118,7 +118,7 @@ paths:
       tags:
         - project
     delete:
-      summary: 'プロジェクト情報の削除'
+      summary: プロジェクト情報の削除
       operationId: delete-projects-project_id
       responses:
         '204':
@@ -131,7 +131,7 @@ paths:
       - $ref: '#/components/parameters/projectIdInPath'
       - $ref: '#/components/parameters/userIdInPath'
     post:
-      summary: 'プロジェクト参加者の登録'
+      summary: プロジェクト参加者の登録
       operationId: post-projects-project_id-users-userid
       responses:
         '204':
@@ -142,7 +142,7 @@ paths:
       tags:
         - project
     delete:
-      summary: 'プロジェクト情報の削除'
+      summary: プロジェクト情報の削除
       operationId: delete-projects-project_id-users-userid
       description: プロジェクトからユーザーを削除
       responses:
@@ -158,18 +158,37 @@ paths:
         - project
   /meetings:
     get:
-      summary: '集会情報のリストの取得'
+      summary: 集会情報のリストの取得
       tags:
         - meeting
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseEvent'
+        '':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseEvent'
       operationId: get-meeting
       description: 集会のリストの入手。knoQ依存。
     post:
-      summary: '集会情報の投稿'
+      summary: 集会情報の投稿
       operationId: post-meeting
       responses:
         '204':
           description: No Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostEvent'
       description: 集会の追加。knoQ依存？
       tags:
         - meeting
@@ -178,27 +197,53 @@ paths:
     parameters:
       - $ref: '#/components/parameters/meetingIdInPath'
     get:
-      summary: '集会情報の詳細の取得'
+      summary: 集会情報の詳細の取得
       tags:
         - meeting
-      responses: {}
-      operationId: get-meetings-meetingId
-      description: 集会情報の入手。knoQ依存
-    delete:
-      summary: '集会情報の削除'
-      operationId: delete-meetings-meetingId
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseEvent'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-meetings-meetingId
+      description: 集会情報の入手。knoQ依存
+    delete:
+      summary: 集会情報の削除
+      operationId: delete-meetings-meetingId
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       description: 集会情報の削除
       tags:
         - meeting
     patch:
-      summary: '集会情報の修正'
+      summary: 集会情報の修正
       operationId: patch-meetings-meetingId
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostEvent'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       description: 集会情報の修正。knoQ
       tags:
         - meeting
@@ -207,7 +252,7 @@ paths:
       - $ref: '#/components/parameters/meetingIdInPath'
       - $ref: '#/components/parameters/userIdInPath'
     post:
-      summary: '集会参加者の登録'
+      summary: 集会参加者の登録
       operationId: post-meetings-meetingId-users-userId
       responses:
         '204':
@@ -216,17 +261,17 @@ paths:
       tags:
         - meeting
     delete:
-      summary: '集会参加者の削除'
+      summary: 集会参加者の削除
       operationId: delete-meetings-meetingId-users-userId
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
       description: 集会参加者からユーザーを削除
       tags:
         - meeting
   /achievements:
     post:
-      summary: '実績情報の登録'
+      summary: 実績情報の登録
       operationId: post-achievements
       responses:
         '204':
@@ -247,7 +292,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
-      summary: '実績に紐づくユーザーを取得'
+      summary: 実績に紐づくユーザーを取得
       tags:
         - achievement
       responses:
@@ -262,7 +307,7 @@ paths:
       operationId: get-users-userId-achievements
       description: ユーザーの実績を取得
     post:
-      summary: '実績に紐づくユーザーを登録'
+      summary: 実績に紐づくユーザーを登録
       operationId: post-users-userId-achievements
       responses:
         '204':
@@ -286,7 +331,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/achievementIdInPath'
     get:
-      summary: '実績情報の取得'
+      summary: 実績情報の取得
       tags:
         - achievement
       responses:
@@ -299,7 +344,7 @@ paths:
       operationId: get-achievements-achievementId
       description: 実績の情報を取得
     patch:
-      summary: '実績情報の修正'
+      summary: 実績情報の修正
       operationId: patch-achievements-achievementId
       responses:
         '204':
@@ -317,7 +362,7 @@ paths:
       tags:
         - achievement
     delete:
-      summary: '実績情報の削除'
+      summary: 実績情報の削除
       operationId: delete-achievements-achievementId
       responses:
         '204':
@@ -333,7 +378,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
     get:
-      summary: 'プロジェクト参加者の取得'
+      summary: プロジェクト参加者の取得
       tags:
         - project
       responses:
@@ -349,7 +394,7 @@ paths:
       description: プロジェクトに所属するユーザーを取得します
   /events:
     get:
-      summary: 'イベント情報の取得'
+      summary: イベント情報の取得
       tags:
         - event
       responses:
@@ -358,13 +403,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/traPtitech/knoQ/master/docs/swagger.yaml#components/responses/eventArray'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseEvent'
       operationId: get-event
       description: イベントの取得
     parameters: []
   /accounts:
     post:
-      summary: 'アカウント情報の登録'
+      summary: アカウント情報の登録
       operationId: post-accounts
       responses:
         '204':
@@ -387,7 +434,7 @@ paths:
         in: path
         required: true
     get:
-      summary: 'アカウント情報の取得'
+      summary: アカウント情報の取得
       tags:
         - account
       responses:
@@ -404,7 +451,7 @@ paths:
       operationId: get-accounts-accountId
       description: 指定したアカウント情報を取得します
     patch:
-      summary: 'アカウント情報の修正'
+      summary: アカウント情報の修正
       operationId: patch-accounts-accountId
       responses:
         '204':
@@ -427,7 +474,7 @@ paths:
       tags:
         - account
     delete:
-      summary: 'アカウント情報の削除'
+      summary: アカウント情報の削除
       operationId: delete-accounts-accountId
       responses:
         '204':
@@ -449,7 +496,7 @@ paths:
         in: path
         required: true
     get:
-      summary: 'ユーザーのアカウント情報の取得'
+      summary: ユーザーのアカウント情報の取得
       responses:
         '200':
           description: OK
@@ -678,6 +725,35 @@ components:
         locked:
           type: boolean
           example: true
+    PostEvent:
+      allOf:
+        - $ref: '#/components/schemas/PutEvent'
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReqTagNameAuth'
+    PutEvent:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReqTagNameAuth'
+    ReqTagNameAuth:
+      allOf:
+        - $ref: '#/components/schemas/ReqTagName'
+      properties:
+        locked:
+          type: boolean
+          example: true
+    ReqTagName:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vue
     PostAccountRequest:
       title: PostAccountRequest
       type: object
