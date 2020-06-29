@@ -9,7 +9,8 @@ paths:
   /users:
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - user
       operationId: get-users
       description: ユーザーのリストを入手します。traQ依存
       responses:
@@ -21,10 +22,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-  '/users/{userid}':
+  '/users/{userId}':
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - user
       responses:
         '200':
           description: OK
@@ -35,11 +37,7 @@ paths:
       operationId: 'get-users-:userid'
       description: ユーザー情報を取得します
     parameters:
-      - schema:
-          type: string
-        name: userid
-        in: path
-        required: true
+      - $ref: '#/components/parameters/userIdInPath'
     patch:
       summary: ''
       operationId: patch-users-userid
@@ -47,10 +45,13 @@ paths:
         '200':
           description: OK
       description: ユーザー情報を更新します。
+      tags:
+        - user
   /projects:
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - project
       responses:
         '200':
           description: OK
@@ -76,16 +77,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostProjectRequest'
+      tags:
+        - project
   '/projects/{projectId}':
     parameters:
-      - schema:
-          type: string
-        name: projectId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/projectIdInPath'
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - project
       responses:
         '200':
           description: OK
@@ -115,6 +115,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostProjectRequest'
+      tags:
+        - project
     delete:
       summary: ''
       operationId: delete-projects-project_id
@@ -122,18 +124,12 @@ paths:
         '204':
           description: No Content
       description: プロジェクトを削除します。
+      tags:
+        - project
   '/projects/{projectId}/users/{userId}':
     parameters:
-      - schema:
-          type: string
-        name: projectId
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: userId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/projectIdInPath'
+      - $ref: '#/components/parameters/userIdInPath'
     post:
       summary: ''
       operationId: post-projects-project_id-users-userid
@@ -143,6 +139,8 @@ paths:
             No Content
             正常に追加できました
       description: プロジェクトにユーザーを追加
+      tags:
+        - project
     delete:
       summary: ''
       operationId: delete-projects-project_id-users-userid
@@ -156,10 +154,13 @@ paths:
           description: |-
             Bad Request
             ユーザーが存在しません
+      tags:
+        - project
   /meetings:
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - meeting
       responses: {}
       operationId: get-meeting
       description: 集会のリストの入手。knoQ依存。
@@ -170,17 +171,16 @@ paths:
         '204':
           description: No Content
       description: 集会の追加。knoQ依存？
+      tags:
+        - meeting
     parameters: []
   '/meetings/{meetingId}':
     parameters:
-      - schema:
-          type: string
-        name: meetingId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/meetingIdInPath'
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - meeting
       responses: {}
       operationId: get-meetings-meetingId
       description: 集会情報の入手。knoQ依存
@@ -191,6 +191,8 @@ paths:
         '200':
           description: OK
       description: 集会情報の削除
+      tags:
+        - meeting
     patch:
       summary: ''
       operationId: patch-meetings-meetingId
@@ -198,18 +200,12 @@ paths:
         '200':
           description: OK
       description: 集会情報の修正。knoQ
+      tags:
+        - meeting
   '/meetings/{meetingId}/users/{userId}':
     parameters:
-      - schema:
-          type: string
-        name: meetingId
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: userId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/meetingIdInPath'
+      - $ref: '#/components/parameters/userIdInPath'
     post:
       summary: ''
       operationId: post-meetings-meetingId-users-userId
@@ -217,6 +213,8 @@ paths:
         '204':
           description: No Content
       description: 集会参加者にユーザーを追加。
+      tags:
+        - meeting
     delete:
       summary: ''
       operationId: delete-meetings-meetingId-users-userId
@@ -224,6 +222,8 @@ paths:
         '200':
           description: OK
       description: 集会参加者からユーザーを削除
+      tags:
+        - meeting
   /achievements:
     post:
       summary: ''
@@ -241,16 +241,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostAchievementRequest'
+      tags:
+        - achievement
   '/users/{userId}/achievements':
     parameters:
-      - schema:
-          type: string
-        name: userId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/userIdInPath'
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - achievement
       responses:
         '200':
           description: OK
@@ -281,16 +280,15 @@ paths:
                   type: string
                 achievement_id:
                   type: string
+      tags:
+        - achievement
   '/achievements/{achievementId}':
     parameters:
-      - schema:
-          type: string
-        name: achievementId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/achievementIdInPath'
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - achievement
       responses:
         '200':
           description: OK
@@ -316,6 +314,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostAchievementRequest'
+      tags:
+        - achievement
     delete:
       summary: ''
       operationId: delete-achievements-achievementId
@@ -327,16 +327,15 @@ paths:
         '404':
           description: Not Found
       description: 実績情報の削除
+      tags:
+        - achievement
   '/projects/{projectId}/users':
     parameters:
-      - schema:
-          type: string
-        name: projectId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/projectIdInPath'
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - project
       responses:
         '200':
           description: OK
@@ -348,62 +347,197 @@ paths:
                   $ref: '#/components/schemas/User'
       operationId: get-projects-projectId-users
       description: プロジェクトに所属するユーザーを取得します
+  /events:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - event
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/traPtitech/knoQ/master/docs/swagger.yaml#components/responses/eventArray'
+      operationId: get-event
+      description: イベントの取得
+    parameters: []
+  /accounts:
+    post:
+      summary: ''
+      operationId: post-accounts
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+      description: アカウント情報を登録します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAccountRequest'
+      tags:
+        - account
+  '/accounts/{accountId}':
+    parameters:
+      - schema:
+          type: string
+        name: accountId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags:
+        - account
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-accounts-accountId
+      description: 指定したアカウント情報を取得します
+    patch:
+      summary: ''
+      operationId: patch-accounts-accountId
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウント情報を修正します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAccountRequest'
+        description: ''
+      tags:
+        - account
+    delete:
+      summary: ''
+      operationId: delete-accounts-accountId
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウント情報を削除します
+      tags:
+        - account
+  '/users/{userId}/accounts':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+      operationId: get-users-userId-accounts
+      description: ユーザーのアカウント情報を取得します
+      tags:
+        - account
 components:
   schemas:
     Project:
       title: Project
       type: object
+      description: プロジェクト
       properties:
         id:
           type: string
+          format: uuid
         name:
           type: string
         description:
           type: string
         start:
           type: string
+          format: date-time
         end:
           type: string
-      description: プロジェクト
+          format: date-time
     Achievement:
       title: Achievement
       type: object
+      description: 実績
       properties:
         id:
           type: string
+          format: uuid
         name:
           type: string
         description:
           type: string
-      description: 実績
     User:
       title: User
       type: object
+      description: ユーザー
       properties:
         id:
           type: string
+          format: uuid
         description:
           type: string
         check:
           type: boolean
-      description: ユーザー
+      required:
+        - id
+        - description
+        - check
     Account:
       title: Account
       type: object
+      description: アカウント
       properties:
         id:
           type: string
+          format: uuid
         type:
           type: string
+          format: uuid
         name:
           type: string
         url:
           type: string
+          format: uri
         user_id:
           type: string
+          format: uuid
         check:
           type: boolean
-      description: アカウント
+      required:
+        - id
+        - type
+        - name
+        - url
+        - user_id
     AccountType:
       title: AccountType
       type: object
@@ -411,25 +545,34 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         prefix:
           type: string
         suffix:
           type: string
         url:
           type: string
+          format: uri
+      required:
+        - id
+        - url
     ProjectMember:
       title: ProjectMember
       type: object
+      description: プロジェクト参加者
       properties:
         project_id:
           type: string
+          format: uuid
         user_id:
           type: string
+          format: uuid
         start:
           type: string
+          format: date-time
         end:
           type: string
-      description: プロジェクト参加者
+          format: date-time
     AchievementMember:
       title: AchievementMember
       type: object
@@ -437,8 +580,10 @@ components:
       properties:
         achievement_id:
           type: string
+          format: uuid
         user_id:
           type: string
+          format: uuid
     PostProjectRequest:
       title: PostProjectRequest
       type: object
@@ -449,8 +594,10 @@ components:
           type: string
         start:
           type: string
+          format: date-time
         end:
           type: string
+          format: date-time
     PostAchievementRequest:
       title: PostAchievementRequest
       type: object
@@ -459,3 +606,135 @@ components:
           type: string
         description:
           type: string
+    Event:
+      title: Event
+      type: object
+      description: イベント情報(knoQ)
+      properties:
+        name:
+          type: string
+          example: 第n回進捗回
+        descirption:
+          type: string
+          example: 第n回の進捗会です。
+        sharedRoom:
+          type: boolean
+          example: false
+        timeStart:
+          type: string
+          example: '2004-04-01T12:00Z'
+        timeEnd:
+          type: string
+          example: '2004-04-01T12:00Z'
+        roomId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        groupId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+    ResponseEvent:
+      title: ResponseEvent
+      description: ''
+      allOf:
+        - type: object
+          properties:
+            eventId:
+              type: string
+              format: uuid
+              example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        - $ref: '#/components/schemas/Event'
+        - type: object
+          properties:
+            tags:
+              type: array
+              items:
+                $ref: '#/components/schemas/ResponseTag'
+            createdBy:
+              type: string
+              format: uuid
+            createdAt:
+              type: string
+              example: '2019-11-02T15:24:42.5438806Z'
+            updatedAt:
+              type: string
+              example: '2019-11-02T15:24:42.5438806Z'
+            deletedAt:
+              type: string
+              format: omitempty
+              nullable: true
+    ResponseTag:
+      title: ResponseTag
+      type: object
+      properties:
+        tagId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        name:
+          type: string
+          example: vue
+        locked:
+          type: boolean
+          example: true
+    PostAccountRequest:
+      title: PostAccountRequest
+      type: object
+      properties:
+        type:
+          type: string
+          format: uuid
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        userId:
+          type: string
+          format: uuid
+        checck:
+          type: boolean
+      required:
+        - url
+  parameters:
+    paletteIdInPath:
+      name: paletteId
+      in: path
+      required: true
+      description: スタンプパレットUUID
+      schema:
+        type: string
+        format: uuid
+    achievementIdInPath:
+      name: achievementId
+      in: path
+      required: true
+      description: 実績UUID
+      schema:
+        type: string
+        format: uuid
+    meetingIdInPath:
+      name: meetingId
+      in: path
+      required: true
+      description: 集会UUID
+      schema:
+        type: string
+        format: uuid
+    userIdInPath:
+      name: userId
+      in: path
+      required: true
+      description: ユーザーUUID
+      schema:
+        type: string
+        format: uuid
+    projectIdInPath:
+      name: projectId
+      in: path
+      required: true
+      description: プロジェクトUUID
+      schema:
+        type: string
+        format: uuid
