@@ -34,6 +34,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '404':
+          description: Not Found
       operationId: 'get-users-:userid'
       description: ユーザー情報を取得します
     parameters:
@@ -42,8 +44,14 @@ paths:
       summary: ユーザー情報の変更
       operationId: patch-users-userid
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       description: ユーザー情報を更新します。
       tags:
         - user
@@ -130,17 +138,6 @@ paths:
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
       - $ref: '#/components/parameters/userIdInPath'
-    post:
-      summary: プロジェクト参加者の登録
-      operationId: post-projects-project_id-users-userid
-      responses:
-        '204':
-          description: |-
-            No Content
-            正常に追加できました
-      description: プロジェクトにユーザーを追加
-      tags:
-        - project
     delete:
       summary: プロジェクト情報の削除
       operationId: delete-projects-project_id-users-userid
@@ -150,6 +147,8 @@ paths:
           description: |-
             No Content
             正常に削除できました
+        '403':
+          description: Forbidden
         '404':
           description: |-
             Bad Request
@@ -183,12 +182,18 @@ paths:
       summary: 集会情報の投稿
       operationId: post-meeting
       responses:
-        '204':
-          description: No Content
+        '201':
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostEvent'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
       description: 集会の追加。knoQ依存？
       tags:
         - meeting
@@ -207,8 +212,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseEvent'
-        '403':
-          description: Forbidden
         '404':
           description: Not Found
       operationId: get-meetings-meetingId
@@ -257,6 +260,10 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
       description: 集会参加者にユーザーを追加。
       tags:
         - meeting
@@ -274,10 +281,16 @@ paths:
       summary: 実績情報の登録
       operationId: post-achievements
       responses:
-        '204':
-          description: No Content
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Achievement'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
         '409':
           description: Conflict
       description: 実績の登録
@@ -304,6 +317,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Achievement'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       operationId: get-users-userId-achievements
       description: ユーザーの実績を取得
     post:
@@ -314,6 +331,10 @@ paths:
           description: No Content
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       description: 実績の登録
       requestBody:
         content:
@@ -341,6 +362,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Achievement'
+        '404':
+          description: Not Found
       operationId: get-achievements-achievementId
       description: 実績の情報を取得
     patch:
@@ -351,6 +374,8 @@ paths:
           description: No Content
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
         '404':
           description: Not Found
       description: 実績情報の修正
@@ -390,8 +415,29 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        '404':
+          description: |-
+            Not Found
+            プロジェクトが存在しません
       operationId: get-projects-projectId-users
       description: プロジェクトに所属するユーザーを取得します
+    post:
+      summary: ''
+      operationId: post-projects-projectId-users
+      responses:
+        '204':
+          description: No Content 追加されました
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProjectMemberRequest'
   /events:
     get:
       summary: イベント情報の取得
@@ -414,10 +460,18 @@ paths:
       summary: アカウント情報の登録
       operationId: post-accounts
       responses:
-        '204':
-          description: No Content
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
       description: アカウント情報を登録します
       requestBody:
         content:
@@ -428,11 +482,7 @@ paths:
         - account
   '/accounts/{accountId}':
     parameters:
-      - schema:
-          type: string
-        name: accountId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/accountIdInPath'
     get:
       summary: アカウント情報の取得
       tags:
@@ -444,8 +494,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-        '403':
-          description: Forbidden
         '404':
           description: Not Found
       operationId: get-accounts-accountId
@@ -458,8 +506,6 @@ paths:
           description: No Content
         '400':
           description: Bad Request
-        '401':
-          description: Unauthorized
         '403':
           description: Forbidden
         '404':
@@ -479,8 +525,6 @@ paths:
       responses:
         '204':
           description: No Content
-        '401':
-          description: Unauthorized
         '403':
           description: Forbidden
         '404':
@@ -490,11 +534,7 @@ paths:
         - account
   '/users/{userId}/accounts':
     parameters:
-      - schema:
-          type: string
-        name: userId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/userIdInPath'
     get:
       summary: ユーザーのアカウント情報の取得
       responses:
@@ -506,6 +546,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Account'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       operationId: get-users-userId-accounts
       description: ユーザーのアカウント情報を取得します
       tags:
@@ -773,6 +817,12 @@ components:
           type: boolean
       required:
         - url
+    PostProjectMemberRequest:
+      title: PostProjectMemberRequest
+      type: object
+      properties:
+        id:
+          type: string
   parameters:
     paletteIdInPath:
       name: paletteId
@@ -811,6 +861,14 @@ components:
       in: path
       required: true
       description: プロジェクトUUID
+      schema:
+        type: string
+        format: uuid
+    accountIdInPath:
+      name: accounttId
+      in: path
+      required: true
+      description: アカウントUUID
       schema:
         type: string
         format: uuid
