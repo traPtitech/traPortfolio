@@ -7,7 +7,7 @@ servers:
 paths:
   /users:
     get:
-      summary: Your GET endpoint
+      summary: ''
       tags: []
       responses:
         '200':
@@ -31,7 +31,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
-      summary: Your GET endpoint
+      summary: ''
       tags: []
       responses:
         '200':
@@ -43,18 +43,23 @@ paths:
         '404':
           description: Not Found
       operationId: getUser
-      description: ユーザー詳細情報を取得
+      description: ユーザー詳細情報を取得します
     patch:
       summary: ''
-      operationId: patchUser
+      operationId: edithUser
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PostUserRequest'
+      description: ユーザー情報を修正します
 components:
   schemas:
     User:
@@ -76,17 +81,12 @@ components:
           description: ユーザー表示名
           minLength: 0
           maxLength: 32
-        iconFileId:
-          type: string
-          format: uuid
-          description: アイコンファイルUUID
         state:
           $ref: '#/components/schemas/UserAccountState'
       required:
         - id
         - name
         - displayName
-        - iconFileId
         - state
     UserAccountState:
       type: integer
@@ -116,10 +116,6 @@ components:
           description: ユーザーUUID
         state:
           $ref: '#/components/schemas/UserAccountState'
-        iconFileId:
-          type: string
-          format: uuid
-          description: アイコンファイルUUID
         displayName:
           type: string
           description: ユーザー表示名
@@ -133,10 +129,13 @@ components:
           type: string
           description: 自己紹介(biography)
           maxLength: 1000
+        realName:
+          type: string
+        check:
+          type: boolean
       required:
         - id
         - state
-        - iconFileId
         - displayName
         - name
         - bio
