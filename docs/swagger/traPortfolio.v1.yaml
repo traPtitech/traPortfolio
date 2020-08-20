@@ -61,6 +61,7 @@ components:
       title: User
       type: object
       description: ユーザー情報
+      x-examples: {}
       properties:
         id:
           type: string
@@ -79,24 +80,14 @@ components:
           type: string
           format: uuid
           description: アイコンファイルUUID
-        bot:
-          type: boolean
-          description: BOTかどうか
         state:
           $ref: '#/components/schemas/UserAccountState'
-        updatedAt:
-          type: string
-          description: 更新日時
-          format: date-time
       required:
         - id
         - name
         - displayName
         - iconFileId
-        - bot
         - state
-        - updatedAt
-      x-examples: {}
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -125,9 +116,6 @@ components:
           description: ユーザーUUID
         state:
           $ref: '#/components/schemas/UserAccountState'
-        bot:
-          type: boolean
-          description: BOTかどうか
         iconFileId:
           type: string
           format: uuid
@@ -141,82 +129,17 @@ components:
           type: string
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
           description: ユーザー名
-        twitterId:
-          type: string
-          description: Twitter ID
-          pattern: '^[a-zA-Z0-9_]{1,15}$'
-        lastOnline:
-          type: string
-          description: 最終オンライン日時
-          format: date-time
-          nullable: true
-        updatedAt:
-          type: string
-          format: date-time
-          description: 更新日時
-        tags:
-          type: array
-          description: タグリスト
-          items:
-            $ref: '#/components/schemas/UserTag'
-        groups:
-          type: array
-          description: 所属グループのUUIDの配列
-          items:
-            type: string
-            format: uuid
         bio:
           type: string
           description: 自己紹介(biography)
           maxLength: 1000
-        homeChannel:
-          type: string
-          format: uuid
-          description: ホームチャンネル
-          nullable: true
       required:
         - id
         - state
-        - bot
         - iconFileId
         - displayName
         - name
-        - twitterId
-        - lastOnline
-        - updatedAt
-        - tags
-        - groups
         - bio
-        - homeChannel
-    UserTag:
-      title: UserTag
-      type: object
-      description: ユーザータグ
-      properties:
-        tagId:
-          type: string
-          description: タグUUID
-          format: uuid
-        tag:
-          type: string
-          description: タグ文字列
-        isLocked:
-          type: boolean
-          description: タグがロックされているか
-        createdAt:
-          type: string
-          description: タグ付与日時
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          description: タグ更新日時
-      required:
-        - tagId
-        - tag
-        - isLocked
-        - createdAt
-        - updatedAt
   parameters:
     userIdInPath:
       name: userId
