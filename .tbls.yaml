@@ -23,8 +23,8 @@ comments:
   - table: accounts
     tableComment: Twitterなどのアカウントテーブル
     columnComments:
-      id: アカウントID
-      type: アカウント種類のUUID
+      id: アカウントUUID
+      type: アカウントのハードコードID
       name: アカウント名
       url: アカウントのURL
       user_id: ユーザーUUID

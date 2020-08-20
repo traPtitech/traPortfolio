@@ -48,7 +48,7 @@ paths:
       description: ユーザー詳細情報を取得します
     patch:
       summary: ユーザー情報の編集
-      operationId: edithUser
+      operationId: editUser
       responses:
         '200':
           description: OK
@@ -133,36 +133,25 @@ components:
           maxLength: 1000
         realName:
           type: string
-        check:
-          type: boolean
+          description: ユーザー本名
       required:
         - id
         - state
         - displayName
         - name
         - bio
+    EditUserRequest:
+      title: EditUserRequest
+      type: object
+      properties:
+        id:
+          type: string
   parameters:
     userIdInPath:
       name: userId
       in: path
       required: true
       description: ユーザーUUID
-      schema:
-        type: string
-        format: uuid
-    projectIdInPath:
-      name: projectId
-      in: path
-      required: true
-      description: プロジェクトUUID
-      schema:
-        type: string
-        format: uuid
-    eventIdInPath:
-      name: eventId
-      in: path
-      required: true
-      description: イベントUUID
       schema:
         type: string
         format: uuid
