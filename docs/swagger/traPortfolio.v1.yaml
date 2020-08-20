@@ -18,7 +18,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-      operationId: get-users
+      operationId: getUsers
       description: ユーザー情報を取得します
       parameters:
         - schema:
@@ -42,29 +42,19 @@ paths:
                 $ref: '#/components/schemas/UserDetail'
         '404':
           description: Not Found
-      operationId: get-users-userId
+      operationId: getUser
       description: ユーザー詳細情報を取得
-  '/user/{userId}/projects':
-    parameters:
-      - schema:
-          type: string
-        name: userId
-        in: path
-        required: true
-    get:
-      summary: Your GET endpoint
-      tags: []
+    patch:
+      summary: ''
+      operationId: patchUser
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Project'
-      operationId: get-user-userId-projects
-      description: ユーザーが所属している（いた）プロジェクトを取得します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUserRequest'
 components:
   schemas:
     User:
@@ -227,48 +217,28 @@ components:
         - isLocked
         - createdAt
         - updatedAt
-    Project:
-      title: Project
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectMember'
-        since:
-          type: string
-          format: date-time
-        until:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-    ProjectMember:
-      title: ProjectMember
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        since:
-          type: string
-        until:
-          type: string
   parameters:
     userIdInPath:
       name: userId
       in: path
       required: true
       description: ユーザーUUID
+      schema:
+        type: string
+        format: uuid
+    projectIdInPath:
+      name: projectId
+      in: path
+      required: true
+      description: プロジェクトUUID
+      schema:
+        type: string
+        format: uuid
+    eventIdInPath:
+      name: eventId
+      in: path
+      required: true
+      description: イベントUUID
       schema:
         type: string
         format: uuid
