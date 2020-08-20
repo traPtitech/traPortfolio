@@ -7,7 +7,7 @@ servers:
 paths:
   /users:
     get:
-      summary: ''
+      summary: ユーザーのリストを取得
       tags: []
       responses:
         '200':
@@ -19,7 +19,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/User'
       operationId: getUsers
-      description: ユーザー情報を取得します
+      description: |-
+        ユーザー情報を取得します
+        `include-suspended`を指定しない場合、レスポンスに非アクティブユーザーは含まれません。
       parameters:
         - schema:
             type: boolean
@@ -31,7 +33,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
-      summary: ''
+      summary: ユーザー詳細情報の取得
       tags: []
       responses:
         '200':
@@ -45,7 +47,7 @@ paths:
       operationId: getUser
       description: ユーザー詳細情報を取得します
     patch:
-      summary: ''
+      summary: ユーザー情報の編集
       operationId: edithUser
       responses:
         '200':
