@@ -29,13 +29,6 @@ comments:
       url: アカウントのURL
       user_id: ユーザーUUID
       check: 公開可能かどうか
-  - table: account_type
-    tableComment: アカウント種類テーブル
-    columnComments:
-      id: アカウントタイプUUID
-      prefix: Twitterの@とか
-      suffix:
-      url: URLの雛形？
   - table: projects
     tableComment: プロジェクトテーブル
     columnComments:
