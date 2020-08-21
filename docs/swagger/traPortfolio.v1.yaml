@@ -1,0 +1,161 @@
+openapi: 3.0.0
+info:
+  title: traPortfolio
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /users:
+    get:
+      summary: ユーザーのリストを取得
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+      operationId: getUsers
+      description: |-
+        ユーザー情報を取得します
+        `include-suspended`を指定しない場合、レスポンスに非アクティブユーザーは含まれません。
+      parameters:
+        - schema:
+            type: boolean
+            default: 'false'
+          in: query
+          name: include-suspended
+          description: アカウントがアクティブでないユーザーを含めるかどうか
+  '/users/{userId}':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザー詳細情報の取得
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+        '404':
+          description: Not Found
+      operationId: getUser
+      description: ユーザー詳細情報を取得します
+    patch:
+      summary: ユーザー情報の編集
+      operationId: editUser
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUserRequest'
+      description: ユーザー情報を修正します
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      description: ユーザー情報
+      x-examples: {}
+      properties:
+        id:
+          type: string
+          description: ユーザーUUID
+          format: uuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: ユーザー名
+        displayName:
+          type: string
+          description: ユーザー表示名
+          minLength: 0
+          maxLength: 32
+        state:
+          $ref: '#/components/schemas/UserAccountState'
+      required:
+        - id
+        - name
+        - displayName
+        - state
+    UserAccountState:
+      type: integer
+      title: UserAccountState
+      description: |-
+        ユーザーアカウント状態
+        0: 停止
+        1: 有効
+        2: 一時停止
+      enum:
+        - 0
+        - 1
+        - 2
+      x-enum-varnames:
+        - deactivated
+        - active
+        - suspended
+      format: int32
+    UserDetail:
+      title: UserDetail
+      type: object
+      description: ユーザー詳細情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ユーザーUUID
+        state:
+          $ref: '#/components/schemas/UserAccountState'
+        displayName:
+          type: string
+          description: ユーザー表示名
+          minLength: 0
+          maxLength: 32
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: ユーザー名
+        bio:
+          type: string
+          description: 自己紹介(biography)
+          maxLength: 1000
+        realName:
+          type: string
+          description: ユーザー本名
+      required:
+        - id
+        - state
+        - displayName
+        - name
+        - bio
+    EditUserRequest:
+      title: EditUserRequest
+      type: object
+      properties:
+        bio:
+          type: string
+          description: 自己紹介(biography)
+        check:
+          type: boolean
+          description: 本名を公開するかどうか
+  parameters:
+    userIdInPath:
+      name: userId
+      in: path
+      required: true
+      description: ユーザーUUID
+      schema:
+        type: string
+        format: uuid
