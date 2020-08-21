@@ -60,7 +60,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserRequest'
+              $ref: '#/components/schemas/EditUserRequest'
       description: ユーザー情報を修正します
 components:
   schemas:
@@ -144,8 +144,12 @@ components:
       title: EditUserRequest
       type: object
       properties:
-        id:
+        bio:
           type: string
+          description: 自己紹介(biography)
+        check:
+          type: boolean
+          description: 本名を公開するかどうか
   parameters:
     userIdInPath:
       name: userId
