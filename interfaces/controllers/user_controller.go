@@ -70,7 +70,7 @@ func (controller *UserController) Save(c Context) (err error) {
 func (controller *UserController) Delete(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	user := domain.User{
-		ID: id,
+		ID: uint(id),
 	}
 	err = controller.Interactor.DeleteById(user)
 	if err != nil {
