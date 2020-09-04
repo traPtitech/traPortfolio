@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  backend:
+    build: ./
+    restart: always
+    entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
+    command: ./traPortfolio
+    expose:
+      - "80"
+      - "6060"
+    ports:
+      - "1323:1323"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mariadb:10.0.19
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: portfolio
+    # conohaのDBのデフォルトCharsetはutf8
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+    expose:
+      - "3306"
+    ports:
+      - "3006:3306"
+
+  adminer:
+    image: adminer:4.7.5
+    restart: always
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+      ADMINER_DESIGN: nette
+    expose:
+      - "8080"
+    ports:
+      - "3001:8080"
