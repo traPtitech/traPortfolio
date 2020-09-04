@@ -3,7 +3,7 @@ package input
 import "github.com/traPtitech/traPortfolio/domain"
 
 type GetUser struct {
-	Id int
+	ID int
 }
 
 type AddUser struct {
@@ -15,5 +15,5 @@ type UpdateUser struct {
 }
 
 type DeleteUser struct {
-	Id int
+	ID int
 }

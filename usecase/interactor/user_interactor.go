@@ -14,8 +14,8 @@ func NewUserInteractor(repo repository.UserRepository) UserInteractor {
 	return UserInteractor{UserRepository: repo}
 }
 
-func (interactor *UserInteractor) UserById(ipt input.GetUser) (user domain.User, err error) {
-	user, err = interactor.UserRepository.FindById(ipt.Id)
+func (interactor *UserInteractor) UserByID(ipt input.GetUser) (user domain.User, err error) {
+	user, err = interactor.UserRepository.FindByID(ipt.ID)
 	return
 }
 
@@ -34,7 +34,7 @@ func (interactor *UserInteractor) Update(ipt input.UpdateUser) (user domain.User
 	return
 }
 
-func (interactor *UserInteractor) DeleteById(ipt input.DeleteUser) (err error) {
-	err = interactor.UserRepository.DeleteById(ipt.Id)
+func (interactor *UserInteractor) DeleteByID(ipt input.DeleteUser) (err error) {
+	err = interactor.UserRepository.DeleteByID(ipt.ID)
 	return
 }

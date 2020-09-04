@@ -22,61 +22,57 @@ func NewUserController(it interactor.UserInteractor) *UserController {
 func (controller *UserController) Show(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	ipt := input.GetUser{
-		Id: id,
+		ID: id,
 	}
-	user, err := controller.Interactor.UserById(ipt)
+	user, err := controller.Interactor.UserByID(ipt)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, NewError(err))
-		return
+		return c.JSON(http.StatusInternalServerError, NewError(err))
 	}
-	c.JSON(http.StatusOK, user)
-	return
+	return c.JSON(http.StatusOK, user)
 }
 
 func (controller *UserController) Index(c Context) (err error) {
 	users, err := controller.Interactor.Users()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, NewError(err))
-		return
+		return c.JSON(http.StatusInternalServerError, NewError(err))
 	}
-	c.JSON(http.StatusOK, users)
-	return
+	return c.JSON(http.StatusOK, users)
 }
 
 func (controller *UserController) Create(c Context) (err error) {
 	u := domain.User{}
-	c.Bind(&u)
+	err = c.Bind(&u)
+	if err != nil {
+		return
+	}
 	ipt := input.AddUser{User: u}
 	user, err := controller.Interactor.Add(ipt)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, NewError(err))
-		return
+		return c.JSON(http.StatusInternalServerError, NewError(err))
 	}
-	c.JSON(http.StatusCreated, user)
-	return
+	return c.JSON(http.StatusCreated, user)
 }
 
 func (controller *UserController) Save(c Context) (err error) {
 	u := domain.User{}
-	c.Bind(&u)
+	err = c.Bind(&u)
+	if err != nil {
+		return
+	}
 	ipt := input.UpdateUser{User: u}
 	user, err := controller.Interactor.Update(ipt)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, NewError(err))
-		return
+		return c.JSON(http.StatusInternalServerError, NewError(err))
 	}
-	c.JSON(http.StatusCreated, user)
-	return
+	return c.JSON(http.StatusCreated, user)
 }
 
 func (controller *UserController) Delete(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	ipt := input.DeleteUser{Id: id}
-	err = controller.Interactor.DeleteById(ipt)
+	ipt := input.DeleteUser{ID: id}
+	err = controller.Interactor.DeleteByID(ipt)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, NewError(err))
-		return
+		return c.JSON(http.StatusInternalServerError, NewError(err))
 	}
-	c.NoContent(http.StatusNoContent)
-	return
+	return c.NoContent(http.StatusNoContent)
 }

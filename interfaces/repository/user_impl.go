@@ -6,14 +6,14 @@ import (
 )
 
 type UserRepository struct {
-	database.SqlHandler
+	database.SQLHandler
 }
 
-func NewUserRepository(sql database.SqlHandler) UserRepository {
-	return UserRepository{SqlHandler: sql}
+func NewUserRepository(sql database.SQLHandler) UserRepository {
+	return UserRepository{SQLHandler: sql}
 }
 
-func (repo *UserRepository) FindById(id int) (user domain.User, err error) {
+func (repo *UserRepository) FindByID(id int) (user domain.User, err error) {
 	if err = repo.Find(&user, id).Error(); err != nil {
 		return
 	}
@@ -43,7 +43,7 @@ func (repo *UserRepository) Update(u domain.User) (user domain.User, err error) 
 	return
 }
 
-func (repo *UserRepository) DeleteById(id int) (err error) {
+func (repo *UserRepository) DeleteByID(id int) (err error) {
 	user := domain.User{}
 	if err = repo.Find(&user, id).Error(); err != nil {
 		return

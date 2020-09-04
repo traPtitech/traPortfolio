@@ -10,27 +10,19 @@ import (
 	"github.com/traPtitech/traPortfolio/usecase/repository"
 )
 
-var repositorySet = wire.NewSet(
+var pingSet = wire.NewSet(
 	impl.NewPingRepository,
-)
-
-var interactorSet = wire.NewSet(
 	interactor.NewPingInteractor,
-)
-
-var controllerSet = wire.NewSet(
 	controllers.NewPingController,
+	wire.Bind(new(repository.PingRepository), new(*impl.PingRepository)),
 )
 
 var apiSet = wire.NewSet(controllers.NewAPI)
 
 func InjectAPIServer() controllers.API {
 	wire.Build(
-		repositorySet,
-		interactorSet,
-		controllerSet,
+		pingSet,
 		apiSet,
-		wire.Bind(new(repository.PingRepository), new(*impl.PingRepository)),
 	)
 	return controllers.API{}
 }

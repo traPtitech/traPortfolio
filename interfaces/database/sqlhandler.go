@@ -1,13 +1,13 @@
 package database
 
-type SqlHandler interface {
-	Exec(string, ...interface{}) SqlHandler
-	Find(interface{}, ...interface{}) SqlHandler
-	First(interface{}, ...interface{}) SqlHandler
-	Raw(string, ...interface{}) SqlHandler
-	Create(interface{}) SqlHandler
-	Save(interface{}) SqlHandler
-	Delete(interface{}) SqlHandler
-	Where(interface{}, ...interface{}) SqlHandler
+type SQLHandler interface {
+	Exec(string, ...interface{}) SQLHandler
+	Find(interface{}, ...interface{}) SQLHandler
+	First(interface{}, ...interface{}) SQLHandler
+	Raw(string, ...interface{}) SQLHandler
+	Create(interface{}) SQLHandler
+	Save(interface{}) SQLHandler
+	Delete(interface{}) SQLHandler
+	Where(interface{}, ...interface{}) SQLHandler
 	Error() error
 }

@@ -11,11 +11,11 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 )
 
-type SqlHandler struct {
+type SQLHandler struct {
 	Conn *gorm.DB
 }
 
-func NewSqlHandler() database.SqlHandler {
+func NewSQLHandler() (database.SQLHandler, error) {
 	user := os.Getenv("DB_USER")
 	if user == "" {
 		user = "root"
@@ -44,6 +44,7 @@ func NewSqlHandler() database.SqlHandler {
 	db, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname))
 	if err != nil {
 		// return fmt.Errorf("failed to connect database: %v", err)s
+		return nil, err
 	}
 
 	db = db.
@@ -55,59 +56,59 @@ func NewSqlHandler() database.SqlHandler {
 	db.DB().SetMaxOpenConns(16)
 	db.BlockGlobalUpdate(true)
 
-	sqlHandler := new(SqlHandler)
+	sqlHandler := new(SQLHandler)
 	sqlHandler.Conn = db
-	return sqlHandler
+	return sqlHandler, nil
 }
 
-func (handler *SqlHandler) Find(out interface{}, where ...interface{}) database.SqlHandler {
+func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
 	res := handler.Conn.Find(out, where...)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Exec(sql string, values ...interface{}) database.SqlHandler {
+func (handler *SQLHandler) Exec(sql string, values ...interface{}) database.SQLHandler {
 	res := handler.Conn.Exec(sql, values...)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) First(out interface{}, where ...interface{}) database.SqlHandler {
+func (handler *SQLHandler) First(out interface{}, where ...interface{}) database.SQLHandler {
 	res := handler.Conn.First(out, where...)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Raw(sql string, values ...interface{}) database.SqlHandler {
+func (handler *SQLHandler) Raw(sql string, values ...interface{}) database.SQLHandler {
 	res := handler.Conn.Raw(sql, values...)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Create(value interface{}) database.SqlHandler {
+func (handler *SQLHandler) Create(value interface{}) database.SQLHandler {
 	res := handler.Conn.Create(value)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Save(value interface{}) database.SqlHandler {
+func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
 	res := handler.Conn.Save(value)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Delete(value interface{}) database.SqlHandler {
+func (handler *SQLHandler) Delete(value interface{}) database.SQLHandler {
 	res := handler.Conn.Delete(value)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Where(query interface{}, args ...interface{}) database.SqlHandler {
+func (handler *SQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
 	res := handler.Conn.Where(query, args...)
 	handler.Conn = res
 	return handler
 }
 
-func (handler *SqlHandler) Error() error {
+func (handler *SQLHandler) Error() error {
 	return handler.Conn.Error
 }

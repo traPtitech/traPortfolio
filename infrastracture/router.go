@@ -10,7 +10,7 @@ func Init() {
 	// Echo instance
 	e := echo.New()
 
-	// userController := controllers.NewUserController(NewSqlHandler())
+	// userController := controllers.NewUserController(NewSQLHandler())
 	// pingRepository := repository.NewPingRepository()
 	// pingInteractor := interactor.NewPingInteractor(pingRepository)
 	// pingController := controllers.NewPingController(pingInteractor)

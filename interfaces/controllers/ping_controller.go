@@ -15,7 +15,9 @@ func NewPingController(it interactor.PingInteractor) *PingController {
 }
 
 func (controller *PingController) Ping(c Context) (err error) {
-	controller.Interactor.Ping()
-	c.String(200, "pong")
-	return
+	err = controller.Interactor.Ping()
+	if err != nil {
+		return err
+	}
+	return c.String(200, "pong")
 }

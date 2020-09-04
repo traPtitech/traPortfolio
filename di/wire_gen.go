@@ -10,6 +10,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/controllers"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecase/interactor"
+	repository2 "github.com/traPtitech/traPortfolio/usecase/repository"
 )
 
 // Injectors from wire.go:
@@ -24,10 +25,6 @@ func InjectAPIServer() controllers.API {
 
 // wire.go:
 
-var repositorySet = wire.NewSet(repository.NewPingRepository)
-
-var interactorSet = wire.NewSet(interactor.NewPingInteractor)
-
-var controllerSet = wire.NewSet(controllers.NewPingController)
+var pingSet = wire.NewSet(repository.NewPingRepository, interactor.NewPingInteractor, controllers.NewPingController, wire.Bind(new(repository2.PingRepository), new(*repository.PingRepository)))
 
 var apiSet = wire.NewSet(controllers.NewAPI)
