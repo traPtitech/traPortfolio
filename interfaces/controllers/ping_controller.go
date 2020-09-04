@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecase/interactor"
 )
 
@@ -9,11 +8,9 @@ type PingController struct {
 	Interactor interactor.PingInteractor
 }
 
-func NewPingController() *PingController {
+func NewPingController(it interactor.PingInteractor) *PingController {
 	return &PingController{
-		Interactor: interactor.PingInteractor{
-			PingRepository: &repository.PingRepository{},
-		},
+		Interactor: it,
 	}
 }
 

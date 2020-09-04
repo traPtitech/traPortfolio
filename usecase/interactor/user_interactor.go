@@ -10,6 +10,10 @@ type UserInteractor struct {
 	UserRepository repository.UserRepository
 }
 
+func NewUserInteractor(repo repository.UserRepository) UserInteractor {
+	return UserInteractor{UserRepository: repo}
+}
+
 func (interactor *UserInteractor) UserById(ipt input.GetUser) (user domain.User, err error) {
 	user, err = interactor.UserRepository.FindById(ipt.Id)
 	return

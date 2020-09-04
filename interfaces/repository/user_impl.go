@@ -9,6 +9,10 @@ type UserRepository struct {
 	database.SqlHandler
 }
 
+func NewUserRepository(sql database.SqlHandler) UserRepository {
+	return UserRepository{SqlHandler: sql}
+}
+
 func (repo *UserRepository) FindById(id int) (user domain.User, err error) {
 	if err = repo.Find(&user, id).Error(); err != nil {
 		return

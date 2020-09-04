@@ -5,8 +5,6 @@ import (
 	"strconv"
 
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecase/input"
 	"github.com/traPtitech/traPortfolio/usecase/interactor"
 )
@@ -15,13 +13,9 @@ type UserController struct {
 	Interactor interactor.UserInteractor
 }
 
-func NewUserController(sqlHandler database.SqlHandler) *UserController {
+func NewUserController(it interactor.UserInteractor) *UserController {
 	return &UserController{
-		Interactor: interactor.UserInteractor{
-			UserRepository: &repository.UserRepository{
-				SqlHandler: sqlHandler,
-			},
-		},
+		Interactor: it,
 	}
 }
 
