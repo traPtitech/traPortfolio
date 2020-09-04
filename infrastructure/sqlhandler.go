@@ -28,7 +28,7 @@ func NewSQLHandler() (database.SQLHandler, error) {
 
 	host := os.Getenv("DB_HOST")
 	if host == "" {
-		host = "localhost"
+		host = "mysql"
 	}
 
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))

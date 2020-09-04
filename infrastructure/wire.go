@@ -28,12 +28,12 @@ var sqlSet = wire.NewSet(NewSQLHandler)
 
 var apiSet = wire.NewSet(controllers.NewAPI)
 
-func InjectAPIServer() controllers.API {
+func InjectAPIServer() (controllers.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,
 		sqlSet,
 		apiSet,
 	)
-	return controllers.API{}
+	return controllers.API{}, nil
 }

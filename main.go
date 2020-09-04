@@ -1,7 +1,7 @@
 package main
 
 import (
-	infrastructure "github.com/traPtitech/traPortfolio/infrastracture"
+	infrastructure "github.com/traPtitech/traPortfolio/infrastructure"
 )
 
 func main() {

@@ -13,18 +13,33 @@ import (
 	repository2 "github.com/traPtitech/traPortfolio/usecase/repository"
 )
 
+import (
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+)
+
 // Injectors from wire.go:
 
-func InjectAPIServer() controllers.API {
+func InjectAPIServer() (controllers.API, error) {
 	pingRepository := repository.NewPingRepository()
 	pingInteractor := interactor.NewPingInteractor(pingRepository)
 	pingController := controllers.NewPingController(pingInteractor)
-	api := controllers.NewAPI(pingController)
-	return api
+	sqlHandler, err := NewSQLHandler()
+	if err != nil {
+		return controllers.API{}, err
+	}
+	userRepository := repository.NewUserRepository(sqlHandler)
+	userInteractor := interactor.NewUserInteractor(userRepository)
+	userController := controllers.NewUserController(userInteractor)
+	api := controllers.NewAPI(pingController, userController)
+	return api, nil
 }
 
 // wire.go:
 
 var pingSet = wire.NewSet(repository.NewPingRepository, interactor.NewPingInteractor, controllers.NewPingController, wire.Bind(new(repository2.PingRepository), new(*repository.PingRepository)))
+
+var userSet = wire.NewSet(repository.NewUserRepository, interactor.NewUserInteractor, controllers.NewUserController, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
+
+var sqlSet = wire.NewSet(NewSQLHandler)
 
 var apiSet = wire.NewSet(controllers.NewAPI)
