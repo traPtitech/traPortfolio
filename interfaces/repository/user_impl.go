@@ -1,11 +1,12 @@
-package database
+package repository
 
 import (
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
 )
 
 type UserRepository struct {
-	SqlHandler
+	database.SqlHandler
 }
 
 func (repo *UserRepository) FindById(id int) (user domain.User, err error) {
@@ -38,7 +39,11 @@ func (repo *UserRepository) Update(u domain.User) (user domain.User, err error) 
 	return
 }
 
-func (repo *UserRepository) DeleteById(user domain.User) (err error) {
+func (repo *UserRepository) DeleteById(id int) (err error) {
+	user := domain.User{}
+	if err = repo.Find(&user, id).Error(); err != nil {
+		return
+	}
 	if err = repo.Delete(&user).Error(); err != nil {
 		return
 	}

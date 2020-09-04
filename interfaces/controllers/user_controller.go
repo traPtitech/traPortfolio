@@ -1,21 +1,24 @@
 package controllers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/usecase"
+	"github.com/traPtitech/traPortfolio/interfaces/repository"
+	"github.com/traPtitech/traPortfolio/usecase/input"
+	"github.com/traPtitech/traPortfolio/usecase/interactor"
 )
 
 type UserController struct {
-	Interactor usecase.UserInteractor
+	Interactor interactor.UserInteractor
 }
 
 func NewUserController(sqlHandler database.SqlHandler) *UserController {
 	return &UserController{
-		Interactor: usecase.UserInteractor{
-			UserRepository: &database.UserRepository{
+		Interactor: interactor.UserInteractor{
+			UserRepository: &repository.UserRepository{
 				SqlHandler: sqlHandler,
 			},
 		},
@@ -24,59 +27,62 @@ func NewUserController(sqlHandler database.SqlHandler) *UserController {
 
 func (controller *UserController) Show(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	user, err := controller.Interactor.UserById(id)
+	ipt := input.GetUser{
+		Id: id,
+	}
+	user, err := controller.Interactor.UserById(ipt)
 	if err != nil {
-		c.JSON(500, NewError(err))
+		c.JSON(http.StatusInternalServerError, NewError(err))
 		return
 	}
-	c.JSON(200, user)
+	c.JSON(http.StatusOK, user)
 	return
 }
 
 func (controller *UserController) Index(c Context) (err error) {
 	users, err := controller.Interactor.Users()
 	if err != nil {
-		c.JSON(500, NewError(err))
+		c.JSON(http.StatusInternalServerError, NewError(err))
 		return
 	}
-	c.JSON(200, users)
+	c.JSON(http.StatusOK, users)
 	return
 }
 
 func (controller *UserController) Create(c Context) (err error) {
 	u := domain.User{}
 	c.Bind(&u)
-	user, err := controller.Interactor.Add(u)
+	ipt := input.AddUser{User: u}
+	user, err := controller.Interactor.Add(ipt)
 	if err != nil {
-		c.JSON(500, NewError(err))
+		c.JSON(http.StatusInternalServerError, NewError(err))
 		return
 	}
-	c.JSON(201, user)
+	c.JSON(http.StatusCreated, user)
 	return
 }
 
 func (controller *UserController) Save(c Context) (err error) {
 	u := domain.User{}
 	c.Bind(&u)
-	user, err := controller.Interactor.Update(u)
+	ipt := input.UpdateUser{User: u}
+	user, err := controller.Interactor.Update(ipt)
 	if err != nil {
-		c.JSON(500, NewError(err))
+		c.JSON(http.StatusInternalServerError, NewError(err))
 		return
 	}
-	c.JSON(201, user)
+	c.JSON(http.StatusCreated, user)
 	return
 }
 
 func (controller *UserController) Delete(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	user := domain.User{
-		ID: uint(id),
-	}
-	err = controller.Interactor.DeleteById(user)
+	ipt := input.DeleteUser{Id: id}
+	err = controller.Interactor.DeleteById(ipt)
 	if err != nil {
-		c.JSON(500, NewError(err))
+		c.JSON(http.StatusInternalServerError, NewError(err))
 		return
 	}
-	c.JSON(200, user)
+	c.NoContent(http.StatusNoContent)
 	return
 }

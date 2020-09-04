@@ -5,4 +5,5 @@ type Context interface {
 	Bind(interface{}) error
 	JSON(int, interface{}) error
 	String(code int, s string) error
+	NoContent(code int) error
 }

@@ -1,4 +1,4 @@
-package usecase
+package repository
 
 import "github.com/traPtitech/traPortfolio/domain"
 
@@ -7,5 +7,5 @@ type UserRepository interface {
 	FindAll() (domain.User, error)
 	Store(domain.User) (domain.User, error)
 	Update(domain.User) (domain.User, error)
-	DeleteById(domain.User) error
+	DeleteById(id int) error
 }

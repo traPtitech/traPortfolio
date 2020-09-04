@@ -1,4 +1,4 @@
-package usecase
+package repository
 
 type PingRepository interface {
 	Ping() error
