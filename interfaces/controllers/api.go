@@ -5,14 +5,15 @@ type API struct {
 	User *UserController
 }
 
-// func NewAPI(ping *PingController, user *UserController) API {
-// 	return API{
-// 		Ping: ping,
-// 		User: user,
-// 	}
-// }
-func NewAPI(ping *PingController) API {
+func NewAPI(ping *PingController, user *UserController) API {
 	return API{
 		Ping: ping,
+		User: user,
 	}
 }
+
+// func NewAPI(ping *PingController) API {
+// 	return API{
+// 		Ping: ping,
+// 	}
+// }

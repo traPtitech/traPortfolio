@@ -9,8 +9,8 @@ type UserRepository struct {
 	database.SQLHandler
 }
 
-func NewUserRepository(sql database.SQLHandler) UserRepository {
-	return UserRepository{SQLHandler: sql}
+func NewUserRepository(sql database.SQLHandler) *UserRepository {
+	return &UserRepository{SQLHandler: sql}
 }
 
 func (repo *UserRepository) FindByID(id int) (user domain.User, err error) {

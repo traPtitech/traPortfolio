@@ -3,7 +3,7 @@
 //go:generate wire
 //+build !wireinject
 
-package di
+package infrastructure
 
 import (
 	"github.com/google/wire"

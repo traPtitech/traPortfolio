@@ -61,6 +61,15 @@ func NewSQLHandler() (database.SQLHandler, error) {
 	return sqlHandler, nil
 }
 
+func (handler *SQLHandler) Connect(dialect string, args ...interface{}) error {
+	db, err := gorm.Open(dialect, args...)
+	if err != nil {
+		return err
+	}
+	handler.Conn = db
+	return nil
+}
+
 func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
 	res := handler.Conn.Find(out, where...)
 	handler.Conn = res

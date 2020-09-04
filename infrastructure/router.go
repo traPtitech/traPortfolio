@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/traPtitech/traPortfolio/di"
 )
 
 func Init() {
@@ -14,7 +13,7 @@ func Init() {
 	// pingRepository := repository.NewPingRepository()
 	// pingInteractor := interactor.NewPingInteractor(pingRepository)
 	// pingController := controllers.NewPingController(pingInteractor)
-	api := di.InjectAPIServer()
+	api := InjectAPIServer()
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
