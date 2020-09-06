@@ -19,7 +19,7 @@ func (interactor *UserInteractor) UserByID(ipt input.GetUser) (user domain.User,
 	return
 }
 
-func (interactor *UserInteractor) Users() (users domain.User, err error) {
+func (interactor *UserInteractor) Users() (users []domain.User, err error) {
 	users, err = interactor.UserRepository.FindAll()
 	return
 }

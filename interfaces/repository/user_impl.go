@@ -20,7 +20,7 @@ func (repo *UserRepository) FindByID(id int) (user domain.User, err error) {
 	return
 }
 
-func (repo *UserRepository) FindAll() (users domain.User, err error) {
+func (repo *UserRepository) FindAll() (users []domain.User, err error) {
 	if err = repo.Find(&users).Error(); err != nil {
 		return
 	}
@@ -36,10 +36,9 @@ func (repo *UserRepository) Store(u domain.User) (user domain.User, err error) {
 }
 
 func (repo *UserRepository) Update(u domain.User) (user domain.User, err error) {
-	if err = repo.Save(&u).Error(); err != nil {
+	if err = repo.Save(&user).Error(); err != nil {
 		return
 	}
-	user = u
 	return
 }
 

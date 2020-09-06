@@ -2,9 +2,9 @@ package domain
 
 type User struct {
 	ID          uint
-	name        string
-	displayName string
-	state       UserAccountStatus
+	Name        string
+	DisplayName string
+	Status      UserAccountStatus
 }
 
 type UserAccountStatus int
