@@ -43,7 +43,7 @@ func (controller *UserController) Create(c Context) (err error) {
 	u := domain.User{}
 	err = c.Bind(&u)
 	if err != nil {
-		return
+		return c.JSON(http.StatusInternalServerError, NewError(err))
 	}
 	ipt := input.AddUser{User: u}
 	user, err := controller.Interactor.Add(ipt)
