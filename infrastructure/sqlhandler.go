@@ -8,6 +8,7 @@ import (
 	gorm "github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 )
 
@@ -55,6 +56,8 @@ func NewSQLHandler() (database.SQLHandler, error) {
 	db.DB().SetMaxIdleConns(2)
 	db.DB().SetMaxOpenConns(16)
 	db.BlockGlobalUpdate(true)
+
+	db.AutoMigrate(&domain.User{})
 
 	sqlHandler := new(SQLHandler)
 	sqlHandler.Conn = db
