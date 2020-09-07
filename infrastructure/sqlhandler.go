@@ -8,7 +8,7 @@ import (
 	gorm "github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 )
 
@@ -56,12 +56,24 @@ func NewSQLHandler() (database.SQLHandler, error) {
 	db.DB().SetMaxIdleConns(2)
 	db.DB().SetMaxOpenConns(16)
 	db.BlockGlobalUpdate(true)
-
-	db.AutoMigrate(&domain.User{})
+	if err := initDB(db); err != nil {
+		return nil, err
+	}
 
 	sqlHandler := new(SQLHandler)
 	sqlHandler.Conn = db
 	return sqlHandler, nil
+}
+
+// initDB データベースのスキーマを更新
+func initDB(db *gorm.DB) error {
+	// gormのエラーの上書き
+	gorm.ErrRecordNotFound = ErrNotFound
+	// db.LogMode(true)
+	if err := migration.Migrate(db, migration.AllTables()); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (handler *SQLHandler) Connect(dialect string, args ...interface{}) error {
