@@ -3,7 +3,7 @@ WORKDIR /go/src/github.com/traPtitech/traPortfolio
 COPY ./go.* ./
 RUN go mod download
 COPY . .
-RUN go build -o /traPortfolio main.go
+RUN go build -o /traPortfolio .
 
 FROM alpine:3.12.0
 WORKDIR /app

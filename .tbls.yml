@@ -20,38 +20,38 @@ comments:
       id: ユーザーUUID
       description: 自己紹介文
       check: 氏名を公開するかどうかの可否
-  - table: accounts
-    tableComment: Twitterなどのアカウントテーブル
-    columnComments:
-      id: アカウントUUID
-      type: アカウントのハードコードID
-      name: アカウント名
-      url: アカウントのURL
-      user_id: ユーザーUUID
-      check: 公開可能かどうか
-  - table: projects
-    tableComment: プロジェクトテーブル
-    columnComments:
-      id: プロジェクトUUID
-      name: プロジェクト名
-      description: プロジェクト説明
-      start: プロジェクト開始期間
-      end: プロジェクト終了期間
-  - table: achievements
-    tableComment: 実績情報
-    columnComments:
-      id: 実績UUID
-      name: 実績名
-      description: 実績の説明
-  - table: projects_members
-    tableComments: プロジェクト所属者テーブル
-    columnComments:
-      project_id: プロジェクトUUID
-      user_id: ユーザーUUID
-      start: プロジェクト所属開始時期
-      end: プロジェクト所属終了時期
-  - table: achievements_members
-    tableComments: 実績メンバーテーブル
-    columnComments:
-      achievement_id: 実績UUID
-      user_id: ユーザーUUID
+  # - table: accounts
+  #   tableComment: Twitterなどのアカウントテーブル
+  #   columnComments:
+  #     id: アカウントUUID
+  #     type: アカウントのハードコードID
+  #     name: アカウント名
+  #     url: アカウントのURL
+  #     user_id: ユーザーUUID
+  #     check: 公開可能かどうか
+  # - table: projects
+  #   tableComment: プロジェクトテーブル
+  #   columnComments:
+  #     id: プロジェクトUUID
+  #     name: プロジェクト名
+  #     description: プロジェクト説明
+  #     start: プロジェクト開始期間
+  #     end: プロジェクト終了期間
+  # - table: achievements
+  #   tableComment: 実績情報
+  #   columnComments:
+  #     id: 実績UUID
+  #     name: 実績名
+  #     description: 実績の説明
+  # - table: projects_members
+  #   tableComments: プロジェクト所属者テーブル
+  #   columnComments:
+  #     project_id: プロジェクトUUID
+  #     user_id: ユーザーUUID
+  #     start: プロジェクト所属開始時期
+  #     end: プロジェクト所属終了時期
+  # - table: achievements_members
+  #   tableComments: 実績メンバーテーブル
+  #   columnComments:
+  #     achievement_id: 実績UUID
+  #     user_id: ユーザーUUID
