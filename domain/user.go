@@ -2,9 +2,6 @@ package domain
 
 type User struct {
 	ID          uint
-	Name        string
-	DisplayName string
-	Status      UserAccountStatus
+	Description string
+	Check       bool
 }
-
-type UserAccountStatus int
