@@ -11,7 +11,12 @@ up-test-db:
 
 .PHONY: db-gen-docs
 db-gen-docs:
-	@./dev/bin/db-gen-docs.sh $(TEST_DB_PORT) $(TBLS_VERSION)
+	# @./dev/bin/db-gen-docs.sh $(TEST_DB_PORT) $(TBLS_VERSION)
+	@if [ -d "./docs/dbschema" ]; then \
+		rm -r ./docs/dbschema; \
+	fi
+	DB_HOST=localhost go run main.go -migrate true
+	docker run --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
 
 .PHONY: rm-test-db
 rm-test-db:
