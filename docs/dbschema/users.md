@@ -2,15 +2,16 @@
 
 ## Description
 
+ユーザーテーブル
+
 <details>
 <summary><strong>Table Definition</strong></summary>
 
 ```sql
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `display_name` varchar(255) DEFAULT NULL,
-  `status` int(11) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `check` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
@@ -21,10 +22,9 @@ CREATE TABLE `users` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | int(10) unsigned |  | false |  |  |  |
-| name | varchar(255) |  | true |  |  |  |
-| display_name | varchar(255) |  | true |  |  |  |
-| status | int(11) |  | true |  |  |  |
+| id | int(10) unsigned |  | false |  |  | ユーザーUUID |
+| description | varchar(255) |  | true |  |  | 自己紹介文 |
+| check | tinyint(1) |  | true |  |  | 氏名を公開するかどうかの可否 |
 
 ## Constraints
 

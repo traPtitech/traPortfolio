@@ -5,7 +5,7 @@
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
 | [migrations](migrations.md) | 1 |  | BASE TABLE |
-| [users](users.md) | 4 |  | BASE TABLE |
+| [users](users.md) | 3 | ユーザーテーブル | BASE TABLE |
 
 ## Relations
 
