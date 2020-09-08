@@ -2,16 +2,16 @@ package interactor
 
 import (
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/usecase/input"
-	"github.com/traPtitech/traPortfolio/usecase/repository"
+	"github.com/traPtitech/traPortfolio/usecases/input"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type UserInteractor struct {
 	UserRepository repository.UserRepository
 }
 
-func NewUserInteractor(repo repository.UserRepository) UserInteractor {
-	return UserInteractor{UserRepository: repo}
+func NewUserInteractor(repo repository.UserRepository) *UserInteractor {
+	return &UserInteractor{UserRepository: repo}
 }
 
 func (interactor *UserInteractor) UserByID(ipt input.GetUser) (user domain.User, err error) {

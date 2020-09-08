@@ -9,8 +9,9 @@ import (
 	"github.com/google/wire"
 	"github.com/traPtitech/traPortfolio/interfaces/controllers"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
-	"github.com/traPtitech/traPortfolio/usecase/interactor"
-	repository2 "github.com/traPtitech/traPortfolio/usecase/repository"
+	"github.com/traPtitech/traPortfolio/usecases/interactor"
+	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
 
 import (
@@ -20,8 +21,7 @@ import (
 // Injectors from wire.go:
 
 func InjectAPIServer() (controllers.API, error) {
-	pingRepository := repository.NewPingRepository()
-	pingInteractor := interactor.NewPingInteractor(pingRepository)
+	pingInteractor := interactor.NewPingInteractor()
 	pingController := controllers.NewPingController(pingInteractor)
 	sqlHandler, err := NewSQLHandler()
 	if err != nil {
@@ -36,9 +36,9 @@ func InjectAPIServer() (controllers.API, error) {
 
 // wire.go:
 
-var pingSet = wire.NewSet(repository.NewPingRepository, interactor.NewPingInteractor, controllers.NewPingController, wire.Bind(new(repository2.PingRepository), new(*repository.PingRepository)))
+var pingSet = wire.NewSet(interactor.NewPingInteractor, controllers.NewPingController, wire.Bind(new(usecase.PingUsecase), new(*interactor.PingInteractor)))
 
-var userSet = wire.NewSet(repository.NewUserRepository, interactor.NewUserInteractor, controllers.NewUserController, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
+var userSet = wire.NewSet(repository.NewUserRepository, interactor.NewUserInteractor, controllers.NewUserController, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*interactor.UserInteractor)))
 
 var sqlSet = wire.NewSet(NewSQLHandler)
 

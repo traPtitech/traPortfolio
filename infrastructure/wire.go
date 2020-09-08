@@ -6,15 +6,15 @@ import (
 	"github.com/google/wire"
 	"github.com/traPtitech/traPortfolio/interfaces/controllers"
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
-	"github.com/traPtitech/traPortfolio/usecase/interactor"
-	"github.com/traPtitech/traPortfolio/usecase/repository"
+	"github.com/traPtitech/traPortfolio/usecases/interactor"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
 
 var pingSet = wire.NewSet(
-	impl.NewPingRepository,
 	interactor.NewPingInteractor,
 	controllers.NewPingController,
-	wire.Bind(new(repository.PingRepository), new(*impl.PingRepository)),
+	wire.Bind(new(usecase.PingUsecase), new(*interactor.PingInteractor)),
 )
 
 var userSet = wire.NewSet(
@@ -22,6 +22,7 @@ var userSet = wire.NewSet(
 	interactor.NewUserInteractor,
 	controllers.NewUserController,
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
+	wire.Bind(new(usecase.UserUsecase), new(*interactor.UserInteractor)),
 )
 
 var sqlSet = wire.NewSet(NewSQLHandler)

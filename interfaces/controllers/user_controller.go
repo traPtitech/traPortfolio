@@ -5,15 +5,15 @@ import (
 	"strconv"
 
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/usecase/input"
-	"github.com/traPtitech/traPortfolio/usecase/interactor"
+	"github.com/traPtitech/traPortfolio/usecases/input"
+	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
 
 type UserController struct {
-	Interactor interactor.UserInteractor
+	Interactor usecase.UserUsecase
 }
 
-func NewUserController(it interactor.UserInteractor) *UserController {
+func NewUserController(it usecase.UserUsecase) *UserController {
 	return &UserController{
 		Interactor: it,
 	}
