@@ -19,12 +19,12 @@ func Init() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/users", func(c echo.Context) error { return api.User.Index(c) })
-	e.GET("/user/:id", func(c echo.Context) error { return api.User.Show(c) })
-	e.POST("/create", func(c echo.Context) error { return api.User.Create(c) })
-	e.PUT("/user/:id", func(c echo.Context) error { return api.User.Save(c) })
-	e.DELETE("/user/:id", func(c echo.Context) error { return api.User.Delete(c) })
-	e.GET("/ping", func(c echo.Context) error { return api.Ping.Ping(c) })
+	e.GET("/users", api.User.Users)
+	e.GET("/user/:id", api.User.UserByID)
+	e.POST("/create", api.User.Add)
+	e.PUT("/user/:id", api.User.Update)
+	e.DELETE("/user/:id", api.User.DeleteByID)
+	e.GET("/ping", api.Ping.Ping)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

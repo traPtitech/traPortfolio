@@ -4,37 +4,34 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
-	"github.com/traPtitech/traPortfolio/interfaces/controllers"
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
-	"github.com/traPtitech/traPortfolio/usecases/interactor"
+	"github.com/traPtitech/traPortfolio/usecases/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
 
 var pingSet = wire.NewSet(
-	interactor.NewPingInteractor,
-	controllers.NewPingController,
-	wire.Bind(new(usecase.PingUsecase), new(*interactor.PingInteractor)),
+	handler.NewPingHandler,
+	wire.Bind(new(usecase.PingUsecase), new(*handler.PingHandler)),
 )
 
 var userSet = wire.NewSet(
 	impl.NewUserRepository,
-	interactor.NewUserInteractor,
-	controllers.NewUserController,
+	handler.NewUserHandler,
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
-	wire.Bind(new(usecase.UserUsecase), new(*interactor.UserInteractor)),
+	wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)),
 )
 
 var sqlSet = wire.NewSet(NewSQLHandler)
 
-var apiSet = wire.NewSet(controllers.NewAPI)
+var apiSet = wire.NewSet(handler.NewAPI)
 
-func InjectAPIServer() (controllers.API, error) {
+func InjectAPIServer() (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,
 		sqlSet,
 		apiSet,
 	)
-	return controllers.API{}, nil
+	return handler.API{}, nil
 }

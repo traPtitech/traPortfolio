@@ -1,5 +1,7 @@
 package usecase
 
+import "github.com/labstack/echo"
+
 type PingUsecase interface {
-	Ping() error
+	Ping(e echo.Context) error
 }

@@ -13,7 +13,7 @@ func NewUserRepository(sql database.SQLHandler) *UserRepository {
 	return &UserRepository{SQLHandler: sql}
 }
 
-func (repo *UserRepository) FindByID(id int) (user domain.User, err error) {
+func (repo *UserRepository) FindByID(id int) (user *domain.User, err error) {
 	if err = repo.Find(&user, id).Error(); err != nil {
 		return
 	}
@@ -27,18 +27,22 @@ func (repo *UserRepository) FindAll() (users []domain.User, err error) {
 	return
 }
 
-func (repo *UserRepository) Store(u domain.User) (user domain.User, err error) {
-	if err = repo.Create(&u).Error(); err != nil {
+func (repo *UserRepository) Store(u *domain.User) (user *domain.User, err error) {
+	if err = repo.Create(u).Error(); err != nil {
 		return
 	}
-	user = u
-	return
+	if err = repo.Find(u).Error(); err != nil {
+		return
+	}
+	return u, nil
 }
 
-func (repo *UserRepository) Update(u domain.User) (user domain.User, err error) {
-	if err = repo.Save(&user).Error(); err != nil {
+func (repo *UserRepository) Update(u *domain.User) (user *domain.User, err error) {
+	if err = repo.Save(&u).Error(); err != nil {
 		return
 	}
+	user.ID = u.ID
+	err = repo.Find(user).Error()
 	return
 }
 

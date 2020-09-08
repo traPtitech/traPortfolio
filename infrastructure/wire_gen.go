@@ -7,9 +7,8 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
-	"github.com/traPtitech/traPortfolio/interfaces/controllers"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
-	"github.com/traPtitech/traPortfolio/usecases/interactor"
+	"github.com/traPtitech/traPortfolio/usecases/handler"
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
@@ -20,26 +19,24 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer() (controllers.API, error) {
-	pingInteractor := interactor.NewPingInteractor()
-	pingController := controllers.NewPingController(pingInteractor)
+func InjectAPIServer() (handler.API, error) {
+	pingHandler := handler.NewPingHandler()
 	sqlHandler, err := NewSQLHandler()
 	if err != nil {
-		return controllers.API{}, err
+		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler)
-	userInteractor := interactor.NewUserInteractor(userRepository)
-	userController := controllers.NewUserController(userInteractor)
-	api := controllers.NewAPI(pingController, userController)
+	userHandler := handler.NewUserHandler(userRepository)
+	api := handler.NewAPI(pingHandler, userHandler)
 	return api, nil
 }
 
 // wire.go:
 
-var pingSet = wire.NewSet(interactor.NewPingInteractor, controllers.NewPingController, wire.Bind(new(usecase.PingUsecase), new(*interactor.PingInteractor)))
+var pingSet = wire.NewSet(handler.NewPingHandler, wire.Bind(new(usecase.PingUsecase), new(*handler.PingHandler)))
 
-var userSet = wire.NewSet(repository.NewUserRepository, interactor.NewUserInteractor, controllers.NewUserController, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*interactor.UserInteractor)))
+var userSet = wire.NewSet(repository.NewUserRepository, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)))
 
 var sqlSet = wire.NewSet(NewSQLHandler)
 
-var apiSet = wire.NewSet(controllers.NewAPI)
+var apiSet = wire.NewSet(handler.NewAPI)
