@@ -23,6 +23,9 @@ func (handler *UserHandler) UserByID(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	user, err := handler.UserRepository.FindByID(id)
+	if err == repository.ErrNotFound {
+		return c.JSON(http.StatusNotFound, err)
+	}
 	if err != nil {
 		return c.JSON(http.StatusOK, user)
 	}
@@ -66,6 +69,9 @@ func (handler *UserHandler) DeleteByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	err = handler.UserRepository.DeleteByID(id)
+	if err == repository.ErrNotFound {
+		return c.JSON(http.StatusNotFound, err)
+	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

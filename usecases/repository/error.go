@@ -1,4 +1,4 @@
-package infrastructure
+package repository
 
 import (
 	"errors"
@@ -16,5 +16,3 @@ var (
 	// ErrInvalidArg argument error
 	ErrInvalidArg = errors.New("argument error")
 )
-
-// gorm.ErrRecordNotFound = ErrNotFound
