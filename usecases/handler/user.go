@@ -17,42 +17,6 @@ func NewUserHandler(repo repository.UserRepository) *UserHandler {
 	return &UserHandler{UserRepository: repo}
 }
 
-func (handler *UserHandler) UserByID(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	}
-	user, err := handler.UserRepository.FindByID(id)
-	if err == repository.ErrNotFound {
-		return c.JSON(http.StatusNotFound, err)
-	}
-	if err != nil {
-		return c.JSON(http.StatusOK, user)
-	}
-	return c.JSON(http.StatusOK, user)
-}
-
-func (handler *UserHandler) Users(c echo.Context) error {
-	users, err := handler.UserRepository.FindAll()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	}
-	return c.JSON(http.StatusOK, users)
-}
-
-func (handler *UserHandler) Add(c echo.Context) error {
-	u := domain.User{}
-	err := c.Bind(&u)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
-	_, err = handler.UserRepository.Store(&u)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	}
-	return c.NoContent(http.StatusOK)
-}
-
 func (handler *UserHandler) Update(c echo.Context) error {
 	u := domain.User{}
 	err := c.Bind(&u)
@@ -60,6 +24,9 @@ func (handler *UserHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	_, err = handler.UserRepository.Update(&u)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
 	return c.NoContent(http.StatusOK)
 }
 

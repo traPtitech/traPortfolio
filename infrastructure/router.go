@@ -19,12 +19,19 @@ func Init() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/users", api.User.Users)
-	e.GET("/user/:id", api.User.UserByID)
-	e.POST("/create", api.User.Add)
-	e.PUT("/user/:id", api.User.Update)
-	e.DELETE("/user/:id", api.User.DeleteByID)
-	e.GET("/ping", api.Ping.Ping)
+	echoAPI := e.Group("/api")
+	v1 := echoAPI.Group("/v1")
+	{
+		apiUsers := v1.Group("/users")
+		{
+			apiUsers.PUT("/:id", api.User.Update)
+			apiUsers.DELETE("/:id", api.User.DeleteByID)
+		}
+		apiPing := v1.Group("/ping")
+		{
+			apiPing.GET("", api.Ping.Ping)
+		}
+	}
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
