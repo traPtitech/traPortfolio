@@ -1,0 +1,9 @@
+.git
+.gitignore
+.gitmodules
+.dockerignore
+.DS_Store
+.tbls.yaml
+.golangci.yml
+Makefile
+README.md
