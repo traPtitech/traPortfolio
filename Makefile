@@ -18,6 +18,11 @@ db-gen-docs:
 	DB_HOST=localhost go run main.go -migrate true
 	docker run --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
 
+.PHONY: db-lint
+db-lint:
+	DB_HOST=localhost go run main.go -migrate true
+	docker run --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
+
 .PHONY: rm-test-db
 rm-test-db:
 	@./dev/bin/down-test-db.sh
