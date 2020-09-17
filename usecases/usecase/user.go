@@ -6,5 +6,4 @@ import (
 
 type UserUsecase interface {
 	Update(c echo.Context) (err error)
-	DeleteByID(c echo.Context) (err error)
 }

@@ -25,7 +25,6 @@ func Init() {
 		apiUsers := v1.Group("/users")
 		{
 			apiUsers.PUT("/:id", api.User.Update)
-			apiUsers.DELETE("/:id", api.User.DeleteByID)
 		}
 		apiPing := v1.Group("/ping")
 		{
