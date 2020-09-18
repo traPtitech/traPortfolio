@@ -20,6 +20,8 @@ comments:
       id: ユーザーUUID
       description: 自己紹介文
       check: 氏名を公開するかどうかの可否
+  - table: migrations
+    tableComment: gormigrate用のデータベースバージョンテーブ
   # - table: accounts
   #   tableComment: Twitterなどのアカウントテーブル
   #   columnComments:
