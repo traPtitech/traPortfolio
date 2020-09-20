@@ -2,13 +2,16 @@ openapi: 3.0.0
 info:
   title: traPortfolio
   version: '1.0'
+  contact:
+    name: traP
+    url: 'https://github.com/traPtitech/traPortfolio'
+  description: traPortfolio v1 API
 servers:
   - url: 'http://localhost:3000'
 paths:
   /users:
     get:
       summary: ユーザーのリストを取得
-      tags: []
       responses:
         '200':
           description: OK
@@ -29,12 +32,13 @@ paths:
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
+      tags:
+        - user
   '/users/{userId}':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
       summary: ユーザー詳細情報の取得
-      tags: []
       responses:
         '200':
           description: OK
@@ -46,6 +50,8 @@ paths:
           description: Not Found
       operationId: getUser
       description: ユーザー詳細情報を取得します
+      tags:
+        - user
     patch:
       summary: ユーザー情報の編集
       operationId: editUser
@@ -56,12 +62,194 @@ paths:
           description: Bad Request
         '404':
           description: Not Found
+      description: ユーザー情報を修正します
+      tags:
+        - user
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUserRequest'
-      description: ユーザー情報を修正します
+              $ref: '#/components/schemas/PostUserRequest'
+  '/user/{userId}/projects':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが所属するプロジェクトの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        '404':
+          description: Not Found
+      operationId: getUsersProject
+      description: ユーザーが所属している（いた）プロジェクトを取得します
+      tags:
+        - user
+        - user project
+  /projects:
+    get:
+      summary: プロジェクトのリストを取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+      operationId: getProjects
+      description: プロジェクトのリストを取得します
+      tags:
+        - project
+    post:
+      summary: プロジェクトの作成
+      operationId: postProject
+      responses:
+        '200':
+          description: OK
+      description: プロジェクトを作成します
+      tags:
+        - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProjectRequest'
+  '/projects/{projectId}':
+    parameters:
+      - $ref: '#/components/parameters/projectIdInPath'
+    get:
+      summary: プロジェクト詳細情報を取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Not Found
+      operationId: getProject
+      description: プロジェクトの詳細情報を取得します
+      tags:
+        - project
+    patch:
+      summary: プロジェクト詳細情報の修正
+      operationId: editProject
+      responses:
+        '200':
+          description: OK
+      description: プロジェクト情報を修正します
+      tags:
+        - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProjectRequest'
+  /events:
+    get:
+      summary: イベントリストを取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+      operationId: getEvents
+      description: イベント情報を取得します
+      tags:
+        - event
+    parameters: []
+  /groups:
+    get:
+      summary: 班のリストの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+      operationId: getGroups
+      description: 班のリストを取得します
+      tags:
+        - group
+    parameters: []
+  '/events/{eventId}':
+    parameters:
+      - $ref: '#/components/parameters/eventIdInPath'
+    get:
+      summary: イベント詳細情報を取得
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+      operationId: getEvent
+      description: イベント情報詳細を取得します
+      tags:
+        - event
+  /contests:
+    get:
+      summary: コンテストのリストの取得
+      tags:
+        - contest
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contest'
+      operationId: getContests
+      description: コンテストのリストを取得します
+    parameters: []
+    post:
+      summary: コンテストの作成
+      operationId: postContest
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostContestRequest'
+      tags:
+        - contest
+      description: コンテストを作成します
+  '/contests/{contestId}':
+    parameters:
+      - $ref: '#/components/parameters/contestIdInPath'
+    get:
+      summary: 大会詳細情報の取得
+      tags:
+        - contest
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+        '404':
+          description: Not Found
+      operationId: getContest
+      description: コンテスト詳細情報を取得します
 components:
   schemas:
     User:
@@ -150,6 +338,199 @@ components:
         check:
           type: boolean
           description: 本名を公開するかどうか
+    Project:
+      title: Project
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectMember'
+        since:
+          type: string
+          format: date-time
+        until:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ProjectMember:
+      title: ProjectMember
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        since:
+          type: string
+        until:
+          type: string
+    Event:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 第n回進捗回
+        descirption:
+          type: string
+          example: 第n回の進捗会です。
+        sharedRoom:
+          type: boolean
+          example: false
+        timeStart:
+          type: string
+          example: '2004-04-01T12:00Z'
+        timeEnd:
+          type: string
+          example: '2004-04-01T12:00Z'
+        roomId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        groupId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+    Contest:
+      title: Contest
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContestMember'
+    ContestMember:
+      title: ContestMember
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Group:
+      title: Group
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        leader:
+          $ref: '#/components/schemas/User'
+        members:
+          type: array
+          items:
+            $ref: ''
+        activity:
+          type: string
+        achievement:
+          type: array
+          items:
+            $ref: '#/components/schemas/Achievement'
+    GroupMember:
+      title: GroupMember
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        since:
+          type: string
+        until:
+          type: string
+    Achievement:
+      title: Achievement
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    PostUserRequest:
+      title: PostUserRequest
+      type: object
+      properties:
+        id:
+          type: string
+        belongedProjects:
+          type: array
+          items:
+            type: object
+            format: uuid
+            properties:
+              projectId:
+                type: string
+                format: uuid
+              since:
+                type: string
+                format: date-time
+              until:
+                type: string
+                format: date-time
+        belongedGroup:
+          type: array
+          items:
+            type: object
+            format: uuid
+            properties:
+              groupId:
+                type: string
+                format: uuid
+              since:
+                type: string
+                format: date-time
+              until:
+                type: string
+                format: date-time
+    PostProjectRequest:
+      title: PostProjectRequest
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectMember'
+        since:
+          type: string
+          format: date-time
+        until:
+          type: string
+          format: date-time
+    PostContestRequest:
+      title: PostContestRequest
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
   parameters:
     userIdInPath:
       name: userId
@@ -159,3 +540,40 @@ components:
       schema:
         type: string
         format: uuid
+    projectIdInPath:
+      name: projectId
+      in: path
+      required: true
+      description: プロジェクトUUID
+      schema:
+        type: string
+        format: uuid
+    eventIdInPath:
+      name: eventId
+      in: path
+      required: true
+      description: イベントUUID
+      schema:
+        type: string
+        format: uuid
+    contestIdInPath:
+      name: contestId
+      in: path
+      required: true
+      description: コンテストUUID
+      schema:
+        type: string
+        format: uuid
+tags:
+  - name: user
+    description: ユーザーAPI
+  - name: project
+    description: プロジェクトAPI
+  - name: event
+    description: イベントAPI
+  - name: group
+    description: 班API
+  - name: user project
+    description: ユーザープロジェクトAPI
+  - name: contest
+    description: 大会・コンテストAPI
