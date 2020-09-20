@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	gorm "github.com/jinzhu/gorm"
+	//
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
