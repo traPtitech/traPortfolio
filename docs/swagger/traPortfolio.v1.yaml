@@ -69,7 +69,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUserRequest'
+              $ref: '#/components/schemas/EditUser'
   '/user/{userId}/projects':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -111,8 +111,8 @@ paths:
       summary: プロジェクトの作成
       operationId: postProject
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
       description: プロジェクトを作成します
       tags:
         - project
@@ -121,7 +121,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostProjectRequest'
+              $ref: '#/components/schemas/PostProject'
   '/projects/{projectId}':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
@@ -146,6 +146,10 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       description: プロジェクト情報を修正します
       tags:
         - project
@@ -154,7 +158,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostProjectRequest'
+              $ref: '#/components/schemas/EditProject'
   /events:
     get:
       summary: イベントリストを取得
@@ -231,7 +235,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostContestRequest'
+              $ref: '#/components/schemas/PostContest'
       tags:
         - contest
       description: コンテストを作成します
@@ -239,7 +243,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/contestIdInPath'
     get:
-      summary: 大会詳細情報の取得
+      summary: コンテスト詳細情報の取得
       tags:
         - contest
       responses:
@@ -331,7 +335,7 @@ components:
         - displayName
         - name
         - bio
-    EditUserRequest:
+    EditUser:
       title: EditUserRequest
       type: object
       description: ユーザー情報変更リクエスト
@@ -422,7 +426,7 @@ components:
       properties:
         name:
           type: string
-          example: 第n回進捗回
+          example: 第n回進捗会
           description: イベント名
         descirption:
           type: string
@@ -574,7 +578,7 @@ components:
         - id
         - name
         - description
-    PostProjectRequest:
+    PostProject:
       title: PostProjectRequest
       type: object
       description: プロジェクト登録リクエスト
@@ -611,7 +615,7 @@ components:
         - members
         - since
         - until
-    PostContestRequest:
+    PostContest:
       title: PostContestRequest
       type: object
       description: コンテスト登録リクエスト
@@ -632,6 +636,29 @@ components:
         - id
         - name
         - description
+    EditProject:
+      title: PatchProject
+      type: object
+      description: プロジェクト更新リクエスト
+      properties:
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: プロジェクト名
+        description:
+          type: string
+          description: プロジェクト説明
+        members:
+          type: string
+          description: プロジェクトメンバー
+        since:
+          type: string
+          format: date-time
+          description: プロジェクトが始まった時
+        until:
+          type: string
+          format: date-time
+          description: プロジェクトが終わった時
   parameters:
     userIdInPath:
       name: userId
