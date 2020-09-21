@@ -117,6 +117,7 @@ paths:
       tags:
         - project
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -149,6 +150,7 @@ paths:
       tags:
         - project
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -225,6 +227,7 @@ paths:
         '200':
           description: OK
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -331,6 +334,7 @@ components:
     EditUserRequest:
       title: EditUserRequest
       type: object
+      description: ユーザー情報変更リクエスト
       properties:
         bio:
           type: string
@@ -338,163 +342,296 @@ components:
         check:
           type: boolean
           description: 本名を公開するかどうか
+          default: 'false'
+      required:
+        - bio
+        - check
     Project:
       title: Project
       type: object
+      description: プロジェクト情報
       properties:
         id:
           type: string
+          format: uuid
+          description: プロジェクトuuid
         name:
           type: string
+          description: プロジェクト名
         description:
           type: string
+          description: プロジェクト説明
         members:
           type: array
+          description: プロジェクトメンバー
           items:
             $ref: '#/components/schemas/ProjectMember'
         since:
           type: string
           format: date-time
+          description: いつからプロジェクトがあるか
         until:
           type: string
+          nullable: true
           format: date-time
+          description: いつプロジェクトが終わったか
         createdAt:
           type: string
+          description: 作成日時
         updatedAt:
           type: string
+          description: 変更日時
+      required:
+        - id
+        - name
+        - description
+        - members
+        - since
+        - until
     ProjectMember:
       title: ProjectMember
       type: object
+      description: プロジェクトメンバー情報
       properties:
         id:
           type: string
+          format: uuid
+          description: プロジェクトuuid
         name:
           type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: プロジェクト名
         since:
           type: string
+          format: date-time
+          description: いつからプロジェクトに所属しているか
         until:
           type: string
+          nullable: true
+          format: date-time
+          description: いつプロジェクトを抜けたか
+      required:
+        - id
+        - name
+        - since
+        - until
     Event:
       type: object
+      description: イベント情報
+      title: Event
       properties:
         name:
           type: string
           example: 第n回進捗回
+          description: イベント名
         descirption:
           type: string
           example: 第n回の進捗会です。
+          description: イベント説明
         sharedRoom:
           type: boolean
           example: false
+          description: シェアされているか
         timeStart:
           type: string
           example: '2004-04-01T12:00Z'
+          description: はじめ
         timeEnd:
           type: string
           example: '2004-04-01T12:00Z'
+          description: おわり
         roomId:
           type: string
           format: uuid
           example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+          description: 部屋uuid
         groupId:
           type: string
           format: uuid
           example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+          description: グループuuid
+      required:
+        - name
+        - descirption
+        - sharedRoom
+        - timeStart
+        - timeEnd
+        - roomId
+        - groupId
     Contest:
       title: Contest
       type: object
-      properties:
-        id:
-          type: string
-        description:
-          type: string
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContestMember'
-    ContestMember:
-      title: ContestMember
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-    Group:
-      title: Group
-      type: object
+      description: コンテスト情報
       properties:
         id:
           type: string
           format: uuid
+          description: コンテスト・大会uuid
+        description:
+          type: string
+          description: コンテスト・大会の説明
+        members:
+          type: array
+          description: コンテスト・大会参加者
+          items:
+            $ref: '#/components/schemas/ContestMember'
+      required:
+        - id
+        - description
+        - members
+    ContestMember:
+      title: ContestMember
+      type: object
+      description: コンテストメンバー情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: コンテスト・大会メンバーuuid
         name:
           type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: ユーザー名
+      required:
+        - id
+        - name
+    Group:
+      title: Group
+      type: object
+      description: 班情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 班uuid
+        name:
+          type: string
+          description: 班名
         leader:
           $ref: '#/components/schemas/User'
         members:
           type: array
+          description: 班メンバー
           items:
             $ref: '#/components/schemas/GroupMember'
         activity:
           type: string
+          description: 班活動
         achievement:
           type: array
+          description: 班実績
           items:
             $ref: '#/components/schemas/Achievement'
+      required:
+        - id
+        - name
+        - leader
+        - members
     GroupMember:
       title: GroupMember
       type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        since:
-          type: string
-        until:
-          type: string
-    Achievement:
-      title: Achievement
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-    PostProjectRequest:
-      title: PostProjectRequest
-      type: object
+      description: 班所属メンバー情報
       properties:
         id:
           type: string
           format: uuid
+          description: 班メンバーuuid
         name:
           type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: ユーザー名
+        since:
+          type: string
+          format: date-time
+          description: いつから班に入っているか
+        until:
+          type: string
+          nullable: true
+          format: date-time
+          description: いつ班から抜けたか(nullable)
+      required:
+        - id
+        - name
+        - since
+        - until
+    Achievement:
+      title: Achievement
+      type: object
+      description: 実績情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 実績uuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: 実績名
         description:
           type: string
+          description: 実績の説明
+      required:
+        - id
+        - name
+        - description
+    PostProjectRequest:
+      title: PostProjectRequest
+      type: object
+      description: プロジェクト登録リクエスト
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: プロジェクトuuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: プロジェクト名
+        description:
+          type: string
+          description: プロジェクト説明
         members:
           type: array
+          description: プロジェクトメンバー
           items:
             $ref: '#/components/schemas/ProjectMember'
         since:
           type: string
           format: date-time
+          description: プロジェクトが始まった時
         until:
+          nullable: true
           type: string
           format: date-time
+          description: プロジェクトが終わった時
+      required:
+        - id
+        - name
+        - description
+        - members
+        - since
+        - until
     PostContestRequest:
       title: PostContestRequest
       type: object
+      description: コンテスト登録リクエスト
       properties:
         id:
           type: string
           format: uuid
+          description: コンテスト・大会uuid
         name:
           type: string
+          minLength: 1
+          maxLength: 64
+          description: コンテスト・大会名
         description:
           type: string
+          description: コンテスト・大会説明
+      required:
+        - id
+        - name
+        - description
   parameters:
     userIdInPath:
       name: userId
