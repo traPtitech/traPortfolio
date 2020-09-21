@@ -69,7 +69,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserRequest'
+              $ref: '#/components/schemas/EditUserRequest'
   '/user/{userId}/projects':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -434,7 +434,7 @@ components:
         members:
           type: array
           items:
-            $ref: ''
+            $ref: '#/components/schemas/GroupMember'
         activity:
           type: string
         achievement:
@@ -463,42 +463,6 @@ components:
           type: string
         description:
           type: string
-    PostUserRequest:
-      title: PostUserRequest
-      type: object
-      properties:
-        id:
-          type: string
-        belongedProjects:
-          type: array
-          items:
-            type: object
-            format: uuid
-            properties:
-              projectId:
-                type: string
-                format: uuid
-              since:
-                type: string
-                format: date-time
-              until:
-                type: string
-                format: date-time
-        belongedGroup:
-          type: array
-          items:
-            type: object
-            format: uuid
-            properties:
-              groupId:
-                type: string
-                format: uuid
-              since:
-                type: string
-                format: date-time
-              until:
-                type: string
-                format: date-time
     PostProjectRequest:
       title: PostProjectRequest
       type: object
