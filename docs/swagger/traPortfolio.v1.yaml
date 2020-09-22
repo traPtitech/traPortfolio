@@ -60,6 +60,8 @@ paths:
           description: OK
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
         '404':
           description: Not Found
       description: ユーザー情報を修正します
@@ -113,6 +115,8 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          description: Bad Request
       description: プロジェクトを作成します
       tags:
         - project
@@ -146,6 +150,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad Request
         '403':
           description: Forbidden
         '404':
@@ -228,8 +234,10 @@ paths:
       summary: コンテストの作成
       operationId: postContest
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
       requestBody:
         required: true
         content:
@@ -257,6 +265,19 @@ paths:
           description: Not Found
       operationId: getContest
       description: コンテスト詳細情報を取得します
+    patch:
+      summary: ''
+      operationId: editContest
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: コンテスト情報を修正します
 components:
   schemas:
     User:
@@ -470,13 +491,13 @@ components:
         id:
           type: string
           format: uuid
-          description: コンテスト・大会uuid
+          description: コンテストuuid
         description:
           type: string
-          description: コンテスト・大会の説明
+          description: コンテストの説明
         members:
           type: array
-          description: コンテスト・大会参加者
+          description: コンテスト参加者
           items:
             $ref: '#/components/schemas/ContestMember'
       required:
@@ -491,7 +512,7 @@ components:
         id:
           type: string
           format: uuid
-          description: コンテスト・大会メンバーuuid
+          description: コンテストメンバーuuid
         name:
           type: string
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
@@ -518,9 +539,9 @@ components:
           description: 班メンバー
           items:
             $ref: '#/components/schemas/GroupMember'
-        activity:
+        description:
           type: string
-          description: 班活動
+          description: 班説明
         achievement:
           type: array
           description: 班実績
@@ -623,15 +644,15 @@ components:
         id:
           type: string
           format: uuid
-          description: コンテスト・大会uuid
+          description: コンテストuuid
         name:
           type: string
           minLength: 1
           maxLength: 64
-          description: コンテスト・大会名
+          description: コンテスト名
         description:
           type: string
-          description: コンテスト・大会説明
+          description: コンテスト説明
       required:
         - id
         - name
@@ -639,7 +660,7 @@ components:
     EditProject:
       title: PatchProject
       type: object
-      description: プロジェクト更新リクエスト
+      description: プロジェクト変更リクエスト
       properties:
         name:
           type: string
@@ -659,6 +680,22 @@ components:
           type: string
           format: date-time
           description: プロジェクトが終わった時
+    EditContest:
+      title: EditContest
+      type: object
+      description: コンテスト情報変更リクエスト
+      properties:
+        name:
+          type: string
+          description: コンテスト名
+        description:
+          type: string
+          description: コンテスト説明
+        members:
+          type: array
+          description: コンテスト参加者
+          items:
+            $ref: '#/components/schemas/ContestMember'
   parameters:
     userIdInPath:
       name: userId
@@ -704,4 +741,4 @@ tags:
   - name: user project
     description: ユーザープロジェクトAPI
   - name: contest
-    description: 大会・コンテストAPI
+    description: コンテストAPI
