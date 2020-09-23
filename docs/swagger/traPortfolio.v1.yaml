@@ -301,11 +301,18 @@ components:
           maxLength: 32
         state:
           $ref: '#/components/schemas/UserAccountState'
+        achievement:
+          type: array
+          description: ユーザー実績
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Achievement'
       required:
         - id
         - name
         - displayName
         - state
+        - achievement
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -542,11 +549,6 @@ components:
         description:
           type: string
           description: 班説明
-        achievement:
-          type: array
-          description: 班実績
-          items:
-            $ref: '#/components/schemas/Achievement'
       required:
         - id
         - name
