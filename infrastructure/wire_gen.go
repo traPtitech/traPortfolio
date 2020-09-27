@@ -20,15 +20,15 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer(token string) (handler.API, error) {
+func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.PortalToken) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
 	sqlHandler, err := NewSQLHandler()
 	if err != nil {
 		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler)
-	traQRepository := repository.NewTraQRepository(token)
-	portalRepository := repository.NewPortalRepository(token)
+	traQRepository := repository.NewTraQRepository(traQToken)
+	portalRepository := repository.NewPortalRepository(portalToken)
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userRepository, userService)
 	api := handler.NewAPI(pingHandler, userHandler)

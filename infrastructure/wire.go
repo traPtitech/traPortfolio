@@ -38,7 +38,7 @@ var sqlSet = wire.NewSet(NewSQLHandler)
 
 var apiSet = wire.NewSet(handler.NewAPI)
 
-func InjectAPIServer(token string) (handler.API, error) {
+func InjectAPIServer(traQToken impl.TraQToken, portalToken impl.PortalToken) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

@@ -10,8 +10,10 @@ type PortalRepository struct {
 	token string
 }
 
-func NewPortalRepository(token string) *PortalRepository {
-	return &PortalRepository{token: token}
+type PortalToken string
+
+func NewPortalRepository(portalToken PortalToken) *PortalRepository {
+	return &PortalRepository{token: string(portalToken)}
 }
 
 func (repo *PortalRepository) GetUser(ctx context.Context, name string) (user *domain.PortalUser, err error) {

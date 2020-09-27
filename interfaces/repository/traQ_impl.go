@@ -10,8 +10,10 @@ type TraQRepository struct {
 	token string
 }
 
-func NewTraQRepository(token string) *TraQRepository {
-	return &TraQRepository{token: token}
+type TraQToken string
+
+func NewTraQRepository(traQToken TraQToken) *TraQRepository {
+	return &TraQRepository{token: string(traQToken)}
 }
 
 func (repo *TraQRepository) GetUser(ctx context.Context, name string) (user *domain.TraQUser, err error) {
