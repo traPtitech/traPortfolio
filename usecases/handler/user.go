@@ -14,8 +14,8 @@ type UserHandler struct {
 	UserService    service.UserService
 }
 
-func NewUserHandler(repo repository.UserRepository) *UserHandler {
-	return &UserHandler{UserRepository: repo}
+func NewUserHandler(repo repository.UserRepository, s service.UserService) *UserHandler {
+	return &UserHandler{UserRepository: repo, UserService: s}
 }
 
 func (handler *UserHandler) Get(c echo.Context) error {

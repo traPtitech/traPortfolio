@@ -15,8 +15,8 @@ type UserService struct {
 	portal repository.PortalRepository
 }
 
-func NewUserService(userRepository repository.UserRepository, traQRepository repository.TraQRepository, portalRepository repository.PortalRepository) *UserService {
-	return &UserService{
+func NewUserService(userRepository repository.UserRepository, traQRepository repository.TraQRepository, portalRepository repository.PortalRepository) UserService {
+	return UserService{
 		repo:   userRepository,
 		traQ:   traQRepository,
 		portal: portalRepository,
