@@ -53,7 +53,7 @@ func NewSQLHandler() (database.SQLHandler, error) {
 	db = db.
 		Set("gorm:save_associations", false).
 		Set("gorm:association_save_reference", false).
-		Set("gorm:table_options", "CHARSET=utf8mb4")
+		Set("gorm:table_options", "CHARSET=utf8mb4 COLLATE=utf8mb4_bin")
 
 	db.DB().SetMaxIdleConns(2)
 	db.DB().SetMaxOpenConns(16)
