@@ -4,8 +4,8 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [migrations](migrations.md) | 1 |  | BASE TABLE |
-| [users](users.md) | 3 | ユーザーテーブル | BASE TABLE |
+| [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブ | BASE TABLE |
+| [users](users.md) | 6 | ユーザーテーブル | BASE TABLE |
 
 ## Relations
 

@@ -10,6 +10,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/usecases/service/user_service"
 	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
 
@@ -19,23 +20,30 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer() (handler.API, error) {
+func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.PortalToken) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
 	sqlHandler, err := NewSQLHandler()
 	if err != nil {
 		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler)
-	userHandler := handler.NewUserHandler(userRepository)
+	traQRepository := repository.NewTraQRepository(traQToken)
+	portalRepository := repository.NewPortalRepository(portalToken)
+	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
+	userHandler := handler.NewUserHandler(userRepository, userService)
 	api := handler.NewAPI(pingHandler, userHandler)
 	return api, nil
 }
 
 // wire.go:
 
+var portalSet = wire.NewSet(repository.NewPortalRepository, wire.Bind(new(repository2.PortalRepository), new(*repository.PortalRepository)))
+
+var traQSet = wire.NewSet(repository.NewTraQRepository, wire.Bind(new(repository2.TraQRepository), new(*repository.TraQRepository)))
+
 var pingSet = wire.NewSet(handler.NewPingHandler, wire.Bind(new(usecase.PingUsecase), new(*handler.PingHandler)))
 
-var userSet = wire.NewSet(repository.NewUserRepository, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)))
+var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)))
 
 var sqlSet = wire.NewSet(NewSQLHandler)
 

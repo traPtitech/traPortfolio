@@ -2,6 +2,8 @@
 
 ## Description
 
+gormigrate用のデータベースバージョンテーブ
+
 <details>
 <summary><strong>Table Definition</strong></summary>
 

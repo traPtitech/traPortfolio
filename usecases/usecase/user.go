@@ -5,5 +5,6 @@ import (
 )
 
 type UserUsecase interface {
+	Get(c echo.Context) (err error)
 	Update(c echo.Context) (err error)
 }

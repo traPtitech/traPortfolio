@@ -9,10 +9,14 @@
 
 ```sql
 CREATE TABLE `users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) DEFAULT NULL,
-  `check` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `id` char(36) NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `check` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(32) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
@@ -22,14 +26,18 @@ CREATE TABLE `users` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | int(10) unsigned |  | false |  |  | ユーザーUUID |
-| description | varchar(255) |  | true |  |  | 自己紹介文 |
-| check | tinyint(1) |  | true |  |  | 氏名を公開するかどうかの可否 |
+| id | char(36) |  | false |  |  | ユーザーUUID |
+| description | text |  | false |  |  | 自己紹介文 |
+| check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 |
+| name | varchar(32) |  | false |  |  | ユーザー名 |
+| created_at | datetime(6) |  | true |  |  |  |
+| updated_at | datetime(6) |  | true |  |  |  |
 
 ## Constraints
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| name | UNIQUE | UNIQUE KEY name (name) |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
 
 ## Indexes
@@ -37,6 +45,7 @@ CREATE TABLE `users` (
 | Name | Definition |
 | ---- | ---------- |
 | PRIMARY | PRIMARY KEY (id) USING BTREE |
+| name | UNIQUE KEY name (name) USING BTREE |
 
 ## Relations
 
