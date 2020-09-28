@@ -278,6 +278,14 @@ paths:
         '404':
           description: Not Found
       description: コンテスト情報を修正します
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditContest'
+      tags:
+        - contest
 components:
   schemas:
     User:
