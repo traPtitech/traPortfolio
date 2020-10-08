@@ -2,13 +2,16 @@ openapi: 3.0.0
 info:
   title: traPortfolio
   version: '1.0'
+  contact:
+    name: traP
+    url: 'https://github.com/traPtitech/traPortfolio'
+  description: traPortfolio v1 API
 servers:
   - url: 'http://localhost:3000'
 paths:
   /users:
     get:
       summary: ユーザーのリストを取得
-      tags: []
       responses:
         '200':
           description: OK
@@ -29,12 +32,13 @@ paths:
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
+      tags:
+        - user
   '/users/{userId}':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
       summary: ユーザー詳細情報の取得
-      tags: []
       responses:
         '200':
           description: OK
@@ -46,6 +50,8 @@ paths:
           description: Not Found
       operationId: getUser
       description: ユーザー詳細情報を取得します
+      tags:
+        - user
     patch:
       summary: ユーザー情報の編集
       operationId: editUser
@@ -54,14 +60,236 @@ paths:
           description: OK
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
         '404':
           description: Not Found
+      description: ユーザー情報を修正します
+      tags:
+        - user
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUserRequest'
-      description: ユーザー情報を修正します
+              $ref: '#/components/schemas/EditUser'
+  '/user/{userId}/projects':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが所属するプロジェクトの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        '404':
+          description: Not Found
+      operationId: getUsersProject
+      description: ユーザーが所属している（いた）プロジェクトを取得します
+      tags:
+        - user
+        - user project
+  /projects:
+    get:
+      summary: プロジェクトのリストを取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+      operationId: getProjects
+      description: プロジェクトのリストを取得します
+      tags:
+        - project
+    post:
+      summary: プロジェクトの作成
+      operationId: postProject
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      description: プロジェクトを作成します
+      tags:
+        - project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProject'
+  '/projects/{projectId}':
+    parameters:
+      - $ref: '#/components/parameters/projectIdInPath'
+    get:
+      summary: プロジェクト詳細情報を取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Not Found
+      operationId: getProject
+      description: プロジェクトの詳細情報を取得します
+      tags:
+        - project
+    patch:
+      summary: プロジェクト詳細情報の修正
+      operationId: editProject
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: プロジェクト情報を修正します
+      tags:
+        - project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditProject'
+  /events:
+    get:
+      summary: イベントリストを取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+      operationId: getEvents
+      description: イベント情報を取得します
+      tags:
+        - event
+    parameters: []
+  /groups:
+    get:
+      summary: 班のリストの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+      operationId: getGroups
+      description: 班のリストを取得します
+      tags:
+        - group
+    parameters: []
+  '/events/{eventId}':
+    parameters:
+      - $ref: '#/components/parameters/eventIdInPath'
+    get:
+      summary: イベント詳細情報を取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Not Found
+      operationId: getEvent
+      description: イベント情報詳細を取得します
+      tags:
+        - event
+  /contests:
+    get:
+      summary: コンテストのリストの取得
+      tags:
+        - contest
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contest'
+      operationId: getContests
+      description: コンテストのリストを取得します
+    parameters: []
+    post:
+      summary: コンテストの作成
+      operationId: postContest
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostContest'
+      tags:
+        - contest
+      description: コンテストを作成します
+  '/contests/{contestId}':
+    parameters:
+      - $ref: '#/components/parameters/contestIdInPath'
+    get:
+      summary: コンテスト詳細情報の取得
+      tags:
+        - contest
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+        '404':
+          description: Not Found
+      operationId: getContest
+      description: コンテスト詳細情報を取得します
+    patch:
+      summary: ''
+      operationId: editContest
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: コンテスト情報を修正します
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditContest'
+      tags:
+        - contest
 components:
   schemas:
     User:
@@ -85,11 +313,18 @@ components:
           maxLength: 32
         state:
           $ref: '#/components/schemas/UserAccountState'
+        achievement:
+          type: array
+          description: ユーザー実績
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Achievement'
       required:
         - id
         - name
         - displayName
         - state
+        - achievement
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -140,9 +375,10 @@ components:
         - displayName
         - name
         - bio
-    EditUserRequest:
+    EditUser:
       title: EditUserRequest
       type: object
+      description: ユーザー情報変更リクエスト
       properties:
         bio:
           type: string
@@ -150,6 +386,359 @@ components:
         check:
           type: boolean
           description: 本名を公開するかどうか
+          default: 'false'
+      required:
+        - bio
+        - check
+    Project:
+      title: Project
+      type: object
+      description: プロジェクト情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: プロジェクトuuid
+        name:
+          type: string
+          description: プロジェクト名
+        description:
+          type: string
+          description: プロジェクト説明
+        members:
+          type: array
+          description: プロジェクトメンバー
+          items:
+            $ref: '#/components/schemas/ProjectMember'
+        duration:
+          format: date-time
+          description: |-
+            プロジェクトの期間
+            nullがあった場合存続中
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
+        createdAt:
+          type: string
+          description: 作成日時
+        updatedAt:
+          type: string
+          description: 変更日時
+      required:
+        - id
+        - name
+        - description
+        - members
+        - duration
+    ProjectMember:
+      title: ProjectMember
+      type: object
+      description: プロジェクトメンバー情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: プロジェクトuuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: プロジェクト名
+        duration:
+          format: date-time
+          description: |-
+            プロジェクトに所属している期間の配列
+            nullがあったらまだ所属している
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
+      required:
+        - id
+        - name
+        - duration
+    Event:
+      type: object
+      description: イベント情報
+      title: Event
+      properties:
+        name:
+          type: string
+          example: 第n回進捗会
+          description: イベント名
+        descirption:
+          type: string
+          example: 第n回の進捗会です。
+          description: イベント説明
+        sharedRoom:
+          type: boolean
+          example: false
+          description: シェアされているか
+        timeStart:
+          type: string
+          example: '2004-04-01T12:00Z'
+          description: はじめ
+        timeEnd:
+          type: string
+          example: '2004-04-01T12:00Z'
+          description: おわり
+        roomId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+          description: 部屋uuid
+        groupId:
+          type: string
+          format: uuid
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+          description: グループuuid
+        level:
+          $ref: '#/components/schemas/EventLevel'
+      required:
+        - name
+        - descirption
+        - sharedRoom
+        - timeStart
+        - timeEnd
+        - roomId
+        - groupId
+        - level
+    Contest:
+      title: Contest
+      type: object
+      description: コンテスト情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: コンテストuuid
+        description:
+          type: string
+          description: コンテストの説明
+        members:
+          type: array
+          description: コンテスト参加者
+          items:
+            $ref: '#/components/schemas/ContestMember'
+      required:
+        - id
+        - description
+        - members
+    ContestMember:
+      title: ContestMember
+      type: object
+      description: コンテストメンバー情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: コンテストメンバーuuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: ユーザー名
+      required:
+        - id
+        - name
+    Group:
+      title: Group
+      type: object
+      description: 班情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 班uuid
+        name:
+          type: string
+          description: 班名
+        leader:
+          $ref: '#/components/schemas/User'
+        members:
+          type: array
+          description: 班メンバー
+          items:
+            $ref: '#/components/schemas/GroupMember'
+        description:
+          type: string
+          description: 班説明
+      required:
+        - id
+        - name
+        - leader
+        - members
+    GroupMember:
+      title: GroupMember
+      type: object
+      description: 班所属メンバー情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 班メンバーuuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: ユーザー名
+        duration:
+          format: date-time
+          description: |-
+            班に入っている期間の配列
+            nullのところはまだ継続して入っている
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
+      required:
+        - id
+        - name
+        - duration
+    Achievement:
+      title: Achievement
+      type: object
+      description: 実績情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 実績uuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: 実績名
+        description:
+          type: string
+          description: 実績の説明
+      required:
+        - id
+        - name
+        - description
+    PostProject:
+      title: PostProjectRequest
+      type: object
+      description: プロジェクト登録リクエスト
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: プロジェクトuuid
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: プロジェクト名
+        description:
+          type: string
+          description: プロジェクト説明
+        members:
+          type: array
+          description: プロジェクトメンバー
+          items:
+            $ref: '#/components/schemas/ProjectMember'
+        duration:
+          type: array
+          description: |-
+            プロジェクト期間の配列
+            nullがあった場合存続中
+          items:
+            $ref: '#/components/schemas/Duration'
+      required:
+        - id
+        - name
+        - description
+        - members
+        - duration
+    PostContest:
+      title: PostContestRequest
+      type: object
+      description: コンテスト登録リクエスト
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: コンテストuuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: コンテスト名
+        description:
+          type: string
+          description: コンテスト説明
+      required:
+        - id
+        - name
+        - description
+    EditProject:
+      title: PatchProject
+      type: object
+      description: プロジェクト変更リクエスト
+      properties:
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          description: プロジェクト名
+        description:
+          type: string
+          description: プロジェクト説明
+        members:
+          type: string
+          description: プロジェクトメンバー
+        duration:
+          format: date-time
+          description: |-
+            プロジェクト期間の配列
+            nullがあった場合存続中
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
+    EditContest:
+      title: EditContest
+      type: object
+      description: コンテスト情報変更リクエスト
+      properties:
+        name:
+          type: string
+          description: コンテスト名
+        description:
+          type: string
+          description: コンテスト説明
+        members:
+          type: array
+          description: コンテスト参加者
+          items:
+            $ref: '#/components/schemas/ContestMember'
+    EventLevel:
+      type: integer
+      title: EventLevel
+      description: |-
+        公開範囲設定
+        0 全て公開
+        1 イベント企画者の名前を伏せて公開
+      enum:
+        - 0
+        - 1
+      x-enum-varnames:
+        - onymous
+        - anonymous
+      x-enum-descriptions:
+        - 全て公開
+        - イベントの企画者の名前を伏せて公開
+    Duration:
+      title: Period
+      type: object
+      properties:
+        since:
+          type: string
+          format: date-time
+          description: 期間始まり
+        until:
+          type: string
+          format: date-time
+          nullable: true
+          description: |-
+            期間終わり
+            nullの場合まだ存続している
+      required:
+        - since
+        - until
+      description: 班やプロジェクトの存続期間
   parameters:
     userIdInPath:
       name: userId
@@ -159,3 +748,40 @@ components:
       schema:
         type: string
         format: uuid
+    projectIdInPath:
+      name: projectId
+      in: path
+      required: true
+      description: プロジェクトUUID
+      schema:
+        type: string
+        format: uuid
+    eventIdInPath:
+      name: eventId
+      in: path
+      required: true
+      description: イベントUUID
+      schema:
+        type: string
+        format: uuid
+    contestIdInPath:
+      name: contestId
+      in: path
+      required: true
+      description: コンテストUUID
+      schema:
+        type: string
+        format: uuid
+tags:
+  - name: user
+    description: ユーザーAPI
+  - name: project
+    description: プロジェクトAPI
+  - name: event
+    description: イベントAPI
+  - name: group
+    description: 班API
+  - name: user project
+    description: ユーザープロジェクトAPI
+  - name: contest
+    description: コンテストAPI
