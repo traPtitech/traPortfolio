@@ -410,17 +410,8 @@ components:
           description: プロジェクトメンバー
           items:
             $ref: '#/components/schemas/ProjectMember'
-        since:
-          type: string
-          format: date-time
-          description: いつからプロジェクトがあるか
-        until:
-          type: string
-          nullable: true
-          format: date-time
-          description: |-
-            いつプロジェクトが終わったか
-            nullの場合はまだ継続中
+        duration:
+          $ref: '#/components/schemas/Duration'
         createdAt:
           type: string
           description: 作成日時
@@ -432,8 +423,7 @@ components:
         - name
         - description
         - members
-        - since
-        - until
+        - duration
     ProjectMember:
       title: ProjectMember
       type: object
@@ -447,22 +437,12 @@ components:
           type: string
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
           description: プロジェクト名
-        since:
-          type: string
-          format: date-time
-          description: いつからプロジェクトに所属しているか
-        until:
-          type: string
-          nullable: true
-          format: date-time
-          description: |-
-            いつプロジェクトを抜けたか
-            nullの場合はまだ所属中
+        duration:
+          $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
-        - since
-        - until
+        - duration
     Event:
       type: object
       description: イベント情報
@@ -586,22 +566,18 @@ components:
           type: string
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
           description: ユーザー名
-        since:
-          type: string
-          format: date-time
-          description: いつから班に入っているか
-        until:
-          type: string
-          nullable: true
+        duration:
           format: date-time
           description: |-
-            いつ班から抜けたか
-            nullの場合はまだ所属中
+            班に入っている期間の配列
+            nullのところはまだ継続して入っている
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
-        - since
-        - until
+        - duration
     Achievement:
       title: Achievement
       type: object
@@ -643,24 +619,14 @@ components:
           description: プロジェクトメンバー
           items:
             $ref: '#/components/schemas/ProjectMember'
-        since:
-          type: string
-          format: date-time
-          description: プロジェクトが始まった時
-        until:
-          nullable: true
-          type: string
-          format: date-time
-          description: |-
-            プロジェクトが終わった時
-            nullの場合はまだ継続中
+        duration:
+          $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
         - description
         - members
-        - since
-        - until
+        - duration
     PostContest:
       title: PostContestRequest
       type: object
@@ -697,17 +663,8 @@ components:
         members:
           type: string
           description: プロジェクトメンバー
-        since:
-          type: string
-          format: date-time
-          description: プロジェクトが始まった時
-        until:
-          type: string
-          format: date-time
-          nullable: true
-          description: |-
-            プロジェクトが終わった時
-            nullの場合はまだ継続中
+        duration:
+          $ref: '#/components/schemas/Duration'
     EditContest:
       title: EditContest
       type: object
@@ -738,8 +695,27 @@ components:
         - onymous
         - anonymous
       x-enum-descriptions:
-        - '全て公開'
-        - 'イベントの企画者の名前を伏せて公開'
+        - 全て公開
+        - イベントの企画者の名前を伏せて公開
+    Duration:
+      title: Period
+      type: object
+      properties:
+        since:
+          type: string
+          format: date-time
+          description: 期間始まり
+        until:
+          type: string
+          format: date-time
+          nullable: true
+          description: |-
+            期間終わり
+            nullの場合まだ存続している
+      required:
+        - since
+        - until
+      description: 班やプロジェクトの存続期間
   parameters:
     userIdInPath:
       name: userId
