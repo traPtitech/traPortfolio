@@ -411,7 +411,13 @@ components:
           items:
             $ref: '#/components/schemas/ProjectMember'
         duration:
-          $ref: '#/components/schemas/Duration'
+          format: date-time
+          description: |-
+            プロジェクトの期間
+            nullがあった場合存続中
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
         createdAt:
           type: string
           description: 作成日時
@@ -438,7 +444,13 @@ components:
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
           description: プロジェクト名
         duration:
-          $ref: '#/components/schemas/Duration'
+          format: date-time
+          description: |-
+            プロジェクトに所属している期間の配列
+            nullがあったらまだ所属している
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
@@ -620,7 +632,12 @@ components:
           items:
             $ref: '#/components/schemas/ProjectMember'
         duration:
-          $ref: '#/components/schemas/Duration'
+          type: array
+          description: |-
+            プロジェクト期間の配列
+            nullがあった場合存続中
+          items:
+            $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
@@ -664,7 +681,13 @@ components:
           type: string
           description: プロジェクトメンバー
         duration:
-          $ref: '#/components/schemas/Duration'
+          format: date-time
+          description: |-
+            プロジェクト期間の配列
+            nullがあった場合存続中
+          type: array
+          items:
+            $ref: '#/components/schemas/Duration'
     EditContest:
       title: EditContest
       type: object
