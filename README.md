@@ -62,7 +62,7 @@ $ make rm-test-db
 
 ### Lint
 
-DB Lint
+DB Lint(you need docker)
 
 ```
 $ make db-lint
