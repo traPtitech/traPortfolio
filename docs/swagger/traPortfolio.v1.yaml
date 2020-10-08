@@ -734,6 +734,9 @@ components:
       enum:
         - 0
         - 1
+      x-enum-varnames:
+        - onymous
+        - anonymous   
   parameters:
     userIdInPath:
       name: userId
