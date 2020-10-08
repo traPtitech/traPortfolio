@@ -418,7 +418,9 @@ components:
           type: string
           nullable: true
           format: date-time
-          description: いつプロジェクトが終わったか
+          description: |-
+            いつプロジェクトが終わったか
+            nullの場合はまだ継続中
         createdAt:
           type: string
           description: 作成日時
@@ -453,7 +455,9 @@ components:
           type: string
           nullable: true
           format: date-time
-          description: いつプロジェクトを抜けたか
+          description: |-
+            いつプロジェクトを抜けたか
+            nullの場合はまだ所属中
       required:
         - id
         - name
@@ -590,7 +594,9 @@ components:
           type: string
           nullable: true
           format: date-time
-          description: いつ班から抜けたか(nullable)
+          description: |-
+            いつ班から抜けたか
+            nullの場合はまだ所属中
       required:
         - id
         - name
@@ -645,7 +651,9 @@ components:
           nullable: true
           type: string
           format: date-time
-          description: プロジェクトが終わった時
+          description: |-
+            プロジェクトが終わった時
+            nullの場合はまだ継続中
       required:
         - id
         - name
@@ -696,7 +704,10 @@ components:
         until:
           type: string
           format: date-time
-          description: プロジェクトが終わった時
+          nullable: true
+          description: |-
+            プロジェクトが終わった時
+            nullの場合はまだ継続中
     EditContest:
       title: EditContest
       type: object
@@ -714,21 +725,15 @@ components:
           items:
             $ref: '#/components/schemas/ContestMember'
     EventLevel:
+      type: integer
       title: EventLevel
-      type: object
       description: |-
         公開範囲設定
         0 全て公開
         1 イベント企画者の名前を伏せて公開
-      properties:
-        id:
-          type: integer
-          description: |-
-            公開範囲設定
-            0 全て公開
-            1 イベント企画者の名前を伏せて公開
-      required:
-        - id
+      enum:
+        - 0
+        - 1
   parameters:
     userIdInPath:
       name: userId
