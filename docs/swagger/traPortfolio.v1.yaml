@@ -736,7 +736,10 @@ components:
         - 1
       x-enum-varnames:
         - onymous
-        - anonymous   
+        - anonymous
+      x-enum-descriptions:
+        - '全て公開'
+        - 'イベントの企画者の名前を伏せて公開'
   parameters:
     userIdInPath:
       name: userId
