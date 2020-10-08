@@ -490,6 +490,8 @@ components:
           format: uuid
           example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
           description: グループuuid
+        level:
+          $ref: '#/components/schemas/EventLevel'
       required:
         - name
         - descirption
@@ -498,6 +500,7 @@ components:
         - timeEnd
         - roomId
         - groupId
+        - level
     Contest:
       title: Contest
       type: object
@@ -706,6 +709,22 @@ components:
           description: コンテスト参加者
           items:
             $ref: '#/components/schemas/ContestMember'
+    EventLevel:
+      title: EventLevel
+      type: object
+      description: |-
+        公開範囲設定
+        0 全て公開
+        1 イベント企画者の名前を伏せて公開
+      properties:
+        id:
+          type: integer
+          description: |-
+            公開範囲設定
+            0 全て公開
+            1 イベント企画者の名前を伏せて公開
+      required:
+        - id
   parameters:
     userIdInPath:
       name: userId
