@@ -19,7 +19,13 @@ traPortfolio backend
 $ docker-compose up
 ```
 
-Now you can access to `http://localhost:1323` for backend server.
+Now you can access to 
+
+- `http://localhost:1323` for backend server.
+- `http://localhost:3001` for Adminer
+  - username: `root`
+  - password: `password`
+  - database: `portfolio`
 
 ### Set up local develop environment without docker
 
