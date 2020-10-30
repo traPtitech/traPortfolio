@@ -22,7 +22,6 @@ var traQSet = wire.NewSet(
 
 var pingSet = wire.NewSet(
 	handler.NewPingHandler,
-	// wire.Bind(new(usecase.PingUsecase), new(*handler.PingHandler)),
 )
 
 var userSet = wire.NewSet(
@@ -30,7 +29,6 @@ var userSet = wire.NewSet(
 	service.NewUserService,
 	handler.NewUserHandler,
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
-	// wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)),
 )
 
 var sqlSet = wire.NewSet(NewSQLHandler)
