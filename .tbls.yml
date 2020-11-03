@@ -21,6 +21,11 @@ comments:
       description: 自己紹介文
       check: 氏名を公開するかどうかの可否
       name: ユーザー名
+  - table: event_level_relations
+    tableComment: knoQイベントと公開レベルの関係テーブル
+    columnComments:
+      id: knoQイベントUUID
+      level: 公開レベル。0ならそのまま公開、1なら匿名
   - table: migrations
     tableComment: gormigrate用のデータベースバージョンテーブル
   # - table: accounts
