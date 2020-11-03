@@ -511,6 +511,10 @@ components:
         permittedPr:
           type: boolean
           description: 広報での利用が許可されているかどうか
+      required:
+        - id
+        - type
+        - permittedPr
     AccountType:
       type: integer
       title: EventLevel
@@ -524,6 +528,8 @@ components:
         - 5
         - 6
         - 7
+        - 8
+        - 9
       x-enum-varnames:
         - homepage
         - blog
@@ -532,6 +538,8 @@ components:
         - pixiv
         - github
         - qiita
+        - atcoder
+        - soundcloud
       x-enum-descriptions:
         - ホームページ (IDはリンクのURLそのまま)
         - ブログ (IDはリンクのURLそのまま)
@@ -540,6 +548,8 @@ components:
         - Pixiv
         - GitHub (@は含まない)
         - Qiita (@は含まない)
+        - AtCoder
+        - SoundCloud
     Project:
       title: Project
       type: object
