@@ -6,6 +6,9 @@ services:
     restart: always
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
     command: ./traPortfolio
+    environment:
+      KNOQ_COOKIE: "your session"
+      KNOQ_API_ENDPOINT: https://knoq.trap.jp/api
     expose:
       - "80"
       - "6060"
@@ -20,6 +23,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: portfolio
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
     # conohaのDBのデフォルトCharsetはutf8
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     expose:
