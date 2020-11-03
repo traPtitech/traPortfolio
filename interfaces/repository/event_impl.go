@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 var (
@@ -44,8 +44,10 @@ func (repo *EventRepository) GetEvents(ctx context.Context) (events []*domain.Ev
 	}
 
 	elvs, err := repo.GetEventLevels()
-	if err != nil {
-		fmt.Printf("here! %s\n", err)
+	if err == repository.ErrNotFound {
+		elvs = make([]*domain.EventLevelRelation, 0)
+	}
+	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
 
@@ -85,15 +87,19 @@ func (repo *EventRepository) GetEventByID(ctx context.Context, ID uuid.UUID) (*d
 
 	elv := domain.EventLevelRelation{ID: ID}
 	err = repo.First(&elv).Error()
-	if err != nil {
+	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
 
+	var level domain.EventLevel = 1
+	if err == nil {
+		level = elv.Level
+	}
 	result := &domain.Event{
 		ID:          er.ID,
 		Description: er.Description,
 		GroupID:     er.GroupID,
-		Level:       elv.Level,
+		Level:       level,
 		Name:        er.Name,
 		RoomID:      er.RoomID,
 		SharedRoom:  er.SharedRoom,
