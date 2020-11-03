@@ -7,6 +7,8 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
@@ -30,7 +32,13 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	portalRepository := repository.NewPortalRepository(portalToken)
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userRepository, userService)
-	api := handler.NewAPI(pingHandler, userHandler)
+	knoqAPI, err := NewKnoqAPI()
+	if err != nil {
+		return handler.API{}, err
+	}
+	eventRepository := repository.NewEventRepository(sqlHandler, knoqAPI)
+	eventHandler := handler.NewEventHandler(eventRepository)
+	api := handler.NewAPI(pingHandler, userHandler, eventHandler)
 	return api, nil
 }
 
@@ -44,6 +52,12 @@ var pingSet = wire.NewSet(handler.NewPingHandler)
 
 var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
 
-var sqlSet = wire.NewSet(NewSQLHandler)
+var eventSet = wire.NewSet(
+	NewKnoqAPI, repository.NewEventRepository, handler.NewEventHandler, wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)), wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
+)
+
+var sqlSet = wire.NewSet(
+	NewSQLHandler, wire.Bind(new(database.SQLHandler), new(*SQLHandler)),
+)
 
 var apiSet = wire.NewSet(handler.NewAPI)

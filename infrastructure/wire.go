@@ -4,6 +4,8 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -31,7 +33,18 @@ var userSet = wire.NewSet(
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
 )
 
-var sqlSet = wire.NewSet(NewSQLHandler)
+var eventSet = wire.NewSet(
+	NewKnoqAPI,
+	impl.NewEventRepository,
+	handler.NewEventHandler,
+	wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)),
+	wire.Bind(new(repository.EventRepository), new(*impl.EventRepository)),
+)
+
+var sqlSet = wire.NewSet(
+	NewSQLHandler,
+	wire.Bind(new(database.SQLHandler), new(*SQLHandler)),
+)
 
 var apiSet = wire.NewSet(handler.NewAPI)
 
@@ -39,6 +52,7 @@ func InjectAPIServer(traQToken impl.TraQToken, portalToken impl.PortalToken) (ha
 	wire.Build(
 		pingSet,
 		userSet,
+		eventSet,
 		sqlSet,
 		apiSet,
 		portalSet,
