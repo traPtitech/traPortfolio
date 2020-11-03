@@ -33,6 +33,11 @@ paths:
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: 指定した文字列がtraP IDに含まれているかどうか
       tags:
         - user
   '/users/{userId}':
