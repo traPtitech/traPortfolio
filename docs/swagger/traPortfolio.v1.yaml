@@ -137,7 +137,7 @@ paths:
                   $ref: '#/components/schemas/Project'
         '404':
           description: Not Found
-      operationId: getUsersProject
+      operationId: getUserProjects
       description: ユーザーが所属している（いた）プロジェクトを取得します
       tags:
         - user
@@ -158,7 +158,7 @@ paths:
                   $ref: '#/components/schemas/Contest'
         '404':
           description: Not Found
-      operationId: getUsersProject
+      operationId: getUserContests
       description: ユーザーが参加したコンテストを取得します
       tags:
         - user
@@ -179,7 +179,7 @@ paths:
                   $ref: '#/components/schemas/Group'
         '404':
           description: Not Found
-      operationId: getUsersProject
+      operationId: getUserGroups
       description: ユーザーが所属しているまたは所属したことのある班を取得します
       tags:
         - user
@@ -200,7 +200,7 @@ paths:
                   $ref: '#/components/schemas/Event'
         '404':
           description: Not Found
-      operationId: getUsersProject
+      operationId: getUserEvents
       description: ユーザーが開催したイベントを取得します
       tags:
         - user
