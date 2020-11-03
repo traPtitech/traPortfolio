@@ -73,6 +73,49 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EditUser'
+  '/users/{userId}/accounts':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    put:
+      summary: アカウント情報の追加
+      operationId: addAccount
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウント情報を追加します
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+    delete:
+      summary: アカウント情報の削除
+      operationId: deleteAccount
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウント情報を削除します
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
   '/user/{userId}/projects':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -370,12 +413,18 @@ components:
         realName:
           type: string
           description: ユーザー本名
+        accounts:
+          type: array
+          description: 各種アカウントへのリンク
+          items:
+            $ref: '#/components/schemas/Account'
       required:
         - id
         - state
         - displayName
         - name
         - bio
+        - accounts
     EditUser:
       title: EditUserRequest
       type: object
@@ -391,6 +440,48 @@ components:
       required:
         - bio
         - check
+    Account:
+      title: Account
+      type: object
+      description: アカウントへのリンク
+      properties:
+        id:
+          type: string
+          description: アカウントID
+        type:
+          $ref: '#/components/schemas/AccountType'
+        permittedPr:
+          type: boolean
+          description: 広報での利用が許可されているかどうか
+    AccountType:
+      type: integer
+      title: EventLevel
+      description: アカウントの種類
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+      x-enum-varnames:
+        - homepage
+        - blog
+        - twitter
+        - facebook
+        - pixiv
+        - github
+        - qiita
+      x-enum-descriptions:
+        - ホームページ (IDはリンクのURLそのまま)
+        - ブログ (IDはリンクのURLそのまま)
+        - Twitter (IDは@～のもの、@は含まない)
+        - Facebook
+        - Pixiv
+        - GitHub (@は含まない)
+        - Qiita (@は含まない)
     Project:
       title: Project
       type: object
