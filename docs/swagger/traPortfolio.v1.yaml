@@ -141,7 +141,70 @@ paths:
       description: ユーザーが所属している（いた）プロジェクトを取得します
       tags:
         - user
-        - user project
+        - project
+  '/user/{userId}/contests':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが参加したコンテストの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contest'
+        '404':
+          description: Not Found
+      operationId: getUsersProject
+      description: ユーザーが参加したコンテストを取得します
+      tags:
+        - user
+        - contest
+  '/user/{userId}/groups':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが所属した班の取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+        '404':
+          description: Not Found
+      operationId: getUsersProject
+      description: ユーザーが所属しているまたは所属したことのある班を取得します
+      tags:
+        - user
+        - group
+  '/user/{userId}/events':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが開催したイベントの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '404':
+          description: Not Found
+      operationId: getUsersProject
+      description: ユーザーが開催したイベントを取得します
+      tags:
+        - user
+        - event
   /projects:
     get:
       summary: プロジェクトのリストを取得
@@ -360,20 +423,10 @@ components:
           description: ユーザー表示名
           minLength: 0
           maxLength: 32
-        state:
-          $ref: '#/components/schemas/UserAccountState'
-        achievement:
-          type: array
-          description: ユーザー実績
-          nullable: true
-          items:
-            $ref: '#/components/schemas/Achievement'
       required:
         - id
         - name
         - displayName
-        - state
-        - achievement
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -676,7 +729,6 @@ components:
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
           description: ユーザー名
         duration:
-          format: date-time
           description: |-
             班に入っている期間の配列
             nullのところはまだ継続して入っている
@@ -687,26 +739,6 @@ components:
         - id
         - name
         - duration
-    Achievement:
-      title: Achievement
-      type: object
-      description: 実績情報
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: 実績uuid
-        name:
-          type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
-          description: 実績名
-        description:
-          type: string
-          description: 実績の説明
-      required:
-        - id
-        - name
-        - description
     PostProject:
       title: PostProjectRequest
       type: object
@@ -878,7 +910,5 @@ tags:
     description: イベントAPI
   - name: group
     description: 班API
-  - name: user project
-    description: ユーザープロジェクトAPI
   - name: contest
     description: コンテストAPI
