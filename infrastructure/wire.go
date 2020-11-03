@@ -8,7 +8,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
-	"github.com/traPtitech/traPortfolio/usecases/usecase"
 )
 
 var portalSet = wire.NewSet(
@@ -23,7 +22,6 @@ var traQSet = wire.NewSet(
 
 var pingSet = wire.NewSet(
 	handler.NewPingHandler,
-	wire.Bind(new(usecase.PingUsecase), new(*handler.PingHandler)),
 )
 
 var userSet = wire.NewSet(
@@ -31,7 +29,6 @@ var userSet = wire.NewSet(
 	service.NewUserService,
 	handler.NewUserHandler,
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
-	wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)),
 )
 
 var sqlSet = wire.NewSet(NewSQLHandler)
