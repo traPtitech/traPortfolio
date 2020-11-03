@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"net/http"
-	"os"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -11,13 +9,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
-
-var (
-	knoQCookie      = os.Getenv("KNOQ_COOKIE")
-	knoQAPIEndpoint = os.Getenv("KNOQ_API_ENDPOINT")
-)
-
-var knoQclient *http.Client
 
 type EventRepository struct {
 	database.SQLHandler
