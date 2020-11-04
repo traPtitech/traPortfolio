@@ -33,6 +33,11 @@ paths:
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: 指定した文字列がtraP IDに含まれているかどうか
       tags:
         - user
   '/users/{userId}':
@@ -73,6 +78,49 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EditUser'
+  '/users/{userId}/accounts':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    put:
+      summary: アカウント情報の追加
+      operationId: addAccount
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウント情報を追加します
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+    delete:
+      summary: アカウント情報の削除
+      operationId: deleteAccount
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウント情報を削除します
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
   '/user/{userId}/projects':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -89,11 +137,74 @@ paths:
                   $ref: '#/components/schemas/Project'
         '404':
           description: Not Found
-      operationId: getUsersProject
+      operationId: getUserProjects
       description: ユーザーが所属している（いた）プロジェクトを取得します
       tags:
         - user
-        - user project
+        - project
+  '/user/{userId}/contests':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが参加したコンテストの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contest'
+        '404':
+          description: Not Found
+      operationId: getUserContests
+      description: ユーザーが参加したコンテストを取得します
+      tags:
+        - user
+        - contest
+  '/user/{userId}/groups':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが所属した班の取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+        '404':
+          description: Not Found
+      operationId: getUserGroups
+      description: ユーザーが所属しているまたは所属したことのある班を取得します
+      tags:
+        - user
+        - group
+  '/user/{userId}/events':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+    get:
+      summary: ユーザーが開催したイベントの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '404':
+          description: Not Found
+      operationId: getUserEvents
+      description: ユーザーが開催したイベントを取得します
+      tags:
+        - user
+        - event
   /projects:
     get:
       summary: プロジェクトのリストを取得
@@ -312,20 +423,10 @@ components:
           description: ユーザー表示名
           minLength: 0
           maxLength: 32
-        state:
-          $ref: '#/components/schemas/UserAccountState'
-        achievement:
-          type: array
-          description: ユーザー実績
-          nullable: true
-          items:
-            $ref: '#/components/schemas/Achievement'
       required:
         - id
         - name
         - displayName
-        - state
-        - achievement
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -370,12 +471,18 @@ components:
         realName:
           type: string
           description: ユーザー本名
+        accounts:
+          type: array
+          description: 各種アカウントへのリンク
+          items:
+            $ref: '#/components/schemas/Account'
       required:
         - id
         - state
         - displayName
         - name
         - bio
+        - accounts
     EditUser:
       title: EditUserRequest
       type: object
@@ -391,6 +498,58 @@ components:
       required:
         - bio
         - check
+    Account:
+      title: Account
+      type: object
+      description: アカウントへのリンク
+      properties:
+        id:
+          type: string
+          description: アカウントID
+        type:
+          $ref: '#/components/schemas/AccountType'
+        permittedPr:
+          type: boolean
+          description: 広報での利用が許可されているかどうか
+      required:
+        - id
+        - type
+        - permittedPr
+    AccountType:
+      type: integer
+      title: EventLevel
+      description: アカウントの種類
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+      x-enum-varnames:
+        - homepage
+        - blog
+        - twitter
+        - facebook
+        - pixiv
+        - github
+        - qiita
+        - atcoder
+        - soundcloud
+      x-enum-descriptions:
+        - ホームページ (IDはリンクのURLそのまま)
+        - ブログ (IDはリンクのURLそのまま)
+        - Twitter (IDは@～のもの、@は含まない)
+        - Facebook
+        - Pixiv
+        - GitHub (@は含まない)
+        - Qiita (@は含まない)
+        - AtCoder
+        - SoundCloud
     Project:
       title: Project
       type: object
@@ -580,7 +739,6 @@ components:
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
           description: ユーザー名
         duration:
-          format: date-time
           description: |-
             班に入っている期間の配列
             nullのところはまだ継続して入っている
@@ -591,26 +749,6 @@ components:
         - id
         - name
         - duration
-    Achievement:
-      title: Achievement
-      type: object
-      description: 実績情報
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: 実績uuid
-        name:
-          type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
-          description: 実績名
-        description:
-          type: string
-          description: 実績の説明
-      required:
-        - id
-        - name
-        - description
     PostProject:
       title: PostProjectRequest
       type: object
@@ -782,7 +920,5 @@ tags:
     description: イベントAPI
   - name: group
     description: 班API
-  - name: user project
-    description: ユーザープロジェクトAPI
   - name: contest
     description: コンテストAPI
