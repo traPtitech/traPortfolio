@@ -1,49 +1,46 @@
-package repository
+package event_service
 
 import (
 	"context"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type EventRepository struct {
-	database.SQLHandler
-	external.KnoqAPI
+// Event Portfolioのレスポンスで使うイベント情報
+type Event struct {
+	ID          uuid.UUID         `json:"eventId"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	GroupID     uuid.UUID         `json:"groupId"`
+	RoomID      uuid.UUID         `json:"roomId"`
+	TimeStart   time.Time         `json:"timeStart"`
+	TimeEnd     time.Time         `json:"timeEnd"`
+	SharedRoom  bool              `json:"sharedRoom"`
+	Level       domain.EventLevel `json:"eventLevel"`
 }
 
-func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) *EventRepository {
-	return &EventRepository{SQLHandler: sql, KnoqAPI: knoq}
+type EventService struct {
+	repo repository.EventRepository
+	knoQ repository.KnoqRepository
 }
 
-func (repo *EventRepository) GetEventLevels() ([]*domain.EventLevelRelation, error) {
-	elvs := make([]*domain.EventLevelRelation, 0)
-	err := repo.Find(&elvs).Error()
+func NewEventService(repo repository.EventRepository, knoQ repository.KnoqRepository) EventService {
+	return EventService{
+		repo,
+		knoQ,
+	}
+}
+
+func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
+	er, err := s.knoQ.GetAll()
 	if err != nil {
 		return nil, err
 	}
-	return elvs, nil
-}
 
-func (repo *EventRepository) GetEventLevelByID(ID uuid.UUID) (*domain.EventLevelRelation, error) {
-	elv := domain.EventLevelRelation{ID: ID}
-	err := repo.First(&elv).Error()
-	if err != nil {
-		return nil, err
-	}
-	return &elv, nil
-}
-
-func (repo *EventRepository) GetEvents(ctx context.Context) (events []*domain.Event, err error) {
-	er, err := repo.KnoqAPI.GetAll()
-	if err != nil {
-		return nil, err
-	}
-
-	elvs, err := repo.GetEventLevels()
+	elvs, err := s.repo.GetEventLevels()
 	if err == repository.ErrNotFound {
 		elvs = make([]*domain.EventLevelRelation, 0)
 	}
@@ -79,14 +76,13 @@ func (repo *EventRepository) GetEvents(ctx context.Context) (events []*domain.Ev
 	return result, nil
 }
 
-func (repo *EventRepository) GetEventByID(ctx context.Context, ID uuid.UUID) (*domain.Event, error) {
-	er, err := repo.KnoqAPI.GetByID(ID)
+func (s *EventService) GetEventByID(ctx context.Context, ID uuid.UUID) (*domain.Event, error) {
+	er, err := s.knoQ.GetByID(ID)
 	if err != nil {
 		return nil, err
 	}
 
-	elv := domain.EventLevelRelation{ID: ID}
-	err = repo.First(&elv).Error()
+	elv, err := s.repo.GetEventLevelByID(ID)
 	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}

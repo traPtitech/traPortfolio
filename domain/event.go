@@ -8,21 +8,27 @@ import (
 
 // Event knoQ上のイベント情報
 type Event struct {
-	ID          uuid.UUID  `json:"eventId"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	GroupID     uuid.UUID  `json:"groupId"`
-	RoomID      uuid.UUID  `json:"roomId"`
-	TimeStart   time.Time  `json:"timeStart"`
-	TimeEnd     time.Time  `json:"timeEnd"`
-	SharedRoom  bool       `json:"sharedRoom"`
-	Level       EventLevel `json:"eventLevel"`
+	ID          uuid.UUID
+	Name        string
+	Description string
+	GroupID     uuid.UUID
+	RoomID      uuid.UUID
+	TimeStart   time.Time
+	TimeEnd     time.Time
+	SharedRoom  bool
+	Level       EventLevel
 }
 
-// EventLevel 0 全て公開, 1 匿名で公開
+// EventLevel 0 匿名で公開, 1 全て公開, 2 部内にのみ公開
 type EventLevel uint
+
+const (
+	EventLevelAnonymous = iota
+	EventLevelPublic
+	EventLevelPrivate
+)
 
 type EventLevelRelation struct {
 	ID    uuid.UUID  `gorm:"type:char(36);not null;primary_key"`
-	Level EventLevel `gorm:"type:tinyint unsigned;not null;default:1"`
+	Level EventLevel `gorm:"type:tinyint unsigned;not null;default:0"`
 }

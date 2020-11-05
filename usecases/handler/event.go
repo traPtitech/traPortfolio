@@ -8,23 +8,24 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	service "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 	// service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
 
 type EventHandler struct {
-	repo repository.EventRepository
-	// EventService    service.EventService
+	repo    repository.EventRepository
+	service service.EventService
 }
 
 // NewEventHandler creates a EventHandler
-func NewEventHandler(repo repository.EventRepository) *EventHandler {
-	return &EventHandler{repo}
+func NewEventHandler(repo repository.EventRepository, service service.EventService) *EventHandler {
+	return &EventHandler{repo, service}
 }
 
 // GetAll GET /events
 func (h *EventHandler) GetAll(c echo.Context) error {
 	ctx := context.Background()
-	events, err := h.repo.GetEvents(ctx)
+	events, err := h.service.GetEvents(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ func (h *EventHandler) GetByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 	ctx := context.Background()
-	event, err := h.repo.GetEventByID(ctx, id)
+	event, err := h.service.GetEventByID(ctx, id)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
