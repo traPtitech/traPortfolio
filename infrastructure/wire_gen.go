@@ -12,7 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/usecases/service/event_service"
+	service2 "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 	"github.com/traPtitech/traPortfolio/usecases/service/user_service"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -29,7 +29,7 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	userRepository := repository.NewUserRepository(sqlHandler)
 	traQRepository := repository.NewTraQRepository(traQToken)
 	portalRepository := repository.NewPortalRepository(portalToken)
-	userService := user_service.NewUserService(userRepository, traQRepository, portalRepository)
+	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userRepository, userService)
 	knoqAPI, err := NewKnoqAPI()
 	if err != nil {
@@ -37,7 +37,7 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	}
 	eventRepository := repository.NewEventRepository(sqlHandler, knoqAPI)
 	knoqRepository := repository.NewKnoqRepository(knoqAPI)
-	eventService := event_service.NewEventService(eventRepository, knoqRepository)
+	eventService := service2.NewEventService(eventRepository, knoqRepository)
 	eventHandler := handler.NewEventHandler(eventRepository, eventService)
 	api := handler.NewAPI(pingHandler, userHandler, eventHandler)
 	return api, nil
@@ -51,14 +51,14 @@ var traQSet = wire.NewSet(repository.NewTraQRepository, wire.Bind(new(repository
 
 var pingSet = wire.NewSet(handler.NewPingHandler)
 
-var userSet = wire.NewSet(repository.NewUserRepository, user_service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)))
+var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)))
 
 var knoQSet = wire.NewSet(
 	NewKnoqAPI, repository.NewKnoqRepository, wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)), wire.Bind(new(repository2.KnoqRepository), new(*repository.KnoqRepository)),
 )
 
 var eventSet = wire.NewSet(
-	knoQSet, repository.NewEventRepository, event_service.NewEventService, handler.NewEventHandler, wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
+	knoQSet, repository.NewEventRepository, service2.NewEventService, handler.NewEventHandler, wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
 )
 
 var sqlSet = wire.NewSet(
