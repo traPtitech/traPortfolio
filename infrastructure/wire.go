@@ -9,7 +9,8 @@ import (
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
+	"github.com/traPtitech/traPortfolio/usecases/service/event_service"
+	"github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
 
 var portalSet = wire.NewSet(
@@ -28,16 +29,23 @@ var pingSet = wire.NewSet(
 
 var userSet = wire.NewSet(
 	impl.NewUserRepository,
-	service.NewUserService,
+	user_service.NewUserService,
 	handler.NewUserHandler,
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
 )
 
-var eventSet = wire.NewSet(
+var knoQSet = wire.NewSet(
 	NewKnoqAPI,
-	impl.NewEventRepository,
-	handler.NewEventHandler,
+	impl.NewKnoqRepository,
 	wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)),
+	wire.Bind(new(repository.KnoqRepository), new(*impl.KnoqRepository)),
+)
+
+var eventSet = wire.NewSet(
+	knoQSet,
+	impl.NewEventRepository,
+	event_service.NewEventService,
+	handler.NewEventHandler,
 	wire.Bind(new(repository.EventRepository), new(*impl.EventRepository)),
 )
 
