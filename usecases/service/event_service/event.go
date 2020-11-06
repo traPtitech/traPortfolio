@@ -41,6 +41,9 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 	}
 
 	elvsmp, err := s.repo.GetEventLevels()
+	if err != nil {
+		return nil, err
+	}
 
 	result := make([]*domain.Event, 0, len(er))
 	for _, v := range er {
