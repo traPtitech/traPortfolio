@@ -136,7 +136,7 @@ jobs:
         run: |
           source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio/traPortfolio
-          DB_HOST=localhost ./traPortfolio/traPortfolio -migrate true
+          DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test ./traPortfolio/traPortfolio -migrate true
           tbls lint
         env:
           TBLS_DSN: "mysql://root:password@127.0.0.1:3306/portfolio"
