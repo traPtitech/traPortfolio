@@ -19,13 +19,13 @@ type Event struct {
 	Level       EventLevel
 }
 
-// EventLevel 0 匿名で公開, 1 全て公開, 2 部内にのみ公開
+// EventLevel
 type EventLevel uint
 
 const (
-	EventLevelAnonymous = iota
-	EventLevelPublic
-	EventLevelPrivate
+	EventLevelAnonymous = iota // 匿名で公開
+	EventLevelPublic           // 全て公開
+	EventLevelPrivate          // 外部に非公開
 )
 
 type EventLevelRelation struct {

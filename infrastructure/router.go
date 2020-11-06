@@ -29,7 +29,7 @@ func Init() {
 		apiEvents := v1.Group("/events")
 		{
 			apiEvents.GET("", api.Event.GetAll)
-			apiEvents.GET("/:id", api.Event.GetByID)
+			apiEvents.GET("/:eventID", api.Event.GetByID)
 		}
 		apiPing := v1.Group("/ping")
 		{

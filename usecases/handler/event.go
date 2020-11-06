@@ -9,7 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	service "github.com/traPtitech/traPortfolio/usecases/service/event_service"
-	// service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
 
 type EventHandler struct {
@@ -29,12 +28,12 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, events) // todo
+	return c.JSON(http.StatusOK, events)
 }
 
 // GetByID GET /events/:eventID
 func (h *EventHandler) GetByID(c echo.Context) error {
-	_id := c.Param("id")
+	_id := c.Param("eventID")
 	if _id == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "event id must not be blank")
 	}
