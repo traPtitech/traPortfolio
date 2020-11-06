@@ -7,6 +7,6 @@ import (
 )
 
 type EventRepository interface {
-	GetEventLevels() ([]*domain.EventLevelRelation, error)
+	GetEventLevels() (map[uuid.UUID]*domain.EventLevelRelation, error)
 	GetEventLevelByID(ID uuid.UUID) (*domain.EventLevelRelation, error)
 }

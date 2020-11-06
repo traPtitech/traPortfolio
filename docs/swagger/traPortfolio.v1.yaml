@@ -856,9 +856,9 @@ components:
         - 1
         - 2
       x-enum-varnames:
-        - EventLevelAnonymous
-        - EventLevelPublic
-        - EventLevelPrivate
+        - Anonymous
+        - Public
+        - Private
       x-enum-descriptions:
         - イベントの企画者の名前を伏せて公開
         - 全て公開

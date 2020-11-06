@@ -40,37 +40,24 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 		return nil, err
 	}
 
-	elvs, err := s.repo.GetEventLevels()
-	if err == repository.ErrNotFound {
-		elvs = make([]*domain.EventLevelRelation, 0)
-	}
-	if err != nil && err != repository.ErrNotFound {
-		return nil, err
-	}
+	elvsmp, err := s.repo.GetEventLevels()
 
-	elvsmp := make(map[uuid.UUID]*domain.EventLevelRelation)
-	for _, v := range elvs {
-		v := v
-		elvsmp[v.ID] = v
-	}
 	result := make([]*domain.Event, 0, len(er))
 	for _, v := range er {
-		_level, ok := elvsmp[v.ID]
-		var level domain.EventLevel = domain.EventLevelAnonymous
-		if ok {
-			level = _level.Level
-		}
-		result = append(result, &domain.Event{
+		e := &domain.Event{
 			ID:          v.ID,
 			Description: v.Description,
 			GroupID:     v.GroupID,
-			Level:       level,
 			Name:        v.Name,
 			RoomID:      v.RoomID,
 			SharedRoom:  v.SharedRoom,
 			TimeEnd:     v.TimeEnd,
-			TimeStart:   v.TimeStart,
-		})
+		}
+		_level, ok := elvsmp[v.ID]
+		if ok {
+			e.Level = _level.Level
+		}
+		result = append(result, e)
 	}
 
 	return result, nil

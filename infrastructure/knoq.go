@@ -23,6 +23,15 @@ type KnoqAPI struct {
 	Client *http.Client
 }
 
+func init() {
+	if knoQCookie == "" {
+		log.Fatal("the environment variable KNOQ_COOKIE should not be empty")
+	}
+	if knoQAPIEndpoint == "" {
+		log.Fatal("the environment variable KNOQ_API_ENDPOINT should not be empty")
+	}
+}
+
 func NewKnoqAPI() (*KnoqAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {

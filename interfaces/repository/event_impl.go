@@ -5,6 +5,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type EventRepository struct {
@@ -16,13 +17,18 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) *EventRe
 	return &EventRepository{SQLHandler: sql, KnoqAPI: knoq}
 }
 
-func (repo *EventRepository) GetEventLevels() ([]*domain.EventLevelRelation, error) {
+func (repo *EventRepository) GetEventLevels() (map[uuid.UUID]*domain.EventLevelRelation, error) {
 	elvs := make([]*domain.EventLevelRelation, 0)
 	err := repo.Find(&elvs).Error()
-	if err != nil {
+	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
-	return elvs, nil
+	elvsmp := make(map[uuid.UUID]*domain.EventLevelRelation, len(elvs))
+	for _, v := range elvs {
+		v := v
+		elvsmp[v.ID] = v
+	}
+	return elvsmp, nil
 }
 
 func (repo *EventRepository) GetEventLevelByID(id uuid.UUID) (*domain.EventLevelRelation, error) {
