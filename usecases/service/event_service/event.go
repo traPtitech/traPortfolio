@@ -74,20 +74,19 @@ func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 		return nil, err
 	}
 
-	var level domain.EventLevel = domain.EventLevelAnonymous
-	if err == nil {
-		level = elv.Level
-	}
 	result := &domain.Event{
 		ID:          er.ID,
 		Description: er.Description,
 		GroupID:     er.GroupID,
-		Level:       level,
 		Name:        er.Name,
 		RoomID:      er.RoomID,
 		SharedRoom:  er.SharedRoom,
 		TimeEnd:     er.TimeEnd,
 		TimeStart:   er.TimeStart,
+	}
+
+	if err == nil {
+		result.Level = elv.Level
 	}
 
 	return result, nil
