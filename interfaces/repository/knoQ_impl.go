@@ -35,8 +35,8 @@ func (repo *KnoqRepository) GetAll() ([]*repository.ResponseEvent, error) {
 	return result, nil
 }
 
-func (repo *KnoqRepository) GetByID(ID uuid.UUID) (*repository.ResponseEvent, error) {
-	eres, err := repo.api.GetByID(ID)
+func (repo *KnoqRepository) GetByID(id uuid.UUID) (*repository.ResponseEvent, error) {
+	eres, err := repo.api.GetByID(id)
 	if err != nil {
 		return nil, err
 	}

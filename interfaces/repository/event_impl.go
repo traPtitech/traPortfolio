@@ -28,8 +28,8 @@ func (repo *EventRepository) GetEventLevels() ([]*domain.EventLevelRelation, err
 	return elvs, nil
 }
 
-func (repo *EventRepository) GetEventLevelByID(ID uuid.UUID) (*domain.EventLevelRelation, error) {
-	elv := domain.EventLevelRelation{ID: ID}
+func (repo *EventRepository) GetEventLevelByID(id uuid.UUID) (*domain.EventLevelRelation, error) {
+	elv := domain.EventLevelRelation{ID: id}
 	err := repo.First(&elv).Error()
 	if err != nil {
 		return nil, err

@@ -61,19 +61,19 @@ func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 	return er, nil
 }
 
-func (knoq *KnoqAPI) GetByID(ID uuid.UUID) (*external.EventResponse, error) {
-	if ID == uuid.Nil {
+func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
+	if id == uuid.Nil {
 		return nil, nil
 	}
 
-	res, err := apiGet(knoq.Client, fmt.Sprintf("/events/%v", ID))
+	res, err := apiGet(knoq.Client, fmt.Sprintf("/events/%v", id))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /events/%v failed", ID)
+		return nil, fmt.Errorf("GET /events/%v failed", id)
 	}
 
 	var er external.EventResponse

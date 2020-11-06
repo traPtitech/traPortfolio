@@ -76,13 +76,13 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 	return result, nil
 }
 
-func (s *EventService) GetEventByID(ctx context.Context, ID uuid.UUID) (*domain.Event, error) {
-	er, err := s.knoQ.GetByID(ID)
+func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.Event, error) {
+	er, err := s.knoQ.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	elv, err := s.repo.GetEventLevelByID(ID)
+	elv, err := s.repo.GetEventLevelByID(id)
 	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
