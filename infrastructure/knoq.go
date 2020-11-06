@@ -19,10 +19,6 @@ var (
 	knoQAPIEndpoint = os.Getenv("KNOQ_API_ENDPOINT")
 )
 
-type KnoqAPI struct {
-	Client *http.Client
-}
-
 func init() {
 	if knoQCookie == "" {
 		log.Fatal("the environment variable KNOQ_COOKIE should not be empty")
@@ -30,6 +26,10 @@ func init() {
 	if knoQAPIEndpoint == "" {
 		log.Fatal("the environment variable KNOQ_API_ENDPOINT should not be empty")
 	}
+}
+
+type KnoqAPI struct {
+	Client *http.Client
 }
 
 func NewKnoqAPI() (*KnoqAPI, error) {

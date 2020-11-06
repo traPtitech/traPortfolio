@@ -56,9 +56,8 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 			SharedRoom:  v.SharedRoom,
 			TimeEnd:     v.TimeEnd,
 		}
-		_level, ok := elvsmp[v.ID]
-		if ok {
-			e.Level = _level.Level
+		if level, ok := elvsmp[v.ID]; ok {
+			e.Level = level.Level
 		}
 		result = append(result, e)
 	}
