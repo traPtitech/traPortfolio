@@ -14,7 +14,9 @@ import (
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
 	service2 "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 	"github.com/traPtitech/traPortfolio/usecases/service/user_service"
+)
 
+import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
@@ -51,7 +53,7 @@ var traQSet = wire.NewSet(repository.NewTraQRepository, wire.Bind(new(repository
 
 var pingSet = wire.NewSet(handler.NewPingHandler)
 
-var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)), wire.Bind(new(usecase.UserUsecase), new(*handler.UserHandler)))
+var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
 
 var knoQSet = wire.NewSet(
 	NewKnoqAPI, repository.NewKnoqRepository, wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)), wire.Bind(new(repository2.KnoqRepository), new(*repository.KnoqRepository)),
