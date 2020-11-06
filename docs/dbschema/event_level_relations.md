@@ -22,7 +22,7 @@ CREATE TABLE `event_level_relations` (
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false |  |  | knoQイベントUUID |
-| level | tinyint(3) unsigned | 1 | false |  |  | 公開レベル。0ならそのまま公開、1なら匿名 |
+| level | tinyint(3) unsigned | 1 | false |  |  | 公開レベル。0なら匿名、1ならそのまま公開、2なら外部に非公開 |
 
 ## Constraints
 

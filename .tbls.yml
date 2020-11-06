@@ -25,7 +25,7 @@ comments:
     tableComment: knoQイベントと公開レベルの関係テーブル
     columnComments:
       id: knoQイベントUUID
-      level: 公開レベル。0匿名、1ならそのまま公開、2なら外部に非公開
+      level: 公開レベル。0なら匿名、1ならそのまま公開、2なら外部に非公開
   - table: migrations
     tableComment: gormigrate用のデータベースバージョンテーブル
   # - table: accounts
