@@ -1,17 +1,18 @@
-# migrations
+# event_level_relations
 
 ## Description
 
-gormigrate用のデータベースバージョンテーブル
+knoQイベントと公開レベルの関係テーブル
 
 <details>
 <summary><strong>Table Definition</strong></summary>
 
 ```sql
-CREATE TABLE `migrations` (
-  `id` varchar(255) NOT NULL,
+CREATE TABLE `event_level_relations` (
+  `id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
 </details>
@@ -20,7 +21,8 @@ CREATE TABLE `migrations` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | varchar(255) |  | false |  |  |  |
+| id | char(36) |  | false |  |  | knoQイベントUUID |
+| level | tinyint(3) unsigned | 1 | false |  |  | 公開レベル。0なら匿名、1ならそのまま公開、2なら外部に非公開 |
 
 ## Constraints
 
@@ -36,7 +38,7 @@ CREATE TABLE `migrations` (
 
 ## Relations
 
-![er](migrations.svg)
+![er](event_level_relations.svg)
 
 ---
 

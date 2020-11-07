@@ -18,7 +18,7 @@ type SQLHandler struct {
 	Conn *gorm.DB
 }
 
-func NewSQLHandler() (database.SQLHandler, error) {
+func NewSQLHandler() (*SQLHandler, error) {
 	user := os.Getenv("DB_USER")
 	if user == "" {
 		user = "root"

@@ -6,6 +6,9 @@ services:
     restart: always
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
     command: ./traPortfolio
+    environment:
+      KNOQ_COOKIE: "your session"
+      KNOQ_API_ENDPOINT: https://knoq.trap.jp/api
     expose:
       - "80"
       - "6060"

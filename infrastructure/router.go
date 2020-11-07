@@ -26,6 +26,11 @@ func Init() {
 		{
 			apiUsers.PUT("/:id", api.User.Update)
 		}
+		apiEvents := v1.Group("/events")
+		{
+			apiEvents.GET("", api.Event.GetAll)
+			apiEvents.GET("/:eventID", api.Event.GetByID)
+		}
 		apiPing := v1.Group("/ping")
 		{
 			apiPing.GET("", api.Ping.Ping)

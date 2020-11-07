@@ -1,27 +1,27 @@
 openapi: 3.0.0
 info:
   title: traPortfolio
-  version: '1.0'
+  version: "1.0"
   contact:
     name: traP
-    url: 'https://github.com/traPtitech/traPortfolio'
+    url: "https://github.com/traPtitech/traPortfolio"
   description: traPortfolio v1 API
 servers:
-  - url: 'http://localhost:1323/api/v1'
+  - url: "http://localhost:1323/api/v1"
     description: local
 paths:
   /users:
     get:
       summary: ユーザーのリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
       operationId: getUsers
       description: |-
         ユーザー情報を取得します
@@ -29,7 +29,7 @@ paths:
       parameters:
         - schema:
             type: boolean
-            default: 'false'
+            default: "false"
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
@@ -40,19 +40,19 @@ paths:
           description: 指定した文字列がtraP IDに含まれているかどうか
       tags:
         - user
-  '/users/{userId}':
+  "/users/{userId}":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザー詳細情報の取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDetail'
-        '404':
+                $ref: "#/components/schemas/UserDetail"
+        "404":
           description: Not Found
       operationId: getUser
       description: ユーザー詳細情報を取得します
@@ -62,13 +62,13 @@ paths:
       summary: ユーザー情報の編集
       operationId: editUser
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       description: ユーザー情報を修正します
       tags:
@@ -77,21 +77,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUser'
-  '/users/{userId}/accounts':
+              $ref: "#/components/schemas/EditUser"
+  "/users/{userId}/accounts":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     put:
       summary: アカウント情報の追加
       operationId: addAccount
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       description: アカウント情報を追加します
       tags:
@@ -100,18 +100,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Account'
+              $ref: "#/components/schemas/Account"
     delete:
       summary: アカウント情報の削除
       operationId: deleteAccount
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       description: アカウント情報を削除します
       tags:
@@ -120,85 +120,85 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Account'
-  '/user/{userId}/projects':
+              $ref: "#/components/schemas/Account"
+  "/user/{userId}/projects":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザーが所属するプロジェクトの取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Project'
-        '404':
+                  $ref: "#/components/schemas/Project"
+        "404":
           description: Not Found
       operationId: getUserProjects
       description: ユーザーが所属している（いた）プロジェクトを取得します
       tags:
         - user
         - project
-  '/user/{userId}/contests':
+  "/user/{userId}/contests":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザーが参加したコンテストの取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Contest'
-        '404':
+                  $ref: "#/components/schemas/Contest"
+        "404":
           description: Not Found
       operationId: getUserContests
       description: ユーザーが参加したコンテストを取得します
       tags:
         - user
         - contest
-  '/user/{userId}/groups':
+  "/user/{userId}/groups":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザーが所属した班の取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Group'
-        '404':
+                  $ref: "#/components/schemas/Group"
+        "404":
           description: Not Found
       operationId: getUserGroups
       description: ユーザーが所属しているまたは所属したことのある班を取得します
       tags:
         - user
         - group
-  '/user/{userId}/events':
+  "/user/{userId}/events":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザーが開催したイベントの取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Event'
-        '404':
+                  $ref: "#/components/schemas/Event"
+        "404":
           description: Not Found
       operationId: getUserEvents
       description: ユーザーが開催したイベントを取得します
@@ -209,14 +209,14 @@ paths:
     get:
       summary: プロジェクトのリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Project'
+                  $ref: "#/components/schemas/Project"
       operationId: getProjects
       description: プロジェクトのリストを取得します
       tags:
@@ -225,9 +225,9 @@ paths:
       summary: プロジェクトの作成
       operationId: postProject
       responses:
-        '201':
+        "201":
           description: Created
-        '400':
+        "400":
           description: Bad Request
       description: プロジェクトを作成します
       tags:
@@ -237,20 +237,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostProject'
-  '/projects/{projectId}':
+              $ref: "#/components/schemas/PostProject"
+  "/projects/{projectId}":
     parameters:
-      - $ref: '#/components/parameters/projectIdInPath'
+      - $ref: "#/components/parameters/projectIdInPath"
     get:
       summary: プロジェクト詳細情報を取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
-        '404':
+                $ref: "#/components/schemas/Project"
+        "404":
           description: Not Found
       operationId: getProject
       description: プロジェクトの詳細情報を取得します
@@ -260,13 +260,13 @@ paths:
       summary: プロジェクト詳細情報の修正
       operationId: editProject
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       description: プロジェクト情報を修正します
       tags:
@@ -276,19 +276,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditProject'
+              $ref: "#/components/schemas/EditProject"
   /events:
     get:
       summary: イベントリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Event'
+                  $ref: "#/components/schemas/Event"
       operationId: getEvents
       description: イベント情報を取得します
       tags:
@@ -298,32 +298,32 @@ paths:
     get:
       summary: 班のリストの取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Group'
+                  $ref: "#/components/schemas/Group"
       operationId: getGroups
       description: 班のリストを取得します
       tags:
         - group
     parameters: []
-  '/events/{eventId}':
+  "/events/{eventId}":
     parameters:
-      - $ref: '#/components/parameters/eventIdInPath'
+      - $ref: "#/components/parameters/eventIdInPath"
     get:
       summary: イベント詳細情報を取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
-        '404':
+                $ref: "#/components/schemas/Event"
+        "404":
           description: Not Found
       operationId: getEvent
       description: イベント情報詳細を取得します
@@ -335,14 +335,14 @@ paths:
       tags:
         - contest
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Contest'
+                  $ref: "#/components/schemas/Contest"
       operationId: getContests
       description: コンテストのリストを取得します
     parameters: []
@@ -350,48 +350,48 @@ paths:
       summary: コンテストの作成
       operationId: postContest
       responses:
-        '201':
+        "201":
           description: Created
-        '400':
+        "400":
           description: Bad Request
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostContest'
+              $ref: "#/components/schemas/PostContest"
       tags:
         - contest
       description: コンテストを作成します
-  '/contests/{contestId}':
+  "/contests/{contestId}":
     parameters:
-      - $ref: '#/components/parameters/contestIdInPath'
+      - $ref: "#/components/parameters/contestIdInPath"
     get:
       summary: コンテスト詳細情報の取得
       tags:
         - contest
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Contest'
-        '404':
+                $ref: "#/components/schemas/Contest"
+        "404":
           description: Not Found
       operationId: getContest
       description: コンテスト詳細情報を取得します
     patch:
-      summary: ''
+      summary: ""
       operationId: editContest
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       description: コンテスト情報を修正します
       requestBody:
@@ -399,7 +399,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContest'
+              $ref: "#/components/schemas/EditContest"
       tags:
         - contest
 components:
@@ -416,7 +416,7 @@ components:
           format: uuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: ユーザー名
         displayName:
           type: string
@@ -454,7 +454,7 @@ components:
           format: uuid
           description: ユーザーUUID
         state:
-          $ref: '#/components/schemas/UserAccountState'
+          $ref: "#/components/schemas/UserAccountState"
         displayName:
           type: string
           description: ユーザー表示名
@@ -462,7 +462,7 @@ components:
           maxLength: 32
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: ユーザー名
         bio:
           type: string
@@ -475,7 +475,7 @@ components:
           type: array
           description: 各種アカウントへのリンク
           items:
-            $ref: '#/components/schemas/Account'
+            $ref: "#/components/schemas/Account"
       required:
         - id
         - state
@@ -494,7 +494,7 @@ components:
         check:
           type: boolean
           description: 本名を公開するかどうか
-          default: 'false'
+          default: "false"
       required:
         - bio
         - check
@@ -507,7 +507,7 @@ components:
           type: string
           description: アカウントID
         type:
-          $ref: '#/components/schemas/AccountType'
+          $ref: "#/components/schemas/AccountType"
         permittedPr:
           type: boolean
           description: 広報での利用が許可されているかどうか
@@ -569,7 +569,7 @@ components:
           type: array
           description: プロジェクトメンバー
           items:
-            $ref: '#/components/schemas/ProjectMember'
+            $ref: "#/components/schemas/ProjectMember"
         duration:
           format: date-time
           description: |-
@@ -577,7 +577,7 @@ components:
             nullがあった場合存続中
           type: array
           items:
-            $ref: '#/components/schemas/Duration'
+            $ref: "#/components/schemas/Duration"
         createdAt:
           type: string
           description: 作成日時
@@ -601,7 +601,7 @@ components:
           description: プロジェクトuuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: プロジェクト名
         duration:
           format: date-time
@@ -610,7 +610,7 @@ components:
             nullがあったらまだ所属している
           type: array
           items:
-            $ref: '#/components/schemas/Duration'
+            $ref: "#/components/schemas/Duration"
       required:
         - id
         - name
@@ -634,11 +634,11 @@ components:
           description: シェアされているか
         timeStart:
           type: string
-          example: '2004-04-01T12:00Z'
+          example: "2004-04-01T12:00Z"
           description: はじめ
         timeEnd:
           type: string
-          example: '2004-04-01T12:00Z'
+          example: "2004-04-01T12:00Z"
           description: おわり
         roomId:
           type: string
@@ -651,7 +651,7 @@ components:
           example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
           description: グループuuid
         level:
-          $ref: '#/components/schemas/EventLevel'
+          $ref: "#/components/schemas/EventLevel"
       required:
         - name
         - descirption
@@ -677,7 +677,7 @@ components:
           type: array
           description: コンテスト参加者
           items:
-            $ref: '#/components/schemas/ContestMember'
+            $ref: "#/components/schemas/ContestMember"
       required:
         - id
         - description
@@ -693,7 +693,7 @@ components:
           description: コンテストメンバーuuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: ユーザー名
       required:
         - id
@@ -711,12 +711,12 @@ components:
           type: string
           description: 班名
         leader:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         members:
           type: array
           description: 班メンバー
           items:
-            $ref: '#/components/schemas/GroupMember'
+            $ref: "#/components/schemas/GroupMember"
         description:
           type: string
           description: 班説明
@@ -736,7 +736,7 @@ components:
           description: 班メンバーuuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: ユーザー名
         duration:
           description: |-
@@ -744,7 +744,7 @@ components:
             nullのところはまだ継続して入っている
           type: array
           items:
-            $ref: '#/components/schemas/Duration'
+            $ref: "#/components/schemas/Duration"
       required:
         - id
         - name
@@ -760,7 +760,7 @@ components:
           description: プロジェクトuuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: プロジェクト名
         description:
           type: string
@@ -769,14 +769,14 @@ components:
           type: array
           description: プロジェクトメンバー
           items:
-            $ref: '#/components/schemas/ProjectMember'
+            $ref: "#/components/schemas/ProjectMember"
         duration:
           type: array
           description: |-
             プロジェクト期間の配列
             nullがあった場合存続中
           items:
-            $ref: '#/components/schemas/Duration'
+            $ref: "#/components/schemas/Duration"
       required:
         - id
         - name
@@ -811,7 +811,7 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: プロジェクト名
         description:
           type: string
@@ -826,7 +826,7 @@ components:
             nullがあった場合存続中
           type: array
           items:
-            $ref: '#/components/schemas/Duration'
+            $ref: "#/components/schemas/Duration"
     EditContest:
       title: EditContest
       type: object
@@ -842,23 +842,27 @@ components:
           type: array
           description: コンテスト参加者
           items:
-            $ref: '#/components/schemas/ContestMember'
+            $ref: "#/components/schemas/ContestMember"
     EventLevel:
       type: integer
       title: EventLevel
       description: |-
         公開範囲設定
-        0 全て公開
-        1 イベント企画者の名前を伏せて公開
+        0 イベント企画者の名前を伏せて公開
+        1 全て公開
+        2 外部に非公開
       enum:
         - 0
         - 1
+        - 2
       x-enum-varnames:
-        - onymous
-        - anonymous
+        - Anonymous
+        - Public
+        - Private
       x-enum-descriptions:
-        - 全て公開
         - イベントの企画者の名前を伏せて公開
+        - 全て公開
+        - 外部に非公開
     Duration:
       title: Period
       type: object

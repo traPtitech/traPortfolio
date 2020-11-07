@@ -4,7 +4,8 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブ | BASE TABLE |
+| [event_level_relations](event_level_relations.md) | 2 | knoQイベントと公開レベルの関係テーブル | BASE TABLE |
+| [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブル | BASE TABLE |
 | [users](users.md) | 6 | ユーザーテーブル | BASE TABLE |
 
 ## Relations

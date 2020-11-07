@@ -9,15 +9,15 @@
 
 ```sql
 CREATE TABLE `users` (
-  `id` char(36) NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `description` text COLLATE utf8mb4_bin NOT NULL,
   `check` tinyint(1) NOT NULL DEFAULT '0',
-  `name` varchar(32) NOT NULL,
+  `name` varchar(32) COLLATE utf8mb4_bin NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
 </details>
