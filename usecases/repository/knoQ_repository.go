@@ -6,7 +6,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type ResponseEvent struct {
+type KnoQEvent struct {
 	ID          uuid.UUID
 	Name        string
 	Description string
@@ -18,6 +18,6 @@ type ResponseEvent struct {
 }
 
 type KnoqRepository interface {
-	GetAll() ([]*ResponseEvent, error)
-	GetByID(id uuid.UUID) (*ResponseEvent, error)
+	GetAll() ([]*KnoQEvent, error)
+	GetByID(id uuid.UUID) (*KnoQEvent, error)
 }

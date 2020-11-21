@@ -14,14 +14,14 @@ func NewKnoqRepository(api external.KnoqAPI) *KnoqRepository {
 	return &KnoqRepository{api}
 }
 
-func (repo *KnoqRepository) GetAll() ([]*repository.ResponseEvent, error) {
+func (repo *KnoqRepository) GetAll() ([]*repository.KnoQEvent, error) {
 	eres, err := repo.api.GetAll()
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*repository.ResponseEvent, 0, len(eres))
+	result := make([]*repository.KnoQEvent, 0, len(eres))
 	for _, v := range eres {
-		result = append(result, &repository.ResponseEvent{
+		result = append(result, &repository.KnoQEvent{
 			ID:          v.ID,
 			Description: v.Description,
 			GroupID:     v.GroupID,
@@ -35,13 +35,13 @@ func (repo *KnoqRepository) GetAll() ([]*repository.ResponseEvent, error) {
 	return result, nil
 }
 
-func (repo *KnoqRepository) GetByID(id uuid.UUID) (*repository.ResponseEvent, error) {
+func (repo *KnoqRepository) GetByID(id uuid.UUID) (*repository.KnoQEvent, error) {
 	eres, err := repo.api.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &repository.ResponseEvent{
+	return &repository.KnoQEvent{
 		ID:          eres.ID,
 		Description: eres.Description,
 		GroupID:     eres.GroupID,
