@@ -1,0 +1,21 @@
+name: swagger docs
+on:
+  push:
+    paths:
+      - "docs/swagger/traPortfolio.v1.yaml"
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Generate Swagger UI
+        uses: Legion2/swagger-ui-action@v1
+        with:
+          output: docs/swagger
+          spec-file: docs/swagger/traPortfolio.v1.yaml
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/swagger
