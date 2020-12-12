@@ -1,5 +1,4 @@
 openapi: 3.0.0
-
 info:
   title: traPortfolio
   version: "1.0"
@@ -759,7 +758,8 @@ components:
           description: イベント名
         duration:
           description: イベントの開催期間
-          $ref: "#/components/schemas/Duration"
+          allOf:
+            - $ref: "#/components/schemas/Duration"
       required:
         - name
         - duration
@@ -800,7 +800,8 @@ components:
           description: コンテスト名
         duration:
           description: コンテストの開催期間
-          $ref: "#/components/schemas/Duration"
+          allOf:
+            - $ref: "#/components/schemas/Duration"
       required:
         - id
         - name
@@ -999,7 +1000,8 @@ components:
           description: コンテスト説明
         duration:
           description: コンテストの開催期間
-          $ref: "#/components/schemas/Duration"
+          allOf:
+            - $ref: "#/components/schemas/Duration"
     EditContestTeam:
       title: PostContestTeam
       type: object
