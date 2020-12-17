@@ -752,6 +752,10 @@ components:
       description: イベント情報
       title: Event
       properties:
+        id:
+          type: string
+          format: uuid
+          description: イベントuuid
         name:
           type: string
           example: 第n回進捗会
@@ -761,6 +765,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/Duration"
       required:
+        - id
         - name
         - duration
     EventDetail:
