@@ -910,7 +910,7 @@ components:
                 nullのところはまだ継続して入っている
               type: array
               items:
-                $ref: "#/components/schemas/Duration"
+                $ref: "#/components/schemas/ProjectDuration"
           required:
             - duration
     GroupDetail:
@@ -953,7 +953,7 @@ components:
                 nullのところはまだ継続して入っている
               type: array
               items:
-                $ref: "#/components/schemas/Duration"
+                $ref: "#/components/schemas/ProjectDuration"
           required:
             - duration
     EditProject:
@@ -1056,7 +1056,7 @@ components:
       required:
         - since
         - until
-      description: 班などの存続期間
+      description: イベントやコンテストなどの存続期間
     ProjectDuration:
       title: ProjectDuration
       type: object
@@ -1070,7 +1070,7 @@ components:
         - since
         - until
       description: |-
-        プロジェクトの期間
+        班やプロジェクトの期間
         nullがあった場合存続中
     YearWithSemester:
       title: YearWithSemester
