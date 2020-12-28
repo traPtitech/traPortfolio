@@ -637,7 +637,6 @@ components:
         - 6
         - 7
         - 8
-        - 9
       x-enum-varnames:
         - homepage
         - blog
@@ -671,13 +670,7 @@ components:
           type: string
           description: プロジェクト名
         duration:
-          format: date-time
-          description: |-
-            プロジェクトの期間
-            nullがあった場合存続中
-          type: array
-          items:
-            $ref: "#/components/schemas/Duration"
+          $ref: "#/components/schemas/ProjectDuration"
       required:
         - id
         - name
@@ -697,7 +690,7 @@ components:
                 nullがあったらまだ所属している
               type: array
               items:
-                $ref: "#/components/schemas/Duration"
+                $ref: "#/components/schemas/ProjectDuration"
           required:
             - userDuration
     ProjectDetail:
@@ -744,7 +737,7 @@ components:
                 nullがあったらまだ所属している
               type: array
               items:
-                $ref: "#/components/schemas/Duration"
+                $ref: "#/components/schemas/ProjectDuration"
           required:
             - duration
     Event:
@@ -917,7 +910,7 @@ components:
                 nullのところはまだ継続して入っている
               type: array
               items:
-                $ref: "#/components/schemas/Duration"
+                $ref: "#/components/schemas/ProjectDuration"
           required:
             - duration
     GroupDetail:
@@ -960,7 +953,7 @@ components:
                 nullのところはまだ継続して入っている
               type: array
               items:
-                $ref: "#/components/schemas/Duration"
+                $ref: "#/components/schemas/ProjectDuration"
           required:
             - duration
     EditProject:
@@ -987,7 +980,7 @@ components:
             nullがあった場合存続中
           type: array
           items:
-            $ref: "#/components/schemas/Duration"
+            $ref: "#/components/schemas/ProjectDuration"
     EditContest:
       title: EditContest
       type: object
@@ -1063,7 +1056,51 @@ components:
       required:
         - since
         - until
-      description: 班やプロジェクトの存続期間
+      description: イベントやコンテストなどの存続期間
+    ProjectDuration:
+      title: ProjectDuration
+      type: object
+      properties:
+        since:
+          $ref: "#/components/schemas/YearWithSemester"
+        until:
+          nullable: true
+          $ref: "#/components/schemas/YearWithSemester"
+      required:
+        - since
+        - until
+      description: |-
+        班やプロジェクトの期間
+        nullがあった場合存続中
+    YearWithSemester:
+      title: YearWithSemester
+      type: object
+      properties:
+        year:
+          type: integer
+        semester:
+          $ref: "#/components/schemas/Semester"
+      required:
+        - year
+        - semester
+      description: |-
+        年度と前期/後期
+    Semester:
+      title: Semester
+      type: integer
+      description: |-
+        0: 前期
+        1: 後期
+      enum:
+        - 0
+        - 1
+      x-enum-varnames:
+        - first
+        - second
+      x-enum-descriptions:
+        - 前期
+        - 後期
+      format: int32
   parameters:
     userIdInPath:
       name: userId
