@@ -14,9 +14,7 @@ func NewUserRepository(sql database.SQLHandler) *UserRepository {
 }
 
 func (repo *UserRepository) Get(name string) (user *domain.User, err error) {
-	// TODO
-	user.ID = 0
-	err = repo.Find(user).Error()
+	err = repo.Where("name = ?", name).Find(user).Error()
 	return
 }
 

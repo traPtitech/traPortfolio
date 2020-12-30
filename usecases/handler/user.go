@@ -19,9 +19,13 @@ func NewUserHandler(repo repository.UserRepository, s service.UserService) *User
 }
 
 func (handler *UserHandler) Get(c echo.Context) error {
-	// todo
-	// handler.UserService.GetUser()
-	return nil // todo
+	u := domain.User{}
+	err := c.Bind(&u)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	result := handler.UserService.GetUser(c.Request().Context(), u.Name)
+	return c.JSON(http.StatusOK, result)
 }
 
 func (handler *UserHandler) Update(c echo.Context) error {

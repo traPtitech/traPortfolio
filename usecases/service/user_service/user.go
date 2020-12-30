@@ -2,12 +2,20 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 // User Portfolioのレスポンスで使うユーザー情報
-type User struct{}
+type User struct{
+	ID          uint      `json:"id"`
+	Description string    `json:"description"`
+	Check       bool      `json:"check"`
+	Name        string    `json:"name"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
 
 type UserService struct {
 	repo   repository.UserRepository
@@ -26,6 +34,13 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 func (s *UserService) GetUser(ctx context.Context, name string) User {
 	_, _ = s.traQ.GetUser(ctx, name)
 	_, _ = s.portal.GetUser(ctx, name)
-	_, _ = s.repo.Get(name)
-	return User{}
+	user, _ := s.repo.Get(name)
+	return User{
+		ID: 			user.ID,
+		Description: 	user.Description,
+		Check: 			user.Check,
+		Name: 			user.Name,
+		CreatedAt: 		user.CreatedAt,
+		UpdatedAt: 		user.UpdatedAt,
+	}
 }
