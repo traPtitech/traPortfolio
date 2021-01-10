@@ -8,18 +8,18 @@ import (
 
 // User Portfolioのレスポンスで使うユーザー情報
 type User struct {
-	ID          uint    		`json:"id"`
-	Name        string  		`json:"name"`
-	RealName 	string  		`json:"realName"`
-	State 		uint8			`json:"state"`
-	Bio			string			`json:"bio"`
-	Accounts	[]Account		`json:"accounts"`
+	ID       uint      `json:"id"`
+	Name     string    `json:"name"`
+	RealName string    `json:"realName"`
+	State    uint8     `json:"state"`
+	Bio      string    `json:"bio"`
+	Accounts []Account `json:"accounts"`
 }
 
 type Account struct {
-	ID			uint			`json:"id"`
-	Type		uint			`json:"type"`
-	PrPermitted	bool			`json:"prPermitted"`
+	ID          uint `json:"id"`
+	Type        uint `json:"type"`
+	PrPermitted bool `json:"prPermitted"`
 }
 
 type UserService struct {
@@ -43,17 +43,17 @@ func (s *UserService) GetUser(ctx context.Context, name string) User {
 	accounts := make([]Account, len(userAccounts))
 	for _, v := range userAccounts {
 		accounts = append(accounts, Account{
-			ID:				v.ID,
-			Type:			v.Type,
-			PrPermitted:	v.Check,
+			ID:          v.ID,
+			Type:        v.Type,
+			PrPermitted: v.Check,
 		})
 	}
-	return User {
-		ID:			user.ID,
-		Name:		user.Name,
-		RealName: 	portalUser.Name,
-		State:		traqUser.State,
-		Bio:		user.Description,
-		Accounts:	accounts,
+	return User{
+		ID:       user.ID,
+		Name:     user.Name,
+		RealName: portalUser.Name,
+		State:    traqUser.State,
+		Bio:      user.Description,
+		Accounts: accounts,
 	}
 }
