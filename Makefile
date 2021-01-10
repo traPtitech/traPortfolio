@@ -5,6 +5,10 @@ TBLS_VERSION := 1.38.3
 golangci-lint:
 	@golangci-lint run
 
+.PHONY: docker-golangci-lint
+docker-golangci-lint:
+	@docker run --rm -v $(CURDIR):/app -w /app golangci/golangci-lint:latest golangci-lint run 
+
 .PHONY: up-test-db
 up-test-db:
 	@TEST_DB_PORT=$(TEST_DB_PORT) ./dev/bin/up-test-db.sh

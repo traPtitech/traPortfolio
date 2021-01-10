@@ -79,3 +79,8 @@ golangci-lint
 ```
 $ make golangci-lint
 ```
+
+golangci-lint with docker
+```
+$ make docker-golangci-lint
+```
