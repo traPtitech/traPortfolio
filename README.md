@@ -74,8 +74,9 @@ DB Lint(you need docker)
 $ make db-lint
 ```
 
-golangci-lint
+golangci-lint(you need docker)
 
 ```
 $ make golangci-lint
 ```
+
