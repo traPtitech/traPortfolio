@@ -138,6 +138,7 @@ jobs:
           tbls lint
         env:
           TBLS_DSN: "mysql://root:password@127.0.0.1:3306/portfolio"
+          TBLS_VERSION: "v1.38.3"
   spectral:
     name: Spectral
     runs-on: ubuntu-latest
