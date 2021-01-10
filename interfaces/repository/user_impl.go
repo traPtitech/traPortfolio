@@ -13,8 +13,11 @@ func NewUserRepository(sql database.SQLHandler) *UserRepository {
 	return &UserRepository{SQLHandler: sql}
 }
 
-func (repo *UserRepository) Get(name string) (user *domain.User, err error) {
-	err = repo.Where("name = ?", name).Find(user).Error()
+func (repo *UserRepository) Get(name string) (user *domain.User, accounts []*domain.Account, err error) {
+	if err = repo.Where("name = ?", name).Find(user).Error(); err != nil {
+		return
+	}
+	err = repo.Where("name = ?", name).Find(accounts).Error()
 	return
 }
 
