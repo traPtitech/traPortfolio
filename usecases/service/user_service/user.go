@@ -7,7 +7,7 @@ import (
 )
 
 // User Portfolioのレスポンスで使うユーザー情報
-type User struct {
+type UserDetail struct {
 	ID       uint      `json:"id"`
 	Name     string    `json:"name"`
 	RealName string    `json:"realName"`
@@ -36,7 +36,7 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 	}
 }
 
-func (s *UserService) GetUser(ctx context.Context, name string) User {
+func (s *UserService) GetUser(ctx context.Context, name string) UserDetail {
 	traqUser, _ := s.traQ.GetUser(ctx, name)
 	portalUser, _ := s.portal.GetUser(ctx, name)
 	user, userAccounts, _ := s.repo.Get(name)
@@ -48,7 +48,7 @@ func (s *UserService) GetUser(ctx context.Context, name string) User {
 			PrPermitted: v.Check,
 		})
 	}
-	return User{
+	return UserDetail{
 		ID:       user.ID,
 		Name:     user.Name,
 		RealName: portalUser.Name,
