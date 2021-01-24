@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 
+	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 // User Portfolioのレスポンスで使うユーザー情報
 type UserDetail struct {
-	ID       uint      `json:"id"`
+	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`
 	RealName string    `json:"realName"`
 	State    uint8     `json:"state"`
@@ -17,9 +18,9 @@ type UserDetail struct {
 }
 
 type Account struct {
-	ID          uint `json:"id"`
-	Type        uint `json:"type"`
-	PrPermitted bool `json:"prPermitted"`
+	ID          uuid.UUID `json:"id"`
+	Type        uint      `json:"type"`
+	PrPermitted bool      `json:"prPermitted"`
 }
 
 type UserService struct {
@@ -36,10 +37,10 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 	}
 }
 
-func (s *UserService) GetUser(ctx context.Context, name string) UserDetail {
-	traqUser, _ := s.traQ.GetUser(ctx, name)
-	portalUser, _ := s.portal.GetUser(ctx, name)
-	user, userAccounts, _ := s.repo.Get(name)
+func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) UserDetail {
+	traqUser, _ := s.traQ.GetUser(ctx, id)
+	portalUser, _ := s.portal.GetUser(ctx, id)
+	user, userAccounts, _ := s.repo.Get(id)
 	accounts := make([]Account, len(userAccounts))
 	for _, v := range userAccounts {
 		accounts = append(accounts, Account{

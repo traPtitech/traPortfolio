@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 )
@@ -13,11 +14,11 @@ func NewUserRepository(sql database.SQLHandler) *UserRepository {
 	return &UserRepository{SQLHandler: sql}
 }
 
-func (repo *UserRepository) Get(name string) (user *domain.User, accounts []*domain.Account, err error) {
-	if err = repo.Where("name = ?", name).Find(user).Error(); err != nil {
+func (repo *UserRepository) Get(id uuid.UUID) (user *domain.User, accounts []*domain.Account, err error) {
+	if err = repo.Where("id = ?", id).Find(user).Error(); err != nil {
 		return
 	}
-	err = repo.Where("name = ?", name).Find(accounts).Error()
+	err = repo.Where("id = ?", id).Find(accounts).Error()
 	return
 }
 

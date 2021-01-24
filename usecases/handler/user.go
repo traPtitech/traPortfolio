@@ -24,7 +24,7 @@ func (handler *UserHandler) Get(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	result := handler.UserService.GetUser(c.Request().Context(), u.Name)
+	result := handler.UserService.GetUser(c.Request().Context(), u.ID)
 	return c.JSON(http.StatusOK, result)
 }
 

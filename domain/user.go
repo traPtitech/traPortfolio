@@ -1,12 +1,13 @@
 package domain
 
 import (
-	"github.com/gofrs/uuid"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 type User struct {
-	ID          uint      `gorm:"type:char(36);not null;primary_key"`
+	ID          uuid.UUID `gorm:"type:char(36);not null;primary_key"`
 	Description string    `gorm:"type:text;not null"`
 	Check       bool      `gorm:"type:boolean;not null;default:false"`
 	Name        string    `gorm:"type:varchar(32);not null;unique"`
@@ -15,7 +16,7 @@ type User struct {
 }
 
 type Account struct {
-	ID        uint      `gorm:"type:char(36);not null;primary_key"`
+	ID        uuid.UUID `gorm:"type:char(36);not null;primary_key"`
 	Type      uint      `gorm:"type:varchar(32);not null"`
 	Name      string    `gorm:"type:varchar(32)"`
 	URL       string    `gorm:"type:text"`
