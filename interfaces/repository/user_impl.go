@@ -14,11 +14,13 @@ func NewUserRepository(sql database.SQLHandler) *UserRepository {
 	return &UserRepository{SQLHandler: sql}
 }
 
-func (repo *UserRepository) Get(id uuid.UUID) (user *domain.User, accounts []*domain.Account, err error) {
-	if err = repo.Where("id = ?", id).Find(user).Error(); err != nil {
-		return
-	}
-	err = repo.Where("id = ?", id).Find(accounts).Error()
+func (repo *UserRepository) GetUser(id uuid.UUID) (user *domain.User, err error) {
+	err = repo.First(user, &domain.User{ID: id}).Error()
+	return
+}
+
+func (repo *UserRepository) GetAccounts(id uuid.UUID) (accounts []*domain.Account, err error) {
+	err = repo.Find(accounts, "id = ?", id).Error()
 	return
 }
 

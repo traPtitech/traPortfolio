@@ -6,6 +6,7 @@ import (
 )
 
 type UserRepository interface {
-	Get(uuid.UUID) (*domain.User, []*domain.Account, error)
+	GetUser(uuid.UUID) (*domain.User, error)
+	GetAccounts(uuid.UUID) ([]*domain.Account, error)
 	Update(*domain.User) (*domain.User, error)
 }

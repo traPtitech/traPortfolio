@@ -40,7 +40,8 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) UserDetail {
 	traqUser, _ := s.traQ.GetUser(ctx, id)
 	portalUser, _ := s.portal.GetUser(ctx, id)
-	user, userAccounts, _ := s.repo.Get(id)
+	user, _ := s.repo.GetUser(id)
+	userAccounts, _ := s.repo.GetAccounts(id)
 	accounts := make([]Account, len(userAccounts))
 	for _, v := range userAccounts {
 		accounts = append(accounts, Account{
