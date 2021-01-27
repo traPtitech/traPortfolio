@@ -32,10 +32,10 @@ func (repo *EventRepository) GetEventLevels() (map[uuid.UUID]*domain.EventLevelR
 }
 
 func (repo *EventRepository) GetEventLevelByID(id uuid.UUID) (*domain.EventLevelRelation, error) {
-	elv := domain.EventLevelRelation{ID: id}
-	err := repo.First(&elv).Error()
+	elv := &domain.EventLevelRelation{}
+	err := repo.First(elv, &domain.EventLevelRelation{ID: id}).Error()
 	if err != nil {
 		return nil, err
 	}
-	return &elv, nil
+	return elv, nil
 }
