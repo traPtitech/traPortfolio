@@ -19,7 +19,7 @@ type UserDetail struct {
 
 type Account struct {
 	ID          uuid.UUID `json:"id"`
-	Type        uuid.UUID `json:"type"`
+	Type        uint      `json:"type"`
 	PrPermitted bool      `json:"prPermitted"`
 }
 

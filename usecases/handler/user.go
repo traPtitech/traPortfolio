@@ -33,7 +33,7 @@ func (handler *UserHandler) GetByID(c echo.Context) error {
 	p := c.Param("id")
 	id, err := uuid.FromString(p)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusBadRequest, err)
 	}
 	ctx := context.Background()
 	result, err := handler.UserService.GetUser(ctx, id)

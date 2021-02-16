@@ -19,9 +19,13 @@ func (repo *UserRepository) GetUsers() (users []*domain.User, err error) {
 	return
 }
 
-func (repo *UserRepository) GetUser(id uuid.UUID) (user *domain.User, err error) {
-	err = repo.First(user, &domain.User{ID: id}).Error()
-	return
+func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.User, error) {
+	user := domain.User{ID: id}
+	err := repo.First(&user).Error()
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (repo *UserRepository) GetAccounts(id uuid.UUID) (accounts []*domain.Account, err error) {
