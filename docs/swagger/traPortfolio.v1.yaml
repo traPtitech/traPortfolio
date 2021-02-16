@@ -625,7 +625,7 @@ components:
         - permittedPr
     AccountType:
       type: integer
-      title: EventLevel
+      title: AccountType
       description: アカウントの種類
       enum:
         - 0
