@@ -37,18 +37,18 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 	}
 }
 
-func (s *UserService) GetUsers(ctx context.Context) ([]UserDetail, error) {
+func (s *UserService) GetUsers(ctx context.Context) ([]*UserDetail, error) {
 	users, err := s.repo.GetUsers()
 	if err != nil {
 		return nil, err
 	}
-	result := make([]UserDetail, 0, len(users))
+	result := make([]*UserDetail, 0, len(users))
 	for _, v := range users {
 		portalUser, err := s.portal.GetUser(ctx, v.Name)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, UserDetail{
+		result = append(result, &UserDetail{
 			ID:       v.ID,
 			Name:     portalUser.Name,
 			RealName: portalUser.AlphabeticName,
@@ -57,22 +57,22 @@ func (s *UserService) GetUsers(ctx context.Context) ([]UserDetail, error) {
 	return result, nil
 }
 
-func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (UserDetail, error) {
+func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, error) {
 	user, err := s.repo.GetUser(id)
 	if err != nil {
-		return UserDetail{}, err
+		return nil, err
 	}
 	userAccounts, err := s.repo.GetAccounts(id)
 	if err != nil {
-		return UserDetail{}, err
+		return nil, err
 	}
 	traqUser, err := s.traQ.GetUser(ctx, user.Name)
 	if err != nil {
-		return UserDetail{}, err
+		return nil, err
 	}
 	portalUser, err := s.portal.GetUser(ctx, user.Name)
 	if err != nil {
-		return UserDetail{}, err
+		return nil, err
 	}
 	accounts := make([]Account, 0, len(userAccounts))
 	for _, v := range userAccounts {
@@ -82,7 +82,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (UserDetail, er
 			PrPermitted: v.Check,
 		})
 	}
-	return UserDetail{
+	return &UserDetail{
 		ID:       user.ID,
 		Name:     user.Name,
 		RealName: portalUser.Name,
