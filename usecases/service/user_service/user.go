@@ -19,7 +19,7 @@ type UserDetail struct {
 
 type Account struct {
 	ID          uuid.UUID `json:"id"`
-	Type        uint      `json:"type"`
+	Type        uuid.UUID `json:"type"`
 	PrPermitted bool      `json:"prPermitted"`
 }
 
@@ -37,12 +37,44 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 	}
 }
 
-func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) UserDetail {
-	traqUser, _ := s.traQ.GetUser(ctx, id)
-	portalUser, _ := s.portal.GetUser(ctx, id)
-	user, _ := s.repo.GetUser(id)
-	userAccounts, _ := s.repo.GetAccounts(id)
-	accounts := make([]Account, len(userAccounts))
+func (s *UserService) GetUsers(ctx context.Context) ([]UserDetail, error) {
+	users, err := s.repo.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+	result := make([]UserDetail, 0, len(users))
+	for _, v := range users {
+		portalUser, err := s.portal.GetUser(ctx, v.Name)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, UserDetail{
+			ID:       v.ID,
+			Name:     portalUser.Name,
+			RealName: portalUser.AlphabeticName,
+		})
+	}
+	return result, nil
+}
+
+func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (UserDetail, error) {
+	user, err := s.repo.GetUser(id)
+	if err != nil {
+		return UserDetail{}, err
+	}
+	userAccounts, err := s.repo.GetAccounts(id)
+	if err != nil {
+		return UserDetail{}, err
+	}
+	traqUser, err := s.traQ.GetUser(ctx, user.Name)
+	if err != nil {
+		return UserDetail{}, err
+	}
+	portalUser, err := s.portal.GetUser(ctx, user.Name)
+	if err != nil {
+		return UserDetail{}, err
+	}
+	accounts := make([]Account, 0, len(userAccounts))
 	for _, v := range userAccounts {
 		accounts = append(accounts, Account{
 			ID:          v.ID,
@@ -57,5 +89,5 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) UserDetail {
 		State:    traqUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,
-	}
+	}, nil
 }

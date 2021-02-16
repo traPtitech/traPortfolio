@@ -24,6 +24,7 @@ func Init() {
 	{
 		apiUsers := v1.Group("/users")
 		{
+			apiUsers.GET("", api.User.GetAll)
 			apiUsers.PUT("/:id", api.User.Update)
 		}
 		apiEvents := v1.Group("/events")
