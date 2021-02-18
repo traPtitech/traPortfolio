@@ -44,12 +44,17 @@ func (handler *UserHandler) GetByID(c echo.Context) error {
 }
 
 func (handler *UserHandler) Update(c echo.Context) error {
-	u := domain.User{}
-	err := c.Bind(&u)
+	p := c.Param("id")
+	id, err := uuid.FromString(p)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	_, err = handler.UserRepository.Update(&u)
+	u := domain.EditUserRequest{}
+	err = c.Bind(&u)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	_, err = handler.UserRepository.Update(id, &u)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

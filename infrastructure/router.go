@@ -26,7 +26,7 @@ func Init() {
 		{
 			apiUsers.GET("", api.User.GetAll)
 			apiUsers.GET("/:id", api.User.GetByID)
-			apiUsers.PUT("/:id", api.User.Update)
+			apiUsers.PATCH("/:id", api.User.Update)
 		}
 		apiEvents := v1.Group("/events")
 		{
