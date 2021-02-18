@@ -1,8 +1,6 @@
 name: swagger docs
 on:
   push:
-    paths:
-      - "docs/swagger/traPortfolio.v1.yaml"
     branches:
       - "master"
 
