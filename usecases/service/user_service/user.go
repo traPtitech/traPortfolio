@@ -8,6 +8,12 @@ import (
 )
 
 // User Portfolioのレスポンスで使うユーザー情報
+type User struct {
+	ID       uuid.UUID
+	Name     string
+	RealName string
+}
+
 type UserDetail struct {
 	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`
@@ -37,21 +43,25 @@ func NewUserService(userRepository repository.UserRepository, traQRepository rep
 	}
 }
 
-func (s *UserService) GetUsers(ctx context.Context) ([]*UserDetail, error) {
+func (s *UserService) GetUsers(ctx context.Context) ([]*User, error) {
 	users, err := s.repo.GetUsers()
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*UserDetail, 0, len(users))
+	portalUsers, err := s.portal.GetUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	idMap := make(map[string]uuid.UUID, len(users))
 	for _, v := range users {
-		portalUser, err := s.portal.GetUser(ctx, v.Name)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, &UserDetail{
-			ID:       v.ID,
-			Name:     portalUser.Name,
-			RealName: portalUser.AlphabeticName,
+		idMap[v.Name] = v.ID
+	}
+	result := make([]*User, 0, len(users))
+	for _, v := range portalUsers {
+		result = append(result, &User{
+			ID:       idMap[v.Name],
+			Name:     v.Name,
+			RealName: v.AlphabeticName,
 		})
 	}
 	return result, nil
@@ -66,7 +76,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	if err != nil {
 		return nil, err
 	}
-	traqUser, err := s.traQ.GetUser(ctx, user.Name)
+	traqUser, err := s.traQ.GetUser(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
