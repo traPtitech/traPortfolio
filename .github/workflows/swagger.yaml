@@ -14,10 +14,12 @@ jobs:
       - name: Generate Swagger UI
         uses: Legion2/swagger-ui-action@v1
         with:
-          output: docs/gh_pages
+          output: docs/_built
           spec-file: docs/swagger/traPortfolio.v1.yaml
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Publish
+        uses: netlify/actions/cli@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/gh_pages
+          args: deploy --dir=docs/_built --prod
+        env:
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
