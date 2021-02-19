@@ -137,8 +137,7 @@ jobs:
           DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test ./traPortfolio/traPortfolio -migrate true
           tbls lint
         env:
-          TBLS_DSN: "mysql://root:password@127.0.0.1:3306/portfolio"
-          TBLS_VERSION: "v1.38.3"
+          TBLS_DSN: "mariadb://root:password@127.0.0.1:3306/portfolio"
   spectral:
     name: Spectral
     runs-on: ubuntu-latest
