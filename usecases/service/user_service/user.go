@@ -58,12 +58,11 @@ func (s *UserService) GetUsers(ctx context.Context) ([]*User, error) {
 	}
 	result := make([]*User, 0, len(users))
 	for _, v := range portalUsers {
-		id, ok := idMap[v.Name]
-		if ok {
+		if id, ok := idMap[v.ID]; ok {
 			result = append(result, &User{
 				ID:       id,
-				Name:     v.Name,
-				RealName: v.AlphabeticName,
+				Name:     v.ID,
+				RealName: v.Name,
 			})
 		}
 	}
