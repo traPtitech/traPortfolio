@@ -25,8 +25,3 @@ type Account struct {
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
 }
-
-type EditUserRequest struct {
-	Bio          string `json:"bio"`
-	HideRealName bool   `json:"hideRealName"`
-}

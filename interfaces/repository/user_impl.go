@@ -4,6 +4,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type UserRepository struct {
@@ -33,7 +34,7 @@ func (repo *UserRepository) GetAccounts(id uuid.UUID) (accounts []*domain.Accoun
 	return
 }
 
-func (repo *UserRepository) Update(id uuid.UUID, u *domain.EditUserRequest) (*domain.User, error) {
+func (repo *UserRepository) Update(id uuid.UUID, u *repository.EditUserRequest) (*domain.User, error) {
 	user := domain.User{
 		ID:          id,
 		Description: u.Bio,

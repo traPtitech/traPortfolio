@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
@@ -49,7 +48,7 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	u := domain.EditUserRequest{}
+	u := repository.EditUserRequest{}
 	err = c.Bind(&u)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
