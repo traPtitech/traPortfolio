@@ -6,9 +6,15 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
+
+type EditUserRequest struct {
+	Bio          string `json:"bio"`
+	HideRealName bool   `json:"hideRealName"`
+}
 
 type UserHandler struct {
 	UserRepository repository.UserRepository
@@ -48,12 +54,17 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	u := repository.EditUserRequest{}
-	err = c.Bind(&u)
+	req := EditUserRequest{}
+	err = c.Bind(&req)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	_, err = handler.UserRepository.Update(id, &u)
+	u := domain.User{
+		ID:          id,
+		Description: req.Bio,
+		Check:       !req.HideRealName,
+	}
+	err = handler.UserRepository.Update(&u)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
