@@ -9,9 +9,9 @@ import (
 
 // User Portfolioのレスポンスで使うユーザー情報
 type User struct {
-	ID       uuid.UUID
-	Name     string
-	RealName string
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	RealName string    `json:"realName"`
 }
 
 type UserDetail struct {
