@@ -135,7 +135,7 @@ func (handler *SQLHandler) Where(query interface{}, args ...interface{}) databas
 	return handler
 }
 
-func (handler *SQLHandler) Model(value interface{}) database.SQLHandler{
+func (handler *SQLHandler) Model(value interface{}) database.SQLHandler {
 	res := handler.Conn.Model(value)
 	handler.Conn = res
 	return handler
