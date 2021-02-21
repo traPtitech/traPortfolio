@@ -34,10 +34,6 @@ func (repo *UserRepository) GetAccounts(id uuid.UUID) (accounts []*domain.Accoun
 }
 
 func (repo *UserRepository) Update(u *domain.User) error {
-	err := repo.Save(&u).Error()
-	if err != nil {
-		return err
-	}
-	err = repo.Find(&u).Error()
+	err := repo.Model(&domain.User{}).Updates(&u).Error()
 	return err
 }
