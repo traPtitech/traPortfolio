@@ -35,29 +35,40 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 }
 
 func (handler *UserHandler) GetByID(c echo.Context) error {
-	p := c.Param("id")
-	id, err := uuid.FromString(p)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+	_id := c.Param("userID")
+	if _id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	id := uuid.FromStringOrNil(_id)
+	if id == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 	ctx := context.Background()
 	result, err := handler.UserService.GetUser(ctx, id)
+	if err == repository.ErrNotFound {
+		return echo.NewHTTPError(http.StatusBadRequest)
+	}
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return err
 	}
 	return c.JSON(http.StatusOK, result)
 }
 
 func (handler *UserHandler) Update(c echo.Context) error {
-	p := c.Param("id")
-	id, err := uuid.FromString(p)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+	_id := c.Param("userID")
+	if _id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	id := uuid.FromStringOrNil(_id)
+	if id == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 	req := EditUserRequest{}
-	err = c.Bind(&req)
+	err := c.Bind(&req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return err
 	}
 	u := domain.User{
 		ID:          id,
@@ -65,8 +76,11 @@ func (handler *UserHandler) Update(c echo.Context) error {
 		Check:       !req.HideRealName,
 	}
 	err = handler.UserRepository.Update(&u)
+	if err == repository.ErrNotFound {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }
