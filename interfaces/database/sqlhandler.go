@@ -9,5 +9,7 @@ type SQLHandler interface {
 	Save(interface{}) SQLHandler
 	Delete(interface{}) SQLHandler
 	Where(interface{}, ...interface{}) SQLHandler
+	Model(interface{}) SQLHandler
+	Updates(interface{}) SQLHandler
 	Error() error
 }

@@ -8,4 +8,5 @@ import (
 
 type PortalRepository interface {
 	GetUser(context.Context, string) (*domain.PortalUser, error)
+	GetUsers(context.Context) ([]*domain.PortalUser, error)
 }

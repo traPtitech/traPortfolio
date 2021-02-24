@@ -20,3 +20,7 @@ func (repo *PortalRepository) GetUser(ctx context.Context, name string) (user *d
 	// TODO
 	return
 }
+
+func (repo *PortalRepository) GetUsers(ctx context.Context) (users []*domain.PortalUser, err error) {
+	return
+}
