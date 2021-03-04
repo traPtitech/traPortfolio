@@ -46,7 +46,7 @@ if you want to change DB port, set the `DB_PORT` environment variable.
 ### Rebuild
 
 ```
-$ doker-compose up --build
+$ docker-compose up --build
 ```
 
 ### Up test DB
