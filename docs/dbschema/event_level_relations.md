@@ -10,7 +10,7 @@ knoQイベントと公開レベルの関係テーブル
 ```sql
 CREATE TABLE `event_level_relations` (
   `id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
@@ -22,7 +22,7 @@ CREATE TABLE `event_level_relations` (
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false |  |  | knoQイベントUUID |
-| level | tinyint(3) unsigned | 1 | false |  |  | 公開レベル。0なら匿名、1ならそのまま公開、2なら外部に非公開 |
+| level | tinyint(3) unsigned | 0 | false |  |  | 公開レベル。0なら匿名、1ならそのまま公開、2なら外部に非公開 |
 
 ## Constraints
 
