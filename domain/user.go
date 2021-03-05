@@ -17,7 +17,7 @@ type User struct {
 
 type Account struct {
 	ID        uuid.UUID `gorm:"type:char(36);not null;primary_key"`
-	Type      uint      `gorm:"type:uint(8);not null"`
+	Type      uint      `gorm:"type:tinyint(1);not null"`
 	Name      string    `gorm:"type:varchar(32)"`
 	URL       string    `gorm:"type:text"`
 	UserID    uuid.UUID `gorm:"type:char(36);not null;unique"`

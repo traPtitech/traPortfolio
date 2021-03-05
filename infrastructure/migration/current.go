@@ -15,6 +15,7 @@ func Migrations() []*gormigrate.Migration {
 func AllTables() []interface{} {
 	return []interface{}{
 		domain.User{},
+		domain.Account{},
 		domain.EventLevelRelation{},
 	}
 }
