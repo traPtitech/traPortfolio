@@ -3,7 +3,7 @@ TBLS_VERSION := 1.38.3
 
 .PHONY: golangci-lint
 golangci-lint:
-	@docker run --rm -v $(CURDIR):/app -w /app golangci/golangci-lint:latest golangci-lint run 
+	@docker run --rm -v $(CURDIR):/app -w /app golangci/golangci-lint:latest golangci-lint run
 
 .PHONY: up-test-db
 up-test-db:
@@ -20,7 +20,7 @@ db-gen-docs:
 
 .PHONY: db-lint
 db-lint:
-	DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test go run main.go -migrate true
+	DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test TRAQ_COOKIE=test TRAQ_API_ENDPOINT=test go run main.go -migrate true
 	docker run --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
 
 .PHONY: rm-test-db
