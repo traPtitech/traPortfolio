@@ -19,7 +19,9 @@ var portalSet = wire.NewSet(
 )
 
 var traQSet = wire.NewSet(
+	NewTraqAPI,
 	impl.NewTraQRepository,
+	wire.Bind(new(external.TraqAPI), new(*TraqAPI)),
 	wire.Bind(new(repository.TraQRepository), new(*impl.TraQRepository)),
 )
 

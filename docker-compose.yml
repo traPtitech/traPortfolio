@@ -9,6 +9,8 @@ services:
     environment:
       KNOQ_COOKIE: "your session"
       KNOQ_API_ENDPOINT: https://knoq.trap.jp/api
+      TRAQ_COOKIE: "your session"
+      TRAQ_API_ENDPOINT: https://q.trap.jp/api/v3
     expose:
       - "80"
       - "6060"

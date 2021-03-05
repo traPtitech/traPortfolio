@@ -47,7 +47,7 @@ func (handler *UserHandler) GetByID(c echo.Context) error {
 	ctx := context.Background()
 	result, err := handler.UserService.GetUser(ctx, id)
 	if err == repository.ErrNotFound {
-		return echo.NewHTTPError(http.StatusBadRequest)
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 	if err != nil {
 		return err
