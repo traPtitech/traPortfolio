@@ -63,14 +63,14 @@ func (traq *TraqAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResp
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users/%v failed: %v", id, res.Status) //TODO
+		return nil, fmt.Errorf("GET /users/%v failed: %v", id, res.Status)
 	}
 
-	var er external.UserResponse
-	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
+	var userResponse external.UserResponse
+	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
-	return &er, nil
+	return &userResponse, nil
 }
 
 func traQAPIGet(client *http.Client, traQToken string, path string) (*http.Response, error) {
