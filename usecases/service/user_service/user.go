@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -15,12 +16,12 @@ type User struct {
 }
 
 type UserDetail struct {
-	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"name"`
-	RealName string    `json:"realName"`
-	State    uint8     `json:"state"`
-	Bio      string    `json:"bio"`
-	Accounts []Account `json:"accounts"`
+	ID       uuid.UUID        `json:"id"`
+	Name     string           `json:"name"`
+	RealName string           `json:"realName"`
+	State    domain.TraQState `json:"state"`
+	Bio      string           `json:"bio"`
+	Accounts []Account        `json:"accounts"`
 }
 
 type Account struct {
@@ -78,7 +79,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	if err != nil {
 		return nil, err
 	}
-	traqUser, err := s.traQ.GetUser(ctx, user.ID)
+	traQUser, err := s.traQ.GetUser(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +99,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 		ID:       user.ID,
 		Name:     user.Name,
 		RealName: portalUser.Name,
-		State:    traqUser.State,
+		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,
 	}, nil
