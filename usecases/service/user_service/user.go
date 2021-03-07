@@ -16,12 +16,12 @@ type User struct {
 }
 
 type UserDetail struct {
-	ID       uuid.UUID    `json:"id"`
-	Name     string       `json:"name"`
-	RealName string       `json:"realName"`
-	State    domain.State `json:"state"`
-	Bio      string       `json:"bio"`
-	Accounts []Account    `json:"accounts"`
+	ID       uuid.UUID        `json:"id"`
+	Name     string           `json:"name"`
+	RealName string           `json:"realName"`
+	State    domain.TraQState `json:"state"`
+	Bio      string           `json:"bio"`
+	Accounts []Account        `json:"accounts"`
 }
 
 type Account struct {

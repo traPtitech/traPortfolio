@@ -6,10 +6,10 @@ import (
 )
 
 type UserResponse struct {
-	State       domain.State `json:"state"`
-	Bot         bool         `json:"bot"`
-	DisplayName string       `json:"displayName"`
-	Name        string       `json:"name"`
+	State       domain.TraQState `json:"state"`
+	Bot         bool             `json:"bot"`
+	DisplayName string           `json:"displayName"`
+	Name        string           `json:"name"`
 }
 
 type TraqAPI interface {
