@@ -12,6 +12,6 @@ type UserResponse struct {
 	Name        string           `json:"name"`
 }
 
-type TraqAPI interface {
+type TraQAPI interface {
 	GetByID(uuid.UUID, string) (*UserResponse, error)
 }

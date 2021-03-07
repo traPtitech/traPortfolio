@@ -10,12 +10,12 @@ import (
 
 type TraQRepository struct {
 	token string
-	api   external.TraqAPI
+	api   external.TraQAPI
 }
 
 type TraQToken string
 
-func NewTraQRepository(api external.TraqAPI, traQToken TraQToken) *TraQRepository {
+func NewTraQRepository(api external.TraQAPI, traQToken TraQToken) *TraQRepository {
 	return &TraQRepository{
 		token: string(traQToken),
 		api:   api,

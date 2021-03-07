@@ -27,11 +27,11 @@ func init() {
 	}
 }
 
-type TraqAPI struct {
+type TraQAPI struct {
 	Client *http.Client
 }
 
-func NewTraqAPI() (*TraqAPI, error) {
+func NewTraQAPI() (*TraQAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)
@@ -48,15 +48,15 @@ func NewTraqAPI() (*TraqAPI, error) {
 		return nil, err
 	}
 	jar.SetCookies(u, cookies)
-	return &TraqAPI{Client: &http.Client{Jar: jar}}, nil
+	return &TraQAPI{Client: &http.Client{Jar: jar}}, nil
 }
 
-func (traq *TraqAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResponse, error) {
+func (traQ *TraQAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResponse, error) {
 	if id == uuid.Nil {
 		return nil, fmt.Errorf("invalid uuid")
 	}
 
-	res, err := traQAPIGet(traq.Client, fmt.Sprintf("/users/%v", id))
+	res, err := traQAPIGet(traQ.Client, fmt.Sprintf("/users/%v", id))
 	if err != nil {
 		return nil, err
 	}

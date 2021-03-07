@@ -79,7 +79,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	if err != nil {
 		return nil, err
 	}
-	traqUser, err := s.traQ.GetUser(ctx, user.ID)
+	traQUser, err := s.traQ.GetUser(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 		ID:       user.ID,
 		Name:     user.Name,
 		RealName: portalUser.Name,
-		State:    traqUser.State,
+		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,
 	}, nil
