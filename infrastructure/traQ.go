@@ -38,7 +38,7 @@ func NewTraqAPI() (*TraqAPI, error) {
 	}
 	cookies := []*http.Cookie{
 		{
-			Name:  "session",
+			Name:  "r_session",
 			Value: traQCookie,
 			Path:  "/",
 		},
@@ -56,7 +56,7 @@ func (traq *TraqAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResp
 		return nil, fmt.Errorf("invalid uuid")
 	}
 
-	res, err := traQAPIGet(traq.Client, traQToken, fmt.Sprintf("/users/%v", id))
+	res, err := traQAPIGet(traq.Client, fmt.Sprintf("/users/%v", id))
 	if err != nil {
 		return nil, err
 	}
@@ -73,9 +73,8 @@ func (traq *TraqAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResp
 	return &userResponse, nil
 }
 
-func traQAPIGet(client *http.Client, traQToken string, path string) (*http.Response, error) {
+func traQAPIGet(client *http.Client, path string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s", traQAPIEndpoint, path), nil)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", traQToken))
 	if err != nil {
 		return nil, err
 	}
