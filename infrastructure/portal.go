@@ -15,6 +15,7 @@ import (
 var (
 	portalCookie      = os.Getenv("PORTAL_COOKIE")
 	portalAPIEndpoint = os.Getenv("PORTAL_API_ENDPOINT")
+	portalUsers       []*external.PortalUserResponse
 )
 
 func init() {
@@ -51,6 +52,10 @@ func NewPortalAPI() (*PortalAPI, error) {
 }
 
 func (portal *PortalAPI) GetAll(portalToken string) ([]*external.PortalUserResponse, error) {
+	if len(portalUsers) > 0 {
+		return portalUsers, nil
+	}
+
 	res, err := apiGet(portal.Client, portalAPIEndpoint, "/user")
 	if err != nil {
 		return nil, err
@@ -65,22 +70,4 @@ func (portal *PortalAPI) GetAll(portalToken string) ([]*external.PortalUserRespo
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
 	return userResponses, nil
-}
-
-func (portal *PortalAPI) GetByID(name string, portalToken string) (*external.PortalUserResponse, error) {
-	res, err := apiGet(portal.Client, portalAPIEndpoint, fmt.Sprintf("/user/%s", name))
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(("GET /user/%s failed: %v"), name, res.Status)
-	}
-
-	var userResponse external.PortalUserResponse
-	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
-	}
-	return &userResponse, err
 }

@@ -8,5 +8,4 @@ type PortalUserResponse struct {
 
 type PortalAPI interface {
 	GetAll(string) ([]*PortalUserResponse, error)
-	GetByID(string, string) (*PortalUserResponse, error)
 }
