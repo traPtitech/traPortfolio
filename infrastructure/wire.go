@@ -14,7 +14,9 @@ import (
 )
 
 var portalSet = wire.NewSet(
+	NewPortalAPI,
 	impl.NewPortalRepository,
+	wire.Bind(new(external.PortalAPI), new(*PortalAPI)),
 	wire.Bind(new(repository.PortalRepository), new(*impl.PortalRepository)),
 )
 

@@ -34,7 +34,11 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 		return handler.API{}, err
 	}
 	traQRepository := repository.NewTraQRepository(traQAPI, traQToken)
-	portalRepository := repository.NewPortalRepository(portalToken)
+	portalAPI, err := NewPortalAPI()
+	if err != nil {
+		return handler.API{}, err
+	}
+	portalRepository := repository.NewPortalRepository(portalAPI, portalToken)
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userRepository, userService)
 	knoqAPI, err := NewKnoqAPI()
@@ -51,7 +55,9 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 
 // wire.go:
 
-var portalSet = wire.NewSet(repository.NewPortalRepository, wire.Bind(new(repository2.PortalRepository), new(*repository.PortalRepository)))
+var portalSet = wire.NewSet(
+	NewPortalAPI, repository.NewPortalRepository, wire.Bind(new(external.PortalAPI), new(*PortalAPI)), wire.Bind(new(repository2.PortalRepository), new(*repository.PortalRepository)),
+)
 
 var traQSet = wire.NewSet(
 	NewTraQAPI, repository.NewTraQRepository, wire.Bind(new(external.TraQAPI), new(*TraQAPI)), wire.Bind(new(repository2.TraQRepository), new(*repository.TraQRepository)),
