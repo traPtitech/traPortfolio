@@ -7,5 +7,5 @@ type PortalUserResponse struct {
 }
 
 type PortalAPI interface {
-	GetAll(string) ([]*PortalUserResponse, error)
+	GetAll() ([]*PortalUserResponse, error)
 }

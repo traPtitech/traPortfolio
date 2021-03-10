@@ -2,28 +2,24 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type PortalRepository struct {
-	token string
-	api   external.PortalAPI
+	api external.PortalAPI
 }
 
-type PortalToken string
+// type PortalToken string
 
-func NewPortalRepository(api external.PortalAPI, portalToken PortalToken) *PortalRepository {
-	return &PortalRepository{
-		token: string(portalToken),
-		api:   api,
-	}
+func NewPortalRepository(api external.PortalAPI) *PortalRepository {
+	return &PortalRepository{api}
 }
 
 func (repo *PortalRepository) GetUsers(ctx context.Context) ([]*domain.PortalUser, error) {
-	users, err := repo.api.GetAll(repo.token)
+	users, err := repo.api.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +35,7 @@ func (repo *PortalRepository) GetUsers(ctx context.Context) ([]*domain.PortalUse
 }
 
 func (repo *PortalRepository) GetUser(ctx context.Context, name string) (*domain.PortalUser, error) {
-	users, err := repo.api.GetAll(repo.token)
+	users, err := repo.api.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -53,5 +49,5 @@ func (repo *PortalRepository) GetUser(ctx context.Context, name string) (*domain
 			}, nil
 		}
 	}
-	return nil, fmt.Errorf("not found")
+	return nil, repository.ErrNotFound
 }

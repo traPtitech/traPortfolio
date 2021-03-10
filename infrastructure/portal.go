@@ -51,7 +51,7 @@ func NewPortalAPI() (*PortalAPI, error) {
 	return &PortalAPI{Client: &http.Client{Jar: jar}}, nil
 }
 
-func (portal *PortalAPI) GetAll(portalToken string) ([]*external.PortalUserResponse, error) {
+func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	if len(portalUsers) > 0 {
 		return portalUsers, nil
 	}
