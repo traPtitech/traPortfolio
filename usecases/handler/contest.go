@@ -45,7 +45,7 @@ func (h *ContestHandler) PostContest(c echo.Context) error {
 		return err
 	}
 
-	create_req := repository.CreateContestArgs{
+	createReq := repository.CreateContestArgs{
 		Name:        req.Name,
 		Description: req.Description,
 		Link:        req.Link,
@@ -53,7 +53,7 @@ func (h *ContestHandler) PostContest(c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	contest, err := h.service.CreateContest(ctx, &create_req)
+	contest, err := h.service.CreateContest(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (h *ContestHandler) PatchContest(c echo.Context) error {
 		return err
 	}
 
-	patch_req := repository.UpdateContestArgs{
+	patchReq := repository.UpdateContestArgs{
 		Name:        req.Name,
 		Description: req.Description,
 		Link:        req.Link,
@@ -97,7 +97,7 @@ func (h *ContestHandler) PatchContest(c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	err = h.service.UpdateContest(ctx, &patch_req)
+	err = h.service.UpdateContest(ctx, &patchReq)
 	if err != nil {
 		return err
 	}

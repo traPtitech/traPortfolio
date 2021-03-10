@@ -12,7 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/usecases/service/contest_service"
+	service3 "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
 	service2 "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 	"github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
@@ -47,7 +47,7 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	eventService := service2.NewEventService(eventRepository, knoqRepository)
 	eventHandler := handler.NewEventHandler(eventRepository, eventService)
 	contestRepository := repository.NewContestRepository(sqlHandler)
-	contestService := contest_service.NewContestService(contestRepository)
+	contestService := service3.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestRepository, contestService)
 	api := handler.NewAPI(pingHandler, userHandler, eventHandler, contestHandler)
 	return api, nil
@@ -73,7 +73,7 @@ var eventSet = wire.NewSet(
 	knoQSet, repository.NewEventRepository, service2.NewEventService, handler.NewEventHandler, wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
 )
 
-var contestSet = wire.NewSet(repository.NewContestRepository, contest_service.NewContestService, handler.NewContestHandler, wire.Bind(new(repository2.ContestRepository), new(*repository.ContestRepository)))
+var contestSet = wire.NewSet(repository.NewContestRepository, service3.NewContestService, handler.NewContestHandler, wire.Bind(new(repository2.ContestRepository), new(*repository.ContestRepository)))
 
 var sqlSet = wire.NewSet(
 	NewSQLHandler, wire.Bind(new(database.SQLHandler), new(*SQLHandler)),

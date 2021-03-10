@@ -1,4 +1,4 @@
-package contest_service
+package service
 
 import (
 	"context"

@@ -9,7 +9,7 @@ import (
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/usecases/service/contest_service"
+	contest_service "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
 	event_service "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 	user_service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
