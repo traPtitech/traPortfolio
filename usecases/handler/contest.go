@@ -82,6 +82,8 @@ type PatchContestResponse struct {
 
 func (h *ContestHandler) PatchContest(c echo.Context) error {
 	ctx := context.Background()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
 	req := &PatchContestRequest{}
 	// todo validation
 	err := c.Bind(req)
@@ -97,7 +99,7 @@ func (h *ContestHandler) PatchContest(c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	err = h.service.UpdateContest(ctx, &patchReq)
+	err = h.service.UpdateContest(ctx, id, &patchReq)
 	if err != nil {
 		return err
 	}

@@ -7,6 +7,8 @@ import (
 var (
 	// ErrNilID id is nil
 	ErrNilID = errors.New("nil id")
+	// ErrInvalidID id is invalid
+	ErrInvalidID = errors.New("invalid uuid")
 	// ErrNotFound not found
 	ErrNotFound = errors.New("not found")
 	// ErrForbidden forbidden

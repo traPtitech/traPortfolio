@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type ContestRepository struct {
@@ -21,10 +23,26 @@ func (repo *ContestRepository) Create(contest *domain.Contest) (*domain.Contest,
 	return contest, nil
 }
 
-func (repo *ContestRepository) Update(changes map[string]interface{}) error {
-	err := repo.h.Updates(changes).Error()
-	if err != nil {
+func (repo *ContestRepository) Update(id uuid.UUID, changes map[string]interface{}) error {
+	if id == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	var (
+		old domain.Contest
+		new domain.Contest
+	)
+
+	tx := repo.h.Begin()
+	if err := tx.First(&old, &domain.Contest{ID: id}).Error(); err != nil {
 		return err
 	}
+	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+		return err
+	}
+	if err := tx.Where(&domain.Contest{ID: id}).First(&new).Error(); err != nil {
+		return err
+	}
+	tx.Commit()
 	return nil
 }

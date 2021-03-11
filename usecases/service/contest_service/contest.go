@@ -36,7 +36,10 @@ func (s ContestService) CreateContest(ctx context.Context, args *repository.Crea
 	}
 	return contest, nil
 }
-func (s ContestService) UpdateContest(ctx context.Context, args *repository.UpdateContestArgs) error {
+func (s ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
+	if id == uuid.Nil {
+		return repository.ErrInvalidID
+	}
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -54,7 +57,7 @@ func (s ContestService) UpdateContest(ctx context.Context, args *repository.Upda
 		changes["until"] = args.Until.Time
 	}
 	if len(changes) > 0 {
-		err := s.repo.Update(changes)
+		err := s.repo.Update(id, changes)
 		if err != nil {
 			return err
 		}
