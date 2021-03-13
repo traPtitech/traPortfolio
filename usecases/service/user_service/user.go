@@ -103,3 +103,39 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 		Accounts: accounts,
 	}, nil
 }
+
+func (s *UserService) AddAccount(ctx context.Context, account Account) error {
+
+	user, err := s.repo.GetUser(account.ID)
+	if err != nil {
+		return err
+	}
+	userAccounts, err := s.repo.GetAccounts(account.ID)
+	if err != nil {
+		return err
+	}
+
+	//TODO
+	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
+
+	return nil
+
+}
+
+func (s *UserService) DeleteAccount(ctx context.Context, account Account) error {
+
+	user, err := s.repo.GetUser(account.ID)
+	if err != nil {
+		return err
+	}
+	userAccounts, err := s.repo.GetAccounts(account.ID)
+	if err != nil {
+		return err
+	}
+
+	//TODO
+	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
+
+	return nil
+
+}

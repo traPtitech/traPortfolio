@@ -18,7 +18,7 @@ services:
       - mysql
 
   mysql:
-    image: mariadb:10.0.19
+    image: mariadb:latest
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password

@@ -84,3 +84,57 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	}
 	return c.NoContent(http.StatusOK)
 }
+
+func (handler *UserHandler) AddAccount(c echo.Context) error {
+	_id := c.Param("userID")
+	if _id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	id := uuid.FromStringOrNil(_id)
+	if id == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
+	}
+
+	a := domain.Account{}
+	err := c.Bind(&a)
+	if err != nil {
+		return err
+	}
+
+	err = handler.UserRepository.AddAccount(a)
+	if err == repository.ErrNotFound {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (handler *UserHandler) DeleteAccount(c echo.Context) error {
+	_id := c.Param("userID")
+	if _id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	id := uuid.FromStringOrNil(_id)
+	if id == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
+	}
+
+	a := domain.Account{}
+	err := c.Bind(&a)
+	if err != nil {
+		return err
+	}
+
+	err = handler.UserRepository.DeleteAccount(a)
+	if err == repository.ErrNotFound {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusOK)
+}
