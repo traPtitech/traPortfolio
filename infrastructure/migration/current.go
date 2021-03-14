@@ -1,7 +1,7 @@
 package migration
 
 import (
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"gopkg.in/gormigrate.v1"
 )
 
@@ -14,8 +14,8 @@ func Migrations() []*gormigrate.Migration {
 
 func AllTables() []interface{} {
 	return []interface{}{
-		domain.User{},
-		domain.Account{},
-		domain.EventLevelRelation{},
+		model.User{},
+		model.Account{},
+		model.EventLevelRelation{},
 	}
 }

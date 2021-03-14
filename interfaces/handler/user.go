@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
@@ -70,7 +70,7 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	u := domain.User{
+	u := model.User{
 		ID:          id,
 		Description: req.Bio,
 		Check:       !req.HideRealName,

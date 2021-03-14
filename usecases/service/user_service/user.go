@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -16,12 +16,12 @@ type User struct {
 }
 
 type UserDetail struct {
-	ID       uuid.UUID        `json:"id"`
-	Name     string           `json:"name"`
-	RealName string           `json:"realName"`
-	State    domain.TraQState `json:"state"`
-	Bio      string           `json:"bio"`
-	Accounts []Account        `json:"accounts"`
+	ID       uuid.UUID       `json:"id"`
+	Name     string          `json:"name"`
+	RealName string          `json:"realName"`
+	State    model.TraQState `json:"state"`
+	Bio      string          `json:"bio"`
+	Accounts []Account       `json:"accounts"`
 }
 
 type Account struct {

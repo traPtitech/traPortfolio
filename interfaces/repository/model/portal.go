@@ -1,4 +1,4 @@
-package domain
+package model
 
 // PortalUser Portal上のユーザー情報
 type PortalUser struct {

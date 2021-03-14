@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 )
 
 type PortalRepository struct {
@@ -16,11 +16,11 @@ func NewPortalRepository(portalToken PortalToken) *PortalRepository {
 	return &PortalRepository{token: string(portalToken)}
 }
 
-func (repo *PortalRepository) GetUser(ctx context.Context, name string) (user *domain.PortalUser, err error) {
+func (repo *PortalRepository) GetUser(ctx context.Context, name string) (user *model.PortalUser, err error) {
 	// TODO
 	return
 }
 
-func (repo *PortalRepository) GetUsers(ctx context.Context) (users []*domain.PortalUser, err error) {
+func (repo *PortalRepository) GetUsers(ctx context.Context) (users []*model.PortalUser, err error) {
 	return
 }
