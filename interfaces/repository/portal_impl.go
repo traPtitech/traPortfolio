@@ -12,8 +12,6 @@ type PortalRepository struct {
 	api external.PortalAPI
 }
 
-// type PortalToken string
-
 func NewPortalRepository(api external.PortalAPI) *PortalRepository {
 	return &PortalRepository{api}
 }
