@@ -17,6 +17,7 @@ import (
 var (
 	portalCookie      = os.Getenv("PORTAL_COOKIE")
 	portalAPIEndpoint = os.Getenv("PORTAL_API_ENDPOINT")
+	cacheKey          = "portalUsers"
 )
 
 func init() {
@@ -58,7 +59,7 @@ func NewPortalAPI() (*PortalAPI, error) {
 }
 
 func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
-	portalUsers, found := portal.Cache.Get("portalUsers")
+	portalUsers, found := portal.Cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
@@ -76,6 +77,6 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	if err := json.NewDecoder(res.Body).Decode(&userResponses); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
-	portal.Cache.Set("portalUsers", userResponses, cache.DefaultExpiration)
+	portal.Cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
 }
