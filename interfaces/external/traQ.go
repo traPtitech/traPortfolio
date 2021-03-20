@@ -2,14 +2,14 @@ package external
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/domain"
 )
 
 type UserResponse struct {
-	State       model.TraQState `json:"state"`
-	Bot         bool            `json:"bot"`
-	DisplayName string          `json:"displayName"`
-	Name        string          `json:"name"`
+	State       domain.TraQState `json:"state"`
+	Bot         bool             `json:"bot"`
+	DisplayName string           `json:"displayName"`
+	Name        string           `json:"name"`
 }
 
 type TraQAPI interface {
