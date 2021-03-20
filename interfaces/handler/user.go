@@ -25,6 +25,12 @@ func NewUserHandler(repo repository.UserRepository, s service.UserService) *User
 	return &UserHandler{UserRepository: repo, UserService: s}
 }
 
+type userResponse struct {
+	id       uuid.UUID `json:"id"`
+	name     string    `json:"name"`
+	realName string    `json:"realName"`
+}
+
 func (handler *UserHandler) GetAll(c echo.Context) error {
 	ctx := context.Background()
 	result, err := handler.UserService.GetUsers(ctx)

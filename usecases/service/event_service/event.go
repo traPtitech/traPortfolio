@@ -2,25 +2,11 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
-
-// Event Portfolioのレスポンスで使うイベント情報
-type Event struct {
-	ID          uuid.UUID        `json:"eventId"`
-	Name        string           `json:"name"`
-	Description string           `json:"description"`
-	GroupID     uuid.UUID        `json:"groupId"`
-	RoomID      uuid.UUID        `json:"roomId"`
-	TimeStart   time.Time        `json:"timeStart"`
-	TimeEnd     time.Time        `json:"timeEnd"`
-	SharedRoom  bool             `json:"sharedRoom"`
-	Level       model.EventLevel `json:"eventLevel"`
-}
 
 type EventService struct {
 	repo repository.EventRepository
@@ -34,62 +20,60 @@ func NewEventService(repo repository.EventRepository, knoQ repository.KnoqReposi
 	}
 }
 
-func (s *EventService) GetEvents(ctx context.Context) ([]*model.Event, error) {
+func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 	er, err := s.knoQ.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	elvsmp, err := s.repo.GetEventLevels()
+	//elvsmp, err := s.repo.GetEventLevels()
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]*model.Event, 0, len(er))
+	result := make([]*domain.Event, 0, len(er))
 	for _, v := range er {
-		e := &model.Event{
-			ID:          v.ID,
-			Description: v.Description,
-			GroupID:     v.GroupID,
-			Name:        v.Name,
-			RoomID:      v.RoomID,
-			SharedRoom:  v.SharedRoom,
-			TimeEnd:     v.TimeEnd,
+		e := &domain.Event{
+			ID:        v.ID,
+			Name:      v.Name,
+			TimeStart: v.TimeStart,
+			TimeEnd:   v.TimeEnd,
 		}
-		if level, ok := elvsmp[v.ID]; ok {
-			e.Level = level.Level
-		}
+		//if level, ok := elvsmp[v.ID]; ok {
+		//	e.Level = level.Level
+		//}
 		result = append(result, e)
 	}
 
 	return result, nil
 }
 
-func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*model.Event, error) {
+func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.EventDetail, error) {
 	er, err := s.knoQ.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	elv, err := s.repo.GetEventLevelByID(id)
+	//elv, err := s.repo.GetEventLevelByID(id)
 	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
 
-	result := &model.Event{
-		ID:          er.ID,
+	result := &domain.EventDetail{
+		Event: domain.Event{
+			ID:        er.ID,
+			Name:      er.Name,
+			TimeStart: er.TimeStart,
+			TimeEnd:   er.TimeEnd,
+		},
 		Description: er.Description,
 		GroupID:     er.GroupID,
-		Name:        er.Name,
 		RoomID:      er.RoomID,
-		SharedRoom:  er.SharedRoom,
-		TimeEnd:     er.TimeEnd,
-		TimeStart:   er.TimeStart,
 	}
 
-	if err == nil {
-		result.Level = elv.Level
-	}
+	//if err == nil {
+	//	result.Level = elv.Level
+	//}
 
 	return result, nil
 }
