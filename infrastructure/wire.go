@@ -14,7 +14,9 @@ import (
 )
 
 var portalSet = wire.NewSet(
+	NewPortalAPI,
 	impl.NewPortalRepository,
+	wire.Bind(new(external.PortalAPI), new(*PortalAPI)),
 	wire.Bind(new(repository.PortalRepository), new(*impl.PortalRepository)),
 )
 
@@ -58,7 +60,7 @@ var sqlSet = wire.NewSet(
 
 var apiSet = wire.NewSet(handler.NewAPI)
 
-func InjectAPIServer(traQToken impl.TraQToken, portalToken impl.PortalToken) (handler.API, error) {
+func InjectAPIServer(traQToken impl.TraQToken) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

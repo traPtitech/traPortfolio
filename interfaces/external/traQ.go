@@ -5,7 +5,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 )
 
-type UserResponse struct {
+type TraQUserResponse struct {
 	State       domain.TraQState `json:"state"`
 	Bot         bool             `json:"bot"`
 	DisplayName string           `json:"displayName"`
@@ -13,5 +13,5 @@ type UserResponse struct {
 }
 
 type TraQAPI interface {
-	GetByID(uuid.UUID, string) (*UserResponse, error)
+	GetByID(uuid.UUID, string) (*TraQUserResponse, error)
 }
