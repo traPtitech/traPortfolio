@@ -9,21 +9,17 @@ import (
 )
 
 type TraQRepository struct {
-	token string
-	api   external.TraQAPI
+	api external.TraQAPI
 }
 
-type TraQToken string
-
-func NewTraQRepository(api external.TraQAPI, traQToken TraQToken) *TraQRepository {
+func NewTraQRepository(api external.TraQAPI) *TraQRepository {
 	return &TraQRepository{
-		token: string(traQToken),
-		api:   api,
+		api: api,
 	}
 }
 
 func (repo *TraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.TraQUser, error) {
-	ures, err := repo.api.GetByID(id, repo.token)
+	ures, err := repo.api.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
