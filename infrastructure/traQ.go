@@ -51,12 +51,12 @@ func NewTraQAPI() (*TraQAPI, error) {
 	return &TraQAPI{Client: &http.Client{Jar: jar}}, nil
 }
 
-func (traQ *TraQAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResponse, error) {
+func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	if id == uuid.Nil {
 		return nil, fmt.Errorf("invalid uuid")
 	}
 
-	res, err := traQAPIGet(traQ.Client, fmt.Sprintf("/users/%v", id))
+	res, err := apiGet(traQ.Client, traQAPIEndpoint, fmt.Sprintf("/users/%v", id))
 	if err != nil {
 		return nil, err
 	}
@@ -66,17 +66,9 @@ func (traQ *TraQAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResp
 		return nil, fmt.Errorf("GET /users/%v failed: %v", id, res.Status)
 	}
 
-	var userResponse external.UserResponse
+	var userResponse external.TraQUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
 	return &userResponse, nil
-}
-
-func traQAPIGet(client *http.Client, path string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s", traQAPIEndpoint, path), nil)
-	if err != nil {
-		return nil, err
-	}
-	return client.Do(req)
 }

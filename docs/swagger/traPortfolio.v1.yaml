@@ -62,8 +62,8 @@ paths:
       summary: ユーザー情報の編集
       operationId: editUser
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
@@ -85,8 +85,8 @@ paths:
       summary: アカウント情報の追加
       operationId: addAccount
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
@@ -113,8 +113,8 @@ paths:
           description: 削除するアカウント情報のUUID
           required: true
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
@@ -230,6 +230,10 @@ paths:
       responses:
         "201":
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
         "400":
           description: Bad Request
       description: プロジェクトを作成します
@@ -263,8 +267,8 @@ paths:
       summary: プロジェクト詳細情報の修正
       operationId: editProject
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
@@ -371,6 +375,10 @@ paths:
       responses:
         "201":
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contest"
         "400":
           description: Bad Request
       requestBody:
@@ -404,8 +412,8 @@ paths:
       summary: コンテスト情報の修正
       operationId: editContest
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
@@ -425,8 +433,12 @@ paths:
       summary: コンテストチームの作成
       operationId: postContestTeam
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContestTeam"
         "400":
           description: Bad Request
         "403":
@@ -465,8 +477,8 @@ paths:
       summary: コンテストチームの修正
       operationId: editContestTeam
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
@@ -486,8 +498,8 @@ paths:
       summary: コンテストチームへのユーザーの追加
       operationId: addContestTeamMember
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "403":
