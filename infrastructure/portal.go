@@ -50,7 +50,7 @@ func NewPortalAPI() (*PortalAPI, error) {
 		return nil, err
 	}
 	jar.SetCookies(u, cookies)
-	c := cache.New(5*time.Minute, 10*time.Minute)
+	c := cache.New(1*time.Hour, 2*time.Hour)
 	return &PortalAPI{
 		Client: &http.Client{Jar: jar},
 		Cache:  c,
