@@ -18,9 +18,9 @@ type EventHandler struct {
 
 // EventResponse Portfolioのレスポンスで使うイベント情報
 type eventResponse struct {
-	id       uuid.UUID `json:"eventId"`
-	name     string    `json:"name"`
-	duration duration
+	ID       uuid.UUID `json:"eventId"`
+	Name     string    `json:"name"`
+	Duration duration
 }
 
 // NewEventHandler creates a EventHandler
@@ -39,11 +39,11 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	res := make([]*eventResponse, len(events))
 	for _, event := range events {
 		res = append(res, &eventResponse{
-			id:   event.ID,
-			name: event.Name,
-			duration: duration{
-				since: event.TimeStart,
-				until: event.TimeEnd,
+			ID:   event.ID,
+			Name: event.Name,
+			Duration: duration{
+				Since: event.TimeStart,
+				Until: event.TimeEnd,
 			},
 		})
 	}
@@ -52,9 +52,9 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 
 type eventDetailResponse struct {
 	eventResponse
-	description string `json:"description"`
-	place       string `json:"place"`
-	hostName    []*userResponse
+	Description string `json:"description"`
+	Place       string `json:"place"`
+	HostName    []*userResponse
 }
 
 // GetByID GET /events/:eventID
@@ -84,25 +84,25 @@ func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
 	userRes := make([]*userResponse, len(event.HostName))
 	for _, user := range event.HostName {
 		userRes = append(userRes, &userResponse{
-			id:       user.Id,
-			name:     user.Name,
-			realName: user.RealName,
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: user.RealName,
 		},
 		)
 	}
 
 	res := &eventDetailResponse{
 		eventResponse: eventResponse{
-			id:   event.ID,
-			name: event.Name,
-			duration: duration{
-				since: event.TimeStart,
-				until: event.TimeEnd,
+			ID:   event.ID,
+			Name: event.Name,
+			Duration: duration{
+				Since: event.TimeStart,
+				Until: event.TimeEnd,
 			},
 		},
-		description: event.Description,
-		place:       event.Place,
-		hostName:    userRes,
+		Description: event.Description,
+		Place:       event.Place,
+		HostName:    userRes,
 	}
 	return res
 }

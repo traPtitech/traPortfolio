@@ -26,7 +26,7 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 		return nil, err
 	}
 
-	//elvsmp, err := s.repo.GetEventLevels()
+	elvsmp, err := s.repo.GetEventLevels()
 	if err != nil {
 		return nil, err
 	}
@@ -39,9 +39,9 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 			TimeStart: v.TimeStart,
 			TimeEnd:   v.TimeEnd,
 		}
-		//if level, ok := elvsmp[v.ID]; ok {
-		//	e.Level = level.Level
-		//}
+		if level, ok := elvsmp[v.ID]; ok {
+			e.Level = level.Level
+		}
 		result = append(result, e)
 	}
 
@@ -54,7 +54,7 @@ func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 		return nil, err
 	}
 
-	//elv, err := s.repo.GetEventLevelByID(id)
+	elv, err := s.repo.GetEventLevelByID(id)
 	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
@@ -71,9 +71,9 @@ func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 		RoomID:      er.RoomID,
 	}
 
-	//if err == nil {
-	//	result.Level = elv.Level
-	//}
+	if err == nil {
+		result.Level = elv.Level
+	}
 
 	return result, nil
 }

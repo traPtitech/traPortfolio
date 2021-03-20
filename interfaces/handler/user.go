@@ -26,9 +26,9 @@ func NewUserHandler(repo repository.UserRepository, s service.UserService) *User
 }
 
 type userResponse struct {
-	id       uuid.UUID `json:"id"`
-	name     string    `json:"name"`
-	realName string    `json:"realName"`
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	RealName string    `json:"realName"`
 }
 
 func (handler *UserHandler) GetAll(c echo.Context) error {
