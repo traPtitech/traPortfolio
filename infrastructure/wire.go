@@ -60,7 +60,7 @@ var sqlSet = wire.NewSet(
 
 var apiSet = wire.NewSet(handler.NewAPI)
 
-func InjectAPIServer(traQToken impl.TraQToken) (handler.API, error) {
+func InjectAPIServer() (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

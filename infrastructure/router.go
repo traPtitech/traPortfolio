@@ -11,7 +11,7 @@ func Init() {
 	// Echo instance
 	e := echo.New()
 
-	api, err := InjectAPIServer("traQToken")
+	api, err := InjectAPIServer()
 	if err != nil {
 		log.Fatal(err)
 	}

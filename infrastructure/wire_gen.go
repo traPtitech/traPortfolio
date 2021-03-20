@@ -22,7 +22,7 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer(traQToken repository.TraQToken) (handler.API, error) {
+func InjectAPIServer() (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
 	sqlHandler, err := NewSQLHandler()
 	if err != nil {
@@ -33,7 +33,7 @@ func InjectAPIServer(traQToken repository.TraQToken) (handler.API, error) {
 	if err != nil {
 		return handler.API{}, err
 	}
-	traQRepository := repository.NewTraQRepository(traQAPI, traQToken)
+	traQRepository := repository.NewTraQRepository(traQAPI)
 	portalAPI, err := NewPortalAPI()
 	if err != nil {
 		return handler.API{}, err
