@@ -39,3 +39,8 @@ func (repo *EventRepository) GetEventLevelByID(id uuid.UUID) (*model.EventLevelR
 	}
 	return elv, nil
 }
+
+// Interface guards
+var (
+	_ repository.EventRepository = (*EventRepository)(nil)
+)

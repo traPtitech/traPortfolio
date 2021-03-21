@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
@@ -34,3 +36,8 @@ func (repo *TraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*model.T
 		Name:        ures.Name,
 	}, nil
 }
+
+// Interface guards
+var (
+	_ repository.TraQRepository = (*TraQRepository)(nil)
+)
