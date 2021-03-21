@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -84,6 +83,6 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 	}, nil
 }
 
-func (s *UserService) Update(ctx context.Context, user *model.User) error {
+func (s *UserService) Update(ctx context.Context, user *domain.EditUser) error {
 	return s.repo.Update(user)
 }

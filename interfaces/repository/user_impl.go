@@ -2,8 +2,11 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type UserRepository struct {
@@ -33,7 +36,17 @@ func (repo *UserRepository) GetAccounts(id uuid.UUID) (accounts []*model.Account
 	return
 }
 
-func (repo *UserRepository) Update(u *model.User) error {
-	err := repo.Model(&model.User{}).Updates(&u).Error()
+func (repo *UserRepository) Update(u *domain.EditUser) error {
+	user := &model.User{ID: u.ID}
+	err := repo.First(user).Error()
+	if err == gorm.ErrRecordNotFound {
+		return repository.ErrNotFound
+	} else if err != nil {
+		return err
+	}
+
+	user.Description = u.Description
+	user.Check = u.Check
+	err = repo.Save(user).Error()
 	return err
 }
