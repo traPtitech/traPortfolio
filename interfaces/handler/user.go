@@ -47,7 +47,7 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 		return err
 	}
 
-	res := make([]*userResponse, len(users))
+	res := make([]*userResponse, 0, len(users))
 	for _, user := range users {
 		res = append(res, &userResponse{
 			ID:       user.ID,
