@@ -3,6 +3,8 @@ package model
 import (
 	"time"
 
+	"github.com/traPtitech/traPortfolio/domain"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -10,25 +12,16 @@ import (
 type Event struct {
 	ID          uuid.UUID
 	Name        string
-	Description string
-	GroupID     uuid.UUID
-	RoomID      uuid.UUID
 	TimeStart   time.Time
 	TimeEnd     time.Time
-	SharedRoom  bool
-	Level       EventLevel
+	Description string
+	Place       string
+	HostName    []*User
+	GroupID     uuid.UUID
+	RoomID      uuid.UUID
 }
 
-// EventLevel
-type EventLevel uint
-
-const (
-	EventLevelAnonymous = iota // 匿名で公開
-	EventLevelPublic           // 全て公開
-	EventLevelPrivate          // 外部に非公開
-)
-
 type EventLevelRelation struct {
-	ID    uuid.UUID  `gorm:"type:char(36);not null;primary_key"`
-	Level EventLevel `gorm:"type:tinyint unsigned;not null;default:0"`
+	ID    uuid.UUID         `gorm:"type:char(36);not null;primary_key"`
+	Level domain.EventLevel `gorm:"type:tinyint unsigned;not null;default:0"`
 }

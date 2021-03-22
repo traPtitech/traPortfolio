@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 )
 
@@ -24,3 +26,8 @@ func (repo *PortalRepository) GetUser(ctx context.Context, name string) (user *m
 func (repo *PortalRepository) GetUsers(ctx context.Context) (users []*model.PortalUser, err error) {
 	return
 }
+
+// Interface guards
+var (
+	_ repository.PortalRepository = (*PortalRepository)(nil)
+)

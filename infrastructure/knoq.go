@@ -99,3 +99,8 @@ func apiGet(client *http.Client, path string) (*http.Response, error) {
 	}
 	return client.Do(req)
 }
+
+// Interface guards
+var (
+	_ external.KnoqAPI = (*KnoqAPI)(nil)
+)
