@@ -1,10 +1,10 @@
 package model
 
-type TraQState uint8
+import "github.com/traPtitech/traPortfolio/domain"
 
 // TraQUser traQ上のユーザー情報
 type TraQUser struct {
-	State       TraQState
+	State       domain.TraQState
 	Bot         bool
 	DisplayName string
 	Name        string
