@@ -22,7 +22,7 @@ type UserDetail struct {
 	RealName string
 	State    TraQState
 	Bio      string
-	Accounts []Account
+	Accounts []*Account
 }
 
 type EditUser struct {

@@ -32,7 +32,7 @@ type userDetailResponse struct {
 	RealName string           `json:"realName"`
 	State    domain.TraQState `json:"state"`
 	Bio      string           `json:"bio"`
-	Accounts []domain.Account `json:"accounts"`
+	Accounts []*domain.Account `json:"accounts"`
 }
 
 func NewUserHandler(s service.UserService) *UserHandler {

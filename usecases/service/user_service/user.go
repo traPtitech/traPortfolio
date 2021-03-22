@@ -65,9 +65,9 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 	if err != nil {
 		return nil, err
 	}
-	accounts := make([]domain.Account, 0, len(userAccounts))
+	accounts := make([]*domain.Account, 0, len(userAccounts))
 	for _, v := range userAccounts {
-		accounts = append(accounts, domain.Account{
+		accounts = append(accounts, &domain.Account{
 			ID:          v.ID,
 			Type:        v.Type,
 			PrPermitted: v.Check,
