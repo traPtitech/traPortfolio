@@ -150,3 +150,8 @@ func (handler *SQLHandler) Updates(values interface{}) database.SQLHandler {
 func (handler *SQLHandler) Error() error {
 	return handler.Conn.Error
 }
+
+// Interface guards
+var (
+	_ database.SQLHandler = (*SQLHandler)(nil)
+)

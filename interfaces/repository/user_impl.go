@@ -50,3 +50,8 @@ func (repo *UserRepository) Update(u *domain.EditUser) error {
 	err = repo.Save(user).Error()
 	return err
 }
+
+// Interface guards
+var (
+	_ repository.UserRepository = (*UserRepository)(nil)
+)
