@@ -319,6 +319,26 @@ paths:
       description: イベント情報詳細を取得します
       tags:
         - event
+    patch:
+      summary: ""
+      operationId: editEvent
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      description: イベント情報を修正します
+      tags:
+        - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditEvent"
   /groups:
     get:
       summary: 班のリストの取得
@@ -769,19 +789,19 @@ components:
           description: イベントの開催期間
           allOf:
             - $ref: "#/components/schemas/Duration"
+        eventLevel:
+          $ref: "#/components/schemas/EventLevel"
       required:
         - id
         - name
         - duration
     EventDetail:
-      type: object
       description: イベントの詳細情報
       title: EventDetail
       allOf:
         - $ref: "#/components/schemas/Event"
-        - type: object
-          properties:
-            descirption:
+        - properties:
+            description:
               type: string
               example: 第n回の進捗会です。
               description: イベント説明
@@ -794,8 +814,9 @@ components:
               items:
                 $ref: "#/components/schemas/User"
           required:
-            - descirption
+            - description
             - place
+      type: object
     Contest:
       title: Contest
       type: object
@@ -1091,8 +1112,7 @@ components:
       required:
         - year
         - semester
-      description: |-
-        年度と前期/後期
+      description: 年度と前期/後期
     Semester:
       title: Semester
       type: integer
@@ -1109,6 +1129,13 @@ components:
         - 前期
         - 後期
       format: int32
+    EditEvent:
+      title: EditEvent
+      type: object
+      description: イベント情報修正リクエスト
+      properties:
+        eventLevel:
+          $ref: "#/components/schemas/EventLevel"
   parameters:
     userIdInPath:
       name: userId

@@ -52,3 +52,8 @@ func (repo *KnoqRepository) GetByID(id uuid.UUID) (*repository.KnoQEvent, error)
 		TimeStart:   eres.TimeStart,
 	}, nil
 }
+
+// Interface guards
+var (
+	_ repository.KnoqRepository = (*KnoqRepository)(nil)
+)
