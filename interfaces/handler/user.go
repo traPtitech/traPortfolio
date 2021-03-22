@@ -27,11 +27,11 @@ type userResponse struct {
 }
 
 type userDetailResponse struct {
-	ID       uuid.UUID        `json:"id"`
-	Name     string           `json:"name"`
-	RealName string           `json:"realName"`
-	State    domain.TraQState `json:"state"`
-	Bio      string           `json:"bio"`
+	ID       uuid.UUID         `json:"id"`
+	Name     string            `json:"name"`
+	RealName string            `json:"realName"`
+	State    domain.TraQState  `json:"state"`
+	Bio      string            `json:"bio"`
 	Accounts []*domain.Account `json:"accounts"`
 }
 
