@@ -36,7 +36,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		return err
 	}
 
-	res := make([]*eventResponse, len(events))
+	res := make([]*eventResponse, 0, len(events))
 	for _, event := range events {
 		res = append(res, &eventResponse{
 			ID:   event.ID,
@@ -81,7 +81,7 @@ func (h *EventHandler) GetByID(c echo.Context) error {
 }
 
 func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
-	userRes := make([]*userResponse, len(event.HostName))
+	userRes := make([]*userResponse, 0, len(event.HostName))
 	for _, user := range event.HostName {
 		userRes = append(userRes, &userResponse{
 			ID:       user.ID,
