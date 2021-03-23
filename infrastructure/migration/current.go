@@ -17,5 +17,6 @@ func AllTables() []interface{} {
 		model.User{},
 		model.Account{},
 		model.EventLevelRelation{},
+		model.Contestt{},
 	}
 }

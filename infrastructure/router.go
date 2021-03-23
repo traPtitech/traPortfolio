@@ -33,6 +33,11 @@ func Init() {
 			apiEvents.GET("", api.Event.GetAll)
 			apiEvents.GET("/:eventID", api.Event.GetByID)
 		}
+		apiContests := v1.Group("/contests")
+		{
+			apiContests.POST("", api.Contest.PostContest)
+			apiContests.PATCH("/:contestID", api.Contest.PatchContest)
+		}
 		apiPing := v1.Group("/ping")
 		{
 			apiPing.GET("", api.Ping.Ping)

@@ -9,6 +9,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	contest_service "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
 	event_service "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 	user_service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
@@ -51,6 +52,13 @@ var eventSet = wire.NewSet(
 	wire.Bind(new(repository.EventRepository), new(*impl.EventRepository)),
 )
 
+var contestSet = wire.NewSet(
+	impl.NewContestRepository,
+	contest_service.NewContestService,
+	handler.NewContestHandler,
+	wire.Bind(new(repository.ContestRepository), new(*impl.ContestRepository)),
+)
+
 var sqlSet = wire.NewSet(
 	NewSQLHandler,
 	wire.Bind(new(database.SQLHandler), new(*SQLHandler)),
@@ -67,6 +75,7 @@ func InjectAPIServer(traQToken impl.TraQToken, portalToken impl.PortalToken) (ha
 		apiSet,
 		portalSet,
 		traQSet,
+		contestSet,
 	)
 	return handler.API{}, nil
 }

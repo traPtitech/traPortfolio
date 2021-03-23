@@ -11,5 +11,7 @@ type SQLHandler interface {
 	Where(interface{}, ...interface{}) SQLHandler
 	Model(interface{}) SQLHandler
 	Updates(interface{}) SQLHandler
+	Begin() SQLHandler
+	Commit() SQLHandler
 	Error() error
 }

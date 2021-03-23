@@ -147,6 +147,19 @@ func (handler *SQLHandler) Updates(values interface{}) database.SQLHandler {
 	return handler
 }
 
+func (handler *SQLHandler) Begin() database.SQLHandler {
+	tx := handler.Conn.Begin()
+	return &SQLHandler{
+		Conn: tx,
+	}
+}
+
+func (handler *SQLHandler) Commit() database.SQLHandler {
+	res := handler.Conn.Commit()
+	handler.Conn = res
+	return handler
+}
+
 func (handler *SQLHandler) Error() error {
 	return handler.Conn.Error
 }
