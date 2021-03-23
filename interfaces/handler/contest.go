@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -37,7 +36,7 @@ type PostContestResponse struct {
 }
 
 func (h *ContestHandler) PostContest(c echo.Context) error {
-	ctx := context.Background()
+	ctx := c.Request().Context()
 	req := &PostContestRequest{}
 	// todo validation
 	err := c.Bind(req)
@@ -74,14 +73,9 @@ type PatchContestRequest struct {
 	Description optional.String `json:"description"`
 	Duration    OptionalDuration
 }
-type PatchContestResponse struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-	Duration
-}
 
 func (h *ContestHandler) PatchContest(c echo.Context) error {
-	ctx := context.Background()
+	ctx := c.Request().Context()
 	_id := c.Param("contestID")
 	id := uuid.FromStringOrNil(_id)
 	req := &PatchContestRequest{}

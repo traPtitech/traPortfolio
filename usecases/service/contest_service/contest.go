@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/gofrs/uuid"
 
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
@@ -20,9 +20,9 @@ func NewContestService(repo repository.ContestRepository) ContestService {
 	}
 }
 
-func (s ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (s ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*model.Contest, error) {
 	uid := uuid.Must(uuid.NewV4())
-	contest := &domain.Contest{
+	contest := &model.Contest{
 		ID:          uid,
 		Name:        args.Name,
 		Description: args.Description,

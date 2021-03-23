@@ -3,9 +3,10 @@ package repository
 import (
 	"time"
 
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+
 	"github.com/gofrs/uuid"
 
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
@@ -28,6 +29,6 @@ type UpdateContestArgs struct {
 type ContestRepository interface {
 	//GetAll() ([]*domain.Contest, error)
 	//GetByID(ID uuid.UUID) (*domain.Contest, error)
-	Create(contest *domain.Contest) (*domain.Contest, error)
+	Create(contest *model.Contest) (*model.Contest, error)
 	Update(id uuid.UUID, changes map[string]interface{}) error
 }

@@ -46,8 +46,6 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	knoqRepository := repository.NewKnoqRepository(knoqAPI)
 	eventService := service2.NewEventService(eventRepository, knoqRepository)
 	eventHandler := handler.NewEventHandler(eventService)
-	api := handler.NewAPI(pingHandler, userHandler, eventHandler)
-	eventHandler := handler.NewEventHandler(eventRepository, eventService)
 	contestRepository := repository.NewContestRepository(sqlHandler)
 	contestService := service3.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestRepository, contestService)

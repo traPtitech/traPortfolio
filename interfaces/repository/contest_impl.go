@@ -2,8 +2,8 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -15,7 +15,7 @@ func NewContestRepository(sql database.SQLHandler) *ContestRepository {
 	return &ContestRepository{h: sql}
 }
 
-func (repo *ContestRepository) Create(contest *domain.Contest) (*domain.Contest, error) {
+func (repo *ContestRepository) Create(contest *model.Contest) (*model.Contest, error) {
 	err := repo.h.Create(contest).Error()
 	if err != nil {
 		return nil, err
@@ -29,18 +29,18 @@ func (repo *ContestRepository) Update(id uuid.UUID, changes map[string]interface
 	}
 
 	var (
-		old domain.Contest
-		new domain.Contest
+		old model.Contest
+		new model.Contest
 	)
 
 	tx := repo.h.Begin()
-	if err := tx.First(&old, &domain.Contest{ID: id}).Error(); err != nil {
+	if err := tx.First(&old, &model.Contest{ID: id}).Error(); err != nil {
 		return err
 	}
 	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
 		return err
 	}
-	if err := tx.Where(&domain.Contest{ID: id}).First(&new).Error(); err != nil {
+	if err := tx.Where(&model.Contest{ID: id}).First(&new).Error(); err != nil {
 		return err
 	}
 	tx.Commit()
