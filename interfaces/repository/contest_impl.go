@@ -46,3 +46,8 @@ func (repo *ContestRepository) Update(id uuid.UUID, changes map[string]interface
 	tx.Commit()
 	return nil
 }
+
+// Interface guards
+var (
+	_ repository.ContestRepository = (*ContestRepository)(nil)
+)
