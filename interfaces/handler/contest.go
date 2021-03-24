@@ -23,8 +23,8 @@ func NewContestHandler(repo repository.ContestRepository, service service.Contes
 }
 
 type PostContestRequest struct {
-	Name        string `json:"name"`
-	Link        string `json:"link"`
+	Name        string `json:"name" validate:"required"`
+	Link        string `json:"link" validate:"url"`
 	Description string `json:"description"`
 	Duration    Duration
 }
@@ -35,13 +35,14 @@ type PostContestResponse struct {
 	Duration
 }
 
-func (h *ContestHandler) PostContest(c echo.Context) error {
+func (h *ContestHandler) PostContest(_c echo.Context) error {
+	c := Context{_c}
 	ctx := c.Request().Context()
 	req := &PostContestRequest{}
 	// todo validation
-	err := c.Bind(req)
+	err := c.BindAndValidate(req)
 	if err != nil {
-		return err
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	createReq := repository.CreateContestArgs{
@@ -74,15 +75,16 @@ type PatchContestRequest struct {
 	Duration    OptionalDuration
 }
 
-func (h *ContestHandler) PatchContest(c echo.Context) error {
+func (h *ContestHandler) PatchContest(_c echo.Context) error {
+	c := Context{_c}
 	ctx := c.Request().Context()
 	_id := c.Param("contestID")
 	id := uuid.FromStringOrNil(_id)
 	req := &PatchContestRequest{}
 	// todo validation
-	err := c.Bind(req)
+	err := c.BindAndValidate(req)
 	if err != nil {
-		return err
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	patchReq := repository.UpdateContestArgs{

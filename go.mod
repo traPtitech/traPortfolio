@@ -3,6 +3,7 @@ module github.com/traPtitech/traPortfolio
 go 1.15
 
 require (
+	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/google/wire v0.5.0
 	github.com/jinzhu/gorm v1.9.16

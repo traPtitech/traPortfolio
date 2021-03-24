@@ -3,6 +3,10 @@ package infrastructure
 import (
 	"log"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
+
+	"github.com/go-playground/validator/v10"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -10,6 +14,15 @@ import (
 func Init() {
 	// Echo instance
 	e := echo.New()
+	e.Validator = &Validator{
+		validator: validator.New(),
+	}
+
+	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			return h(&handler.Context{c})
+		}
+	})
 
 	api, err := InjectAPIServer("traQToken", "portalToken")
 	if err != nil {
@@ -46,4 +59,12 @@ func Init() {
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+type Validator struct {
+	validator *validator.Validate
+}
+
+func (v *Validator) Validate(i interface{}) error {
+	return v.validator.Struct(i)
 }

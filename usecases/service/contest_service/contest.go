@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 
@@ -58,6 +61,9 @@ func (s ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *r
 	}
 	if len(changes) > 0 {
 		err := s.repo.Update(id, changes)
+		if err != nil && err == repository.ErrNotFound {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
 		if err != nil {
 			return err
 		}
