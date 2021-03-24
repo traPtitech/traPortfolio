@@ -11,7 +11,6 @@ type Event struct {
 	Name      string
 	TimeStart time.Time
 	TimeEnd   time.Time
-	Level     EventLevel
 }
 
 // Event knoQ上のイベント情報
@@ -19,6 +18,7 @@ type EventDetail struct {
 	Event
 	Description string
 	Place       string
+	Level       EventLevel
 	HostName    []*User
 	GroupID     uuid.UUID
 	RoomID      uuid.UUID

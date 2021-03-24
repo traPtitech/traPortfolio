@@ -26,11 +26,6 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 		return nil, err
 	}
 
-	elvsmp, err := s.repo.GetEventLevels()
-	if err != nil {
-		return nil, err
-	}
-
 	result := make([]*domain.Event, 0, len(er))
 	for _, v := range er {
 		e := &domain.Event{
@@ -38,9 +33,6 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 			Name:      v.Name,
 			TimeStart: v.TimeStart,
 			TimeEnd:   v.TimeEnd,
-		}
-		if level, ok := elvsmp[v.ID]; ok {
-			e.Level = level.Level
 		}
 		result = append(result, e)
 	}
