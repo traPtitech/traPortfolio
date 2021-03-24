@@ -18,12 +18,6 @@ func Init() {
 		validator: validator.New(),
 	}
 
-	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			return h(&handler.Context{Context: c})
-		}
-	})
-
 	api, err := InjectAPIServer("traQToken", "portalToken")
 	if err != nil {
 		log.Fatal(err)
@@ -31,6 +25,11 @@ func Init() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			return h(&handler.Context{Context: c})
+		}
+	})
 
 	echoAPI := e.Group("/api")
 	v1 := echoAPI.Group("/v1")
