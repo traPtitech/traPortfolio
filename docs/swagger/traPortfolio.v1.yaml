@@ -789,8 +789,6 @@ components:
           description: イベントの開催期間
           allOf:
             - $ref: "#/components/schemas/Duration"
-        eventLevel:
-          $ref: "#/components/schemas/EventLevel"
       required:
         - id
         - name
@@ -813,6 +811,8 @@ components:
               description: 主催者
               items:
                 $ref: "#/components/schemas/User"
+            eventLevel:
+              $ref: "#/components/schemas/EventLevel"
           required:
             - description
             - place

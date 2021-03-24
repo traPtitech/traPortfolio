@@ -20,7 +20,7 @@ type EventHandler struct {
 type eventResponse struct {
 	ID       uuid.UUID `json:"eventId"`
 	Name     string    `json:"name"`
-	Duration duration
+	Duration Duration
 }
 
 // NewEventHandler creates a EventHandler
@@ -41,7 +41,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		res = append(res, &eventResponse{
 			ID:   event.ID,
 			Name: event.Name,
-			Duration: duration{
+			Duration: Duration{
 				Since: event.TimeStart,
 				Until: event.TimeEnd,
 			},
@@ -95,7 +95,7 @@ func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
 		eventResponse: eventResponse{
 			ID:   event.ID,
 			Name: event.Name,
-			Duration: duration{
+			Duration: Duration{
 				Since: event.TimeStart,
 				Until: event.TimeEnd,
 			},
