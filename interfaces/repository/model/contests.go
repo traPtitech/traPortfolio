@@ -44,5 +44,5 @@ type ContestTeamUserBelonging struct {
 }
 
 func (*ContestTeamUserBelonging) TableName() string {
-	return "contest_team_user_belonging"
+	return "contest_team_user_belongings"
 }

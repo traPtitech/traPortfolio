@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -50,7 +48,7 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 	return nil
 }
 
-func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
+func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam := model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
 		ContestID:   contestID,
@@ -79,21 +77,45 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 	return result, nil
 }
 
-func (repo *ContestRepository) getTeamMember(teamID uuid.UUID) ([]*model.User, error) {
-	members := make([]*model.User, 0)
-	userTableName := (&model.User{}).TableName()
-	relationTableName := (&model.ContestTeamUserBelonging{}).TableName()
+//func (repo *ContestRepository) getTeamMember(teamID uuid.UUID) ([]*model.User, error) {
+//	members := make([]*model.User, 0)
+//	userTableName := (&model.User{}).TableName()
+//	relationTableName := (&model.ContestTeamUserBelonging{}).TableName()
+//
+//	err := repo.h.Model(&model.User{}).
+//		Joins(fmt.Sprintf("INNER JOIN %s ON %s.user_id = %s.id", relationTableName, relationTableName, userTableName)).
+//		Where(fmt.Sprintf("%s.team_id = ?", relationTableName), teamID).
+//		Find(&members).
+//		Error()
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//	return members, nil
+//}
 
-	err := repo.h.Model(&model.User{}).
-		Joins(fmt.Sprintf("INNER JOIN %s ON %s.user_id = %s.id", relationTableName, relationTableName, userTableName)).
-		Where(fmt.Sprintf("%s.team_id = ?", relationTableName), teamID).
-		Find(&members).
-		Error()
-
-	if err != nil {
-		return nil, err
+func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error {
+	if teamID == uuid.Nil {
+		return repository.ErrNilID
 	}
-	return members, nil
+
+	var (
+		old model.Contest
+		new model.Contest
+	)
+
+	tx := repo.h.Begin()
+	if err := tx.First(&old, &model.ContestTeam{ID: teamID}).Error(); err != nil {
+		return err
+	}
+	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+		return err
+	}
+	if err := tx.Where(&model.ContestTeam{ID: teamID}).First(&new).Error(); err != nil {
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 // Interface guards

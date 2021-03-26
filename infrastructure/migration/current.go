@@ -19,7 +19,6 @@ func AllTables() []interface{} {
 		model.EventLevelRelation{},
 		model.Contest{},
 		model.ContestTeam{},
-		model.ContestContestTeamBelonging{},
 		model.ContestTeamUserBelonging{},
 	}
 }

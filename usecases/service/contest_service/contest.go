@@ -74,10 +74,39 @@ func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *
 	return nil
 }
 
-func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
+func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam, err := s.repo.CreateContestTeam(contestID, args)
 	if err != nil {
 		return nil, err
 	}
 	return contestTeam, nil
+}
+
+func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
+	if teamID == uuid.Nil {
+		return repository.ErrInvalidID
+	}
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
+	}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Link.Valid {
+		changes["link"] = args.Link.String
+	}
+	if args.Result.Valid {
+		changes["result"] = args.Result.String
+	}
+	if len(changes) > 0 {
+		err := s.repo.UpdateContestTeam(teamID, changes)
+		if err != nil && err == repository.ErrNotFound {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

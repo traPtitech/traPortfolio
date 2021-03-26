@@ -35,10 +35,18 @@ type CreateContestTeamArgs struct {
 	Description string
 }
 
+type UpdateContestTeamArgs struct {
+	Name        optional.String
+	Result      optional.String
+	Link        optional.String
+	Description optional.String
+}
+
 type ContestRepository interface {
 	//GetAll() ([]*domain.Contest, error)
 	//GetByID(ID uuid.UUID) (*domain.Contest, error)
 	CreateContest(contest *model.Contest) (*model.Contest, error)
 	UpdateContest(id uuid.UUID, changes map[string]interface{}) error
-	CreateContestTeam(contestID uuid.UUID, args CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
+	CreateContestTeam(contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
+	UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error
 }

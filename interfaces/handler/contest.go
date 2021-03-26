@@ -130,7 +130,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		Link:        req.Link,
 		Description: req.Description,
 	}
-	contestTeam, err := h.service.CreateContestTeam(ctx, id, args)
+	contestTeam, err := h.service.CreateContestTeam(ctx, id, &args)
 	if err != nil {
 		return err
 	}
@@ -142,4 +142,36 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		Result:      contestTeam.Result,
 	}
 	return c.JSON(http.StatusCreated, res)
+}
+
+type PatchContestTeamRequest struct {
+	Name        optional.String `json:"name"`
+	Link        optional.String `json:"link" validate:"url"`
+	Description optional.String `json:"description"`
+	Result      optional.String `json:"result"`
+}
+
+func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	// todo contestIDが必要ない
+	_ = uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+	req := &PatchContestTeamRequest{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	args := repository.UpdateContestTeamArgs{
+		Name:        req.Name,
+		Result:      req.Result,
+		Link:        req.Link,
+		Description: req.Description,
+	}
+
+	err = h.service.UpdateContestTeam(ctx, teamID, &args)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusCreated)
 }
