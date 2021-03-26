@@ -48,8 +48,15 @@ func Init() {
 		apiContests := v1.Group("/contests")
 		{
 			apiContests.POST("", api.Contest.PostContest)
-			apiContests.PATCH("/:contestID", api.Contest.PatchContest)
-			apiContests.POST("/:contestID", api.Contest.PostContestTeam)
+			apiContestsCID := apiContests.Group("/:contestID")
+			{
+				apiContestsCID.PATCH("", api.Contest.PatchContest)
+				apiContestsCID.POST("", api.Contest.PostContestTeam)
+				apiContestsCIDTID := apiContestsCID.Group("/:teamID")
+				{
+					apiContestsCIDTID.PATCH("", api.Contest.PatchContestTeam)
+				}
+			}
 		}
 		apiPing := v1.Group("/ping")
 		{
