@@ -527,16 +527,13 @@ paths:
         '404':
           description: Not Found
       description: コンテストチームにユーザーを追加します
-      parameters:
-        - schema:
-            type: string
-            format: uuid
-          in: query
-          name: userId
-          description: 追加するユーザーのUUID
-          required: true
       tags:
         - contest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutContestTeamMember'
     delete:
       summary: コンテストチームからのユーザーの削除
       operationId: deleteContestTeamMember
@@ -1136,6 +1133,19 @@ components:
       properties:
         eventLevel:
           $ref: '#/components/schemas/EventLevel'
+    PutContestTeamMember:
+      title: PutContestTeamMember
+      type: object
+      properties:
+        members:
+          type: array
+          format: uuid
+          description: チームメンバーUUIDの配列
+          items:
+            type: string
+            format: uuid
+      required:
+        - members
   parameters:
     userIdInPath:
       name: userId
