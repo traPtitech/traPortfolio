@@ -511,7 +511,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContest'
+              $ref: '#/components/schemas/EditContestTeam'
       tags:
         - contest
     put:
