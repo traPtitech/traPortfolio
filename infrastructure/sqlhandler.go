@@ -160,6 +160,12 @@ func (handler *SQLHandler) Commit() database.SQLHandler {
 	return handler
 }
 
+func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQLHandler {
+	res := handler.Conn.Joins(query, args)
+	handler.Conn = res
+	return handler
+}
+
 func (handler *SQLHandler) Error() error {
 	return handler.Conn.Error
 }

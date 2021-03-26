@@ -49,6 +49,7 @@ func Init() {
 		{
 			apiContests.POST("", api.Contest.PostContest)
 			apiContests.PATCH("/:contestID", api.Contest.PatchContest)
+			apiContests.POST("/:contestID", api.Contest.PostContestTeam)
 		}
 		apiPing := v1.Group("/ping")
 		{

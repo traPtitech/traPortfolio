@@ -13,13 +13,12 @@ import (
 )
 
 type ContestHandler struct {
-	repo    repository.ContestRepository
 	service service.ContestService
 }
 
 // NewEventHandler creates a EventHandler
-func NewContestHandler(repo repository.ContestRepository, service service.ContestService) *ContestHandler {
-	return &ContestHandler{repo, service}
+func NewContestHandler(service service.ContestService) *ContestHandler {
+	return &ContestHandler{service}
 }
 
 type PostContestRequest struct {
@@ -100,4 +99,47 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
+}
+
+type PostContestTeamRequest struct {
+	Name        string `json:"name"`
+	Link        string `json:"link"`
+	Description string `json:"description"`
+	Result      string `json:"result"`
+}
+
+type PostContestTeamResponse struct {
+	ID     uuid.UUID `json:"id"`
+	Name   string    `json:"name"`
+	Result string    `json:"result"`
+}
+
+func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+	req := &PostContestTeamRequest{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	args := repository.CreateContestTeamArgs{
+		Name:        req.Name,
+		Result:      req.Result,
+		Link:        req.Link,
+		Description: req.Description,
+	}
+	contestTeam, err := h.service.CreateContestTeam(ctx, id, args)
+	if err != nil {
+		return err
+	}
+
+	res := &PostContestTeamRequest{
+		Name:        contestTeam.Name,
+		Link:        contestTeam.Link,
+		Description: contestTeam.Description,
+		Result:      contestTeam.Result,
+	}
+	return c.JSON(http.StatusCreated, res)
 }

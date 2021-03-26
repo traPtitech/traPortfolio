@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/domain"
+
 	"github.com/labstack/echo/v4"
 
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
@@ -23,7 +25,7 @@ func NewContestService(repo repository.ContestRepository) ContestService {
 	}
 }
 
-func (s ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*model.Contest, error) {
+func (s *ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*model.Contest, error) {
 	uid := uuid.Must(uuid.NewV4())
 	contest := &model.Contest{
 		ID:          uid,
@@ -33,13 +35,14 @@ func (s ContestService) CreateContest(ctx context.Context, args *repository.Crea
 		Since:       args.Since,
 		Until:       args.Until,
 	}
-	contest, err := s.repo.Create(contest)
+	contest, err := s.repo.CreateContest(contest)
 	if err != nil {
 		return nil, err
 	}
 	return contest, nil
 }
-func (s ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
+
+func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
 	if id == uuid.Nil {
 		return repository.ErrInvalidID
 	}
@@ -60,7 +63,7 @@ func (s ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *r
 		changes["until"] = args.Until.Time
 	}
 	if len(changes) > 0 {
-		err := s.repo.Update(id, changes)
+		err := s.repo.UpdateContest(id, changes)
 		if err != nil && err == repository.ErrNotFound {
 			return echo.NewHTTPError(http.StatusNotFound)
 		}
@@ -69,4 +72,12 @@ func (s ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *r
 		}
 	}
 	return nil
+}
+
+func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
+	contestTeam, err := s.repo.CreateContestTeam(contestID, args)
+	if err != nil {
+		return nil, err
+	}
+	return contestTeam, nil
 }

@@ -23,6 +23,7 @@ func (*Contest) TableName() string {
 
 type ContestTeam struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primary_key"`
+	ContestID   uuid.UUID `gorm:"type:char(36);not null"`
 	Name        string    `gorm:"type:varchar(32)"`
 	Description string    `gorm:"type:text"`
 	Result      string    `gorm:"type:text"`

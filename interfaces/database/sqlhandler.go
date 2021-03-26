@@ -13,5 +13,6 @@ type SQLHandler interface {
 	Updates(interface{}) SQLHandler
 	Begin() SQLHandler
 	Commit() SQLHandler
+	Joins(string, ...interface{}) SQLHandler
 	Error() error
 }
