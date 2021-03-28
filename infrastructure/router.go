@@ -40,10 +40,6 @@ func Init() {
 			apiUsers.GET("/:userID", api.User.GetByID)
 			apiUsers.PATCH("/:userID", api.User.Update)
 		}
-		apiProjects := v1.Group("/projects")
-		{
-			apiProjects.POST("", api.Project.PostProject)
-		}
 		apiEvents := v1.Group("/events")
 		{
 			apiEvents.GET("", api.Event.GetAll)

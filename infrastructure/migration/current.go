@@ -16,7 +16,6 @@ func AllTables() []interface{} {
 	return []interface{}{
 		model.User{},
 		model.Account{},
-		model.Project{},
 		model.EventLevelRelation{},
 		model.Contest{},
 		model.ContestTeam{},
