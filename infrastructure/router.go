@@ -55,6 +55,7 @@ func Init() {
 				apiContestsCIDTID := apiContestsCID.Group("/:teamID")
 				{
 					apiContestsCIDTID.PATCH("", api.Contest.PatchContestTeam)
+					apiContestsCIDTID.PUT("", api.Contest.PutContestTeamMember)
 				}
 			}
 		}

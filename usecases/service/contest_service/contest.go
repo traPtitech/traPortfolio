@@ -110,3 +110,8 @@ func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 	}
 	return nil
 }
+
+func (s *ContestService) AddContestTeamMember(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.AddContestTeamMember(teamID, memberIDs)
+	return err
+}

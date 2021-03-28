@@ -13,6 +13,9 @@ type SQLHandler interface {
 	Updates(interface{}) SQLHandler
 	Begin() SQLHandler
 	Commit() SQLHandler
+	Rollback() SQLHandler
+	Transaction(fc func(handler SQLHandler) error) error
 	Joins(string, ...interface{}) SQLHandler
+
 	Error() error
 }

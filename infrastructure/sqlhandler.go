@@ -166,6 +166,20 @@ func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQL
 	return handler
 }
 
+func (handler *SQLHandler) Rollback() database.SQLHandler {
+	res := handler.Conn.Rollback()
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error {
+	ffc := func(tx *gorm.DB) error {
+		driver := &SQLHandler{Conn: tx}
+		return fc(driver)
+	}
+	return handler.Conn.Transaction(ffc)
+}
+
 func (handler *SQLHandler) Error() error {
 	return handler.Conn.Error
 }

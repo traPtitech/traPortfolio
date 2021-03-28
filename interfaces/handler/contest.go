@@ -175,3 +175,26 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	}
 	return c.NoContent(http.StatusCreated)
 }
+
+type PutContestTeamMember struct {
+	Members []uuid.UUID `json:"members"`
+}
+
+func (h *ContestHandler) PutContestTeamMember(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	// todo contestIDが必要ない
+	_ = uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+	req := &PutContestTeamMember{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	err = h.service.AddContestTeamMember(ctx, teamID, req.Members)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
+}

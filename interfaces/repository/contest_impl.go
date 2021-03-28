@@ -104,18 +104,56 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 		new model.Contest
 	)
 
-	tx := repo.h.Begin()
-	if err := tx.First(&old, &model.ContestTeam{ID: teamID}).Error(); err != nil {
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.First(&old, &model.ContestTeam{ID: teamID}).Error(); err != nil {
+			return err
+		}
+		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+			return err
+		}
+		if err := tx.Where(&model.ContestTeam{ID: teamID}).First(&new).Error(); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		return err
 	}
-	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-		return err
-	}
-	if err := tx.Where(&model.ContestTeam{ID: teamID}).First(&new).Error(); err != nil {
-		return err
-	}
-	tx.Commit()
 	return nil
+}
+
+func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
+	if teamID == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	curMp := make(map[uuid.UUID]struct{}, len(members))
+	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
+	err := repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	if err != nil {
+		return err
+	}
+	for _, v := range _cur {
+		curMp[v.UserID] = struct{}{}
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		for _, memberID := range members {
+			if _, ok := curMp[memberID]; ok {
+				continue
+			}
+			err = tx.Create(model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 // Interface guards
