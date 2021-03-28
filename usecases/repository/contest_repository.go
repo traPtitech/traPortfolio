@@ -50,4 +50,5 @@ type ContestRepository interface {
 	CreateContestTeam(contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
 	UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error
 	AddContestTeamMember(teamID uuid.UUID, memberIDs []uuid.UUID) error
+	DeleteContestTeamMember(teamID uuid.UUID, memberIDs []uuid.UUID) error
 }

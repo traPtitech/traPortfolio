@@ -56,6 +56,7 @@ func Init() {
 				{
 					apiContestsCIDTID.PATCH("", api.Contest.PatchContestTeam)
 					apiContestsCIDTID.PUT("", api.Contest.PutContestTeamMember)
+					apiContestsCIDTID.DELETE("", api.Contest.DeleteContestTeamMember)
 				}
 			}
 		}

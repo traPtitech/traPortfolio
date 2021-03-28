@@ -123,8 +123,8 @@ func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
 	return handler
 }
 
-func (handler *SQLHandler) Delete(value interface{}) database.SQLHandler {
-	res := handler.Conn.Delete(value)
+func (handler *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
+	res := handler.Conn.Delete(value, where)
 	handler.Conn = res
 	return handler
 }

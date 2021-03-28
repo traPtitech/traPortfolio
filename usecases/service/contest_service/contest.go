@@ -115,3 +115,8 @@ func (s *ContestService) AddContestTeamMember(ctx context.Context, teamID uuid.U
 	err := s.repo.AddContestTeamMember(teamID, memberIDs)
 	return err
 }
+
+func (s *ContestService) DeleteContestTeamMember(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.DeleteContestTeamMember(teamID, memberIDs)
+	return err
+}

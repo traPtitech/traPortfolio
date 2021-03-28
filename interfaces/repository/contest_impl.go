@@ -156,6 +156,39 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 
 }
 
+func (repo *ContestRepository) DeleteContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
+	if teamID == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	curMp := make(map[uuid.UUID]struct{}, len(members))
+	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
+	err := repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	if err != nil {
+		return err
+	}
+	for _, v := range _cur {
+		curMp[v.UserID] = struct{}{}
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		for _, memberID := range members {
+			if _, ok := curMp[memberID]; ok {
+				err = tx.Delete(&model.ContestTeamUserBelonging{}, &model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 // Interface guards
 var (
 	_ repository.ContestRepository = (*ContestRepository)(nil)

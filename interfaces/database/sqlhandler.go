@@ -7,7 +7,7 @@ type SQLHandler interface {
 	Raw(string, ...interface{}) SQLHandler
 	Create(interface{}) SQLHandler
 	Save(interface{}) SQLHandler
-	Delete(interface{}) SQLHandler
+	Delete(interface{}, ...interface{}) SQLHandler
 	Where(interface{}, ...interface{}) SQLHandler
 	Model(interface{}) SQLHandler
 	Updates(interface{}) SQLHandler
