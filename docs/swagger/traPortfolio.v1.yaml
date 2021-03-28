@@ -1011,7 +1011,7 @@ components:
           description: |-
             プロジェクト期間の配列
             untilがなかった場合存続中
-          type: array
+          type: object #TODO
           items:
             $ref: "#/components/schemas/ProjectDuration"
     EditContest:
