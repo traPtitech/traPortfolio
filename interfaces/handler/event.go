@@ -3,17 +3,18 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/usecases/service"
+
 	"github.com/traPtitech/traPortfolio/domain"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	service "github.com/traPtitech/traPortfolio/usecases/service/event_service"
 )
 
 type EventHandler struct {
-	service service.EventService
+	srv service.EventService
 }
 
 // EventResponse Portfolioのレスポンスで使うイベント情報
@@ -31,7 +32,7 @@ func NewEventHandler(service service.EventService) *EventHandler {
 // GetAll GET /events
 func (h *EventHandler) GetAll(c echo.Context) error {
 	ctx := c.Request().Context()
-	events, err := h.service.GetEvents(ctx)
+	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
 		return err
 	}
@@ -69,7 +70,7 @@ func (h *EventHandler) GetByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 	ctx := c.Request().Context()
-	event, err := h.service.GetEventByID(ctx, id)
+	event, err := h.srv.GetEventByID(ctx, id)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}

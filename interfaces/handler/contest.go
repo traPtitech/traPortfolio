@@ -3,17 +3,18 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/usecases/service"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	service "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
 )
 
 type ContestHandler struct {
-	service service.ContestService
+	srv service.ContestService
 }
 
 // NewEventHandler creates a EventHandler
@@ -52,7 +53,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	contest, err := h.service.CreateContest(ctx, &createReq)
+	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -94,7 +95,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	err = h.service.UpdateContest(ctx, id, &patchReq)
+	err = h.srv.UpdateContest(ctx, id, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -130,7 +131,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		Link:        req.Link,
 		Description: req.Description,
 	}
-	contestTeam, err := h.service.CreateContestTeam(ctx, id, &args)
+	contestTeam, err := h.srv.CreateContestTeam(ctx, id, &args)
 	if err != nil {
 		return err
 	}
@@ -169,7 +170,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 		Description: req.Description,
 	}
 
-	err = h.service.UpdateContestTeam(ctx, teamID, &args)
+	err = h.srv.UpdateContestTeam(ctx, teamID, &args)
 	if err != nil {
 		return err
 	}
@@ -192,7 +193,7 @@ func (h *ContestHandler) PutContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.service.AddContestTeamMember(ctx, teamID, req.Members)
+	err = h.srv.AddContestTeamMember(ctx, teamID, req.Members)
 	if err != nil {
 		return err
 	}
@@ -211,7 +212,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.service.DeleteContestTeamMember(ctx, teamID, req.Members)
+	err = h.srv.DeleteContestTeamMember(ctx, teamID, req.Members)
 	if err != nil {
 		return err
 	}

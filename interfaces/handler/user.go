@@ -3,11 +3,12 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/usecases/service"
+
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
 
 type EditUserRequest struct {
@@ -16,7 +17,7 @@ type EditUserRequest struct {
 }
 
 type UserHandler struct {
-	UserService service.UserService
+	srv service.UserService
 }
 
 // userResponse Portfolioのレスポンスで使うイベント情報
@@ -36,13 +37,13 @@ type userDetailResponse struct {
 }
 
 func NewUserHandler(s service.UserService) *UserHandler {
-	return &UserHandler{UserService: s}
+	return &UserHandler{srv: s}
 }
 
 // GetAll GET /users
 func (handler *UserHandler) GetAll(c echo.Context) error {
 	ctx := c.Request().Context()
-	users, err := handler.UserService.GetUsers(ctx)
+	users, err := handler.srv.GetUsers(ctx)
 	if err != nil {
 		return err
 	}
@@ -70,7 +71,7 @@ func (handler *UserHandler) GetByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 	ctx := c.Request().Context()
-	user, err := handler.UserService.GetUser(ctx, id)
+	user, err := handler.srv.GetUser(ctx, id)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
@@ -110,7 +111,7 @@ func (handler *UserHandler) Update(c echo.Context) error {
 		Description: req.Bio,
 		Check:       !req.HideRealName,
 	}
-	err = handler.UserService.Update(ctx, &u)
+	err = handler.srv.Update(ctx, &u)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
