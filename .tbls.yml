@@ -78,8 +78,11 @@ comments:
       id: プロジェクトUUID
       name: プロジェクト名
       description: プロジェクト説明
-      start: プロジェクト開始期間
-      end: プロジェクト終了期間
+      link: プロジェクト情報のリンク
+      since: プロジェクト開始期間
+      until: プロジェクト終了期間
+      created_at: プロジェクト作成日時
+      updated_at: プロジェクト更新日時
   # - table: achievements
   #   tableComment: 実績情報
   #   columnComments:

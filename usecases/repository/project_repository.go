@@ -1,10 +1,19 @@
 package repository
 
 import (
-	"github.com/traPtitech/traPortfolio/domain"
+	"time"
+
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 )
 
+type CreateProjectArgs struct {
+	Name        string
+	Description string
+	Link        string
+	Since       time.Time
+	Until       time.Time
+}
+
 type ProjectRepository interface {
-	PostProject(*domain.ProjectDetail) (*model.Project, error)
+	Create(*model.Project) (*model.Project, error)
 }

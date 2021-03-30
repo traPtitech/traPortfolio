@@ -1,40 +1,22 @@
 package repository
 
 import (
-	"time"
-
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 )
 
-//TODO いつ？
-var (
-	semesterToMonth [2]time.Month = [2]time.Month{time.August, time.December}
-)
-
 type ProjectRepository struct {
-	database.SQLHandler
+	h database.SQLHandler
 }
 
 func NewProjectRepository(sql database.SQLHandler) *ProjectRepository {
-	return &ProjectRepository{SQLHandler: sql}
+	return &ProjectRepository{h: sql}
 }
 
-func (repo *ProjectRepository) PostProject(p *domain.ProjectDetail) (*model.Project, error) {
-	project := model.Project{
-		ID:          p.ID,
-		Name:        p.Name,
-		Description: p.Description,
-		Start:       formatDuration(p.Duration.Since),
-		End:         formatDuration(p.Duration.Until),
+func (repo *ProjectRepository) Create(project *model.Project) (*model.Project, error) {
+	err := repo.h.Create(project).Error()
+	if err != nil {
+		return nil, err
 	}
-	err := repo.Create(&project).Error()
-	return &project, err
-}
-
-func formatDuration(date domain.YearWithSemester) time.Time {
-	year := int(date.Year)
-	month := semesterToMonth[date.Semester]
-	return time.Date(year, month, 1, 0, 0, 0, 0, &time.Location{})
+	return project, nil
 }

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
@@ -20,6 +20,19 @@ func NewProjectService(projectRepository repository.ProjectRepository, traQRepos
 	}
 }
 
-func (s *ProjectService) PostProject(ctx context.Context, p *domain.ProjectDetail) (*model.Project, error) {
-	return s.repo.PostProject(p)
+func (s *ProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*model.Project, error) {
+	uid := uuid.Must(uuid.NewV4())
+	project := &model.Project{
+		ID:          uid,
+		Name:        args.Name,
+		Description: args.Description,
+		Link:        args.Link,
+		Since:       args.Since,
+		Until:       args.Until,
+	}
+	project, err := s.repo.Create(project)
+	if err != nil {
+		return nil, err
+	}
+	return project, nil
 }
