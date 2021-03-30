@@ -104,38 +104,31 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	}, nil
 }
 
-func (s *UserService) AddAccount(ctx context.Context, account Account) error {
+func (s *UserService) AddAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) error {
 
-	user, err := s.repo.GetUser(account.ID)
-	if err != nil {
-		return err
-	}
-	userAccounts, err := s.repo.GetAccounts(account.ID)
-	if err != nil {
-		return err
-	}
-
-	//TODO
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
-	return nil
+	err := s.repo.AddAccount(id, account)
+
+	return err
 
 }
 
-func (s *UserService) DeleteAccount(ctx context.Context, account Account) error {
-
-	user, err := s.repo.GetUser(account.ID)
-	if err != nil {
-		return err
-	}
-	userAccounts, err := s.repo.GetAccounts(account.ID)
-	if err != nil {
-		return err
-	}
+func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
+	/*
+		user, err := s.repo.GetUser(account.ID)
+		if err != nil {
+			return err
+		}
+		userAccounts, err := s.repo.GetAccounts(account.ID)
+		if err != nil {
+			return err
+		}*/
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
+	err := s.repo.DeleteAccount(accountid, userid)
 
-	return nil
+	return err
 
 }

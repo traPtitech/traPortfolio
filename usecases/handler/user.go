@@ -21,6 +21,12 @@ type UserHandler struct {
 	UserService    service.UserService
 }
 
+type Account struct {
+	ID          uuid.UUID `json:"id"`
+	Type        uint      `json:"type"`
+	PrPermitted bool      `json:"prPermitted"`
+}
+
 func NewUserHandler(repo repository.UserRepository, s service.UserService) *UserHandler {
 	return &UserHandler{UserRepository: repo, UserService: s}
 }
@@ -96,13 +102,19 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 
-	a := domain.Account{}
+	a := Account{}
 	err := c.Bind(&a)
 	if err != nil {
 		return err
 	}
 
-	err = handler.UserRepository.AddAccount(a)
+	a2 := repository.CreateAccountArgs{
+		ID:          a.ID,
+		Type:        a.Type,
+		PrPermitted: a.PrPermitted,
+	}
+
+	err = handler.UserService.AddAccount(c.Request().Context(), id, &a2)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
@@ -123,13 +135,19 @@ func (handler *UserHandler) DeleteAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 
-	a := domain.Account{}
+	a := Account{}
 	err := c.Bind(&a)
 	if err != nil {
 		return err
 	}
 
-	err = handler.UserRepository.DeleteAccount(a)
+	a2 := repository.CreateAccountArgs{
+		ID:          a.ID,
+		Type:        a.Type,
+		PrPermitted: a.PrPermitted,
+	}
+
+	err = handler.UserService.DeleteAccount(c.Request().Context(), id, &a2)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
