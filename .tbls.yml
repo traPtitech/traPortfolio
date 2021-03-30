@@ -41,19 +41,13 @@ comments:
     tableComment: コンテスト参加チームテーブル
     columnComments:
      id: コンテストチームUUID
+     contest_id: コンテストUUID
      name: チーム名
      description: チーム情報
      result: 順位などの結果
      link: コンテストチームの詳細が載っているページへのリンク
      created_at: コンテストチーム作成日時
      updated_at: コンテストチーム更新日時
-  - table: contest_contest_team_belongings
-    tableComment: コンテストとコンテストチーム関係テーブル
-    columnComments:
-      contest_id: コンテストUUID
-      team_id: コンテストチームUUID
-      created_at: 関係テーブル作成日時
-      updated_at: 関係テーブル更新日時
   - table: contest_team_user_belongings
     tableComment: コンテストチームとユーザー関係テーブル
     columnComments:

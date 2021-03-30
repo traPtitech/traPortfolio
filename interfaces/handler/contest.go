@@ -3,23 +3,23 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/usecases/service"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	service "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
 )
 
 type ContestHandler struct {
-	repo    repository.ContestRepository
-	service service.ContestService
+	srv service.ContestService
 }
 
 // NewEventHandler creates a EventHandler
-func NewContestHandler(repo repository.ContestRepository, service service.ContestService) *ContestHandler {
-	return &ContestHandler{repo, service}
+func NewContestHandler(service service.ContestService) *ContestHandler {
+	return &ContestHandler{service}
 }
 
 type PostContestRequest struct {
@@ -53,7 +53,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	contest, err := h.service.CreateContest(ctx, &createReq)
+	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -95,9 +95,126 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	err = h.service.UpdateContest(ctx, id, &patchReq)
+	err = h.srv.UpdateContest(ctx, id, &patchReq)
 	if err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
+}
+
+type PostContestTeamRequest struct {
+	Name        string `json:"name"`
+	Link        string `json:"link"`
+	Description string `json:"description"`
+	Result      string `json:"result"`
+}
+
+type PostContestTeamResponse struct {
+	ID     uuid.UUID `json:"id"`
+	Name   string    `json:"name"`
+	Result string    `json:"result"`
+}
+
+func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+	req := &PostContestTeamRequest{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	args := repository.CreateContestTeamArgs{
+		Name:        req.Name,
+		Result:      req.Result,
+		Link:        req.Link,
+		Description: req.Description,
+	}
+	contestTeam, err := h.srv.CreateContestTeam(ctx, id, &args)
+	if err != nil {
+		return err
+	}
+
+	res := &PostContestTeamRequest{
+		Name:        contestTeam.Name,
+		Link:        contestTeam.Link,
+		Description: contestTeam.Description,
+		Result:      contestTeam.Result,
+	}
+	return c.JSON(http.StatusCreated, res)
+}
+
+type PatchContestTeamRequest struct {
+	Name        optional.String `json:"name"`
+	Link        optional.String `json:"link" validate:"url"`
+	Description optional.String `json:"description"`
+	Result      optional.String `json:"result"`
+}
+
+func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	// todo contestIDが必要ない
+	_ = uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+	req := &PatchContestTeamRequest{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	args := repository.UpdateContestTeamArgs{
+		Name:        req.Name,
+		Result:      req.Result,
+		Link:        req.Link,
+		Description: req.Description,
+	}
+
+	err = h.srv.UpdateContestTeam(ctx, teamID, &args)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusCreated)
+}
+
+type PutContestTeamMember struct {
+	Members []uuid.UUID `json:"members"`
+}
+
+func (h *ContestHandler) PutContestTeamMember(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	// todo contestIDが必要ない
+	_ = uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+	req := &PutContestTeamMember{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	err = h.srv.AddContestTeamMember(ctx, teamID, req.Members)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	// todo contestIDが必要ない
+	_ = uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+	req := &PutContestTeamMember{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	err = h.srv.DeleteContestTeamMember(ctx, teamID, req.Members)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
 }
