@@ -127,9 +127,15 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 		return repository.ErrNilID
 	}
 
+	// 存在チェック
+	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
+	if err != nil {
+		return err
+	}
+
 	curMp := make(map[uuid.UUID]struct{}, len(members))
 	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err := repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
 	if err != nil {
 		return err
 	}
@@ -161,9 +167,15 @@ func (repo *ContestRepository) DeleteContestTeamMember(teamID uuid.UUID, members
 		return repository.ErrNilID
 	}
 
+	// 存在チェック
+	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
+	if err != nil {
+		return err
+	}
+
 	curMp := make(map[uuid.UUID]struct{}, len(members))
 	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err := repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
 	if err != nil {
 		return err
 	}
