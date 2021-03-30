@@ -108,13 +108,25 @@ func (s *UserService) AddAccount(ctx context.Context, id uuid.UUID, account *rep
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
-	err := s.repo.AddAccount(id, account)
+	if id == uuid.Nil {
+		return repository.ErrInvalidArg
+	}
+
+	if len(account.ID) == 0 {
+		return repository.ErrInvalidArg
+	}
+
+	if !(0 <= account.Type && account.Type < 9) {
+		return repository.ErrInvalidArg
+	}
+
+	err := s.repo.Update( /*??*/ )
 
 	return err
 
 }
 
-func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
+func (s *UserService) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 	/*
 		user, err := s.repo.GetUser(account.ID)
 		if err != nil {
@@ -127,7 +139,12 @@ func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, us
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
-	err := s.repo.DeleteAccount(accountid, userid)
+
+	if id == uuid.Nil {
+		return repository.ErrInvalidArg
+	}
+
+	err := s.repo.DeleteAccount(id)
 
 	return err
 

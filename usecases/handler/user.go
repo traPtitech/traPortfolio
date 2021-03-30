@@ -102,19 +102,19 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 
-	a := Account{}
-	err := c.Bind(&a)
+	req := Account{}
+	err := c.Bind(&req)
 	if err != nil {
 		return err
 	}
 
-	a2 := repository.CreateAccountArgs{
-		ID:          a.ID,
-		Type:        a.Type,
-		PrPermitted: a.PrPermitted,
+	args := repository.CreateAccountArgs{
+		ID:          req.ID,
+		Type:        req.Type,
+		PrPermitted: req.PrPermitted,
 	}
 
-	err = handler.UserService.AddAccount(c.Request().Context(), id, &a2)
+	err = handler.UserService.AddAccount(c.Request().Context(), id, &args)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
@@ -135,19 +135,7 @@ func (handler *UserHandler) DeleteAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 
-	a := Account{}
-	err := c.Bind(&a)
-	if err != nil {
-		return err
-	}
-
-	a2 := repository.CreateAccountArgs{
-		ID:          a.ID,
-		Type:        a.Type,
-		PrPermitted: a.PrPermitted,
-	}
-
-	err = handler.UserService.DeleteAccount(c.Request().Context(), id, &a2)
+	err := handler.UserService.DeleteAccount(c.Request().Context(), id)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
