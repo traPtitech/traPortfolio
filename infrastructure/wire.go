@@ -9,10 +9,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	contest_service "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
-	event_service "github.com/traPtitech/traPortfolio/usecases/service/event_service"
-	user_service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
-	project_service "github.com/traPtitech/traPortfolio/usecases/service/project_service"
+	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
 var portalSet = wire.NewSet(
@@ -40,7 +37,7 @@ var userSet = wire.NewSet(
 
 var projectSet = wire.NewSet(
 	impl.NewProjectRepository,
-	project_service.NewProjectService,
+	service.NewProjectService,
 	handler.NewProjectHandler,
 	wire.Bind(new(repository.ProjectRepository), new(*impl.ProjectRepository)),
 )

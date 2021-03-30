@@ -12,10 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
-	service4 "github.com/traPtitech/traPortfolio/usecases/service/contest_service"
-	service3 "github.com/traPtitech/traPortfolio/usecases/service/event_service"
-	service2 "github.com/traPtitech/traPortfolio/usecases/service/project_service"
-	"github.com/traPtitech/traPortfolio/usecases/service/user_service"
+	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
 import (
@@ -40,7 +37,7 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userService)
 	projectRepository := repository.NewProjectRepository(sqlHandler)
-	projectService := service2.NewProjectService(projectRepository, traQRepository)
+	projectService := service.NewProjectService(projectRepository, traQRepository)
 	projectHandler := handler.NewProjectHandler(projectService)
 	knoqAPI, err := NewKnoqAPI()
 	if err != nil {
@@ -48,11 +45,11 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	}
 	eventRepository := repository.NewEventRepository(sqlHandler, knoqAPI)
 	knoqRepository := repository.NewKnoqRepository(knoqAPI)
-	eventService := service3.NewEventService(eventRepository, knoqRepository)
+	eventService := service.NewEventService(eventRepository, knoqRepository)
 	eventHandler := handler.NewEventHandler(eventService)
 	contestRepository := repository.NewContestRepository(sqlHandler)
-	contestService := service4.NewContestService(contestRepository)
-	contestHandler := handler.NewContestHandler(contestRepository, contestService)
+	contestService := service.NewContestService(contestRepository)
+	contestHandler := handler.NewContestHandler(contestService)
 	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)
 	return api, nil
 }
@@ -69,17 +66,17 @@ var pingSet = wire.NewSet(handler.NewPingHandler)
 
 var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
 
-var projectSet = wire.NewSet(repository.NewProjectRepository, service2.NewProjectService, handler.NewProjectHandler, wire.Bind(new(repository2.ProjectRepository), new(*repository.ProjectRepository)))
+var projectSet = wire.NewSet(repository.NewProjectRepository, service.NewProjectService, handler.NewProjectHandler, wire.Bind(new(repository2.ProjectRepository), new(*repository.ProjectRepository)))
 
 var knoQSet = wire.NewSet(
 	NewKnoqAPI, repository.NewKnoqRepository, wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)), wire.Bind(new(repository2.KnoqRepository), new(*repository.KnoqRepository)),
 )
 
 var eventSet = wire.NewSet(
-	knoQSet, repository.NewEventRepository, service3.NewEventService, handler.NewEventHandler, wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
+	knoQSet, repository.NewEventRepository, service.NewEventService, handler.NewEventHandler, wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
 )
 
-var contestSet = wire.NewSet(repository.NewContestRepository, service4.NewContestService, handler.NewContestHandler, wire.Bind(new(repository2.ContestRepository), new(*repository.ContestRepository)))
+var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler, wire.Bind(new(repository2.ContestRepository), new(*repository.ContestRepository)))
 
 var sqlSet = wire.NewSet(
 	NewSQLHandler, wire.Bind(new(database.SQLHandler), new(*SQLHandler)),
