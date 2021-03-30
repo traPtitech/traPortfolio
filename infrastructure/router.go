@@ -43,7 +43,6 @@ func Init() {
 		apiProjects := v1.Group("/projects")
 		{
 			apiProjects.POST("", api.Project.PostProject)
-			apiProjects.PATCH("/:projectID", api.Project.PatchProject)
 		}
 		apiEvents := v1.Group("/events")
 		{
