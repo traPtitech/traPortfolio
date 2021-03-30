@@ -141,6 +141,8 @@ paths:
         '404':
           description: Not Found
       description: ユーザーアカウントのリストを取得します
+      tags:
+        - user
   '/user/{userId}/projects':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -575,7 +577,9 @@ paths:
       - $ref: '#/components/parameters/teamIdInPath'
     get:
       summary: コンテストチームメンバーの取得
-      tags: []
+      tags:
+        - contest
+        - user
       responses:
         '200':
           description: OK
@@ -609,6 +613,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - contest
+        - user
     delete:
       summary: コンテストチームメンバーの削除
       operationId: deleteContestTeamMembers
@@ -625,6 +632,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - contest
+        - user
   '/users/{userId}/accounts/{accountId}':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -661,7 +671,9 @@ paths:
       - $ref: '#/components/parameters/projectIdInPath'
     get:
       summary: プロジェクトメンバーの取得
-      tags: []
+      tags:
+        - project
+        - user
       responses:
         '200':
           description: OK
@@ -692,6 +704,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - project
+        - user
     delete:
       summary: プロジェクトメンバーの削除
       operationId: deleteProjectMembers
@@ -710,6 +725,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - project
+        - user
 components:
   schemas:
     User:
