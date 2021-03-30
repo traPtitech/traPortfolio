@@ -7,11 +7,15 @@ type SQLHandler interface {
 	Raw(string, ...interface{}) SQLHandler
 	Create(interface{}) SQLHandler
 	Save(interface{}) SQLHandler
-	Delete(interface{}) SQLHandler
+	Delete(interface{}, ...interface{}) SQLHandler
 	Where(interface{}, ...interface{}) SQLHandler
 	Model(interface{}) SQLHandler
 	Updates(interface{}) SQLHandler
 	Begin() SQLHandler
 	Commit() SQLHandler
+	Rollback() SQLHandler
+	Transaction(fc func(handler SQLHandler) error) error
+	Joins(string, ...interface{}) SQLHandler
+
 	Error() error
 }

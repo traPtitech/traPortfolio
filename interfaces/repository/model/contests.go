@@ -17,8 +17,13 @@ type Contest struct {
 	UpdatedAt   time.Time `gorm:"precision:6"`
 }
 
+func (*Contest) TableName() string {
+	return "contests"
+}
+
 type ContestTeam struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primary_key"`
+	ContestID   uuid.UUID `gorm:"type:char(36);not null"`
 	Name        string    `gorm:"type:varchar(32)"`
 	Description string    `gorm:"type:text"`
 	Result      string    `gorm:"type:text"`
@@ -27,11 +32,8 @@ type ContestTeam struct {
 	UpdatedAt   time.Time `gorm:"precision:6"`
 }
 
-type ContestContestTeamBelonging struct {
-	ContestID uuid.UUID `gorm:"type:char(36);not null;primary_key"`
-	TeamID    uuid.UUID `gorm:"type:char(36);not null;primary_key"`
-	CreatedAt time.Time `gorm:"precision:6"`
-	UpdatedAt time.Time `gorm:"precision:6"`
+func (*ContestTeam) TableName() string {
+	return "contest_teams"
 }
 
 type ContestTeamUserBelonging struct {
@@ -39,4 +41,8 @@ type ContestTeamUserBelonging struct {
 	UserID    uuid.UUID `gorm:"type:char(36);not null;primary_key"`
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
+}
+
+func (*ContestTeamUserBelonging) TableName() string {
+	return "contest_team_user_belongings"
 }

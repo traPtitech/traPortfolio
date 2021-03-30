@@ -15,6 +15,10 @@ type User struct {
 	UpdatedAt   time.Time `gorm:"precision:6"`
 }
 
+func (*User) TableName() string {
+	return "users"
+}
+
 type Account struct {
 	ID        uuid.UUID `gorm:"type:char(36);not null;primary_key"`
 	Type      uint      `gorm:"type:tinyint(1);not null"`

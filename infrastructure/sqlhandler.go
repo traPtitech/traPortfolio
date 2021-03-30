@@ -123,8 +123,8 @@ func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
 	return handler
 }
 
-func (handler *SQLHandler) Delete(value interface{}) database.SQLHandler {
-	res := handler.Conn.Delete(value)
+func (handler *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
+	res := handler.Conn.Delete(value, where)
 	handler.Conn = res
 	return handler
 }
@@ -158,6 +158,26 @@ func (handler *SQLHandler) Commit() database.SQLHandler {
 	res := handler.Conn.Commit()
 	handler.Conn = res
 	return handler
+}
+
+func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQLHandler {
+	res := handler.Conn.Joins(query, args)
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Rollback() database.SQLHandler {
+	res := handler.Conn.Rollback()
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error {
+	ffc := func(tx *gorm.DB) error {
+		driver := &SQLHandler{Conn: tx}
+		return fc(driver)
+	}
+	return handler.Conn.Transaction(ffc)
 }
 
 func (handler *SQLHandler) Error() error {

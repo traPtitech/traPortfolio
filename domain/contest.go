@@ -24,6 +24,7 @@ type ContestDetail struct {
 
 type ContestTeam struct {
 	ID        uuid.UUID
+	ContestID uuid.UUID
 	Name      string
 	Result    string
 	CreatedAt time.Time
