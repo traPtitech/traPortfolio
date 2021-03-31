@@ -9,6 +9,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
+	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 //TODO 何月？
@@ -16,7 +17,7 @@ var (
 	semesterToMonth = [2]time.Month{time.August, time.December}
 )
 
-type PatchProject struct {
+type PostProjectRequest struct {
 	Name        string                 `json:"name"`
 	Link        string                 `json:"link"`
 	Description string                 `json:"description"`
@@ -42,7 +43,7 @@ func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := &PatchProject{}
+	req := &PostProjectRequest{}
 	err := c.Bind(req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -70,7 +71,40 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
-//TODO 関数名変えたい
+type PatchProjectRequest struct {
+	Name        optional.String `json:"name"`
+	Link        optional.String `json:"link"`
+	Description optional.String `json:"description"`
+	Duration    OptionalProjectDuration
+}
+
+func (h *ProjectHandler) PatchProject(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("projectID")
+	id := uuid.FromStringOrNil(_id)
+	req := &PatchProjectRequest{}
+	// todo validation
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	patchReq := repository.UpdateProjectArgs{
+		Name:        req.Name,
+		Description: req.Description,
+		Link:        req.Link,
+		Since:       OptionalSemToTime(req.Duration.Since),
+		Until:       OptionalSemToTime(req.Duration.Until),
+	}
+
+	err = h.service.UpdateProject(ctx, id, &patchReq)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 func SemToTime(date domain.YearWithSemester) time.Time {
 	year := int(date.Year)
 	month := semesterToMonth[date.Semester]
@@ -89,4 +123,16 @@ func TimeToSem(t time.Time) domain.YearWithSemester {
 		Year:     year,
 		Semester: semester,
 	}
+}
+
+func OptionalSemToTime(date OptionalYearWithSemester) optional.Time {
+	t := optional.Time{}
+	if date.Year.Valid && date.Semester.Valid {
+		year := int(date.Year.Int64)
+		month := semesterToMonth[date.Semester.Int64]
+		t.Time, t.Valid = time.Date(year, month, 1, 0, 0, 0, 0, &time.Location{}), true
+	} else {
+		t.Valid = false
+	}
+	return t
 }
