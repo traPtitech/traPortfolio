@@ -15,6 +15,25 @@ func NewProjectRepository(sql database.SQLHandler) *ProjectRepository {
 	return &ProjectRepository{h: sql}
 }
 
+//TODO GetAllの方がいい？
+func (repo *ProjectRepository) GetProjects() ([]*model.Project, error) {
+	projects := []*model.Project{}
+	err := repo.h.Find(&projects).Error()
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
+func (repo *ProjectRepository) GetProject(id uuid.UUID) (*model.Project, error) {
+	project := &model.Project{ID: id}
+	err := repo.h.First(&project).Error()
+	if err != nil {
+		return nil, err
+	}
+	return project, nil
+}
+
 func (repo *ProjectRepository) Create(project *model.Project) (*model.Project, error) {
 	err := repo.h.Create(project).Error()
 	if err != nil {

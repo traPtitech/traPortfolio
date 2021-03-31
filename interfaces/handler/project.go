@@ -17,26 +17,84 @@ var (
 	semesterToMonth = [2]time.Month{time.August, time.December}
 )
 
-type PostProjectRequest struct {
-	Name        string                 `json:"name"`
-	Link        string                 `json:"link"`
-	Description string                 `json:"description"`
-	Duration    domain.ProjectDuration `json:"duration"`
+// ProjectResponse Portfolioのレスポンスで使うイベント情報
+type ProjectResponse struct {
+	ID       uuid.UUID              `json:"id"`
+	Name     string                 `json:"name"`
+	Duration domain.ProjectDuration `json:"duration"`
+}
+
+type ProjectDetailResponse struct {
+	ID          uuid.UUID
+	Name        string
+	Duration    domain.ProjectDuration
+	Link        string
+	Description string
+	Members     []*domain.ProjectMember
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type ProjectHandler struct {
 	service service.ProjectService
 }
 
-// PostProjectResponse Portfolioのレスポンスで使うイベント情報
-type PostProjectResponse struct {
-	ID       uuid.UUID              `json:"id"`
-	Name     string                 `json:"name"`
-	Duration domain.ProjectDuration `json:"duration"`
-}
-
 func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 	return &ProjectHandler{service: s}
+}
+
+// GetAll GET /projects
+func (h *ProjectHandler) GetAll(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	projects, err := h.service.GetProjects(ctx)
+	if err != nil {
+		return err
+	}
+	res := make([]*ProjectResponse, 0, len(projects))
+	for _, v := range projects {
+		res = append(res, &ProjectResponse{
+			ID:   v.ID,
+			Name: v.Name,
+			Duration: domain.ProjectDuration{
+				Since: TimeToSem(v.Since),
+				Until: TimeToSem(v.Until),
+			},
+		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// GetByID GET /projects:/projectID
+func (h *ProjectHandler) GetByID(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("projectID")
+	id := uuid.FromStringOrNil(_id)
+	project, err := h.service.GetProject(ctx, id)
+	if err != nil {
+		return err
+	}
+	res := &ProjectDetailResponse{
+		ID:   project.ID,
+		Name: project.Name,
+		Duration: domain.ProjectDuration{
+			Since: TimeToSem(project.Since),
+			Until: TimeToSem(project.Until),
+		},
+		Link: project.Link,
+		// Members:   project.Members, //TODO
+		CreatedAt: project.CreatedAt,
+		UpdatedAt: project.UpdatedAt,
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+type PostProjectRequest struct {
+	Name        string                 `json:"name"`
+	Link        string                 `json:"link"`
+	Description string                 `json:"description"`
+	Duration    domain.ProjectDuration `json:"duration"`
 }
 
 // PostProject POST /projects
@@ -60,7 +118,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	res := PostProjectResponse{
+	res := ProjectResponse{
 		ID:   project.ID,
 		Name: project.Name,
 		Duration: domain.ProjectDuration{

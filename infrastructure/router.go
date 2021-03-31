@@ -42,6 +42,8 @@ func Init() {
 		}
 		apiProjects := v1.Group("/projects")
 		{
+			apiProjects.GET("", api.Project.GetAll)
+			apiProjects.GET("/:projectID", api.Project.GetByID)
 			apiProjects.POST("", api.Project.PostProject)
 			apiProjects.PATCH("/:projectID", api.Project.PatchProject)
 		}

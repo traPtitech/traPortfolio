@@ -22,6 +22,22 @@ func NewProjectService(projectRepository repository.ProjectRepository, traQRepos
 	}
 }
 
+func (s *ProjectService) GetProjects(ctx context.Context) ([]*model.Project, error) {
+	res, err := s.repo.GetProjects()
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {
+	res, err := s.repo.GetProject(id)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (s *ProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*model.Project, error) {
 	uid := uuid.Must(uuid.NewV4())
 	project := &model.Project{
