@@ -641,8 +641,19 @@ paths:
       - $ref: '#/components/parameters/accountIdInPath'
     get:
       summary: ユーザーアカウント詳細情報の取得
-      tags: []
-      responses: {}
+      tags:
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
       operationId: getUserAccount
       description: ユーザーアカウントの詳細情報を取得します
     patch:
