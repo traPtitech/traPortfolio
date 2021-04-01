@@ -81,7 +81,7 @@ paths:
   '/users/{userId}/accounts':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
-    put:
+    post:
       summary: アカウント情報の追加
       operationId: addAccount
       responses:
@@ -100,7 +100,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Account'
+              $ref: '#/components/schemas/EditAccount'
     delete:
       summary: アカウント情報の削除
       operationId: deleteAccount
@@ -122,6 +122,25 @@ paths:
         '404':
           description: Not Found
       description: アカウント情報を削除します
+      tags:
+        - user
+    get:
+      summary: ユーザーアカウントのリストを取得
+      operationId: getUserAccounts
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        '404':
+          description: Not Found
+      description: ユーザーアカウントのリストを取得します
       tags:
         - user
   '/user/{userId}/projects':
@@ -449,6 +468,33 @@ paths:
               $ref: '#/components/schemas/EditContest'
       tags:
         - contest
+    delete:
+      summary: コンテストの削除
+      operationId: deleteContest
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: コンテストを削除します
+      tags:
+        - contest
+  '/contests/{contestId}/teams':
+    parameters:
+      - $ref: '#/components/parameters/contestIdInPath'
+    get:
+      summary: コンテストチームのリストの取得
+      tags:
+        - contest
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+      operationId: getContestTeams
+      description: コンテストのチーム情報を取得します
     post:
       summary: コンテストチームの作成
       operationId: postContestTeam
@@ -467,14 +513,13 @@ paths:
           description: Not Found
       description: コンテストチームを作成します
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EditContestTeam'
       tags:
         - contest
-  '/contests/{contestId}/{teamId}':
+  '/contests/{contestId}/teams/{teamId}':
     parameters:
       - $ref: '#/components/parameters/contestIdInPath'
       - $ref: '#/components/parameters/teamIdInPath'
@@ -485,14 +530,14 @@ paths:
       responses:
         '200':
           description: OK
+        '404':
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContestTeamDetail'
-        '404':
-          description: Not Found
       operationId: getContestTeam
-      description: コンテスト詳細情報を取得します
+      description: コンテストチーム詳細情報を取得します
     patch:
       summary: コンテストチームの修正
       operationId: editContestTeam
@@ -505,18 +550,54 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
-      description: コンテストチーム情報を修正します
+      description: コンテストチームを修正します
+      tags:
+        - contest
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EditContestTeam'
+    delete:
+      summary: コンテストチームの削除
+      operationId: deleteContestTeam
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: コンテストチームを削除します
       tags:
         - contest
-    put:
-      summary: コンテストチームへのユーザーの追加
-      operationId: addContestTeamMember
+  '/contests/{contestId}/teams/{teamId}/members':
+    parameters:
+      - $ref: '#/components/parameters/contestIdInPath'
+      - $ref: '#/components/parameters/teamIdInPath'
+    get:
+      summary: コンテストチームメンバーの取得
+      tags:
+        - contest
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getContestTeamMembers
+      description: コンテストチームメンバーを取得します
+    post:
+      summary: コンテストチームメンバーの追加
+      operationId: postContestTeamMembers
       responses:
         '204':
           description: No Content
@@ -526,37 +607,138 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
-      description: コンテストチームにユーザーを追加します
-      tags:
-        - contest
+      description: コンテストチームメンバーを追加します
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutContestTeamMember'
+              $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - contest
+        - user
     delete:
-      summary: コンテストチームからのユーザーの削除
-      operationId: deleteContestTeamMember
+      summary: コンテストチームメンバーの削除
+      operationId: deleteContestTeamMembers
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: コンテストチームメンバーを削除します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - contest
+        - user
+  '/users/{userId}/accounts/{accountId}':
+    parameters:
+      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: '#/components/parameters/accountIdInPath'
+    get:
+      summary: ユーザーアカウント詳細情報の取得
+      tags:
+        - user
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getUserAccount
+      description: ユーザーアカウントの詳細情報を取得します
+    patch:
+      summary: アカウント情報の修正
+      operationId: editUserAccount
+      responses:
+        '204':
+          description: No Content
         '400':
           description: Bad Request
         '403':
           description: Forbidden
         '404':
           description: Not Found
-      description: コンテストチームからユーザーを削除します
-      parameters:
-        - schema:
-            type: string
-            format: uuid
-          in: query
-          name: userId
-          description: 削除するユーザーのUUID
-          required: true
+      description: アカウント情報を修正します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditAccount'
+        description: ''
       tags:
-        - contest
+        - user
+  '/projects/{projectId}/members':
+    parameters:
+      - $ref: '#/components/parameters/projectIdInPath'
+    get:
+      summary: プロジェクトメンバーの取得
+      tags:
+        - project
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: プロジェクトメンバーの配列
+                items:
+                  $ref: '#/components/schemas/User'
+      operationId: getProjectMembers
+      description: プロジェクトメンバーを取得します
+    post:
+      summary: プロジェクトメンバーの追加
+      operationId: addProjectMenbers
+      description: プロジェクトメンバーを追加します
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - project
+        - user
+    delete:
+      summary: プロジェクトメンバーの削除
+      operationId: deleteProjectMembers
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: プロジェクトメンバーを削除します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberIDs'
+      tags:
+        - project
+        - user
 components:
   schemas:
     User:
@@ -646,12 +828,10 @@ components:
         type:
           $ref: '#/components/schemas/AccountType'
         prPermitted:
-          type: boolean
-          description: 広報での利用が許可されているかどうか
+          $ref: '#/components/schemas/PrPermitted'
       required:
         - id
         - type
-        - permittedPr
     AccountType:
       type: integer
       title: AccountType
@@ -1133,19 +1313,32 @@ components:
       properties:
         eventLevel:
           $ref: '#/components/schemas/EventLevel'
-    PutContestTeamMember:
-      title: PutContestTeamMember
+    MemberIDs:
+      title: MemberIDs
       type: object
+      description: ユーザーのUUIDの配列
       properties:
         members:
           type: array
-          format: uuid
-          description: チームメンバーUUIDの配列
+          description: ユーザーのUUIDの配列
           items:
             type: string
             format: uuid
       required:
         - members
+    EditAccount:
+      title: EditAccount
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AccountType'
+        prPermitted:
+          $ref: '#/components/schemas/PrPermitted'
+      description: アカウント変更リクエスト
+    PrPermitted:
+      title: PrPermitted
+      type: boolean
+      description: 広報での利用が許可されているかどうか
   parameters:
     userIdInPath:
       name: userId
@@ -1195,6 +1388,14 @@ components:
       schema:
         type: string
         format: uuid
+    accountIdInPath:
+      name: accountId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      description: アカウントUUID
+      required: true
 tags:
   - name: user
     description: ユーザーAPI
