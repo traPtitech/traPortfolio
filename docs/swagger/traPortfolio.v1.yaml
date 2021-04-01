@@ -1389,7 +1389,7 @@ components:
         type: string
         format: uuid
     accountIdInPath:
-      name: accountIdInPath
+      name: accountId
       in: path
       schema:
         type: string
