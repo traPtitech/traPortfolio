@@ -3,11 +3,12 @@ package repository
 import (
 	"context"
 
+	"github.com/traPtitech/traPortfolio/domain"
+
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 )
 
 type TraQRepository struct {
@@ -20,12 +21,12 @@ func NewTraQRepository(api external.TraQAPI) *TraQRepository {
 	}
 }
 
-func (repo *TraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*model.TraQUser, error) {
+func (repo *TraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.TraQUser, error) {
 	ures, err := repo.api.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return &model.TraQUser{
+	return &domain.TraQUser{
 		State:       ures.State,
 		Bot:         ures.Bot,
 		DisplayName: ures.DisplayName,
