@@ -52,17 +52,21 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 		new model.Contest
 	)
 
-	tx := repo.h.Begin()
-	if err := tx.First(&old, &model.Contest{ID: id}).Error(); err != nil {
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.First(&old, &model.Contest{ID: id}).Error(); err != nil {
+			return err
+		}
+		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+			return err
+		}
+		if err := tx.Where(&model.Contest{ID: id}).First(&new).Error(); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		return err
 	}
-	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-		return err
-	}
-	if err := tx.Where(&model.Contest{ID: id}).First(&new).Error(); err != nil {
-		return err
-	}
-	tx.Commit()
 	return nil
 }
 
