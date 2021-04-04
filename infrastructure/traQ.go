@@ -51,7 +51,7 @@ func NewTraQAPI() (*TraQAPI, error) {
 	return &TraQAPI{Client: &http.Client{Jar: jar}}, nil
 }
 
-func (traQ *TraQAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResponse, error) {
+func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	if id == uuid.Nil {
 		return nil, fmt.Errorf("invalid uuid")
 	}
@@ -66,7 +66,7 @@ func (traQ *TraQAPI) GetByID(id uuid.UUID, traQToken string) (*external.UserResp
 		return nil, fmt.Errorf("GET /users/%v failed: %v", id, res.Status)
 	}
 
-	var userResponse external.UserResponse
+	var userResponse external.TraQUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}

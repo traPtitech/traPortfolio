@@ -25,7 +25,7 @@ func NewTraQRepository(api external.TraQAPI, traQToken TraQToken) *TraQRepositor
 }
 
 func (repo *TraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*model.TraQUser, error) {
-	ures, err := repo.api.GetByID(id, repo.token)
+	ures, err := repo.api.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
