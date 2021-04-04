@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
@@ -9,17 +10,67 @@ import (
 )
 
 type EventRepository struct {
-	database.SQLHandler
-	external.KnoqAPI
+	h   database.SQLHandler
+	api external.KnoqAPI
 }
 
 func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) *EventRepository {
-	return &EventRepository{SQLHandler: sql, KnoqAPI: knoq}
+	return &EventRepository{h: sql, api: knoq}
 }
 
-func (repo *EventRepository) GetEventLevels() (map[uuid.UUID]*model.EventLevelRelation, error) {
+func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
+	events, err := repo.api.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*domain.Event, 0, len(events))
+	for _, v := range events {
+		e := &domain.Event{
+			ID:        v.ID,
+			Name:      v.Name,
+			TimeStart: v.TimeStart,
+			TimeEnd:   v.TimeEnd,
+		}
+		result = append(result, e)
+	}
+
+	return result, nil
+}
+
+func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error) {
+	er, err := repo.api.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	elv, err := repo.getEventLevelByID(id)
+	if err != nil && err != repository.ErrNotFound {
+		return nil, err
+	}
+
+	result := &domain.EventDetail{
+		Event: domain.Event{
+			ID:        er.ID,
+			Name:      er.Name,
+			TimeStart: er.TimeStart,
+			TimeEnd:   er.TimeEnd,
+		},
+		Description: er.Description,
+		GroupID:     er.GroupID,
+		RoomID:      er.RoomID,
+	}
+
+	if err == nil {
+		result.Level = elv.Level
+	}
+
+	return result, nil
+}
+
+func (repo *EventRepository) getEventLevels() (map[uuid.UUID]*model.EventLevelRelation, error) {
 	elvs := make([]*model.EventLevelRelation, 0)
-	err := repo.Find(&elvs).Error()
+	err := repo.h.Find(&elvs).Error()
 	if err != nil && err != repository.ErrNotFound {
 		return nil, err
 	}
@@ -31,9 +82,9 @@ func (repo *EventRepository) GetEventLevels() (map[uuid.UUID]*model.EventLevelRe
 	return elvsmp, nil
 }
 
-func (repo *EventRepository) GetEventLevelByID(id uuid.UUID) (*model.EventLevelRelation, error) {
+func (repo *EventRepository) getEventLevelByID(id uuid.UUID) (*model.EventLevelRelation, error) {
 	elv := &model.EventLevelRelation{}
-	err := repo.First(elv, &model.EventLevelRelation{ID: id}).Error()
+	err := repo.h.First(elv, &model.EventLevelRelation{ID: id}).Error()
 	if err != nil {
 		return nil, err
 	}
