@@ -631,13 +631,16 @@ components:
         bio:
           type: string
           description: 自己紹介(biography)
-        hideRealName:
+        check:
           type: boolean
-          description: 本名を公開するかどうか
-          default: 'true'
+          description: |-
+            本名を公開するかどうか
+            true: 公開
+            false: 非公開
+          default: true
       required:
         - bio
-        - hideRealName
+        - check
     Account:
       title: Account
       type: object

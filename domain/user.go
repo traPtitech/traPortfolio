@@ -24,9 +24,3 @@ type UserDetail struct {
 	Bio      string
 	Accounts []*Account
 }
-
-type EditUser struct {
-	ID          uuid.UUID
-	Description string
-	Check       bool
-}

@@ -98,18 +98,22 @@ func (repo *UserRepository) GetAccounts(id uuid.UUID) ([]*domain.Account, error)
 	return result, nil
 }
 
-func (repo *UserRepository) Update(u *domain.EditUser) error {
-	user := &model.User{ID: u.ID}
-	err := repo.First(user).Error()
-	if err == gorm.ErrRecordNotFound {
-		return repository.ErrNotFound
-	} else if err != nil {
-		return err
-	}
+func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{}) error {
+	err := repo.Transaction(func(tx database.SQLHandler) error {
+		user := &model.User{ID: id}
+		err := repo.First(user).Error()
+		if err == gorm.ErrRecordNotFound {
+			return repository.ErrNotFound
+		} else if err != nil {
+			return err
+		}
 
-	user.Description = u.Description
-	user.Check = u.Check
-	err = repo.Save(user).Error()
+		err = repo.Model(user).Updates(changes).Error()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	return err
 }
 

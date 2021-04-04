@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -38,6 +41,25 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 	return user, nil
 }
 
-func (s *UserService) Update(ctx context.Context, user *domain.EditUser) error {
-	return s.repo.Update(user)
+func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
+	if id == uuid.Nil {
+		return repository.ErrInvalidID
+	}
+	changes := map[string]interface{}{}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Check.Valid {
+		changes["check"] = args.Check.Bool
+	}
+	if len(changes) > 0 {
+		err := s.repo.Update(id, changes)
+		if err != nil && err == repository.ErrNotFound {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
