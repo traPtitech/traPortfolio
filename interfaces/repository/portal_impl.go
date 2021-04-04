@@ -9,13 +9,10 @@ import (
 )
 
 type PortalRepository struct {
-	token string
 }
 
-type PortalToken string
-
-func NewPortalRepository(portalToken PortalToken) *PortalRepository {
-	return &PortalRepository{token: string(portalToken)}
+func NewPortalRepository() *PortalRepository {
+	return &PortalRepository{}
 }
 
 func (repo *PortalRepository) GetUser(ctx context.Context, name string) (user *model.PortalUser, err error) {

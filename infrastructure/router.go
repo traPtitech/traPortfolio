@@ -18,7 +18,7 @@ func Init() {
 		validator: validator.New(),
 	}
 
-	api, err := InjectAPIServer("traQToken", "portalToken")
+	api, err := InjectAPIServer()
 	if err != nil {
 		log.Fatal(err)
 	}
