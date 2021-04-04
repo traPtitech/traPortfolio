@@ -68,20 +68,6 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 	return result, nil
 }
 
-func (repo *EventRepository) getEventLevels() (map[uuid.UUID]*model.EventLevelRelation, error) {
-	elvs := make([]*model.EventLevelRelation, 0)
-	err := repo.h.Find(&elvs).Error()
-	if err != nil && err != repository.ErrNotFound {
-		return nil, err
-	}
-	elvsmp := make(map[uuid.UUID]*model.EventLevelRelation, len(elvs))
-	for _, v := range elvs {
-		v := v
-		elvsmp[v.ID] = v
-	}
-	return elvsmp, nil
-}
-
 func (repo *EventRepository) getEventLevelByID(id uuid.UUID) (*model.EventLevelRelation, error) {
 	elv := &model.EventLevelRelation{}
 	err := repo.h.First(elv, &model.EventLevelRelation{ID: id}).Error()

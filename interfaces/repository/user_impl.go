@@ -21,11 +21,8 @@ func NewUserRepository(sql database.SQLHandler) *UserRepository {
 }
 
 func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
-	users, err := repo.GetUsers()
-	if err != nil {
-		return nil, err
-	}
-	portalUsers, err := repo.portal.GetAll()
+	users := make([]*model.User, 0)
+	err := repo.Find(&users).Error()
 	if err != nil {
 		return nil, err
 	}
@@ -33,13 +30,19 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 	for _, v := range users {
 		idMap[v.Name] = v.ID
 	}
+
+	portalUsers, err := repo.portal.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
 	result := make([]*domain.User, 0, len(users))
 	for _, v := range portalUsers {
-		if id, ok := idMap[v.ID]; ok {
+		if id, ok := idMap[v.TraQID]; ok {
 			result = append(result, &domain.User{
 				ID:       id,
-				Name:     v.ID,
-				RealName: v.Name,
+				Name:     v.TraQID,
+				RealName: v.RealName,
 			})
 		}
 	}
@@ -71,7 +74,7 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	result := domain.UserDetail{
 		ID:       user.ID,
 		Name:     user.Name,
-		RealName: portalUser.Name,
+		RealName: portalUser.RealName,
 		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,

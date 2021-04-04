@@ -3,8 +3,8 @@ package external
 import "github.com/gofrs/uuid"
 
 type PortalUserResponse struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
+	TraQID         string `json:"id"`
+	RealName       string `json:"name"`
 	AlphabeticName string `json:"alphabeticName"`
 }
 
