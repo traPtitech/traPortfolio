@@ -8,8 +8,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
-
 	"github.com/gofrs/uuid"
 
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -25,17 +23,8 @@ func NewContestService(repo repository.ContestRepository) ContestService {
 	}
 }
 
-func (s *ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*model.Contest, error) {
-	uid := uuid.Must(uuid.NewV4())
-	contest := &model.Contest{
-		ID:          uid,
-		Name:        args.Name,
-		Description: args.Description,
-		Link:        args.Link,
-		Since:       args.Since,
-		Until:       args.Until,
-	}
-	contest, err := s.repo.CreateContest(contest)
+func (s *ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
+	contest, err := s.repo.CreateContest(args)
 	if err != nil {
 		return nil, err
 	}

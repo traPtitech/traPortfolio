@@ -5,8 +5,6 @@ import (
 
 	"github.com/traPtitech/traPortfolio/domain"
 
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
-
 	"github.com/gofrs/uuid"
 
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -45,7 +43,7 @@ type UpdateContestTeamArgs struct {
 type ContestRepository interface {
 	//GetAll() ([]*domain.Contest, error)
 	//GetByID(ID uuid.UUID) (*domain.Contest, error)
-	CreateContest(contest *model.Contest) (*model.Contest, error)
+	CreateContest(args *CreateContestArgs) (*domain.Contest, error)
 	UpdateContest(id uuid.UUID, changes map[string]interface{}) error
 	CreateContestTeam(contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
 	UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error
