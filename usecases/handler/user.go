@@ -24,6 +24,7 @@ type UserHandler struct {
 type Account struct {
 	ID          string `json:"id"`
 	Type        uint   `json:"type"`
+	URL         string `gorm:"type:text"`
 	PrPermitted bool   `json:"prPermitted"`
 }
 
@@ -114,7 +115,7 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 		PrPermitted: req.PrPermitted,
 	}
 
-	err = handler.UserService.AddAccount(c.Request().Context(), id, &args)
+	err = handler.UserService.CreateAccount(c.Request().Context(), id, &args)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}

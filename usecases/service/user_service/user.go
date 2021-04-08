@@ -106,7 +106,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	}, nil
 }
 
-func (s *UserService) AddAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) error {
+func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) error {
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
@@ -118,7 +118,7 @@ func (s *UserService) AddAccount(ctx context.Context, id uuid.UUID, account *rep
 		return repository.ErrInvalidArg
 	}
 
-	if !(0 <= account.Type && account.Type < domain.AccountLimit) {
+	if account.Type >= domain.AccountLimit {
 		return repository.ErrInvalidArg
 	}
 
