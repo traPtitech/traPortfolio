@@ -109,12 +109,17 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
+	since := semToTime(req.Duration.Since)
+	until := semToTime(req.Duration.Until)
+	if since.After(until) {
+		return c.JSON(http.StatusBadRequest, "invalid duration")
+	}
 	createReq := repository.CreateProjectArgs{
 		Name:        req.Name,
 		Description: req.Description,
 		Link:        req.Link,
-		Since:       semToTime(req.Duration.Since),
-		Until:       semToTime(req.Duration.Until),
+		Since:       since,
+		Until:       until,
 	}
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
@@ -201,7 +206,7 @@ func convertToProjectMembers(members []*model.ProjectMemberDetail) []*domain.Pro
 	res := make([]*domain.ProjectMember, 0, len(members))
 	for _, v := range members {
 		m := &domain.ProjectMember{
-			ID:       v.ID,
+			ID:       v.UserID,
 			Name:     v.Name,
 			RealName: v.RealName,
 			Duration: domain.ProjectDuration{

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
@@ -34,7 +36,11 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*model.Project, error) 
 
 func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*model.ProjectMemberDetail, error) {
 	members := make([]*model.ProjectMemberDetail, 0)
-	if err := repo.h.Find(&members, "project_id = ?", id).Joins("left join users on users.id = project_members.user_id").Error(); err != nil {
+	selectQuery := "project_members.project_id, users.id as user_id, users.name, project_members.since, project_members.until"
+	joinQuery := "left join users on users.id = project_members.user_id"
+	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where("project_id = ?", id).Joins(joinQuery).Scan(&members).Error()
+	fmt.Printf("%#v\n\n", *members[0])
+	if err != nil {
 		return nil, err
 	}
 	return members, nil

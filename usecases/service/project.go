@@ -35,7 +35,7 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.P
 	if err != nil {
 		return nil, err
 	}
-	projectMembers, err := s.repo.GetProjectMembers(id)
+	members, err := s.repo.GetProjectMembers(id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,15 +43,14 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.P
 	if err != nil {
 		return nil, err
 	}
-	members := make([]*model.ProjectMemberDetail, 0, len(projectMembers))
-	for _, v := range projectMembers {
-		for _, pu := range portalUsers {
-			if v.Name == pu.ID {
-				v.RealName = pu.Name
-				members = append(members, v)
-			}
-		}
+	NameMap := make(map[string]string, len(portalUsers))
+	for _, v := range portalUsers {
+		NameMap[v.ID] = v.Name
 	}
+	for i, v := range members {
+		members[i].RealName = NameMap[v.Name]
+	}
+
 	res := &model.ProjectDetail{
 		ID:          project.ID,
 		Name:        project.Name,

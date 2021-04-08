@@ -18,6 +18,7 @@ type Project struct {
 }
 
 type ProjectMember struct {
+	ID        uuid.UUID `gorm:"type:char(36);not null;primary_key"`
 	ProjectID uuid.UUID `gorm:"type:char(36);not null"`
 	UserID    uuid.UUID `gorm:"type:char(36);not null"`
 	Since     time.Time `gorm:"precision:6"`
@@ -38,7 +39,7 @@ type ProjectDetail struct {
 
 type ProjectMemberDetail struct {
 	ProjectID uuid.UUID
-	ID        uuid.UUID
+	UserID    uuid.UUID
 	Name      string
 	RealName  string
 	Since     time.Time
