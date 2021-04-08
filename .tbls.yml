@@ -83,13 +83,13 @@ comments:
   #     id: 実績UUID
   #     name: 実績名
   #     description: 実績の説明
-  # - table: projects_members
-  #   tableComments: プロジェクト所属者テーブル
-  #   columnComments:
-  #     project_id: プロジェクトUUID
-  #     user_id: ユーザーUUID
-  #     start: プロジェクト所属開始時期
-  #     end: プロジェクト所属終了時期
+  - table: project_members
+    tableComment: プロジェクト所属者テーブル
+    columnComments:
+      project_id: プロジェクトUUID
+      user_id: ユーザーUUID
+      since: プロジェクト所属開始時期
+      until: プロジェクト所属終了時期
   # - table: achievements_members
   #   tableComments: 実績メンバーテーブル
   #   columnComments:

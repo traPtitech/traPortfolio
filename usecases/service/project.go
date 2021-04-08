@@ -11,14 +11,14 @@ import (
 )
 
 type ProjectService struct {
-	repo repository.ProjectRepository
-	traQ repository.TraQRepository
+	repo   repository.ProjectRepository
+	portal repository.PortalRepository
 }
 
-func NewProjectService(projectRepository repository.ProjectRepository, traQRepository repository.TraQRepository) ProjectService {
+func NewProjectService(projectRepository repository.ProjectRepository, portalRepository repository.PortalRepository) ProjectService {
 	return ProjectService{
-		repo: projectRepository,
-		traQ: traQRepository,
+		repo:   projectRepository,
+		portal: portalRepository,
 	}
 }
 
@@ -30,10 +30,37 @@ func (s *ProjectService) GetProjects(ctx context.Context) ([]*model.Project, err
 	return res, nil
 }
 
-func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {
-	res, err := s.repo.GetProject(id)
+func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.ProjectDetail, error) {
+	project, err := s.repo.GetProject(id)
 	if err != nil {
 		return nil, err
+	}
+	members, err := s.repo.GetProjectMembers(id)
+	if err != nil {
+		return nil, err
+	}
+	portalUsers, err := s.portal.GetUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	NameMap := make(map[string]string, len(portalUsers))
+	for _, v := range portalUsers {
+		NameMap[v.ID] = v.Name
+	}
+	for i, v := range members {
+		members[i].RealName = NameMap[v.Name]
+	}
+
+	res := &model.ProjectDetail{
+		ID:          project.ID,
+		Name:        project.Name,
+		Link:        project.Link,
+		Description: project.Description,
+		Members:     members,
+		Since:       project.Since,
+		Until:       project.Until,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.UpdatedAt,
 	}
 	return res, nil
 }
