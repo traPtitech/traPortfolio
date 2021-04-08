@@ -9,10 +9,12 @@
 
 ```sql
 CREATE TABLE `project_members` (
+  `id` char(36) COLLATE utf8mb4_bin NOT NULL,
   `project_id` char(36) COLLATE utf8mb4_bin NOT NULL,
   `user_id` char(36) COLLATE utf8mb4_bin NOT NULL,
   `since` datetime(6) DEFAULT NULL,
-  `until` datetime(6) DEFAULT NULL
+  `until` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
@@ -22,10 +24,23 @@ CREATE TABLE `project_members` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
+| id | char(36) |  | false |  |  |  |
 | project_id | char(36) |  | false |  |  | プロジェクトUUID |
 | user_id | char(36) |  | false |  |  | ユーザーUUID |
 | since | datetime(6) |  | true |  |  | プロジェクト所属開始時期 |
 | until | datetime(6) |  | true |  |  | プロジェクト所属終了時期 |
+
+## Constraints
+
+| Name | Type | Definition |
+| ---- | ---- | ---------- |
+| PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
+
+## Indexes
+
+| Name | Definition |
+| ---- | ---------- |
+| PRIMARY | PRIMARY KEY (id) USING BTREE |
 
 ## Relations
 

@@ -10,7 +10,7 @@
 | [contests](contests.md) | 8 | コンテストテーブル | BASE TABLE |
 | [event_level_relations](event_level_relations.md) | 2 | knoQイベントと公開レベルの関係テーブル | BASE TABLE |
 | [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブル | BASE TABLE |
-| [project_members](project_members.md) | 4 | プロジェクト所属者テーブル | BASE TABLE |
+| [project_members](project_members.md) | 5 | プロジェクト所属者テーブル | BASE TABLE |
 | [projects](projects.md) | 8 | プロジェクトテーブル | BASE TABLE |
 | [users](users.md) | 6 | ユーザーテーブル | BASE TABLE |
 

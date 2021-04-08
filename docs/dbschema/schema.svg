@@ -159,23 +159,26 @@
 <!-- project_members -->
 <g id="node7" class="node">
 <title>project_members</title>
-<polygon fill="#efefef" stroke="transparent" points="2091.5,-222.5 2091.5,-257.5 2341.5,-257.5 2341.5,-222.5 2091.5,-222.5"/>
-<polygon fill="none" stroke="#000000" points="2091.5,-222.5 2091.5,-257.5 2341.5,-257.5 2341.5,-222.5 2091.5,-222.5"/>
-<text text-anchor="start" x="2098.3688" y="-235.3" font-family="Arial Bold" font-size="18.00" fill="#000000">project_members</text>
-<text text-anchor="start" x="2237.3774" y="-235.3" font-family="Arial" font-size="14.00" fill="#000000"> </text>
-<text text-anchor="start" x="2241.268" y="-235.3" font-family="Arial" font-size="14.00" fill="#666666">[BASE TABLE]</text>
-<polygon fill="none" stroke="#000000" points="2091.5,-192.5 2091.5,-222.5 2341.5,-222.5 2341.5,-192.5 2091.5,-192.5"/>
-<text text-anchor="start" x="2098.5" y="-203.9" font-family="Arial" font-size="14.00" fill="#000000">project_id </text>
-<text text-anchor="start" x="2163.068" y="-203.9" font-family="Arial" font-size="14.00" fill="#666666">[char(36)]</text>
-<polygon fill="none" stroke="#000000" points="2091.5,-162.5 2091.5,-192.5 2341.5,-192.5 2341.5,-162.5 2091.5,-162.5"/>
-<text text-anchor="start" x="2098.5" y="-173.9" font-family="Arial" font-size="14.00" fill="#000000">user_id </text>
-<text text-anchor="start" x="2148.2882" y="-173.9" font-family="Arial" font-size="14.00" fill="#666666">[char(36)]</text>
-<polygon fill="none" stroke="#000000" points="2091.5,-132.5 2091.5,-162.5 2341.5,-162.5 2341.5,-132.5 2091.5,-132.5"/>
-<text text-anchor="start" x="2098.5" y="-143.9" font-family="Arial" font-size="14.00" fill="#000000">since </text>
-<text text-anchor="start" x="2135.0624" y="-143.9" font-family="Arial" font-size="14.00" fill="#666666">[datetime(6)]</text>
-<polygon fill="none" stroke="#000000" points="2091.5,-102.5 2091.5,-132.5 2341.5,-132.5 2341.5,-102.5 2091.5,-102.5"/>
-<text text-anchor="start" x="2098.5" y="-113.9" font-family="Arial" font-size="14.00" fill="#000000">until </text>
-<text text-anchor="start" x="2128.0596" y="-113.9" font-family="Arial" font-size="14.00" fill="#666666">[datetime(6)]</text>
+<polygon fill="#efefef" stroke="transparent" points="2091.5,-237.5 2091.5,-272.5 2341.5,-272.5 2341.5,-237.5 2091.5,-237.5"/>
+<polygon fill="none" stroke="#000000" points="2091.5,-237.5 2091.5,-272.5 2341.5,-272.5 2341.5,-237.5 2091.5,-237.5"/>
+<text text-anchor="start" x="2098.3688" y="-250.3" font-family="Arial Bold" font-size="18.00" fill="#000000">project_members</text>
+<text text-anchor="start" x="2237.3774" y="-250.3" font-family="Arial" font-size="14.00" fill="#000000"> </text>
+<text text-anchor="start" x="2241.268" y="-250.3" font-family="Arial" font-size="14.00" fill="#666666">[BASE TABLE]</text>
+<polygon fill="none" stroke="#000000" points="2091.5,-207.5 2091.5,-237.5 2341.5,-237.5 2341.5,-207.5 2091.5,-207.5"/>
+<text text-anchor="start" x="2098.5" y="-218.9" font-family="Arial" font-size="14.00" fill="#000000">id </text>
+<text text-anchor="start" x="2113.2798" y="-218.9" font-family="Arial" font-size="14.00" fill="#666666">[char(36)]</text>
+<polygon fill="none" stroke="#000000" points="2091.5,-177.5 2091.5,-207.5 2341.5,-207.5 2341.5,-177.5 2091.5,-177.5"/>
+<text text-anchor="start" x="2098.5" y="-188.9" font-family="Arial" font-size="14.00" fill="#000000">project_id </text>
+<text text-anchor="start" x="2163.068" y="-188.9" font-family="Arial" font-size="14.00" fill="#666666">[char(36)]</text>
+<polygon fill="none" stroke="#000000" points="2091.5,-147.5 2091.5,-177.5 2341.5,-177.5 2341.5,-147.5 2091.5,-147.5"/>
+<text text-anchor="start" x="2098.5" y="-158.9" font-family="Arial" font-size="14.00" fill="#000000">user_id </text>
+<text text-anchor="start" x="2148.2882" y="-158.9" font-family="Arial" font-size="14.00" fill="#666666">[char(36)]</text>
+<polygon fill="none" stroke="#000000" points="2091.5,-117.5 2091.5,-147.5 2341.5,-147.5 2341.5,-117.5 2091.5,-117.5"/>
+<text text-anchor="start" x="2098.5" y="-128.9" font-family="Arial" font-size="14.00" fill="#000000">since </text>
+<text text-anchor="start" x="2135.0624" y="-128.9" font-family="Arial" font-size="14.00" fill="#666666">[datetime(6)]</text>
+<polygon fill="none" stroke="#000000" points="2091.5,-87.5 2091.5,-117.5 2341.5,-117.5 2341.5,-87.5 2091.5,-87.5"/>
+<text text-anchor="start" x="2098.5" y="-98.9" font-family="Arial" font-size="14.00" fill="#000000">until </text>
+<text text-anchor="start" x="2128.0596" y="-98.9" font-family="Arial" font-size="14.00" fill="#666666">[datetime(6)]</text>
 </g>
 <!-- projects -->
 <g id="node8" class="node">
