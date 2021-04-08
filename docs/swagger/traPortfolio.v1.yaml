@@ -85,8 +85,12 @@ paths:
       summary: アカウント情報の追加
       operationId: addAccount
       responses:
-        '204':
-          description: No Content
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
         '400':
           description: Bad Request
         '403':
@@ -101,29 +105,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EditAccount'
-    delete:
-      summary: アカウント情報の削除
-      operationId: deleteAccount
-      parameters:
-        - schema:
-            type: string
-            format: uuid
-          in: query
-          name: accountId
-          description: 削除するアカウント情報のUUID
-          required: true
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-      description: アカウント情報を削除します
-      tags:
-        - user
     get:
       summary: ユーザーアカウントのリストを取得
       operationId: getUserAccounts
@@ -677,6 +658,19 @@ paths:
         description: ''
       tags:
         - user
+    delete:
+      summary: ユーザーアカウントの削除
+      operationId: deleteAccount
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: アカウントを削除します
   '/projects/{projectId}/members':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
@@ -832,9 +826,14 @@ components:
           $ref: '#/components/schemas/AccountType'
         prPermitted:
           $ref: '#/components/schemas/PrPermitted'
+        url:
+          type: string
+          description: アカウントurl
       required:
         - id
         - type
+        - prPermitted
+        - url
     AccountType:
       type: integer
       title: AccountType
@@ -1332,12 +1331,16 @@ components:
     EditAccount:
       title: EditAccount
       type: object
+      description: アカウント変更リクエスト
       properties:
         type:
           $ref: '#/components/schemas/AccountType'
         prPermitted:
           $ref: '#/components/schemas/PrPermitted'
-      description: アカウント変更リクエスト
+        url:
+          type: string
+          description: アカウントurl
+          format: uri
     PrPermitted:
       title: PrPermitted
       type: boolean
