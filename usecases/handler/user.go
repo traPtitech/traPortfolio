@@ -115,14 +115,14 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 		PrPermitted: req.PrPermitted,
 	}
 
-	err = handler.UserService.CreateAccount(c.Request().Context(), id, &args)
+	account, err := handler.UserService.CreateAccount(c.Request().Context(), id, &args)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 	if err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, account)
 }
 
 func (handler *UserHandler) DeleteAccount(c echo.Context) error {

@@ -17,7 +17,6 @@ type UserRepository interface {
 	GetUser(uuid.UUID) (*domain.User, error)
 	GetAccounts(uuid.UUID) ([]*domain.Account, error)
 	Update(*domain.User) error
-	AddAccount(uuid.UUID, *CreateAccountArgs) error
-	CreateAccount(uuid.UUID, *CreateAccountArgs) error
+	CreateAccount(uuid.UUID, *CreateAccountArgs) (*domain.Account, error)
 	DeleteAccount(uuid.UUID, uuid.UUID) error
 }

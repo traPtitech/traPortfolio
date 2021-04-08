@@ -106,28 +106,27 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	}, nil
 }
 
-func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) error {
+func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
 	if id == uuid.Nil {
-		return repository.ErrInvalidArg
+		return nil, repository.ErrInvalidArg
 	}
 
 	if len(account.ID) == 0 {
-		return repository.ErrInvalidArg
+		return nil, repository.ErrInvalidArg
 	}
 
 	if account.Type >= domain.AccountLimit {
-		return repository.ErrInvalidArg
+		return nil, repository.ErrInvalidArg
 	}
 
-	err := s.repo.CreateAccount(id, account)
 	//implに実装は書く
 	//accountの構造体たりないので補う
 	//ここらへんのコメントアウトはリファクタのときにでも消す
 
-	return err
+	return s.repo.CreateAccount(id, account)
 
 }
 
