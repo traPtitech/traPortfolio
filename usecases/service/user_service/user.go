@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -24,9 +25,10 @@ type UserDetail struct {
 }
 
 type Account struct {
-	ID          uuid.UUID `json:"id"`
-	Type        uint      `json:"type"`
-	PrPermitted bool      `json:"prPermitted"`
+	ID          string `json:"id"`
+	Type        uint   `json:"type"`
+	URL         string `gorm:"type:text"`
+	PrPermitted bool   `json:"prPermitted"`
 }
 
 type UserService struct {
@@ -89,7 +91,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	accounts := make([]Account, 0, len(userAccounts))
 	for _, v := range userAccounts {
 		accounts = append(accounts, Account{
-			ID:          v.ID,
+			ID:          v.Name,
 			Type:        v.Type,
 			PrPermitted: v.Check,
 		})
@@ -116,26 +118,20 @@ func (s *UserService) AddAccount(ctx context.Context, id uuid.UUID, account *rep
 		return repository.ErrInvalidArg
 	}
 
-	if !(0 <= account.Type && account.Type < 9) {
+	if !(0 <= account.Type && account.Type < domain.AccountLimit) {
 		return repository.ErrInvalidArg
 	}
 
-	err := s.repo.Update( /*??*/ )
+	err := s.repo.CreateAccount(id, account)
+	//implに実装は書く
+	//accountの構造体たりないので補う
+	//ここらへんのコメントアウトはリファクタのときにでも消す
 
 	return err
 
 }
 
 func (s *UserService) DeleteAccount(ctx context.Context, id uuid.UUID) error {
-	/*
-		user, err := s.repo.GetUser(account.ID)
-		if err != nil {
-			return err
-		}
-		userAccounts, err := s.repo.GetAccounts(account.ID)
-		if err != nil {
-			return err
-		}*/
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/

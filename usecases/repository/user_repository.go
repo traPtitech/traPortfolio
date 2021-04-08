@@ -6,8 +6,9 @@ import (
 )
 
 type CreateAccountArgs struct {
-	ID          uuid.UUID
+	ID          string
 	Type        uint
+	URL         string
 	PrPermitted bool
 }
 
@@ -17,5 +18,6 @@ type UserRepository interface {
 	GetAccounts(uuid.UUID) ([]*domain.Account, error)
 	Update(*domain.User) error
 	AddAccount(uuid.UUID, *CreateAccountArgs) error
+	CreateAccount(uuid.UUID, *CreateAccountArgs) error
 	DeleteAccount(uuid.UUID) error
 }

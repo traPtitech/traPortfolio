@@ -22,9 +22,9 @@ type UserHandler struct {
 }
 
 type Account struct {
-	ID          uuid.UUID `json:"id"`
-	Type        uint      `json:"type"`
-	PrPermitted bool      `json:"prPermitted"`
+	ID          string `json:"id"`
+	Type        uint   `json:"type"`
+	PrPermitted bool   `json:"prPermitted"`
 }
 
 func NewUserHandler(repo repository.UserRepository, s service.UserService) *UserHandler {
