@@ -37,7 +37,7 @@ func InjectAPIServer(traQToken repository.TraQToken, portalToken repository.Port
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userService)
 	projectRepository := repository.NewProjectRepository(sqlHandler)
-	projectService := service.NewProjectService(projectRepository, traQRepository)
+	projectService := service.NewProjectService(projectRepository, portalRepository)
 	projectHandler := handler.NewProjectHandler(projectService)
 	knoqAPI, err := NewKnoqAPI()
 	if err != nil {

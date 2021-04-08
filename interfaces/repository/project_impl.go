@@ -26,11 +26,18 @@ func (repo *ProjectRepository) GetProjects() ([]*model.Project, error) {
 
 func (repo *ProjectRepository) GetProject(id uuid.UUID) (*model.Project, error) {
 	project := &model.Project{ID: id}
-	err := repo.h.First(&project).Error()
-	if err != nil {
+	if err := repo.h.First(&project).Error(); err != nil {
 		return nil, err
 	}
 	return project, nil
+}
+
+func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*model.ProjectMemberDetail, error) {
+	members := make([]*model.ProjectMemberDetail, 0)
+	if err := repo.h.Find(&members, "project_id = ?", id).Joins("left join users on users.id = project_members.user_id").Error(); err != nil {
+		return nil, err
+	}
+	return members, nil
 }
 
 func (repo *ProjectRepository) CreateProject(project *model.Project) (*model.Project, error) {

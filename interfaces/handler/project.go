@@ -7,6 +7,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -82,8 +83,8 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 			Since: timeToSem(project.Since),
 			Until: timeToSem(project.Until),
 		},
-		Link: project.Link,
-		// Members:   project.Members, //TODO
+		Link:      project.Link,
+		Members:   convertToProjectMembers(project.Members),
 		CreatedAt: project.CreatedAt,
 		UpdatedAt: project.UpdatedAt,
 	}
@@ -194,4 +195,21 @@ func optionalSemToTime(date OptionalYearWithSemester) optional.Time {
 		t.Valid = false
 	}
 	return t
+}
+
+func convertToProjectMembers(members []*model.ProjectMemberDetail) []*domain.ProjectMember {
+	res := make([]*domain.ProjectMember, 0, len(members))
+	for _, v := range members {
+		m := &domain.ProjectMember{
+			ID:       v.ID,
+			Name:     v.Name,
+			RealName: v.RealName,
+			Duration: domain.ProjectDuration{
+				Since: timeToSem(v.Since),
+				Until: timeToSem(v.Until),
+			},
+		}
+		res = append(res, m)
+	}
+	return res
 }
