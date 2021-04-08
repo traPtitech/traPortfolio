@@ -40,7 +40,7 @@ func (repo *UserRepository) Update(u *domain.User) error {
 }
 
 func (repo *UserRepository) CreateAccount(id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
-	account_ := domain.Account{
+	tmpaccount := domain.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   account.Type,
 		Name:   account.ID,
@@ -48,14 +48,14 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, account *repository.Crea
 		UserID: id,
 		Check:  account.PrPermitted,
 	}
-	err := repo.Create(account_).Error()
+	err := repo.Create(tmpaccount).Error()
 	if err != nil {
 		return nil, err
 	}
 
 	var result *domain.Account
 
-	err = repo.First(result, domain.Account{ID: account_.ID}).Error()
+	err = repo.First(result, domain.Account{ID: tmpaccount.ID}).Error()
 
 	if err != nil {
 		return nil, err
