@@ -48,7 +48,7 @@ func (s *ProjectService) CreateProject(ctx context.Context, args *repository.Cre
 		Since:       args.Since,
 		Until:       args.Until,
 	}
-	project, err := s.repo.Create(project)
+	project, err := s.repo.CreateProject(project)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 		changes["until"] = args.Until.Time
 	}
 	if len(changes) > 0 {
-		err := s.repo.Update(id, changes)
+		err := s.repo.UpdateProject(id, changes)
 		if err != nil && err == repository.ErrNotFound {
 			return echo.NewHTTPError(http.StatusNotFound)
 		}

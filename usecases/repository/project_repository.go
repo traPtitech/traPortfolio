@@ -27,6 +27,6 @@ type UpdateProjectArgs struct {
 type ProjectRepository interface {
 	GetProjects() ([]*model.Project, error)
 	GetProject(id uuid.UUID) (*model.Project, error)
-	Create(project *model.Project) (*model.Project, error)
-	Update(id uuid.UUID, changes map[string]interface{}) error
+	CreateProject(project *model.Project) (*model.Project, error)
+	UpdateProject(id uuid.UUID, changes map[string]interface{}) error
 }

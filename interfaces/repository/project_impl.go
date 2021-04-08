@@ -15,7 +15,6 @@ func NewProjectRepository(sql database.SQLHandler) *ProjectRepository {
 	return &ProjectRepository{h: sql}
 }
 
-//TODO GetAllの方がいい？
 func (repo *ProjectRepository) GetProjects() ([]*model.Project, error) {
 	projects := []*model.Project{}
 	err := repo.h.Find(&projects).Error()
@@ -34,7 +33,7 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*model.Project, error) 
 	return project, nil
 }
 
-func (repo *ProjectRepository) Create(project *model.Project) (*model.Project, error) {
+func (repo *ProjectRepository) CreateProject(project *model.Project) (*model.Project, error) {
 	err := repo.h.Create(project).Error()
 	if err != nil {
 		return nil, err
@@ -42,7 +41,7 @@ func (repo *ProjectRepository) Create(project *model.Project) (*model.Project, e
 	return project, nil
 }
 
-func (repo *ProjectRepository) Update(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
 	if id == uuid.Nil {
 		return repository.ErrNilID
 	}
@@ -53,13 +52,24 @@ func (repo *ProjectRepository) Update(id uuid.UUID, changes map[string]interface
 	)
 
 	tx := repo.h.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := tx.Error(); err != nil {
+		return err
+	}
 	if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
+		tx.Rollback()
 		return err
 	}
 	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+		tx.Rollback()
 		return err
 	}
 	if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
+		tx.Rollback()
 		return err
 	}
 	tx.Commit()

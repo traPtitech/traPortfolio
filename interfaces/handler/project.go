@@ -25,14 +25,14 @@ type ProjectResponse struct {
 }
 
 type ProjectDetailResponse struct {
-	ID          uuid.UUID
-	Name        string
-	Duration    domain.ProjectDuration
-	Link        string
-	Description string
-	Members     []*domain.ProjectMember
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          uuid.UUID               `json:"id"`
+	Name        string                  `json:"name"`
+	Duration    domain.ProjectDuration  `json:"duration"`
+	Link        string                  `json:"link"`
+	Description string                  `json:"description"`
+	Members     []*domain.ProjectMember `json:"members"`
+	CreatedAt   time.Time               `json:"created_at"`
+	UpdatedAt   time.Time               `json:"updated_at"`
 }
 
 type ProjectHandler struct {
@@ -57,15 +57,15 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 			ID:   v.ID,
 			Name: v.Name,
 			Duration: domain.ProjectDuration{
-				Since: TimeToSem(v.Since),
-				Until: TimeToSem(v.Until),
+				Since: timeToSem(v.Since),
+				Until: timeToSem(v.Until),
 			},
 		})
 	}
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetByID GET /projects:/projectID
+// GetByID GET /projects/:projectID
 func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -79,8 +79,8 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 		ID:   project.ID,
 		Name: project.Name,
 		Duration: domain.ProjectDuration{
-			Since: TimeToSem(project.Since),
-			Until: TimeToSem(project.Until),
+			Since: timeToSem(project.Since),
+			Until: timeToSem(project.Until),
 		},
 		Link: project.Link,
 		// Members:   project.Members, //TODO
@@ -102,7 +102,8 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := &PostProjectRequest{}
-	err := c.Bind(req)
+	// todo validation
+	err := c.BindAndValidate(req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
@@ -111,8 +112,8 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 		Name:        req.Name,
 		Description: req.Description,
 		Link:        req.Link,
-		Since:       SemToTime(req.Duration.Since),
-		Until:       SemToTime(req.Duration.Until),
+		Since:       semToTime(req.Duration.Since),
+		Until:       semToTime(req.Duration.Until),
 	}
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
@@ -122,8 +123,8 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 		ID:   project.ID,
 		Name: project.Name,
 		Duration: domain.ProjectDuration{
-			Since: TimeToSem(project.Since),
-			Until: TimeToSem(project.Until),
+			Since: timeToSem(project.Since),
+			Until: timeToSem(project.Until),
 		},
 	}
 	return c.JSON(http.StatusCreated, res)
@@ -152,8 +153,8 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		Name:        req.Name,
 		Description: req.Description,
 		Link:        req.Link,
-		Since:       OptionalSemToTime(req.Duration.Since),
-		Until:       OptionalSemToTime(req.Duration.Until),
+		Since:       optionalSemToTime(req.Duration.Since),
+		Until:       optionalSemToTime(req.Duration.Until),
 	}
 
 	err = h.service.UpdateProject(ctx, id, &patchReq)
@@ -163,13 +164,13 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func SemToTime(date domain.YearWithSemester) time.Time {
+func semToTime(date domain.YearWithSemester) time.Time {
 	year := int(date.Year)
 	month := semesterToMonth[date.Semester]
 	return time.Date(year, month, 1, 0, 0, 0, 0, &time.Location{})
 }
 
-func TimeToSem(t time.Time) domain.YearWithSemester {
+func timeToSem(t time.Time) domain.YearWithSemester {
 	year := uint(t.Year())
 	var semester uint
 	for i, v := range semesterToMonth {
@@ -183,7 +184,7 @@ func TimeToSem(t time.Time) domain.YearWithSemester {
 	}
 }
 
-func OptionalSemToTime(date OptionalYearWithSemester) optional.Time {
+func optionalSemToTime(date OptionalYearWithSemester) optional.Time {
 	t := optional.Time{}
 	if date.Year.Valid && date.Semester.Valid {
 		year := int(date.Year.Int64)
