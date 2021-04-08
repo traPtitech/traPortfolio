@@ -25,3 +25,16 @@ type Account struct {
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
 }
+
+const (
+	HOMEPAGE uint = iota
+	BLOG
+	TWITTER
+	FACEBOOK
+	PIXIV
+	GITHUB
+	QIITA
+	ATCODER
+	SOUNDCLOUD
+	AccountLimit
+)

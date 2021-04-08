@@ -25,9 +25,10 @@ type UserDetail struct {
 }
 
 type Account struct {
-	ID          uuid.UUID `json:"id"`
-	Type        uint      `json:"type"`
-	PrPermitted bool      `json:"prPermitted"`
+	ID          string `json:"id"`
+	Type        uint   `json:"type"`
+	URL         string `gorm:"type:text"`
+	PrPermitted bool   `json:"prPermitted"`
 }
 
 type UserService struct {
@@ -90,7 +91,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 	accounts := make([]Account, 0, len(userAccounts))
 	for _, v := range userAccounts {
 		accounts = append(accounts, Account{
-			ID:          v.ID,
+			ID:          v.Name,
 			Type:        v.Type,
 			PrPermitted: v.Check,
 		})
@@ -103,4 +104,47 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*UserDetail, e
 		Bio:      user.Description,
 		Accounts: accounts,
 	}, nil
+}
+
+func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
+
+	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
+
+	if id == uuid.Nil {
+		return nil, repository.ErrInvalidArg
+	}
+
+	if len(account.ID) == 0 {
+		return nil, repository.ErrInvalidArg
+	}
+
+	if account.Type >= domain.AccountLimit {
+		return nil, repository.ErrInvalidArg
+	}
+
+	//implに実装は書く
+	//accountの構造体たりないので補う
+	//ここらへんのコメントアウトはリファクタのときにでも消す
+
+	return s.repo.CreateAccount(id, account)
+
+}
+
+func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
+
+	//TODO
+	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
+
+	if accountid == uuid.Nil {
+		return repository.ErrInvalidArg
+	}
+
+	if userid == uuid.Nil {
+		return repository.ErrInvalidArg
+	}
+
+	err := s.repo.DeleteAccount(accountid, userid)
+
+	return err
+
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type UserRepository struct {
@@ -36,4 +37,36 @@ func (repo *UserRepository) GetAccounts(id uuid.UUID) (accounts []*domain.Accoun
 func (repo *UserRepository) Update(u *domain.User) error {
 	err := repo.Model(&domain.User{}).Updates(&u).Error()
 	return err
+}
+
+func (repo *UserRepository) CreateAccount(id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
+	tmpaccount := domain.Account{
+		ID:     uuid.Must(uuid.NewV4()),
+		Type:   account.Type,
+		Name:   account.ID,
+		URL:    account.URL,
+		UserID: id,
+		Check:  account.PrPermitted,
+	}
+	err := repo.Create(tmpaccount).Error()
+	if err != nil {
+		return nil, err
+	}
+
+	var result *domain.Account
+
+	err = repo.First(result, domain.Account{ID: tmpaccount.ID}).Error()
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (repo *UserRepository) DeleteAccount(accountid uuid.UUID, userid uuid.UUID) error {
+
+	err := repo.Delete(&domain.Account{}, &domain.Account{ID: accountid, UserID: userid}).Error()
+
+	return err
+
 }

@@ -21,6 +21,13 @@ type UserHandler struct {
 	UserService    service.UserService
 }
 
+type Account struct {
+	ID          string `json:"id"`
+	Type        uint   `json:"type"`
+	URL         string `gorm:"type:text"`
+	PrPermitted bool   `json:"prPermitted"`
+}
+
 func NewUserHandler(repo repository.UserRepository, s service.UserService) *UserHandler {
 	return &UserHandler{UserRepository: repo, UserService: s}
 }
@@ -76,6 +83,70 @@ func (handler *UserHandler) Update(c echo.Context) error {
 		Check:       !req.HideRealName,
 	}
 	err = handler.UserRepository.Update(&u)
+	if err == repository.ErrNotFound {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (handler *UserHandler) AddAccount(c echo.Context) error {
+	_id := c.Param("userID")
+	if _id == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	id := uuid.FromStringOrNil(_id)
+	if id == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
+	}
+
+	req := Account{}
+	err := c.Bind(&req)
+	if err != nil {
+		return err
+	}
+
+	args := repository.CreateAccountArgs{
+		ID:          req.ID,
+		Type:        req.Type,
+		PrPermitted: req.PrPermitted,
+	}
+
+	account, err := handler.UserService.CreateAccount(c.Request().Context(), id, &args)
+	if err == repository.ErrNotFound {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, account)
+}
+
+func (handler *UserHandler) DeleteAccount(c echo.Context) error {
+	_accountid := c.Param("accountID")
+	if _accountid == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	accountid := uuid.FromStringOrNil(_accountid)
+	if accountid == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
+	}
+
+	_userid := c.Param("userID")
+	if _userid == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	userid := uuid.FromStringOrNil(_userid)
+	if userid == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
+	}
+
+	err := handler.UserService.DeleteAccount(c.Request().Context(), accountid, userid)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
