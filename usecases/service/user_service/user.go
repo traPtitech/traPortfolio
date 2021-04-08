@@ -131,16 +131,20 @@ func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 
 }
 
-func (s *UserService) DeleteAccount(ctx context.Context, id uuid.UUID) error {
+func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
 
-	if id == uuid.Nil {
+	if accountid == uuid.Nil {
 		return repository.ErrInvalidArg
 	}
 
-	err := s.repo.DeleteAccount(id)
+	if userid == uuid.Nil {
+		return repository.ErrInvalidArg
+	}
+
+	err := s.repo.DeleteAccount(accountid, userid)
 
 	return err
 

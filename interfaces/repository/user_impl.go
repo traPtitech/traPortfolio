@@ -62,3 +62,11 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, account *repository.Crea
 	}
 	return result, nil
 }
+
+func (repo *UserRepository) DeleteAccount(accountid uuid.UUID, userid uuid.UUID) error {
+
+	err := repo.Delete(&domain.Account{}, &domain.Account{ID: accountid, UserID: userid}).Error()
+
+	return err
+
+}

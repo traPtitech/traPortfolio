@@ -126,17 +126,27 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 }
 
 func (handler *UserHandler) DeleteAccount(c echo.Context) error {
-	_id := c.Param("userID")
-	if _id == "" {
+	_accountid := c.Param("accountID")
+	if _accountid == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
 	}
 
-	id := uuid.FromStringOrNil(_id)
-	if id == uuid.Nil {
+	accountid := uuid.FromStringOrNil(_accountid)
+	if accountid == uuid.Nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 
-	err := handler.UserService.DeleteAccount(c.Request().Context(), id)
+	_userid := c.Param("userID")
+	if _userid == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+	}
+
+	userid := uuid.FromStringOrNil(_userid)
+	if userid == uuid.Nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
+	}
+
+	err := handler.UserService.DeleteAccount(c.Request().Context(), accountid, userid)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
