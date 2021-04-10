@@ -7,9 +7,25 @@ import (
 )
 
 type Project struct {
-	ID       uuid.UUID
-	Name     string
-	Duration ProjectDuration
+	ID          uuid.UUID
+	Name        string
+	Since       time.Time
+	Until       time.Time
+	Description string
+	Link        string
+	Members     []*ProjectMember
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type ProjectMember struct {
+	ID        uuid.UUID
+	ProjectID uuid.UUID
+	UserID    uuid.UUID
+	Name      string
+	RealName  string
+	Since     time.Time
+	Until     time.Time
 }
 
 type ProjectDuration struct {
@@ -20,22 +36,4 @@ type ProjectDuration struct {
 type YearWithSemester struct {
 	Year     uint
 	Semester uint
-}
-
-type ProjectDetail struct {
-	ID          uuid.UUID
-	Name        string
-	Duration    ProjectDuration
-	Link        string
-	Description string
-	Members     []*ProjectMember
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-type ProjectMember struct {
-	ID       uuid.UUID
-	Name     string
-	RealName string
-	Duration ProjectDuration
 }

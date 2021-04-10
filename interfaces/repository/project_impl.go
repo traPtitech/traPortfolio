@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"fmt"
-
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -17,41 +16,75 @@ func NewProjectRepository(sql database.SQLHandler) *ProjectRepository {
 	return &ProjectRepository{h: sql}
 }
 
-func (repo *ProjectRepository) GetProjects() ([]*model.Project, error) {
+func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	projects := []*model.Project{}
 	err := repo.h.Find(&projects).Error()
 	if err != nil {
 		return nil, err
 	}
-	return projects, nil
+	res := make([]*domain.Project, 0, len(projects))
+	for _, v := range projects {
+		p := &domain.Project{
+			ID:          v.ID,
+			Name:        v.Name,
+			Since:       v.Since,
+			Until:       v.Until,
+			Description: v.Description,
+			Link:        v.Link,
+			CreatedAt:   v.CreatedAt,
+			UpdatedAt:   v.CreatedAt,
+		}
+		res = append(res, p)
+	}
+	return res, nil
 }
 
-func (repo *ProjectRepository) GetProject(id uuid.UUID) (*model.Project, error) {
+func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
 	project := &model.Project{ID: id}
 	if err := repo.h.First(&project).Error(); err != nil {
 		return nil, err
 	}
-	return project, nil
+	res := &domain.Project{
+		ID:          project.ID,
+		Name:        project.Name,
+		Since:       project.Since,
+		Until:       project.Until,
+		Description: project.Description,
+		Link:        project.Link,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.CreatedAt,
+	}
+	return res, nil
 }
 
-func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*model.ProjectMemberDetail, error) {
-	members := make([]*model.ProjectMemberDetail, 0)
-	selectQuery := "project_members.project_id, users.id as user_id, users.name, project_members.since, project_members.until"
+func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.ProjectMember, error) {
+	members := make([]*domain.ProjectMember, 0)
+	selectQuery := "users.id as user_id, users.name, project_members.since, project_members.until"
+	whereQuery := "project_members.project_id = ?"
 	joinQuery := "left join users on users.id = project_members.user_id"
-	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where("project_id = ?", id).Joins(joinQuery).Scan(&members).Error()
-	fmt.Printf("%#v\n\n", *members[0])
+	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, id).Joins(joinQuery).Scan(&members).Error() //TODO 2回目からエラーが出る
 	if err != nil {
 		return nil, err
 	}
 	return members, nil
 }
 
-func (repo *ProjectRepository) CreateProject(project *model.Project) (*model.Project, error) {
+func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
 	err := repo.h.Create(project).Error()
 	if err != nil {
 		return nil, err
 	}
-	return project, nil
+	res := &domain.Project{
+		ID:          project.ID,
+		Name:        project.Name,
+		Since:       project.Since,
+		Until:       project.Until,
+		Description: project.Description,
+		Link:        project.Link,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.CreatedAt,
+	}
+	return res, nil
 }
 
 func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {

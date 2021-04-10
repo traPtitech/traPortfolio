@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
@@ -22,7 +23,7 @@ func NewProjectService(projectRepository repository.ProjectRepository, portalRep
 	}
 }
 
-func (s *ProjectService) GetProjects(ctx context.Context) ([]*model.Project, error) {
+func (s *ProjectService) GetProjects(ctx context.Context) ([]*domain.Project, error) {
 	res, err := s.repo.GetProjects()
 	if err != nil {
 		return nil, err
@@ -30,7 +31,7 @@ func (s *ProjectService) GetProjects(ctx context.Context) ([]*model.Project, err
 	return res, nil
 }
 
-func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.ProjectDetail, error) {
+func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.Project, error) {
 	project, err := s.repo.GetProject(id)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.P
 		members[i].RealName = NameMap[v.Name]
 	}
 
-	res := &model.ProjectDetail{
+	res := &domain.Project{
 		ID:          project.ID,
 		Name:        project.Name,
 		Link:        project.Link,
@@ -65,7 +66,7 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*model.P
 	return res, nil
 }
 
-func (s *ProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*model.Project, error) {
+func (s *ProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
 	uid := uuid.Must(uuid.NewV4())
 	project := &model.Project{
 		ID:          uid,
@@ -75,11 +76,11 @@ func (s *ProjectService) CreateProject(ctx context.Context, args *repository.Cre
 		Since:       args.Since,
 		Until:       args.Until,
 	}
-	project, err := s.repo.CreateProject(project)
+	res, err := s.repo.CreateProject(project)
 	if err != nil {
 		return nil, err
 	}
-	return project, nil
+	return res, nil
 }
 
 func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {

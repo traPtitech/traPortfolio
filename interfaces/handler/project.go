@@ -7,7 +7,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -26,14 +25,21 @@ type ProjectResponse struct {
 }
 
 type ProjectDetailResponse struct {
-	ID          uuid.UUID               `json:"id"`
-	Name        string                  `json:"name"`
-	Duration    domain.ProjectDuration  `json:"duration"`
-	Link        string                  `json:"link"`
-	Description string                  `json:"description"`
-	Members     []*domain.ProjectMember `json:"members"`
-	CreatedAt   time.Time               `json:"created_at"`
-	UpdatedAt   time.Time               `json:"updated_at"`
+	ID          uuid.UUID                `json:"id"`
+	Name        string                   `json:"name"`
+	Duration    domain.ProjectDuration   `json:"duration"`
+	Link        string                   `json:"link"`
+	Description string                   `json:"description"`
+	Members     []*ProjectMemberResponse `json:"members"`
+	CreatedAt   time.Time                `json:"created_at"`
+	UpdatedAt   time.Time                `json:"updated_at"`
+}
+
+type ProjectMemberResponse struct {
+	ID       uuid.UUID              `json:"id"`
+	Name     string                 `json:"name"`
+	RealName string                 `json:"real_name"`
+	Duration domain.ProjectDuration `json:"duration"`
 }
 
 type ProjectHandler struct {
@@ -202,10 +208,10 @@ func optionalSemToTime(date OptionalYearWithSemester) optional.Time {
 	return t
 }
 
-func convertToProjectMembers(members []*model.ProjectMemberDetail) []*domain.ProjectMember {
-	res := make([]*domain.ProjectMember, 0, len(members))
+func convertToProjectMembers(members []*domain.ProjectMember) []*ProjectMemberResponse {
+	res := make([]*ProjectMemberResponse, 0, len(members))
 	for _, v := range members {
-		m := &domain.ProjectMember{
+		m := &ProjectMemberResponse{
 			ID:       v.UserID,
 			Name:     v.Name,
 			RealName: v.RealName,

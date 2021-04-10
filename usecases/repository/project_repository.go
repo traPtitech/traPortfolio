@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
@@ -25,9 +26,9 @@ type UpdateProjectArgs struct {
 }
 
 type ProjectRepository interface {
-	GetProjects() ([]*model.Project, error)
-	GetProject(id uuid.UUID) (*model.Project, error)
-	GetProjectMembers(id uuid.UUID) ([]*model.ProjectMemberDetail, error)
-	CreateProject(project *model.Project) (*model.Project, error)
+	GetProjects() ([]*domain.Project, error)
+	GetProject(id uuid.UUID) (*domain.Project, error)
+	GetProjectMembers(id uuid.UUID) ([]*domain.ProjectMember, error)
+	CreateProject(project *model.Project) (*domain.Project, error)
 	UpdateProject(id uuid.UUID, changes map[string]interface{}) error
 }

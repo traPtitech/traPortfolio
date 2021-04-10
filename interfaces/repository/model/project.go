@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 )
 
 type Project struct {
@@ -30,7 +31,7 @@ type ProjectDetail struct {
 	Name        string
 	Link        string
 	Description string
-	Members     []*ProjectMemberDetail
+	Members     []*domain.ProjectMember
 	Since       time.Time
 	Until       time.Time
 	CreatedAt   time.Time
