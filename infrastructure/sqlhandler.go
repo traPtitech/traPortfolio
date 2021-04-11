@@ -16,6 +16,7 @@ import (
 
 type SQLHandler struct {
 	Conn *gorm.DB
+	Orig *gorm.DB
 }
 
 func NewSQLHandler() (*SQLHandler, error) {
@@ -64,6 +65,8 @@ func NewSQLHandler() (*SQLHandler, error) {
 
 	sqlHandler := new(SQLHandler)
 	sqlHandler.Conn = db
+	db2 := *db
+	sqlHandler.Orig = &db2
 	return sqlHandler, nil
 }
 
@@ -193,6 +196,7 @@ func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error
 }
 
 func (handler *SQLHandler) Error() error {
+	*handler.Conn = *handler.Orig
 	return handler.Conn.Error
 }
 
