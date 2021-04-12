@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
@@ -14,14 +15,14 @@ func NewKnoqRepository(api external.KnoqAPI) *KnoqRepository {
 	return &KnoqRepository{api}
 }
 
-func (repo *KnoqRepository) GetAll() ([]*repository.KnoQEvent, error) {
+func (repo *KnoqRepository) GetAll() ([]*domain.KnoQEvent, error) {
 	eres, err := repo.api.GetAll()
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*repository.KnoQEvent, 0, len(eres))
+	result := make([]*domain.KnoQEvent, 0, len(eres))
 	for _, v := range eres {
-		result = append(result, &repository.KnoQEvent{
+		result = append(result, &domain.KnoQEvent{
 			ID:          v.ID,
 			Description: v.Description,
 			GroupID:     v.GroupID,
@@ -35,13 +36,13 @@ func (repo *KnoqRepository) GetAll() ([]*repository.KnoQEvent, error) {
 	return result, nil
 }
 
-func (repo *KnoqRepository) GetByID(id uuid.UUID) (*repository.KnoQEvent, error) {
+func (repo *KnoqRepository) GetByID(id uuid.UUID) (*domain.KnoQEvent, error) {
 	eres, err := repo.api.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &repository.KnoQEvent{
+	return &domain.KnoQEvent{
 		ID:          eres.ID,
 		Description: eres.Description,
 		GroupID:     eres.GroupID,

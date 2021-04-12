@@ -3,10 +3,11 @@ package repository
 import (
 	"context"
 
+	"github.com/traPtitech/traPortfolio/domain"
+
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 )
 
 type TraQRepository interface {
-	GetUser(context.Context, uuid.UUID) (*model.TraQUser, error)
+	GetUser(context.Context, uuid.UUID) (*domain.TraQUser, error)
 }

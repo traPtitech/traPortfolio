@@ -3,6 +3,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/util/optional"
+
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
 	"github.com/gofrs/uuid"
@@ -12,8 +14,8 @@ import (
 )
 
 type EditUserRequest struct {
-	Bio          string `json:"bio"`
-	HideRealName bool   `json:"hideRealName"`
+	Bio   optional.String `json:"bio"`
+	Check optional.Bool   `json:"check"`
 }
 
 type UserHandler struct {
@@ -106,12 +108,11 @@ func (handler *UserHandler) Update(c echo.Context) error {
 		return err
 	}
 	ctx := c.Request().Context()
-	u := domain.EditUser{
-		ID:          id,
+	u := repository.UpdateUserArgs{
 		Description: req.Bio,
-		Check:       !req.HideRealName,
+		Check:       req.Check,
 	}
-	err = handler.srv.Update(ctx, &u)
+	err = handler.srv.Update(ctx, id, &u)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}

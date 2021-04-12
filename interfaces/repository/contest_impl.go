@@ -16,12 +16,30 @@ func NewContestRepository(sql database.SQLHandler) *ContestRepository {
 	return &ContestRepository{h: sql}
 }
 
-func (repo *ContestRepository) CreateContest(contest *model.Contest) (*model.Contest, error) {
+func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
+	contest := model.Contest{
+		ID:          uuid.Must(uuid.NewV4()),
+		Name:        args.Name,
+		Description: args.Description,
+		Link:        args.Link,
+		Since:       args.Since,
+		Until:       args.Until,
+	}
 	err := repo.h.Create(contest).Error()
 	if err != nil {
 		return nil, err
 	}
-	return contest, nil
+
+	result := &domain.Contest{
+		ID:        contest.ID,
+		Name:      contest.Name,
+		TimeStart: contest.Since,
+		TimeEnd:   contest.Until,
+		CreatedAt: contest.CreatedAt,
+		UpdatedAt: contest.UpdatedAt,
+	}
+
+	return result, nil
 }
 
 func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]interface{}) error {
@@ -34,17 +52,21 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 		new model.Contest
 	)
 
-	tx := repo.h.Begin()
-	if err := tx.First(&old, &model.Contest{ID: id}).Error(); err != nil {
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.First(&old, &model.Contest{ID: id}).Error(); err != nil {
+			return err
+		}
+		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+			return err
+		}
+		if err := tx.Where(&model.Contest{ID: id}).First(&new).Error(); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		return err
 	}
-	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-		return err
-	}
-	if err := tx.Where(&model.Contest{ID: id}).First(&new).Error(); err != nil {
-		return err
-	}
-	tx.Commit()
 	return nil
 }
 

@@ -61,8 +61,8 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		ID:   contest.ID,
 		Name: contest.Name,
 		Duration: Duration{
-			Since: contest.Since,
-			Until: contest.Until,
+			Since: contest.TimeStart,
+			Until: contest.TimeEnd,
 		},
 	}
 	return c.JSON(http.StatusCreated, res)

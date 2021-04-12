@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/domain"
 )
 
 type PortalRepository interface {
-	GetUser(context.Context, string) (*model.PortalUser, error)
-	GetUsers(context.Context) ([]*model.PortalUser, error)
+	GetUser(context.Context, string) (*domain.PortalUser, error)
+	GetUsers(context.Context) ([]*domain.PortalUser, error)
 }

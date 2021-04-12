@@ -3,12 +3,17 @@ package repository
 import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
+type UpdateUserArgs struct {
+	Description optional.String
+	Check       optional.Bool
+}
+
 type UserRepository interface {
-	GetUsers() ([]*model.User, error)
-	GetUser(uuid.UUID) (*model.User, error)
-	GetAccounts(uuid.UUID) ([]*model.Account, error)
-	Update(*domain.EditUser) error
+	GetUsers() ([]*domain.User, error)
+	GetUser(uuid.UUID) (*domain.UserDetail, error)
+	GetAccounts(uuid.UUID) ([]*domain.Account, error)
+	Update(id uuid.UUID, changes map[string]interface{}) error
 }
