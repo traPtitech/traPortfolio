@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/domain"
 )
 
 type Project struct {
@@ -24,25 +23,4 @@ type ProjectMember struct {
 	UserID    uuid.UUID `gorm:"type:char(36);not null"`
 	Since     time.Time `gorm:"precision:6"`
 	Until     time.Time `gorm:"precision:6"`
-}
-
-type ProjectDetail struct {
-	ID          uuid.UUID
-	Name        string
-	Link        string
-	Description string
-	Members     []*domain.ProjectMember
-	Since       time.Time
-	Until       time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-type ProjectMemberDetail struct {
-	ProjectID uuid.UUID
-	UserID    uuid.UUID
-	Name      string
-	RealName  string
-	Since     time.Time
-	Until     time.Time
 }

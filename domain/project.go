@@ -19,13 +19,11 @@ type Project struct {
 }
 
 type ProjectMember struct {
-	ID        uuid.UUID
-	ProjectID uuid.UUID
-	UserID    uuid.UUID
-	Name      string
-	RealName  string
-	Since     time.Time
-	Until     time.Time
+	UserID   uuid.UUID
+	Name     string
+	RealName string
+	Since    time.Time
+	Until    time.Time
 }
 
 type ProjectDuration struct {

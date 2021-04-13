@@ -60,14 +60,12 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 	}
 	res := make([]*ProjectResponse, 0, len(projects))
 	for _, v := range projects {
-		res = append(res, &ProjectResponse{
-			ID:   v.ID,
-			Name: v.Name,
-			Duration: domain.ProjectDuration{
-				Since: timeToSem(v.Since),
-				Until: timeToSem(v.Until),
-			},
-		})
+		p := &ProjectResponse{
+			ID:       v.ID,
+			Name:     v.Name,
+			Duration: convertToProjectDuration(v.Since, v.Until),
+		}
+		res = append(res, p)
 	}
 	return c.JSON(http.StatusOK, res)
 }
@@ -83,12 +81,9 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 		return err
 	}
 	res := &ProjectDetailResponse{
-		ID:   project.ID,
-		Name: project.Name,
-		Duration: domain.ProjectDuration{
-			Since: timeToSem(project.Since),
-			Until: timeToSem(project.Until),
-		},
+		ID:        project.ID,
+		Name:      project.Name,
+		Duration:  convertToProjectDuration(project.Since, project.Until),
 		Link:      project.Link,
 		Members:   convertToProjectMembers(project.Members),
 		CreatedAt: project.CreatedAt,
@@ -132,12 +127,9 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 		return err
 	}
 	res := ProjectResponse{
-		ID:   project.ID,
-		Name: project.Name,
-		Duration: domain.ProjectDuration{
-			Since: timeToSem(project.Since),
-			Until: timeToSem(project.Until),
-		},
+		ID:       project.ID,
+		Name:     project.Name,
+		Duration: convertToProjectDuration(project.Since, project.Until),
 	}
 	return c.JSON(http.StatusCreated, res)
 }
@@ -161,12 +153,17 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
+	since := optionalSemToTime(req.Duration.Since)
+	until := optionalSemToTime(req.Duration.Until)
+	if since.Valid && until.Valid && since.Time.After(until.Time) {
+		return c.JSON(http.StatusBadRequest, "invalid duration")
+	}
 	patchReq := repository.UpdateProjectArgs{
 		Name:        req.Name,
 		Description: req.Description,
 		Link:        req.Link,
-		Since:       optionalSemToTime(req.Duration.Since),
-		Until:       optionalSemToTime(req.Duration.Until),
+		Since:       since,
+		Until:       until,
 	}
 
 	err = h.service.UpdateProject(ctx, id, &patchReq)
@@ -174,6 +171,13 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func convertToProjectDuration(since, until time.Time) domain.ProjectDuration {
+	return domain.ProjectDuration{
+		Since: timeToSem(since),
+		Until: timeToSem(until),
+	}
 }
 
 func semToTime(date domain.YearWithSemester) time.Time {
