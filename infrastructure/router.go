@@ -39,6 +39,8 @@ func Init() {
 			apiUsers.GET("", api.User.GetAll)
 			apiUsers.GET("/:userID", api.User.GetByID)
 			apiUsers.PATCH("/:userID", api.User.Update)
+			apiUsers.PUT("/:userID/accounts", api.User.AddAccount)
+			apiUsers.DELETE("/:userID/accounts/:accountID", api.User.DeleteAccount)
 		}
 		apiProjects := v1.Group("/projects")
 		{

@@ -12,7 +12,7 @@ import (
 
 type UserRepository struct {
 	database.SQLHandler
-	portal external.PortalQAPI
+	portal external.PortalAPI
 	traQ   external.TraQAPI
 }
 
@@ -118,6 +118,38 @@ func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{})
 		return nil
 	})
 	return err
+}
+
+func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
+	account := model.Account{
+		ID:     uuid.Must(uuid.NewV4()),
+		Type:   args.Type,
+		Name:   args.ID,
+		URL:    args.URL,
+		UserID: id,
+		Check:  args.PrPermitted,
+	}
+	err := repo.Create(account).Error()
+	if err != nil {
+		return nil, err
+	}
+
+	var result *domain.Account
+
+	err = repo.First(result, domain.Account{ID: account.ID}).Error()
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
+
+	err := repo.Delete(&domain.Account{}, &model.Account{ID: accountID, UserID: userID}).Error()
+
+	return err
+
 }
 
 // Interface guards

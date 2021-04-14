@@ -53,7 +53,7 @@ func NewKnoqAPI() (*KnoqAPI, error) {
 }
 
 func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, "/events")
+	res, err := apiGet(knoq.Client, knoQAPIEndpoint, "/events")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 		return nil, nil
 	}
 
-	res, err := apiGet(knoq.Client, fmt.Sprintf("/events/%v", id))
+	res, err := apiGet(knoq.Client, knoQAPIEndpoint, fmt.Sprintf("/events/%v", id))
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +90,6 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 		return nil, err
 	}
 	return &er, nil
-}
-
-func apiGet(client *http.Client, path string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s", knoQAPIEndpoint, path), nil)
-	if err != nil {
-		return nil, err
-	}
-	return client.Do(req)
 }
 
 // Interface guards

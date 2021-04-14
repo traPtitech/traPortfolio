@@ -8,7 +8,7 @@ type PortalUserResponse struct {
 	AlphabeticName string `json:"alphabeticName"`
 }
 
-type PortalQAPI interface {
+type PortalAPI interface {
 	GetAll() ([]*PortalUserResponse, error)
-	GetByID(id uuid.UUID) (PortalUserResponse, error)
+	GetByID(id uuid.UUID) (*PortalUserResponse, error)
 }

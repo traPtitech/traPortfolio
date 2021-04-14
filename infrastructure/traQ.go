@@ -56,7 +56,7 @@ func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 		return nil, fmt.Errorf("invalid uuid")
 	}
 
-	res, err := traQAPIGet(traQ.Client, fmt.Sprintf("/users/%v", id))
+	res, err := apiGet(traQ.Client, traQAPIEndpoint, fmt.Sprintf("/users/%v", id))
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +71,6 @@ func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
 	return &userResponse, nil
-}
-
-func traQAPIGet(client *http.Client, path string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s", traQAPIEndpoint, path), nil)
-	if err != nil {
-		return nil, err
-	}
-	return client.Do(req)
 }
 
 // Interface guards

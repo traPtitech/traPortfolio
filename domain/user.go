@@ -24,3 +24,16 @@ type UserDetail struct {
 	Bio      string
 	Accounts []*Account
 }
+
+const (
+	HOMEPAGE uint = iota
+	BLOG
+	TWITTER
+	FACEBOOK
+	PIXIV
+	GITHUB
+	QIITA
+	ATCODER
+	SOUNDCLOUD
+	AccountLimit
+)

@@ -33,7 +33,11 @@ func InjectAPIServer() (handler.API, error) {
 		return handler.API{}, err
 	}
 	traQRepository := repository.NewTraQRepository(traQAPI)
-	portalRepository := repository.NewPortalRepository()
+	portalAPI, err := NewPortalAPI()
+	if err != nil {
+		return handler.API{}, err
+	}
+	portalRepository := repository.NewPortalRepository(portalAPI)
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userService)
 	projectRepository := repository.NewProjectRepository(sqlHandler)
@@ -55,7 +59,9 @@ func InjectAPIServer() (handler.API, error) {
 
 // wire.go:
 
-var portalSet = wire.NewSet(repository.NewPortalRepository, wire.Bind(new(repository2.PortalRepository), new(*repository.PortalRepository)))
+var portalSet = wire.NewSet(
+	NewPortalAPI, repository.NewPortalRepository, wire.Bind(new(external.PortalAPI), new(*PortalAPI)), wire.Bind(new(repository2.PortalRepository), new(*repository.PortalRepository)),
+)
 
 var traQSet = wire.NewSet(
 	NewTraQAPI, repository.NewTraQRepository, wire.Bind(new(external.TraQAPI), new(*TraQAPI)), wire.Bind(new(repository2.TraQRepository), new(*repository.TraQRepository)),
