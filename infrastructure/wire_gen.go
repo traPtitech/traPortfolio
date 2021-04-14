@@ -36,6 +36,9 @@ func InjectAPIServer() (handler.API, error) {
 	portalRepository := repository.NewPortalRepository()
 	userService := service.NewUserService(userRepository, traQRepository, portalRepository)
 	userHandler := handler.NewUserHandler(userService)
+	projectRepository := repository.NewProjectRepository(sqlHandler)
+	projectService := service.NewProjectService(projectRepository, portalRepository)
+	projectHandler := handler.NewProjectHandler(projectService)
 	knoqAPI, err := NewKnoqAPI()
 	if err != nil {
 		return handler.API{}, err
@@ -46,7 +49,7 @@ func InjectAPIServer() (handler.API, error) {
 	contestRepository := repository.NewContestRepository(sqlHandler)
 	contestService := service.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestService)
-	api := handler.NewAPI(pingHandler, userHandler, eventHandler, contestHandler)
+	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)
 	return api, nil
 }
 
@@ -61,6 +64,8 @@ var traQSet = wire.NewSet(
 var pingSet = wire.NewSet(handler.NewPingHandler)
 
 var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
+
+var projectSet = wire.NewSet(repository.NewProjectRepository, service.NewProjectService, handler.NewProjectHandler, wire.Bind(new(repository2.ProjectRepository), new(*repository.ProjectRepository)))
 
 var knoQSet = wire.NewSet(
 	NewKnoqAPI, repository.NewKnoqRepository, wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)), wire.Bind(new(repository2.KnoqRepository), new(*repository.KnoqRepository)),

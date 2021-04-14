@@ -35,6 +35,13 @@ var userSet = wire.NewSet(
 	wire.Bind(new(repository.UserRepository), new(*impl.UserRepository)),
 )
 
+var projectSet = wire.NewSet(
+	impl.NewProjectRepository,
+	service.NewProjectService,
+	handler.NewProjectHandler,
+	wire.Bind(new(repository.ProjectRepository), new(*impl.ProjectRepository)),
+)
+
 var knoQSet = wire.NewSet(
 	NewKnoqAPI,
 	impl.NewKnoqRepository,
@@ -68,6 +75,7 @@ func InjectAPIServer() (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,
+		projectSet,
 		eventSet,
 		sqlSet,
 		apiSet,

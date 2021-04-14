@@ -16,6 +16,8 @@ type SQLHandler interface {
 	Rollback() SQLHandler
 	Transaction(fc func(handler SQLHandler) error) error
 	Joins(string, ...interface{}) SQLHandler
+	Scan(interface{}) SQLHandler
+	Select(interface{}, ...interface{}) SQLHandler
 
 	Error() error
 }

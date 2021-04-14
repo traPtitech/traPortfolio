@@ -168,6 +168,18 @@ func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQL
 	return handler
 }
 
+func (handler *SQLHandler) Scan(dest interface{}) database.SQLHandler {
+	res := handler.Conn.Scan(dest)
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
+	res := handler.Conn.Select(query, args...)
+	handler.Conn = res
+	return handler
+}
+
 func (handler *SQLHandler) Rollback() database.SQLHandler {
 	res := handler.Conn.Rollback()
 	handler.Conn = res
