@@ -24,8 +24,8 @@ func (repo *PortalRepository) GetUsers(ctx context.Context) ([]*domain.PortalUse
 	result := make([]*domain.PortalUser, 0, len(users))
 	for _, v := range users {
 		result = append(result, &domain.PortalUser{
-			ID:             v.ID,
-			Name:           v.Name,
+			ID:             v.TraQID,
+			Name:           v.RealName,
 			AlphabeticName: v.AlphabeticName,
 		})
 	}
@@ -39,13 +39,18 @@ func (repo *PortalRepository) GetUser(ctx context.Context, name string) (*domain
 	}
 
 	for _, v := range users {
-		if v.ID == name {
+		if v.TraQID == name {
 			return &domain.PortalUser{
-				ID:             v.ID,
-				Name:           v.Name,
+				ID:             v.TraQID,
+				Name:           v.RealName,
 				AlphabeticName: v.AlphabeticName,
 			}, nil
 		}
 	}
 	return nil, repository.ErrNotFound
 }
+
+// Interface guards
+var (
+	_ repository.PortalRepository = (*PortalRepository)(nil)
+)

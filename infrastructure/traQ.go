@@ -72,3 +72,8 @@ func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	}
 	return &userResponse, nil
 }
+
+// Interface guards
+var (
+	_ external.TraQAPI = (*TraQAPI)(nil)
+)

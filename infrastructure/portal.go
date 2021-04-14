@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/patrickmn/go-cache"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 )
@@ -79,4 +81,9 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	}
 	portal.Cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
+}
+
+func (portal *PortalAPI) GetByID(id uuid.UUID) (*external.PortalUserResponse, error) {
+	// todo
+	return nil, errors.New("todo")
 }

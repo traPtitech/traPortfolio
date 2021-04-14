@@ -1,46 +1,74 @@
 package handler
 
 import (
-	"context"
 	"net/http"
+
+	"github.com/traPtitech/traPortfolio/util/optional"
+
+	"github.com/traPtitech/traPortfolio/usecases/service"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	service "github.com/traPtitech/traPortfolio/usecases/service/user_service"
 )
 
 type EditUserRequest struct {
-	Bio          string `json:"bio"`
-	HideRealName bool   `json:"hideRealName"`
+	Bio   optional.String `json:"bio"`
+	Check optional.Bool   `json:"check"`
 }
 
 type UserHandler struct {
-	UserRepository repository.UserRepository
-	UserService    service.UserService
+	srv service.UserService
+}
+
+// userResponse Portfolioのレスポンスで使うイベント情報
+type userResponse struct {
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	RealName string    `json:"realName"`
+}
+
+type userDetailResponse struct {
+	ID       uuid.UUID         `json:"id"`
+	Name     string            `json:"name"`
+	RealName string            `json:"realName"`
+	State    domain.TraQState  `json:"state"`
+	Bio      string            `json:"bio"`
+	Accounts []*domain.Account `json:"accounts"`
 }
 
 type Account struct {
 	ID          string `json:"id"`
 	Type        uint   `json:"type"`
-	URL         string `gorm:"type:text"`
+	URL         string `json:"url"`
 	PrPermitted bool   `json:"prPermitted"`
 }
 
-func NewUserHandler(repo repository.UserRepository, s service.UserService) *UserHandler {
-	return &UserHandler{UserRepository: repo, UserService: s}
+func NewUserHandler(s service.UserService) *UserHandler {
+	return &UserHandler{srv: s}
 }
 
+// GetAll GET /users
 func (handler *UserHandler) GetAll(c echo.Context) error {
-	ctx := context.Background()
-	result, err := handler.UserService.GetUsers(ctx)
+	ctx := c.Request().Context()
+	users, err := handler.srv.GetUsers(ctx)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, result)
+
+	res := make([]*userResponse, 0, len(users))
+	for _, user := range users {
+		res = append(res, &userResponse{
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: user.RealName,
+		})
+	}
+	return c.JSON(http.StatusOK, res)
 }
 
+// GetByID GET /users/:userID
 func (handler *UserHandler) GetByID(c echo.Context) error {
 	_id := c.Param("userID")
 	if _id == "" {
@@ -51,17 +79,26 @@ func (handler *UserHandler) GetByID(c echo.Context) error {
 	if id == uuid.Nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
-	ctx := context.Background()
-	result, err := handler.UserService.GetUser(ctx, id)
+	ctx := c.Request().Context()
+	user, err := handler.srv.GetUser(ctx, id)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, result)
+
+	return c.JSON(http.StatusOK, &userDetailResponse{
+		ID:       user.ID,
+		Name:     user.Name,
+		RealName: user.RealName,
+		State:    user.State,
+		Bio:      user.Bio,
+		Accounts: user.Accounts,
+	})
 }
 
+// Update PATCH /users/:userID
 func (handler *UserHandler) Update(c echo.Context) error {
 	_id := c.Param("userID")
 	if _id == "" {
@@ -77,12 +114,12 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	u := domain.User{
-		ID:          id,
+	ctx := c.Request().Context()
+	u := repository.UpdateUserArgs{
 		Description: req.Bio,
-		Check:       !req.HideRealName,
+		Check:       req.Check,
 	}
-	err = handler.UserRepository.Update(&u)
+	err = handler.srv.Update(ctx, id, &u)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
@@ -115,7 +152,7 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 		PrPermitted: req.PrPermitted,
 	}
 
-	account, err := handler.UserService.CreateAccount(c.Request().Context(), id, &args)
+	account, err := handler.srv.CreateAccount(c.Request().Context(), id, &args)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
@@ -146,7 +183,7 @@ func (handler *UserHandler) DeleteAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
 	}
 
-	err := handler.UserService.DeleteAccount(c.Request().Context(), accountid, userid)
+	err := handler.srv.DeleteAccount(c.Request().Context(), accountid, userid)
 	if err == repository.ErrNotFound {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}

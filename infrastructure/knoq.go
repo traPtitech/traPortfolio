@@ -91,3 +91,8 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 	}
 	return &er, nil
 }
+
+// Interface guards
+var (
+	_ external.KnoqAPI = (*KnoqAPI)(nil)
+)

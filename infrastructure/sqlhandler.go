@@ -16,6 +16,7 @@ import (
 
 type SQLHandler struct {
 	Conn *gorm.DB
+	orig *gorm.DB
 }
 
 func NewSQLHandler() (*SQLHandler, error) {
@@ -64,6 +65,7 @@ func NewSQLHandler() (*SQLHandler, error) {
 
 	sqlHandler := new(SQLHandler)
 	sqlHandler.Conn = db
+	sqlHandler.orig = db
 	return sqlHandler, nil
 }
 
@@ -123,8 +125,8 @@ func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
 	return handler
 }
 
-func (handler *SQLHandler) Delete(value1 interface{}, value2 ...interface{}) database.SQLHandler {
-	res := handler.Conn.Delete(value1, value2...)
+func (handler *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
+	res := handler.Conn.Delete(value, where)
 	handler.Conn = res
 	return handler
 }
@@ -147,6 +149,57 @@ func (handler *SQLHandler) Updates(values interface{}) database.SQLHandler {
 	return handler
 }
 
+func (handler *SQLHandler) Begin() database.SQLHandler {
+	tx := handler.Conn.Begin()
+	return &SQLHandler{
+		Conn: tx,
+	}
+}
+
+func (handler *SQLHandler) Commit() database.SQLHandler {
+	res := handler.Conn.Commit()
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQLHandler {
+	res := handler.Conn.Joins(query, args)
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Scan(dest interface{}) database.SQLHandler {
+	res := handler.Conn.Scan(dest)
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
+	res := handler.Conn.Select(query, args...)
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Rollback() database.SQLHandler {
+	res := handler.Conn.Rollback()
+	handler.Conn = res
+	return handler
+}
+
+func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error {
+	ffc := func(tx *gorm.DB) error {
+		driver := &SQLHandler{Conn: tx}
+		return fc(driver)
+	}
+	return handler.Conn.Transaction(ffc)
+}
+
 func (handler *SQLHandler) Error() error {
+	handler.Conn = handler.orig
 	return handler.Conn.Error
 }
+
+// Interface guards
+var (
+	_ database.SQLHandler = (*SQLHandler)(nil)
+)

@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
+
+	"github.com/gofrs/uuid"
 )
 
 type TraQRepository interface {

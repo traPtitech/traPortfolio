@@ -11,5 +11,13 @@ type SQLHandler interface {
 	Where(interface{}, ...interface{}) SQLHandler
 	Model(interface{}) SQLHandler
 	Updates(interface{}) SQLHandler
+	Begin() SQLHandler
+	Commit() SQLHandler
+	Rollback() SQLHandler
+	Transaction(fc func(handler SQLHandler) error) error
+	Joins(string, ...interface{}) SQLHandler
+	Scan(interface{}) SQLHandler
+	Select(interface{}, ...interface{}) SQLHandler
+
 	Error() error
 }
