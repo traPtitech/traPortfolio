@@ -36,10 +36,6 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.repo.GetProjectMembers(id)
-	if err != nil {
-		return nil, err
-	}
 	portalUsers, err := s.portal.GetUsers(ctx)
 	if err != nil {
 		return nil, err
@@ -48,22 +44,10 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 	for _, v := range portalUsers {
 		NameMap[v.ID] = v.Name
 	}
-	for i, v := range members {
-		members[i].RealName = NameMap[v.Name]
+	for i, v := range project.Members {
+		project.Members[i].RealName = NameMap[v.Name]
 	}
-
-	res := &domain.Project{
-		ID:          project.ID,
-		Name:        project.Name,
-		Link:        project.Link,
-		Description: project.Description,
-		Members:     members,
-		Since:       project.Since,
-		Until:       project.Until,
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.UpdatedAt,
-	}
-	return res, nil
+	return project, nil
 }
 
 func (s *ProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {

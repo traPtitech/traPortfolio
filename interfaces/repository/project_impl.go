@@ -17,7 +17,7 @@ func NewProjectRepository(sql database.SQLHandler) *ProjectRepository {
 }
 
 func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
-	projects := []*model.Project{}
+	projects := make([]*model.Project, 0)
 	err := repo.h.Find(&projects).Error()
 	if err != nil {
 		return nil, err
@@ -44,20 +44,7 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	if err := repo.h.First(&project).Error(); err != nil {
 		return nil, err
 	}
-	res := &domain.Project{
-		ID:          project.ID,
-		Name:        project.Name,
-		Since:       project.Since,
-		Until:       project.Until,
-		Description: project.Description,
-		Link:        project.Link,
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.CreatedAt,
-	}
-	return res, nil
-}
 
-func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.ProjectMember, error) {
 	members := make([]*domain.ProjectMember, 0)
 	selectQuery := "users.id as user_id, users.name, project_members.since, project_members.until"
 	whereQuery := "project_members.project_id = ?"
@@ -66,7 +53,18 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.Projec
 	if err != nil {
 		return nil, err
 	}
-	return members, nil
+	res := &domain.Project{
+		ID:          project.ID,
+		Name:        project.Name,
+		Since:       project.Since,
+		Until:       project.Until,
+		Description: project.Description,
+		Link:        project.Link,
+		Members:     members,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.CreatedAt,
+	}
+	return res, nil
 }
 
 func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
