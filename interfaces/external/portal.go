@@ -1,7 +1,5 @@
 package external
 
-import "github.com/gofrs/uuid"
-
 type PortalUserResponse struct {
 	TraQID         string `json:"id"`
 	RealName       string `json:"name"`
@@ -10,5 +8,5 @@ type PortalUserResponse struct {
 
 type PortalAPI interface {
 	GetAll() ([]*PortalUserResponse, error)
-	GetByID(id uuid.UUID) (*PortalUserResponse, error)
+	GetByID(string) (*PortalUserResponse, error)
 }

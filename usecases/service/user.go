@@ -12,17 +12,11 @@ import (
 )
 
 type UserService struct {
-	repo   repository.UserRepository
-	traQ   repository.TraQRepository
-	portal repository.PortalRepository
+	repo repository.UserRepository
 }
 
-func NewUserService(userRepository repository.UserRepository, traQRepository repository.TraQRepository, portalRepository repository.PortalRepository) UserService {
-	return UserService{
-		repo:   userRepository,
-		traQ:   traQRepository,
-		portal: portalRepository,
-	}
+func NewUserService(userRepository repository.UserRepository) UserService {
+	return UserService{repo: userRepository}
 }
 
 func (s *UserService) GetUsers(ctx context.Context) ([]*domain.User, error) {
