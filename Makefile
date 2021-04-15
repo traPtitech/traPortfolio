@@ -15,12 +15,12 @@ db-gen-docs:
 	@if [ -d "./docs/dbschema" ]; then \
 		rm -r ./docs/dbschema; \
 	fi
-	DB_HOST=localhost go run main.go -migrate true
+	DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test TRAQ_COOKIE=test TRAQ_API_ENDPOINT=test PORTAL_COOKIE=test PORTAL_API_ENDPOINT=test go run main.go -migrate true
 	docker run -u $$(id -u) --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
 
 .PHONY: db-lint
 db-lint:
-	DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test TRAQ_COOKIE=test TRAQ_API_ENDPOINT=test go run main.go -migrate true
+	DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test TRAQ_COOKIE=test TRAQ_API_ENDPOINT=test PORTAL_COOKIE=test PORTAL_API_ENDPOINT=test go run main.go -migrate true
 	docker run --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
 
 .PHONY: rm-test-db
