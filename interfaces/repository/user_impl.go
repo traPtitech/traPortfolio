@@ -16,8 +16,12 @@ type UserRepository struct {
 	traQ   external.TraQAPI
 }
 
-func NewUserRepository(sql database.SQLHandler) *UserRepository {
-	return &UserRepository{SQLHandler: sql}
+func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, traQAPI external.TraQAPI) *UserRepository {
+	return &UserRepository{
+		SQLHandler: sql,
+		portal:     portalAPI,
+		traQ:       traQAPI,
+	}
 }
 
 func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
@@ -56,7 +60,7 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 		return nil, err
 	}
 
-	portalUser, err := repo.portal.GetByID(id)
+	portalUser, err := repo.portal.GetByID(user.Name)
 	if err != nil {
 		return nil, err
 	}

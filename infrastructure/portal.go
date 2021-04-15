@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/patrickmn/go-cache"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 )
@@ -83,7 +81,29 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	return userResponses, nil
 }
 
-func (portal *PortalAPI) GetByID(id uuid.UUID) (*external.PortalUserResponse, error) {
-	// todo
-	return nil, errors.New("todo")
+func (portal *PortalAPI) GetByID(id string) (*external.PortalUserResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("invalid traQID")
+	}
+
+	res, err := apiGet(portal.Client, portalAPIEndpoint, fmt.Sprintf("/user/%v", id))
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GET /user/%v failed: %v", id, res.Status)
+	}
+
+	var userResponse external.PortalUserResponse
+	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
+		return nil, fmt.Errorf("decode failed: %v", err)
+	}
+	return &userResponse, nil
 }
+
+// Interface guards
+var (
+	_ external.PortalAPI = (*PortalAPI)(nil)
+)
