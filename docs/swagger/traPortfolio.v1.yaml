@@ -671,6 +671,8 @@ paths:
         '404':
           description: Not Found
       description: アカウントを削除します
+      tags:
+        - user
   '/projects/{projectId}/members':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
