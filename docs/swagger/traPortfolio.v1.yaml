@@ -111,14 +111,14 @@ paths:
       responses:
         '200':
           description: OK
-        '403':
-          description: Forbidden
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Account'
+        '403':
+          description: Forbidden
         '404':
           description: Not Found
       description: ユーザーアカウントのリストを取得します
@@ -1343,6 +1343,9 @@ components:
           type: string
           description: アカウントurl
           format: uri
+        id:
+          type: string
+          description: アカウントID
     PrPermitted:
       title: PrPermitted
       type: boolean
