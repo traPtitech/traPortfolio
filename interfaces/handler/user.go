@@ -129,6 +129,39 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// GetAccount GET /users/:userID/accounts
+func (handler *UserHandler) GetAccounts(_c echo.Context) error {
+	c := Context{_c}
+	_ = c.Request().Context()
+	_id := c.Param("userID")
+	id := uuid.FromStringOrNil(_id)
+
+	accounts, err := handler.srv.GetAccounts(id)
+	if err != nil {
+		return convertError(err)
+	}
+
+	return c.JSON(http.StatusOK, accounts)
+}
+
+// GetAccount GET /users/:userID/accounts/:accountID
+func (handler *UserHandler) GetAccount(_c echo.Context) error {
+	c := Context{_c}
+	_ = c.Request().Context()
+	_id := c.Param("userID")
+	userID := uuid.FromStringOrNil(_id)
+	_id = c.Param("userID")
+	accountID := uuid.FromStringOrNil(_id)
+
+	account, err := handler.srv.GetAccount(userID, accountID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	return c.JSON(http.StatusOK, account)
+}
+
+// AddAccount POST /users/:userID/accounts
 func (handler *UserHandler) AddAccount(c echo.Context) error {
 	_id := c.Param("userID")
 	if _id == "" {
@@ -162,6 +195,7 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 	return c.JSON(http.StatusOK, account)
 }
 
+// DeleteAccount DELETE /users/:userID/accounts/:accountID
 func (handler *UserHandler) DeleteAccount(c echo.Context) error {
 	_accountid := c.Param("accountID")
 	if _accountid == "" {

@@ -47,8 +47,14 @@ func Init() {
 				{
 					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
 
+					apiUsersUIDAccounts.GET("/", api.User.GetAccounts)
 					apiUsersUIDAccounts.PUT("/", api.User.AddAccount)
-					apiUsersUIDAccounts.DELETE("/:accountID", api.User.DeleteAccount)
+					{
+						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
+
+						apiUsersUIDAccountsAID.GET("/", api.User.GetAccount)
+						apiUsersUIDAccountsAID.DELETE("/", api.User.DeleteAccount)
+					}
 				}
 			}
 		}
