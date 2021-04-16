@@ -32,45 +32,70 @@ func Init() {
 	})
 
 	echoAPI := e.Group("/api")
-	v1 := echoAPI.Group("/v1")
 	{
-		apiUsers := v1.Group("/users")
+		v1 := echoAPI.Group("/v1")
+
 		{
+			apiUsers := v1.Group("/users")
+
 			apiUsers.GET("", api.User.GetAll)
-			apiUsers.GET("/:userID", api.User.GetByID)
-			apiUsers.PATCH("/:userID", api.User.Update)
-			apiUsers.PUT("/:userID/accounts", api.User.AddAccount)
-			apiUsers.DELETE("/:userID/accounts/:accountID", api.User.DeleteAccount)
+			{
+				apiUsersUID := apiUsers.Group("/:userID")
+
+				apiUsersUID.GET("/", api.User.GetByID)
+				apiUsersUID.PATCH("/", api.User.Update)
+				{
+					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
+
+					apiUsersUIDAccounts.PUT("/", api.User.AddAccount)
+					apiUsersUIDAccounts.DELETE("/:accountID", api.User.DeleteAccount)
+				}
+			}
 		}
-		apiProjects := v1.Group("/projects")
+
 		{
+			apiProjects := v1.Group("/projects")
+
 			apiProjects.GET("", api.Project.GetAll)
-			apiProjects.GET("/:projectID", api.Project.GetByID)
 			apiProjects.POST("", api.Project.PostProject)
-			apiProjects.PATCH("/:projectID", api.Project.PatchProject)
+
+			{
+				apiProjectsPID := apiProjects.Group("/:projectID")
+
+				apiProjectsPID.GET("/", api.Project.GetByID)
+				apiProjectsPID.PATCH("/", api.Project.PatchProject)
+			}
 		}
-		apiEvents := v1.Group("/events")
+
 		{
+			apiEvents := v1.Group("/events")
+
 			apiEvents.GET("", api.Event.GetAll)
 			apiEvents.GET("/:eventID", api.Event.GetByID)
 		}
-		apiContests := v1.Group("/contests")
+
 		{
+			apiContests := v1.Group("/contests")
+
 			apiContests.POST("", api.Contest.PostContest)
-			apiContestsCID := apiContests.Group("/:contestID")
 			{
+				apiContestsCID := apiContests.Group("/:contestID")
+
 				apiContestsCID.PATCH("", api.Contest.PatchContest)
 				apiContestsCID.POST("", api.Contest.PostContestTeam)
-				apiContestsCIDTID := apiContestsCID.Group("/:teamID")
 				{
+					apiContestsCIDTID := apiContestsCID.Group("/:teamID")
+
 					apiContestsCIDTID.PATCH("", api.Contest.PatchContestTeam)
 					apiContestsCIDTID.PUT("", api.Contest.PutContestTeamMember)
 					apiContestsCIDTID.DELETE("", api.Contest.DeleteContestTeamMember)
 				}
 			}
 		}
-		apiPing := v1.Group("/ping")
+
 		{
+			apiPing := v1.Group("/ping")
+
 			apiPing.GET("", api.Ping.Ping)
 		}
 	}
