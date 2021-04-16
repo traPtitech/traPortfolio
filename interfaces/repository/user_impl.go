@@ -87,9 +87,9 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	return &result, nil
 }
 
-func (repo *UserRepository) GetAccounts(id uuid.UUID) ([]*domain.Account, error) {
+func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
-	err := repo.Find(&accounts, "user_id = ?", id).Error()
+	err := repo.Find(&accounts, "user_id = ?", userID).Error()
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +102,25 @@ func (repo *UserRepository) GetAccounts(id uuid.UUID) ([]*domain.Account, error)
 			PrPermitted: v.Check,
 		})
 	}
+	return result, nil
+}
+
+func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
+	account := &model.Account{ID: accountID}
+	err := repo.First(account).Error()
+	if err != nil {
+		return nil, err
+	}
+	if account.UserID != userID {
+		return nil, repository.ErrNotFound
+	}
+
+	result := &domain.Account{
+		ID:          account.ID,
+		Type:        account.Type,
+		PrPermitted: account.Check,
+	}
+
 	return result, nil
 }
 
