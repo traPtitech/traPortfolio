@@ -129,7 +129,7 @@ func (handler *UserHandler) Update(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-// GetAccount GET /users/:userID/accounts
+// GetAccounts GET /users/:userID/accounts
 func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 	c := Context{_c}
 	_ = c.Request().Context()
