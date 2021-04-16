@@ -124,7 +124,7 @@ paths:
       description: ユーザーアカウントのリストを取得します
       tags:
         - user
-  '/user/{userId}/projects':
+  '/users/{userId}/projects':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
@@ -145,7 +145,7 @@ paths:
       tags:
         - user
         - project
-  '/user/{userId}/contests':
+  '/users/{userId}/contests':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
@@ -166,7 +166,7 @@ paths:
       tags:
         - user
         - contest
-  '/user/{userId}/groups':
+  '/users/{userId}/groups':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
@@ -187,7 +187,7 @@ paths:
       tags:
         - user
         - group
-  '/user/{userId}/events':
+  '/users/{userId}/events':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
