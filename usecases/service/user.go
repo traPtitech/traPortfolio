@@ -58,6 +58,20 @@ func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository
 	return nil
 }
 
+func (s *UserService) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
+	if userID == uuid.Nil || accountID == uuid.Nil {
+		return nil, repository.ErrNilID
+	}
+	return s.repo.GetAccount(userID, accountID)
+}
+
+func (s *UserService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
+	if userID == uuid.Nil {
+		return nil, repository.ErrNilID
+	}
+	return s.repo.GetAccounts(userID)
+}
+
 func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/

@@ -42,13 +42,19 @@ func Init() {
 			{
 				apiUsersUID := apiUsers.Group("/:userID")
 
-				apiUsersUID.GET("/", api.User.GetByID)
-				apiUsersUID.PATCH("/", api.User.Update)
+				apiUsersUID.GET("", api.User.GetByID)
+				apiUsersUID.PATCH("", api.User.Update)
 				{
 					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
 
-					apiUsersUIDAccounts.PUT("/", api.User.AddAccount)
-					apiUsersUIDAccounts.DELETE("/:accountID", api.User.DeleteAccount)
+					apiUsersUIDAccounts.GET("", api.User.GetAccounts)
+					apiUsersUIDAccounts.POST("", api.User.AddAccount)
+					{
+						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
+
+						apiUsersUIDAccountsAID.GET("", api.User.GetAccount)
+						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteAccount)
+					}
 				}
 			}
 		}
@@ -62,8 +68,8 @@ func Init() {
 			{
 				apiProjectsPID := apiProjects.Group("/:projectID")
 
-				apiProjectsPID.GET("/", api.Project.GetByID)
-				apiProjectsPID.PATCH("/", api.Project.PatchProject)
+				apiProjectsPID.GET("", api.Project.GetByID)
+				apiProjectsPID.PATCH("", api.Project.PatchProject)
 			}
 		}
 

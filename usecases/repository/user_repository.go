@@ -21,8 +21,9 @@ type CreateAccountArgs struct {
 type UserRepository interface {
 	GetUsers() ([]*domain.User, error)
 	GetUser(uuid.UUID) (*domain.UserDetail, error)
-	GetAccounts(uuid.UUID) ([]*domain.Account, error)
 	Update(id uuid.UUID, changes map[string]interface{}) error
+	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
+	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
 	CreateAccount(uuid.UUID, *CreateAccountArgs) (*domain.Account, error)
 	DeleteAccount(uuid.UUID, uuid.UUID) error
 }
