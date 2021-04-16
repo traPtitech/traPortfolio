@@ -48,7 +48,7 @@ func Init() {
 					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
 
 					apiUsersUIDAccounts.GET("", api.User.GetAccounts)
-					apiUsersUIDAccounts.PUT("", api.User.AddAccount)
+					apiUsersUIDAccounts.POST("", api.User.AddAccount)
 					{
 						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
 

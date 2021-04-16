@@ -150,7 +150,7 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 	_ = c.Request().Context()
 	_id := c.Param("userID")
 	userID := uuid.FromStringOrNil(_id)
-	_id = c.Param("userID")
+	_id = c.Param("accountID")
 	accountID := uuid.FromStringOrNil(_id)
 
 	account, err := handler.srv.GetAccount(userID, accountID)
