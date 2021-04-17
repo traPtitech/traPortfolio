@@ -26,3 +26,7 @@ db-lint:
 .PHONY: rm-test-db
 rm-test-db:
 	@./dev/bin/down-test-db.sh
+
+.PHONY: go-gen
+go-gen:
+	@go generate ./...
