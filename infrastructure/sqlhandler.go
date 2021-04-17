@@ -15,8 +15,7 @@ import (
 )
 
 type SQLHandler struct {
-	Conn *gorm.DB
-	orig *gorm.DB
+	conn *gorm.DB
 }
 
 func NewSQLHandler() (*SQLHandler, error) {
@@ -64,8 +63,7 @@ func NewSQLHandler() (*SQLHandler, error) {
 	}
 
 	sqlHandler := new(SQLHandler)
-	sqlHandler.Conn = db
-	sqlHandler.orig = db
+	sqlHandler.conn = db
 	return sqlHandler, nil
 }
 
@@ -85,118 +83,100 @@ func (handler *SQLHandler) Connect(dialect string, args ...interface{}) error {
 	if err != nil {
 		return err
 	}
-	handler.Conn = db
+	handler.conn = db
 	return nil
 }
 
 func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
-	res := handler.Conn.Find(out, where...)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Find(out, where...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Exec(sql string, values ...interface{}) database.SQLHandler {
-	res := handler.Conn.Exec(sql, values...)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Exec(sql, values...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) First(out interface{}, where ...interface{}) database.SQLHandler {
-	res := handler.Conn.First(out, where...)
-	handler.Conn = res
-	return handler
+	db := handler.conn.First(out, where...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Raw(sql string, values ...interface{}) database.SQLHandler {
-	res := handler.Conn.Raw(sql, values...)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Raw(sql, values...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Create(value interface{}) database.SQLHandler {
-	res := handler.Conn.Create(value)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Create(value)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
-	res := handler.Conn.Save(value)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Save(value)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
-	res := handler.Conn.Delete(value, where)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Delete(value, where)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
-	res := handler.Conn.Where(query, args...)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Where(query, args...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Model(value interface{}) database.SQLHandler {
-	res := handler.Conn.Model(value)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Model(value)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Updates(values interface{}) database.SQLHandler {
-	res := handler.Conn.Updates(values)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Updates(values)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Begin() database.SQLHandler {
-	tx := handler.Conn.Begin()
-	return &SQLHandler{
-		Conn: tx,
-	}
+	tx := handler.conn.Begin()
+	return &SQLHandler{conn: tx}
 }
 
 func (handler *SQLHandler) Commit() database.SQLHandler {
-	res := handler.Conn.Commit()
-	handler.Conn = res
-	return handler
+	db := handler.conn.Commit()
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQLHandler {
-	res := handler.Conn.Joins(query, args)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Joins(query, args)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Scan(dest interface{}) database.SQLHandler {
-	res := handler.Conn.Scan(dest)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Scan(dest)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
-	res := handler.Conn.Select(query, args...)
-	handler.Conn = res
-	return handler
+	db := handler.conn.Select(query, args...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Rollback() database.SQLHandler {
-	res := handler.Conn.Rollback()
-	handler.Conn = res
-	return handler
+	db := handler.conn.Rollback()
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error {
 	ffc := func(tx *gorm.DB) error {
-		driver := &SQLHandler{Conn: tx}
+		driver := &SQLHandler{conn: tx}
 		return fc(driver)
 	}
-	return handler.Conn.Transaction(ffc)
+	return handler.conn.Transaction(ffc)
 }
 
 func (handler *SQLHandler) Error() error {
-	handler.Conn = handler.orig
-	return handler.Conn.Error
+	return handler.conn.Error
 }
 
 // Interface guards
