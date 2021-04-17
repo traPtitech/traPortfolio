@@ -7,12 +7,12 @@ services:
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
     command: ./traPortfolio
     environment:
-      KNOQ_COOKIE: "your session"
-      KNOQ_API_ENDPOINT: https://knoq.trap.jp/api
-      TRAQ_COOKIE: "your session"
-      TRAQ_API_ENDPOINT: https://q.trap.jp/api/v3
-      PORTAL_COOKIE: "your session"
-      PORTAL_API_ENDPOINT: https://portal.trap.jp/api
+      KNOQ_COOKIE: ${KNOQ_COOKIE}
+      KNOQ_API_ENDPOINT: ${KNOQ_API_ENDPOINT}
+      TRAQ_COOKIE: ${KNOQ_COOKIE}
+      TRAQ_API_ENDPOINT: ${TRAQ_API_ENDPOINT}
+      PORTAL_COOKIE: ${PORTAL_COOKIE}
+      PORTAL_API_ENDPOINT: ${PORTAL_API_ENDPOINT}
     expose:
       - "80"
       - "6060"
