@@ -12,7 +12,7 @@ type ContestRepository struct {
 	h database.SQLHandler
 }
 
-func NewContestRepository(sql database.SQLHandler) *ContestRepository {
+func NewContestRepository(sql database.SQLHandler) repository.ContestRepository {
 	return &ContestRepository{h: sql}
 }
 

@@ -16,7 +16,7 @@ type UserRepository struct {
 	traQ   external.TraQAPI
 }
 
-func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, traQAPI external.TraQAPI) *UserRepository {
+func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, traQAPI external.TraQAPI) repository.UserRepository {
 	return &UserRepository{
 		SQLHandler: sql,
 		portal:     portalAPI,

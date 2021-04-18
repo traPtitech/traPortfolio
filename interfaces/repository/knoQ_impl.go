@@ -11,7 +11,7 @@ type KnoqRepository struct {
 	api external.KnoqAPI
 }
 
-func NewKnoqRepository(api external.KnoqAPI) *KnoqRepository {
+func NewKnoqRepository(api external.KnoqAPI) repository.KnoqRepository {
 	return &KnoqRepository{api}
 }
 

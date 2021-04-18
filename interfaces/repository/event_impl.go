@@ -14,7 +14,7 @@ type EventRepository struct {
 	api external.KnoqAPI
 }
 
-func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) *EventRepository {
+func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) repository.EventRepository {
 	return &EventRepository{h: sql, api: knoq}
 }
 

@@ -12,7 +12,7 @@ type ProjectRepository struct {
 	h database.SQLHandler
 }
 
-func NewProjectRepository(sql database.SQLHandler) *ProjectRepository {
+func NewProjectRepository(sql database.SQLHandler) repository.ProjectRepository {
 	return &ProjectRepository{h: sql}
 }
 

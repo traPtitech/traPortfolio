@@ -32,7 +32,7 @@ type KnoqAPI struct {
 	Client *http.Client
 }
 
-func NewKnoqAPI() (*KnoqAPI, error) {
+func NewKnoqAPI() (external.KnoqAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)
