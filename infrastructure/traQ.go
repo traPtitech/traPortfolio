@@ -31,7 +31,7 @@ type TraQAPI struct {
 	Client *http.Client
 }
 
-func NewTraQAPI() (*TraQAPI, error) {
+func NewTraQAPI() (external.TraQAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)

@@ -15,7 +15,7 @@ type TraQRepository struct {
 	api external.TraQAPI
 }
 
-func NewTraQRepository(api external.TraQAPI) *TraQRepository {
+func NewTraQRepository(api external.TraQAPI) repository.TraQRepository {
 	return &TraQRepository{
 		api: api,
 	}

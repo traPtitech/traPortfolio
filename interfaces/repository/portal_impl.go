@@ -12,7 +12,7 @@ type PortalRepository struct {
 	api external.PortalAPI
 }
 
-func NewPortalRepository(api external.PortalAPI) *PortalRepository {
+func NewPortalRepository(api external.PortalAPI) repository.PortalRepository {
 	return &PortalRepository{api}
 }
 

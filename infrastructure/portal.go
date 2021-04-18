@@ -34,7 +34,7 @@ type PortalAPI struct {
 	Cache  *cache.Cache
 }
 
-func NewPortalAPI() (*PortalAPI, error) {
+func NewPortalAPI() (external.PortalAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)

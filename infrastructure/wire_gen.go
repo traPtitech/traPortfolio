@@ -7,11 +7,8 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
-	repository2 "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
@@ -59,31 +56,31 @@ func InjectAPIServer() (handler.API, error) {
 // wire.go:
 
 var portalSet = wire.NewSet(
-	NewPortalAPI, repository.NewPortalRepository, wire.Bind(new(external.PortalAPI), new(*PortalAPI)), wire.Bind(new(repository2.PortalRepository), new(*repository.PortalRepository)),
+	NewPortalAPI, repository.NewPortalRepository,
 )
 
 var traQSet = wire.NewSet(
-	NewTraQAPI, repository.NewTraQRepository, wire.Bind(new(external.TraQAPI), new(*TraQAPI)), wire.Bind(new(repository2.TraQRepository), new(*repository.TraQRepository)),
+	NewTraQAPI, repository.NewTraQRepository,
 )
 
 var pingSet = wire.NewSet(handler.NewPingHandler)
 
-var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler, wire.Bind(new(repository2.UserRepository), new(*repository.UserRepository)))
+var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler)
 
-var projectSet = wire.NewSet(repository.NewProjectRepository, service.NewProjectService, handler.NewProjectHandler, wire.Bind(new(repository2.ProjectRepository), new(*repository.ProjectRepository)))
+var projectSet = wire.NewSet(repository.NewProjectRepository, service.NewProjectService, handler.NewProjectHandler)
 
 var knoQSet = wire.NewSet(
-	NewKnoqAPI, repository.NewKnoqRepository, wire.Bind(new(external.KnoqAPI), new(*KnoqAPI)), wire.Bind(new(repository2.KnoqRepository), new(*repository.KnoqRepository)),
+	NewKnoqAPI, repository.NewKnoqRepository,
 )
 
 var eventSet = wire.NewSet(
-	knoQSet, repository.NewEventRepository, service.NewEventService, handler.NewEventHandler, wire.Bind(new(repository2.EventRepository), new(*repository.EventRepository)),
+	knoQSet, repository.NewEventRepository, service.NewEventService, handler.NewEventHandler,
 )
 
-var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler, wire.Bind(new(repository2.ContestRepository), new(*repository.ContestRepository)))
+var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
 
 var sqlSet = wire.NewSet(
-	NewSQLHandler, wire.Bind(new(database.SQLHandler), new(*SQLHandler)),
+	NewSQLHandler,
 )
 
 var apiSet = wire.NewSet(handler.NewAPI)
