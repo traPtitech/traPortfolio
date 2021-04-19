@@ -3,7 +3,7 @@
 set -eu
 
 containername=portfolio-test-db
-port=${TEST_DB_PORT:-3306}
+port=${TEST_DB_PORT:-3307}
 
 if docker ps | grep ${containername} >/dev/null; then
     exit 0 # 既にテストDBコンテナが起動している
