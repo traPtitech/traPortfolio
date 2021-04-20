@@ -181,7 +181,7 @@ type PutContestTeamMember struct {
 	Members []uuid.UUID `json:"members"`
 }
 
-func (h *ContestHandler) PutContestTeamMember(_c echo.Context) error {
+func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
