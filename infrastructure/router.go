@@ -59,7 +59,6 @@ func Init() {
 				}
 			}
 		}
-
 		{
 			apiProjects := v1.Group("/projects")
 
@@ -89,13 +88,21 @@ func Init() {
 				apiContestsCID := apiContests.Group("/:contestID")
 
 				apiContestsCID.PATCH("", api.Contest.PatchContest)
-				apiContestsCID.POST("", api.Contest.PostContestTeam)
 				{
-					apiContestsCIDTID := apiContestsCID.Group("/:teamID")
+					apiContestsCIDTeams := apiContestsCID.Group("/teams")
 
-					apiContestsCIDTID.PATCH("", api.Contest.PatchContestTeam)
-					apiContestsCIDTID.PUT("", api.Contest.PutContestTeamMember)
-					apiContestsCIDTID.DELETE("", api.Contest.DeleteContestTeamMember)
+					apiContestsCIDTeams.POST("", api.Contest.PostContestTeam)
+					{
+						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")
+
+						apiContestsCIDTeamsTID.PATCH("", api.Contest.PatchContestTeam)
+						{
+							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
+
+							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
+							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.PostContestTeamMember)
+						}
+					}
 				}
 			}
 		}
