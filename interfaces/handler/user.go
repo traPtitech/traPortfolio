@@ -45,6 +45,13 @@ type Account struct {
 	PrPermitted bool   `json:"prPermitted"`
 }
 
+type EditAccountRequest struct {
+	ID          optional.String `json:"id"` // traqID
+	Type        optional.Int64  `json:"type"`
+	URL         optional.String `json:"url"`
+	PrPermitted optional.Bool   `json:"prPermitted"`
+}
+
 func NewUserHandler(s service.UserService) *UserHandler {
 	return &UserHandler{srv: s}
 }
@@ -193,6 +200,34 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, account)
+}
+
+// PatchAccount PATCH /users/:userID/accounts/:accountID
+func (handler *UserHandler) PatchAccount(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("userID")
+	userID := uuid.FromStringOrNil(_id)
+	_id = c.Param("accountID")
+	accountID := uuid.FromStringOrNil(_id)
+	req := EditAccountRequest{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	args := repository.UpdateAccountArgs{
+		ID:          req.ID,
+		Type:        req.Type,
+		URL:         req.URL,
+		PrPermitted: req.PrPermitted,
+	}
+	err = handler.srv.EditAccount(ctx, accountID, userID, &args)
+	if err != nil {
+		return convertError(err)
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteAccount DELETE /users/:userID/accounts/:accountID
