@@ -25,17 +25,23 @@ type ProjectResponse struct {
 }
 
 type ProjectDetailResponse struct {
-	ID          uuid.UUID                `json:"id"`
-	Name        string                   `json:"name"`
-	Duration    domain.ProjectDuration   `json:"duration"`
-	Link        string                   `json:"link"`
-	Description string                   `json:"description"`
-	Members     []*ProjectMemberResponse `json:"members"`
-	CreatedAt   time.Time                `json:"created_at"`
-	UpdatedAt   time.Time                `json:"updated_at"`
+	ID          uuid.UUID                      `json:"id"`
+	Name        string                         `json:"name"`
+	Duration    domain.ProjectDuration         `json:"duration"`
+	Link        string                         `json:"link"`
+	Description string                         `json:"description"`
+	Members     []*ProjectMemberDetailResponse `json:"members"`
+	CreatedAt   time.Time                      `json:"created_at"`
+	UpdatedAt   time.Time                      `json:"updated_at"`
 }
 
 type ProjectMemberResponse struct {
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	RealName string    `json:"real_name"`
+}
+
+type ProjectMemberDetailResponse struct {
 	ID       uuid.UUID              `json:"id"`
 	Name     string                 `json:"name"`
 	RealName string                 `json:"real_name"`
@@ -85,7 +91,7 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 		Name:      project.Name,
 		Duration:  convertToProjectDuration(project.Since, project.Until),
 		Link:      project.Link,
-		Members:   convertToProjectMembers(project.Members),
+		Members:   convertToProjectMembersDetail(project.Members),
 		CreatedAt: project.CreatedAt,
 		UpdatedAt: project.UpdatedAt,
 	}
@@ -173,6 +179,28 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// GetMembers GET /projects/:projectID/members
+func (h *ProjectHandler) GetMembers(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("projectID")
+	id := uuid.FromStringOrNil(_id)
+	members, err := h.service.GetProjectMembers(ctx, id)
+	if err != nil {
+		return err
+	}
+	res := make([]*ProjectMemberResponse, 0, len(members))
+	for _, v := range members {
+		m := &ProjectMemberResponse{
+			ID:       v.ID,
+			Name:     v.Name,
+			RealName: v.RealName,
+		}
+		res = append(res, m)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
 func convertToProjectDuration(since, until time.Time) domain.ProjectDuration {
 	return domain.ProjectDuration{
 		Since: timeToSem(since),
@@ -212,10 +240,10 @@ func optionalSemToTime(date OptionalYearWithSemester) optional.Time {
 	return t
 }
 
-func convertToProjectMembers(members []*domain.ProjectMember) []*ProjectMemberResponse {
-	res := make([]*ProjectMemberResponse, 0, len(members))
+func convertToProjectMembersDetail(members []*domain.ProjectMember) []*ProjectMemberDetailResponse {
+	res := make([]*ProjectMemberDetailResponse, 0, len(members))
 	for _, v := range members {
-		m := &ProjectMemberResponse{
+		m := &ProjectMemberDetailResponse{
 			ID:       v.UserID,
 			Name:     v.Name,
 			RealName: v.RealName,

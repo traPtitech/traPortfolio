@@ -70,6 +70,12 @@ func Init() {
 
 				apiProjectsPID.GET("", api.Project.GetByID)
 				apiProjectsPID.PATCH("", api.Project.PatchProject)
+
+				apiProjectsPIDMembers := apiProjectsPID.Group("/members")
+
+				apiProjectsPIDMembers.GET("", api.Project.GetMembers)
+				// apiProjectsPIDMembers.POST("", api.Project.PostMembers)
+				// apiProjectsPIDMembers.DELETE("", api.Project.DeleteMembers)
 			}
 		}
 

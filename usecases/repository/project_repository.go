@@ -32,4 +32,5 @@ type ProjectRepository interface {
 	GetProject(id uuid.UUID) (*domain.Project, error)
 	CreateProject(project *model.Project) (*domain.Project, error)
 	UpdateProject(id uuid.UUID, changes map[string]interface{}) error
+	GetProjectMembers(id uuid.UUID) ([]*domain.User, error)
 }
