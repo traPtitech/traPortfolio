@@ -167,6 +167,25 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 	return result, nil
 }
 
+func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
+	err := repo.Transaction(func(tx database.SQLHandler) error {
+		account := &model.Account{ID: accountID}
+		err := repo.First(account).Error()
+		if err == gorm.ErrRecordNotFound || account.UserID != userID {
+			return repository.ErrNotFound
+		} else if err != nil {
+			return err
+		}
+
+		err = repo.Model(account).Updates(changes).Error()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
+
 func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
 
 	err := repo.Delete(&domain.Account{}, &model.Account{ID: accountID, UserID: userID}).Error()

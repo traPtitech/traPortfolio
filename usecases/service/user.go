@@ -96,6 +96,36 @@ func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 
 }
 
+func (s *UserService) EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
+	if accountID == uuid.Nil || userID == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	changes := map[string]interface{}{}
+	if args.ID.Valid {
+		changes["id"] = args.ID.String
+	}
+	if args.URL.Valid {
+		changes["url"] = args.URL.String
+	}
+	if args.PrPermitted.Valid {
+		changes["check"] = args.PrPermitted.Bool
+	}
+	if args.Type.Valid {
+		changes["type"] = args.Type.Int64
+	}
+	if len(changes) > 0 {
+		err := s.repo.UpdateAccount(accountID, userID, changes)
+		if err != nil && err == repository.ErrNotFound {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
 
 	//TODO

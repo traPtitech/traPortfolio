@@ -53,6 +53,7 @@ func Init() {
 						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
 
 						apiUsersUIDAccountsAID.GET("", api.User.GetAccount)
+						apiUsersUIDAccountsAID.PATCH("", api.User.PatchAccount)
 						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteAccount)
 					}
 				}

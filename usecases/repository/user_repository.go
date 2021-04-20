@@ -14,10 +14,17 @@ type UpdateUserArgs struct {
 }
 
 type CreateAccountArgs struct {
-	ID          string
+	ID          string // traqID
 	Type        uint
 	URL         string
 	PrPermitted bool
+}
+
+type UpdateAccountArgs struct {
+	ID          optional.String // traqID
+	Type        optional.Int64
+	URL         optional.String
+	PrPermitted optional.Bool
 }
 
 type UserRepository interface {
@@ -27,5 +34,6 @@ type UserRepository interface {
 	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
 	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
 	CreateAccount(uuid.UUID, *CreateAccountArgs) (*domain.Account, error)
+	UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error
 	DeleteAccount(uuid.UUID, uuid.UUID) error
 }
