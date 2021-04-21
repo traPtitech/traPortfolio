@@ -43,7 +43,7 @@ type UpdateContestTeamArgs struct {
 }
 
 type ContestRepository interface {
-	//GetAll() ([]*domain.Contest, error)
+	GetAll() ([]*domain.Contest, error)
 	//GetByID(ID uuid.UUID) (*domain.Contest, error)
 	CreateContest(args *CreateContestArgs) (*domain.Contest, error)
 	UpdateContest(id uuid.UUID, changes map[string]interface{}) error

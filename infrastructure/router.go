@@ -83,6 +83,7 @@ func Init() {
 		{
 			apiContests := v1.Group("/contests")
 
+			apiContests.GET("", api.Contest.GetContests)
 			apiContests.POST("", api.Contest.PostContest)
 			{
 				apiContestsCID := apiContests.Group("/:contestID")

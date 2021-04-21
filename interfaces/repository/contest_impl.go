@@ -16,6 +16,28 @@ func NewContestRepository(sql database.SQLHandler) repository.ContestRepository 
 	return &ContestRepository{h: sql}
 }
 
+func (repo *ContestRepository) GetAll() ([]*domain.Contest, error) {
+	contests := make([]*model.Contest, 10)
+	err := repo.h.Find(&contests).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	result := make([]*domain.Contest, 0, len(contests))
+
+	for _, v := range contests {
+		result = append(result, &domain.Contest{
+			ID:        v.ID,
+			Name:      v.Name,
+			TimeStart: v.Since,
+			TimeEnd:   v.Until,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
+		})
+	}
+	return result, nil
+}
+
 func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
 	contest := model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
