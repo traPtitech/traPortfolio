@@ -23,6 +23,15 @@ func NewContestService(repo repository.ContestRepository) ContestService {
 	}
 }
 
+func (s *ContestService) GetContests(ctx context.Context) ([]*domain.Contest, error) {
+	contest, err := s.repo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	return contest, nil
+}
+
 func (s *ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
 	contest, err := s.repo.CreateContest(args)
 	if err != nil {

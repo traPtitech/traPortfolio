@@ -17,7 +17,7 @@ type ContestHandler struct {
 	srv service.ContestService
 }
 
-// NewEventHandler creates a EventHandler
+// NewContestHandler creates a ContestHandler
 func NewContestHandler(service service.ContestService) *ContestHandler {
 	return &ContestHandler{service}
 }
@@ -29,12 +29,35 @@ type PostContestRequest struct {
 	Duration    Duration
 }
 
-type PostContestResponse struct {
+type ContestResponse struct {
 	ID   uuid.UUID `json:"id"`
 	Name string    `json:"name"`
 	Duration
 }
 
+// GetContests GET /contests
+func (h *ContestHandler) GetContests(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	contests, err := h.srv.GetContests(ctx)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*ContestResponse, 0, len(contests))
+	for _, v := range contests {
+		res = append(res, &ContestResponse{
+			ID:   v.ID,
+			Name: v.Name,
+			Duration: Duration{
+				Since: v.TimeStart,
+				Until: v.TimeEnd,
+			},
+		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// PostContest POST /contests
 func (h *ContestHandler) PostContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -57,7 +80,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	res := PostContestResponse{
+	res := ContestResponse{
 		ID:   contest.ID,
 		Name: contest.Name,
 		Duration: Duration{
@@ -75,6 +98,7 @@ type PatchContestRequest struct {
 	Duration    OptionalDuration
 }
 
+// PatchContest PATCH /contests/:contestID
 func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -115,6 +139,7 @@ type PostContestTeamResponse struct {
 	Result string    `json:"result"`
 }
 
+// PostContestTeam POST /contests/:contestID/teams
 func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -152,6 +177,7 @@ type PatchContestTeamRequest struct {
 	Result      optional.String `json:"result"`
 }
 
+// PatchContestTeam PATCH /contests/:contestID
 func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -181,6 +207,7 @@ type PutContestTeamMember struct {
 	Members []uuid.UUID `json:"members"`
 }
 
+// PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -200,6 +227,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
