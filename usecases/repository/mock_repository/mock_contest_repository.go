@@ -94,6 +94,36 @@ func (mr *MockContestRepositoryMockRecorder) DeleteContestTeamMember(teamID, mem
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContestTeamMember", reflect.TypeOf((*MockContestRepository)(nil).DeleteContestTeamMember), teamID, memberIDs)
 }
 
+// GetAll mocks base method.
+func (m *MockContestRepository) GetAll() ([]*domain.Contest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll")
+	ret0, _ := ret[0].([]*domain.Contest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockContestRepositoryMockRecorder) GetAll() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockContestRepository)(nil).GetAll))
+}
+
+// GetByID mocks base method.
+func (m *MockContestRepository) GetByID(ID uuid.UUID) (*domain.ContestDetail, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByID", ID)
+	ret0, _ := ret[0].(*domain.ContestDetail)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByID indicates an expected call of GetByID.
+func (mr *MockContestRepositoryMockRecorder) GetByID(ID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockContestRepository)(nil).GetByID), ID)
+}
+
 // UpdateContest mocks base method.
 func (m *MockContestRepository) UpdateContest(id uuid.UUID, changes map[string]interface{}) error {
 	m.ctrl.T.Helper()

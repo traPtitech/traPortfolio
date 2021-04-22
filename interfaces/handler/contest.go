@@ -35,6 +35,19 @@ type ContestResponse struct {
 	Duration
 }
 
+type ContestDetailResponse struct {
+	ContestResponse
+	Link        string                 `json:"link"`
+	Description string                 `json:"description"`
+	Teams       []*ContestTeamResponse `json:"teams"`
+}
+
+type ContestTeamResponse struct {
+	ID     uuid.UUID `json:"id"`
+	Name   string    `json:"name"`
+	Result string    `json:"result"`
+}
+
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(_c echo.Context) error {
 	c := Context{_c}
@@ -53,6 +66,43 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 				Until: v.TimeEnd,
 			},
 		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+func (h *ContestHandler) GetContest(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+
+	contest, err := h.srv.GetContest(ctx, id)
+
+	teams := make([]*ContestTeamResponse, 0, len(contest.Teams))
+	for _, v := range contest.Teams {
+		teams = append(teams, &ContestTeamResponse{
+			ID:     v.ID,
+			Name:   v.Name,
+			Result: v.Result,
+		})
+	}
+
+	res := &ContestDetailResponse{
+		ContestResponse: ContestResponse{
+			ID:   contest.ID,
+			Name: contest.Name,
+			Duration: Duration{
+				Since: contest.TimeStart,
+				Until: contest.TimeEnd,
+			},
+		},
+		Link:        contest.Link,
+		Description: contest.Description,
+		Teams:       teams,
+	}
+
+	if err != nil {
+		return convertError(err)
 	}
 	return c.JSON(http.StatusOK, res)
 }
