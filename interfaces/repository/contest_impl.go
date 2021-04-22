@@ -38,6 +38,35 @@ func (repo *ContestRepository) GetAll() ([]*domain.Contest, error) {
 	return result, nil
 }
 
+func (repo *ContestRepository) GetByID(id uuid.UUID) (*domain.ContestDetail, error) {
+	contest := &model.Contest{ID: id}
+	err := repo.h.First(contest).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	teams, err := repo.GetContestTeams(id)
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	res := &domain.ContestDetail{
+		Contest: domain.Contest{
+			ID:        contest.ID,
+			Name:      contest.Name,
+			TimeStart: contest.Since,
+			TimeEnd:   contest.Until,
+			CreatedAt: contest.CreatedAt,
+			UpdatedAt: contest.UpdatedAt,
+		},
+		Link:        contest.Link,
+		Description: contest.Description,
+		Teams:       teams,
+	}
+
+	return res, nil
+}
+
 func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
 	contest := model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
@@ -90,6 +119,26 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 		return err
 	}
 	return nil
+}
+
+func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	teams := make([]*model.ContestTeam, 10)
+	err := repo.h.Model(&model.ContestTeam{}).Where("contest_id = ?", contestID).Find(&teams).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	result := make([]*domain.ContestTeam, 0, len(teams))
+	for _, v := range teams {
+		result = append(result, &domain.ContestTeam{
+			ID:        v.ID,
+			ContestID: v.ContestID,
+			Name:      v.Name,
+			Result:    v.Result,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
+		})
+	}
+	return result, nil
 }
 
 func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {

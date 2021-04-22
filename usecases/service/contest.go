@@ -32,6 +32,14 @@ func (s *ContestService) GetContests(ctx context.Context) ([]*domain.Contest, er
 	return contest, nil
 }
 
+func (s *ContestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error) {
+	contest, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return contest, nil
+}
+
 func (s *ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
 	contest, err := s.repo.CreateContest(args)
 	if err != nil {

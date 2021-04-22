@@ -88,6 +88,7 @@ func Init() {
 			{
 				apiContestsCID := apiContests.Group("/:contestID")
 
+				apiContestsCID.GET("", api.Contest.GetContest)
 				apiContestsCID.PATCH("", api.Contest.PatchContest)
 				{
 					apiContestsCIDTeams := apiContestsCID.Group("/teams")
