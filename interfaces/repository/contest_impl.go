@@ -16,7 +16,7 @@ func NewContestRepository(sql database.SQLHandler) repository.ContestRepository 
 	return &ContestRepository{h: sql}
 }
 
-func (repo *ContestRepository) GetAll() ([]*domain.Contest, error) {
+func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 	contests := make([]*model.Contest, 10)
 	err := repo.h.Find(&contests).Error()
 	if err != nil {
@@ -38,7 +38,7 @@ func (repo *ContestRepository) GetAll() ([]*domain.Contest, error) {
 	return result, nil
 }
 
-func (repo *ContestRepository) GetByID(id uuid.UUID) (*domain.ContestDetail, error) {
+func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, error) {
 	contest := &model.Contest{ID: id}
 	err := repo.h.First(contest).Error()
 	if err != nil {
