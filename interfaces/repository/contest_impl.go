@@ -121,6 +121,30 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 	return nil
 }
 
+func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
+	if id == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	err := repo.h.First(&model.Contest{ID: id}).Error()
+	if err != nil {
+		return convertError(err)
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		err = tx.Delete(&model.Contest{}, &model.Contest{ID: id}).Error()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return convertError(err)
+	}
+	return nil
+}
+
 func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
 	teams := make([]*model.ContestTeam, 10)
 	err := repo.h.Model(&model.ContestTeam{}).Where("contest_id = ?", contestID).Find(&teams).Error()

@@ -80,6 +80,11 @@ func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *
 	return nil
 }
 
+func (s *ContestService) DeleteContest(ctx context.Context, id uuid.UUID) error {
+	err := s.repo.DeleteContest(id)
+	return err
+}
+
 func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam, err := s.repo.CreateContestTeam(contestID, args)
 	if err != nil {

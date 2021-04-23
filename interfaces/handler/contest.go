@@ -176,6 +176,19 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
+// DeleteContest DELETE /contests/:contestID
+func (h *ContestHandler) DeleteContest(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+	err := h.srv.DeleteContest(ctx, id)
+	if err != nil {
+		return convertError(err)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 type PostContestTeamRequest struct {
 	Name        string `json:"name"`
 	Link        string `json:"link"`
