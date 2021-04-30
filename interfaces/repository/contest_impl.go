@@ -9,11 +9,12 @@ import (
 )
 
 type ContestRepository struct {
-	h database.SQLHandler
+	h      database.SQLHandler
+	portal repository.PortalRepository
 }
 
-func NewContestRepository(sql database.SQLHandler) repository.ContestRepository {
-	return &ContestRepository{h: sql}
+func NewContestRepository(sql database.SQLHandler, portal repository.PortalRepository) repository.ContestRepository {
+	return &ContestRepository{h: sql, portal: portal}
 }
 
 func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
@@ -237,6 +238,43 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 		return err
 	}
 	return nil
+}
+
+func (repo *ContestRepository) GetContestTeamMember(teamID uuid.UUID, contestID uuid.UUID) ([]*domain.User, error) {
+	if teamID == uuid.Nil || contestID == uuid.Nil {
+		return nil, repository.ErrNilID
+	}
+
+	users := make([]*model.User, 10)
+	err := repo.h.
+		Model(&model.ContestTeamUserBelonging{}).
+		Where("contest_team_user_belongings.team_id = ?", teamID).
+		Joins("INNER JOIN users ON contest_team_user_belongings.user_id = users.id").
+		Scan(&users).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	result := make([]*domain.User, 0, len(users))
+	portalMp, err := repo.portal.MakeUserMp()
+
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	for _, v := range users {
+		portalUser, ok := portalMp[v.Name]
+		name := ""
+		if ok {
+			name = portalUser.Name
+		}
+		result = append(result, &domain.User{
+			ID:       v.ID,
+			Name:     v.Name,
+			RealName: name,
+		})
+	}
+	return result, nil
 }
 
 func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
