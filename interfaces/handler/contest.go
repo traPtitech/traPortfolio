@@ -270,6 +270,28 @@ type PutContestTeamMember struct {
 	Members []uuid.UUID `json:"members"`
 }
 
+// GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
+func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	contestID := uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+
+	users, err := h.srv.GetContestTeamMember(ctx, contestID, teamID)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*userResponse, 0, len(users))
+	for _, v := range users {
+		res = append(res, &userResponse{
+			ID:       v.ID,
+			Name:     v.Name,
+			RealName: v.RealName,
+		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
 // PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}

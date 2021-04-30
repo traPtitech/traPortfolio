@@ -46,7 +46,7 @@ func InjectAPIServer() (handler.API, error) {
 	eventRepository := repository.NewEventRepository(sqlHandler, knoqAPI)
 	eventService := service.NewEventService(eventRepository)
 	eventHandler := handler.NewEventHandler(eventService)
-	contestRepository := repository.NewContestRepository(sqlHandler)
+	contestRepository := repository.NewContestRepository(sqlHandler, portalRepository)
 	contestService := service.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestService)
 	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)

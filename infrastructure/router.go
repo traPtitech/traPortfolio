@@ -102,6 +102,7 @@ func Init() {
 						{
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
+							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMember)
 							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
 							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.PostContestTeamMember)
 						}

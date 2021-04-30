@@ -122,6 +122,10 @@ func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 	return nil
 }
 
+func (s *ContestService) GetContestTeamMember(ctx context.Context, teamID uuid.UUID, contestID uuid.UUID) ([]*domain.User, error) {
+	return s.repo.GetContestTeamMember(teamID, contestID)
+}
+
 func (s *ContestService) AddContestTeamMember(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	err := s.repo.AddContestTeamMember(teamID, memberIDs)
 	return err
