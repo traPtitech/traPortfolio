@@ -240,7 +240,7 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 	return nil
 }
 
-func (repo *ContestRepository) GetContestTeamMember(teamID uuid.UUID, contestID uuid.UUID) ([]*domain.User, error) {
+func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
 	if teamID == uuid.Nil || contestID == uuid.Nil {
 		return nil, repository.ErrNilID
 	}
@@ -248,6 +248,7 @@ func (repo *ContestRepository) GetContestTeamMember(teamID uuid.UUID, contestID 
 	users := make([]*model.User, 10)
 	err := repo.h.
 		Model(&model.ContestTeamUserBelonging{}).
+		Select("users.*").
 		Where("contest_team_user_belongings.team_id = ?", teamID).
 		Joins("INNER JOIN users ON contest_team_user_belongings.user_id = users.id").
 		Scan(&users).
@@ -282,6 +283,10 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 		return repository.ErrNilID
 	}
 
+	if members == nil {
+		return repository.ErrInvalidArg
+	}
+
 	// 存在チェック
 	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
 	if err != nil {
@@ -290,7 +295,7 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 
 	curMp := make(map[uuid.UUID]struct{}, len(members))
 	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(&_cur).Error()
 	if err != nil {
 		return err
 	}
