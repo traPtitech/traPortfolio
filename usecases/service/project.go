@@ -117,3 +117,11 @@ func (s *ProjectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([
 	}
 	return members, nil
 }
+
+func (s *ProjectService) AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
+	err := s.repo.AddProjectMembers(projectID, args)
+	if err != nil {
+		return err
+	}
+	return nil
+}

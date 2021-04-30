@@ -73,9 +73,9 @@ func Init() {
 
 				apiProjectsPIDMembers := apiProjectsPID.Group("/members")
 
-				apiProjectsPIDMembers.GET("", api.Project.GetMembers)
-				// apiProjectsPIDMembers.POST("", api.Project.PostMembers)
-				// apiProjectsPIDMembers.DELETE("", api.Project.DeleteMembers)
+				apiProjectsPIDMembers.GET("", api.Project.GetProjectMembers)
+				apiProjectsPIDMembers.POST("", api.Project.PostProjectMembers)
+				// apiProjectsPIDMembers.DELETE("", api.Project.DeleteProjectMembers)
 			}
 		}
 

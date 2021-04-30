@@ -87,13 +87,14 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 		return err
 	}
 	res := &ProjectDetailResponse{
-		ID:        project.ID,
-		Name:      project.Name,
-		Duration:  convertToProjectDuration(project.Since, project.Until),
-		Link:      project.Link,
-		Members:   convertToProjectMembersDetail(project.Members),
-		CreatedAt: project.CreatedAt,
-		UpdatedAt: project.UpdatedAt,
+		ID:          project.ID,
+		Name:        project.Name,
+		Duration:    convertToProjectDuration(project.Since, project.Until),
+		Link:        project.Link,
+		Description: project.Description,
+		Members:     convertToProjectMembersDetail(project.Members),
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.UpdatedAt,
 	}
 	return c.JSON(http.StatusOK, res)
 }
@@ -179,8 +180,8 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// GetMembers GET /projects/:projectID/members
-func (h *ProjectHandler) GetMembers(_c echo.Context) error {
+// GetProjectMembers GET /projects/:projectID/members
+func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	_id := c.Param("projectID")
@@ -199,6 +200,41 @@ func (h *ProjectHandler) GetMembers(_c echo.Context) error {
 		res = append(res, m)
 	}
 	return c.JSON(http.StatusOK, res)
+}
+
+type PostProjectMembersRequest struct {
+	Members []*struct {
+		UserID   string                 `json:"user_id"`
+		Duration domain.ProjectDuration `json:"duration"`
+	}
+}
+
+// PostProjectMembers POST /projects/:projectID/members
+func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("projectID")
+	id := uuid.FromStringOrNil(_id)
+	req := &PostProjectMembersRequest{}
+	// todo validation
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
+	for _, v := range req.Members {
+		m := &repository.CreateProjectMemberArgs{
+			UserID: uuid.FromStringOrNil(v.UserID),
+			Since:  semToTime(v.Duration.Since),
+			Until:  semToTime(v.Duration.Until),
+		}
+		createReq = append(createReq, m)
+	}
+	err = h.service.AddProjectMembers(ctx, id, createReq)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func convertToProjectDuration(since, until time.Time) domain.ProjectDuration {

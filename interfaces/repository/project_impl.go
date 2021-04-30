@@ -120,7 +120,7 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]in
 	return nil
 }
 
-func (repo ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, error) {
+func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, error) {
 	members := make([]*domain.User, 0)
 	selectQuery := "users.id as id, users.name"
 	whereQuery := "project_members.project_id = ?"
@@ -130,6 +130,58 @@ func (repo ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, e
 		return nil, err
 	}
 	return members, nil
+}
+
+func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
+	if projectID == uuid.Nil {
+		return repository.ErrInvalidID
+	}
+
+	//存在チェック
+	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
+	if err != nil {
+		return err
+	}
+
+	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
+	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
+	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
+	if err != nil {
+		return err
+	}
+	for _, v := range _mmbs {
+		mmbsMp[v.UserID] = struct{}{}
+	}
+
+	members := make([]*model.ProjectMember, 0, len(projectMembers))
+	for _, v := range projectMembers {
+		if v.UserID == uuid.Nil {
+			return repository.ErrInvalidID
+		}
+		uid := uuid.Must(uuid.NewV4())
+		m := &model.ProjectMember{
+			ID:        uid,
+			ProjectID: projectID,
+			UserID:    v.UserID,
+			Since:     v.Since,
+			Until:     v.Until,
+		}
+		members = append(members, m)
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		for _, v := range members {
+			if _, ok := mmbsMp[v.UserID]; ok {
+				continue
+			}
+			err = tx.Create(v).Error()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return nil
 }
 
 // Interface guards

@@ -27,10 +27,17 @@ type UpdateProjectArgs struct {
 	Until       optional.Time
 }
 
+type CreateProjectMemberArgs struct {
+	UserID uuid.UUID
+	Since  time.Time
+	Until  time.Time
+}
+
 type ProjectRepository interface {
 	GetProjects() ([]*domain.Project, error)
 	GetProject(id uuid.UUID) (*domain.Project, error)
 	CreateProject(project *model.Project) (*domain.Project, error)
 	UpdateProject(id uuid.UUID, changes map[string]interface{}) error
 	GetProjectMembers(id uuid.UUID) ([]*domain.User, error)
+	AddProjectMembers(id uuid.UUID, args []*CreateProjectMemberArgs) error
 }
