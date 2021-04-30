@@ -266,10 +266,6 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
-type PutContestTeamMember struct {
-	Members []uuid.UUID `json:"members"`
-}
-
 // GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
 func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
@@ -292,6 +288,10 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+type PostContestTeamMember struct {
+	Members []uuid.UUID `json:"members" validate:"required"`
+}
+
 // PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
@@ -299,7 +299,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	// todo contestIDが必要ない
 	_ = uuid.FromStringOrNil(c.Param("contestID"))
 	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PutContestTeamMember{}
+	req := &PostContestTeamMember{}
 	err := c.BindAndValidate(req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -319,7 +319,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	// todo contestIDが必要ない
 	_ = uuid.FromStringOrNil(c.Param("contestID"))
 	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PutContestTeamMember{}
+	req := &PostContestTeamMember{}
 	err := c.BindAndValidate(req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
