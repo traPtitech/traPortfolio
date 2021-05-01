@@ -184,6 +184,44 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	return nil
 }
 
+func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
+	if projectID == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	// 存在チェック
+	err := repo.h.First(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID}).Error()
+	if err != nil {
+		return err
+	}
+
+	mmbsMp := make(map[uuid.UUID]struct{}, len(members))
+	_mmbs := make([]*model.ProjectMember, 0, len(members))
+	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
+	if err != nil {
+		return err
+	}
+	for _, v := range _mmbs {
+		mmbsMp[v.UserID] = struct{}{}
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		for _, memberID := range members {
+			if _, ok := mmbsMp[memberID]; ok {
+				err = tx.Delete(&model.ProjectMember{ProjectID: projectID, UserID: memberID}).Error()
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Interface guards
 var (
 	_ repository.ProjectRepository = (*ProjectRepository)(nil)

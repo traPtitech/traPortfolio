@@ -125,3 +125,8 @@ func (s *ProjectService) AddProjectMembers(ctx context.Context, projectID uuid.U
 	}
 	return nil
 }
+
+func (s *ProjectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.DeleteProjectMembers(projectID, memberIDs)
+	return err
+}

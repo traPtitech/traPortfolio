@@ -209,6 +209,10 @@ type PostProjectMembersRequest struct {
 	}
 }
 
+type PutProjectMembersRequest struct {
+	Members []uuid.UUID `json:"members"`
+}
+
 // PostProjectMembers POST /projects/:projectID/members
 func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
 	c := Context{_c}
@@ -235,6 +239,26 @@ func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
 		return err
 	}
 	return nil
+}
+
+// DeleteProjectMembers DELETE /projects/:projectID/members
+func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("projectID")
+	id := uuid.FromStringOrNil(_id)
+	req := &PutProjectMembersRequest{}
+	// todo validation
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	err = h.service.DeleteProjectMembers(ctx, id, req.Members)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 func convertToProjectDuration(since, until time.Time) domain.ProjectDuration {

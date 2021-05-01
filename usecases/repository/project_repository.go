@@ -40,4 +40,5 @@ type ProjectRepository interface {
 	UpdateProject(id uuid.UUID, changes map[string]interface{}) error
 	GetProjectMembers(id uuid.UUID) ([]*domain.User, error)
 	AddProjectMembers(id uuid.UUID, args []*CreateProjectMemberArgs) error
+	DeleteProjectMembers(id uuid.UUID, memberIDs []uuid.UUID) error
 }

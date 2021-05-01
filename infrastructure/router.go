@@ -75,7 +75,7 @@ func Init() {
 
 				apiProjectsPIDMembers.GET("", api.Project.GetProjectMembers)
 				apiProjectsPIDMembers.POST("", api.Project.PostProjectMembers)
-				// apiProjectsPIDMembers.DELETE("", api.Project.DeleteProjectMembers)
+				apiProjectsPIDMembers.DELETE("", api.Project.DeleteProjectMembers)
 			}
 		}
 
