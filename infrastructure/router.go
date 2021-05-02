@@ -89,11 +89,14 @@ func Init() {
 		{
 			apiContests := v1.Group("/contests")
 
+			apiContests.GET("", api.Contest.GetContests)
 			apiContests.POST("", api.Contest.PostContest)
 			{
 				apiContestsCID := apiContests.Group("/:contestID")
 
+				apiContestsCID.GET("", api.Contest.GetContest)
 				apiContestsCID.PATCH("", api.Contest.PatchContest)
+				apiContestsCID.DELETE("", api.Contest.DeleteContest)
 				{
 					apiContestsCIDTeams := apiContestsCID.Group("/teams")
 
@@ -105,6 +108,7 @@ func Init() {
 						{
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
+							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMember)
 							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
 							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.PostContestTeamMember)
 						}

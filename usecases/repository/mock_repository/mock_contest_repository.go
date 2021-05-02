@@ -80,6 +80,20 @@ func (mr *MockContestRepositoryMockRecorder) CreateContestTeam(contestID, args i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateContestTeam", reflect.TypeOf((*MockContestRepository)(nil).CreateContestTeam), contestID, args)
 }
 
+// DeleteContest mocks base method.
+func (m *MockContestRepository) DeleteContest(id uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteContest", id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteContest indicates an expected call of DeleteContest.
+func (mr *MockContestRepositoryMockRecorder) DeleteContest(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContest", reflect.TypeOf((*MockContestRepository)(nil).DeleteContest), id)
+}
+
 // DeleteContestTeamMember mocks base method.
 func (m *MockContestRepository) DeleteContestTeamMember(teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	m.ctrl.T.Helper()
@@ -92,6 +106,51 @@ func (m *MockContestRepository) DeleteContestTeamMember(teamID uuid.UUID, member
 func (mr *MockContestRepositoryMockRecorder) DeleteContestTeamMember(teamID, memberIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContestTeamMember", reflect.TypeOf((*MockContestRepository)(nil).DeleteContestTeamMember), teamID, memberIDs)
+}
+
+// GetContest mocks base method.
+func (m *MockContestRepository) GetContest(ID uuid.UUID) (*domain.ContestDetail, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContest", ID)
+	ret0, _ := ret[0].(*domain.ContestDetail)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContest indicates an expected call of GetContest.
+func (mr *MockContestRepositoryMockRecorder) GetContest(ID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContest", reflect.TypeOf((*MockContestRepository)(nil).GetContest), ID)
+}
+
+// GetContestTeamMember mocks base method.
+func (m *MockContestRepository) GetContestTeamMember(teamID, contestID uuid.UUID) ([]*domain.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContestTeamMember", teamID, contestID)
+	ret0, _ := ret[0].([]*domain.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContestTeamMember indicates an expected call of GetContestTeamMember.
+func (mr *MockContestRepositoryMockRecorder) GetContestTeamMember(teamID, contestID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContestTeamMember", reflect.TypeOf((*MockContestRepository)(nil).GetContestTeamMember), teamID, contestID)
+}
+
+// GetContests mocks base method.
+func (m *MockContestRepository) GetContests() ([]*domain.Contest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContests")
+	ret0, _ := ret[0].([]*domain.Contest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContests indicates an expected call of GetContests.
+func (mr *MockContestRepositoryMockRecorder) GetContests() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContests", reflect.TypeOf((*MockContestRepository)(nil).GetContests))
 }
 
 // UpdateContest mocks base method.

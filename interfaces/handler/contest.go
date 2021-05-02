@@ -17,7 +17,7 @@ type ContestHandler struct {
 	srv service.ContestService
 }
 
-// NewEventHandler creates a EventHandler
+// NewContestHandler creates a ContestHandler
 func NewContestHandler(service service.ContestService) *ContestHandler {
 	return &ContestHandler{service}
 }
@@ -29,12 +29,85 @@ type PostContestRequest struct {
 	Duration    Duration
 }
 
-type PostContestResponse struct {
+type ContestResponse struct {
 	ID   uuid.UUID `json:"id"`
 	Name string    `json:"name"`
 	Duration
 }
 
+type ContestDetailResponse struct {
+	ContestResponse
+	Link        string                 `json:"link"`
+	Description string                 `json:"description"`
+	Teams       []*ContestTeamResponse `json:"teams"`
+}
+
+type ContestTeamResponse struct {
+	ID     uuid.UUID `json:"id"`
+	Name   string    `json:"name"`
+	Result string    `json:"result"`
+}
+
+// GetContests GET /contests
+func (h *ContestHandler) GetContests(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	contests, err := h.srv.GetContests(ctx)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*ContestResponse, 0, len(contests))
+	for _, v := range contests {
+		res = append(res, &ContestResponse{
+			ID:   v.ID,
+			Name: v.Name,
+			Duration: Duration{
+				Since: v.TimeStart,
+				Until: v.TimeEnd,
+			},
+		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+func (h *ContestHandler) GetContest(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+
+	contest, err := h.srv.GetContest(ctx, id)
+
+	teams := make([]*ContestTeamResponse, 0, len(contest.Teams))
+	for _, v := range contest.Teams {
+		teams = append(teams, &ContestTeamResponse{
+			ID:     v.ID,
+			Name:   v.Name,
+			Result: v.Result,
+		})
+	}
+
+	res := &ContestDetailResponse{
+		ContestResponse: ContestResponse{
+			ID:   contest.ID,
+			Name: contest.Name,
+			Duration: Duration{
+				Since: contest.TimeStart,
+				Until: contest.TimeEnd,
+			},
+		},
+		Link:        contest.Link,
+		Description: contest.Description,
+		Teams:       teams,
+	}
+
+	if err != nil {
+		return convertError(err)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// PostContest POST /contests
 func (h *ContestHandler) PostContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -57,7 +130,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	res := PostContestResponse{
+	res := ContestResponse{
 		ID:   contest.ID,
 		Name: contest.Name,
 		Duration: Duration{
@@ -75,6 +148,7 @@ type PatchContestRequest struct {
 	Duration    OptionalDuration
 }
 
+// PatchContest PATCH /contests/:contestID
 func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -102,6 +176,19 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
+// DeleteContest DELETE /contests/:contestID
+func (h *ContestHandler) DeleteContest(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+	err := h.srv.DeleteContest(ctx, id)
+	if err != nil {
+		return convertError(err)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 type PostContestTeamRequest struct {
 	Name        string `json:"name"`
 	Link        string `json:"link"`
@@ -115,6 +202,7 @@ type PostContestTeamResponse struct {
 	Result string    `json:"result"`
 }
 
+// PostContestTeam POST /contests/:contestID/teams
 func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -152,6 +240,7 @@ type PatchContestTeamRequest struct {
 	Result      optional.String `json:"result"`
 }
 
+// PatchContestTeam PATCH /contests/:contestID
 func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
@@ -177,17 +266,40 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
-type PutContestTeamMember struct {
-	Members []uuid.UUID `json:"members"`
+// GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
+func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	contestID := uuid.FromStringOrNil(c.Param("contestID"))
+	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+
+	users, err := h.srv.GetContestTeamMember(ctx, contestID, teamID)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*userResponse, 0, len(users))
+	for _, v := range users {
+		res = append(res, &userResponse{
+			ID:       v.ID,
+			Name:     v.Name,
+			RealName: v.RealName,
+		})
+	}
+	return c.JSON(http.StatusOK, res)
 }
 
+type PostContestTeamMember struct {
+	Members []uuid.UUID `json:"members" validate:"required"`
+}
+
+// PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	_ = uuid.FromStringOrNil(c.Param("contestID"))
 	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PutContestTeamMember{}
+	req := &PostContestTeamMember{}
 	err := c.BindAndValidate(req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -200,13 +312,14 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	_ = uuid.FromStringOrNil(c.Param("contestID"))
 	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PutContestTeamMember{}
+	req := &PostContestTeamMember{}
 	err := c.BindAndValidate(req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())

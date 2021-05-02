@@ -9,11 +9,63 @@ import (
 )
 
 type ContestRepository struct {
-	h database.SQLHandler
+	h      database.SQLHandler
+	portal repository.PortalRepository
 }
 
-func NewContestRepository(sql database.SQLHandler) repository.ContestRepository {
-	return &ContestRepository{h: sql}
+func NewContestRepository(sql database.SQLHandler, portal repository.PortalRepository) repository.ContestRepository {
+	return &ContestRepository{h: sql, portal: portal}
+}
+
+func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
+	contests := make([]*model.Contest, 10)
+	err := repo.h.Find(&contests).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	result := make([]*domain.Contest, 0, len(contests))
+
+	for _, v := range contests {
+		result = append(result, &domain.Contest{
+			ID:        v.ID,
+			Name:      v.Name,
+			TimeStart: v.Since,
+			TimeEnd:   v.Until,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
+		})
+	}
+	return result, nil
+}
+
+func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, error) {
+	contest := &model.Contest{ID: id}
+	err := repo.h.First(contest).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	teams, err := repo.GetContestTeams(id)
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	res := &domain.ContestDetail{
+		Contest: domain.Contest{
+			ID:        contest.ID,
+			Name:      contest.Name,
+			TimeStart: contest.Since,
+			TimeEnd:   contest.Until,
+			CreatedAt: contest.CreatedAt,
+			UpdatedAt: contest.UpdatedAt,
+		},
+		Link:        contest.Link,
+		Description: contest.Description,
+		Teams:       teams,
+	}
+
+	return res, nil
 }
 
 func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
@@ -68,6 +120,50 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 		return err
 	}
 	return nil
+}
+
+func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
+	if id == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	err := repo.h.First(&model.Contest{ID: id}).Error()
+	if err != nil {
+		return convertError(err)
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		err = tx.Delete(&model.Contest{}, &model.Contest{ID: id}).Error()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return convertError(err)
+	}
+	return nil
+}
+
+func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	teams := make([]*model.ContestTeam, 10)
+	err := repo.h.Model(&model.ContestTeam{}).Where("contest_id = ?", contestID).Find(&teams).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	result := make([]*domain.ContestTeam, 0, len(teams))
+	for _, v := range teams {
+		result = append(result, &domain.ContestTeam{
+			ID:        v.ID,
+			ContestID: v.ContestID,
+			Name:      v.Name,
+			Result:    v.Result,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
+		})
+	}
+	return result, nil
 }
 
 func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
@@ -144,9 +240,51 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 	return nil
 }
 
+func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+	if teamID == uuid.Nil || contestID == uuid.Nil {
+		return nil, repository.ErrNilID
+	}
+
+	users := make([]*model.User, 10)
+	err := repo.h.
+		Model(&model.ContestTeamUserBelonging{}).
+		Select("users.*").
+		Where("contest_team_user_belongings.team_id = ?", teamID).
+		Joins("INNER JOIN users ON contest_team_user_belongings.user_id = users.id").
+		Scan(&users).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	result := make([]*domain.User, 0, len(users))
+	portalMp, err := repo.portal.MakeUserMp()
+
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	for _, v := range users {
+		portalUser, ok := portalMp[v.Name]
+		name := ""
+		if ok {
+			name = portalUser.Name
+		}
+		result = append(result, &domain.User{
+			ID:       v.ID,
+			Name:     v.Name,
+			RealName: name,
+		})
+	}
+	return result, nil
+}
+
 func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
 	if teamID == uuid.Nil {
 		return repository.ErrNilID
+	}
+
+	if members == nil {
+		return repository.ErrInvalidArg
 	}
 
 	// 存在チェック
@@ -157,7 +295,7 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 
 	curMp := make(map[uuid.UUID]struct{}, len(members))
 	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(&_cur).Error()
 	if err != nil {
 		return err
 	}
