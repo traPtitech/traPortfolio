@@ -114,13 +114,13 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	// todo validation
 	err := c.BindAndValidate(req)
 	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	since := semToTime(req.Duration.Since)
 	until := semToTime(req.Duration.Until)
 	if since.After(until) {
-		return c.JSON(http.StatusBadRequest, "invalid duration")
+		return convertError(repository.ErrInvalidArg)
 	}
 	createReq := repository.CreateProjectArgs{
 		Name:        req.Name,
@@ -131,7 +131,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	}
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := ProjectResponse{
 		ID:       project.ID,
@@ -157,13 +157,13 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	// todo validation
 	err := c.BindAndValidate(req)
 	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	since := optionalSemToTime(req.Duration.Since)
 	until := optionalSemToTime(req.Duration.Until)
 	if since.Valid && until.Valid && since.Time.After(until.Time) {
-		return c.JSON(http.StatusBadRequest, "invalid duration")
+		return convertError(repository.ErrInvalidArg)
 	}
 	patchReq := repository.UpdateProjectArgs{
 		Name:        req.Name,
@@ -175,7 +175,7 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 
 	err = h.service.UpdateProject(ctx, id, &patchReq)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -188,7 +188,7 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	id := uuid.FromStringOrNil(_id)
 	members, err := h.service.GetProjectMembers(ctx, id)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := make([]*ProjectMemberResponse, 0, len(members))
 	for _, v := range members {
@@ -223,7 +223,7 @@ func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
 	// todo validation
 	err := c.BindAndValidate(req)
 	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
@@ -236,7 +236,7 @@ func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
 	}
 	err = h.service.AddProjectMembers(ctx, id, createReq)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return nil
 }
@@ -251,12 +251,12 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	// todo validation
 	err := c.BindAndValidate(req)
 	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	err = h.service.DeleteProjectMembers(ctx, id, req.Members)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }

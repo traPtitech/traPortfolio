@@ -20,7 +20,7 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	projects := make([]*model.Project, 0)
 	err := repo.h.Find(&projects).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	res := make([]*domain.Project, 0, len(projects))
 	for _, v := range projects {
@@ -42,7 +42,7 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
 	project := &model.Project{ID: id}
 	if err := repo.h.First(&project).Error(); err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	members := make([]*domain.ProjectMember, 0)
@@ -51,7 +51,7 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	joinQuery := "left join users on users.id = project_members.user_id"
 	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, id).Joins(joinQuery).Scan(&members).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	res := &domain.Project{
 		ID:          project.ID,
@@ -70,7 +70,7 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
 	err := repo.h.Create(project).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	res := &domain.Project{
 		ID:          project.ID,
@@ -127,7 +127,7 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 	joinQuery := "left join users on users.id = project_members.user_id"
 	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, id).Joins(joinQuery).Scan(&members).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	return members, nil
 }
@@ -140,14 +140,14 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	//存在チェック
 	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
 	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
 	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	for _, v := range _mmbs {
 		mmbsMp[v.UserID] = struct{}{}
@@ -176,7 +176,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 			}
 			err = tx.Create(v).Error()
 			if err != nil {
-				return err
+				return convertError(err)
 			}
 		}
 		return nil
@@ -192,14 +192,14 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 	// 存在チェック
 	err := repo.h.First(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID}).Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(members))
 	_mmbs := make([]*model.ProjectMember, 0, len(members))
 	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	for _, v := range _mmbs {
 		mmbsMp[v.UserID] = struct{}{}
@@ -208,16 +208,16 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
 		for _, memberID := range members {
 			if _, ok := mmbsMp[memberID]; ok {
-				err = tx.Delete(&model.ProjectMember{ProjectID: projectID, UserID: memberID}).Error()
+				err = tx.Delete(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID, UserID: memberID}).Error()
 				if err != nil {
-					return err
+					return convertError(err)
 				}
 			}
 		}
 		return nil
 	})
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return nil
 }
