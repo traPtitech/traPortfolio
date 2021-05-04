@@ -118,7 +118,7 @@ func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
 }
 
 func (handler *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.conn.Delete(value, where)
+	db := handler.conn.Delete(value, where...)
 	return &SQLHandler{conn: db}
 }
 

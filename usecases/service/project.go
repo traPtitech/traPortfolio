@@ -98,3 +98,35 @@ func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 	}
 	return nil
 }
+
+func (s *ProjectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([]*domain.User, error) {
+	members, err := s.repo.GetProjectMembers(id)
+	if err != nil {
+		return nil, err
+	}
+	portalUsers, err := s.portal.GetUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	NameMap := make(map[string]string, len(portalUsers))
+	for _, v := range portalUsers {
+		NameMap[v.ID] = v.Name
+	}
+	for i, v := range members {
+		members[i].RealName = NameMap[v.Name]
+	}
+	return members, nil
+}
+
+func (s *ProjectService) AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
+	err := s.repo.AddProjectMembers(projectID, args)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ProjectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.DeleteProjectMembers(projectID, memberIDs)
+	return err
+}
