@@ -202,11 +202,13 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-type PostProjectMembersRequest struct {
-	Members []*struct {
-		UserID   string                 `json:"user_id"`
-		Duration domain.ProjectDuration `json:"duration"`
-	}
+type AddProjectMembersRequest struct {
+	Members []*MemberIDWithProjectDuration
+}
+
+type MemberIDWithProjectDuration struct {
+	UserID   string                 `json:"user_id"`
+	Duration domain.ProjectDuration `json:"duration"`
 }
 
 type PutProjectMembersRequest struct {
@@ -219,7 +221,7 @@ func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
 	ctx := c.Request().Context()
 	_id := c.Param("projectID")
 	id := uuid.FromStringOrNil(_id)
-	req := &PostProjectMembersRequest{}
+	req := &AddProjectMembersRequest{}
 	// todo validation
 	err := c.BindAndValidate(req)
 	if err != nil {
