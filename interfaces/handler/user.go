@@ -52,6 +52,13 @@ type EditAccountRequest struct {
 	PrPermitted optional.Bool   `json:"prPermitted"`
 }
 
+type UserProjectResponse struct {
+	ID           uuid.UUID              `json:"id"`
+	Name         string                 `json:"name"`
+	Duration     domain.ProjectDuration `json:"duration"`
+	UserDuration domain.ProjectDuration `json:"user_duration"`
+}
+
 func NewUserHandler(s service.UserService) *UserHandler {
 	return &UserHandler{srv: s}
 }
@@ -260,4 +267,27 @@ func (handler *UserHandler) DeleteAccount(c echo.Context) error {
 		return err
 	}
 	return c.NoContent(http.StatusOK)
+}
+
+// GetProjects GET /users/:userID/projects
+func (handler *UserHandler) GetProjects(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("userID")
+	userID := uuid.FromStringOrNil(_id)
+	projects, err := handler.srv.GetUserProjects(ctx, userID)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*UserProjectResponse, 0, len(projects))
+	for _, v := range projects {
+		up := &UserProjectResponse{
+			ID:           v.ID,
+			Name:         v.Name,
+			Duration:     convertToProjectDuration(v.Since, v.Until),
+			UserDuration: convertToProjectDuration(v.UserSince, v.UserUntil),
+		}
+		res = append(res, up)
+	}
+	return c.JSON(http.StatusOK, res)
 }

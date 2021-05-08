@@ -194,6 +194,18 @@ func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID)
 
 }
 
+func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
+	projects := make([]*domain.UserProject, 0)
+	selectQuery := "projects.id, projects.name, projects.since, projects.until, project_members.since AS user_since, project_members.until AS user_until"
+	whereQuery := "project_members.user_id = ?"
+	joinQuery := "LEFT JOIN projects ON project_members.project_id = projects.id"
+	err := repo.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, userID).Joins(joinQuery).Scan(&projects).Error()
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
 // Interface guards
 var (
 	_ repository.UserRepository = (*UserRepository)(nil)
