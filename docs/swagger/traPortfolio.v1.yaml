@@ -710,7 +710,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MemberIDs'
+              $ref: '#/components/schemas/AddProjectMembers'
       tags:
         - project
         - user
@@ -1317,8 +1317,8 @@ components:
       properties:
         eventLevel:
           $ref: '#/components/schemas/EventLevel'
-    AddProjectMember:
-      title: AddProjectMember
+    AddProjectMembers:
+      title: AddProjectMembers
       type: array
       description: プロジェクトメンバー追加リクエスト
       items:
@@ -1329,9 +1329,11 @@ components:
       type: object
       description: プロジェクトメンバーのユーザーUUID(期間含む)
       properties:
-        user_id: uuid
+        user_id:
+          type: string
+          format: uuid
         duration:
-          $ref: '#/components/schemas/ProjectDetail'
+          $ref: '#/components/schemas/ProjectDuration'
     MemberIDs:
       title: MemberIDs
       type: object
