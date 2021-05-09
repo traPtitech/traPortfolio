@@ -56,6 +56,10 @@ func Init() {
 						apiUsersUIDAccountsAID.PATCH("", api.User.PatchAccount)
 						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteAccount)
 					}
+
+					apiUsersUIDProjects := apiUsersUID.Group("/projects")
+
+					apiUsersUIDProjects.GET("", api.User.GetProjects)
 				}
 			}
 		}

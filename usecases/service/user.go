@@ -144,3 +144,14 @@ func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, us
 	return err
 
 }
+
+func (s *UserService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {
+	if userID == uuid.Nil {
+		return nil, repository.ErrInvalidID
+	}
+	projects, err := s.repo.GetProjects(userID)
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
