@@ -215,8 +215,8 @@ type PutProjectMembersRequest struct {
 	Members []uuid.UUID `json:"members"`
 }
 
-// PostProjectMembers POST /projects/:projectID/members
-func (h *ProjectHandler) PostProjectMembers(_c echo.Context) error {
+// AddProjectMembers POST /projects/:projectID/members
+func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	_id := c.Param("projectID")
