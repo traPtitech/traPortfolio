@@ -1330,6 +1330,9 @@ components:
           format: uuid
         duration:
           $ref: '#/components/schemas/ProjectDuration'
+      required:
+        - user_id
+        - duration
     MemberIDs:
       title: MemberIDs
       type: object
