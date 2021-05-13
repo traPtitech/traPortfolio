@@ -206,6 +206,19 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 	return projects, nil
 }
 
+func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
+	contests := make([]*domain.UserContest, 0)
+	selectQuery := "contest_teams.id, contest_teams.name, contest_teams.result, contests.name AS contest_name"
+	whereQuery := "contest_team_user_belongings.user_id = ?"
+	joinQuery := "LEFT JOIN contests ON contest_teams.contest_id = contests.id"
+	joinQuery2 := "LEFT JOIN contest_team_user_belongings ON contest_teams.id = contest_team_user_belongings.team_id"
+	err := repo.Model(&model.ContestTeam{}).Select(selectQuery).Where(whereQuery, userID).Joins(joinQuery).Joins(joinQuery2).Scan(&contests).Error()
+	if err != nil {
+		return nil, err
+	}
+	return contests, nil
+}
+
 // Interface guards
 var (
 	_ repository.UserRepository = (*UserRepository)(nil)

@@ -155,3 +155,14 @@ func (s *UserService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]
 	}
 	return projects, nil
 }
+
+func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error) {
+	if userID == uuid.Nil {
+		return nil, repository.ErrInvalidID
+	}
+	contests, err := s.repo.GetContests(userID)
+	if err != nil {
+		return nil, err
+	}
+	return contests, nil
+}
