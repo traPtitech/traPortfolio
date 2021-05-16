@@ -1327,7 +1327,7 @@ components:
       type: object
       description: プロジェクトメンバーのユーザーUUID(期間含む)
       properties:
-        user_id:
+        userId:
           type: string
           format: uuid
         duration:
