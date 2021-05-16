@@ -1320,8 +1320,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MemberIDWithProjectDuration'
-          required:
-            - members
+      required:
+        - members
     MemberIDWithProjectDuration:
       title: MemberIDWithProjectDuration
       type: object
