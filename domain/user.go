@@ -36,6 +36,13 @@ type UserProject struct {
 	UserUntil time.Time
 }
 
+type UserContest struct {
+	ID          uuid.UUID
+	Name        string
+	Result      string
+	ContestName string
+}
+
 const (
 	HOMEPAGE uint = iota
 	BLOG

@@ -59,6 +59,13 @@ type UserProjectResponse struct {
 	UserDuration domain.ProjectDuration `json:"user_duration"`
 }
 
+type ContestTeamWithContestNameResponse struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Result      string    `json:"result"`
+	ContestName string    `json:"contest_name"`
+}
+
 func NewUserHandler(s service.UserService) *UserHandler {
 	return &UserHandler{srv: s}
 }
@@ -288,6 +295,29 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 			UserDuration: convertToProjectDuration(v.UserSince, v.UserUntil),
 		}
 		res = append(res, up)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// GetContests GET /users/:userID/contests
+func (handler *UserHandler) GetContests(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("userID")
+	userID := uuid.FromStringOrNil(_id)
+	contests, err := handler.srv.GetUserContests(ctx, userID)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*ContestTeamWithContestNameResponse, 0, len(contests))
+	for _, v := range contests {
+		uc := &ContestTeamWithContestNameResponse{
+			ID:          v.ID,
+			Name:        v.Name,
+			Result:      v.Result,
+			ContestName: v.ContestName,
+		}
+		res = append(res, uc)
 	}
 	return c.JSON(http.StatusOK, res)
 }
