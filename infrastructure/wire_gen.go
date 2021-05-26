@@ -33,17 +33,17 @@ func InjectAPIServer() (handler.API, error) {
 		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler, portalAPI, traQAPI)
-	userService := service.NewUserService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
-	projectRepository := repository.NewProjectRepository(sqlHandler)
-	portalRepository := repository.NewPortalRepository(portalAPI)
-	projectService := service.NewProjectService(projectRepository, portalRepository)
-	projectHandler := handler.NewProjectHandler(projectService)
 	knoqAPI, err := NewKnoqAPI()
 	if err != nil {
 		return handler.API{}, err
 	}
 	eventRepository := repository.NewEventRepository(sqlHandler, knoqAPI)
+	userService := service.NewUserService(userRepository, eventRepository)
+	userHandler := handler.NewUserHandler(userService)
+	projectRepository := repository.NewProjectRepository(sqlHandler)
+	portalRepository := repository.NewPortalRepository(portalAPI)
+	projectService := service.NewProjectService(projectRepository, portalRepository)
+	projectHandler := handler.NewProjectHandler(projectService)
 	eventService := service.NewEventService(eventRepository)
 	eventHandler := handler.NewEventHandler(eventService)
 	contestRepository := repository.NewContestRepository(sqlHandler, portalRepository)

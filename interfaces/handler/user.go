@@ -321,3 +321,28 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, res)
 }
+
+// GetEvents GET /users/:userID/events
+func (handler *UserHandler) GetEvents(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("userID")
+	userID := uuid.FromStringOrNil(_id)
+	events, err := handler.srv.GetUserEvents(ctx, userID)
+	if err != nil {
+		return convertError(err)
+	}
+	res := make([]*eventResponse, 0, len(events)) //TODO 型名
+	for _, v := range events {
+		e := &eventResponse{
+		ID: v.ID,
+		Name: v.Name,
+		Duration: Duration{
+			Since: v.TimeStart,
+			Until: v.TimeEnd,
+		},
+	}
+		res = append(res, e)
+	}
+	return c.JSON(http.StatusOK, res)
+}

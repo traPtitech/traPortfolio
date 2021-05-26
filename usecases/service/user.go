@@ -12,11 +12,12 @@ import (
 )
 
 type UserService struct {
-	repo repository.UserRepository
+	repo  repository.UserRepository
+	event repository.EventRepository
 }
 
-func NewUserService(userRepository repository.UserRepository) UserService {
-	return UserService{repo: userRepository}
+func NewUserService(userRepository repository.UserRepository, eventRepository repository.EventRepository) UserService {
+	return UserService{repo: userRepository, event: eventRepository}
 }
 
 func (s *UserService) GetUsers(ctx context.Context) ([]*domain.User, error) {
@@ -165,4 +166,15 @@ func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 		return nil, err
 	}
 	return contests, nil
+}
+
+func (s *UserService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
+	if userID == uuid.Nil {
+		return nil, repository.ErrInvalidID
+	}
+	events, err := s.event.GetUserEvents(userID)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
 }
