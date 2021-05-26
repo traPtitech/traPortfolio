@@ -335,13 +335,13 @@ func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	res := make([]*eventResponse, 0, len(events)) //TODO 型名
 	for _, v := range events {
 		e := &eventResponse{
-		ID: v.ID,
-		Name: v.Name,
-		Duration: Duration{
-			Since: v.TimeStart,
-			Until: v.TimeEnd,
-		},
-	}
+			ID:   v.ID,
+			Name: v.Name,
+			Duration: Duration{
+				Since: v.TimeStart,
+				Until: v.TimeEnd,
+			},
+		}
 		res = append(res, e)
 	}
 	return c.JSON(http.StatusOK, res)
