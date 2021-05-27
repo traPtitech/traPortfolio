@@ -10,4 +10,5 @@ import (
 type EventRepository interface {
 	GetEvents() ([]*domain.Event, error)
 	GetEvent(id uuid.UUID) (*domain.EventDetail, error)
+	GetUserEvents(id uuid.UUID) ([]*domain.Event, error)
 }

@@ -62,7 +62,12 @@ func Init() {
 					apiUsersUIDProjects.GET("", api.User.GetProjects)
 
 					apiUsersUIDContests := apiUsersUID.Group("/contests")
+
 					apiUsersUIDContests.GET("", api.User.GetContests)
+
+					apiUsersUIDEvents := apiUsersUID.Group("/events")
+
+					apiUsersUIDEvents.GET("", api.User.GetEvents)
 				}
 			}
 		}

@@ -92,6 +92,28 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 	return &er, nil
 }
 
+func (knoq *KnoqAPI) GetByUserID(id uuid.UUID) ([]*external.EventResponse, error) {
+	if id == uuid.Nil {
+		return nil, nil
+	}
+
+	res, err := apiGet(knoq.Client, knoQAPIEndpoint, fmt.Sprintf("/users/%v/events", id))
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GET /users/%v/events failed", id)
+	}
+
+	var er []*external.EventResponse
+	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
+		return nil, err
+	}
+	return er, nil
+}
+
 // Interface guards
 var (
 	_ external.KnoqAPI = (*KnoqAPI)(nil)
