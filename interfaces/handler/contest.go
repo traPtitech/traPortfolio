@@ -30,9 +30,9 @@ type PostContestRequest struct {
 }
 
 type ContestResponse struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-	Duration
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	Duration Duration  `json:"duration"`
 }
 
 type ContestDetailResponse struct {
@@ -200,6 +200,29 @@ type PostContestTeamResponse struct {
 	ID     uuid.UUID `json:"id"`
 	Name   string    `json:"name"`
 	Result string    `json:"result"`
+}
+
+// GetContestTeam GET /contests/:contestID/teams
+func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	id := uuid.FromStringOrNil(_id)
+	contestTeams, err := h.srv.GetContestTeams(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	res := make([]*ContestTeamResponse, 0, len(contestTeams))
+	for _, v := range contestTeams {
+		ct := &ContestTeamResponse{
+			ID:     v.ID,
+			Name:   v.Name,
+			Result: v.Result,
+		}
+		res = append(res, ct)
+	}
+	return c.JSON(http.StatusOK, res)
 }
 
 // PostContestTeam POST /contests/:contestID/teams

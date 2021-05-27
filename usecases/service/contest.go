@@ -85,6 +85,14 @@ func (s *ContestService) DeleteContest(ctx context.Context, id uuid.UUID) error 
 	return err
 }
 
+func (s *ContestService) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	contestTeams, err := s.repo.GetContestTeams(contestID)
+	if err != nil {
+		return nil, err
+	}
+	return contestTeams, nil
+}
+
 func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam, err := s.repo.CreateContestTeam(contestID, args)
 	if err != nil {
