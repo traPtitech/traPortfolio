@@ -202,7 +202,7 @@ type PostContestTeamResponse struct {
 	Result string    `json:"result"`
 }
 
-// GetContestTeam GET /contests/:contestID/teams
+// GetContestTeams GET /contests/:contestID/teams
 func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
