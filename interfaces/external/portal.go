@@ -8,5 +8,5 @@ type PortalUserResponse struct {
 
 type PortalAPI interface {
 	GetAll() ([]*PortalUserResponse, error)
-	GetByID(string) (*PortalUserResponse, error)
+	GetByID(traQID string) (*PortalUserResponse, error)
 }

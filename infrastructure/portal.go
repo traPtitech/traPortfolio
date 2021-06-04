@@ -81,19 +81,19 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	return userResponses, nil
 }
 
-func (portal *PortalAPI) GetByID(id string) (*external.PortalUserResponse, error) {
-	if id == "" {
+func (portal *PortalAPI) GetByID(traQID string) (*external.PortalUserResponse, error) {
+	if traQID == "" {
 		return nil, fmt.Errorf("invalid traQID")
 	}
 
-	res, err := apiGet(portal.Client, portalAPIEndpoint, fmt.Sprintf("/user/%v", id))
+	res, err := apiGet(portal.Client, portalAPIEndpoint, fmt.Sprintf("/user/%v", traQID))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /user/%v failed: %v", id, res.Status)
+		return nil, fmt.Errorf("GET /user/%v failed: %v", traQID, res.Status)
 	}
 
 	var userResponse external.PortalUserResponse

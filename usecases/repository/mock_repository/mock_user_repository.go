@@ -95,6 +95,36 @@ func (mr *MockUserRepositoryMockRecorder) GetAccounts(userID interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccounts", reflect.TypeOf((*MockUserRepository)(nil).GetAccounts), userID)
 }
 
+// GetContests mocks base method.
+func (m *MockUserRepository) GetContests(arg0 uuid.UUID) ([]*domain.UserContest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContests", arg0)
+	ret0, _ := ret[0].([]*domain.UserContest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContests indicates an expected call of GetContests.
+func (mr *MockUserRepositoryMockRecorder) GetContests(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContests", reflect.TypeOf((*MockUserRepository)(nil).GetContests), arg0)
+}
+
+// GetProjects mocks base method.
+func (m *MockUserRepository) GetProjects(arg0 uuid.UUID) ([]*domain.UserProject, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProjects", arg0)
+	ret0, _ := ret[0].([]*domain.UserProject)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProjects indicates an expected call of GetProjects.
+func (mr *MockUserRepositoryMockRecorder) GetProjects(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjects", reflect.TypeOf((*MockUserRepository)(nil).GetProjects), arg0)
+}
+
 // GetUser mocks base method.
 func (m *MockUserRepository) GetUser(arg0 uuid.UUID) (*domain.UserDetail, error) {
 	m.ctrl.T.Helper()

@@ -9,8 +9,8 @@ import (
 )
 
 type PortalRepository interface {
-	GetUser(context.Context, string) (*domain.PortalUser, error)
-	GetUsers(context.Context) ([]*domain.PortalUser, error)
+	GetUsers(ctx context.Context) ([]*domain.PortalUser, error)
+	GetUser(ctx context.Context, traQID string) (*domain.PortalUser, error)
 
 	MakeUserMp() (map[string]*domain.PortalUser, error)
 }
