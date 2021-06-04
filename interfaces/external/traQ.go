@@ -13,5 +13,5 @@ type TraQUserResponse struct {
 }
 
 type TraQAPI interface {
-	GetByID(uuid.UUID) (*TraQUserResponse, error)
+	GetByID(id uuid.UUID) (*TraQUserResponse, error)
 }

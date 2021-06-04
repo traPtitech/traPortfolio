@@ -11,7 +11,7 @@ import (
 )
 
 type TraQRepository interface {
-	GetUser(context.Context, uuid.UUID) (*domain.TraQUser, error)
+	GetUser(ctx context.Context, id uuid.UUID) (*domain.TraQUser, error)
 }
 
 /*

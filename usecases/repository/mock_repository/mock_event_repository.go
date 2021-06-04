@@ -64,3 +64,18 @@ func (mr *MockEventRepositoryMockRecorder) GetEvents() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvents", reflect.TypeOf((*MockEventRepository)(nil).GetEvents))
 }
+
+// GetUserEvents mocks base method.
+func (m *MockEventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserEvents", userID)
+	ret0, _ := ret[0].([]*domain.Event)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserEvents indicates an expected call of GetUserEvents.
+func (mr *MockEventRepositoryMockRecorder) GetUserEvents(userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserEvents", reflect.TypeOf((*MockEventRepository)(nil).GetUserEvents), userID)
+}

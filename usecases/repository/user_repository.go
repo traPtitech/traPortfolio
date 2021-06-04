@@ -29,13 +29,13 @@ type UpdateAccountArgs struct {
 
 type UserRepository interface {
 	GetUsers() ([]*domain.User, error)
-	GetUser(uuid.UUID) (*domain.UserDetail, error)
+	GetUser(id uuid.UUID) (*domain.UserDetail, error)
 	Update(id uuid.UUID, changes map[string]interface{}) error
-	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
-	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
-	CreateAccount(uuid.UUID, *CreateAccountArgs) (*domain.Account, error)
-	UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error
-	DeleteAccount(uuid.UUID, uuid.UUID) error
-	GetProjects(uuid.UUID) ([]*domain.UserProject, error)
-	GetContests(uuid.UUID) ([]*domain.UserContest, error)
+	GetAccounts(id uuid.UUID) ([]*domain.Account, error)
+	GetAccount(id uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
+	CreateAccount(id uuid.UUID, args *CreateAccountArgs) (*domain.Account, error)
+	UpdateAccount(id uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error
+	DeleteAccount(id uuid.UUID, accountID uuid.UUID) error
+	GetProjects(id uuid.UUID) ([]*domain.UserProject, error)
+	GetContests(id uuid.UUID) ([]*domain.UserContest, error)
 }

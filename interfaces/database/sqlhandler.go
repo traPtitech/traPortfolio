@@ -1,23 +1,23 @@
 package database
 
 type SQLHandler interface {
-	Exec(string, ...interface{}) SQLHandler
-	Find(interface{}, ...interface{}) SQLHandler
-	First(interface{}, ...interface{}) SQLHandler
-	Raw(string, ...interface{}) SQLHandler
-	Create(interface{}) SQLHandler
-	Save(interface{}) SQLHandler
-	Delete(interface{}, ...interface{}) SQLHandler
-	Where(interface{}, ...interface{}) SQLHandler
-	Model(interface{}) SQLHandler
-	Updates(interface{}) SQLHandler
+	Exec(sql string, values ...interface{}) SQLHandler
+	Find(out interface{}, where ...interface{}) SQLHandler
+	First(out interface{}, where ...interface{}) SQLHandler
+	Raw(sql string, values ...interface{}) SQLHandler
+	Create(value interface{}) SQLHandler
+	Save(value interface{}) SQLHandler
+	Delete(value interface{}, where ...interface{}) SQLHandler
+	Where(query interface{}, args ...interface{}) SQLHandler
+	Model(value interface{}) SQLHandler
+	Updates(values interface{}) SQLHandler
 	Begin() SQLHandler
 	Commit() SQLHandler
+	Joins(query string, args ...interface{}) SQLHandler
+	Scan(dest interface{}) SQLHandler
+	Select(query interface{}, args ...interface{}) SQLHandler
 	Rollback() SQLHandler
 	Transaction(fc func(handler SQLHandler) error) error
-	Joins(string, ...interface{}) SQLHandler
-	Scan(interface{}) SQLHandler
-	Select(interface{}, ...interface{}) SQLHandler
 
 	Error() error
 }

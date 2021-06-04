@@ -11,6 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/traPtitech/traPortfolio/domain"
 	model "github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	repository "github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 // MockProjectRepository is a mock of ProjectRepository interface.
@@ -36,6 +37,20 @@ func (m *MockProjectRepository) EXPECT() *MockProjectRepositoryMockRecorder {
 	return m.recorder
 }
 
+// AddProjectMembers mocks base method.
+func (m *MockProjectRepository) AddProjectMembers(id uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddProjectMembers", id, args)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddProjectMembers indicates an expected call of AddProjectMembers.
+func (mr *MockProjectRepositoryMockRecorder) AddProjectMembers(id, args interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProjectMembers", reflect.TypeOf((*MockProjectRepository)(nil).AddProjectMembers), id, args)
+}
+
 // CreateProject mocks base method.
 func (m *MockProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
 	m.ctrl.T.Helper()
@@ -51,6 +66,20 @@ func (mr *MockProjectRepositoryMockRecorder) CreateProject(project interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectRepository)(nil).CreateProject), project)
 }
 
+// DeleteProjectMembers mocks base method.
+func (m *MockProjectRepository) DeleteProjectMembers(id uuid.UUID, memberIDs []uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProjectMembers", id, memberIDs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteProjectMembers indicates an expected call of DeleteProjectMembers.
+func (mr *MockProjectRepositoryMockRecorder) DeleteProjectMembers(id, memberIDs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProjectMembers", reflect.TypeOf((*MockProjectRepository)(nil).DeleteProjectMembers), id, memberIDs)
+}
+
 // GetProject mocks base method.
 func (m *MockProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
 	m.ctrl.T.Helper()
@@ -64,6 +93,21 @@ func (m *MockProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error
 func (mr *MockProjectRepositoryMockRecorder) GetProject(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectRepository)(nil).GetProject), id)
+}
+
+// GetProjectMembers mocks base method.
+func (m *MockProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProjectMembers", id)
+	ret0, _ := ret[0].([]*domain.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProjectMembers indicates an expected call of GetProjectMembers.
+func (mr *MockProjectRepositoryMockRecorder) GetProjectMembers(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectMembers", reflect.TypeOf((*MockProjectRepository)(nil).GetProjectMembers), id)
 }
 
 // GetProjects mocks base method.

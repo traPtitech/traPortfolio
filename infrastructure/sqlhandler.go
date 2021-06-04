@@ -87,13 +87,13 @@ func (handler *SQLHandler) Connect(dialect string, args ...interface{}) error {
 	return nil
 }
 
-func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.conn.Find(out, where...)
+func (handler *SQLHandler) Exec(sql string, values ...interface{}) database.SQLHandler {
+	db := handler.conn.Exec(sql, values...)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Exec(sql string, values ...interface{}) database.SQLHandler {
-	db := handler.conn.Exec(sql, values...)
+func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
+	db := handler.conn.Find(out, where...)
 	return &SQLHandler{conn: db}
 }
 
