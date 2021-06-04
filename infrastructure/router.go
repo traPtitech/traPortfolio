@@ -65,6 +65,10 @@ func Init() {
 
 					apiUsersUIDContests.GET("", api.User.GetContests)
 
+					// apiUsersUIDGroups := apiUsersUID.Group("/groups")
+
+					// apiUsersUIDGroups.GET("", api.User.GetGroups)
+
 					apiUsersUIDEvents := apiUsersUID.Group("/events")
 
 					apiUsersUIDEvents.GET("", api.User.GetEvents)
@@ -95,8 +99,19 @@ func Init() {
 			apiEvents := v1.Group("/events")
 
 			apiEvents.GET("", api.Event.GetAll)
-			apiEvents.GET("/:eventID", api.Event.GetByID)
+
+			apiEventsEID := apiEvents.Group("/:eventID")
+
+			apiEventsEID.GET("", api.Event.GetByID)
+			apiEventsEID.PATCH("", api.Event.PatchEvent)
 		}
+
+		// {
+		// 	apiGroups := v1.Group("/groups")
+
+		// 	apiGroups.GET("", api.Group.GetAll)
+		// 	apiGroups.GET("/:groupID", api.Group.GetByID)
+		// }
 
 		{
 			apiContests := v1.Group("/contests")
@@ -117,13 +132,15 @@ func Init() {
 					{
 						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")
 
+						// apiContestsCIDTeamsTID.GET("", api.contest.GetContestTeam)
 						apiContestsCIDTeamsTID.PATCH("", api.Contest.PatchContestTeam)
+						// apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
 						{
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
 							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMember)
-							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
 							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.PostContestTeamMember)
+							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
 						}
 					}
 				}

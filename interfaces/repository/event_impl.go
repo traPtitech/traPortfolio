@@ -68,6 +68,13 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 	return result, nil
 }
 
+func (repo *EventRepository) UpdateEvent(elv *model.EventLevelRelation) error {
+	if err := repo.h.Model(&model.EventLevelRelation{}).Updates(elv).Error(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (repo *EventRepository) GetUserEvents(id uuid.UUID) ([]*domain.Event, error) {
 	events, err := repo.api.GetByUserID(id)
 	if err != nil {
