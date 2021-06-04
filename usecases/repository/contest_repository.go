@@ -48,6 +48,7 @@ type ContestRepository interface {
 	CreateContest(args *CreateContestArgs) (*domain.Contest, error)
 	UpdateContest(id uuid.UUID, changes map[string]interface{}) error
 	DeleteContest(id uuid.UUID) error
+	GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error)
 	CreateContestTeam(contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
 	UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error
 	GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)

@@ -112,6 +112,7 @@ func Init() {
 				{
 					apiContestsCIDTeams := apiContestsCID.Group("/teams")
 
+					apiContestsCIDTeams.GET("", api.Contest.GetContestTeams)
 					apiContestsCIDTeams.POST("", api.Contest.PostContestTeam)
 					{
 						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")

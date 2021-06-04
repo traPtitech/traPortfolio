@@ -472,6 +472,12 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContestTeam'
         '404':
           description: Not Found
       operationId: getContestTeams
@@ -511,12 +517,12 @@ paths:
       responses:
         '200':
           description: OK
-        '404':
-          description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContestTeamDetail'
+        '404':
+          description: Not Found
       operationId: getContestTeam
       description: コンテストチーム詳細情報を取得します
     patch:
