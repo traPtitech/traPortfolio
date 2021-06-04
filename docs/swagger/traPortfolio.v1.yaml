@@ -716,7 +716,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MemberIDs'
+              $ref: '#/components/schemas/AddProjectMembers'
       tags:
         - project
         - user
@@ -1194,13 +1194,7 @@ components:
           type: string
           description: プロジェクト説明
         duration:
-          format: date-time
-          description: |-
-            プロジェクト期間の配列
-            untilがなかった場合存続中
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectDuration'
+          $ref: '#/components/schemas/ProjectDuration'
     EditContest:
       title: EditContest
       type: object
@@ -1323,6 +1317,30 @@ components:
       properties:
         eventLevel:
           $ref: '#/components/schemas/EventLevel'
+    AddProjectMembers:
+      title: AddProjectMembers
+      type: object
+      description: プロジェクトメンバー追加リクエスト
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberIDWithProjectDuration'
+      required:
+        - members
+    MemberIDWithProjectDuration:
+      title: MemberIDWithProjectDuration
+      type: object
+      description: プロジェクトメンバーのユーザーUUID(期間含む)
+      properties:
+        userId:
+          type: string
+          format: uuid
+        duration:
+          $ref: '#/components/schemas/ProjectDuration'
+      required:
+        - user_id
+        - duration
     MemberIDs:
       title: MemberIDs
       type: object
