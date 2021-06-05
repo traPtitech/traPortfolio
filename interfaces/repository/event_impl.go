@@ -62,14 +62,41 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 	}
 
 	if err == nil {
-		result.Level = elv.Level
+		result.Level = *elv.Level
 	}
 
 	return result, nil
 }
 
 func (repo *EventRepository) UpdateEvent(elv *model.EventLevelRelation) error {
-	if err := repo.h.Model(&model.EventLevelRelation{}).Updates(elv).Error(); err != nil {
+	if elv.ID == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	var (
+		old model.EventLevelRelation
+		new model.EventLevelRelation
+	)
+
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.First(&old, &model.EventLevelRelation{ID: elv.ID}).Error(); err != nil {
+			if err == repository.ErrNotFound {
+				if err := tx.Create(elv).Error(); err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
+		}
+		if err := tx.Model(&old).Updates(elv).Error(); err != nil {
+			return err
+		}
+		if err := tx.Where(&model.EventLevelRelation{ID: elv.ID}).First(&new).Error(); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		return err
 	}
 	return nil

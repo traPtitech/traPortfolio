@@ -82,7 +82,7 @@ func (h *EventHandler) GetByID(c echo.Context) error {
 }
 
 type EditEventRequest struct {
-	EventLevel domain.EventLevel
+	EventLevel *domain.EventLevel
 }
 
 // PatchEvent PATCH /events/:eventID
@@ -92,14 +92,13 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	_id := c.Param("eventID")
 	id := uuid.FromStringOrNil(_id)
 	req := &EditEventRequest{}
-	// todo validation
 	err := c.BindAndValidate(req)
 	if err != nil {
 		return convertError(err)
 	}
 
 	patchReq := repository.UpdateEventArg{
-		Level: req.EventLevel,
+		Level: *req.EventLevel,
 	}
 
 	if err := h.srv.UpdateEvent(ctx, id, &patchReq); err != nil {
