@@ -80,11 +80,7 @@ func (repo *EventRepository) UpdateEvent(elv *model.EventLevelRelation) error {
 
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if err := tx.First(&old, &model.EventLevelRelation{ID: elv.ID}).Error(); err != nil {
-			if err == repository.ErrNotFound {
-				if err := tx.Create(elv).Error(); err != nil {
-					return err
-				}
-			} else {
+			if err != nil {
 				return err
 			}
 		}
