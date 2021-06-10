@@ -48,6 +48,13 @@ type ContestTeamResponse struct {
 	Result string    `json:"result"`
 }
 
+type ContestTeamDetailResponse struct {
+	ContestTeamResponse
+	Link        string          `json:"link"`
+	Description string          `json:"description"`
+	Members     []*userResponse `json:"members"`
+}
+
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(_c echo.Context) error {
 	c := Context{_c}
@@ -221,6 +228,42 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 			Result: v.Result,
 		}
 		res = append(res, ct)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// GetContestTeams GET /contests/:contestID/teams/:teamID
+func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("contestID")
+	contestID := uuid.FromStringOrNil(_id)
+	_id = c.Param("teamID")
+	teamID := uuid.FromStringOrNil(_id)
+	contestTeam, err := h.srv.GetContestTeam(ctx, contestID, teamID)
+	if err != nil {
+		return err
+	}
+
+	members := make([]*userResponse, 0, len(contestTeam.Members))
+	for _, user := range contestTeam.Members {
+		members = append(members, &userResponse{
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: user.RealName,
+		},
+		)
+	}
+
+	res := &ContestTeamDetailResponse{
+		ContestTeamResponse: ContestTeamResponse{
+			ID:     contestTeam.ID,
+			Name:   contestTeam.Name,
+			Result: contestTeam.Result,
+		},
+		Link:        contestTeam.Link,
+		Description: contestTeam.Description,
+		Members:     members,
 	}
 	return c.JSON(http.StatusOK, res)
 }
