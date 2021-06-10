@@ -175,7 +175,7 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 		ID:        teamID,
 		ContestID: contestID,
 	}
-	err := repo.h.Model(&model.ContestTeam{}).Find(&team).Error()
+	err := repo.h.Model(&model.ContestTeam{}).First(&team).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
