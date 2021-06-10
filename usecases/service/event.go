@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -28,9 +27,5 @@ func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 }
 
 func (s *EventService) UpdateEvent(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventArg) error {
-	elv := model.EventLevelRelation{
-		ID:    id,
-		Level: &arg.Level,
-	}
-	return s.repo.UpdateEvent(&elv)
+	return s.repo.UpdateEvent(id, arg)
 }
