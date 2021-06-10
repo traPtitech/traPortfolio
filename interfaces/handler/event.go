@@ -81,6 +81,32 @@ func (h *EventHandler) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, formatUserDetail(event))
 }
 
+type EditEventRequest struct {
+	EventLevel *domain.EventLevel
+}
+
+// PatchEvent PATCH /events/:eventID
+func (h *EventHandler) PatchEvent(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	_id := c.Param("eventID")
+	id := uuid.FromStringOrNil(_id)
+	req := &EditEventRequest{}
+	err := c.BindAndValidate(req)
+	if err != nil {
+		return convertError(err)
+	}
+
+	patchReq := repository.UpdateEventArg{
+		Level: *req.EventLevel,
+	}
+
+	if err := h.srv.UpdateEvent(ctx, id, &patchReq); err != nil {
+		return convertError(err)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
 	userRes := make([]*userResponse, 0, len(event.HostName))
 	for _, user := range event.HostName {

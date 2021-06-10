@@ -25,3 +25,7 @@ func (s *EventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.EventDetail, error) {
 	return s.repo.GetEvent(id)
 }
+
+func (s *EventService) UpdateEvent(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventArg) error {
+	return s.repo.UpdateEvent(id, arg)
+}
