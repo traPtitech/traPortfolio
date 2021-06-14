@@ -251,8 +251,7 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 			ID:       user.ID,
 			Name:     user.Name,
 			RealName: user.RealName,
-		},
-		)
+		})	
 	}
 
 	res := &ContestTeamDetailResponse{
