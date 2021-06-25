@@ -166,6 +166,41 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 	return result, nil
 }
 
+func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
+	if teamID == uuid.Nil || contestID == uuid.Nil {
+		return nil, repository.ErrNilID
+	}
+
+	team := &model.ContestTeam{
+		ID:        teamID,
+		ContestID: contestID,
+	}
+	err := repo.h.Model(&model.ContestTeam{}).First(&team).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	members, err := repo.GetContestTeamMember(contestID, teamID)
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	res := &domain.ContestTeamDetail{
+		ContestTeam: domain.ContestTeam{
+			ID:        team.ID,
+			ContestID: team.ContestID,
+			Name:      team.Name,
+			Result:    team.Result,
+			CreatedAt: team.CreatedAt,
+			UpdatedAt: team.UpdatedAt,
+		},
+		Link:        team.Link,
+		Description: team.Description,
+		Members:     members,
+	}
+	return res, nil
+}
+
 func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam := model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
@@ -194,23 +229,6 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 	}
 	return result, nil
 }
-
-//func (repo *ContestRepository) getTeamMember(teamID uuid.UUID) ([]*model.User, error) {
-//	members := make([]*model.User, 0)
-//	userTableName := (&model.User{}).TableName()
-//	relationTableName := (&model.ContestTeamUserBelonging{}).TableName()
-//
-//	err := repo.h.Model(&model.User{}).
-//		Joins(fmt.Sprintf("INNER JOIN %s ON %s.user_id = %s.id", relationTableName, relationTableName, userTableName)).
-//		Where(fmt.Sprintf("%s.team_id = ?", relationTableName), teamID).
-//		Find(&members).
-//		Error()
-//
-//	if err != nil {
-//		return nil, err
-//	}
-//	return members, nil
-//}
 
 func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error {
 	if teamID == uuid.Nil {

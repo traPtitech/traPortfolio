@@ -132,7 +132,7 @@ func Init() {
 					{
 						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")
 
-						// apiContestsCIDTeamsTID.GET("", api.contest.GetContestTeam)
+						apiContestsCIDTeamsTID.GET("", api.Contest.GetContestTeam)
 						apiContestsCIDTeamsTID.PATCH("", api.Contest.PatchContestTeam)
 						// apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
 						{
