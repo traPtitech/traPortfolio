@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
@@ -77,11 +76,10 @@ func initDB(db *gorm.DB) error {
 	// gormのエラーの上書き
 	gorm.ErrRecordNotFound = repository.ErrNotFound
 	// db.LogMode(true)
-	init, err := migration.Migrate(db, migration.AllTables())
+	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err
 	}
-	log.Println(init)
 	return nil
 }
 
