@@ -3,6 +3,7 @@ module github.com/traPtitech/traPortfolio
 go 1.16
 
 require (
+	github.com/go-gormigrate/gormigrate/v2 v2.0.0
 	github.com/go-playground/validator/v10 v10.5.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.5.0
@@ -11,5 +12,6 @@ require (
 	github.com/json-iterator/go v1.1.10
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	gopkg.in/gormigrate.v1 v1.6.0
+	gorm.io/driver/mysql v1.1.1
+	gorm.io/gorm v1.21.11
 )

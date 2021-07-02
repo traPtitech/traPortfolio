@@ -2,12 +2,13 @@ package infrastructure
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
+	"time"
 
-	gorm "github.com/jinzhu/gorm"
-	//
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -44,26 +45,30 @@ func NewSQLHandler() (database.SQLHandler, error) {
 		dbname = "portfolio"
 	}
 
-	db, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname))
+	engine, err := gorm.Open(mysql.New(mysql.Config{
+		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci&loc=Local", user, password, host, port, dbname),
+	}), &gorm.Config{
+		NowFunc: func() time.Time {
+			return time.Now().Truncate(time.Microsecond)
+		},
+	})
 	if err != nil {
 		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
 	}
+	db, err := engine.DB()
+	if err != nil {
+		return nil, err
+	}
 
-	db = db.
-		Set("gorm:save_associations", false).
-		Set("gorm:association_save_reference", false).
-		Set("gorm:table_options", "CHARSET=utf8mb4 COLLATE=utf8mb4_bin")
-
-	db.DB().SetMaxIdleConns(2)
-	db.DB().SetMaxOpenConns(16)
-	db.BlockGlobalUpdate(true)
-	if err := initDB(db); err != nil {
+	db.SetMaxIdleConns(2)
+	db.SetMaxOpenConns(16)
+	if err := initDB(engine); err != nil {
 		return nil, err
 	}
 
 	sqlHandler := new(SQLHandler)
-	sqlHandler.conn = db
+	sqlHandler.conn = engine
 	return sqlHandler, nil
 }
 
@@ -72,18 +77,11 @@ func initDB(db *gorm.DB) error {
 	// gormのエラーの上書き
 	gorm.ErrRecordNotFound = repository.ErrNotFound
 	// db.LogMode(true)
-	if err := migration.Migrate(db, migration.AllTables()); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (handler *SQLHandler) Connect(dialect string, args ...interface{}) error {
-	db, err := gorm.Open(dialect, args...)
+	init, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err
 	}
-	handler.conn = db
+	log.Println(init)
 	return nil
 }
 
