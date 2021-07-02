@@ -152,14 +152,14 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 		UserID: id,
 		Check:  args.PrPermitted,
 	}
-	err := repo.Create(account).Error()
+	err := repo.Create(&account).Error()
 	if err != nil {
 		return nil, err
 	}
 
-	var result *domain.Account
+	result := &domain.Account{}
 
-	err = repo.First(result, domain.Account{ID: account.ID}).Error()
+	err = repo.First(result, &model.Account{ID: account.ID}).Error()
 
 	if err != nil {
 		return nil, err
