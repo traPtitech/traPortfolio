@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID `gorm:"type:char(36);not null;primary_key"`
+	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Description string    `gorm:"type:text;not null"`
 	Check       bool      `gorm:"type:boolean;not null;default:false"`
 	Name        string    `gorm:"type:varchar(32);not null;unique"`
@@ -20,7 +20,7 @@ func (*User) TableName() string {
 }
 
 type Account struct {
-	ID        uuid.UUID `gorm:"type:char(36);not null;primary_key"`
+	ID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Type      uint      `gorm:"type:tinyint(1);not null"`
 	Name      string    `gorm:"type:varchar(32)"`
 	URL       string    `gorm:"type:text"`
@@ -28,4 +28,6 @@ type Account struct {
 	Check     bool      `gorm:"type:boolean;not null;default:false"`
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
+
+	User User `gorm:"foreignKey:UserID"`
 }
