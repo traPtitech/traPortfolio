@@ -9,15 +9,15 @@
 
 ```sql
 CREATE TABLE `users` (
-  `id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `description` text COLLATE utf8mb4_bin NOT NULL,
+  `id` char(36) NOT NULL,
+  `description` text NOT NULL,
   `check` tinyint(1) NOT NULL DEFAULT '0',
-  `name` varchar(32) COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(32) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ```
 
 </details>
@@ -26,7 +26,7 @@ CREATE TABLE `users` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | char(36) |  | false |  |  | ユーザーUUID |
+| id | char(36) |  | false | [accounts](accounts.md) [contest_team_user_belongings](contest_team_user_belongings.md) [project_members](project_members.md) |  | ユーザーUUID |
 | description | text |  | false |  |  | 自己紹介文 |
 | check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 |
 | name | varchar(32) |  | false |  |  | ユーザー名 |

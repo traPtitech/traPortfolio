@@ -9,16 +9,18 @@
 
 ```sql
 CREATE TABLE `contest_teams` (
-  `id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `contest_id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
-  `description` text COLLATE utf8mb4_bin,
-  `result` text COLLATE utf8mb4_bin,
-  `link` text COLLATE utf8mb4_bin,
+  `id` char(36) NOT NULL,
+  `contest_id` char(36) NOT NULL,
+  `name` varchar(32) DEFAULT NULL,
+  `description` text,
+  `result` text,
+  `link` text,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+  PRIMARY KEY (`id`),
+  KEY `fk_contest_teams_contest` (`contest_id`),
+  CONSTRAINT `fk_contest_teams_contest` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ```
 
 </details>
@@ -27,8 +29,8 @@ CREATE TABLE `contest_teams` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | char(36) |  | false |  |  | コンテストチームUUID |
-| contest_id | char(36) |  | false |  |  | コンテストUUID |
+| id | char(36) |  | false | [contest_team_user_belongings](contest_team_user_belongings.md) |  | コンテストチームUUID |
+| contest_id | char(36) |  | false |  | [contests](contests.md) | コンテストUUID |
 | name | varchar(32) |  | true |  |  | チーム名 |
 | description | text |  | true |  |  | チーム情報 |
 | result | text |  | true |  |  | 順位などの結果 |
@@ -40,12 +42,14 @@ CREATE TABLE `contest_teams` (
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| fk_contest_teams_contest | FOREIGN KEY | FOREIGN KEY (contest_id) REFERENCES contests (id) |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
+| fk_contest_teams_contest | KEY fk_contest_teams_contest (contest_id) USING BTREE |
 | PRIMARY | PRIMARY KEY (id) USING BTREE |
 
 ## Relations
