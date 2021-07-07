@@ -9,16 +9,16 @@
 
 ```sql
 CREATE TABLE `contests` (
-  `id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
-  `description` text COLLATE utf8mb4_bin,
-  `link` text COLLATE utf8mb4_bin,
+  `id` char(36) NOT NULL,
+  `name` varchar(32) DEFAULT NULL,
+  `description` text,
+  `link` text,
   `since` datetime(6) DEFAULT NULL,
   `until` datetime(6) DEFAULT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ```
 
 </details>
@@ -27,7 +27,7 @@ CREATE TABLE `contests` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | char(36) |  | false |  |  | コンテストUUID |
+| id | char(36) |  | false | [contest_teams](contest_teams.md) |  | コンテストUUID |
 | name | varchar(32) |  | true |  |  | コンテスト名 |
 | description | text |  | true |  |  | コンテスト説明 |
 | link | text |  | true |  |  | コンテスト情報のリンク |
