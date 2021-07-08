@@ -1,6 +1,23 @@
 TEST_DB_PORT := 3307
 TBLS_VERSION := 1.38.3
 
+GOFILES=$(wildcard *.go **/*.go)
+
+BINARY=./bin/traPortfolio
+
+.PHONY: all
+all: clean build
+
+.PHONY: build
+build: $(GOFILES)
+	go build -o $(BINARY)
+
+.PHONY: clean
+clean: ## Cleanup working directory
+	@$(RM) $(BINARY)
+	@go clean
+
+
 .PHONY: golangci-lint
 golangci-lint:
 	@docker run --rm -v $(CURDIR):/app -w /app golangci/golangci-lint:latest golangci-lint run
