@@ -2,8 +2,6 @@ package infrastructure
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -14,38 +12,31 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
+type SQLConfig struct {
+	user     string
+	password string
+	host     string
+	port     int
+	dbname   string
+}
+
+func NewSQLConfig(user, password, host, dbname string, port int) SQLConfig {
+	return SQLConfig{
+		user,
+		password,
+		host,
+		port,
+		dbname,
+	}
+}
+
 type SQLHandler struct {
 	conn *gorm.DB
 }
 
-func NewSQLHandler() (database.SQLHandler, error) {
-	user := os.Getenv("DB_USER")
-	if user == "" {
-		user = "root"
-	}
-
-	password := os.Getenv("DB_PASSWORD")
-	if password == "" {
-		password = "password"
-	}
-
-	host := os.Getenv("DB_HOST")
-	if host == "" {
-		host = "mysql"
-	}
-
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		port = 3306
-	}
-
-	dbname := os.Getenv("DB_DATABASE")
-	if dbname == "" {
-		dbname = "portfolio"
-	}
-
+func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 	engine, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci&loc=Local", user, password, host, port, dbname),
+		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci&loc=Local", conf.user, conf.password, conf.host, conf.port, conf.dbname),
 	}), &gorm.Config{
 		NowFunc: func() time.Time {
 			return time.Now().Truncate(time.Microsecond)

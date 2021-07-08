@@ -8,31 +8,29 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 )
 
-var (
-	knoQCookie      = os.Getenv("KNOQ_COOKIE")
-	knoQAPIEndpoint = os.Getenv("KNOQ_API_ENDPOINT")
-)
+type KnoQConfig struct {
+	cookie   string
+	endpoint string
+}
 
-func init() {
-	if knoQCookie == "" {
-		log.Fatal("the environment variable KNOQ_COOKIE should not be empty")
-	}
-	if knoQAPIEndpoint == "" {
-		log.Fatal("the environment variable KNOQ_API_ENDPOINT should not be empty")
+func NewKnoqConfig(cookie, endpoint string) KnoQConfig {
+	return KnoQConfig{
+		cookie,
+		endpoint,
 	}
 }
 
 type KnoqAPI struct {
 	Client *http.Client
+	conf   *KnoQConfig
 }
 
-func NewKnoqAPI() (external.KnoqAPI, error) {
+func NewKnoqAPI(conf *KnoQConfig) (external.KnoqAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)
@@ -40,20 +38,20 @@ func NewKnoqAPI() (external.KnoqAPI, error) {
 	cookies := []*http.Cookie{
 		{
 			Name:  "session",
-			Value: knoQCookie,
+			Value: conf.cookie,
 			Path:  "/",
 		},
 	}
-	u, err := url.Parse(knoQAPIEndpoint)
+	u, err := url.Parse(conf.endpoint)
 	if err != nil {
 		return nil, err
 	}
 	jar.SetCookies(u, cookies)
-	return &KnoqAPI{Client: &http.Client{Jar: jar}}, nil
+	return &KnoqAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
 }
 
 func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, knoQAPIEndpoint, "/events")
+	res, err := apiGet(knoq.Client, knoq.conf.endpoint, "/events")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +73,7 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 		return nil, nil
 	}
 
-	res, err := apiGet(knoq.Client, knoQAPIEndpoint, fmt.Sprintf("/events/%v", id))
+	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/events/%v", id))
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +95,7 @@ func (knoq *KnoqAPI) GetByUserID(id uuid.UUID) ([]*external.EventResponse, error
 		return nil, nil
 	}
 
-	res, err := apiGet(knoq.Client, knoQAPIEndpoint, fmt.Sprintf("/users/%v/events", id))
+	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/users/%v/events", id))
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ CREATE TABLE `accounts` (
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`),
+  KEY `fk_accounts_user` (`user_id`),
   CONSTRAINT `fk_accounts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ```
@@ -44,14 +44,13 @@ CREATE TABLE `accounts` (
 | ---- | ---- | ---------- |
 | fk_accounts_user | FOREIGN KEY | FOREIGN KEY (user_id) REFERENCES users (id) |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
-| user_id | UNIQUE | UNIQUE KEY user_id (user_id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
+| fk_accounts_user | KEY fk_accounts_user (user_id) USING BTREE |
 | PRIMARY | PRIMARY KEY (id) USING BTREE |
-| user_id | UNIQUE KEY user_id (user_id) USING BTREE |
 
 ## Relations
 
