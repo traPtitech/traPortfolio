@@ -11,14 +11,14 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Init() {
+func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) {
 	// Echo instance
 	e := echo.New()
 	e.Validator = &Validator{
 		validator: validator.New(),
 	}
 
-	api, err := InjectAPIServer()
+	api, err := InjectAPIServer(s, t, p, k)
 	if err != nil {
 		log.Fatal(err)
 	}
