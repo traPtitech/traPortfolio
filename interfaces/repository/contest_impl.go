@@ -69,7 +69,7 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 }
 
 func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
-	contest := model.Contest{
+	contest := &model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
 		Description: args.Description,
@@ -202,7 +202,7 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 }
 
 func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
-	contestTeam := model.ContestTeam{
+	contestTeam := &model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
 		ContestID:   contestID,
 		Name:        _contestTeam.Name,

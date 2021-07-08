@@ -1,32 +1,20 @@
 package migration
 
 import (
-	"github.com/jinzhu/gorm"
-	"gopkg.in/gormigrate.v1"
+	"github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/gorm"
 )
 
 // Migrate execute migrations
-func Migrate(db *gorm.DB, tables []interface{}) error {
+// 初回実行でスキーマが初期化された場合、initでtrueを返します
+func Migrate(db *gorm.DB, tables []interface{}) (init bool, err error) {
 	m := gormigrate.New(db, gormigrate.DefaultOptions, Migrations())
 
-	m.InitSchema(func(tx *gorm.DB) error {
-		mv1 := gormigrate.New(tx, gormigrate.DefaultOptions, []*gormigrate.Migration{
-			{
-				ID:      "assume existing DB",
-				Migrate: v1().Migrate,
-			},
-		})
-		err := mv1.Migrate()
-		if err != nil {
-			return err
-		}
+	m.InitSchema(func(db *gorm.DB) error {
+		init = true
 
-		err = tx.AutoMigrate(tables...).Error
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return db.AutoMigrate(AllTables()...)
 	})
-	return m.Migrate()
+	err = m.Migrate()
+	return
 }

@@ -9,12 +9,15 @@
 
 ```sql
 CREATE TABLE `contest_team_user_belongings` (
-  `team_id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `user_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `team_id` char(36) NOT NULL,
+  `user_id` char(36) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
-  PRIMARY KEY (`team_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+  PRIMARY KEY (`team_id`,`user_id`),
+  KEY `fk_contest_team_user_belongings_user` (`user_id`),
+  CONSTRAINT `fk_contest_team_user_belongings_contest_team` FOREIGN KEY (`team_id`) REFERENCES `contest_teams` (`id`),
+  CONSTRAINT `fk_contest_team_user_belongings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ```
 
 </details>
@@ -23,8 +26,8 @@ CREATE TABLE `contest_team_user_belongings` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| team_id | char(36) |  | false |  |  | コンテストチームUUID |
-| user_id | char(36) |  | false |  |  | ユーザーUUID |
+| team_id | char(36) |  | false |  | [contest_teams](contest_teams.md) | コンテストチームUUID |
+| user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
 | created_at | datetime(6) |  | true |  |  | 関係テーブル作成日時 |
 | updated_at | datetime(6) |  | true |  |  | 関係テーブル更新日時 |
 
@@ -32,12 +35,15 @@ CREATE TABLE `contest_team_user_belongings` (
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| fk_contest_team_user_belongings_contest_team | FOREIGN KEY | FOREIGN KEY (team_id) REFERENCES contest_teams (id) |
+| fk_contest_team_user_belongings_user | FOREIGN KEY | FOREIGN KEY (user_id) REFERENCES users (id) |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (team_id, user_id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
+| fk_contest_team_user_belongings_user | KEY fk_contest_team_user_belongings_user (user_id) USING BTREE |
 | PRIMARY | PRIMARY KEY (team_id, user_id) USING BTREE |
 
 ## Relations

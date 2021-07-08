@@ -2,8 +2,8 @@
 package migration
 
 import (
-	"github.com/jinzhu/gorm"
-	"gopkg.in/gormigrate.v1"
+	"github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/gorm"
 )
 
 // v1 unique_index:idx_room_uniqueの削除

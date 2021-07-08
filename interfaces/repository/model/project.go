@@ -7,7 +7,7 @@ import (
 )
 
 type Project struct {
-	ID          uuid.UUID `gorm:"type:char(36);not null;primary_key"`
+	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Name        string    `gorm:"type:varchar(32)"`
 	Description string    `gorm:"type:text"`
 	Link        string    `gorm:"type:text"`
@@ -18,9 +18,12 @@ type Project struct {
 }
 
 type ProjectMember struct {
-	ID        uuid.UUID `gorm:"type:char(36);not null;primary_key"`
+	ID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	ProjectID uuid.UUID `gorm:"type:char(36);not null"`
 	UserID    uuid.UUID `gorm:"type:char(36);not null"`
 	Since     time.Time `gorm:"precision:6"`
 	Until     time.Time `gorm:"precision:6"`
+
+	Project Project `gorm:"foreignKey:ProjectID"`
+	User    User    `gorm:"foreignKey:UserID"`
 }
