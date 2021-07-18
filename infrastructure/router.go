@@ -106,12 +106,12 @@ func Init() {
 			apiEventsEID.PATCH("", api.Event.PatchEvent)
 		}
 
-		// {
+		//{
 		// 	apiGroups := v1.Group("/groups")
 
-		// 	apiGroups.GET("", api.Group.GetAll)
+		//	apiGroups.GET("", api.Group.GetAll)
 		// 	apiGroups.GET("/:groupID", api.Group.GetByID)
-		// }
+		//}
 
 		{
 			apiContests := v1.Group("/contests")
