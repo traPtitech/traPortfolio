@@ -104,6 +104,10 @@ func (knoq *KnoqAPI) GetByUserID(id uuid.UUID) ([]*external.EventResponse, error
 	return er, nil
 }
 
+func (knoq *KnoqAPI) GetAllGropus() ([]*external.GroupsResponse, error) {
+	//hello
+}
+
 // Interface guards
 var (
 	_ external.KnoqAPI = (*KnoqAPI)(nil)
