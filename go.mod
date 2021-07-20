@@ -11,5 +11,6 @@ require (
 	github.com/json-iterator/go v1.1.10
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/stretchr/testify v1.7.0
 	gopkg.in/gormigrate.v1 v1.6.0
 )
