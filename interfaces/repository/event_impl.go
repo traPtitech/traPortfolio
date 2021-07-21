@@ -87,10 +87,9 @@ func (repo *EventRepository) UpdateEvent(id uuid.UUID, arg *repository.UpdateEve
 		if err := tx.Model(&old).Updates(arg).Error(); err != nil {
 			return err
 		}
-		if err := tx.Where(&model.EventLevelRelation{ID: id}).First(&new).Error(); err != nil {
-			return err
-		}
-		return nil
+		err := tx.Where(&model.EventLevelRelation{ID: id}).First(&new).Error()
+
+		return err
 	})
 	if err != nil {
 		return err
