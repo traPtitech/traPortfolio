@@ -12,28 +12,24 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
-import (
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-)
-
 // Injectors from wire.go:
 
-func InjectAPIServer() (handler.API, error) {
+func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
-	sqlHandler, err := NewSQLHandler()
+	sqlHandler, err := NewSQLHandler(s)
 	if err != nil {
 		return handler.API{}, err
 	}
-	portalAPI, err := NewPortalAPI()
+	portalAPI, err := NewPortalAPI(p)
 	if err != nil {
 		return handler.API{}, err
 	}
-	traQAPI, err := NewTraQAPI()
+	traQAPI, err := NewTraQAPI(t)
 	if err != nil {
 		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler, portalAPI, traQAPI)
-	knoqAPI, err := NewKnoqAPI()
+	knoqAPI, err := NewKnoqAPI(k)
 	if err != nil {
 		return handler.API{}, err
 	}

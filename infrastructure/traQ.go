@@ -7,31 +7,29 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 )
 
-var (
-	traQCookie      = os.Getenv("TRAQ_COOKIE")
-	traQAPIEndpoint = os.Getenv("TRAQ_API_ENDPOINT")
-)
+type TraQConfig struct {
+	cookie   string
+	endpoint string
+}
 
-func init() {
-	if traQCookie == "" {
-		log.Fatal("the environment variable TRAQ_COOKIE should not be empty")
-	}
-	if traQAPIEndpoint == "" {
-		log.Fatal("the environment variable TRAQ_API_ENDPOINT should not be empty")
+func NewTraQConfig(cookie, endpoint string) TraQConfig {
+	return TraQConfig{
+		cookie,
+		endpoint,
 	}
 }
 
 type TraQAPI struct {
 	Client *http.Client
+	conf   *TraQConfig
 }
 
-func NewTraQAPI() (external.TraQAPI, error) {
+func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)
@@ -39,16 +37,16 @@ func NewTraQAPI() (external.TraQAPI, error) {
 	cookies := []*http.Cookie{
 		{
 			Name:  "r_session",
-			Value: traQCookie,
+			Value: conf.cookie,
 			Path:  "/",
 		},
 	}
-	u, err := url.Parse(traQAPIEndpoint)
+	u, err := url.Parse(conf.endpoint)
 	if err != nil {
 		return nil, err
 	}
 	jar.SetCookies(u, cookies)
-	return &TraQAPI{Client: &http.Client{Jar: jar}}, nil
+	return &TraQAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
 }
 
 func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
@@ -56,7 +54,7 @@ func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 		return nil, fmt.Errorf("invalid uuid")
 	}
 
-	res, err := apiGet(traQ.Client, traQAPIEndpoint, fmt.Sprintf("/users/%v", id))
+	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", id))
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ services:
       - "3306"
 
   adminer:
-    image: adminer:4.7.5
+    image: adminer
     restart: always
     environment:
       ADMINER_DEFAULT_SERVER: mysql

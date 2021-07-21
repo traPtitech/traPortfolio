@@ -69,7 +69,7 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 }
 
 func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
-	contest := model.Contest{
+	contest := &model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
 		Description: args.Description,
@@ -111,10 +111,9 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
 			return err
 		}
-		if err := tx.Where(&model.Contest{ID: id}).First(&new).Error(); err != nil {
-			return err
-		}
-		return nil
+		err := tx.Where(&model.Contest{ID: id}).First(&new).Error()
+
+		return err
 	})
 	if err != nil {
 		return err
@@ -202,7 +201,7 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 }
 
 func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
-	contestTeam := model.ContestTeam{
+	contestTeam := &model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
 		ContestID:   contestID,
 		Name:        _contestTeam.Name,
@@ -247,10 +246,9 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
 			return err
 		}
-		if err := tx.Where(&model.ContestTeam{ID: teamID}).First(&new).Error(); err != nil {
-			return err
-		}
-		return nil
+		err := tx.Where(&model.ContestTeam{ID: teamID}).First(&new).Error()
+
+		return err
 	})
 	if err != nil {
 		return err

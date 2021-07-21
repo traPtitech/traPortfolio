@@ -7,34 +7,34 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 )
 
-var (
-	portalCookie      = os.Getenv("PORTAL_COOKIE")
-	portalAPIEndpoint = os.Getenv("PORTAL_API_ENDPOINT")
-	cacheKey          = "portalUsers"
+const (
+	cacheKey = "portalUsers"
 )
 
-func init() {
-	if portalCookie == "" {
-		log.Fatal("the environment variable PORTAL_COOKIE should not be empty")
-	}
-	if portalAPIEndpoint == "" {
-		log.Fatal("the environment variable PORTAL_API_ENDPOINT should not be empty")
+type PortalConfig struct {
+	cookie   string
+	endpoint string
+}
+
+func NewPortalConfig(cookie, endpoint string) PortalConfig {
+	return PortalConfig{
+		cookie, endpoint,
 	}
 }
 
 type PortalAPI struct {
 	Client *http.Client
 	Cache  *cache.Cache
+	conf   *PortalConfig
 }
 
-func NewPortalAPI() (external.PortalAPI, error) {
+func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)
@@ -42,11 +42,11 @@ func NewPortalAPI() (external.PortalAPI, error) {
 	cookies := []*http.Cookie{
 		{
 			Name:  "access_token",
-			Value: portalCookie,
+			Value: conf.cookie,
 			Path:  "/",
 		},
 	}
-	u, err := url.Parse(portalAPIEndpoint)
+	u, err := url.Parse(conf.endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +55,7 @@ func NewPortalAPI() (external.PortalAPI, error) {
 	return &PortalAPI{
 		Client: &http.Client{Jar: jar},
 		Cache:  c,
+		conf:   conf,
 	}, nil
 }
 
@@ -64,7 +65,7 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
 
-	res, err := apiGet(portal.Client, portalAPIEndpoint, "/user")
+	res, err := apiGet(portal.Client, portal.conf.endpoint, "/user")
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +87,7 @@ func (portal *PortalAPI) GetByID(traQID string) (*external.PortalUserResponse, e
 		return nil, fmt.Errorf("invalid traQID")
 	}
 
-	res, err := apiGet(portal.Client, portalAPIEndpoint, fmt.Sprintf("/user/%v", traQID))
+	res, err := apiGet(portal.Client, portal.conf.endpoint, fmt.Sprintf("/user/%v", traQID))
 	if err != nil {
 		return nil, err
 	}

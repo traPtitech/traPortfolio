@@ -2,68 +2,63 @@ package infrastructure
 
 import (
 	"fmt"
-	"os"
-	"strconv"
+	"time"
 
-	gorm "github.com/jinzhu/gorm"
-	//
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
+type SQLConfig struct {
+	user     string
+	password string
+	host     string
+	port     int
+	dbname   string
+}
+
+func NewSQLConfig(user, password, host, dbname string, port int) SQLConfig {
+	return SQLConfig{
+		user,
+		password,
+		host,
+		port,
+		dbname,
+	}
+}
+
 type SQLHandler struct {
 	conn *gorm.DB
 }
 
-func NewSQLHandler() (database.SQLHandler, error) {
-	user := os.Getenv("DB_USER")
-	if user == "" {
-		user = "root"
-	}
-
-	password := os.Getenv("DB_PASSWORD")
-	if password == "" {
-		password = "password"
-	}
-
-	host := os.Getenv("DB_HOST")
-	if host == "" {
-		host = "mysql"
-	}
-
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		port = 3306
-	}
-
-	dbname := os.Getenv("DB_DATABASE")
-	if dbname == "" {
-		dbname = "portfolio"
-	}
-
-	db, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname))
+func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
+	engine, err := gorm.Open(mysql.New(mysql.Config{
+		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci&loc=Local", conf.user, conf.password, conf.host, conf.port, conf.dbname),
+	}), &gorm.Config{
+		NowFunc: func() time.Time {
+			return time.Now().Truncate(time.Microsecond)
+		},
+	})
 	if err != nil {
 		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
 	}
+	db, err := engine.DB()
+	if err != nil {
+		return nil, err
+	}
 
-	db = db.
-		Set("gorm:save_associations", false).
-		Set("gorm:association_save_reference", false).
-		Set("gorm:table_options", "CHARSET=utf8mb4 COLLATE=utf8mb4_bin")
-
-	db.DB().SetMaxIdleConns(2)
-	db.DB().SetMaxOpenConns(16)
-	db.BlockGlobalUpdate(true)
-	if err := initDB(db); err != nil {
+	db.SetMaxIdleConns(2)
+	db.SetMaxOpenConns(16)
+	if err := initDB(engine); err != nil {
 		return nil, err
 	}
 
 	sqlHandler := new(SQLHandler)
-	sqlHandler.conn = db
+	sqlHandler.conn = engine
 	return sqlHandler, nil
 }
 
@@ -72,18 +67,10 @@ func initDB(db *gorm.DB) error {
 	// gormのエラーの上書き
 	gorm.ErrRecordNotFound = repository.ErrNotFound
 	// db.LogMode(true)
-	if err := migration.Migrate(db, migration.AllTables()); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (handler *SQLHandler) Connect(dialect string, args ...interface{}) error {
-	db, err := gorm.Open(dialect, args...)
+	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err
 	}
-	handler.conn = db
 	return nil
 }
 
