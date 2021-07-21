@@ -5,8 +5,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 )
 
-// TODO: 関数を置く場所などをちゃんと考える
-
 type MockRepository struct {
 	contest *mock_repository.MockContestRepository
 	event   *mock_repository.MockEventRepository
