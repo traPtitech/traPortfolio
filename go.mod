@@ -12,6 +12,7 @@ require (
 	github.com/json-iterator/go v1.1.10
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/stretchr/testify v1.7.0
 	gorm.io/driver/mysql v1.1.1
 	gorm.io/gorm v1.21.11
 )
