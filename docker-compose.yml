@@ -42,3 +42,34 @@ services:
       - "8080"
     ports:
       - "3001:8080"
+
+  # TODO: ポート番号を決める
+  mock_traq:
+    image: stoplight/prism:3
+    restart: always
+    expose:
+      - "4010"
+    ports:
+      - "4010:4010"
+    command: mock -h 0.0.0.0 -p 4010 -d "https://raw.githubusercontent.com/traPtitech/traQ/master/docs/v3-api.yaml"
+
+
+  mock_portal:
+    image: stoplight/prism:3
+    restart: always
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    expose:
+      - "4011"
+    ports:
+      - "4011:4011"
+    command: mock -h 0.0.0.0 -p 4011 -d "https://raw.githubusercontent.com/traPtitech/portal/master/document/swagger.yaml?token=${GITHUB_TOKEN}"
+
+  mock_knoq:
+    image: stoplight/prism:3
+    restart: always
+    expose:
+      - "4012"
+    ports:
+      - "4012:4012"
+    command: mock -h 0.0.0.0 -p 4012 -d "https://raw.githubusercontent.com/traPtitech/knoQ/master/docs/swagger.yaml"
