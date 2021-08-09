@@ -3,6 +3,11 @@ package infrastructure
 import (
 	"fmt"
 	"net/http"
+	"os"
+)
+
+var (
+	isDevelopment = (os.Getenv("APP_EMV") == "development")
 )
 
 func apiGet(client *http.Client, endpoint string, path string) (*http.Response, error) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 )
 
 type KnoQConfig struct {
@@ -31,6 +32,10 @@ type KnoqAPI struct {
 }
 
 func NewKnoqAPI(conf *KnoQConfig) (external.KnoqAPI, error) {
+	if isDevelopment {
+		return &mock_external.MockKnoqAPI{}, nil
+	}
+
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)

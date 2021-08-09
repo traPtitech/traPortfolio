@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 )
 
 type TraQConfig struct {
@@ -30,6 +31,10 @@ type TraQAPI struct {
 }
 
 func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
+	if isDevelopment {
+		return &mock_external.MockTraQAPI{}, nil
+	}
+
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		log.Fatal(err)
