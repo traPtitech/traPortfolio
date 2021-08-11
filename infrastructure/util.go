@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	isDevelopment = (os.Getenv("APP_EMV") == "development")
+	isDevelopment = (os.Getenv("APP_ENV") == "development")
 )
 
 func apiGet(client *http.Client, endpoint string, path string) (*http.Response, error) {
