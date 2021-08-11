@@ -9,13 +9,13 @@ import (
 var (
 	portalUserMap = map[string]*external.PortalUserResponse{
 		"user1": {
-			TraQID: "user1",
-			RealName: "ユーザー1 ユーザー1",
+			TraQID:         "user1",
+			RealName:       "ユーザー1 ユーザー1",
 			AlphabeticName: "user1 user1",
 		},
 		"user2": {
-			TraQID: "user2",
-			RealName: "ユーザー2 ユーザー2",
+			TraQID:         "user2",
+			RealName:       "ユーザー2 ユーザー2",
 			AlphabeticName: "user2 user2",
 		},
 		"lolico": {
