@@ -15,14 +15,16 @@ import (
 )
 
 type KnoQConfig struct {
-	cookie   string
-	endpoint string
+	cookie        string
+	endpoint      string
+	isDevelopment bool
 }
 
-func NewKnoqConfig(cookie, endpoint string) KnoQConfig {
+func NewKnoqConfig(cookie, endpoint string, isDevelopment bool) KnoQConfig {
 	return KnoQConfig{
 		cookie,
 		endpoint,
+		isDevelopment,
 	}
 }
 
@@ -32,7 +34,7 @@ type KnoqAPI struct {
 }
 
 func NewKnoqAPI(conf *KnoQConfig) (external.KnoqAPI, error) {
-	if isDevelopment {
+	if conf.isDevelopment {
 		return &mock_external.MockKnoqAPI{}, nil
 	}
 

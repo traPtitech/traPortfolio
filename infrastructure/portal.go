@@ -19,13 +19,16 @@ const (
 )
 
 type PortalConfig struct {
-	cookie   string
-	endpoint string
+	cookie        string
+	endpoint      string
+	isDevelopment bool
 }
 
-func NewPortalConfig(cookie, endpoint string) PortalConfig {
+func NewPortalConfig(cookie, endpoint string, isDevelopment bool) PortalConfig {
 	return PortalConfig{
-		cookie, endpoint,
+		cookie,
+		endpoint,
+		isDevelopment,
 	}
 }
 
@@ -36,7 +39,7 @@ type PortalAPI struct {
 }
 
 func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
-	if isDevelopment {
+	if conf.isDevelopment {
 		return &mock_external.MockPortalAPI{}, nil
 	}
 
