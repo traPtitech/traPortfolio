@@ -10,6 +10,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util"
+	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 func TestUserService_GetUsers(t *testing.T) {
@@ -125,6 +126,247 @@ func TestUserService_GetUser(t *testing.T) {
 
 			s := NewUserService(repo.user, repo.event)
 			got, err := s.GetUser(tt.args.ctx, tt.args.id)
+
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestUserService_Update(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		ctx  context.Context
+		id   uuid.UUID
+		args *repository.UpdateUserArgs
+	}
+	tests := []struct {
+		name      string
+		args      args
+		setup     func(m *MockRepository, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid.Must(uuid.NewV4()),
+				args: &repository.UpdateUserArgs{
+					Description: optional.StringFrom(util.AlphaNumeric(10)),
+					Check:       optional.BoolFrom(true),
+				},
+			},
+			setup: func(m *MockRepository, args args) {
+				changes := map[string]interface{}{
+					"description": args.args.Description.String,
+					"check":       args.args.Check.Bool,
+				}
+				m.user.EXPECT().Update(args.id, changes).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success_OnlyDescription",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid.Must(uuid.NewV4()),
+				args: &repository.UpdateUserArgs{
+					Description: optional.StringFrom(util.AlphaNumeric(10)),
+				},
+			},
+			setup: func(m *MockRepository, args args) {
+				changes := map[string]interface{}{
+					"description": args.args.Description.String,
+				}
+				m.user.EXPECT().Update(args.id, changes).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := newMockRepository(ctrl)
+			tt.setup(repo, tt.args)
+
+			s := NewUserService(repo.user, repo.event)
+
+			tt.assertion(t, s.Update(tt.args.ctx, tt.args.id, tt.args.args))
+		})
+	}
+}
+
+func TestUserService_GetAccount(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		userID    uuid.UUID
+		accountID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      *domain.Account
+		setup     func(m *MockRepository, args args, want *domain.Account)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				userID:    uuid.Must(uuid.NewV4()),
+				accountID: uuid.Must(uuid.NewV4()),
+			},
+			want: &domain.Account{
+				ID:          uuid.Nil, // setupで変更,
+				Type:        domain.HOMEPAGE,
+				PrPermitted: true,
+			},
+			setup: func(m *MockRepository, args args, want *domain.Account) {
+				want.ID = args.accountID
+				m.user.EXPECT().GetAccount(args.userID, args.accountID).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "NilID",
+			args: args{
+				userID:    uuid.Must(uuid.NewV4()),
+				accountID: uuid.Nil,
+			},
+			want:      nil,
+			setup:     func(m *MockRepository, args args, want *domain.Account) {},
+			assertion: assert.Error,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := newMockRepository(ctrl)
+			tt.setup(repo, tt.args, tt.want)
+
+			s := NewUserService(repo.user, repo.event)
+			got, err := s.GetAccount(tt.args.userID, tt.args.accountID)
+
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestUserService_GetAccounts(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      []*domain.Account
+		setup     func(m *MockRepository, args args, want []*domain.Account)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{userID: uuid.Must(uuid.NewV4())},
+			want: []*domain.Account{
+				{
+					ID:          uuid.Must(uuid.NewV4()),
+					Type:        domain.HOMEPAGE,
+					PrPermitted: true,
+				},
+			},
+			setup: func(m *MockRepository, args args, want []*domain.Account) {
+				m.user.EXPECT().GetAccounts(args.userID).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name:      "NilID",
+			args:      args{userID: uuid.Nil},
+			want:      nil,
+			setup:     func(m *MockRepository, args args, want []*domain.Account) {},
+			assertion: assert.Error,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := newMockRepository(ctrl)
+			tt.setup(repo, tt.args, tt.want)
+
+			s := NewUserService(repo.user, repo.event)
+			got, err := s.GetAccounts(tt.args.userID)
+
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestUserService_CreateAccount(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		ctx     context.Context
+		id      uuid.UUID
+		account *repository.CreateAccountArgs
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      *domain.Account
+		setup     func(m *MockRepository, args args, want *domain.Account)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx: context.Background(),
+				id:  uuid.Must(uuid.NewV4()),
+				account: &repository.CreateAccountArgs{
+					ID:          util.AlphaNumeric(5),
+					Type:        domain.HOMEPAGE,
+					URL:         "https://" + util.AlphaNumeric(10),
+					PrPermitted: true,
+				},
+			},
+			want: &domain.Account{
+				ID:          uuid.Must(uuid.NewV4()),
+				Type:        domain.HOMEPAGE,
+				PrPermitted: true,
+			},
+			setup: func(m *MockRepository, args args, want *domain.Account) {
+				m.user.EXPECT().CreateAccount(args.id, args.account).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := newMockRepository(ctrl)
+			tt.setup(repo, tt.args, tt.want)
+
+			s := NewUserService(repo.user, repo.event)
+			got, err := s.CreateAccount(tt.args.ctx, tt.args.id, tt.args.account)
 
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
