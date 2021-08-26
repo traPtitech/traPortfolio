@@ -55,6 +55,7 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 			Name:      er.Name,
 			TimeStart: er.TimeStart,
 			TimeEnd:   er.TimeEnd,
+			// TODO: HostName:
 		},
 		Description: er.Description,
 		GroupID:     er.GroupID,

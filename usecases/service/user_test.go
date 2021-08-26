@@ -31,7 +31,7 @@ func TestUserService_GetUsers(t *testing.T) {
 			args: args{ctx: context.Background()},
 			want: []*domain.User{
 				{
-					ID:       uuid.Must(uuid.NewV4()),
+					ID:       util.UUID(),
 					Name:     util.AlphaNumeric(5),
 					RealName: util.AlphaNumeric(5),
 				},
@@ -79,7 +79,7 @@ func TestUserService_GetUser(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.Must(uuid.NewV4()),
+				id:  util.UUID(),
 			},
 			want: &domain.UserDetail{
 				ID:       uuid.Nil, // setupで変更する
@@ -89,7 +89,7 @@ func TestUserService_GetUser(t *testing.T) {
 				Bio:      util.AlphaNumeric(10),
 				Accounts: []*domain.Account{
 					{
-						ID:          uuid.Must(uuid.NewV4()),
+						ID:          util.UUID(),
 						Type:        0,
 						PrPermitted: true,
 					},

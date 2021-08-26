@@ -3,6 +3,8 @@ package util
 import (
 	"math/rand"
 	"unsafe"
+
+	"github.com/gofrs/uuid"
 )
 
 const (
@@ -30,4 +32,9 @@ func AlphaNumeric(n int) string {
 		remain--
 	}
 	return *(*string)(unsafe.Pointer(&b))
+}
+
+// UUID ランダムなUUIDを生成します
+func UUID() uuid.UUID {
+	return uuid.Must(uuid.NewV4())
 }
