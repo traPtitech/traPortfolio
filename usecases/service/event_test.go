@@ -108,18 +108,6 @@ func TestEventService_GetEventByID(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		{
-			name: "NilID",
-			args: args{
-				ctx: context.Background(),
-				id:  uuid.Nil,
-			},
-			want: nil,
-			setup: func(m *MockRepository, args args, want *domain.EventDetail) {
-				m.event.EXPECT().GetEvent(args.id).Return(nil, repository.ErrInvalidID)
-			},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -167,20 +155,6 @@ func TestEventService_UpdateEvent(t *testing.T) {
 				m.event.EXPECT().UpdateEvent(args.id, args.arg).Return(nil)
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name: "NilID",
-			args: args{
-				ctx: context.Background(),
-				id:  uuid.Nil,
-				arg: &repository.UpdateEventArg{
-					Level: domain.EventLevelAnonymous,
-				},
-			},
-			setup: func(m *MockRepository, args args) {
-				m.event.EXPECT().UpdateEvent(args.id, args.arg).Return(repository.ErrInvalidID)
-			},
-			assertion: assert.Error,
 		},
 	}
 
