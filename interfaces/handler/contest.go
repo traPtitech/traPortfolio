@@ -232,16 +232,15 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-//TODO
 // GetContestTeams GET /contests/:contestID/teams/:teamID
 func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("contestID")
-	contestID := uuid.FromStringOrNil(_id)
-	_id = c.Param("teamID")
-	teamID := uuid.FromStringOrNil(_id)
-	contestTeam, err := h.srv.GetContestTeam(ctx, contestID, teamID)
+	req := teamParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+	contestTeam, err := h.srv.GetContestTeam(ctx, req.ContestID, req.TeamID)
 	if err != nil {
 		return err
 	}
