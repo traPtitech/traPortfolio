@@ -203,7 +203,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	c := Context{_c}
 	req := EditAccountRequest{}
-	err := c.BindAndValidate(req)
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
