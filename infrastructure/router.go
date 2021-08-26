@@ -14,8 +14,12 @@ import (
 func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) {
 	// Echo instance
 	e := echo.New()
+	v := validator.New()
+	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
+		log.Fatal(err)
+	}
 	e.Validator = &Validator{
-		validator: validator.New(),
+		validator: v,
 	}
 
 	api, err := InjectAPIServer(s, t, p, k)

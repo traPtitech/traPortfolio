@@ -16,6 +16,10 @@ func convertError(err error) error {
 	case errors.Is(err, repository.ErrInvalidID):
 		fallthrough
 	case errors.Is(err, repository.ErrInvalidArg):
+		fallthrough
+	case errors.Is(err, repository.ErrBind):
+		fallthrough
+	case errors.Is(err, repository.ErrValidate):
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("bad request: %w", err))
 
 	case errors.Is(err, repository.ErrAlreadyExists):

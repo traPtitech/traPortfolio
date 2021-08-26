@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"github.com/go-playground/validator/v10"
+	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type API struct {
@@ -28,9 +31,16 @@ type Context struct {
 
 func (c *Context) BindAndValidate(i interface{}) error {
 	if err := c.Bind(i); err != nil {
-		return err
+		return repository.ErrBind
 	}
-	err := c.Validate(i)
+	if err := c.Validate(i); err != nil {
+		return repository.ErrValidate
+	}
 
-	return err
+	return nil
+}
+
+func IsValidUUID(fl validator.FieldLevel) bool {
+	id, ok := fl.Field().Interface().(uuid.UUID)
+	return ok && id != uuid.Nil
 }
