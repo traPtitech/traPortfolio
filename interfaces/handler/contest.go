@@ -22,10 +22,20 @@ func NewContestHandler(service service.ContestService) *ContestHandler {
 	return &ContestHandler{service}
 }
 
+type contestParam struct {
+	ContestID uuid.UUID `param:"contestID" validate:"is-uuid"`
+}
+
+type teamParams struct {
+	ContestID uuid.UUID `param:"contestID" validate:"is-uuid"`
+	TeamID    uuid.UUID `param:"teamID" validate:"is-uuid"`
+}
+
 type PostContestRequest struct {
-	Name        string `json:"name" validate:"required"`
-	Link        string `json:"link" validate:"url"`
-	Description string `json:"description"`
+	ContestID   uuid.UUID `param:"contestID" validate:"is-uuid"`
+	Name        string    `json:"name" validate:"required"`
+	Link        string    `json:"link" validate:"url"`
+	Description string    `json:"description"`
 	Duration    Duration
 }
 
@@ -80,10 +90,15 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 func (h *ContestHandler) GetContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("contestID")
-	id := uuid.FromStringOrNil(_id)
+	req := contestParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
 
-	contest, err := h.srv.GetContest(ctx, id)
+	contest, err := h.srv.GetContest(ctx, req.ContestID)
+	if err != nil {
+		return convertError(err)
+	}
 
 	teams := make([]*ContestTeamResponse, 0, len(contest.Teams))
 	for _, v := range contest.Teams {
@@ -108,9 +123,6 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		Teams:       teams,
 	}
 
-	if err != nil {
-		return convertError(err)
-	}
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -118,9 +130,8 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 func (h *ContestHandler) PostContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := &PostContestRequest{}
-	// todo validation
-	err := c.BindAndValidate(req)
+	req := PostContestRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
@@ -149,6 +160,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 }
 
 type PatchContestRequest struct {
+	ContestID   uuid.UUID       `param:"contestID" validate:"is-uuid"`
 	Name        optional.String `json:"name"`
 	Link        optional.String `json:"link"`
 	Description optional.String `json:"description"`
@@ -159,11 +171,8 @@ type PatchContestRequest struct {
 func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("contestID")
-	id := uuid.FromStringOrNil(_id)
-	req := &PatchContestRequest{}
-	// todo validation
-	err := c.BindAndValidate(req)
+	req := PatchContestRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
@@ -176,7 +185,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		Until:       req.Duration.Until,
 	}
 
-	err = h.srv.UpdateContest(ctx, id, &patchReq)
+	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -187,35 +196,26 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("contestID")
-	id := uuid.FromStringOrNil(_id)
-	err := h.srv.DeleteContest(ctx, id)
+	req := contestParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+	err := h.srv.DeleteContest(ctx, req.ContestID)
 	if err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-type PostContestTeamRequest struct {
-	Name        string `json:"name"`
-	Link        string `json:"link"`
-	Description string `json:"description"`
-	Result      string `json:"result"`
-}
-
-type PostContestTeamResponse struct {
-	ID     uuid.UUID `json:"id"`
-	Name   string    `json:"name"`
-	Result string    `json:"result"`
-}
-
 // GetContestTeams GET /contests/:contestID/teams
 func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("contestID")
-	id := uuid.FromStringOrNil(_id)
-	contestTeams, err := h.srv.GetContestTeams(ctx, id)
+	req := contestParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+	contestTeams, err := h.srv.GetContestTeams(ctx, req.ContestID)
 	if err != nil {
 		return err
 	}
@@ -232,6 +232,7 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+//TODO
 // GetContestTeams GET /contests/:contestID/teams/:teamID
 func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	c := Context{_c}
@@ -267,14 +268,26 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+type PostContestTeamRequest struct {
+	ContestID   uuid.UUID `param:"contestID" validate:"is-uuid"`
+	Name        string    `json:"name"`
+	Link        string    `json:"link"`
+	Description string    `json:"description"`
+	Result      string    `json:"result"`
+}
+
+type PostContestTeamResponse struct {
+	ID     uuid.UUID `json:"id"`
+	Name   string    `json:"name"`
+	Result string    `json:"result"`
+}
+
 // PostContestTeam POST /contests/:contestID/teams
 func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("contestID")
-	id := uuid.FromStringOrNil(_id)
-	req := &PostContestTeamRequest{}
-	err := c.BindAndValidate(req)
+	req := PostContestTeamRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
@@ -284,7 +297,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		Link:        req.Link,
 		Description: req.Description,
 	}
-	contestTeam, err := h.srv.CreateContestTeam(ctx, id, &args)
+	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
 	if err != nil {
 		return err
 	}
@@ -299,6 +312,8 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 }
 
 type PatchContestTeamRequest struct {
+	ContestID   uuid.UUID       `param:"contestID" validate:"is-uuid"`
+	TeamID      uuid.UUID       `param:"teamID" validate:"is-uuid"`
 	Name        optional.String `json:"name"`
 	Link        optional.String `json:"link" validate:"url"`
 	Description optional.String `json:"description"`
@@ -310,10 +325,8 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
-	_ = uuid.FromStringOrNil(c.Param("contestID"))
-	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PatchContestTeamRequest{}
-	err := c.BindAndValidate(req)
+	req := PatchContestTeamRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
@@ -324,7 +337,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 		Description: req.Description,
 	}
 
-	err = h.srv.UpdateContestTeam(ctx, teamID, &args)
+	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)
 	if err != nil {
 		return err
 	}
@@ -335,10 +348,12 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	contestID := uuid.FromStringOrNil(c.Param("contestID"))
-	teamID := uuid.FromStringOrNil(c.Param("teamID"))
+	req := teamParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
 
-	users, err := h.srv.GetContestTeamMember(ctx, contestID, teamID)
+	users, err := h.srv.GetContestTeamMember(ctx, req.ContestID, req.TeamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -354,7 +369,9 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 }
 
 type PostContestTeamMember struct {
-	Members []uuid.UUID `json:"members" validate:"required"`
+	ContestID uuid.UUID   `param:"contestID" validate:"is-uuid"`
+	TeamID    uuid.UUID   `param:"teamID" validate:"is-uuid"`
+	Members   []uuid.UUID `json:"members" validate:"required"`
 }
 
 // PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
@@ -362,15 +379,13 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
-	_ = uuid.FromStringOrNil(c.Param("contestID"))
-	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PostContestTeamMember{}
-	err := c.BindAndValidate(req)
+	req := PostContestTeamMember{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.AddContestTeamMember(ctx, teamID, req.Members)
+	err = h.srv.AddContestTeamMember(ctx, req.TeamID, req.Members)
 	if err != nil {
 		return err
 	}
@@ -382,15 +397,13 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
-	_ = uuid.FromStringOrNil(c.Param("contestID"))
-	teamID := uuid.FromStringOrNil(c.Param("teamID"))
-	req := &PostContestTeamMember{}
-	err := c.BindAndValidate(req)
+	req := PostContestTeamMember{} // TODO: 構造体分けたいかも
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeamMember(ctx, teamID, req.Members)
+	err = h.srv.DeleteContestTeamMember(ctx, req.TeamID, req.Members)
 	if err != nil {
 		return err
 	}
