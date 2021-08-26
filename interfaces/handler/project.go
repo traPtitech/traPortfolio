@@ -107,7 +107,6 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 }
 
 type PostProjectRequest struct {
-	ProjectID   uuid.UUID              `param:"projectID" validate:"is-uuid"`
 	Name        string                 `json:"name"`
 	Link        string                 `json:"link"`
 	Description string                 `json:"description"`
@@ -216,7 +215,7 @@ type AddProjectMembersRequest struct {
 }
 
 type MemberIDWithProjectDuration struct {
-	UserID   string                 `json:"user_id"`
+	UserID   uuid.UUID              `json:"userID" validate:"is-uuid"` // TODO: validateしてくれない
 	Duration domain.ProjectDuration `json:"duration"`
 }
 
@@ -231,8 +230,11 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	}
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
+		if v.UserID == uuid.Nil { // TODO
+			return convertError(repository.ErrInvalidArg)
+		}
 		m := &repository.CreateProjectMemberArgs{
-			UserID: uuid.FromStringOrNil(v.UserID),
+			UserID: v.UserID,
 			Since:  semToTime(v.Duration.Since),
 			Until:  semToTime(v.Duration.Until),
 		}
