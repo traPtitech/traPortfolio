@@ -86,10 +86,6 @@ func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Pr
 }
 
 func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
-	if id == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	var (
 		old model.Project
 		new model.Project
@@ -133,10 +129,6 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 }
 
 func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
-	if projectID == uuid.Nil {
-		return repository.ErrInvalidID
-	}
-
 	//存在チェック
 	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
 	if err != nil {
@@ -155,9 +147,6 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 
 	members := make([]*model.ProjectMember, 0, len(projectMembers))
 	for _, v := range projectMembers {
-		if v.UserID == uuid.Nil {
-			return repository.ErrInvalidID
-		}
 		uid := uuid.Must(uuid.NewV4())
 		m := &model.ProjectMember{
 			ID:        uid,
@@ -181,14 +170,14 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 		}
 		return nil
 	})
+	if err != nil {
+		return convertError(err)
+	}
+
 	return nil
 }
 
 func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
-	if projectID == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	// 存在チェック
 	err := repo.h.First(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID}).Error()
 	if err != nil {

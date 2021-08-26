@@ -49,9 +49,6 @@ func (s *ContestService) CreateContest(ctx context.Context, args *repository.Cre
 }
 
 func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
-	if id == uuid.Nil {
-		return repository.ErrInvalidID
-	}
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -111,9 +108,6 @@ func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
-	if teamID == uuid.Nil {
-		return repository.ErrInvalidID
-	}
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String

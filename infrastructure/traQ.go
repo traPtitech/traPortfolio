@@ -50,10 +50,6 @@ func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 }
 
 func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
-	if id == uuid.Nil {
-		return nil, fmt.Errorf("invalid uuid")
-	}
-
 	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", id))
 	if err != nil {
 		return nil, err

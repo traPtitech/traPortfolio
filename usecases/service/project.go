@@ -68,9 +68,6 @@ func (s *ProjectService) CreateProject(ctx context.Context, args *repository.Cre
 }
 
 func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {
-	if id == uuid.Nil {
-		return repository.ErrInvalidID
-	}
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
