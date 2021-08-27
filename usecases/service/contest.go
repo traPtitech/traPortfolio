@@ -2,11 +2,8 @@ package service
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/traPtitech/traPortfolio/domain"
-
-	"github.com/labstack/echo/v4"
 
 	"github.com/gofrs/uuid"
 
@@ -67,9 +64,6 @@ func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *
 	}
 	if len(changes) > 0 {
 		err := s.repo.UpdateContest(id, changes)
-		if err != nil && err == repository.ErrNotFound {
-			return echo.NewHTTPError(http.StatusNotFound)
-		}
 		if err != nil {
 			return err
 		}
@@ -123,9 +117,6 @@ func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 	}
 	if len(changes) > 0 {
 		err := s.repo.UpdateContestTeam(teamID, changes)
-		if err != nil && err == repository.ErrNotFound {
-			return echo.NewHTTPError(http.StatusNotFound)
-		}
 		if err != nil {
 			return err
 		}
