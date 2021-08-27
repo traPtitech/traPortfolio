@@ -146,7 +146,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 
 	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := ContestResponse{
 		ID:   contest.ID,
@@ -187,7 +187,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 
 	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusCreated)
 }
@@ -217,7 +217,7 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	}
 	contestTeams, err := h.srv.GetContestTeams(ctx, req.ContestID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	res := make([]*ContestTeamResponse, 0, len(contestTeams))
@@ -242,7 +242,7 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	}
 	contestTeam, err := h.srv.GetContestTeam(ctx, req.ContestID, req.TeamID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	members := make([]*userResponse, 0, len(contestTeam.Members))
@@ -298,7 +298,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	}
 	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	res := &PostContestTeamRequest{
@@ -338,7 +338,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 
 	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusCreated)
 }
@@ -386,7 +386,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 
 	err = h.srv.AddContestTeamMember(ctx, req.TeamID, req.Members)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -404,7 +404,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 
 	err = h.srv.DeleteContestTeamMember(ctx, req.TeamID, req.Members)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }

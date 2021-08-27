@@ -34,7 +34,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	ctx := c.Request().Context()
 	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	res := make([]*eventResponse, 0, len(events))

@@ -20,18 +20,18 @@ func convertError(err error) error {
 	case errors.Is(err, repository.ErrBind):
 		fallthrough
 	case errors.Is(err, repository.ErrValidate):
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("bad request: %w", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("bad request: %w", err).Error())
 
 	case errors.Is(err, repository.ErrAlreadyExists):
-		return echo.NewHTTPError(http.StatusConflict, fmt.Errorf("conflicts: %w", err))
+		return echo.NewHTTPError(http.StatusConflict, fmt.Errorf("conflicts: %w", err).Error())
 
 	case errors.Is(err, repository.ErrForbidden):
-		return echo.NewHTTPError(http.StatusForbidden, fmt.Errorf("forbideen: %w", err))
+		return echo.NewHTTPError(http.StatusForbidden, fmt.Errorf("forbideen: %w", err).Error())
 
 	case errors.Is(err, repository.ErrNotFound):
-		return echo.NewHTTPError(http.StatusNotFound, fmt.Errorf("not found: %w", err))
+		return echo.NewHTTPError(http.StatusNotFound, fmt.Errorf("not found: %w", err).Error())
 
 	default:
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("%w", err))
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("%w", err).Error())
 	}
 }

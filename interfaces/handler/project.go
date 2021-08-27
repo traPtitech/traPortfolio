@@ -66,7 +66,7 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := make([]*ProjectResponse, 0, len(projects))
 	for _, v := range projects {
@@ -91,7 +91,7 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	ctx := c.Request().Context()
 	project, err := h.service.GetProject(ctx, req.ProjectID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := &ProjectDetailResponse{
 		ID:          project.ID,
