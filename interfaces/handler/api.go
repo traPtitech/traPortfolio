@@ -31,9 +31,11 @@ type Context struct {
 
 func (c *Context) BindAndValidate(i interface{}) error {
 	if err := c.Bind(i); err != nil {
+		c.Logger().Error(err)
 		return repository.ErrBind
 	}
 	if err := c.Validate(i); err != nil {
+		c.Logger().Error(err)
 		return repository.ErrValidate
 	}
 
