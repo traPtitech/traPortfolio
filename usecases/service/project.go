@@ -2,10 +2,8 @@ package service
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/gofrs/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -68,9 +66,6 @@ func (s *ProjectService) CreateProject(ctx context.Context, args *repository.Cre
 }
 
 func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {
-	if id == uuid.Nil {
-		return repository.ErrInvalidID
-	}
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -89,9 +84,6 @@ func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 	}
 	if len(changes) > 0 {
 		err := s.repo.UpdateProject(id, changes)
-		if err != nil && err == repository.ErrNotFound {
-			return echo.NewHTTPError(http.StatusNotFound)
-		}
 		if err != nil {
 			return err
 		}

@@ -101,18 +101,6 @@ func TestUserService_GetUser(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		{
-			name: "NilID",
-			args: args{
-				ctx: context.Background(),
-				id:  uuid.Nil,
-			},
-			want: nil,
-			setup: func(m *MockRepository, args args, want *domain.UserDetail) {
-				m.user.EXPECT().GetUser(args.id).Return(nil, repository.ErrInvalidID)
-			},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -232,16 +220,6 @@ func TestUserService_GetAccount(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		{
-			name: "NilID",
-			args: args{
-				userID:    uuid.Must(uuid.NewV4()),
-				accountID: uuid.Nil,
-			},
-			want:      nil,
-			setup:     func(m *MockRepository, args args, want *domain.Account) {},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -289,13 +267,6 @@ func TestUserService_GetAccounts(t *testing.T) {
 				m.user.EXPECT().GetAccounts(args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name:      "NilID",
-			args:      args{userID: uuid.Nil},
-			want:      nil,
-			setup:     func(m *MockRepository, args args, want []*domain.Account) {},
-			assertion: assert.Error,
 		},
 	}
 
@@ -424,22 +395,6 @@ func TestUserService_EditAccount(t *testing.T) {
 			setup:     func(m *MockRepository, args args) {},
 			assertion: assert.NoError,
 		},
-		{
-			name: "NilID",
-			args: args{
-				ctx:       context.Background(),
-				accountID: uuid.Nil,
-				userID:    uuid.Must(uuid.NewV4()),
-				args: &repository.UpdateAccountArgs{
-					ID:          optional.StringFrom(util.AlphaNumeric(5)),
-					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
-					URL:         optional.StringFrom("https://" + util.AlphaNumeric(10)),
-					PrPermitted: optional.BoolFrom(true),
-				},
-			},
-			setup:     func(m *MockRepository, args args) {},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -483,16 +438,6 @@ func TestUserService_DeleteAccount(t *testing.T) {
 				m.user.EXPECT().DeleteAccount(args.accountid, args.userid).Return(nil)
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name: "NilID",
-			args: args{
-				ctx:       context.Background(),
-				accountid: uuid.Nil,
-				userid:    uuid.Must(uuid.NewV4()),
-			},
-			setup:     func(m *MockRepository, args args) {},
-			assertion: assert.Error,
 		},
 	}
 
@@ -547,16 +492,6 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		{
-			name: "NilID",
-			args: args{
-				ctx:    context.Background(),
-				userID: uuid.Nil,
-			},
-			want:      nil,
-			setup:     func(m *MockRepository, args args, want []*domain.UserProject) {},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -610,16 +545,6 @@ func TestUserService_GetUserContests(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		{
-			name: "NilID",
-			args: args{
-				ctx:    context.Background(),
-				userID: uuid.Nil,
-			},
-			want:      nil,
-			setup:     func(m *MockRepository, args args, want []*domain.UserContest) {},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -672,16 +597,6 @@ func TestUserService_GetUserEvents(t *testing.T) {
 				m.event.EXPECT().GetUserEvents(args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name: "NilID",
-			args: args{
-				ctx:    context.Background(),
-				userID: uuid.Nil,
-			},
-			want:      nil,
-			setup:     func(m *MockRepository, args args, want []*domain.Event) {},
-			assertion: assert.Error,
 		},
 	}
 

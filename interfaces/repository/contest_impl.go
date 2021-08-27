@@ -95,10 +95,6 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 }
 
 func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]interface{}) error {
-	if id == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	var (
 		old model.Contest
 		new model.Contest
@@ -122,10 +118,6 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 }
 
 func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
-	if id == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	err := repo.h.First(&model.Contest{ID: id}).Error()
 	if err != nil {
 		return convertError(err)
@@ -166,10 +158,6 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 }
 
 func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
-	if teamID == uuid.Nil || contestID == uuid.Nil {
-		return nil, repository.ErrNilID
-	}
-
 	team := &model.ContestTeam{
 		ID:        teamID,
 		ContestID: contestID,
@@ -230,10 +218,6 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 }
 
 func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error {
-	if teamID == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	var (
 		old model.Contest
 		new model.Contest
@@ -257,10 +241,6 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 }
 
 func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	if teamID == uuid.Nil || contestID == uuid.Nil {
-		return nil, repository.ErrNilID
-	}
-
 	users := make([]*model.User, 10)
 	err := repo.h.
 		Model(&model.ContestTeamUserBelonging{}).
@@ -295,10 +275,6 @@ func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID 
 }
 
 func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
-	if teamID == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	if members == nil {
 		return repository.ErrInvalidArg
 	}
@@ -339,10 +315,6 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 }
 
 func (repo *ContestRepository) DeleteContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
-	if teamID == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	// 存在チェック
 	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
 	if err != nil {

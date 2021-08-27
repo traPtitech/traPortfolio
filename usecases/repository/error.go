@@ -17,4 +17,8 @@ var (
 	ErrAlreadyExists = errors.New("already exists")
 	// ErrInvalidArg argument error
 	ErrInvalidArg = errors.New("argument error")
+	// ErrBind failed to bind request
+	ErrBind = errors.New("bind error")
+	// ErrValidate failed to validate request
+	ErrValidate = errors.New("validate error")
 )

@@ -13,13 +13,19 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type EditUserRequest struct {
-	Bio   optional.String `json:"bio"`
-	Check optional.Bool   `json:"check"`
+type userParam struct {
+	UserID uuid.UUID `param:"userID" validate:"is-uuid"`
 }
 
-type UserHandler struct {
-	srv service.UserService
+type accountParams struct {
+	UserID    uuid.UUID `param:"userID" validate:"is-uuid"`
+	AccountID uuid.UUID `param:"accountID" validate:"is-uuid"`
+}
+
+type EditUserRequest struct {
+	UserID uuid.UUID       `param:"userID" validate:"is-uuid"`
+	Bio    optional.String `json:"bio"`
+	Check  optional.Bool   `json:"check"`
 }
 
 // userResponse Portfolioのレスポンスで使うイベント情報
@@ -38,14 +44,17 @@ type userDetailResponse struct {
 	Accounts []*domain.Account `json:"accounts"`
 }
 
-type Account struct {
-	ID          string `json:"id"`
-	Type        uint   `json:"type"`
-	URL         string `json:"url"`
-	PrPermitted bool   `json:"prPermitted"`
+type AddAccountRequest struct {
+	UserID      uuid.UUID `param:"userID" validate:"is-uuid"`
+	ID          string    `json:"id"`
+	Type        uint      `json:"type"`
+	URL         string    `json:"url"`
+	PrPermitted bool      `json:"prPermitted"`
 }
 
 type EditAccountRequest struct {
+	UserID      uuid.UUID       `param:"userID" validate:"is-uuid"`
+	AccountID   uuid.UUID       `param:"accountID" validate:"is-uuid"`
 	ID          optional.String `json:"id"` // traqID
 	Type        optional.Int64  `json:"type"`
 	URL         optional.String `json:"url"`
@@ -66,6 +75,10 @@ type ContestTeamWithContestNameResponse struct {
 	ContestName string    `json:"contest_name"`
 }
 
+type UserHandler struct {
+	srv service.UserService
+}
+
 func NewUserHandler(s service.UserService) *UserHandler {
 	return &UserHandler{srv: s}
 }
@@ -75,7 +88,7 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 	ctx := c.Request().Context()
 	users, err := handler.srv.GetUsers(ctx)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	res := make([]*userResponse, 0, len(users))
@@ -90,23 +103,17 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 }
 
 // GetByID GET /users/:userID
-func (handler *UserHandler) GetByID(c echo.Context) error {
-	_id := c.Param("userID")
-	if _id == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+func (handler *UserHandler) GetByID(_c echo.Context) error {
+	c := Context{_c}
+	req := userParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
 	}
 
-	id := uuid.FromStringOrNil(_id)
-	if id == uuid.Nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
-	}
 	ctx := c.Request().Context()
-	user, err := handler.srv.GetUser(ctx, id)
-	if err == repository.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
+	user, err := handler.srv.GetUser(ctx, req.UserID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return c.JSON(http.StatusOK, &userDetailResponse{
@@ -120,32 +127,21 @@ func (handler *UserHandler) GetByID(c echo.Context) error {
 }
 
 // Update PATCH /users/:userID
-func (handler *UserHandler) Update(c echo.Context) error {
-	_id := c.Param("userID")
-	if _id == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+func (handler *UserHandler) Update(_c echo.Context) error {
+	c := Context{_c}
+	req := EditUserRequest{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
 	}
 
-	id := uuid.FromStringOrNil(_id)
-	if id == uuid.Nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
-	}
-	req := EditUserRequest{}
-	err := c.Bind(&req)
-	if err != nil {
-		return err
-	}
 	ctx := c.Request().Context()
 	u := repository.UpdateUserArgs{
 		Description: req.Bio,
 		Check:       req.Check,
 	}
-	err = handler.srv.Update(ctx, id, &u)
-	if err == repository.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
+	err := handler.srv.Update(ctx, req.UserID, &u)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusOK)
 }
@@ -153,11 +149,12 @@ func (handler *UserHandler) Update(c echo.Context) error {
 // GetAccounts GET /users/:userID/accounts
 func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 	c := Context{_c}
-	_ = c.Request().Context()
-	_id := c.Param("userID")
-	id := uuid.FromStringOrNil(_id)
+	req := userParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
 
-	accounts, err := handler.srv.GetAccounts(id)
+	accounts, err := handler.srv.GetAccounts(req.UserID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -168,13 +165,12 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 // GetAccount GET /users/:userID/accounts/:accountID
 func (handler *UserHandler) GetAccount(_c echo.Context) error {
 	c := Context{_c}
-	_ = c.Request().Context()
-	_id := c.Param("userID")
-	userID := uuid.FromStringOrNil(_id)
-	_id = c.Param("accountID")
-	accountID := uuid.FromStringOrNil(_id)
+	req := accountParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
 
-	account, err := handler.srv.GetAccount(userID, accountID)
+	account, err := handler.srv.GetAccount(req.UserID, req.AccountID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -183,35 +179,22 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 }
 
 // AddAccount POST /users/:userID/accounts
-func (handler *UserHandler) AddAccount(c echo.Context) error {
-	_id := c.Param("userID")
-	if _id == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+func (handler *UserHandler) AddAccount(_c echo.Context) error {
+	c := Context{_c}
+	req := AddAccountRequest{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
 	}
 
-	id := uuid.FromStringOrNil(_id)
-	if id == uuid.Nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
-	}
-
-	req := Account{}
-	err := c.Bind(&req)
-	if err != nil {
-		return err
-	}
-
+	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
 		ID:          req.ID,
 		Type:        req.Type,
 		PrPermitted: req.PrPermitted,
 	}
-
-	account, err := handler.srv.CreateAccount(c.Request().Context(), id, &args)
-	if err == repository.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
+	account, err := handler.srv.CreateAccount(ctx, req.UserID, &args)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.JSON(http.StatusOK, account)
 }
@@ -219,24 +202,20 @@ func (handler *UserHandler) AddAccount(c echo.Context) error {
 // PatchAccount PATCH /users/:userID/accounts/:accountID
 func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	c := Context{_c}
-	ctx := c.Request().Context()
-	_id := c.Param("userID")
-	userID := uuid.FromStringOrNil(_id)
-	_id = c.Param("accountID")
-	accountID := uuid.FromStringOrNil(_id)
 	req := EditAccountRequest{}
-	err := c.BindAndValidate(req)
+	err := c.BindAndValidate(&req)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return convertError(err)
 	}
 
+	ctx := c.Request().Context()
 	args := repository.UpdateAccountArgs{
 		ID:          req.ID,
 		Type:        req.Type,
 		URL:         req.URL,
 		PrPermitted: req.PrPermitted,
 	}
-	err = handler.srv.EditAccount(ctx, accountID, userID, &args)
+	err = handler.srv.EditAccount(ctx, req.AccountID, req.UserID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -245,33 +224,17 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 }
 
 // DeleteAccount DELETE /users/:userID/accounts/:accountID
-func (handler *UserHandler) DeleteAccount(c echo.Context) error {
-	_accountid := c.Param("accountID")
-	if _accountid == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
+func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
+	c := Context{_c}
+	req := accountParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
 	}
 
-	accountid := uuid.FromStringOrNil(_accountid)
-	if accountid == uuid.Nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
-	}
-
-	_userid := c.Param("userID")
-	if _userid == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "user id must not be blank")
-	}
-
-	userid := uuid.FromStringOrNil(_userid)
-	if userid == uuid.Nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
-	}
-
-	err := handler.srv.DeleteAccount(c.Request().Context(), accountid, userid)
-	if err == repository.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
+	ctx := c.Request().Context()
+	err := handler.srv.DeleteAccount(ctx, req.AccountID, req.UserID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	return c.NoContent(http.StatusOK)
 }
@@ -279,10 +242,13 @@ func (handler *UserHandler) DeleteAccount(c echo.Context) error {
 // GetProjects GET /users/:userID/projects
 func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	c := Context{_c}
+	req := userParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
 	ctx := c.Request().Context()
-	_id := c.Param("userID")
-	userID := uuid.FromStringOrNil(_id)
-	projects, err := handler.srv.GetUserProjects(ctx, userID)
+	projects, err := handler.srv.GetUserProjects(ctx, req.UserID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -302,10 +268,13 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 // GetContests GET /users/:userID/contests
 func (handler *UserHandler) GetContests(_c echo.Context) error {
 	c := Context{_c}
+	req := userParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
 	ctx := c.Request().Context()
-	_id := c.Param("userID")
-	userID := uuid.FromStringOrNil(_id)
-	contests, err := handler.srv.GetUserContests(ctx, userID)
+	contests, err := handler.srv.GetUserContests(ctx, req.UserID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -325,14 +294,17 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 // GetEvents GET /users/:userID/events
 func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	c := Context{_c}
+	req := userParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
 	ctx := c.Request().Context()
-	_id := c.Param("userID")
-	userID := uuid.FromStringOrNil(_id)
-	events, err := handler.srv.GetUserEvents(ctx, userID)
+	events, err := handler.srv.GetUserEvents(ctx, req.UserID)
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*eventResponse, 0, len(events)) //TODO 型名
+	res := make([]*eventResponse, 0, len(events))
 	for _, v := range events {
 		e := &eventResponse{
 			ID:   v.ID,
