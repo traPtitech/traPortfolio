@@ -74,11 +74,6 @@ func initDB(db *gorm.DB) error {
 	return nil
 }
 
-func (handler *SQLHandler) Exec(sql string, values ...interface{}) database.SQLHandler {
-	db := handler.conn.Exec(sql, values...)
-	return &SQLHandler{conn: db}
-}
-
 func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
 	db := handler.conn.Find(out, where...)
 	return &SQLHandler{conn: db}
@@ -89,18 +84,8 @@ func (handler *SQLHandler) First(out interface{}, where ...interface{}) database
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Raw(sql string, values ...interface{}) database.SQLHandler {
-	db := handler.conn.Raw(sql, values...)
-	return &SQLHandler{conn: db}
-}
-
 func (handler *SQLHandler) Create(value interface{}) database.SQLHandler {
 	db := handler.conn.Create(value)
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
-	db := handler.conn.Save(value)
 	return &SQLHandler{conn: db}
 }
 
@@ -131,21 +116,6 @@ func (handler *SQLHandler) Begin() database.SQLHandler {
 
 func (handler *SQLHandler) Commit() database.SQLHandler {
 	db := handler.conn.Commit()
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQLHandler {
-	db := handler.conn.Joins(query, args)
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Scan(dest interface{}) database.SQLHandler {
-	db := handler.conn.Scan(dest)
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
-	db := handler.conn.Select(query, args...)
 	return &SQLHandler{conn: db}
 }
 
