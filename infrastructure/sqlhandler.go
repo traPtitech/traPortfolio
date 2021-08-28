@@ -66,7 +66,7 @@ func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 func initDB(db *gorm.DB) error {
 	// gormのエラーの上書き
 	gorm.ErrRecordNotFound = repository.ErrNotFound
-	// db.LogMode(true)
+	// db.Logger = db.Logger.LogMode(logger.Info)
 	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err
@@ -146,6 +146,11 @@ func (handler *SQLHandler) Scan(dest interface{}) database.SQLHandler {
 
 func (handler *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
 	db := handler.conn.Select(query, args...)
+	return &SQLHandler{conn: db}
+}
+
+func (handler *SQLHandler) Preload(query string, args ...interface{}) database.SQLHandler {
+	db := handler.conn.Preload(query, args...)
 	return &SQLHandler{conn: db}
 }
 

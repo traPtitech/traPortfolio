@@ -45,22 +45,33 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 		return nil, convertError(err)
 	}
 
-	members := make([]*domain.ProjectMember, 0)
-	selectQuery := "users.id as user_id, users.name, project_members.since, project_members.until"
-	whereQuery := "project_members.project_id = ?"
-	joinQuery := "left join users on users.id = project_members.user_id"
-	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, id).Joins(joinQuery).Scan(&members).Error()
+	members := make([]*model.ProjectMember, 0)
+	err := repo.h.
+		Preload("User").
+		Where(model.ProjectMember{ProjectID: id}).
+		Find(&members).
+		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
+
+	m := make([]*domain.ProjectMember, 0, len(members))
+	for _, v := range members {
+		m = append(m, &domain.ProjectMember{
+			UserID: v.UserID,
+			Name:   v.User.Name,
+			Since:  v.Since,
+			Until:  v.Until,
+		})
+	}
 	res := &domain.Project{
-		ID:          project.ID,
+		ID:          id,
 		Name:        project.Name,
 		Since:       project.Since,
 		Until:       project.Until,
 		Description: project.Description,
 		Link:        project.Link,
-		Members:     members,
+		Members:     m,
 		CreatedAt:   project.CreatedAt,
 		UpdatedAt:   project.CreatedAt,
 	}
@@ -117,15 +128,25 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]in
 }
 
 func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, error) {
-	members := make([]*domain.User, 0)
-	selectQuery := "users.id as id, users.name"
-	whereQuery := "project_members.project_id = ?"
-	joinQuery := "left join users on users.id = project_members.user_id"
-	err := repo.h.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, id).Joins(joinQuery).Scan(&members).Error()
+	members := make([]*model.ProjectMember, 0)
+	err := repo.h.
+		Preload("User").
+		Where(model.ProjectMember{ProjectID: id}).
+		Find(&members).
+		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
-	return members, nil
+
+	res := make([]*domain.User, 0, len(members))
+	for _, v := range members {
+		res = append(res, &domain.User{
+			ID:   v.UserID,
+			Name: v.User.Name,
+		})
+	}
+
+	return res, nil
 }
 
 func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {

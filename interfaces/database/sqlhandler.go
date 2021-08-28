@@ -16,6 +16,7 @@ type SQLHandler interface {
 	Joins(query string, args ...interface{}) SQLHandler
 	Scan(dest interface{}) SQLHandler
 	Select(query interface{}, args ...interface{}) SQLHandler
+	Preload(query string, args ...interface{}) SQLHandler
 	Rollback() SQLHandler
 	Transaction(fc func(handler SQLHandler) error) error
 

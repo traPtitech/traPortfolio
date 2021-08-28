@@ -241,33 +241,32 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 }
 
 func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	users := make([]*model.User, 10)
+	belongings := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.h.
-		Model(&model.ContestTeamUserBelonging{}).
-		Select("users.*").
-		Where("contest_team_user_belongings.team_id = ?", teamID).
-		Joins("INNER JOIN users ON contest_team_user_belongings.user_id = users.id").
-		Scan(&users).
+		Preload("User").
+		Where(model.ContestTeamUserBelonging{TeamID: teamID}).
+		Find(&belongings).
 		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
-	result := make([]*domain.User, 0, len(users))
+	result := make([]*domain.User, 0, len(belongings))
 	portalMp, err := repo.portal.MakeUserMp()
 
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	for _, v := range users {
-		portalUser, ok := portalMp[v.Name]
+	for _, v := range belongings {
+		u := v.User
+		portalUser, ok := portalMp[u.Name]
 		name := ""
 		if ok {
 			name = portalUser.Name
 		}
 		result = append(result, &domain.User{
-			ID:       v.ID,
-			Name:     v.Name,
+			ID:       u.ID,
+			Name:     u.Name,
 			RealName: name,
 		})
 	}
@@ -300,7 +299,7 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 			if _, ok := curMp[memberID]; ok {
 				continue
 			}
-			err = tx.Create(model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
+			err = tx.Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
 			if err != nil {
 				return err
 			}
