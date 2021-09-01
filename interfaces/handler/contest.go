@@ -32,10 +32,9 @@ type teamParams struct {
 }
 
 type PostContestRequest struct {
-	ContestID   uuid.UUID `param:"contestID" validate:"is-uuid"`
-	Name        string    `json:"name" validate:"required"`
-	Link        string    `json:"link" validate:"url"`
-	Description string    `json:"description"`
+	Name        string `json:"name" validate:"required"`
+	Link        string `json:"link" validate:"url"`
+	Description string `json:"description"`
 	Duration    Duration
 }
 

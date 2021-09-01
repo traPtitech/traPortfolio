@@ -66,17 +66,12 @@ func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 func initDB(db *gorm.DB) error {
 	// gormのエラーの上書き
 	gorm.ErrRecordNotFound = repository.ErrNotFound
-	// db.LogMode(true)
+	// db.Logger = db.Logger.LogMode(logger.Info)
 	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func (handler *SQLHandler) Exec(sql string, values ...interface{}) database.SQLHandler {
-	db := handler.conn.Exec(sql, values...)
-	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
@@ -89,18 +84,8 @@ func (handler *SQLHandler) First(out interface{}, where ...interface{}) database
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Raw(sql string, values ...interface{}) database.SQLHandler {
-	db := handler.conn.Raw(sql, values...)
-	return &SQLHandler{conn: db}
-}
-
 func (handler *SQLHandler) Create(value interface{}) database.SQLHandler {
 	db := handler.conn.Create(value)
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Save(value interface{}) database.SQLHandler {
-	db := handler.conn.Save(value)
 	return &SQLHandler{conn: db}
 }
 
@@ -134,18 +119,8 @@ func (handler *SQLHandler) Commit() database.SQLHandler {
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Joins(query string, args ...interface{}) database.SQLHandler {
-	db := handler.conn.Joins(query, args)
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Scan(dest interface{}) database.SQLHandler {
-	db := handler.conn.Scan(dest)
-	return &SQLHandler{conn: db}
-}
-
-func (handler *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
-	db := handler.conn.Select(query, args...)
+func (handler *SQLHandler) Preload(query string, args ...interface{}) database.SQLHandler {
+	db := handler.conn.Preload(query, args...)
 	return &SQLHandler{conn: db}
 }
 
