@@ -301,11 +301,10 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := &PostContestTeamRequest{
-		Name:        contestTeam.Name,
-		Link:        contestTeam.Link,
-		Description: contestTeam.Description,
-		Result:      contestTeam.Result,
+	res := &PostContestTeamResponse{
+		ID:     contestTeam.ID,
+		Name:   contestTeam.Name,
+		Result: contestTeam.Result,
 	}
 	return c.JSON(http.StatusCreated, res)
 }
