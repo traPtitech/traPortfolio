@@ -161,7 +161,7 @@ func TestUserService_Update(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.Must(uuid.NewV4()),
+				id:  util.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: optional.StringFrom(util.AlphaNumeric(10)),
 					Check:       optional.BoolFrom(true),
@@ -180,7 +180,7 @@ func TestUserService_Update(t *testing.T) {
 			name: "Fail_Notfound",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.Must(uuid.NewV4()),
+				id:  util.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: optional.StringFrom(util.AlphaNumeric(10)),
 					Check:       optional.BoolFrom(true),
@@ -230,8 +230,8 @@ func TestUserService_GetAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				userID:    uuid.Must(uuid.NewV4()),
-				accountID: uuid.Must(uuid.NewV4()),
+				userID:    util.UUID(),
+				accountID: util.UUID(),
 			},
 			want: &domain.Account{
 				ID:          uuid.Nil, // setupで変更,
@@ -279,10 +279,10 @@ func TestUserService_GetAccounts(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{userID: uuid.Must(uuid.NewV4())},
+			args: args{userID: util.UUID()},
 			want: []*domain.Account{
 				{
-					ID:          uuid.Must(uuid.NewV4()),
+					ID:          util.UUID(),
 					Type:        domain.HOMEPAGE,
 					PrPermitted: true,
 				},
@@ -331,7 +331,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.Must(uuid.NewV4()),
+				id:  util.UUID(),
 				account: &repository.CreateAccountArgs{
 					ID:          util.AlphaNumeric(5),
 					Type:        domain.HOMEPAGE,
@@ -340,7 +340,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				},
 			},
 			want: &domain.Account{
-				ID:          uuid.Must(uuid.NewV4()),
+				ID:          util.UUID(),
 				Type:        domain.HOMEPAGE,
 				PrPermitted: true,
 			},
@@ -353,7 +353,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 			name: "Fail_EmptyID",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.Must(uuid.NewV4()),
+				id:  util.UUID(),
 				account: &repository.CreateAccountArgs{
 					ID:          "",
 					Type:        domain.HOMEPAGE,
@@ -370,7 +370,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 			name: "Fail_InvalidAccountType",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.Must(uuid.NewV4()),
+				id:  util.UUID(),
 				account: &repository.CreateAccountArgs{
 					ID:          util.AlphaNumeric(5),
 					Type:        10000,
@@ -422,8 +422,8 @@ func TestUserService_EditAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				accountID: uuid.Must(uuid.NewV4()),
-				userID:    uuid.Must(uuid.NewV4()),
+				accountID: util.UUID(),
+				userID:    util.UUID(),
 				args: &repository.UpdateAccountArgs{
 					ID:          optional.StringFrom(util.AlphaNumeric(5)),
 					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
@@ -446,8 +446,8 @@ func TestUserService_EditAccount(t *testing.T) {
 			name: "Fail_Notfound",
 			args: args{
 				ctx:       context.Background(),
-				accountID: uuid.Must(uuid.NewV4()),
-				userID:    uuid.Must(uuid.NewV4()),
+				accountID: util.UUID(),
+				userID:    util.UUID(),
 				args: &repository.UpdateAccountArgs{
 					ID:          optional.StringFrom(util.AlphaNumeric(5)),
 					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
@@ -502,8 +502,8 @@ func TestUserService_DeleteAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				accountid: uuid.Must(uuid.NewV4()),
-				userid:    uuid.Must(uuid.NewV4()),
+				accountid: util.UUID(),
+				userid:    util.UUID(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				repo.EXPECT().DeleteAccount(args.accountid, args.userid).Return(nil)
@@ -546,11 +546,11 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:    context.Background(),
-				userID: uuid.Must(uuid.NewV4()),
+				userID: util.UUID(),
 			},
 			want: []*domain.UserProject{
 				{
-					ID:        uuid.Must(uuid.NewV4()),
+					ID:        util.UUID(),
 					Name:      util.AlphaNumeric(5),
 					Since:     time.Now(),
 					Until:     time.Now(),
@@ -567,7 +567,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			name: "Fail_Notfound",
 			args: args{
 				ctx:    context.Background(),
-				userID: uuid.Must(uuid.NewV4()),
+				userID: util.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserProject) {
@@ -613,11 +613,11 @@ func TestUserService_GetUserContests(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:    context.Background(),
-				userID: uuid.Must(uuid.NewV4()),
+				userID: util.UUID(),
 			},
 			want: []*domain.UserContest{
 				{
-					ID:          uuid.Must(uuid.NewV4()),
+					ID:          util.UUID(),
 					Name:        util.AlphaNumeric(5),
 					Result:      util.AlphaNumeric(5),
 					ContestName: util.AlphaNumeric(5),
@@ -632,7 +632,7 @@ func TestUserService_GetUserContests(t *testing.T) {
 			name: "Fail_Notfound",
 			args: args{
 				ctx:    context.Background(),
-				userID: uuid.Must(uuid.NewV4()),
+				userID: util.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
@@ -678,11 +678,11 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:    context.Background(),
-				userID: uuid.Must(uuid.NewV4()),
+				userID: util.UUID(),
 			},
 			want: []*domain.Event{
 				{
-					ID:        uuid.Must(uuid.NewV4()),
+					ID:        util.UUID(),
 					Name:      util.AlphaNumeric(5),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
@@ -697,7 +697,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			name: "Fail_Notfound",
 			args: args{
 				ctx:    context.Background(),
-				userID: uuid.Must(uuid.NewV4()),
+				userID: util.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.Event) {
