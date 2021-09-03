@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 	"github.com/traPtitech/traPortfolio/util"
 )
 
@@ -22,7 +23,7 @@ func TestEventService_GetEvents(t *testing.T) {
 		name      string
 		args      args
 		want      []*domain.Event
-		setup     func(m *MockRepository, args args, want []*domain.Event)
+		setup     func(repo *mock_repository.MockEventRepository, args args, want []*domain.Event)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -38,8 +39,8 @@ func TestEventService_GetEvents(t *testing.T) {
 					TimeEnd:   time.Now(),
 				},
 			},
-			setup: func(m *MockRepository, args args, want []*domain.Event) {
-				m.event.EXPECT().GetEvents().Return(want, nil)
+			setup: func(event *mock_repository.MockEventRepository, args args, want []*domain.Event) {
+				event.EXPECT().GetEvents().Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -52,10 +53,10 @@ func TestEventService_GetEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			repo := newMockRepository(ctrl)
+			repo := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := NewEventService(repo.event)
+			s := NewEventService(repo)
 			got, err := s.GetEvents(tt.args.ctx)
 
 			tt.assertion(t, err)
@@ -74,7 +75,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 		name      string
 		args      args
 		want      *domain.EventDetail
-		setup     func(m *MockRepository, args args, want *domain.EventDetail)
+		setup     func(repo *mock_repository.MockEventRepository, args args, want *domain.EventDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -103,8 +104,8 @@ func TestEventService_GetEventByID(t *testing.T) {
 				GroupID: util.UUID(),
 				RoomID:  util.UUID(),
 			},
-			setup: func(m *MockRepository, args args, want *domain.EventDetail) {
-				m.event.EXPECT().GetEvent(args.id).Return(want, nil)
+			setup: func(event *mock_repository.MockEventRepository, args args, want *domain.EventDetail) {
+				event.EXPECT().GetEvent(args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -117,10 +118,10 @@ func TestEventService_GetEventByID(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			repo := newMockRepository(ctrl)
+			repo := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := NewEventService(repo.event)
+			s := NewEventService(repo)
 			got, err := s.GetEventByID(tt.args.ctx, tt.args.id)
 
 			tt.assertion(t, err)
@@ -139,7 +140,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		setup     func(m *MockRepository, args args)
+		setup     func(repo *mock_repository.MockEventRepository, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -151,8 +152,8 @@ func TestEventService_UpdateEvent(t *testing.T) {
 					Level: domain.EventLevelAnonymous,
 				},
 			},
-			setup: func(m *MockRepository, args args) {
-				m.event.EXPECT().UpdateEvent(args.id, args.arg).Return(nil)
+			setup: func(event *mock_repository.MockEventRepository, args args) {
+				event.EXPECT().UpdateEvent(args.id, args.arg).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -165,11 +166,10 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			repo := newMockRepository(ctrl)
+			repo := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := NewEventService(repo.event)
-
+			s := NewEventService(repo)
 			tt.assertion(t, s.UpdateEvent(tt.args.ctx, tt.args.id, tt.args.arg))
 		})
 	}
