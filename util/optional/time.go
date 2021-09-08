@@ -12,6 +12,14 @@ type Time struct {
 	sql.NullTime
 }
 
+func TimeFrom(t time.Time) Time {
+	return NewTime(t, true)
+}
+
+func NewTime(t time.Time, valid bool) Time {
+	return Time{NullTime: sql.NullTime{Time: t, Valid: valid}}
+}
+
 func (t *Time) UnmarshalJSON(data []byte) error {
 	if bytes.Equal(data, []byte("null")) {
 		t.Time, t.Valid = time.Time{}, false
