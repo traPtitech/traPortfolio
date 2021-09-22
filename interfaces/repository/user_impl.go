@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/jinzhu/gorm"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
@@ -128,7 +127,7 @@ func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{})
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := &model.User{ID: id}
 		err := repo.First(user).Error()
-		if err == gorm.ErrRecordNotFound {
+		if err == repository.ErrNotFound {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err
@@ -171,7 +170,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := &model.Account{ID: accountID}
 		err := repo.First(account).Error()
-		if err == gorm.ErrRecordNotFound || account.UserID != userID {
+		if err == repository.ErrNotFound || account.UserID != userID {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err
