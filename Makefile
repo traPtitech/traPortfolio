@@ -8,6 +8,10 @@ BINARY=./bin/traPortfolio
 .PHONY: all
 all: clean build
 
+.PHONY: test
+test: $(GOFILES) 
+	go test -v -cover -race ./...
+
 .PHONY: build
 build: $(GOFILES)
 	go build -o $(BINARY)
