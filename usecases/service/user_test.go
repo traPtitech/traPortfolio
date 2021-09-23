@@ -107,7 +107,14 @@ func TestUserService_GetUser(t *testing.T) {
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.UserDetail) {
 				want.ID = args.id
-				repo.EXPECT().GetUser(args.id).Return(want, nil)
+				repo.EXPECT().GetUser(args.id).Return(&domain.UserDetail{
+					ID:       want.ID,
+					Name:     want.Name,
+					RealName: want.RealName,
+					State:    want.State,
+					Bio:      want.Bio,
+				}, nil)
+				repo.EXPECT().GetAccounts(args.id).Return(want.Accounts, nil)
 			},
 			assertion: assert.NoError,
 		},

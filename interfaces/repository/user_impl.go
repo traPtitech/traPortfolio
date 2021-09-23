@@ -69,18 +69,13 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 		return nil, err
 	}
 
-	accounts, err := repo.GetAccounts(id)
-	if err != nil {
-		return nil, err
-	}
-
 	result := domain.UserDetail{
 		ID:       user.ID,
 		Name:     user.Name,
 		RealName: portalUser.RealName,
 		State:    traQUser.State,
 		Bio:      user.Description,
-		Accounts: accounts,
+		// Accounts: GetAccountsで取得
 	}
 
 	return &result, nil

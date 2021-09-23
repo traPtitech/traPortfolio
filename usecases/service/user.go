@@ -30,6 +30,11 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 	if err != nil {
 		return nil, err
 	}
+	accounts, err := s.repo.GetAccounts(id)
+	if err != nil {
+		return nil, err
+	}
+	user.Accounts = accounts
 	return user, nil
 }
 
