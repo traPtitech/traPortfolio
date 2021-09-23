@@ -84,6 +84,7 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
 	err := repo.Find(&accounts, "user_id = ?", userID).Error()
+	// TODO: ErrRecordNotFoundのときエラー出さないほうがよさそう
 	if err != nil {
 		return nil, err
 	}

@@ -126,7 +126,20 @@ func TestUserService_GetUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.UserDetail) {
-				repo.EXPECT().GetUser(args.id).Return(want, repository.ErrForbidden)
+				repo.EXPECT().GetUser(args.id).Return(nil, repository.ErrForbidden)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "Fail_ForbiddenAccount",
+			args: args{
+				ctx: context.Background(),
+				id:  util.UUID(),
+			},
+			want: nil,
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.UserDetail) {
+				repo.EXPECT().GetUser(args.id).Return(&domain.UserDetail{}, nil)
+				repo.EXPECT().GetAccounts(args.id).Return(nil, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
