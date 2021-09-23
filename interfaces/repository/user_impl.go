@@ -54,9 +54,21 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	user := model.User{ID: id}
-	err := repo.First(&user).Error()
+	err := repo.
+		Preload("Accounts").
+		First(&user).
+		Error()
 	if err != nil {
 		return nil, err
+	}
+
+	accounts := make([]*domain.Account, 0, len(user.Accounts))
+	for _, v := range user.Accounts {
+		accounts = append(accounts, &domain.Account{
+			ID:          v.ID,
+			Type:        v.Type,
+			PrPermitted: v.Check,
+		})
 	}
 
 	portalUser, err := repo.portal.GetByID(user.Name)
@@ -65,11 +77,6 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	}
 
 	traQUser, err := repo.traQ.GetByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	accounts, err := repo.GetAccounts(id)
 	if err != nil {
 		return nil, err
 	}
