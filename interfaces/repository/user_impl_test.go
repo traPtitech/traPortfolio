@@ -22,30 +22,8 @@ var (
 		uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
 		uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
 	}
-	testUsers = []*domain.User{
-		{
-			ID:       ids[0],
-			Name:     "user1",
-			RealName: "ユーザー1 ユーザー1",
-		},
-		{
-			ID:       ids[1],
-			Name:     "user2",
-			RealName: "ユーザー2 ユーザー2",
-		},
-		{
-			ID:       ids[2],
-			Name:     "lolico",
-			RealName: "東 工子",
-		},
-	}
 )
 
-// TODO: たまに失敗する
-// Error Trace:	user_impl_test.go:108
-// Error:      	Not equal:
-// expected: []*domain.User{(*domain.User)(0x9dc700), (*domain.User)(0x9dc740), (*domain.User)(0x9dc780)}
-// actual  : []*domain.User{(*domain.User)(0xc000236240), (*domain.User)(0xc000236270), (*domain.User)(0xc0002362a0)}
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
 	type fields struct {
@@ -63,17 +41,35 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name:   "Success",
 			fields: fields{},
-			want:   testUsers,
+			want: []*domain.User{
+				{
+					ID:       ids[0],
+					Name:     "user1",
+					RealName: "ユーザー1 ユーザー1",
+				},
+				{
+					ID:       ids[1],
+					Name:     "user2",
+					RealName: "ユーザー2 ユーザー2",
+				},
+				{
+					ID:       ids[2],
+					Name:     "lolico",
+					RealName: "東 工子",
+				},
+			},
 			setup: func(f fields, want []*domain.User) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.EXPECT().Find(&[]*model.User{}).
 					DoAndReturn(func(users *[]*model.User) database.SQLHandler {
-						for _, user := range want {
-							*users = append(*users, &model.User{
-								ID:   user.ID,
-								Name: user.Name,
+						_users := make([]*model.User, 0, len(want))
+						for _, u := range want {
+							_users = append(_users, &model.User{
+								ID:   u.ID,
+								Name: u.Name,
 							})
 						}
+						*users = _users
 						return sqlhandler
 					})
 				sqlhandler.EXPECT().Error().Return(nil)
@@ -136,7 +132,11 @@ func TestUserRepository_GetUser(t *testing.T) {
 			fields: fields{},
 			args:   args{ids[0]},
 			want: &domain.UserDetail{
-				User:  *testUsers[0],
+				User: domain.User{
+					ID:       ids[0],
+					Name:     "user1",
+					RealName: "ユーザー1 ユーザー1",
+				},
 				State: 1,
 				Bio:   util.AlphaNumeric(5),
 				Accounts: []*domain.Account{
