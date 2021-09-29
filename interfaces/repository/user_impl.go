@@ -82,9 +82,11 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	}
 
 	result := domain.UserDetail{
-		ID:       user.ID,
-		Name:     user.Name,
-		RealName: portalUser.RealName,
+		User: domain.User{
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: portalUser.RealName,
+		},
 		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,

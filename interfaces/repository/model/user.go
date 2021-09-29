@@ -14,7 +14,7 @@ type User struct {
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
 
-	Accounts []Account `gorm:"foreignKey:UserID"`
+	Accounts []*Account `gorm:"foreignKey:UserID"`
 }
 
 func (*User) TableName() string {
