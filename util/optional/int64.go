@@ -11,6 +11,19 @@ type Int64 struct {
 	sql.NullInt64
 }
 
+func Int64From(i int64) Int64 {
+	return NewInt64(i, true)
+}
+
+func NewInt64(i int64, valid bool) Int64 {
+	return Int64{
+		NullInt64: sql.NullInt64{
+			Int64: i,
+			Valid: valid,
+		},
+	}
+}
+
 func (n *Int64) UnmarshalJSON(data []byte) error {
 	if bytes.Equal(data, []byte("null")) {
 		n.Int64, n.Valid = 0, false
