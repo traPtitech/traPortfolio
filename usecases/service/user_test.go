@@ -92,9 +92,11 @@ func TestUserService_GetUser(t *testing.T) {
 				id:  util.UUID(),
 			},
 			want: &domain.UserDetail{
-				ID:       uuid.Nil, // setupで変更する
-				Name:     util.AlphaNumeric(5),
-				RealName: util.AlphaNumeric(5),
+				User: domain.User{
+					ID:       uuid.Nil, // setupで変更する
+					Name:     util.AlphaNumeric(5),
+					RealName: util.AlphaNumeric(5),
+				},
 				State:    0,
 				Bio:      util.AlphaNumeric(10),
 				Accounts: []*domain.Account{
