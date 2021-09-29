@@ -12,6 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/util"
 	"gorm.io/gorm"
 )
 
@@ -40,6 +41,11 @@ var (
 	}
 )
 
+// TODO: たまに失敗する
+// Error Trace:	user_impl_test.go:108
+// Error:      	Not equal:
+// expected: []*domain.User{(*domain.User)(0x9dc700), (*domain.User)(0x9dc740), (*domain.User)(0x9dc780)}
+// actual  : []*domain.User{(*domain.User)(0xc000236240), (*domain.User)(0xc000236270), (*domain.User)(0xc0002362a0)}
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
 	type fields struct {
@@ -68,7 +74,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 								Name: user.Name,
 							})
 						}
-						return f.sqlhandler
+						return sqlhandler
 					})
 				sqlhandler.EXPECT().Error().Return(nil)
 			},
@@ -80,7 +86,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			want:   nil,
 			setup: func(f fields, want []*domain.User) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
-				sqlhandler.EXPECT().Find(&[]*model.User{}).Return(f.sqlhandler)
+				sqlhandler.EXPECT().Find(&[]*model.User{}).Return(sqlhandler)
 				sqlhandler.EXPECT().Error().Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -101,6 +107,84 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
 			// Assertion
 			got, err := repo.GetUsers()
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestUserRepository_GetUser(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		id uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      *domain.UserDetail
+		setup     func(f fields, args args, want *domain.UserDetail)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name:   "Success",
+			fields: fields{},
+			args:   args{ids[0]},
+			want: &domain.UserDetail{
+				User:  *testUsers[0],
+				State: 1,
+				Bio:   util.AlphaNumeric(5),
+				Accounts: []*domain.Account{
+					{
+						ID:          util.UUID(),
+						Type:        domain.HOMEPAGE,
+						PrPermitted: true,
+					},
+				},
+			},
+			setup: func(f fields, args args, want *domain.UserDetail) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.EXPECT().Preload("Accounts").Return(sqlhandler)
+				sqlhandler.EXPECT().First(&model.User{ID: args.id}).DoAndReturn(func(user *model.User) database.SQLHandler {
+					user.ID = args.id
+					user.Name = want.Name
+					user.Description = want.Bio
+
+					for _, v := range want.Accounts {
+						user.Accounts = append(user.Accounts, &model.Account{
+							ID:    v.ID,
+							Type:  v.Type,
+							Check: v.PrPermitted,
+						})
+					}
+
+					return sqlhandler
+				})
+				sqlhandler.EXPECT().Error().Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				sqlhandler: mock_database.NewMockSQLHandler(ctrl),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			}
+			tt.setup(tt.fields, tt.args, tt.want)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			got, err := repo.GetUser(tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
