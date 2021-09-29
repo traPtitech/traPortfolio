@@ -55,6 +55,7 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 			Name:      er.Name,
 			TimeStart: er.TimeStart,
 			TimeEnd:   er.TimeEnd,
+			// TODO: HostName:
 		},
 		Description: er.Description,
 		GroupID:     er.GroupID,
@@ -69,10 +70,6 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 }
 
 func (repo *EventRepository) UpdateEvent(id uuid.UUID, arg *repository.UpdateEventArg) error {
-	if id == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	var (
 		old model.EventLevelRelation
 		new model.EventLevelRelation

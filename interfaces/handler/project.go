@@ -17,6 +17,10 @@ var (
 	semesterToMonth = [2]time.Month{time.August, time.December}
 )
 
+type projectParams struct {
+	ProjectID uuid.UUID `param:"projectID" validate:"is-uuid"`
+}
+
 // ProjectResponse Portfolioのレスポンスで使うイベント情報
 type ProjectResponse struct {
 	ID       uuid.UUID              `json:"id"`
@@ -62,7 +66,7 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := make([]*ProjectResponse, 0, len(projects))
 	for _, v := range projects {
@@ -79,12 +83,15 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 // GetByID GET /projects/:projectID
 func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
+	req := projectParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
 	ctx := c.Request().Context()
-	_id := c.Param("projectID")
-	id := uuid.FromStringOrNil(_id)
-	project, err := h.service.GetProject(ctx, id)
+	project, err := h.service.GetProject(ctx, req.ProjectID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	res := &ProjectDetailResponse{
 		ID:          project.ID,
@@ -110,9 +117,8 @@ type PostProjectRequest struct {
 func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := &PostProjectRequest{}
-	// todo validation
-	err := c.BindAndValidate(req)
+	req := PostProjectRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
@@ -142,6 +148,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 }
 
 type PatchProjectRequest struct {
+	ProjectID   uuid.UUID       `param:"projectID" validate:"is-uuid"`
 	Name        optional.String `json:"name"`
 	Link        optional.String `json:"link"`
 	Description optional.String `json:"description"`
@@ -151,11 +158,8 @@ type PatchProjectRequest struct {
 func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("projectID")
-	id := uuid.FromStringOrNil(_id)
-	req := &PatchProjectRequest{}
-	// todo validation
-	err := c.BindAndValidate(req)
+	req := PatchProjectRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
@@ -173,7 +177,7 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		Until:       until,
 	}
 
-	err = h.service.UpdateProject(ctx, id, &patchReq)
+	err = h.service.UpdateProject(ctx, req.ProjectID, &patchReq)
 	if err != nil {
 		return convertError(err)
 	}
@@ -183,10 +187,13 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 // GetProjectMembers GET /projects/:projectID/members
 func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	c := Context{_c}
+	req := projectParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
 	ctx := c.Request().Context()
-	_id := c.Param("projectID")
-	id := uuid.FromStringOrNil(_id)
-	members, err := h.service.GetProjectMembers(ctx, id)
+	members, err := h.service.GetProjectMembers(ctx, req.ProjectID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -203,60 +210,56 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 }
 
 type AddProjectMembersRequest struct {
-	Members []*MemberIDWithProjectDuration
+	ProjectID uuid.UUID                      `param:"projectID" validate:"is-uuid"`
+	Members   []*MemberIDWithProjectDuration `json:"members" validate:"dive"`
 }
 
 type MemberIDWithProjectDuration struct {
-	UserID   string                 `json:"user_id"`
+	UserID   uuid.UUID              `json:"userID" validate:"is-uuid"`
 	Duration domain.ProjectDuration `json:"duration"`
-}
-
-type PutProjectMembersRequest struct {
-	Members []uuid.UUID `json:"members"`
 }
 
 // AddProjectMembers POST /projects/:projectID/members
 func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("projectID")
-	id := uuid.FromStringOrNil(_id)
-	req := &AddProjectMembersRequest{}
-	// todo validation
-	err := c.BindAndValidate(req)
+	req := AddProjectMembersRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
 		m := &repository.CreateProjectMemberArgs{
-			UserID: uuid.FromStringOrNil(v.UserID),
+			UserID: v.UserID,
 			Since:  semToTime(v.Duration.Since),
 			Until:  semToTime(v.Duration.Until),
 		}
 		createReq = append(createReq, m)
 	}
-	err = h.service.AddProjectMembers(ctx, id, createReq)
+	err = h.service.AddProjectMembers(ctx, req.ProjectID, createReq)
 	if err != nil {
 		return convertError(err)
 	}
 	return nil
 }
 
+type PutProjectMembersRequest struct {
+	ProjectID uuid.UUID   `param:"projectID" validate:"is-uuid"`
+	Members   []uuid.UUID `json:"members"`
+}
+
 // DeleteProjectMembers DELETE /projects/:projectID/members
 func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	_id := c.Param("projectID")
-	id := uuid.FromStringOrNil(_id)
-	req := &PutProjectMembersRequest{}
-	// todo validation
-	err := c.BindAndValidate(req)
+	req := PutProjectMembersRequest{}
+	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
 
-	err = h.service.DeleteProjectMembers(ctx, id, req.Members)
+	err = h.service.DeleteProjectMembers(ctx, req.ProjectID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}

@@ -13,6 +13,8 @@ type User struct {
 	Name        string    `gorm:"type:varchar(32);not null;unique"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
+
+	Accounts []Account `gorm:"foreignKey:UserID"`
 }
 
 func (*User) TableName() string {
@@ -28,6 +30,4 @@ type Account struct {
 	Check     bool      `gorm:"type:boolean;not null;default:false"`
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
-
-	User User `gorm:"foreignKey:UserID"`
 }

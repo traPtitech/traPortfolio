@@ -2,9 +2,6 @@ package service
 
 import (
 	"context"
-	"net/http"
-
-	"github.com/labstack/echo/v4"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -37,9 +34,6 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 }
 
 func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
-	if id == uuid.Nil {
-		return repository.ErrInvalidID
-	}
 	changes := map[string]interface{}{}
 	if args.Description.Valid {
 		changes["description"] = args.Description.String
@@ -49,9 +43,6 @@ func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository
 	}
 	if len(changes) > 0 {
 		err := s.repo.Update(id, changes)
-		if err != nil && err == repository.ErrNotFound {
-			return echo.NewHTTPError(http.StatusNotFound)
-		}
 		if err != nil {
 			return err
 		}
@@ -60,26 +51,16 @@ func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository
 }
 
 func (s *UserService) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
-	if userID == uuid.Nil || accountID == uuid.Nil {
-		return nil, repository.ErrNilID
-	}
 	return s.repo.GetAccount(userID, accountID)
 }
 
 func (s *UserService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
-	if userID == uuid.Nil {
-		return nil, repository.ErrNilID
-	}
 	return s.repo.GetAccounts(userID)
 }
 
 func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
-
-	if id == uuid.Nil {
-		return nil, repository.ErrInvalidArg
-	}
 
 	if len(account.ID) == 0 {
 		return nil, repository.ErrInvalidArg
@@ -98,10 +79,6 @@ func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 }
 
 func (s *UserService) EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
-	if accountID == uuid.Nil || userID == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	changes := map[string]interface{}{}
 	if args.ID.Valid {
 		changes["id"] = args.ID.String
@@ -117,9 +94,6 @@ func (s *UserService) EditAccount(ctx context.Context, accountID uuid.UUID, user
 	}
 	if len(changes) > 0 {
 		err := s.repo.UpdateAccount(accountID, userID, changes)
-		if err != nil && err == repository.ErrNotFound {
-			return echo.NewHTTPError(http.StatusNotFound)
-		}
 		if err != nil {
 			return err
 		}
@@ -132,14 +106,6 @@ func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, us
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
 
-	if accountid == uuid.Nil {
-		return repository.ErrInvalidArg
-	}
-
-	if userid == uuid.Nil {
-		return repository.ErrInvalidArg
-	}
-
 	err := s.repo.DeleteAccount(accountid, userid)
 
 	return err
@@ -147,9 +113,6 @@ func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, us
 }
 
 func (s *UserService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {
-	if userID == uuid.Nil {
-		return nil, repository.ErrInvalidID
-	}
 	projects, err := s.repo.GetProjects(userID)
 	if err != nil {
 		return nil, err
@@ -158,9 +121,6 @@ func (s *UserService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]
 }
 
 func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error) {
-	if userID == uuid.Nil {
-		return nil, repository.ErrInvalidID
-	}
 	contests, err := s.repo.GetContests(userID)
 	if err != nil {
 		return nil, err
@@ -169,9 +129,6 @@ func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 }
 
 func (s *UserService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
-	if userID == uuid.Nil {
-		return nil, repository.ErrInvalidID
-	}
 	events, err := s.event.GetUserEvents(userID)
 	if err != nil {
 		return nil, err

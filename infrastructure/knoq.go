@@ -76,10 +76,6 @@ func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 }
 
 func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
-	if id == uuid.Nil {
-		return nil, nil
-	}
-
 	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/events/%v", id))
 	if err != nil {
 		return nil, err
@@ -98,10 +94,6 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 }
 
 func (knoq *KnoqAPI) GetByUserID(id uuid.UUID) ([]*external.EventResponse, error) {
-	if id == uuid.Nil {
-		return nil, nil
-	}
-
 	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/users/%v/events", id))
 	if err != nil {
 		return nil, err

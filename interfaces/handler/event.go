@@ -34,7 +34,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	ctx := c.Request().Context()
 	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	res := make([]*eventResponse, 0, len(events))
@@ -51,6 +51,10 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+type eventParam struct {
+	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
+}
+
 type eventDetailResponse struct {
 	eventResponse
 	Description string `json:"description"`
@@ -59,49 +63,41 @@ type eventDetailResponse struct {
 }
 
 // GetByID GET /events/:eventID
-func (h *EventHandler) GetByID(c echo.Context) error {
-	_id := c.Param("eventID")
-	if _id == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "event id must not be blank")
+func (h *EventHandler) GetByID(_c echo.Context) error {
+	c := Context{_c}
+	req := eventParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
 	}
 
-	id := uuid.FromStringOrNil(_id)
-	if id == uuid.Nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid uuid")
-	}
 	ctx := c.Request().Context()
-	event, err := h.srv.GetEventByID(ctx, id)
-	if err == repository.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
+	event, err := h.srv.GetEventByID(ctx, req.EventID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return c.JSON(http.StatusOK, formatUserDetail(event))
 }
 
 type EditEventRequest struct {
+	EventID    uuid.UUID `param:"eventID" validate:"is-uuid"`
 	EventLevel *domain.EventLevel
 }
 
 // PatchEvent PATCH /events/:eventID
 func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	c := Context{_c}
-	ctx := c.Request().Context()
-	_id := c.Param("eventID")
-	id := uuid.FromStringOrNil(_id)
 	req := &EditEventRequest{}
-	err := c.BindAndValidate(req)
-	if err != nil {
+	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
+	ctx := c.Request().Context()
 	patchReq := repository.UpdateEventArg{
 		Level: *req.EventLevel,
 	}
 
-	if err := h.srv.UpdateEvent(ctx, id, &patchReq); err != nil {
+	if err := h.srv.UpdateEvent(ctx, req.EventID, &patchReq); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)

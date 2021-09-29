@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/jinzhu/gorm"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
@@ -55,9 +54,21 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	user := model.User{ID: id}
-	err := repo.First(&user).Error()
+	err := repo.
+		Preload("Accounts").
+		First(&user).
+		Error()
 	if err != nil {
 		return nil, err
+	}
+
+	accounts := make([]*domain.Account, 0, len(user.Accounts))
+	for _, v := range user.Accounts {
+		accounts = append(accounts, &domain.Account{
+			ID:          v.ID,
+			Type:        v.Type,
+			PrPermitted: v.Check,
+		})
 	}
 
 	portalUser, err := repo.portal.GetByID(user.Name)
@@ -66,11 +77,6 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	}
 
 	traQUser, err := repo.traQ.GetByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	accounts, err := repo.GetAccounts(id)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +134,7 @@ func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{})
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := &model.User{ID: id}
 		err := repo.First(user).Error()
-		if err == gorm.ErrRecordNotFound {
+		if err == repository.ErrNotFound {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err
@@ -171,7 +177,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := &model.Account{ID: accountID}
 		err := repo.First(account).Error()
-		if err == gorm.ErrRecordNotFound || account.UserID != userID {
+		if err == repository.ErrNotFound || account.UserID != userID {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err
@@ -195,28 +201,53 @@ func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID)
 }
 
 func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
-	projects := make([]*domain.UserProject, 0)
-	selectQuery := "projects.id, projects.name, projects.since, projects.until, project_members.since AS user_since, project_members.until AS user_until"
-	whereQuery := "project_members.user_id = ?"
-	joinQuery := "LEFT JOIN projects ON project_members.project_id = projects.id"
-	err := repo.Model(&model.ProjectMember{}).Select(selectQuery).Where(whereQuery, userID).Joins(joinQuery).Scan(&projects).Error()
+	projects := make([]*model.ProjectMember, 0)
+	err := repo.
+		Preload("Project").
+		Where(&model.ProjectMember{UserID: userID}).
+		Find(&projects).
+		Error()
 	if err != nil {
 		return nil, err
 	}
-	return projects, nil
+
+	res := make([]*domain.UserProject, 0, len(projects))
+	for _, v := range projects {
+		res = append(res, &domain.UserProject{
+			ID:        v.Project.ID,
+			Name:      v.Project.Name,
+			Since:     v.Project.Since,
+			Until:     v.Project.Until,
+			UserSince: v.Since,
+			UserUntil: v.Until,
+		})
+	}
+	return res, nil
 }
 
 func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
-	contests := make([]*domain.UserContest, 0)
-	selectQuery := "contest_teams.id, contest_teams.name, contest_teams.result, contests.name AS contest_name"
-	whereQuery := "contest_team_user_belongings.user_id = ?"
-	joinQuery := "LEFT JOIN contests ON contest_teams.contest_id = contests.id"
-	joinQuery2 := "LEFT JOIN contest_team_user_belongings ON contest_teams.id = contest_team_user_belongings.team_id"
-	err := repo.Model(&model.ContestTeam{}).Select(selectQuery).Where(whereQuery, userID).Joins(joinQuery).Joins(joinQuery2).Scan(&contests).Error()
+	contests := make([]*model.ContestTeamUserBelonging, 0)
+	err := repo.
+		Preload("ContestTeam").
+		Where(&model.ContestTeamUserBelonging{UserID: userID}).
+		Find(&contests).
+		Error()
 	if err != nil {
 		return nil, err
 	}
-	return contests, nil
+
+	res := make([]*domain.UserContest, 0, len(contests))
+	for _, v := range contests {
+		ct := v.ContestTeam
+		res = append(res, &domain.UserContest{
+			ID:          ct.ID,
+			Name:        ct.Name,
+			Result:      ct.Result,
+			ContestName: ct.Name,
+		})
+	}
+
+	return res, nil
 }
 
 // Interface guards
