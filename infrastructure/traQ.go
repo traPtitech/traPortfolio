@@ -34,7 +34,7 @@ type TraQAPI struct {
 
 func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 	if conf.isDevelopment {
-		return &mock_external.MockTraQAPI{}, nil
+		return mock_external.NewMockTraQAPI(), nil
 	}
 
 	jar, err := cookiejar.New(nil)

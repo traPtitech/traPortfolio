@@ -1,10 +1,9 @@
 package repository
 
 import (
-	"fmt"
-	"net/http"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -13,16 +12,40 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
-	"github.com/traPtitech/traPortfolio/util"
 	"gorm.io/gorm"
+)
+
+var (
+	ids = []uuid.UUID{
+		uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
+		uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
+		uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
+	}
+	testUsers = []*domain.User{
+		{
+			ID:       ids[0],
+			Name:     "user1",
+			RealName: "ユーザー1 ユーザー1",
+		},
+		{
+			ID:       ids[1],
+			Name:     "user2",
+			RealName: "ユーザー2 ユーザー2",
+		},
+		{
+			ID:       ids[2],
+			Name:     "lolico",
+			RealName: "東 工子",
+		},
+	}
 )
 
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
 	type fields struct {
-		sqlhandler *mock_database.MockSQLHandler
-		portal     *mock_external.MockPortalAPI
-		traq       *mock_external.MockTraQAPI
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
 	}
 	tests := []struct {
 		name      string
@@ -34,15 +57,10 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name:   "Success",
 			fields: fields{},
-			want: []*domain.User{
-				{
-					ID:       util.UUID(),
-					Name:     util.AlphaNumeric(5),
-					RealName: util.AlphaNumeric(5),
-				},
-			},
+			want:   testUsers,
 			setup: func(f fields, want []*domain.User) {
-				f.sqlhandler.EXPECT().Find(&[]*model.User{}).
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.EXPECT().Find(&[]*model.User{}).
 					DoAndReturn(func(users *[]*model.User) database.SQLHandler {
 						for _, user := range want {
 							*users = append(*users, &model.User{
@@ -52,17 +70,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 						}
 						return f.sqlhandler
 					})
-				f.sqlhandler.EXPECT().Error().Return(nil)
-				f.portal.EXPECT().GetAll().DoAndReturn(func() ([]*external.PortalUserResponse, error) {
-					p := make([]*external.PortalUserResponse, 0, len(want))
-					for _, v := range want {
-						p = append(p, &external.PortalUserResponse{
-							TraQID:   v.Name,
-							RealName: v.RealName,
-						})
-					}
-					return p, nil
-				})
+				sqlhandler.EXPECT().Error().Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -71,19 +79,9 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			fields: fields{},
 			want:   nil,
 			setup: func(f fields, want []*domain.User) {
-				f.sqlhandler.EXPECT().Find(&[]*model.User{}).Return(f.sqlhandler)
-				f.sqlhandler.EXPECT().Error().Return(gorm.ErrInvalidDB)
-			},
-			assertion: assert.Error,
-		},
-		{
-			name:   "Fail_Portal",
-			fields: fields{},
-			want:   nil,
-			setup: func(f fields, want []*domain.User) {
-				f.sqlhandler.EXPECT().Find(&[]*model.User{}).Return(f.sqlhandler)
-				f.sqlhandler.EXPECT().Error().Return(nil)
-				f.portal.EXPECT().GetAll().Return(nil, fmt.Errorf("GET /user failed: %v", http.StatusInternalServerError))
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.EXPECT().Find(&[]*model.User{}).Return(f.sqlhandler)
+				sqlhandler.EXPECT().Error().Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -96,8 +94,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			tt.fields = fields{
 				sqlhandler: mock_database.NewMockSQLHandler(ctrl),
-				portal:     mock_external.NewMockPortalAPI(ctrl),
-				traq:       mock_external.NewMockTraQAPI(ctrl),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
 			}
 			tt.setup(tt.fields, tt.want)
 			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)

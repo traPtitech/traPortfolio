@@ -28,6 +28,10 @@ var (
 
 type MockPortalAPI struct{}
 
+func NewMockPortalAPI() *MockPortalAPI {
+	return &MockPortalAPI{}
+}
+
 func (m *MockPortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	res := make([]*external.PortalUserResponse, 0)
 	for _, v := range portalUserMap {
