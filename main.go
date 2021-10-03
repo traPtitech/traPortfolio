@@ -6,7 +6,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
 func main() {
@@ -24,7 +26,20 @@ func main() {
 		t := traQConf()
 		p := portalConf()
 		k := knoQConf()
-		infrastructure.Init(&s, &t, &p, &k)
+		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
+		if err != nil {
+			log.Fatal(err)
+		}
+		e := echo.New()
+		handler.Setup(e, &api)
+
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "1323"
+		}
+
+		// Start server
+		e.Logger.Fatal("failed to start server", e.Start(":"+port))
 	}
 }
 

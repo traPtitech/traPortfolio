@@ -1,9 +1,7 @@
-package infrastructure
+package handler
 
 import (
 	"log"
-
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 
 	"github.com/go-playground/validator/v10"
 
@@ -11,27 +9,22 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) {
+func Setup(e *echo.Echo, api *API) {
 	// Echo instance
-	e := echo.New()
 	v := validator.New()
-	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
+	if err := v.RegisterValidation("is-uuid", IsValidUUID); err != nil {
 		log.Fatal(err)
 	}
 	e.Validator = &Validator{
 		validator: v,
 	}
 
-	api, err := InjectAPIServer(s, t, p, k)
-	if err != nil {
-		log.Fatal(err)
-	}
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return h(&handler.Context{Context: c})
+			return h(&Context{Context: c})
 		}
 	})
 
@@ -158,8 +151,6 @@ func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) {
 		}
 	}
 
-	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
 }
 
 type Validator struct {
