@@ -77,7 +77,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name:   "Fail_DB",
+			name:   "InvalidDB",
 			fields: fields{},
 			want:   nil,
 			setup: func(f fields, want []*domain.User) {
@@ -168,6 +168,19 @@ func TestUserRepository_GetUser(t *testing.T) {
 				sqlhandler.EXPECT().Error().Return(nil)
 			},
 			assertion: assert.NoError,
+		},
+		{
+			name:   "InvalidDB",
+			fields: fields{},
+			args:   args{ids[0]},
+			want:   nil,
+			setup: func(f fields, args args, want *domain.UserDetail) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.EXPECT().Preload("Accounts").Return(sqlhandler)
+				sqlhandler.EXPECT().First(&model.User{ID: args.id}).Return(sqlhandler)
+				sqlhandler.EXPECT().Error().Return(gorm.ErrInvalidDB)
+			},
+			assertion: assert.Error,
 		},
 	}
 	for _, tt := range tests {
