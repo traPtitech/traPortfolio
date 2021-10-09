@@ -1,19 +1,18 @@
 package repository
 
 import (
+	"regexp"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/util"
-	"gorm.io/gorm"
 )
 
 var (
@@ -34,13 +33,15 @@ func TestUserRepository_GetUsers(t *testing.T) {
 	tests := []struct {
 		name      string
 		fields    fields
+		isValidDB bool
 		want      []*domain.User
 		setup     func(f fields, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name:   "Success",
-			fields: fields{},
+			name:      "Success",
+			fields:    fields{},
+			isValidDB: true,
 			want: []*domain.User{
 				{
 					ID:       ids[0],
@@ -59,32 +60,23 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				},
 			},
 			setup: func(f fields, want []*domain.User) {
+				rows := sqlmock.NewRows([]string{"id", "name"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.Name)
+				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
-				sqlhandler.EXPECT().Find(&[]*model.User{}).
-					DoAndReturn(func(users *[]*model.User) database.SQLHandler {
-						_users := make([]*model.User, 0, len(want))
-						for _, u := range want {
-							_users = append(_users, &model.User{
-								ID:   u.ID,
-								Name: u.Name,
-							})
-						}
-						*users = _users
-						return sqlhandler
-					})
-				sqlhandler.EXPECT().Error().Return(nil)
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
+					WillReturnRows(rows)
 			},
 			assertion: assert.NoError,
 		},
 		{
-			name:   "InvalidDB",
-			fields: fields{},
-			want:   nil,
-			setup: func(f fields, want []*domain.User) {
-				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
-				sqlhandler.EXPECT().Find(&[]*model.User{}).Return(sqlhandler)
-				sqlhandler.EXPECT().Error().Return(gorm.ErrInvalidDB)
-			},
+			name:      "InvalidDB",
+			fields:    fields{},
+			isValidDB: false,
+			want:      nil,
+			setup:     func(f fields, want []*domain.User) {},
 			assertion: assert.Error,
 		},
 	}
@@ -93,9 +85,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			ctrl := gomock.NewController(t)
 			tt.fields = fields{
-				sqlhandler: mock_database.NewMockSQLHandler(ctrl),
+				sqlhandler: mock_database.NewMockSQLHandler(tt.isValidDB),
 				portal:     mock_external.NewMockPortalAPI(),
 				traq:       mock_external.NewMockTraQAPI(),
 			}
@@ -123,14 +114,16 @@ func TestUserRepository_GetUser(t *testing.T) {
 		name      string
 		fields    fields
 		args      args
+		isValidDB bool
 		want      *domain.UserDetail
 		setup     func(f fields, args args, want *domain.UserDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name:   "Success",
-			fields: fields{},
-			args:   args{ids[0]},
+			name:      "Success",
+			fields:    fields{},
+			args:      args{ids[0]},
+			isValidDB: true,
 			want: &domain.UserDetail{
 				User: domain.User{
 					ID:       ids[0],
@@ -149,37 +142,50 @@ func TestUserRepository_GetUser(t *testing.T) {
 			},
 			setup: func(f fields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
-				sqlhandler.EXPECT().Preload("Accounts").Return(sqlhandler)
-				sqlhandler.EXPECT().First(&model.User{ID: args.id}).DoAndReturn(func(user *model.User) database.SQLHandler {
-					user.ID = args.id
-					user.Name = want.Name
-					user.Description = want.Bio
-
-					for _, v := range want.Accounts {
-						user.Accounts = append(user.Accounts, &model.Account{
-							ID:    v.ID,
-							Type:  v.Type,
-							Check: v.PrPermitted,
-						})
-					}
-
-					return sqlhandler
-				})
-				sqlhandler.EXPECT().Error().Return(nil)
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows(
+							[]string{"id", "name", "description"}).
+							AddRow(want.User.ID, want.User.Name, want.Bio),
+					)
+				rows := sqlmock.NewRows([]string{"id", "user_id", "type", "check"})
+				for _, v := range want.Accounts {
+					rows.AddRow(v.ID, want.User.ID, v.Type, v.PrPermitted)
+				}
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
+							AddRow(want.Accounts[0].ID, args.id, want.Accounts[0].Type, want.Accounts[0].PrPermitted),
+					)
 			},
 			assertion: assert.NoError,
 		},
 		{
-			name:   "InvalidDB",
-			fields: fields{},
-			args:   args{ids[0]},
-			want:   nil,
+			name:      "NotFound",
+			fields:    fields{},
+			args:      args{ids[0]},
+			isValidDB: true,
+			want:      nil,
 			setup: func(f fields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
-				sqlhandler.EXPECT().Preload("Accounts").Return(sqlhandler)
-				sqlhandler.EXPECT().First(&model.User{ID: args.id}).Return(sqlhandler)
-				sqlhandler.EXPECT().Error().Return(gorm.ErrInvalidDB)
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description"}))
 			},
+			assertion: assert.Error,
+		},
+		{
+			name:      "InvalidDB",
+			fields:    fields{},
+			args:      args{ids[0]},
+			isValidDB: false,
+			want:      nil,
+			setup:     func(f fields, args args, want *domain.UserDetail) {},
 			assertion: assert.Error,
 		},
 	}
@@ -188,9 +194,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			ctrl := gomock.NewController(t)
 			tt.fields = fields{
-				sqlhandler: mock_database.NewMockSQLHandler(ctrl),
+				sqlhandler: mock_database.NewMockSQLHandler(tt.isValidDB),
 				portal:     mock_external.NewMockPortalAPI(),
 				traq:       mock_external.NewMockTraQAPI(),
 			}
