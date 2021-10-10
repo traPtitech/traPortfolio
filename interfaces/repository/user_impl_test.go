@@ -15,6 +15,8 @@ import (
 	"github.com/traPtitech/traPortfolio/util"
 )
 
+const isValidDB = true
+
 var (
 	ids = []uuid.UUID{
 		uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
@@ -33,15 +35,17 @@ func TestUserRepository_GetUsers(t *testing.T) {
 	tests := []struct {
 		name      string
 		fields    fields
-		isValidDB bool
 		want      []*domain.User
 		setup     func(f fields, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name:      "Success",
-			fields:    fields{},
-			isValidDB: true,
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
 			want: []*domain.User{
 				{
 					ID:       ids[0],
@@ -72,9 +76,12 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name:      "InvalidDB",
-			fields:    fields{},
-			isValidDB: false,
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
 			want:      nil,
 			setup:     func(f fields, want []*domain.User) {},
 			assertion: assert.Error,
@@ -85,11 +92,6 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.fields = fields{
-				sqlhandler: mock_database.NewMockSQLHandler(tt.isValidDB),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			}
 			tt.setup(tt.fields, tt.want)
 			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
 			// Assertion
@@ -114,16 +116,18 @@ func TestUserRepository_GetUser(t *testing.T) {
 		name      string
 		fields    fields
 		args      args
-		isValidDB bool
 		want      *domain.UserDetail
 		setup     func(f fields, args args, want *domain.UserDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name:      "Success",
-			fields:    fields{},
-			args:      args{ids[0]},
-			isValidDB: true,
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{ids[0]},
 			want: &domain.UserDetail{
 				User: domain.User{
 					ID:       ids[0],
@@ -165,11 +169,14 @@ func TestUserRepository_GetUser(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name:      "NotFound",
-			fields:    fields{},
-			args:      args{ids[0]},
-			isValidDB: true,
-			want:      nil,
+			name: "NotFound",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{ids[0]},
+			want: nil,
 			setup: func(f fields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
@@ -180,10 +187,13 @@ func TestUserRepository_GetUser(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name:      "InvalidDB",
-			fields:    fields{},
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
 			args:      args{ids[0]},
-			isValidDB: false,
 			want:      nil,
 			setup:     func(f fields, args args, want *domain.UserDetail) {},
 			assertion: assert.Error,
@@ -194,11 +204,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.fields = fields{
-				sqlhandler: mock_database.NewMockSQLHandler(tt.isValidDB),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			}
 			tt.setup(tt.fields, tt.args, tt.want)
 			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
 			// Assertion
