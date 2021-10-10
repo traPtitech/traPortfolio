@@ -22,6 +22,7 @@ func main() {
 		}
 		log.Println("finished")
 	} else {
+		isDevelopment := os.Getenv("APP_ENV") == "development"
 		s := sqlConf()
 		t := traQConf()
 		p := portalConf()
@@ -71,22 +72,22 @@ func sqlConf() infrastructure.SQLConfig {
 	return infrastructure.NewSQLConfig(user, password, host, dbname, port)
 }
 
-func traQConf() infrastructure.TraQConfig {
+func traQConf(isDevelopment bool) infrastructure.TraQConfig {
 	traQCookie := os.Getenv("TRAQ_COOKIE")
 	traQAPIEndpoint := os.Getenv("TRAQ_API_ENDPOINT")
 
-	return infrastructure.NewTraQConfig(traQCookie, traQAPIEndpoint)
+	return infrastructure.NewTraQConfig(traQCookie, traQAPIEndpoint, isDevelopment)
 }
 
-func knoQConf() infrastructure.KnoQConfig {
+func knoQConf(isDevelopment bool) infrastructure.KnoQConfig {
 	knoQCookie := os.Getenv("KNOQ_COOKIE")
 	knoQAPIEndpoint := os.Getenv("KNOQ_API_ENDPOINT")
 
-	return infrastructure.NewKnoqConfig(knoQCookie, knoQAPIEndpoint)
+	return infrastructure.NewKnoqConfig(knoQCookie, knoQAPIEndpoint, isDevelopment)
 }
 
-func portalConf() infrastructure.PortalConfig {
+func portalConf(isDevelopment bool) infrastructure.PortalConfig {
 	portalCookie := os.Getenv("PORTAL_COOKIE")
 	portalAPIEndpoint := os.Getenv("PORTAL_API_ENDPOINT")
-	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint)
+	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint, isDevelopment)
 }
