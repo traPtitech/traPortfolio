@@ -114,13 +114,10 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 }
 
 func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
-	account := &model.Account{ID: accountID}
-	err := repo.First(account).Error()
+	account := &model.Account{}
+	err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
 	if err != nil {
 		return nil, err
-	}
-	if account.UserID != userID {
-		return nil, repository.ErrNotFound
 	}
 
 	result := &domain.Account{
@@ -177,9 +174,9 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
-		account := &model.Account{ID: accountID}
-		err := repo.First(account).Error()
-		if err == repository.ErrNotFound || account.UserID != userID {
+		account := &model.Account{}
+		err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
+		if err == repository.ErrNotFound {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err
