@@ -9,7 +9,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type MockSQLHandler struct {
@@ -35,8 +34,6 @@ func NewMockSQLHandler(isValidDB bool) database.SQLHandler {
 	if err != nil && isValidDB {
 		log.Fatal(err)
 	}
-
-	gorm.ErrRecordNotFound = repository.ErrNotFound
 
 	return &MockSQLHandler{engine, mock}
 }
