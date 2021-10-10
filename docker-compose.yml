@@ -7,6 +7,7 @@ services:
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
     command: ./traPortfolio
     environment:
+      APP_ENV: ${APP_ENV}
       KNOQ_COOKIE: ${KNOQ_COOKIE}
       KNOQ_API_ENDPOINT: ${KNOQ_API_ENDPOINT}
       TRAQ_COOKIE: ${TRAQ_COOKIE}
