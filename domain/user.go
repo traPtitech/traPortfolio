@@ -43,6 +43,13 @@ type UserContest struct {
 	ContestName string
 }
 
+type UserGroup struct {
+	ID       uuid.UUID
+	Name     string
+	Realname string
+	Duration ProjectDuration
+}
+
 const (
 	HOMEPAGE uint = iota
 	BLOG
