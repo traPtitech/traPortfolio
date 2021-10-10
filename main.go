@@ -24,9 +24,9 @@ func main() {
 	} else {
 		isDevelopment := os.Getenv("APP_ENV") == "development"
 		s := sqlConf()
-		t := traQConf()
-		p := portalConf()
-		k := knoQConf()
+		t := traQConf(isDevelopment)
+		p := portalConf(isDevelopment)
+		k := knoQConf(isDevelopment)
 		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
 		if err != nil {
 			log.Fatal(err)
