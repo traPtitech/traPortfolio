@@ -80,8 +80,8 @@ func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 
 func (s *UserService) EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
-	if args.ID.Valid {
-		changes["id"] = args.ID.String
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
 	}
 	if args.URL.Valid {
 		changes["url"] = args.URL.String

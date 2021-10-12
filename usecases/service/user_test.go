@@ -430,7 +430,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: util.UUID(),
 				userID:    util.UUID(),
 				args: &repository.UpdateAccountArgs{
-					ID:          optional.StringFrom(util.AlphaNumeric(5)),
+					Name:        optional.StringFrom(util.AlphaNumeric(5)),
 					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
 					URL:         optional.StringFrom("https://" + util.AlphaNumeric(10)),
 					PrPermitted: optional.BoolFrom(true),
@@ -438,7 +438,7 @@ func TestUserService_EditAccount(t *testing.T) {
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				changes := map[string]interface{}{
-					"id":    args.args.ID.String,
+					"name":  args.args.Name.String,
 					"url":   args.args.URL.String,
 					"check": args.args.PrPermitted.Bool,
 					"type":  args.args.Type.Int64,
@@ -454,7 +454,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: util.UUID(),
 				userID:    util.UUID(),
 				args: &repository.UpdateAccountArgs{
-					ID:          optional.StringFrom(util.AlphaNumeric(5)),
+					Name:        optional.StringFrom(util.AlphaNumeric(5)),
 					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
 					URL:         optional.StringFrom("https://" + util.AlphaNumeric(10)),
 					PrPermitted: optional.BoolFrom(true),
@@ -462,7 +462,7 @@ func TestUserService_EditAccount(t *testing.T) {
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				changes := map[string]interface{}{
-					"id":    args.args.ID.String,
+					"name":  args.args.Name.String,
 					"url":   args.args.URL.String,
 					"check": args.args.PrPermitted.Bool,
 					"type":  args.args.Type.Int64,
