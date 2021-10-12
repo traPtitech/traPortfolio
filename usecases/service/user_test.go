@@ -97,8 +97,8 @@ func TestUserService_GetUser(t *testing.T) {
 					Name:     util.AlphaNumeric(5),
 					RealName: util.AlphaNumeric(5),
 				},
-				State:    0,
-				Bio:      util.AlphaNumeric(10),
+				State: 0,
+				Bio:   util.AlphaNumeric(10),
 				Accounts: []*domain.Account{
 					{
 						ID:          util.UUID(),
@@ -335,7 +335,8 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  util.UUID(),
 				account: &repository.CreateAccountArgs{
-					ID:          util.AlphaNumeric(5),
+					ID:          util.UUID(),
+					Name:        util.AlphaNumeric(5),
 					Type:        domain.HOMEPAGE,
 					URL:         "https://" + util.AlphaNumeric(10),
 					PrPermitted: true,
@@ -357,7 +358,8 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  util.UUID(),
 				account: &repository.CreateAccountArgs{
-					ID:          "",
+					ID:          uuid.Nil,
+					Name:        "",
 					Type:        domain.HOMEPAGE,
 					URL:         "https://" + util.AlphaNumeric(10),
 					PrPermitted: true,
@@ -374,7 +376,8 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  util.UUID(),
 				account: &repository.CreateAccountArgs{
-					ID:          util.AlphaNumeric(5),
+					ID:          util.UUID(),
+					Name:        util.AlphaNumeric(5),
 					Type:        10000,
 					URL:         "https://" + util.AlphaNumeric(10),
 					PrPermitted: true,

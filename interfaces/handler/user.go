@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/util"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
@@ -188,7 +189,8 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
-		ID:          req.ID,
+		ID:          util.UUID(),
+		Name:        req.ID,
 		Type:        req.Type,
 		PrPermitted: req.PrPermitted,
 	}

@@ -14,7 +14,8 @@ type UpdateUserArgs struct {
 }
 
 type CreateAccountArgs struct {
-	ID          string // traqID
+	ID          uuid.UUID
+	Name        string // traqID
 	Type        uint
 	URL         string
 	PrPermitted bool
