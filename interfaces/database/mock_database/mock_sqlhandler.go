@@ -9,7 +9,13 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
+
+// TODO 適切な場所に書く
+func init() {
+	gorm.ErrRecordNotFound = repository.ErrNotFound
+}
 
 type MockSQLHandler struct {
 	Conn *gorm.DB

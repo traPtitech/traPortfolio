@@ -12,6 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util"
 )
 
@@ -436,7 +437,7 @@ func TestUserRepository_Update(t *testing.T) {
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnRows(sqlmock.NewRows([]string{}))
+					WillReturnError(repository.ErrNotFound)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectCommit()
 			},
