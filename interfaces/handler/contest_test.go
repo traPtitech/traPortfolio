@@ -24,7 +24,7 @@ func mustParseTime(layout, value string) time.Time {
 func TestContestHandler_GetContests(t *testing.T) {
 	tests := []struct {
 		name         string
-		setup        func(th *TestHandlers, want []*domain.Contest) (handler echo.HandlerFunc, method string, path string)
+		setup        func(th *TestHandlers, want []*domain.Contest) (handler echo.HandlerFunc, path string)
 		statusCode   int
 		dbContest    []*domain.Contest
 		expectedBody []*ContestResponse
@@ -32,9 +32,9 @@ func TestContestHandler_GetContests(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setup: func(th *TestHandlers, want []*domain.Contest) (handler echo.HandlerFunc, method string, path string) {
+			setup: func(th *TestHandlers, want []*domain.Contest) (handler echo.HandlerFunc, path string) {
 				th.Repository.MockContestRepository.EXPECT().GetContests().Return(want, nil)
-				return th.API.Contest.GetContests, http.MethodGet, "/api/v1/contests"
+				return th.API.Contest.GetContests, "/api/v1/contests"
 			},
 			statusCode: 200,
 			dbContest: []*domain.Contest{
@@ -68,10 +68,10 @@ func TestContestHandler_GetContests(t *testing.T) {
 			for i, v := range tt.expectedBody {
 				tt.dbContest[i].ID = v.ID
 			}
-			handler, method, path := tt.setup(&handlers, tt.dbContest)
+			handler, path := tt.setup(&handlers, tt.dbContest)
 
 			var resBody []*ContestResponse
-			statusCode, _, err := doRequest(t, handler, method, path, nil, &resBody)
+			statusCode, _, err := doRequest(t, handler, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
 			tt.assertion(t, err)
