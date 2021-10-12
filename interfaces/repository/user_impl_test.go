@@ -213,3 +213,77 @@ func TestUserRepository_GetUser(t *testing.T) {
 		})
 	}
 }
+
+func TestUserRepository_GetAccounts(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      []*domain.Account
+		setup     func(f fields, args args, want []*domain.Account)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{ids[0]},
+			want: []*domain.Account{
+				{
+					ID:          util.UUID(),
+					Type:        domain.HOMEPAGE,
+					PrPermitted: true,
+				},
+			},
+			setup: func(f fields, args args, want []*domain.Account) {
+				rows := sqlmock.NewRows([]string{"id", "user_id", "type", "check"})
+				for _, v := range want {
+					rows.AddRow(v.ID, args.userID, v.Type, v.PrPermitted)
+				}
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE user_id = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args:      args{ids[0]},
+			want:      nil,
+			setup:     func(f fields, args args, want []*domain.Account) {},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args, tt.want)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			got, err := repo.GetAccounts(tt.args.userID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
