@@ -18,7 +18,7 @@ func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) TestHandlers {
 	return testHandlers
 }
 
-func doRequest(t *testing.T, handler func(echo.Context) error, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
+func doRequest(t *testing.T, handler func(echo.Context) error, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder, error) {
 	t.Helper()
 
 	req := httptest.NewRequest(method, path, requestEncode(t, reqBody))
@@ -26,12 +26,16 @@ func doRequest(t *testing.T, handler func(echo.Context) error, method, path stri
 	rec := httptest.NewRecorder()
 
 	ctx := echo.New().NewContext(req, rec)
-	handler(ctx)
+	err := handler(ctx)
+	if err != nil {
+		return rec.Code, rec, err
+	}
+
 	if resBody != nil {
 		responseDecode(t, rec, resBody)
 	}
 
-	return rec.Code, rec
+	return rec.Code, rec, nil
 }
 
 func requestEncode(t *testing.T, body interface{}) *strings.Reader {

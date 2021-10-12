@@ -17,6 +17,6 @@ type TestRepository struct {
 }
 
 type TestHandlers struct {
-	Api        API
+	API        API
 	Repository TestRepository
 }

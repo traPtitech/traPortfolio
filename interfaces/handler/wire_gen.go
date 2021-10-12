@@ -44,7 +44,7 @@ func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 		MockUserRepository:    mockUserRepository,
 	}
 	testHandlers := TestHandlers{
-		Api:        api,
+		API:        api,
 		Repository: testRepository,
 	}
 	return testHandlers

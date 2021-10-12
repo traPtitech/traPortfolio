@@ -28,12 +28,13 @@ func TestContestHandler_GetContests(t *testing.T) {
 		statusCode   int
 		dbContest    []*domain.Contest
 		expectedBody []*ContestResponse
+		assertion    assert.ErrorAssertionFunc
 	}{
 		{
 			name: "success",
 			setup: func(th *TestHandlers, want []*domain.Contest) (handler echo.HandlerFunc, method string, path string) {
 				th.Repository.MockContestRepository.EXPECT().GetContests().Return(want, nil)
-				return th.Api.Contest.GetContests, http.MethodGet, "/api/v1/contests"
+				return th.API.Contest.GetContests, http.MethodGet, "/api/v1/contests"
 			},
 			statusCode: 200,
 			dbContest: []*domain.Contest{
@@ -55,6 +56,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 					},
 				},
 			},
+			assertion: assert.NoError,
 		},
 	}
 	for _, tt := range tests {
@@ -69,9 +71,10 @@ func TestContestHandler_GetContests(t *testing.T) {
 			handler, method, path := tt.setup(&handlers, tt.dbContest)
 
 			var resBody []*ContestResponse
-			statusCode, _ := doRequest(t, handler, method, path, nil, &resBody)
+			statusCode, _, err := doRequest(t, handler, method, path, nil, &resBody)
 
 			// Assertion
+			tt.assertion(t, err)
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, tt.expectedBody, resBody)
 		})
