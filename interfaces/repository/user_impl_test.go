@@ -363,3 +363,96 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		})
 	}
 }
+
+func TestUserRepository_Update(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		id      uuid.UUID
+		changes map[string]interface{}
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setup     func(f fields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				id: ids[0],
+				changes: map[string]interface{}{
+					"description": util.AlphaNumeric(10),
+					"check":       true,
+				},
+			},
+			setup: func(f fields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.id), // TODO: もっとちゃんと返したほうがいいかも
+					)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["check"], args.changes["description"], sqlmock.AnyArg(), args.id). // UpdatedAtはsqlmock.AnyArg()でマッチさせる
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				sqlhandler.Mock.ExpectCommit()
+				sqlhandler.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "NotFound",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				id: ids[0],
+				changes: map[string]interface{}{
+					"description": util.AlphaNumeric(10),
+					"check":       true,
+				},
+			},
+			setup: func(f fields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(sqlmock.NewRows([]string{}))
+				sqlhandler.Mock.ExpectRollback()
+				sqlhandler.Mock.ExpectCommit()
+			},
+			assertion: assert.Error,
+		},
+		// TODO: トランザクションエラーのテストを書く
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			tt.assertion(t, repo.Update(tt.args.id, tt.args.changes))
+		})
+	}
+}
