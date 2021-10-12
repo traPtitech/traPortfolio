@@ -457,3 +457,133 @@ func TestUserRepository_Update(t *testing.T) {
 		})
 	}
 }
+
+func TestUserRepository_CreateAccount(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		id   uuid.UUID
+		args *repository.CreateAccountArgs
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      *domain.Account
+		setup     func(f fields, args args, want *domain.Account)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				id: ids[0],
+				args: &repository.CreateAccountArgs{
+					ID:          util.UUID(),
+					Name:        util.AlphaNumeric(5),
+					Type:        domain.HOMEPAGE,
+					URL:         util.AlphaNumeric(5),
+					PrPermitted: true,
+				},
+			},
+			want: &domain.Account{
+				ID:          uuid.Nil, // setupで変更
+				Type:        domain.HOMEPAGE,
+				PrPermitted: true,
+			},
+			setup: func(f fields, args args, want *domain.Account) {
+				want.ID = args.args.ID
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(args.args.ID, args.args.Type, args.args.Name, args.args.URL, args.id, args.args.PrPermitted, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				sqlhandler.Mock.ExpectCommit()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.args.ID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "type", "check"}).
+							AddRow(args.args.ID, args.args.Type, args.args.PrPermitted),
+					)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				id: ids[0],
+				args: &repository.CreateAccountArgs{
+					ID:          util.UUID(),
+					Name:        util.AlphaNumeric(5),
+					Type:        domain.HOMEPAGE,
+					URL:         util.AlphaNumeric(5),
+					PrPermitted: true,
+				},
+			},
+			want:      nil,
+			setup:     func(f fields, args args, want *domain.Account) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "CreatedButNotFound",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				id: ids[0],
+				args: &repository.CreateAccountArgs{
+					ID:          util.UUID(),
+					Name:        util.AlphaNumeric(5),
+					Type:        domain.HOMEPAGE,
+					URL:         util.AlphaNumeric(5),
+					PrPermitted: true,
+				},
+			},
+			want: nil,
+			setup: func(f fields, args args, want *domain.Account) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(args.args.ID, args.args.Type, args.args.Name, args.args.URL, args.id, args.args.PrPermitted, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				sqlhandler.Mock.ExpectCommit()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.args.ID).
+					WillReturnError(repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args, tt.want)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			got, err := repo.CreateAccount(tt.args.id, tt.args.args)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
