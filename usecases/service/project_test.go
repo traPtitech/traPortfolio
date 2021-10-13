@@ -57,7 +57,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "ErrInvalidDB",
 			args: args{ctx: context.Background()},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.Project) {
@@ -136,7 +136,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_PortalForbidden",
+			name: "PortalForbidden",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -149,7 +149,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -227,7 +227,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
@@ -304,7 +304,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -388,7 +388,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_PortalForbidden",
+			name: "PortalForbidden",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -401,7 +401,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -465,7 +465,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "InvalidDB",
 			args: args{
 				ctx:       context.Background(),
 				projectID: util.UUID(),
@@ -528,7 +528,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_ErrInvalidDB",
+			name: "InvalidDB",
 			args: args{
 				ctx:       context.Background(),
 				projectID: util.UUID(),
