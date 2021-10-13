@@ -682,3 +682,70 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		})
 	}
 }
+
+func TestUserRepository_DeleteAccount(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		accountID uuid.UUID
+		userID    uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setup     func(f fields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				accountID: util.UUID(),
+				userID:    ids[0],
+			},
+			setup: func(f fields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				sqlhandler.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				accountID: util.UUID(),
+				userID:    ids[0],
+			},
+			setup:     func(f fields, args args) {},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
+		})
+	}
+}
