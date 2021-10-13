@@ -902,6 +902,18 @@ func TestUserRepository_GetContests(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
+		{
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args:      args{userID: ids[0]},
+			want:      nil,
+			setup:     func(f fields, args args, want []*domain.UserContest) {},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
