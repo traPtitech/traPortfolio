@@ -3,6 +3,7 @@ package repository
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
@@ -746,6 +747,90 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
 			// Assertion
 			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
+		})
+	}
+}
+
+func TestUserRepository_GetProjects(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      []*domain.UserProject
+		setup     func(f fields, args args, want []*domain.UserProject)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{userID: ids[0]},
+			want: []*domain.UserProject{
+				{
+					ID:        util.UUID(),
+					Name:      util.AlphaNumeric(5),
+					Since:     time.Now(),
+					Until:     time.Now(),
+					UserSince: time.Now(),
+					UserUntil: time.Now(),
+				},
+			},
+			setup: func(f fields, args args, want []*domain.UserProject) {
+				rows := sqlmock.NewRows([]string{"id", "project_id", "user_id", "since", "until"})
+				for _, v := range want {
+					rows.AddRow(util.UUID(), v.ID, args.userID, v.UserSince, v.UserUntil)
+				}
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+				for _, v := range want {
+					sqlhandler.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ?")).
+						WithArgs(v.ID).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
+								AddRow(v.ID, v.Name, util.AlphaNumeric(10), util.AlphaNumeric(5), v.Since, v.Until, time.Now(), time.Now()),
+						)
+				}
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "InvalidDB",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(!isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args:      args{userID: ids[0]},
+			want:      nil,
+			setup:     func(f fields, args args, want []*domain.UserProject) {},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args, tt.want)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			got, err := repo.GetProjects(tt.args.userID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
