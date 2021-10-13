@@ -235,7 +235,7 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
 	contests := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.
-		Preload("ContestTeam").
+		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
 		Find(&contests).
 		Error()
@@ -250,7 +250,7 @@ func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest
 			ID:          ct.ID,
 			Name:        ct.Name,
 			Result:      ct.Result,
-			ContestName: ct.Name,
+			ContestName: ct.Contest.Name,
 		})
 	}
 

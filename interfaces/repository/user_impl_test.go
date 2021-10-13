@@ -835,3 +835,85 @@ func TestUserRepository_GetProjects(t *testing.T) {
 		})
 	}
 }
+
+func TestUserRepository_GetContests(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      []*domain.UserContest
+		setup     func(f fields, args args, want []*domain.UserContest)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{userID: ids[0]},
+			want: []*domain.UserContest{
+				{
+					ID:          util.UUID(),
+					Name:        util.AlphaNumeric(5),
+					Result:      util.AlphaNumeric(5),
+					ContestName: util.AlphaNumeric(5),
+				},
+			},
+			setup: func(f fields, args args, want []*domain.UserContest) {
+				rows := sqlmock.NewRows([]string{"team_id"})
+				for _, v := range want {
+					rows.AddRow(v.ID)
+				}
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+				cids := make([]uuid.UUID, len(want))
+				for i, v := range want {
+					cids[i] = util.UUID()
+					sqlhandler.Mock.
+						ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
+						WithArgs(v.ID).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"id", "contest_id", "name", "result", "contest_name"}).
+								AddRow(v.ID, cids[i], v.Name, v.Result, v.ContestName),
+						)
+				}
+				for i, v := range want {
+					sqlhandler.Mock.
+						ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ?")).
+						WithArgs(cids[i]).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"id", "name"}).
+								AddRow(cids[i], v.ContestName),
+						)
+				}
+			},
+			assertion: assert.NoError,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args, tt.want)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			got, err := repo.GetContests(tt.args.userID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
