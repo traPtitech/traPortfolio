@@ -793,7 +793,8 @@ func TestUserRepository_GetProjects(t *testing.T) {
 					rows.AddRow(util.UUID(), v.ID, args.userID, v.UserSince, v.UserUntil)
 				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
-				sqlhandler.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`user_id` = ?")).
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnRows(rows)
 				for _, v := range want {
