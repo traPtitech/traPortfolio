@@ -587,3 +587,98 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		})
 	}
 }
+
+func TestUserRepository_UpdateAccount(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		sqlhandler database.SQLHandler
+		portal     external.PortalAPI
+		traq       external.TraQAPI
+	}
+	type args struct {
+		userID    uuid.UUID
+		accountID uuid.UUID
+		changes   map[string]interface{}
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setup     func(f fields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				userID:    ids[0],
+				accountID: util.UUID(),
+				changes: map[string]interface{}{
+					"name":  util.AlphaNumeric(5),
+					"url":   util.AlphaNumeric(5),
+					"check": true,
+					"type":  domain.HOMEPAGE,
+				},
+			},
+			setup: func(f fields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], sqlmock.AnyArg(), args.accountID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				sqlhandler.Mock.ExpectCommit()
+				sqlhandler.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "NotFound",
+			fields: fields{
+				sqlhandler: mock_database.NewMockSQLHandler(isValidDB),
+				portal:     mock_external.NewMockPortalAPI(),
+				traq:       mock_external.NewMockTraQAPI(),
+			},
+			args: args{
+				userID:    ids[0],
+				accountID: util.UUID(),
+				changes: map[string]interface{}{
+					"name":  util.AlphaNumeric(5),
+					"url":   util.AlphaNumeric(5),
+					"check": true,
+					"type":  domain.HOMEPAGE,
+				},
+			},
+			setup: func(f fields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnError(repository.ErrNotFound)
+				sqlhandler.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		// TODO: トランザクションエラーのテストを書く
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			tt.setup(tt.fields, tt.args)
+			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			// Assertion
+			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.changes))
+		})
+	}
+}
