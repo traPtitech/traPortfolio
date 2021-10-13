@@ -5,7 +5,6 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -33,10 +32,7 @@ func NewMockSQLHandler(isValidDB bool) database.SQLHandler {
 		conf.Conn = db
 	}
 
-	engine, err := gorm.Open(
-		mysql.New(conf),
-		&gorm.Config{Logger: logger.Default.LogMode(logger.Info)},
-	)
+	engine, err := gorm.Open(mysql.New(conf), &gorm.Config{})
 	if err != nil && isValidDB {
 		log.Fatal(err)
 	}
