@@ -123,6 +123,21 @@ func (mr *MockContestRepositoryMockRecorder) GetContest(id interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContest", reflect.TypeOf((*MockContestRepository)(nil).GetContest), id)
 }
 
+// GetContestTeam mocks base method.
+func (m *MockContestRepository) GetContestTeam(contestID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetContestTeam", contestID, teamID)
+	ret0, _ := ret[0].(*domain.ContestTeamDetail)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetContestTeam indicates an expected call of GetContestTeam.
+func (mr *MockContestRepositoryMockRecorder) GetContestTeam(contestID, teamID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContestTeam", reflect.TypeOf((*MockContestRepository)(nil).GetContestTeam), contestID, teamID)
+}
+
 // GetContestTeamMember mocks base method.
 func (m *MockContestRepository) GetContestTeamMember(contestID, teamID uuid.UUID) ([]*domain.User, error) {
 	m.ctrl.T.Helper()

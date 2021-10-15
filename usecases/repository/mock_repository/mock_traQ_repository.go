@@ -37,16 +37,16 @@ func (m *MockTraQRepository) EXPECT() *MockTraQRepositoryMockRecorder {
 }
 
 // GetUser mocks base method.
-func (m *MockTraQRepository) GetUser(arg0 context.Context, arg1 uuid.UUID) (*domain.TraQUser, error) {
+func (m *MockTraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.TraQUser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetUser", ctx, id)
 	ret0, _ := ret[0].(*domain.TraQUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUser indicates an expected call of GetUser.
-func (mr *MockTraQRepositoryMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockTraQRepositoryMockRecorder) GetUser(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockTraQRepository)(nil).GetUser), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockTraQRepository)(nil).GetUser), ctx, id)
 }
