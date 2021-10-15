@@ -22,7 +22,7 @@ type CreateAccountArgs struct {
 }
 
 type UpdateAccountArgs struct {
-	ID          optional.String // traqID
+	Name        optional.String // Twitter等のアカウントID
 	Type        optional.Int64
 	URL         optional.String
 	PrPermitted optional.Bool
