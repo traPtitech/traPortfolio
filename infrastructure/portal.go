@@ -40,7 +40,7 @@ type PortalAPI struct {
 
 func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
 	if conf.isDevelopment {
-		return &mock_external.MockPortalAPI{}, nil
+		return mock_external.NewMockPortalAPI(), nil
 	}
 
 	jar, err := cookiejar.New(nil)

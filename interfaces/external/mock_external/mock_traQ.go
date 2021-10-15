@@ -32,6 +32,10 @@ var (
 
 type MockTraQAPI struct{}
 
+func NewMockTraQAPI() *MockTraQAPI {
+	return &MockTraQAPI{}
+}
+
 func (m *MockTraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	if res, ok := traQUserMap[id]; ok {
 		return res, nil
