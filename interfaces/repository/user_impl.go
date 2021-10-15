@@ -145,19 +145,14 @@ func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{})
 		}
 		return nil
 	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
 	account := model.Account{
-		ID:     args.ID,
+		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
-		Name:   args.Name,
+		Name:   args.ID,
 		URL:    args.URL,
 		UserID: id,
 		Check:  args.PrPermitted,
@@ -167,17 +162,14 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 		return nil, err
 	}
 
-	ver := &model.Account{}
-	err = repo.First(ver, &model.Account{ID: account.ID}).Error()
+	result := &domain.Account{}
+
+	err = repo.First(result, &model.Account{ID: account.ID}).Error()
 
 	if err != nil {
 		return nil, err
 	}
-	return &domain.Account{
-		ID:          ver.ID,
-		Type:        ver.Type,
-		PrPermitted: ver.Check,
-	}, nil
+	return result, nil
 }
 
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
