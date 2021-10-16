@@ -2,11 +2,14 @@ package repository
 
 import (
 	"database/sql/driver"
+	"errors"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 )
+
+var errUnexpected = errors.New("unexpected error")
 
 type anyTime struct{}
 
