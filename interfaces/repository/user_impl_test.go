@@ -559,12 +559,12 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(args.args.ID, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.args.ID).
+					WithArgs(anyUUID{}).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,

@@ -168,10 +168,10 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 	ver := &model.Account{}
 	err = repo.First(ver, &model.Account{ID: account.ID}).Error()
-
 	if err != nil {
 		return nil, err
 	}
+
 	return &domain.Account{
 		ID:          ver.ID,
 		Type:        ver.Type,
