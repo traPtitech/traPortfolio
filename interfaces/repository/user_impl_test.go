@@ -411,7 +411,7 @@ func TestUserRepository_Update(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["description"], sqlmock.AnyArg(), args.id). // UpdatedAtはsqlmock.AnyArg()でマッチさせる
+					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -504,12 +504,12 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(sqlmock.AnyArg(), args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(sqlmock.AnyArg()).
+					WithArgs(anyUUID{}).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "type", "check"}).
 							AddRow(want.ID, args.args.Type, args.args.PrPermitted), // TODO: 実際に入ってきたIDとwant.IDが一致しない
@@ -559,7 +559,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(args.args.ID, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WithArgs(args.args.ID, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.
@@ -626,11 +626,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.accountID, args.userID).
+					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], sqlmock.AnyArg(), args.accountID).
+					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
