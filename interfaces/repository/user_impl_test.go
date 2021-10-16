@@ -495,7 +495,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				},
 			},
 			want: &domain.Account{
-				ID:          util.UUID(),
+				// ID: 関数内で生成するので比較しない
 				Type:        domain.HOMEPAGE,
 				PrPermitted: true,
 			},
@@ -511,8 +511,8 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "type", "check"}).
-							AddRow(want.ID, args.args.Type, args.args.PrPermitted), // TODO: 実際に入ってきたIDとwant.IDが一致しない
+						sqlmock.NewRows([]string{"type", "check"}).
+							AddRow(args.args.Type, args.args.PrPermitted),
 					)
 			},
 			assertion: assert.NoError,
