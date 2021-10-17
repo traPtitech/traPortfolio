@@ -93,7 +93,7 @@ type groupDetailResponse struct {
 	Link        string
 	Leader      *domain.User
 	Members     []*domain.UserGroup
-	Desctiption string
+	Description string
 }
 
 func (h *GroupHandler) GetGroup(_c echo.Context) error {
@@ -142,7 +142,7 @@ func formatGetGroup(group *domain.GroupDetail) *groupDetailResponse {
 			RealName: group.Leader.RealName,
 		},
 		Members:     groupRes,
-		Desctiption: group.Description,
+		Description: group.Description,
 	}
 
 	return res
