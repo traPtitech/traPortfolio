@@ -1,4 +1,5 @@
-//+build wireinject
+//go:build wireinject
+// +build wireinject
 
 package infrastructure
 
@@ -47,7 +48,12 @@ var eventSet = wire.NewSet(
 	handler.NewEventHandler,
 )
 
+var groupExternalSet = wire.NewSet(
+	NewGroupAPI,
+)
+
 var groupSet = wire.NewSet(
+	groupExternalSet,
 	impl.NewGroupRepository,
 	service.NewGroupService,
 	handler.NewGroupHandler,

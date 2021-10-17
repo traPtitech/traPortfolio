@@ -24,7 +24,8 @@ func main() {
 		t := traQConf()
 		p := portalConf()
 		k := knoQConf()
-		infrastructure.Init(&s, &t, &p, &k)
+		g := groupConf()
+		infrastructure.Init(&s, &t, &p, &k, &g)
 	}
 }
 
@@ -74,4 +75,10 @@ func portalConf() infrastructure.PortalConfig {
 	portalCookie := os.Getenv("PORTAL_COOKIE")
 	portalAPIEndpoint := os.Getenv("PORTAL_API_ENDPOINT")
 	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint)
+}
+
+func groupConf() infrastructure.GroupConfig {
+	portalCookie := os.Getenv("TRAQ_COOKIE")
+	portalAPIEndpoint := os.Getenv("TRAQ_API_ENDPOINT")
+	return infrastructure.NewgGoupConfig(portalCookie, portalAPIEndpoint)
 }
