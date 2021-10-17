@@ -22,7 +22,7 @@ type MockSQLHandler struct {
 	Mock sqlmock.Sqlmock
 }
 
-func NewMockSQLHandler() database.SQLHandler {
+func NewMockSQLHandler() *MockSQLHandler {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		log.Fatal(err)

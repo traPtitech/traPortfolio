@@ -36,33 +36,33 @@ func (m *MockPortalRepository) EXPECT() *MockPortalRepositoryMockRecorder {
 }
 
 // GetUser mocks base method.
-func (m *MockPortalRepository) GetUser(arg0 context.Context, arg1 string) (*domain.PortalUser, error) {
+func (m *MockPortalRepository) GetUser(ctx context.Context, traQID string) (*domain.PortalUser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetUser", ctx, traQID)
 	ret0, _ := ret[0].(*domain.PortalUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUser indicates an expected call of GetUser.
-func (mr *MockPortalRepositoryMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockPortalRepositoryMockRecorder) GetUser(ctx, traQID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockPortalRepository)(nil).GetUser), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockPortalRepository)(nil).GetUser), ctx, traQID)
 }
 
 // GetUsers mocks base method.
-func (m *MockPortalRepository) GetUsers(arg0 context.Context) ([]*domain.PortalUser, error) {
+func (m *MockPortalRepository) GetUsers(ctx context.Context) ([]*domain.PortalUser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUsers", arg0)
+	ret := m.ctrl.Call(m, "GetUsers", ctx)
 	ret0, _ := ret[0].([]*domain.PortalUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUsers indicates an expected call of GetUsers.
-func (mr *MockPortalRepositoryMockRecorder) GetUsers(arg0 interface{}) *gomock.Call {
+func (mr *MockPortalRepositoryMockRecorder) GetUsers(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockPortalRepository)(nil).GetUsers), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockPortalRepository)(nil).GetUsers), ctx)
 }
 
 // MakeUserMp mocks base method.

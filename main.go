@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 )
 
@@ -25,7 +26,21 @@ func main() {
 		t := traQConf(isDevelopment)
 		p := portalConf(isDevelopment)
 		k := knoQConf(isDevelopment)
-		infrastructure.Init(&s, &t, &p, &k)
+
+		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		e := echo.New()
+		infrastructure.Setup(e, api)
+
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = ":1323"
+		}
+		// Start server
+		e.Logger.Fatal(e.Start(port))
 	}
 }
 
