@@ -70,7 +70,7 @@ func (group *GroupAPI) GetGroupsByID(userID uuid.UUID) ([]*external.GroupUserRes
 }
 
 func (group *GroupAPI) GetAllGroups() ([]*external.GroupsResponse, error) {
-	res, err := apiGet(group.Client, group.conf.endpoint, fmt.Sprintf("/groups"))
+	res, err := apiGet(group.Client, group.conf.endpoint, "/groups")
 	if err != nil {
 		return nil, err
 	}
