@@ -13,14 +13,16 @@ import (
 )
 
 type GroupConfig struct {
-	cookie   string
-	endpoint string
+	cookie        string
+	endpoint      string
+	isDevelopment bool
 }
 
-func NewgGoupConfig(cookie, endpoint string) GroupConfig {
+func NewgGoupConfig(cookie, endpoint string, isDevelopment bool) GroupConfig {
 	return GroupConfig{
 		cookie,
 		endpoint,
+		isDevelopment,
 	}
 }
 
