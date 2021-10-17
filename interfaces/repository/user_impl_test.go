@@ -25,27 +25,30 @@ var (
 	}
 )
 
+type mockUserRepositoryFields struct {
+	sqlhandler database.SQLHandler
+	portal     external.PortalAPI
+	traq       external.TraQAPI
+}
+
+func newMockUserRepositoryFields() mockUserRepositoryFields {
+	return mockUserRepositoryFields{
+		sqlhandler: mock_database.NewMockSQLHandler(),
+		portal:     mock_external.NewMockPortalAPI(),
+		traq:       mock_external.NewMockTraQAPI(),
+	}
+}
+
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	tests := []struct {
 		name      string
-		fields    fields
 		want      []*domain.User
-		setup     func(f fields, want []*domain.User)
+		setup     func(f mockUserRepositoryFields, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			want: []*domain.User{
 				{
 					ID:       ids[0],
@@ -63,7 +66,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 					RealName: "東 工子",
 				},
 			},
-			setup: func(f fields, want []*domain.User) {
+			setup: func(f mockUserRepositoryFields, want []*domain.User) {
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range want {
 					rows.AddRow(v.ID, v.Name)
@@ -77,13 +80,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			want: nil,
-			setup: func(f fields, want []*domain.User) {
+			setup: func(f mockUserRepositoryFields, want []*domain.User) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
@@ -97,8 +95,9 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUsers()
 			tt.assertion(t, err)
@@ -109,29 +108,18 @@ func TestUserRepository_GetUsers(t *testing.T) {
 
 func TestUserRepository_GetUser(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		id uuid.UUID
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
 		want      *domain.UserDetail
-		setup     func(f fields, args args, want *domain.UserDetail)
+		setup     func(f mockUserRepositoryFields, args args, want *domain.UserDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{ids[0]},
 			want: &domain.UserDetail{
 				User: domain.User{
@@ -149,7 +137,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					},
 				},
 			},
-			setup: func(f fields, args args, want *domain.UserDetail) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
@@ -175,14 +163,9 @@ func TestUserRepository_GetUser(t *testing.T) {
 		},
 		{
 			name: "NotFound",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{ids[0]},
 			want: nil,
-			setup: func(f fields, args args, want *domain.UserDetail) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
@@ -193,14 +176,9 @@ func TestUserRepository_GetUser(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{ids[0]},
 			want: nil,
-			setup: func(f fields, args args, want *domain.UserDetail) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
@@ -215,8 +193,9 @@ func TestUserRepository_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUser(tt.args.id)
 			tt.assertion(t, err)
@@ -227,29 +206,18 @@ func TestUserRepository_GetUser(t *testing.T) {
 
 func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		userID uuid.UUID
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
 		want      []*domain.Account
-		setup     func(f fields, args args, want []*domain.Account)
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.Account)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{ids[0]},
 			want: []*domain.Account{
 				{
@@ -258,7 +226,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 					PrPermitted: true,
 				},
 			},
-			setup: func(f fields, args args, want []*domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.Account) {
 				rows := sqlmock.NewRows([]string{"id", "user_id", "type", "check"})
 				for _, v := range want {
 					rows.AddRow(v.ID, args.userID, v.Type, v.PrPermitted)
@@ -273,14 +241,9 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{ids[0]},
 			want: nil,
-			setup: func(f fields, args args, want []*domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE user_id = ?")).
@@ -295,8 +258,9 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccounts(tt.args.userID)
 			tt.assertion(t, err)
@@ -307,40 +271,29 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 func TestUserRepository_GetAccount(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		userID    uuid.UUID
 		accountID uuid.UUID
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
 		want      *domain.Account
-		setup     func(f fields, args args, want *domain.Account)
+		setup     func(f mockUserRepositoryFields, args args, want *domain.Account)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				userID:    ids[0],
 				accountID: util.UUID(),
 			},
 			want: &domain.Account{
-				ID:          uuid.Nil, // setupで変更する TODO: もう少しいい方法を取りたい
+				ID:          uuid.Nil, // setupで変更する // TODO: もう少しいい方法を取りたい
 				Type:        domain.HOMEPAGE,
 				PrPermitted: true,
 			},
-			setup: func(f fields, args args, want *domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				want.ID = args.userID
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
@@ -355,14 +308,9 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{ids[0], util.UUID()},
 			want: nil,
-			setup: func(f fields, args args, want *domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
@@ -377,8 +325,9 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccount(tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
@@ -389,29 +338,18 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 func TestUserRepository_Update(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		id      uuid.UUID
 		changes map[string]interface{}
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
-		setup     func(f fields, args args)
+		setup     func(f mockUserRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				id: ids[0],
 				changes: map[string]interface{}{
@@ -419,7 +357,7 @@ func TestUserRepository_Update(t *testing.T) {
 					"check":       true,
 				},
 			},
-			setup: func(f fields, args args) {
+			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -441,11 +379,6 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name: "NotFound",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				id: ids[0],
 				changes: map[string]interface{}{
@@ -453,7 +386,7 @@ func TestUserRepository_Update(t *testing.T) {
 					"check":       true,
 				},
 			},
-			setup: func(f fields, args args) {
+			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -472,8 +405,9 @@ func TestUserRepository_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.Update(tt.args.id, tt.args.changes))
 		})
@@ -482,30 +416,19 @@ func TestUserRepository_Update(t *testing.T) {
 
 func TestUserRepository_CreateAccount(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		id   uuid.UUID
 		args *repository.CreateAccountArgs
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
 		want      *domain.Account
-		setup     func(f fields, args args, want *domain.Account)
+		setup     func(f mockUserRepositoryFields, args args, want *domain.Account)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
@@ -520,7 +443,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				Type:        domain.HOMEPAGE,
 				PrPermitted: true,
 			},
-			setup: func(f fields, args args, want *domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -540,11 +463,6 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
@@ -555,7 +473,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f fields, args args, want *domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -568,11 +486,6 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "CreatedButNotFound",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
@@ -583,7 +496,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f fields, args args, want *domain.Account) {
+			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -604,8 +517,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.CreateAccount(tt.args.id, tt.args.args)
 			tt.assertion(t, err)
@@ -616,11 +530,6 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		userID    uuid.UUID
 		accountID uuid.UUID
@@ -628,18 +537,12 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
-		setup     func(f fields, args args)
+		setup     func(f mockUserRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				userID:    ids[0],
 				accountID: util.UUID(),
@@ -650,7 +553,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					"type":  domain.HOMEPAGE,
 				},
 			},
-			setup: func(f fields, args args) {
+			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -668,11 +571,6 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		},
 		{
 			name: "NotFound",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				userID:    ids[0],
 				accountID: util.UUID(),
@@ -683,7 +581,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					"type":  domain.HOMEPAGE,
 				},
 			},
-			setup: func(f fields, args args) {
+			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
@@ -701,8 +599,9 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.changes))
 		})
@@ -711,34 +610,23 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		accountID uuid.UUID
 		userID    uuid.UUID
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
-		setup     func(f fields, args args)
+		setup     func(f mockUserRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				accountID: util.UUID(),
 				userID:    ids[0],
 			},
-			setup: func(f fields, args args) {
+			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
@@ -750,16 +638,11 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{
 				accountID: util.UUID(),
 				userID:    ids[0],
 			},
-			setup: func(f fields, args args) {
+			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
@@ -775,8 +658,9 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
 		})
@@ -785,29 +669,18 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 
 func TestUserRepository_GetProjects(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		userID uuid.UUID
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
 		want      []*domain.UserProject
-		setup     func(f fields, args args, want []*domain.UserProject)
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.UserProject)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{userID: ids[0]},
 			want: []*domain.UserProject{
 				{
@@ -819,7 +692,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 					UserUntil: time.Now(),
 				},
 			},
-			setup: func(f fields, args args, want []*domain.UserProject) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserProject) {
 				rows := sqlmock.NewRows([]string{"id", "project_id", "user_id", "since", "until"})
 				for _, v := range want {
 					rows.AddRow(util.UUID(), v.ID, args.userID, v.UserSince, v.UserUntil)
@@ -842,14 +715,9 @@ func TestUserRepository_GetProjects(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{userID: ids[0]},
 			want: nil,
-			setup: func(f fields, args args, want []*domain.UserProject) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserProject) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`user_id` = ?")).
@@ -864,8 +732,9 @@ func TestUserRepository_GetProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetProjects(tt.args.userID)
 			tt.assertion(t, err)
@@ -876,29 +745,18 @@ func TestUserRepository_GetProjects(t *testing.T) {
 
 func TestUserRepository_GetContests(t *testing.T) {
 	t.Parallel()
-	type fields struct {
-		sqlhandler database.SQLHandler
-		portal     external.PortalAPI
-		traq       external.TraQAPI
-	}
 	type args struct {
 		userID uuid.UUID
 	}
 	tests := []struct {
 		name      string
-		fields    fields
 		args      args
 		want      []*domain.UserContest
-		setup     func(f fields, args args, want []*domain.UserContest)
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.UserContest)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{userID: ids[0]},
 			want: []*domain.UserContest{
 				{
@@ -908,7 +766,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ContestName: util.AlphaNumeric(5),
 				},
 			},
-			setup: func(f fields, args args, want []*domain.UserContest) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
 				rows := sqlmock.NewRows([]string{"team_id"})
 				for _, v := range want {
 					rows.AddRow(v.ID)
@@ -942,14 +800,9 @@ func TestUserRepository_GetContests(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			fields: fields{
-				sqlhandler: mock_database.NewMockSQLHandler(),
-				portal:     mock_external.NewMockPortalAPI(),
-				traq:       mock_external.NewMockTraQAPI(),
-			},
 			args: args{userID: ids[0]},
 			want: nil,
-			setup: func(f fields, args args, want []*domain.UserContest) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
@@ -963,8 +816,9 @@ func TestUserRepository_GetContests(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			tt.setup(tt.fields, tt.args, tt.want)
-			repo := NewUserRepository(tt.fields.sqlhandler, tt.fields.portal, tt.fields.traq)
+			f := newMockUserRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetContests(tt.args.userID)
 			tt.assertion(t, err)
