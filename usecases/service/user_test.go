@@ -43,7 +43,7 @@ func TestUserService_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Forbidden",
+			name: "Forbidden",
 			args: args{ctx: context.Background()},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
@@ -92,11 +92,13 @@ func TestUserService_GetUser(t *testing.T) {
 				id:  util.UUID(),
 			},
 			want: &domain.UserDetail{
-				ID:       uuid.Nil, // setupで変更する
-				Name:     util.AlphaNumeric(5),
-				RealName: util.AlphaNumeric(5),
-				State:    0,
-				Bio:      util.AlphaNumeric(10),
+				User: domain.User{
+					ID:       uuid.Nil, // setupで変更する
+					Name:     util.AlphaNumeric(5),
+					RealName: util.AlphaNumeric(5),
+				},
+				State: 0,
+				Bio:   util.AlphaNumeric(10),
 				Accounts: []*domain.Account{
 					{
 						ID:          util.UUID(),
@@ -112,14 +114,14 @@ func TestUserService_GetUser(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Forbidden",
+			name: "Forbidden",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.UserDetail) {
-				repo.EXPECT().GetUser(args.id).Return(want, repository.ErrForbidden)
+				repo.EXPECT().GetUser(args.id).Return(nil, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
@@ -177,7 +179,7 @@ func TestUserService_Update(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Notfound",
+			name: "Notfound",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -350,7 +352,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_EmptyID",
+			name: "EmptyID",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -367,7 +369,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "Fail_InvalidAccountType",
+			name: "InvalidAccountType",
 			args: args{
 				ctx: context.Background(),
 				id:  util.UUID(),
@@ -443,7 +445,7 @@ func TestUserService_EditAccount(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Notfound",
+			name: "Notfound",
 			args: args{
 				ctx:       context.Background(),
 				accountID: util.UUID(),
@@ -564,7 +566,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Notfound",
+			name: "Notfound",
 			args: args{
 				ctx:    context.Background(),
 				userID: util.UUID(),
@@ -629,7 +631,7 @@ func TestUserService_GetUserContests(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Notfound",
+			name: "Notfound",
 			args: args{
 				ctx:    context.Background(),
 				userID: util.UUID(),
@@ -694,7 +696,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Fail_Notfound",
+			name: "Notfound",
 			args: args{
 				ctx:    context.Background(),
 				userID: util.UUID(),

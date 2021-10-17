@@ -8,6 +8,10 @@ BINARY=./bin/traPortfolio
 .PHONY: all
 all: clean build
 
+.PHONY: test
+test: $(GOFILES)
+	go test -v -cover -race ./...
+
 .PHONY: build
 build: $(GOFILES)
 	go build -o $(BINARY)
@@ -20,7 +24,7 @@ clean: ## Cleanup working directory
 
 .PHONY: golangci-lint
 golangci-lint:
-	@docker run --rm -v $(CURDIR):/app -w /app golangci/golangci-lint:latest golangci-lint run
+	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run ./...
 
 .PHONY: up-test-db
 up-test-db:

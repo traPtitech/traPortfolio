@@ -19,9 +19,7 @@ type Account struct {
 }
 
 type UserDetail struct {
-	ID       uuid.UUID
-	Name     string
-	RealName string
+	User
 	State    TraQState
 	Bio      string
 	Accounts []*Account

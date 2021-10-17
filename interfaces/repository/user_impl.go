@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/jinzhu/gorm"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
@@ -55,9 +54,21 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	user := model.User{ID: id}
-	err := repo.First(&user).Error()
+	err := repo.
+		Preload("Accounts").
+		First(&user).
+		Error()
 	if err != nil {
 		return nil, err
+	}
+
+	accounts := make([]*domain.Account, 0, len(user.Accounts))
+	for _, v := range user.Accounts {
+		accounts = append(accounts, &domain.Account{
+			ID:          v.ID,
+			Type:        v.Type,
+			PrPermitted: v.Check,
+		})
 	}
 
 	portalUser, err := repo.portal.GetByID(user.Name)
@@ -70,15 +81,12 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 		return nil, err
 	}
 
-	accounts, err := repo.GetAccounts(id)
-	if err != nil {
-		return nil, err
-	}
-
 	result := domain.UserDetail{
-		ID:       user.ID,
-		Name:     user.Name,
-		RealName: portalUser.RealName,
+		User: domain.User{
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: portalUser.RealName,
+		},
 		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,
@@ -128,7 +136,7 @@ func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{})
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := &model.User{ID: id}
 		err := repo.First(user).Error()
-		if err == gorm.ErrRecordNotFound {
+		if err == repository.ErrNotFound {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err
@@ -171,7 +179,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := &model.Account{ID: accountID}
 		err := repo.First(account).Error()
-		if err == gorm.ErrRecordNotFound || account.UserID != userID {
+		if err == repository.ErrNotFound || account.UserID != userID {
 			return repository.ErrNotFound
 		} else if err != nil {
 			return err

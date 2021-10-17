@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 )
 
@@ -20,12 +21,27 @@ func main() {
 		}
 		log.Println("finished")
 	} else {
+		isDevelopment := os.Getenv("APP_ENV") == "development"
 		s := sqlConf()
-		t := traQConf()
-		p := portalConf()
-		k := knoQConf()
-		g := groupConf()
-		infrastructure.Init(&s, &t, &p, &k, &g)
+		t := traQConf(isDevelopment)
+		p := portalConf(isDevelopment)
+		k := knoQConf(isDevelopment)
+		g := groupConf(isDevelopment)
+
+		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k, &g)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		e := echo.New()
+		infrastructure.Setup(e, api)
+
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = ":1323"
+		}
+		// Start server
+		e.Logger.Fatal(e.Start(port))
 	}
 }
 
@@ -57,24 +73,24 @@ func sqlConf() infrastructure.SQLConfig {
 	return infrastructure.NewSQLConfig(user, password, host, dbname, port)
 }
 
-func traQConf() infrastructure.TraQConfig {
+func traQConf(isDevelopment bool) infrastructure.TraQConfig {
 	traQCookie := os.Getenv("TRAQ_COOKIE")
 	traQAPIEndpoint := os.Getenv("TRAQ_API_ENDPOINT")
 
-	return infrastructure.NewTraQConfig(traQCookie, traQAPIEndpoint)
+	return infrastructure.NewTraQConfig(traQCookie, traQAPIEndpoint, isDevelopment)
 }
 
-func knoQConf() infrastructure.KnoQConfig {
+func knoQConf(isDevelopment bool) infrastructure.KnoQConfig {
 	knoQCookie := os.Getenv("KNOQ_COOKIE")
 	knoQAPIEndpoint := os.Getenv("KNOQ_API_ENDPOINT")
 
-	return infrastructure.NewKnoqConfig(knoQCookie, knoQAPIEndpoint)
+	return infrastructure.NewKnoqConfig(knoQCookie, knoQAPIEndpoint, isDevelopment)
 }
 
-func portalConf() infrastructure.PortalConfig {
+func portalConf(isDevelopment bool) infrastructure.PortalConfig {
 	portalCookie := os.Getenv("PORTAL_COOKIE")
 	portalAPIEndpoint := os.Getenv("PORTAL_API_ENDPOINT")
-	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint)
+	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint, isDevelopment)
 }
 
 func groupConf() infrastructure.GroupConfig {

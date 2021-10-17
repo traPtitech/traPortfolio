@@ -11,9 +11,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig, g *GroupConfig) {
-	// Echo instance
-	e := echo.New()
+func Setup(e *echo.Echo, api handler.API) {
+
 	v := validator.New()
 	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
 		log.Fatal(err)
@@ -22,10 +21,6 @@ func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig, g *GroupC
 		validator: v,
 	}
 
-	api, err := InjectAPIServer(s, t, p, k, g)
-	if err != nil {
-		log.Fatal(err)
-	}
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -159,8 +154,6 @@ func Init(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig, g *GroupC
 		}
 	}
 
-	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
 }
 
 type Validator struct {
