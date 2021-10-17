@@ -270,6 +270,8 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 }
 
 func TestUserRepository_GetAccount(t *testing.T) {
+	aid := util.UUID() // Successで使うaccountID
+
 	t.Parallel()
 	type args struct {
 		userID    uuid.UUID
@@ -286,29 +288,31 @@ func TestUserRepository_GetAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				userID:    ids[0],
-				accountID: util.UUID(),
+				accountID: aid,
 			},
 			want: &domain.Account{
-				ID:          uuid.Nil, // setupで変更する // TODO: もう少しいい方法を取りたい
+				ID:          aid,
 				Type:        domain.HOMEPAGE,
 				PrPermitted: true,
 			},
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
-				want.ID = args.userID
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.accountID, args.userID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
-							AddRow(want.ID, args.userID, want.Type, want.PrPermitted),
+							AddRow(args.accountID, args.userID, want.Type, want.PrPermitted),
 					)
 			},
 			assertion: assert.NoError,
 		},
 		{
 			name: "UnexpectedError",
-			args: args{ids[0], util.UUID()},
+			args: args{
+				userID:    ids[0],
+				accountID: util.UUID(),
+			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
