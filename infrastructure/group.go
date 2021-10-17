@@ -67,7 +67,7 @@ func (group *GroupAPI) GetGroupsByID(userID uuid.UUID) ([]*external.GroupUserRes
 	return er, nil
 }
 
-func (group *GroupAPI) GetAllGropus() ([]*external.GroupsResponse, error) {
+func (group *GroupAPI) GetAllGroups() ([]*external.GroupsResponse, error) {
 	res, err := apiGet(group.Client, group.conf.endpoint, fmt.Sprintf("/groups"))
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (group *GroupAPI) GetAllGropus() ([]*external.GroupsResponse, error) {
 	return er, nil
 }
 
-func (group *GroupAPI) GetGroup(groupID uuid.UUID) ([]*external.GroupDetailResponse, error) {
+func (group *GroupAPI) GetGroup(groupID uuid.UUID) (*external.GroupDetailResponse, error) {
 	res, err := apiGet(group.Client, group.conf.endpoint, fmt.Sprintf("/groups/%d", groupID))
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (group *GroupAPI) GetGroup(groupID uuid.UUID) ([]*external.GroupDetailRespo
 		return nil, fmt.Errorf("GET /groups/%d failed", groupID)
 	}
 
-	var er []*external.GroupDetailResponse
+	var er *external.GroupDetailResponse
 	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
 		return nil, err
 	}

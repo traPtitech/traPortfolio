@@ -46,7 +46,7 @@ type UserContest struct {
 type UserGroup struct {
 	ID       uuid.UUID
 	Name     string
-	Realname string
+	RealName string
 	Duration ProjectDuration
 }
 

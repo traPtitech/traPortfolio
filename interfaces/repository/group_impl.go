@@ -89,7 +89,8 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 			Name:     eres.Leader.Name,
 			RealName: eres.Leader.RealName,
 		},
-		Members: erMembers,
+		Members:     erMembers,
+		Description: eres.Description,
 	}
 	return result, nil
 }
