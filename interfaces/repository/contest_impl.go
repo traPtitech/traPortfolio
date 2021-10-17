@@ -240,6 +240,31 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 	return nil
 }
 
+func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uuid.UUID) error {
+	if contestID == uuid.Nil || teamID == uuid.Nil {
+		return repository.ErrNilID
+	}
+
+	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
+	if err != nil {
+		return err
+	}
+
+	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		err = tx.Delete(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
 	belongings := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.h.
