@@ -51,6 +51,13 @@ var mockEventSet = wire.NewSet(
 	wire.Bind(new(repository.EventRepository), new(*mock_repository.MockEventRepository)),
 )
 
+var mockGroupSet = wire.NewSet(
+	mock_repository.NewMockGroupRepository,
+	service.NewGroupService,
+	NewGroupHandler,
+	wire.Bind(new(repository.GroupRepository), new(*mock_repository.MockGroupRepository)),
+)
+
 var mockContestSet = wire.NewSet(
 	mock_repository.NewMockContestRepository,
 	service.NewContestService,
@@ -72,6 +79,7 @@ func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 		mockPortalSet,
 		mockTraQSet,
 		mockContestSet,
+		mockGroupSet,
 	)
 	return TestHandlers{}
 }

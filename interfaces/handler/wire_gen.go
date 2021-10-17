@@ -31,7 +31,10 @@ func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 	mockContestRepository := mock_repository.NewMockContestRepository(ctrl)
 	contestService := service.NewContestService(mockContestRepository)
 	contestHandler := NewContestHandler(contestService)
-	api := NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)
+	mockGroupRepository := mock_repository.NewMockGroupRepository(ctrl)
+	groupService := service.NewGroupService(mockGroupRepository)
+	groupHandler := NewGroupHandler(groupService)
+	api := NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
 	mockKnoqRepository := mock_repository.NewMockKnoqRepository(ctrl)
 	mockTraQRepository := mock_repository.NewMockTraQRepository(ctrl)
 	testRepository := TestRepository{
@@ -69,6 +72,8 @@ var mockKnoQSet = wire.NewSet(mock_repository.NewMockKnoqRepository, wire.Bind(n
 var mockEventSet = wire.NewSet(
 	mockKnoQSet, mock_repository.NewMockEventRepository, service.NewEventService, NewEventHandler, wire.Bind(new(repository.EventRepository), new(*mock_repository.MockEventRepository)),
 )
+
+var mockGroupSet = wire.NewSet(mock_repository.NewMockGroupRepository, service.NewGroupService, NewGroupHandler, wire.Bind(new(repository.GroupRepository), new(*mock_repository.MockGroupRepository)))
 
 var mockContestSet = wire.NewSet(mock_repository.NewMockContestRepository, service.NewContestService, NewContestHandler, wire.Bind(new(repository.ContestRepository), new(*mock_repository.MockContestRepository)))
 
