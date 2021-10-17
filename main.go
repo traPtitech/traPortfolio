@@ -78,7 +78,7 @@ func portalConf() infrastructure.PortalConfig {
 }
 
 func groupConf() infrastructure.GroupConfig {
-	portalCookie := os.Getenv("TRAQ_COOKIE")
-	portalAPIEndpoint := os.Getenv("TRAQ_API_ENDPOINT")
-	return infrastructure.NewgGoupConfig(portalCookie, portalAPIEndpoint)
+	traQCookie := os.Getenv("TRAQ_COOKIE")
+	traQAPIEndpoint := os.Getenv("TRAQ_API_ENDPOINT")
+	return infrastructure.NewgGoupConfig(traQCookie, traQAPIEndpoint)
 }
