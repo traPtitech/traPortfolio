@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -44,9 +46,10 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 		return nil, err
 	}
 
-	elv, err := repo.getEventLevelByID(id)
-	if err != nil && err != repository.ErrNotFound {
-		return nil, err
+	// IDのリストだけ取得、Name,RealNameはPortalから取得する
+	hostName := make([]*domain.User, 0, len(er.Admins))
+	for _, aid := range er.Admins {
+		hostName = append(hostName, &domain.User{ID: aid})
 	}
 
 	result := &domain.EventDetail{
@@ -55,15 +58,22 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 			Name:      er.Name,
 			TimeStart: er.TimeStart,
 			TimeEnd:   er.TimeEnd,
-			// TODO: HostName:
 		},
 		Description: er.Description,
-		GroupID:     er.GroupID,
-		RoomID:      er.RoomID,
+		Place:       er.Place,
+		// Level:
+		HostName: hostName,
+		GroupID:  er.GroupID,
+		RoomID:   er.RoomID,
 	}
 
+	elv, err := repo.getEventLevelByID(id)
 	if err == nil {
 		result.Level = *elv.Level
+	} else if errors.Is(err, repository.ErrNotFound) {
+		result.Level = domain.EventLevelAnonymous
+	} else {
+		return nil, err
 	}
 
 	return result, nil
@@ -84,9 +94,11 @@ func (repo *EventRepository) UpdateEvent(id uuid.UUID, arg *repository.UpdateEve
 		if err := tx.Model(&old).Updates(arg).Error(); err != nil {
 			return err
 		}
-		err := tx.Where(&model.EventLevelRelation{ID: id}).First(&new).Error()
+		if err := tx.Where(&model.EventLevelRelation{ID: id}).First(&new).Error(); err != nil {
+			return err
+		}
 
-		return err
+		return nil
 	})
 	if err != nil {
 		return err
