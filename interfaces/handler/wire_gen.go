@@ -26,7 +26,7 @@ func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 	mockPortalRepository := mock_repository.NewMockPortalRepository(ctrl)
 	projectService := service.NewProjectService(mockProjectRepository, mockPortalRepository)
 	projectHandler := NewProjectHandler(projectService)
-	eventService := service.NewEventService(mockEventRepository)
+	eventService := service.NewEventService(mockEventRepository, mockUserRepository)
 	eventHandler := NewEventHandler(eventService)
 	mockContestRepository := mock_repository.NewMockContestRepository(ctrl)
 	contestService := service.NewContestService(mockContestRepository)

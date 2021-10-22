@@ -57,9 +57,10 @@ type eventParam struct {
 
 type eventDetailResponse struct {
 	eventResponse
-	Description string `json:"description"`
-	Place       string `json:"place"`
-	HostName    []*userResponse
+	Description string            `json:"description"`
+	Place       string            `json:"place"`
+	HostName    []*userResponse   `json:"hostname"`
+	EventLevel  domain.EventLevel `json:"eventLevel"`
 }
 
 // GetByID GET /events/:eventID
@@ -126,6 +127,7 @@ func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
 		Description: event.Description,
 		Place:       event.Place,
 		HostName:    userRes,
+		EventLevel:  event.Level,
 	}
 	return res
 }
