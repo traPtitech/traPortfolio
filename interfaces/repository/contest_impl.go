@@ -159,11 +159,6 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 		return nil, convertError(err)
 	}
 
-	members, err := repo.GetContestTeamMember(contestID, teamID)
-	if err != nil {
-		return nil, convertError(err)
-	}
-
 	res := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
 			ID:        team.ID,
@@ -173,7 +168,7 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 		},
 		Link:        team.Link,
 		Description: team.Description,
-		Members:     members,
+		// Members:
 	}
 	return res, nil
 }
@@ -228,7 +223,7 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 	return nil
 }
 
-func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
 	belongings := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.h.
 		Preload("User").
@@ -261,7 +256,7 @@ func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID 
 	return result, nil
 }
 
-func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
+func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	if members == nil {
 		return repository.ErrInvalidArg
 	}
@@ -301,7 +296,7 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 
 }
 
-func (repo *ContestRepository) DeleteContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
+func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	// 存在チェック
 	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
 	if err != nil {
