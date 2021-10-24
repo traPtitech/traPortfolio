@@ -32,8 +32,6 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 			Name:      v.Name,
 			TimeStart: v.Since,
 			TimeEnd:   v.Until,
-			CreatedAt: v.CreatedAt,
-			UpdatedAt: v.UpdatedAt,
 		})
 	}
 	return result, nil
@@ -57,8 +55,6 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 			Name:      contest.Name,
 			TimeStart: contest.Since,
 			TimeEnd:   contest.Until,
-			CreatedAt: contest.CreatedAt,
-			UpdatedAt: contest.UpdatedAt,
 		},
 		Link:        contest.Link,
 		Description: contest.Description,
@@ -87,8 +83,6 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		Name:      contest.Name,
 		TimeStart: contest.Since,
 		TimeEnd:   contest.Until,
-		CreatedAt: contest.CreatedAt,
-		UpdatedAt: contest.UpdatedAt,
 	}
 
 	return result, nil
@@ -150,8 +144,6 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 			ContestID: v.ContestID,
 			Name:      v.Name,
 			Result:    v.Result,
-			CreatedAt: v.CreatedAt,
-			UpdatedAt: v.UpdatedAt,
 		})
 	}
 	return result, nil
@@ -178,8 +170,6 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 			ContestID: team.ContestID,
 			Name:      team.Name,
 			Result:    team.Result,
-			CreatedAt: team.CreatedAt,
-			UpdatedAt: team.UpdatedAt,
 		},
 		Link:        team.Link,
 		Description: team.Description,
@@ -207,8 +197,6 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 			ContestID: contestTeam.ContestID,
 			Name:      contestTeam.Name,
 			Result:    contestTeam.Result,
-			CreatedAt: contestTeam.CreatedAt,
-			UpdatedAt: contestTeam.UpdatedAt,
 		},
 		Link:        contestTeam.Link,
 		Description: contestTeam.Description,
