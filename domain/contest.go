@@ -11,8 +11,6 @@ type Contest struct {
 	Name      string
 	TimeStart time.Time
 	TimeEnd   time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
 }
 
 type ContestDetail struct {
@@ -27,8 +25,6 @@ type ContestTeam struct {
 	ContestID uuid.UUID
 	Name      string
 	Result    string
-	CreatedAt time.Time
-	UpdatedAt time.Time
 }
 
 type ContestTeamDetail struct {

@@ -43,8 +43,6 @@ func TestContestHandler_GetContests(t *testing.T) {
 					Name:      "test1",
 					TimeStart: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
 					TimeEnd:   mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
-					CreatedAt: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
-					UpdatedAt: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
 				},
 			},
 			expectedBody: []*ContestResponse{

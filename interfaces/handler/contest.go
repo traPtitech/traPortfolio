@@ -350,7 +350,7 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	users, err := h.srv.GetContestTeamMember(ctx, req.ContestID, req.TeamID)
+	users, err := h.srv.GetContestTeamMembers(ctx, req.ContestID, req.TeamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -382,7 +382,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.AddContestTeamMember(ctx, req.TeamID, req.Members)
+	err = h.srv.AddContestTeamMembers(ctx, req.TeamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
@@ -400,7 +400,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeamMember(ctx, req.TeamID, req.Members)
+	err = h.srv.DeleteContestTeamMembers(ctx, req.TeamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
