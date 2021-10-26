@@ -149,6 +149,7 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 	return result, nil
 }
 
+// Membersは別途GetContestTeamMembersで取得するためここではnilのまま返す
 func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
 	team := &model.ContestTeam{
 		ID:        teamID,
