@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -69,7 +70,7 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 
 	elv, err := repo.getEventLevelByID(id)
 	if err == nil {
-		result.Level = *elv.Level
+		result.Level = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
 		result.Level = domain.EventLevelAnonymous
 	} else {
@@ -80,22 +81,21 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 }
 
 func (repo *EventRepository) UpdateEvent(id uuid.UUID, arg *repository.UpdateEventArg) error {
-	var (
-		old model.EventLevelRelation
-		new model.EventLevelRelation
-	)
-
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if err := tx.First(&old, &model.EventLevelRelation{ID: id}).Error(); err != nil {
-			if err != nil {
-				return err
-			}
+		if elv, err := repo.getEventLevelByID(id); err != nil {
+			return err
+		} else if elv.Level == arg.Level {
+			return nil // updateする必要がないのでここでcommitする
 		}
-		if err := tx.Model(&old).Updates(arg).Error(); err != nil {
+
+		if err := tx.Model(&model.EventLevelRelation{ID: id}).Update("level", arg.Level).Error(); err != nil {
 			return err
 		}
-		if err := tx.Where(&model.EventLevelRelation{ID: id}).First(&new).Error(); err != nil {
+
+		if elv, err := repo.getEventLevelByID(id); err != nil {
 			return err
+		} else if elv.Level != arg.Level {
+			return fmt.Errorf("updated level was expected %d, but got %d", elv.Level, arg.Level)
 		}
 
 		return nil
@@ -103,6 +103,7 @@ func (repo *EventRepository) UpdateEvent(id uuid.UUID, arg *repository.UpdateEve
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

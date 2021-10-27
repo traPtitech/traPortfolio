@@ -61,6 +61,11 @@ func (handler *MockSQLHandler) Delete(value interface{}, where ...interface{}) d
 	return &MockSQLHandler{Conn: db}
 }
 
+func (handler *MockSQLHandler) Update(column string, values interface{}) database.SQLHandler {
+	db := handler.Conn.Update(column, values)
+	return &MockSQLHandler{Conn: db}
+}
+
 func (handler *MockSQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
 	db := handler.Conn.Where(query, args...)
 	return &MockSQLHandler{Conn: db}
