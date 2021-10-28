@@ -36,10 +36,10 @@ func (m *MockGroupRepository) EXPECT() *MockGroupRepositoryMockRecorder {
 }
 
 // GetAllGroups mocks base method.
-func (m *MockGroupRepository) GetAllGroups() ([]*domain.Groups, error) {
+func (m *MockGroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllGroups")
-	ret0, _ := ret[0].([]*domain.Groups)
+	ret0, _ := ret[0].([]*domain.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,17 +65,17 @@ func (mr *MockGroupRepositoryMockRecorder) GetGroup(groupID interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockGroupRepository)(nil).GetGroup), groupID)
 }
 
-// GetGroupsByID mocks base method.
-func (m *MockGroupRepository) GetGroupsByID(userID uuid.UUID) ([]*domain.GroupUser, error) {
+// GetGroupsByUserID mocks base method.
+func (m *MockGroupRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGroupsByID", userID)
+	ret := m.ctrl.Call(m, "GetGroupsByUserID", userID)
 	ret0, _ := ret[0].([]*domain.GroupUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetGroupsByID indicates an expected call of GetGroupsByID.
-func (mr *MockGroupRepositoryMockRecorder) GetGroupsByID(userID interface{}) *gomock.Call {
+// GetGroupsByUserID indicates an expected call of GetGroupsByUserID.
+func (mr *MockGroupRepositoryMockRecorder) GetGroupsByUserID(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupsByID", reflect.TypeOf((*MockGroupRepository)(nil).GetGroupsByID), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupsByUserID", reflect.TypeOf((*MockGroupRepository)(nil).GetGroupsByUserID), userID)
 }

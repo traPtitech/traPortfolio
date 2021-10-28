@@ -128,6 +128,14 @@ func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 	return contests, nil
 }
 
+func (s *UserService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
+	groups, err := s.repo.GetGroupsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return groups, nil
+}
+
 func (s *UserService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
 	events, err := s.event.GetUserEvents(userID)
 	if err != nil {

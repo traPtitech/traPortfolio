@@ -22,7 +22,7 @@ func (s *GroupService) GetGroupsByID(ctx context.Context, userID uuid.UUID) ([]*
 	return s.repo.GetGroupsByID(userID)
 }
 
-func (s *GroupService) GetAllGroups(ctx context.Context) ([]*domain.Groups, error) {
+func (s *GroupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
 	return s.repo.GetAllGroups()
 }
 

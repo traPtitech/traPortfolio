@@ -8,7 +8,7 @@ import (
 )
 
 type GroupRepository interface {
-	GetGroupsByID(userID uuid.UUID) ([]*domain.GroupUser, error)
-	GetAllGroups() ([]*domain.Groups, error)
+	GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error)
+	GetAllGroups() ([]*domain.Group, error)
 	GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error)
 }

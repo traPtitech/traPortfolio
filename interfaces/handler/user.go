@@ -68,6 +68,12 @@ type UserProjectResponse struct {
 	UserDuration domain.ProjectDuration `json:"user_duration"`
 }
 
+type groupUserResponse struct {
+	ID       uuid.UUID
+	Name     string
+	Duration domain.GroupDuration
+}
+
 type ContestTeamWithContestNameResponse struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
@@ -287,6 +293,40 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 			ContestName: v.ContestName,
 		}
 		res = append(res, uc)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// GetEvents GET /users/:userID/groups
+func (h *UserHandler) GetGroupsByUserID(_c echo.Context) error {
+	c := Context{_c}
+	req := groupParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	groups, err := h.srv.GetGroupsByUserID(ctx, req.GroupID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	res := make([]*groupUserResponse, 0, len(groups))
+	for _, group := range groups {
+		res = append(res, &groupUserResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Duration: domain.GroupDuration{
+				Since: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+				Until: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+			},
+		})
 	}
 	return c.JSON(http.StatusOK, res)
 }

@@ -25,45 +25,6 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 	return &GroupHandler{service}
 }
 
-type groupUserResponse struct {
-	ID       uuid.UUID
-	Name     string
-	Duration domain.ProjectDuration
-}
-
-func (h *GroupHandler) GetGroupsByID(_c echo.Context) error {
-	c := Context{_c}
-	req := groupParam{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
-	}
-
-	ctx := c.Request().Context()
-	groups, err := h.srv.GetGroupsByID(ctx, req.GroupID)
-	if err != nil {
-		return convertError(err)
-	}
-
-	res := make([]*groupUserResponse, 0, len(groups))
-	for _, group := range groups {
-		res = append(res, &groupUserResponse{
-			ID:   group.ID,
-			Name: group.Name,
-			Duration: domain.ProjectDuration{
-				Since: domain.YearWithSemester{
-					Year:     group.Duration.Since.Year,
-					Semester: group.Duration.Since.Semester,
-				},
-				Until: domain.YearWithSemester{
-					Year:     group.Duration.Since.Year,
-					Semester: group.Duration.Since.Semester,
-				},
-			},
-		})
-	}
-	return c.JSON(http.StatusOK, res)
-}
-
 // GroupResponse Portfolioのレスポンスで使う班情報
 type groupsResponse struct {
 	ID   uuid.UUID `json:"groupId"`
@@ -119,7 +80,7 @@ func formatGetGroup(group *domain.GroupDetail) *groupDetailResponse {
 			ID:       v.ID,
 			Name:     v.Name,
 			RealName: v.RealName,
-			Duration: domain.ProjectDuration{
+			Duration: domain.GroupDuration{
 				Since: domain.YearWithSemester{
 					Year:     v.Duration.Since.Year,
 					Semester: v.Duration.Since.Semester,

@@ -45,7 +45,7 @@ type UserGroup struct {
 	ID       uuid.UUID
 	Name     string
 	RealName string
-	Duration ProjectDuration
+	Duration GroupDuration
 }
 
 const (

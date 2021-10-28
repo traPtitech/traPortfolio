@@ -7,10 +7,15 @@ import (
 type GroupUser struct {
 	ID       uuid.UUID
 	Name     string
-	Duration ProjectDuration
+	Duration GroupDuration
 }
 
-type Groups struct {
+type GroupDuration struct {
+	Since YearWithSemester
+	Until YearWithSemester
+}
+
+type Group struct {
 	ID   uuid.UUID
 	Name string
 }

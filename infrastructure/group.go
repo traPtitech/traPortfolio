@@ -99,7 +99,7 @@ func (group *GroupAPI) GetGroup(groupID uuid.UUID) (*external.GroupDetailRespons
 	}
 
 	var er *external.GroupDetailResponse
-	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(er); err != nil {
 		return nil, err
 	}
 	return er, nil
