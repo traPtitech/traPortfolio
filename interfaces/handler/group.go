@@ -25,6 +25,52 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 	return &GroupHandler{service}
 }
 
+type groupUserResponse struct {
+	ID       uuid.UUID
+	Name     string
+	Duration domain.GroupDuration
+}
+
+type GroupMemberDetailResponse struct {
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	RealName string    `json:"real_name"`
+	Duration domain.GroupDuration
+}
+
+func (h *GroupHandler) GetGroupsByUserID(_c echo.Context) error {
+	c := Context{_c}
+	req := groupParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	groups, err := h.srv.GetGroupsByUserID(ctx, req.GroupID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	res := make([]*groupUserResponse, 0, len(groups))
+	for _, group := range groups {
+		res = append(res, &groupUserResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Duration: domain.GroupDuration{
+				Since: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+				Until: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+			},
+		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
 // GroupResponse Portfolioのレスポンスで使う班情報
 type groupsResponse struct {
 	ID   uuid.UUID `json:"groupId"`
@@ -52,8 +98,8 @@ type groupDetailResponse struct {
 	ID          uuid.UUID
 	Name        string
 	Link        string
-	Leader      *domain.User
-	Members     []*domain.UserGroup
+	Leader      *userResponse
+	Members     []*GroupMemberDetailResponse
 	Description string
 }
 
@@ -74,9 +120,9 @@ func (h *GroupHandler) GetGroup(_c echo.Context) error {
 }
 
 func formatGetGroup(group *domain.GroupDetail) *groupDetailResponse {
-	groupRes := make([]*domain.UserGroup, 0, len(group.Members))
+	groupRes := make([]*GroupMemberDetailResponse, 0, len(group.Members))
 	for _, v := range group.Members {
-		groupRes = append(groupRes, &domain.UserGroup{
+		groupRes = append(groupRes, &GroupMemberDetailResponse{
 			ID:       v.ID,
 			Name:     v.Name,
 			RealName: v.RealName,
@@ -97,7 +143,7 @@ func formatGetGroup(group *domain.GroupDetail) *groupDetailResponse {
 		ID:   group.ID,
 		Name: group.Name,
 		Link: group.Link,
-		Leader: &domain.User{
+		Leader: &userResponse{
 			ID:       group.Leader.ID,
 			Name:     group.Leader.Name,
 			RealName: group.Leader.RealName,
