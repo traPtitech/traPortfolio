@@ -127,7 +127,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					Name:     "user1",
 					RealName: "ユーザー1 ユーザー1",
 				},
-				State: 1,
+				State: domain.TraqStateActive,
 				Bio:   util.AlphaNumeric(5),
 				Accounts: []*domain.Account{
 					{

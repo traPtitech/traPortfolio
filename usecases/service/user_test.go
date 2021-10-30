@@ -97,7 +97,7 @@ func TestUserService_GetUser(t *testing.T) {
 					Name:     util.AlphaNumeric(5),
 					RealName: util.AlphaNumeric(5),
 				},
-				State: 0,
+				State: domain.TraqStateActive,
 				Bio:   util.AlphaNumeric(10),
 				Accounts: []*domain.Account{
 					{

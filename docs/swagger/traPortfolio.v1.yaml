@@ -767,7 +767,7 @@ components:
       title: UserAccountState
       description: |-
         ユーザーアカウント状態
-        0: 停止
+        0: 凍結
         1: 有効
         2: 一時停止
       enum:
@@ -778,6 +778,10 @@ components:
         - deactivated
         - active
         - suspended
+      x-enum-descriptions:
+        - 凍結
+        - 有効
+        - 一時停止
       format: int32
     UserDetail:
       title: UserDetail
