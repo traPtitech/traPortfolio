@@ -1,41 +1,60 @@
-package handler
+package handler_test
 
 import (
 	"encoding/json"
+	"log"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
+	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
-func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) TestHandlers {
+func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) handler.TestHandlers {
 	t.Helper()
-	testHandlers := SetupTestApi(ctrl)
+	testHandlers := handler.SetupTestApi(ctrl)
 
 	return testHandlers
 }
 
-func doRequest(t *testing.T, handler func(echo.Context) error, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder, error) {
+type Validator struct {
+	validator *validator.Validate
+}
+
+func (v *Validator) Validate(i interface{}) error {
+	return v.validator.Struct(i)
+}
+
+func doRequest(t *testing.T, api handler.API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()
 
 	req := httptest.NewRequest(method, path, requestEncode(t, reqBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 
-	ctx := echo.New().NewContext(req, rec)
-	err := handler(ctx)
-	if err != nil {
-		return rec.Code, rec, err
+	e := echo.New()
+	v := validator.New()
+
+	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
+		log.Fatal(err)
 	}
+	e.Validator = &Validator{
+		validator: v,
+	}
+
+	infrastructure.Setup(e, api)
+	e.ServeHTTP(rec, req)
 
 	if resBody != nil {
 		responseDecode(t, rec, resBody)
 	}
 
-	return rec.Code, rec, nil
+	return rec.Code, rec
 }
 
 func requestEncode(t *testing.T, body interface{}) *strings.Reader {
