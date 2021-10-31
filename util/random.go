@@ -48,7 +48,7 @@ func Time() time.Time {
 	delta := max - min
 
 	sec := rand.Int63n(delta) + min
-	return time.UnixMicro(sec)
+	return time.UnixMicro(sec).In(time.UTC)
 }
 
 func URL(useHTTPS bool, domainLength uint16) *url.URL {
