@@ -5,13 +5,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/util/random"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/util"
 )
 
 func TestEventService_GetEvents(t *testing.T) {
@@ -38,8 +39,8 @@ func TestEventService_GetEvents(t *testing.T) {
 			},
 			want: []*domain.Event{
 				{
-					ID:        util.UUID(),
-					Name:      util.AlphaNumeric(5),
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(5),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
@@ -93,27 +94,27 @@ func TestEventService_GetEventByID(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					// ID:
-					Name:      util.AlphaNumeric(5),
+					Name:      random.AlphaNumeric(5),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Description: util.AlphaNumeric(10),
-				Place:       util.AlphaNumeric(5),
+				Description: random.AlphaNumeric(10),
+				Place:       random.AlphaNumeric(5),
 				Level:       domain.EventLevelAnonymous,
 				HostName: []*domain.User{
 					{
-						ID:       util.UUID(),
-						Name:     util.AlphaNumeric(5),
-						RealName: util.AlphaNumeric(5),
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(5),
+						RealName: random.AlphaNumeric(5),
 					},
 				},
-				GroupID: util.UUID(),
-				RoomID:  util.UUID(),
+				GroupID: random.UUID(),
+				RoomID:  random.UUID(),
 			},
 			setup: func(f fields, args args, want *domain.EventDetail) {
 				want.ID = args.id
@@ -141,7 +142,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 			name: "KnoqForBidden",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: nil,
 			setup: func(f fields, args args, want *domain.EventDetail) {
@@ -154,7 +155,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 			name: "PortalForbidden",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: nil,
 			setup: func(f fields, args args, want *domain.EventDetail) {
@@ -163,16 +164,16 @@ func TestEventService_GetEventByID(t *testing.T) {
 				e.EXPECT().GetEvent(args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
 						ID:        args.id,
-						Name:      util.AlphaNumeric(5),
+						Name:      random.AlphaNumeric(5),
 						TimeStart: time.Now(),
 						TimeEnd:   time.Now(),
 					},
-					Description: util.AlphaNumeric(10),
-					Place:       util.AlphaNumeric(5),
+					Description: random.AlphaNumeric(10),
+					Place:       random.AlphaNumeric(5),
 					Level:       domain.EventLevelAnonymous,
-					HostName:    []*domain.User{{ID: util.UUID()}},
-					GroupID:     util.UUID(),
-					RoomID:      util.UUID(),
+					HostName:    []*domain.User{{ID: random.UUID()}},
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
 				}, nil)
 				u.EXPECT().GetUsers().Return(nil, repository.ErrForbidden)
 			},
@@ -221,7 +222,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 				arg: &repository.UpdateEventArg{
 					Level: domain.EventLevelAnonymous,
 				},
