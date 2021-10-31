@@ -27,11 +27,11 @@ func mustParseTime(layout, value string) time.Time {
 
 func TestContestHandler_GetContests(t *testing.T) {
 	tests := []struct {
-		name          string
-		setup         func(th *handler.TestHandlers, want []*domain.Contest) (path string)
-		statusCode    int
-		repo_contests []*domain.Contest
-		hres_contests []*handler.ContestResponse
+		name         string
+		setup        func(th *handler.TestHandlers, want []*domain.Contest) (path string)
+		statusCode   int
+		repoContests []*domain.Contest
+		hresContests []*handler.ContestResponse
 	}{
 		{
 			name: "success",
@@ -40,7 +40,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 				return "/api/v1/contests"
 			},
 			statusCode: http.StatusOK,
-			repo_contests: []*domain.Contest{
+			repoContests: []*domain.Contest{
 				{
 					ID:        uuid.Nil,
 					Name:      "test1",
@@ -48,7 +48,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 					TimeEnd:   mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
 				},
 			},
-			hres_contests: []*handler.ContestResponse{
+			hresContests: []*handler.ContestResponse{
 				{
 					Name: "test1",
 					Duration: handler.Duration{
@@ -65,10 +65,10 @@ func TestContestHandler_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			handlers := SetupTestHandlers(t, ctrl)
 
-			for i, v := range tt.hres_contests {
-				tt.repo_contests[i].ID = v.ID
+			for i, v := range tt.hresContests {
+				tt.repoContests[i].ID = v.ID
 			}
-			path := tt.setup(&handlers, tt.repo_contests)
+			path := tt.setup(&handlers, tt.repoContests)
 
 			var resBody []*handler.ContestResponse
 			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
@@ -76,7 +76,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 			// Assertion
 
 			assert.Equal(t, tt.statusCode, statusCode)
-			assert.Equal(t, tt.hres_contests, resBody)
+			assert.Equal(t, tt.hresContests, resBody)
 		})
 	}
 }

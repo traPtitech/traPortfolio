@@ -51,9 +51,9 @@ func Time() time.Time {
 	return time.UnixMicro(sec)
 }
 
-func URL(useHttps bool, domainLength uint16) *url.URL {
+func URL(useHTTPS bool, domainLength uint16) *url.URL {
 	scheme := "https"
-	if !useHttps {
+	if !useHTTPS {
 		scheme = "http"
 	}
 	scheme += "://"
