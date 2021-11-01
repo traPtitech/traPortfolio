@@ -148,7 +148,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		id  uuid.UUID
-		arg *repository.UpdateEventArg
+		arg *repository.UpdateEventLevelArg
 	}
 	tests := []struct {
 		name      string
@@ -160,7 +160,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: sampleUUID,
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -190,7 +190,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			name: "LevelNotFound",
 			args: args{
 				id: sampleUUID,
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -208,7 +208,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			name: "DoNotUpdate",
 			args: args{
 				id: sampleUUID,
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -229,7 +229,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			name: "UpdateError",
 			args: args{
 				id: sampleUUID,
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -253,7 +253,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			name: "ConfirmingError",
 			args: args{
 				id: sampleUUID,
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -280,7 +280,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			name: "InconsistentLevel",
 			args: args{
 				id: sampleUUID,
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -316,7 +316,7 @@ func TestEventRepository_UpdateEvent(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
-			tt.assertion(t, repo.UpdateEvent(tt.args.id, tt.args.arg))
+			tt.assertion(t, repo.UpdateEventLevel(tt.args.id, tt.args.arg))
 		})
 	}
 }
