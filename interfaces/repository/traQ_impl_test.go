@@ -4,12 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/traPtitech/traPortfolio/util/random"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	"github.com/traPtitech/traPortfolio/util"
 )
 
 func TestTraQRepository_GetUser(t *testing.T) {
@@ -48,7 +49,7 @@ func TestTraQRepository_GetUser(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want:      nil,
 			setup:     func(f fields, args args, want *domain.TraQUser) {},
