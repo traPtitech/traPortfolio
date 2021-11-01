@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/util/random"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +16,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util"
 )
 
 var (
@@ -127,11 +128,11 @@ func TestUserRepository_GetUser(t *testing.T) {
 					Name:     "user1",
 					RealName: "ユーザー1 ユーザー1",
 				},
-				State: 1,
-				Bio:   util.AlphaNumeric(5),
+				State: domain.TraqStateActive,
+				Bio:   random.AlphaNumeric(5),
 				Accounts: []*domain.Account{
 					{
-						ID:          util.UUID(),
+						ID:          random.UUID(),
 						Type:        domain.HOMEPAGE,
 						PrPermitted: true,
 					},
@@ -221,7 +222,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			args: args{ids[0]},
 			want: []*domain.Account{
 				{
-					ID:          util.UUID(),
+					ID:          random.UUID(),
 					Type:        domain.HOMEPAGE,
 					PrPermitted: true,
 				},
@@ -270,7 +271,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 }
 
 func TestUserRepository_GetAccount(t *testing.T) {
-	aid := util.UUID() // Successで使うaccountID
+	aid := random.UUID() // Successで使うaccountID
 
 	t.Parallel()
 	type args struct {
@@ -311,7 +312,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				userID:    ids[0],
-				accountID: util.UUID(),
+				accountID: random.UUID(),
 			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
@@ -357,7 +358,7 @@ func TestUserRepository_Update(t *testing.T) {
 			args: args{
 				id: ids[0],
 				changes: map[string]interface{}{
-					"description": util.AlphaNumeric(10),
+					"description": random.AlphaNumeric(10),
 					"check":       true,
 				},
 			},
@@ -386,7 +387,7 @@ func TestUserRepository_Update(t *testing.T) {
 			args: args{
 				id: ids[0],
 				changes: map[string]interface{}{
-					"description": util.AlphaNumeric(10),
+					"description": random.AlphaNumeric(10),
 					"check":       true,
 				},
 			},
@@ -436,9 +437,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
-					ID:          util.AlphaNumeric(5),
+					ID:          random.AlphaNumeric(5),
 					Type:        domain.HOMEPAGE,
-					URL:         util.AlphaNumeric(5),
+					URL:         random.AlphaNumeric(5),
 					PrPermitted: true,
 				},
 			},
@@ -470,9 +471,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
-					ID:          util.AlphaNumeric(5),
+					ID:          random.AlphaNumeric(5),
 					Type:        domain.HOMEPAGE,
-					URL:         util.AlphaNumeric(5),
+					URL:         random.AlphaNumeric(5),
 					PrPermitted: true,
 				},
 			},
@@ -493,9 +494,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
-					ID:          util.AlphaNumeric(5),
+					ID:          random.AlphaNumeric(5),
 					Type:        domain.HOMEPAGE,
-					URL:         util.AlphaNumeric(5),
+					URL:         random.AlphaNumeric(5),
 					PrPermitted: true,
 				},
 			},
@@ -549,10 +550,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				userID:    ids[0],
-				accountID: util.UUID(),
+				accountID: random.UUID(),
 				changes: map[string]interface{}{
-					"name":  util.AlphaNumeric(5),
-					"url":   util.AlphaNumeric(5),
+					"name":  random.AlphaNumeric(5),
+					"url":   random.AlphaNumeric(5),
 					"check": true,
 					"type":  domain.HOMEPAGE,
 				},
@@ -577,10 +578,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				userID:    ids[0],
-				accountID: util.UUID(),
+				accountID: random.UUID(),
 				changes: map[string]interface{}{
-					"name":  util.AlphaNumeric(5),
-					"url":   util.AlphaNumeric(5),
+					"name":  random.AlphaNumeric(5),
+					"url":   random.AlphaNumeric(5),
 					"check": true,
 					"type":  domain.HOMEPAGE,
 				},
@@ -627,7 +628,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				accountID: util.UUID(),
+				accountID: random.UUID(),
 				userID:    ids[0],
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -643,7 +644,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				accountID: util.UUID(),
+				accountID: random.UUID(),
 				userID:    ids[0],
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -688,8 +689,8 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			args: args{userID: ids[0]},
 			want: []*domain.UserProject{
 				{
-					ID:        util.UUID(),
-					Name:      util.AlphaNumeric(5),
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(5),
 					Since:     time.Now(),
 					Until:     time.Now(),
 					UserSince: time.Now(),
@@ -699,7 +700,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserProject) {
 				rows := sqlmock.NewRows([]string{"id", "project_id", "user_id", "since", "until"})
 				for _, v := range want {
-					rows.AddRow(util.UUID(), v.ID, args.userID, v.UserSince, v.UserUntil)
+					rows.AddRow(random.UUID(), v.ID, args.userID, v.UserSince, v.UserUntil)
 				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
@@ -711,7 +712,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 						WithArgs(v.ID).
 						WillReturnRows(
 							sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-								AddRow(v.ID, v.Name, util.AlphaNumeric(10), util.AlphaNumeric(5), v.Since, v.Until, time.Now(), time.Now()),
+								AddRow(v.ID, v.Name, random.AlphaNumeric(10), random.AlphaNumeric(5), v.Since, v.Until, time.Now(), time.Now()),
 						)
 				}
 			},
@@ -764,10 +765,10 @@ func TestUserRepository_GetContests(t *testing.T) {
 			args: args{userID: ids[0]},
 			want: []*domain.UserContest{
 				{
-					ID:          util.UUID(),
-					Name:        util.AlphaNumeric(5),
-					Result:      util.AlphaNumeric(5),
-					ContestName: util.AlphaNumeric(5),
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(5),
+					Result:      random.AlphaNumeric(5),
+					ContestName: random.AlphaNumeric(5),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
@@ -781,7 +782,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 					WillReturnRows(rows)
 				cids := make([]uuid.UUID, len(want))
 				for i, v := range want {
-					cids[i] = util.UUID()
+					cids[i] = random.UUID()
 					sqlhandler.Mock.
 						ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
 						WithArgs(v.ID).

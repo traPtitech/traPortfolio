@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/util/random"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +16,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util"
 )
 
 var (
@@ -106,7 +107,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		{
 			name: "KnoqNotFound",
 			args: args{
-				id: util.UUID(),
+				id: random.UUID(),
 			},
 			want:      nil,
 			setup:     func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {},
