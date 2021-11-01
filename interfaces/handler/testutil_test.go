@@ -2,12 +2,10 @@ package handler_test
 
 import (
 	"encoding/json"
-	"log"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
@@ -22,14 +20,6 @@ func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) handler.TestHandle
 	return testHandlers
 }
 
-type Validator struct {
-	validator *validator.Validate
-}
-
-func (v *Validator) Validate(i interface{}) error {
-	return v.validator.Struct(i)
-}
-
 func doRequest(t *testing.T, api handler.API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()
 
@@ -38,14 +28,6 @@ func doRequest(t *testing.T, api handler.API, method, path string, reqBody inter
 	rec := httptest.NewRecorder()
 
 	e := echo.New()
-	v := validator.New()
-
-	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
-		log.Fatal(err)
-	}
-	e.Validator = &Validator{
-		validator: v,
-	}
 
 	infrastructure.Setup(e, api)
 	e.ServeHTTP(rec, req)
