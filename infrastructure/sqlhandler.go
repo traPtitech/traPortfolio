@@ -36,7 +36,7 @@ type SQLHandler struct {
 
 func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 	engine, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci&parseTime=true", conf.user, conf.password, conf.host, conf.port, conf.dbname),
+		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", conf.user, conf.password, conf.host, conf.port, conf.dbname),
 	}), &gorm.Config{
 		NowFunc: func() time.Time {
 			return time.Now().Truncate(time.Microsecond)
