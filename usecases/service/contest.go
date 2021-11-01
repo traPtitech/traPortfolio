@@ -72,8 +72,11 @@ func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *
 }
 
 func (s *ContestService) DeleteContest(ctx context.Context, id uuid.UUID) error {
-	err := s.repo.DeleteContest(id)
-	return err
+	if err := s.repo.DeleteContest(id); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *ContestService) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
@@ -89,6 +92,13 @@ func (s *ContestService) GetContestTeam(ctx context.Context, contestID uuid.UUID
 	if err != nil {
 		return nil, err
 	}
+
+	members, err := s.repo.GetContestTeamMembers(contestID, teamID)
+	if err != nil {
+		return nil, err
+	}
+
+	contestTeam.Members = members
 
 	return contestTeam, nil
 }
@@ -124,16 +134,16 @@ func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 	return nil
 }
 
-func (s *ContestService) GetContestTeamMember(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	return s.repo.GetContestTeamMember(contestID, teamID)
+func (s *ContestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+	return s.repo.GetContestTeamMembers(contestID, teamID)
 }
 
-func (s *ContestService) AddContestTeamMember(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.AddContestTeamMember(teamID, memberIDs)
+func (s *ContestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.AddContestTeamMembers(teamID, memberIDs)
 	return err
 }
 
-func (s *ContestService) DeleteContestTeamMember(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.DeleteContestTeamMember(teamID, memberIDs)
+func (s *ContestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.DeleteContestTeamMembers(teamID, memberIDs)
 	return err
 }

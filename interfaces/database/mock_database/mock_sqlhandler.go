@@ -9,29 +9,32 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
+
+// TODO 適切な場所に書く
+func init() {
+	gorm.ErrRecordNotFound = repository.ErrNotFound
+}
 
 type MockSQLHandler struct {
 	Conn *gorm.DB
 	Mock sqlmock.Sqlmock
 }
 
-func NewMockSQLHandler(isValidDB bool) *MockSQLHandler {
+func NewMockSQLHandler() *MockSQLHandler {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	conf := mysql.Config{SkipInitializeWithVersion: true}
-	if isValidDB {
-		conf.Conn = db
-	}
+	conf.Conn = db
 
-	engine, err := gorm.Open(
-		mysql.New(conf),
-		&gorm.Config{Logger: logger.Default.LogMode(logger.Info)},
-	)
-	if err != nil && isValidDB {
+	engine, err := gorm.Open(mysql.New(conf), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+	if err != nil {
 		log.Fatal(err)
 	}
 

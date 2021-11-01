@@ -210,7 +210,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.UpdateAccountArgs{
-		ID:          req.ID,
+		Name:        req.ID,
 		Type:        req.Type,
 		URL:         req.URL,
 		PrPermitted: req.PrPermitted,

@@ -32,8 +32,6 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 			Name:      v.Name,
 			TimeStart: v.Since,
 			TimeEnd:   v.Until,
-			CreatedAt: v.CreatedAt,
-			UpdatedAt: v.UpdatedAt,
 		})
 	}
 	return result, nil
@@ -57,8 +55,6 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 			Name:      contest.Name,
 			TimeStart: contest.Since,
 			TimeEnd:   contest.Until,
-			CreatedAt: contest.CreatedAt,
-			UpdatedAt: contest.UpdatedAt,
 		},
 		Link:        contest.Link,
 		Description: contest.Description,
@@ -87,8 +83,6 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		Name:      contest.Name,
 		TimeStart: contest.Since,
 		TimeEnd:   contest.Until,
-		CreatedAt: contest.CreatedAt,
-		UpdatedAt: contest.UpdatedAt,
 	}
 
 	return result, nil
@@ -150,13 +144,12 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 			ContestID: v.ContestID,
 			Name:      v.Name,
 			Result:    v.Result,
-			CreatedAt: v.CreatedAt,
-			UpdatedAt: v.UpdatedAt,
 		})
 	}
 	return result, nil
 }
 
+// Membersは別途GetContestTeamMembersで取得するためここではnilのまま返す
 func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
 	team := &model.ContestTeam{
 		ID:        teamID,
@@ -167,23 +160,16 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 		return nil, convertError(err)
 	}
 
-	members, err := repo.GetContestTeamMember(contestID, teamID)
-	if err != nil {
-		return nil, convertError(err)
-	}
-
 	res := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
 			ID:        team.ID,
 			ContestID: team.ContestID,
 			Name:      team.Name,
 			Result:    team.Result,
-			CreatedAt: team.CreatedAt,
-			UpdatedAt: team.UpdatedAt,
 		},
 		Link:        team.Link,
 		Description: team.Description,
-		Members:     members,
+		// Members:
 	}
 	return res, nil
 }
@@ -207,8 +193,6 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 			ContestID: contestTeam.ContestID,
 			Name:      contestTeam.Name,
 			Result:    contestTeam.Result,
-			CreatedAt: contestTeam.CreatedAt,
-			UpdatedAt: contestTeam.UpdatedAt,
 		},
 		Link:        contestTeam.Link,
 		Description: contestTeam.Description,
@@ -265,7 +249,7 @@ func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uui
 	return nil
 }
 
-func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
 	belongings := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.h.
 		Preload("User").
@@ -298,7 +282,7 @@ func (repo *ContestRepository) GetContestTeamMember(contestID uuid.UUID, teamID 
 	return result, nil
 }
 
-func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
+func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	if members == nil {
 		return repository.ErrInvalidArg
 	}
@@ -338,7 +322,7 @@ func (repo *ContestRepository) AddContestTeamMember(teamID uuid.UUID, members []
 
 }
 
-func (repo *ContestRepository) DeleteContestTeamMember(teamID uuid.UUID, members []uuid.UUID) error {
+func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	// 存在チェック
 	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
 	if err != nil {

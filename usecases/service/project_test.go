@@ -6,13 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/util/random"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/util"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"gorm.io/gorm"
 )
@@ -34,17 +35,17 @@ func TestProjectService_GetProjects(t *testing.T) {
 			args: args{ctx: context.Background()},
 			want: []*domain.Project{
 				{
-					ID:          util.UUID(),
-					Name:        util.AlphaNumeric(5),
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(5),
 					Since:       time.Now(),
 					Until:       time.Now(),
-					Description: util.AlphaNumeric(10),
-					Link:        util.AlphaNumeric(10),
+					Description: random.AlphaNumeric(10),
+					Link:        random.AlphaNumeric(10),
 					Members: []*domain.ProjectMember{
 						{
-							UserID:   util.UUID(),
-							Name:     util.AlphaNumeric(5),
-							RealName: util.AlphaNumeric(5),
+							UserID:   random.UUID(),
+							Name:     random.AlphaNumeric(5),
+							RealName: random.AlphaNumeric(5),
 							Since:    time.Now(),
 							Until:    time.Now(),
 						},
@@ -103,20 +104,20 @@ func TestProjectService_GetProject(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: &domain.Project{
-				ID:          util.UUID(),
-				Name:        util.AlphaNumeric(5),
+				ID:          random.UUID(),
+				Name:        random.AlphaNumeric(5),
 				Since:       time.Now(),
 				Until:       time.Now(),
-				Description: util.AlphaNumeric(10),
-				Link:        util.AlphaNumeric(10),
+				Description: random.AlphaNumeric(10),
+				Link:        random.AlphaNumeric(10),
 				Members: []*domain.ProjectMember{
 					{
-						UserID:   util.UUID(),
-						Name:     util.AlphaNumeric(5),
-						RealName: util.AlphaNumeric(5),
+						UserID:   random.UUID(),
+						Name:     random.AlphaNumeric(5),
+						RealName: random.AlphaNumeric(5),
 						Since:    time.Now(),
 						Until:    time.Now(),
 					},
@@ -139,7 +140,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			name: "PortalForbidden",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
@@ -152,7 +153,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
@@ -199,15 +200,15 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:        util.AlphaNumeric(5),
-					Description: util.AlphaNumeric(10),
-					Link:        util.AlphaNumeric(10),
+					Name:        random.AlphaNumeric(5),
+					Description: random.AlphaNumeric(10),
+					Link:        random.AlphaNumeric(10),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
 			},
 			want: &domain.Project{
-				ID:          util.UUID(),
+				ID:          random.UUID(),
 				Name:        "",
 				Description: "",
 				Link:        "",
@@ -231,9 +232,9 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:        util.AlphaNumeric(5),
-					Description: util.AlphaNumeric(10),
-					Link:        util.AlphaNumeric(10),
+					Name:        random.AlphaNumeric(5),
+					Description: random.AlphaNumeric(10),
+					Link:        random.AlphaNumeric(10),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
@@ -282,11 +283,11 @@ func TestProjectService_UpdateProject(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.StringFrom(util.AlphaNumeric(5)),
-					Description: optional.StringFrom(util.AlphaNumeric(10)),
-					Link:        optional.StringFrom(util.AlphaNumeric(10)),
+					Name:        optional.StringFrom(random.AlphaNumeric(5)),
+					Description: optional.StringFrom(random.AlphaNumeric(10)),
+					Link:        optional.StringFrom(random.AlphaNumeric(10)),
 					Since:       optional.TimeFrom(time.Now()),
 					Until:       optional.TimeFrom(time.Now()),
 				},
@@ -307,11 +308,11 @@ func TestProjectService_UpdateProject(t *testing.T) {
 			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.StringFrom(util.AlphaNumeric(5)),
-					Description: optional.StringFrom(util.AlphaNumeric(10)),
-					Link:        optional.StringFrom(util.AlphaNumeric(10)),
+					Name:        optional.StringFrom(random.AlphaNumeric(5)),
+					Description: optional.StringFrom(random.AlphaNumeric(10)),
+					Link:        optional.StringFrom(random.AlphaNumeric(10)),
 					Since:       optional.TimeFrom(time.Now()),
 					Until:       optional.TimeFrom(time.Now()),
 				},
@@ -365,13 +366,13 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: []*domain.User{
 				{
-					ID:       util.UUID(),
-					Name:     util.AlphaNumeric(5),
-					RealName: util.AlphaNumeric(5),
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(5),
+					RealName: random.AlphaNumeric(5),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
@@ -391,7 +392,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			name: "PortalForbidden",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
@@ -404,7 +405,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			name: "InvalidDB",
 			args: args{
 				ctx: context.Background(),
-				id:  util.UUID(),
+				id:  random.UUID(),
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
@@ -450,10 +451,10 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				projectID: util.UUID(),
+				projectID: random.UUID(),
 				args: []*repository.CreateProjectMemberArgs{
 					{
-						UserID: util.UUID(),
+						UserID: random.UUID(),
 						Since:  time.Now(),
 						Until:  time.Now(),
 					},
@@ -468,10 +469,10 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 			name: "InvalidDB",
 			args: args{
 				ctx:       context.Background(),
-				projectID: util.UUID(),
+				projectID: random.UUID(),
 				args: []*repository.CreateProjectMemberArgs{
 					{
-						UserID: util.UUID(),
+						UserID: random.UUID(),
 						Since:  time.Now(),
 						Until:  time.Now(),
 					},
@@ -519,8 +520,8 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				projectID: util.UUID(),
-				memberIDs: []uuid.UUID{util.UUID()},
+				projectID: random.UUID(),
+				memberIDs: []uuid.UUID{random.UUID()},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
 				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(nil)
@@ -531,8 +532,8 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 			name: "InvalidDB",
 			args: args{
 				ctx:       context.Background(),
-				projectID: util.UUID(),
-				memberIDs: []uuid.UUID{util.UUID()},
+				projectID: random.UUID(),
+				memberIDs: []uuid.UUID{random.UUID()},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
 				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(gorm.ErrInvalidDB)
