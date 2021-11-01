@@ -51,24 +51,6 @@ func NewGroupAPI(conf *GroupConfig) (external.GroupAPI, error) {
 	return &GroupAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
 }
 
-func (group *GroupAPI) GetGroupsByUserID(userID uuid.UUID) ([]*external.GroupUserResponse, error) {
-	res, err := apiGet(group.Client, group.conf.endpoint, fmt.Sprintf("/users/%v/groups", userID))
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users/%v/groups failed", userID)
-	}
-
-	var er []*external.GroupUserResponse
-	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
-		return nil, err
-	}
-	return er, nil
-}
-
 func (group *GroupAPI) GetAllGroups() ([]*external.GroupsResponse, error) {
 	res, err := apiGet(group.Client, group.conf.endpoint, "/groups")
 	if err != nil {

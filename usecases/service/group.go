@@ -18,10 +18,6 @@ func NewGroupService(repo repository.GroupRepository) GroupService {
 	}
 }
 
-func (s *GroupService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
-	return s.repo.GetGroupsByUserID(userID)
-}
-
 func (s *GroupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
 	return s.repo.GetAllGroups()
 }

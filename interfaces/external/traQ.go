@@ -37,7 +37,7 @@ type TraQAPI interface {
 }
 
 type GroupAPI interface {
-	GetGroupsByUserID(userID uuid.UUID) ([]*GroupUserResponse, error)
+	// GetGroupsByUserID(userID uuid.UUID) ([]*GroupUserResponse, error)
 	GetAllGroups() ([]*GroupsResponse, error)
 	GetGroup(groupID uuid.UUID) (*GroupDetailResponse, error)
 }

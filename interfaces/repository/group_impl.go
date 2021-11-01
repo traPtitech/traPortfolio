@@ -15,31 +15,6 @@ func NewGroupRepository(api external.GroupAPI) repository.GroupRepository {
 	return &GroupRepository{api}
 }
 
-func (repo *GroupRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
-	eres, err := repo.api.GetGroupsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*domain.GroupUser, 0, len(eres))
-	for _, v := range eres {
-		result = append(result, &domain.GroupUser{
-			ID:   v.ID,
-			Name: v.Name,
-			Duration: domain.GroupDuration{
-				Since: domain.YearWithSemester{
-					Year:     v.Duration.Since.Year,
-					Semester: v.Duration.Since.Semester,
-				},
-				Until: domain.YearWithSemester{
-					Year:     v.Duration.Since.Year,
-					Semester: v.Duration.Since.Semester,
-				},
-			},
-		})
-	}
-	return result, nil
-}
-
 func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	eres, err := repo.api.GetAllGroups()
 	if err != nil {
