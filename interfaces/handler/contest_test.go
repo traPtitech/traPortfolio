@@ -74,7 +74,6 @@ func TestContestHandler_GetContests(t *testing.T) {
 			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
-
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, tt.hresContests, resBody)
 		})
