@@ -14,7 +14,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 func mustParseTime(layout, value string) time.Time {
@@ -95,24 +95,24 @@ func makeContest() (*domain.ContestDetail, *handler.ContestDetailResponse) {
 	d := domain.ContestDetail{
 		Contest: domain.Contest{
 			ID:        getContestID[0],
-			Name:      util.AlphaNumeric(rand.Intn(30) + 1),
-			TimeStart: util.Time(),
-			TimeEnd:   util.Time(),
+			Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+			TimeStart: random.Time(),
+			TimeEnd:   random.Time(),
 		},
-		Link:        util.RandURLString(),
-		Description: util.AlphaNumeric(rand.Intn(30) + 1),
+		Link:        random.RandURLString(),
+		Description: random.AlphaNumeric(rand.Intn(30) + 1),
 		Teams: []*domain.ContestTeam{
 			{
 				ID:        getContestID[1],
 				ContestID: getContestID[0],
-				Name:      util.AlphaNumeric(rand.Intn(30) + 1),
-				Result:    util.AlphaNumeric(rand.Intn(30) + 1),
+				Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+				Result:    random.AlphaNumeric(rand.Intn(30) + 1),
 			},
 			{
 				ID:        getContestID[2],
 				ContestID: getContestID[0],
-				Name:      util.AlphaNumeric(rand.Intn(30) + 1),
-				Result:    util.AlphaNumeric(rand.Intn(30) + 1),
+				Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+				Result:    random.AlphaNumeric(rand.Intn(30) + 1),
 			},
 		},
 	}
@@ -171,7 +171,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
-				uid := util.UUID()
+				uid := random.UUID()
 				th.Repository.MockContestRepository.EXPECT().GetContest(uid).Return(nil, repository.ErrNotFound)
 
 				return &domain.ContestDetail{}, &handler.ContestDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s", uid)
