@@ -51,7 +51,7 @@ func NewGroupAPI(conf *GroupConfig) (external.GroupAPI, error) {
 	return &GroupAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
 }
 
-func (group *GroupAPI) GetGroupsByID(userID uuid.UUID) ([]*external.GroupUserResponse, error) {
+func (group *GroupAPI) GetGroupsByUserID(userID uuid.UUID) ([]*external.GroupUserResponse, error) {
 	res, err := apiGet(group.Client, group.conf.endpoint, fmt.Sprintf("/users/%v/groups", userID))
 	if err != nil {
 		return nil, err

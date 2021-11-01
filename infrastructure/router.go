@@ -64,9 +64,9 @@ func Setup(e *echo.Echo, api handler.API) {
 
 					apiUsersUIDContests.GET("", api.User.GetContests)
 
-					// apiUsersUIDGroups := apiUsersUID.Group("/groups")
+					apiUsersUIDGroups := apiUsersUID.Group("/groups")
 
-					// apiUsersUIDGroups.GET("", api.User.GetGroups)
+					apiUsersUIDGroups.GET("", api.User.GetGroupsByUserID)
 
 					apiUsersUIDEvents := apiUsersUID.Group("/events")
 
@@ -110,7 +110,8 @@ func Setup(e *echo.Echo, api handler.API) {
 
 			apiGroups.GET("", api.Group.GetAllGroups)
 			apiGroups.GET("/:groupID", api.Group.GetGroup)
-			apiGroups.GET("/:userID/groups", api.Group.GetGroupsByID)
+			// here will be deleted
+			apiGroups.GET("/:userID/groups", api.Group.GetGroupsByUserID)
 		}
 
 		{

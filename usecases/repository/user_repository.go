@@ -37,6 +37,6 @@ type UserRepository interface {
 	UpdateAccount(id uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error
 	DeleteAccount(id uuid.UUID, accountID uuid.UUID) error
 	GetProjects(id uuid.UUID) ([]*domain.UserProject, error)
-	GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error)
 	GetContests(id uuid.UUID) ([]*domain.UserContest, error)
+	GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error)
 }
