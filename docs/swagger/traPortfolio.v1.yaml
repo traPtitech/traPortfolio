@@ -701,7 +701,7 @@ paths:
       description: プロジェクトメンバーを取得します
     post:
       summary: プロジェクトメンバーの追加
-      operationId: addProjectMenbers
+      operationId: addProjectMembers
       description: プロジェクトメンバーを追加します
       responses:
         '204':
@@ -752,6 +752,7 @@ components:
           type: string
           description: ユーザーUUID
           format: uuid
+          x-go-type: uuid.UUID
         name:
           type: string
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
@@ -823,9 +824,6 @@ components:
             true: 公開
             false: 非公開
           default: true
-      required:
-        - bio
-        - check
     Account:
       title: Account
       type: object
@@ -888,6 +886,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: プロジェクトuuid
         name:
           type: string
@@ -936,12 +935,14 @@ components:
               description: プロジェクトメンバー
               items:
                 $ref: '#/components/schemas/ProjectMember'
-            createdAt:
+            createdAt: # TODO: いらないかも
               type: string
               description: 作成日時
-            updatedAt:
+              x-go-type: time.Time
+            updatedAt: # TODO: いらないかも
               type: string
               description: 変更日時
+              x-go-type: time.Time
           required:
             - description
             - members
@@ -971,6 +972,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: イベントuuid
         name:
           type: string
@@ -978,8 +980,7 @@ components:
           description: イベント名
         duration:
           description: イベントの開催期間
-          allOf:
-            - $ref: '#/components/schemas/Duration'
+          $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
@@ -1016,14 +1017,14 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: コンテストuuid
         name:
           type: string
           description: コンテスト名
         duration:
           description: コンテストの開催期間
-          allOf:
-            - $ref: '#/components/schemas/Duration'
+          $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
@@ -1059,6 +1060,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: コンテストチームuuid
         name:
           type: string
@@ -1113,6 +1115,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: 班uuid
         name:
           type: string
@@ -1216,8 +1219,7 @@ components:
           description: コンテスト説明
         duration:
           description: コンテストの開催期間
-          allOf:
-            - $ref: '#/components/schemas/Duration'
+          $ref: '#/components/schemas/Duration'
     EditContestTeam:
       title: PostContestTeam
       type: object
@@ -1340,10 +1342,11 @@ components:
         userId:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
         duration:
           $ref: '#/components/schemas/ProjectDuration'
       required:
-        - user_id
+        - userId
         - duration
     MemberIDs:
       title: MemberIDs
@@ -1356,6 +1359,7 @@ components:
           items:
             type: string
             format: uuid
+            x-go-type: uuid.UUID
       required:
         - members
     EditAccount:
@@ -1387,6 +1391,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     groupIdInPath:
       name: groupId
       in: path
@@ -1395,6 +1400,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     projectIdInPath:
       name: projectId
       in: path
@@ -1403,6 +1409,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     eventIdInPath:
       name: eventId
       in: path
@@ -1411,6 +1418,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     contestIdInPath:
       name: contestId
       in: path
@@ -1419,6 +1427,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     teamIdInPath:
       name: teamId
       in: path
@@ -1427,12 +1436,14 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     accountIdInPath:
       name: accountId
       in: path
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
       description: アカウントUUID
       required: true
 tags:
