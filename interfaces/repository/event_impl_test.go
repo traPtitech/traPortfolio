@@ -144,7 +144,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 	}
 }
 
-func TestEventRepository_UpdateEvent(t *testing.T) {
+func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		id  uuid.UUID
