@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -90,12 +89,6 @@ func (repo *EventRepository) UpdateEventLevel(id uuid.UUID, arg *repository.Upda
 
 		if err := tx.Model(&model.EventLevelRelation{ID: id}).Update("level", arg.Level).Error(); err != nil {
 			return err
-		}
-
-		if elv, err := repo.getEventLevelByID(id); err != nil {
-			return err
-		} else if elv.Level != arg.Level {
-			return fmt.Errorf("updated level was expected %d, but got %d", elv.Level, arg.Level)
 		}
 
 		return nil
