@@ -27,7 +27,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 		setup        func(th *TestHandlers, want []*domain.Contest) (handler echo.HandlerFunc, path string)
 		statusCode   int
 		dbContest    []*domain.Contest
-		expectedBody []*ContestResponse
+		expectedBody []*Contest
 		assertion    assert.ErrorAssertionFunc
 	}{
 		{
@@ -45,12 +45,12 @@ func TestContestHandler_GetContests(t *testing.T) {
 					TimeEnd:   mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
 				},
 			},
-			expectedBody: []*ContestResponse{
+			expectedBody: []*Contest{
 				{
 					Name: "test1",
 					Duration: Duration{
 						Since: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
-						Until: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
+						// Until: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"), //TODO
 					},
 				},
 			},
@@ -64,11 +64,11 @@ func TestContestHandler_GetContests(t *testing.T) {
 			handlers := SetupTestHandlers(t, ctrl)
 
 			for i, v := range tt.expectedBody {
-				tt.dbContest[i].ID = v.ID
+				tt.dbContest[i].ID = v.Id
 			}
 			handler, path := tt.setup(&handlers, tt.dbContest)
 
-			var resBody []*ContestResponse
+			var resBody []*Contest
 			statusCode, _, err := doRequest(t, handler, http.MethodGet, path, nil, &resBody)
 
 			// Assertion

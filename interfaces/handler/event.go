@@ -13,15 +13,12 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type EventHandler struct {
-	srv service.EventService
+type eventIDInPath struct {
+	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
 }
 
-// EventResponse Portfolioのレスポンスで使うイベント情報
-type eventResponse struct {
-	ID       uuid.UUID `json:"eventId"`
-	Name     string    `json:"name"`
-	Duration Duration
+type EventHandler struct {
+	srv service.EventService
 }
 
 // NewEventHandler creates a EventHandler
@@ -37,36 +34,24 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*eventResponse, 0, len(events))
+	res := make([]*Event, 0, len(events))
 	for _, event := range events {
-		res = append(res, &eventResponse{
-			ID:   event.ID,
+		res = append(res, &Event{
+			Id:   event.ID,
 			Name: event.Name,
 			Duration: Duration{
 				Since: event.TimeStart,
-				Until: event.TimeEnd,
+				Until: &event.TimeEnd,
 			},
 		})
 	}
 	return c.JSON(http.StatusOK, res)
 }
 
-type eventParam struct {
-	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
-}
-
-type eventDetailResponse struct {
-	eventResponse
-	Description string            `json:"description"`
-	Place       string            `json:"place"`
-	HostName    []*userResponse   `json:"hostname"`
-	EventLevel  domain.EventLevel `json:"eventLevel"`
-}
-
 // GetByID GET /events/:eventID
 func (h *EventHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := eventParam{}
+	req := eventIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -80,22 +65,20 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 	return c.JSON(http.StatusOK, formatUserDetail(event))
 }
 
-type EditEventRequest struct {
-	EventID    uuid.UUID `param:"eventID" validate:"is-uuid"`
-	EventLevel *domain.EventLevel
-}
-
 // PatchEvent PATCH /events/:eventID
 func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	c := Context{_c}
-	req := &EditEventRequest{}
+	req := struct {
+		eventIDInPath
+		EditEventJSONRequestBody
+	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
 	patchReq := repository.UpdateEventArg{
-		Level: *req.EventLevel,
+		// Level: *req.EventLevel, // TODO
 	}
 
 	if err := h.srv.UpdateEvent(ctx, req.EventID, &patchReq); err != nil {
@@ -104,30 +87,30 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
-	userRes := make([]*userResponse, 0, len(event.HostName))
+func formatUserDetail(event *domain.EventDetail) *EventDetail {
+	userRes := make([]*User, 0, len(event.HostName))
 	for _, user := range event.HostName {
-		userRes = append(userRes, &userResponse{
-			ID:       user.ID,
+		userRes = append(userRes, &User{
+			Id:       user.ID,
 			Name:     user.Name,
-			RealName: user.RealName,
+			RealName: &user.RealName,
 		},
 		)
 	}
 
-	res := &eventDetailResponse{
-		eventResponse: eventResponse{
-			ID:   event.ID,
+	res := &EventDetail{
+		Event: Event{
+			Id:   event.ID,
 			Name: event.Name,
 			Duration: Duration{
 				Since: event.TimeStart,
-				Until: event.TimeEnd,
+				Until: &event.TimeEnd,
 			},
 		},
 		Description: event.Description,
 		Place:       event.Place,
-		HostName:    userRes,
-		EventLevel:  event.Level,
+		// Hostname:    userRes, // TODO
+		// EventLevel:  EventLevel(event.Level), // TODO
 	}
 	return res
 }

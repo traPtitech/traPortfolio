@@ -9,70 +9,15 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type userParam struct {
+type userIDInPath struct {
 	UserID uuid.UUID `param:"userID" validate:"is-uuid"`
 }
 
-type accountParams struct {
-	UserID    uuid.UUID `param:"userID" validate:"is-uuid"`
+type accountIDInPath struct {
 	AccountID uuid.UUID `param:"accountID" validate:"is-uuid"`
-}
-
-type EditUserRequest struct {
-	UserID uuid.UUID       `param:"userID" validate:"is-uuid"`
-	Bio    optional.String `json:"bio"`
-	Check  optional.Bool   `json:"check"`
-}
-
-// userResponse Portfolioのレスポンスで使うイベント情報
-type userResponse struct {
-	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"name"`
-	RealName string    `json:"realName"`
-}
-
-type userDetailResponse struct {
-	ID       uuid.UUID         `json:"id"`
-	Name     string            `json:"name"`
-	RealName string            `json:"realName"`
-	State    domain.TraQState  `json:"state"`
-	Bio      string            `json:"bio"`
-	Accounts []*domain.Account `json:"accounts"`
-}
-
-type AddAccountRequest struct {
-	UserID      uuid.UUID `param:"userID" validate:"is-uuid"`
-	ID          string    `json:"id"`
-	Type        uint      `json:"type"`
-	URL         string    `json:"url"`
-	PrPermitted bool      `json:"prPermitted"`
-}
-
-type EditAccountRequest struct {
-	UserID      uuid.UUID       `param:"userID" validate:"is-uuid"`
-	AccountID   uuid.UUID       `param:"accountID" validate:"is-uuid"`
-	ID          optional.String `json:"id"` // traqID
-	Type        optional.Int64  `json:"type"`
-	URL         optional.String `json:"url"`
-	PrPermitted optional.Bool   `json:"prPermitted"`
-}
-
-type UserProjectResponse struct {
-	ID           uuid.UUID              `json:"id"`
-	Name         string                 `json:"name"`
-	Duration     domain.ProjectDuration `json:"duration"`
-	UserDuration domain.ProjectDuration `json:"user_duration"`
-}
-
-type ContestTeamWithContestNameResponse struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"name"`
-	Result      string    `json:"result"`
-	ContestName string    `json:"contest_name"`
 }
 
 type UserHandler struct {
@@ -91,12 +36,12 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*userResponse, 0, len(users))
+	res := make([]*User, 0, len(users))
 	for _, user := range users {
-		res = append(res, &userResponse{
-			ID:       user.ID,
+		res = append(res, &User{
+			Id:       user.ID,
 			Name:     user.Name,
-			RealName: user.RealName,
+			RealName: &user.RealName,
 		})
 	}
 	return c.JSON(http.StatusOK, res)
@@ -105,7 +50,7 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 // GetByID GET /users/:userID
 func (handler *UserHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := userParam{}
+	req := userIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -116,28 +61,33 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, &userDetailResponse{
-		ID:       user.ID,
-		Name:     user.Name,
-		RealName: user.RealName,
-		State:    user.State,
-		Bio:      user.Bio,
-		Accounts: user.Accounts,
+	return c.JSON(http.StatusOK, &UserDetail{
+		User: User{
+			Id:       user.ID,
+			Name:     user.Name,
+			RealName: &user.RealName,
+		},
+		State: UserAccountState(user.State),
+		Bio:   user.Bio,
+		// Accounts: user.Accounts, // TODO
 	})
 }
 
 // Update PATCH /users/:userID
 func (handler *UserHandler) Update(_c echo.Context) error {
 	c := Context{_c}
-	req := EditUserRequest{}
+	req := struct {
+		userIDInPath
+		EditUserJSONRequestBody
+	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
 	u := repository.UpdateUserArgs{
-		Description: req.Bio,
-		Check:       req.Check,
+		Description: optional.StringFrom(*req.Bio), //TODO: valid: falseを追加する
+		Check:       optional.BoolFrom(*req.Check),
 	}
 	err := handler.srv.Update(ctx, req.UserID, &u)
 	if err != nil {
@@ -149,7 +99,7 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 // GetAccounts GET /users/:userID/accounts
 func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 	c := Context{_c}
-	req := userParam{}
+	req := userIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -165,7 +115,10 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 // GetAccount GET /users/:userID/accounts/:accountID
 func (handler *UserHandler) GetAccount(_c echo.Context) error {
 	c := Context{_c}
-	req := accountParams{}
+	req := struct {
+		userIDInPath
+		accountIDInPath
+	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -181,16 +134,20 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 // AddAccount POST /users/:userID/accounts
 func (handler *UserHandler) AddAccount(_c echo.Context) error {
 	c := Context{_c}
-	req := AddAccountRequest{}
+	req := struct {
+		userIDInPath
+		AddAccountJSONRequestBody
+	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
-		ID:          req.ID,
-		Type:        req.Type,
-		PrPermitted: req.PrPermitted,
+		ID:          *req.Id,
+		Type:        uint(*req.Type),
+		PrPermitted: bool(*req.PrPermitted),
+		URL:         *req.Url,
 	}
 	account, err := handler.srv.CreateAccount(ctx, req.UserID, &args)
 	if err != nil {
@@ -202,7 +159,11 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 // PatchAccount PATCH /users/:userID/accounts/:accountID
 func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	c := Context{_c}
-	req := EditAccountRequest{}
+	req := struct {
+		userIDInPath
+		accountIDInPath
+		EditUserAccountJSONRequestBody
+	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
@@ -210,10 +171,10 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.UpdateAccountArgs{
-		Name:        req.ID,
-		Type:        req.Type,
-		URL:         req.URL,
-		PrPermitted: req.PrPermitted,
+		Name:        optional.StringFrom(*req.Id), // TODO
+		Type:        optional.Int64From(int64(*req.Type)),
+		URL:         optional.StringFrom(*req.Url),
+		PrPermitted: optional.BoolFrom(bool(*req.PrPermitted)),
 	}
 	err = handler.srv.EditAccount(ctx, req.AccountID, req.UserID, &args)
 	if err != nil {
@@ -226,7 +187,10 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 // DeleteAccount DELETE /users/:userID/accounts/:accountID
 func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 	c := Context{_c}
-	req := accountParams{}
+	req := struct {
+		userIDInPath
+		accountIDInPath
+	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -242,7 +206,7 @@ func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 // GetProjects GET /users/:userID/projects
 func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	c := Context{_c}
-	req := userParam{}
+	req := userIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -252,13 +216,15 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*UserProjectResponse, 0, len(projects))
+	res := make([]*UserProject, 0, len(projects))
 	for _, v := range projects {
-		up := &UserProjectResponse{
-			ID:           v.ID,
-			Name:         v.Name,
-			Duration:     convertToProjectDuration(v.Since, v.Until),
-			UserDuration: convertToProjectDuration(v.UserSince, v.UserUntil),
+		up := &UserProject{
+			Project: Project{
+				Id:       v.ID,
+				Name:     v.Name,
+				Duration: convertToProjectDuration(v.Since, v.Until),
+			},
+			UserDuration: []ProjectDuration{convertToProjectDuration(v.UserSince, v.UserUntil)}, //TODO: objectでいいはず
 		}
 		res = append(res, up)
 	}
@@ -268,7 +234,7 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 // GetContests GET /users/:userID/contests
 func (handler *UserHandler) GetContests(_c echo.Context) error {
 	c := Context{_c}
-	req := userParam{}
+	req := userIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -278,12 +244,14 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*ContestTeamWithContestNameResponse, 0, len(contests))
+	res := make([]*ContestTeamWithContestName, 0, len(contests))
 	for _, v := range contests {
-		uc := &ContestTeamWithContestNameResponse{
-			ID:          v.ID,
-			Name:        v.Name,
-			Result:      v.Result,
+		uc := &ContestTeamWithContestName{
+			ContestTeam: ContestTeam{
+				Id:     v.ID,
+				Name:   v.Name,
+				Result: &v.Result,
+			},
 			ContestName: v.ContestName,
 		}
 		res = append(res, uc)
@@ -294,7 +262,7 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 // GetEvents GET /users/:userID/events
 func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	c := Context{_c}
-	req := userParam{}
+	req := userIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -304,14 +272,14 @@ func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*eventResponse, 0, len(events))
+	res := make([]*Event, 0, len(events))
 	for _, v := range events {
-		e := &eventResponse{
-			ID:   v.ID,
+		e := &Event{
+			Id:   v.ID,
 			Name: v.Name,
 			Duration: Duration{
 				Since: v.TimeStart,
-				Until: v.TimeEnd,
+				Until: &v.TimeEnd,
 			},
 		}
 		res = append(res, e)
