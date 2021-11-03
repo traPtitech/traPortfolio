@@ -10,12 +10,12 @@ type Contest struct {
 	ID        uuid.UUID
 	Name      string
 	TimeStart time.Time
-	TimeEnd   time.Time
+	TimeEnd   *time.Time
 }
 
 type ContestDetail struct {
 	Contest
-	Link        string
+	Link        *string
 	Description string
 	Teams       []*ContestTeam
 }

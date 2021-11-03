@@ -42,7 +42,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 					ID:        uuid.Nil,
 					Name:      "test1",
 					TimeStart: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
-					TimeEnd:   mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
+					// TimeEnd:   mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"), // TODO
 				},
 			},
 			expectedBody: []*Contest{

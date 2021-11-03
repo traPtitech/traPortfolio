@@ -31,7 +31,7 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 			ID:        v.ID,
 			Name:      v.Name,
 			TimeStart: v.Since,
-			TimeEnd:   v.Until,
+			TimeEnd:   &v.Until,
 		})
 	}
 	return result, nil
@@ -54,7 +54,7 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 			ID:        contest.ID,
 			Name:      contest.Name,
 			TimeStart: contest.Since,
-			TimeEnd:   contest.Until,
+			TimeEnd:   &contest.Until,
 		},
 		Link:        contest.Link,
 		Description: contest.Description,
@@ -69,7 +69,7 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
 		Description: args.Description,
-		Link:        args.Link,
+		Link:        &args.Link,
 		Since:       args.Since,
 		Until:       args.Until,
 	}
@@ -82,7 +82,7 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		ID:        contest.ID,
 		Name:      contest.Name,
 		TimeStart: contest.Since,
-		TimeEnd:   contest.Until,
+		TimeEnd:   &contest.Until,
 	}
 
 	return result, nil

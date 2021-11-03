@@ -38,17 +38,19 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*Contest, 0, len(contests))
-	for _, v := range contests {
-		res = append(res, &Contest{
+
+	res := make([]Contest, len(contests))
+	for i, v := range contests {
+		res[i] = Contest{
 			Id:   v.ID,
 			Name: v.Name,
 			Duration: Duration{
 				Since: v.TimeStart,
-				Until: &v.TimeEnd,
+				Until: v.TimeEnd,
 			},
-		})
+		}
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -65,13 +67,13 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	teams := make([]*ContestTeam, 0, len(contest.Teams))
-	for _, v := range contest.Teams {
-		teams = append(teams, &ContestTeam{
+	teams := make([]ContestTeam, len(contest.Teams))
+	for i, v := range contest.Teams {
+		teams[i] = ContestTeam{
 			Id:     v.ID,
 			Name:   v.Name,
 			Result: &v.Result,
-		})
+		}
 	}
 
 	res := &ContestDetail{
@@ -80,12 +82,12 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 			Name: contest.Name,
 			Duration: Duration{
 				Since: contest.TimeStart,
-				Until: &contest.TimeEnd,
+				Until: contest.TimeEnd,
 			},
 		},
-		Link:        &contest.Link,
+		Link:        contest.Link,
 		Description: contest.Description,
-		// Teams:       teams, //TODO
+		Teams:       teams,
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -101,12 +103,19 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	createReq := repository.CreateContestArgs{
-		Name:        *req.Name,
-		Description: *req.Description,
-		Link:        *req.Link,
-		Since:       req.Duration.Since,
-		Until:       *req.Duration.Until,
+	createReq := repository.CreateContestArgs{}
+	if req.Name != nil {
+		createReq.Name = *req.Name
+	}
+	if req.Description != nil {
+		createReq.Description = *req.Description
+	}
+	if req.Link != nil {
+		createReq.Link = *req.Link
+	}
+	if req.Duration != nil {
+		createReq.Since = req.Duration.Since
+		createReq.Until = *req.Duration.Until
 	}
 
 	contest, err := h.srv.CreateContest(ctx, &createReq)
@@ -118,9 +127,10 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		Name: contest.Name,
 		Duration: Duration{
 			Since: contest.TimeStart,
-			Until: &contest.TimeEnd,
+			Until: contest.TimeEnd,
 		},
 	}
+
 	return c.JSON(http.StatusCreated, res)
 }
 
@@ -141,14 +151,17 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		Name:        optional.StringFrom(req.Name),
 		Description: optional.StringFrom(req.Description),
 		Link:        optional.StringFrom(req.Link),
-		Since:       optional.TimeFrom(&req.Duration.Since),
-		Until:       optional.TimeFrom(req.Duration.Until),
+	}
+	if req.Duration != nil {
+		patchReq.Since = optional.TimeFrom(&req.Duration.Since)
+		patchReq.Until = optional.TimeFrom(req.Duration.Until)
 	}
 
 	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
 	if err != nil {
 		return convertError(err)
 	}
+
 	return c.NoContent(http.StatusCreated)
 }
 
@@ -208,13 +221,13 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	members := make([]*User, 0, len(contestTeam.Members))
-	for _, user := range contestTeam.Members {
-		members = append(members, &User{
+	members := make([]User, len(contestTeam.Members))
+	for i, user := range contestTeam.Members {
+		members[i] = User{
 			Id:       user.ID,
 			Name:     user.Name,
 			RealName: &user.RealName,
-		})
+		}
 	}
 
 	res := &ContestTeamDetail{
@@ -225,8 +238,9 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		},
 		Link:        &contestTeam.Link,
 		Description: contestTeam.Description,
-		// Members:     members, //TODO
+		Members:     members,
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -305,14 +319,15 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*User, 0, len(users))
-	for _, v := range users {
-		res = append(res, &User{
+	res := make([]User, len(users))
+	for i, v := range users {
+		res[i] = User{
 			Id:       v.ID,
 			Name:     v.Name,
 			RealName: &v.RealName,
-		})
+		}
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
