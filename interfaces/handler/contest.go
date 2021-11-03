@@ -138,11 +138,11 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	}
 
 	patchReq := repository.UpdateContestArgs{
-		Name:        optional.StringFrom(*req.Name),
-		Description: optional.StringFrom(*req.Description),
-		Link:        optional.StringFrom(*req.Link),
-		Since:       optional.TimeFrom(req.Duration.Since),
-		Until:       optional.TimeFrom(*req.Duration.Until),
+		Name:        optional.StringFrom(req.Name),
+		Description: optional.StringFrom(req.Description),
+		Link:        optional.StringFrom(req.Link),
+		Since:       optional.TimeFrom(&req.Duration.Since),
+		Until:       optional.TimeFrom(req.Duration.Until),
 	}
 
 	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
@@ -276,10 +276,10 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	args := repository.UpdateContestTeamArgs{
-		Name:        optional.StringFrom(*req.Name),
-		Result:      optional.StringFrom(*req.Result),
-		Link:        optional.StringFrom(*req.Link),
-		Description: optional.StringFrom(*req.Description),
+		Name:        optional.StringFrom(req.Name),
+		Result:      optional.StringFrom(req.Result),
+		Link:        optional.StringFrom(req.Link),
+		Description: optional.StringFrom(req.Description),
 	}
 
 	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)

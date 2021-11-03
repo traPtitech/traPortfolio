@@ -166,8 +166,8 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.StringFrom(random.AlphaNumeric(10)),
-					Check:       optional.BoolFrom(true),
+					Description: optional.NewString(random.AlphaNumeric(10), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -185,8 +185,8 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.StringFrom(random.AlphaNumeric(10)),
-					Check:       optional.BoolFrom(true),
+					Description: optional.NewString(random.AlphaNumeric(10), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -428,10 +428,10 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.StringFrom(random.AlphaNumeric(5)),
-					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
-					URL:         optional.StringFrom("https://" + random.AlphaNumeric(10)),
-					PrPermitted: optional.BoolFrom(true),
+					Name:        optional.NewString(random.AlphaNumeric(5), true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					URL:         optional.NewString("https://"+random.AlphaNumeric(10), true),
+					PrPermitted: optional.NewBool(true, true),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -452,10 +452,10 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.StringFrom(random.AlphaNumeric(5)),
-					Type:        optional.Int64From(int64(domain.HOMEPAGE)),
-					URL:         optional.StringFrom("https://" + random.AlphaNumeric(10)),
-					PrPermitted: optional.BoolFrom(true),
+					Name:        optional.NewString(random.AlphaNumeric(5), true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					URL:         optional.NewString("https://"+random.AlphaNumeric(10), true),
+					PrPermitted: optional.NewBool(true, true),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {

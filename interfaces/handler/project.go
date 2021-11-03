@@ -129,9 +129,9 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		return convertError(repository.ErrInvalidArg)
 	}
 	patchReq := repository.UpdateProjectArgs{
-		Name:        optional.StringFrom(*req.Name),
-		Description: optional.StringFrom(*req.Description),
-		Link:        optional.StringFrom(*req.Link),
+		Name:        optional.StringFrom(req.Name),
+		Description: optional.StringFrom(req.Description),
+		Link:        optional.StringFrom(req.Link),
 		Since:       since,
 		Until:       until,
 	}
