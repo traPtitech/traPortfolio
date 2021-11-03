@@ -209,7 +209,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		id  uuid.UUID
-		arg *repository.UpdateEventArg
+		arg *repository.UpdateEventLevelArg
 	}
 	tests := []struct {
 		name      string
@@ -223,13 +223,13 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				id:  random.UUID(),
-				arg: &repository.UpdateEventArg{
+				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelAnonymous,
 				},
 			},
 			setup: func(f fields, args args) {
 				e := f.event.(*mock_repository.MockEventRepository)
-				e.EXPECT().UpdateEvent(args.id, args.arg).Return(nil)
+				e.EXPECT().UpdateEventLevel(args.id, args.arg).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -247,7 +247,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			tt.setup(tt.fields, tt.args)
 			s := NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
-			tt.assertion(t, s.UpdateEvent(tt.args.ctx, tt.args.id, tt.args.arg))
+			tt.assertion(t, s.UpdateEventLevel(tt.args.ctx, tt.args.id, tt.args.arg))
 		})
 	}
 }

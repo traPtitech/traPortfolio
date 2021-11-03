@@ -143,3 +143,117 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestEventRepository_UpdateEventLevel(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		id  uuid.UUID
+		arg *repository.UpdateEventLevelArg
+	}
+	tests := []struct {
+		name      string
+		args      args
+		setup     func(f mockEventRepositoryFields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				id: sampleUUID,
+				arg: &repository.UpdateEventLevelArg{
+					Level: domain.EventLevelPublic,
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "level"}).
+							AddRow(args.id, domain.EventLevelAnonymous),
+					)
+				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=? WHERE `id` = ?")).
+					WithArgs(args.arg.Level, args.id).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "LevelNotFound",
+			args: args{
+				id: sampleUUID,
+				arg: &repository.UpdateEventLevelArg{
+					Level: domain.EventLevelPublic,
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnError(repository.ErrNotFound)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "DoNotUpdate",
+			args: args{
+				id: sampleUUID,
+				arg: &repository.UpdateEventLevelArg{
+					Level: domain.EventLevelPublic,
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "level"}).
+							AddRow(args.id, domain.EventLevelPublic), // equal to args.arg.Level
+					)
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UpdateError",
+			args: args{
+				id: sampleUUID,
+				arg: &repository.UpdateEventLevelArg{
+					Level: domain.EventLevelPublic,
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "level"}).
+							AddRow(args.id, domain.EventLevelAnonymous),
+					)
+				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=? WHERE `id` = ?")).
+					WithArgs(args.arg.Level, args.id).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			f := newMockEventRepositoryFields()
+			tt.setup(f, tt.args)
+			repo := NewEventRepository(f.h, f.api)
+			// Assertion
+			tt.assertion(t, repo.UpdateEventLevel(tt.args.id, tt.args.arg))
+		})
+	}
+}

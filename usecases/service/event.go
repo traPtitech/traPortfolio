@@ -47,6 +47,6 @@ func (s *EventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 	return event, nil
 }
 
-func (s *EventService) UpdateEvent(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventArg) error {
-	return s.event.UpdateEvent(id, arg)
+func (s *EventService) UpdateEventLevel(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+	return s.event.UpdateEventLevel(id, arg)
 }
