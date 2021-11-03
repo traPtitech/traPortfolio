@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"encoding/json"
@@ -9,33 +9,34 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
+	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
-func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) TestHandlers {
+func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) handler.TestHandlers {
 	t.Helper()
-	testHandlers := SetupTestApi(ctrl)
+	testHandlers := handler.SetupTestApi(ctrl)
 
 	return testHandlers
 }
 
-func doRequest(t *testing.T, handler func(echo.Context) error, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder, error) {
+func doRequest(t *testing.T, api handler.API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()
 
 	req := httptest.NewRequest(method, path, requestEncode(t, reqBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 
-	ctx := echo.New().NewContext(req, rec)
-	err := handler(ctx)
-	if err != nil {
-		return rec.Code, rec, err
-	}
+	e := echo.New()
+
+	infrastructure.Setup(e, api)
+	e.ServeHTTP(rec, req)
 
 	if resBody != nil {
 		responseDecode(t, rec, resBody)
 	}
 
-	return rec.Code, rec, nil
+	return rec.Code, rec
 }
 
 func requestEncode(t *testing.T, body interface{}) *strings.Reader {
