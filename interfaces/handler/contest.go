@@ -13,11 +13,11 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type contestIDInPath struct {
+type ContestIDInPath struct {
 	ContestID uuid.UUID `param:"contestID" validate:"is-uuid"`
 }
 
-type teamIDInPath struct {
+type TeamIDInPath struct {
 	TeamID uuid.UUID `param:"teamID" validate:"is-uuid"`
 }
 
@@ -55,7 +55,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 func (h *ContestHandler) GetContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := contestIDInPath{}
+	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -129,7 +129,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		contestIDInPath
+		ContestIDInPath
 		EditContestJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -156,7 +156,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := contestIDInPath{}
+	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -171,7 +171,7 @@ func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := contestIDInPath{}
+	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -197,8 +197,8 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		contestIDInPath
-		teamIDInPath
+		ContestIDInPath
+		TeamIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -235,7 +235,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		contestIDInPath
+		ContestIDInPath
 		PostContestTeamJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -267,8 +267,8 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	req := struct {
-		contestIDInPath
-		teamIDInPath
+		ContestIDInPath
+		TeamIDInPath
 		EditContestTeamJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -294,8 +294,8 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		contestIDInPath
-		teamIDInPath
+		ContestIDInPath
+		TeamIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -322,8 +322,8 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	req := struct {
-		contestIDInPath
-		teamIDInPath
+		ContestIDInPath
+		TeamIDInPath
 		MemberIDs
 	}{}
 	err := c.BindAndValidate(&req)
@@ -344,8 +344,8 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	req := struct {
-		contestIDInPath
-		teamIDInPath
+		ContestIDInPath
+		TeamIDInPath
 		MemberIDs
 	}{}
 	err := c.BindAndValidate(&req)

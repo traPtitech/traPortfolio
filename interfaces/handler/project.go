@@ -17,7 +17,7 @@ var (
 	semesterToMonth = [2]time.Month{time.August, time.December}
 )
 
-type projectIDInPath struct {
+type ProjectIDInPath struct {
 	ProjectID uuid.UUID `param:"projectID" validate:"is-uuid"`
 }
 
@@ -52,7 +52,7 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 // GetByID GET /projects/:projectID
 func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := projectIDInPath{}
+	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -115,7 +115,7 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		projectIDInPath
+		ProjectIDInPath
 		EditProjectJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -146,7 +146,7 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 // GetProjectMembers GET /projects/:projectID/members
 func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	c := Context{_c}
-	req := projectIDInPath{}
+	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -176,7 +176,7 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		projectIDInPath
+		ProjectIDInPath
 		AddProjectMembersJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -204,7 +204,7 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	req := struct {
-		projectIDInPath
+		ProjectIDInPath
 		DeleteProjectMembersJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)

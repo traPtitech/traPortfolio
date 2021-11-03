@@ -13,7 +13,7 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type eventIDInPath struct {
+type EventIDInPath struct {
 	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
 }
 
@@ -51,7 +51,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 // GetByID GET /events/:eventID
 func (h *EventHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := eventIDInPath{}
+	req := EventIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -69,7 +69,7 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	c := Context{_c}
 	req := struct {
-		eventIDInPath
+		EventIDInPath
 		EditEventJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {

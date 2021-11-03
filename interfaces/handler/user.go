@@ -12,11 +12,11 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type userIDInPath struct {
+type UserIDInPath struct {
 	UserID uuid.UUID `param:"userID" validate:"is-uuid"`
 }
 
-type accountIDInPath struct {
+type AccountIDInPath struct {
 	AccountID uuid.UUID `param:"accountID" validate:"is-uuid"`
 }
 
@@ -50,7 +50,7 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 // GetByID GET /users/:userID
 func (handler *UserHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := userIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -77,7 +77,7 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 func (handler *UserHandler) Update(_c echo.Context) error {
 	c := Context{_c}
 	req := struct {
-		userIDInPath
+		UserIDInPath
 		EditUserJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -99,7 +99,7 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 // GetAccounts GET /users/:userID/accounts
 func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 	c := Context{_c}
-	req := userIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -116,8 +116,8 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 func (handler *UserHandler) GetAccount(_c echo.Context) error {
 	c := Context{_c}
 	req := struct {
-		userIDInPath
-		accountIDInPath
+		UserIDInPath
+		AccountIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -135,7 +135,7 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 func (handler *UserHandler) AddAccount(_c echo.Context) error {
 	c := Context{_c}
 	req := struct {
-		userIDInPath
+		UserIDInPath
 		AddAccountJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -160,8 +160,8 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	c := Context{_c}
 	req := struct {
-		userIDInPath
-		accountIDInPath
+		UserIDInPath
+		AccountIDInPath
 		EditUserAccountJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -188,8 +188,8 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 	c := Context{_c}
 	req := struct {
-		userIDInPath
-		accountIDInPath
+		UserIDInPath
+		AccountIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -206,7 +206,7 @@ func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 // GetProjects GET /users/:userID/projects
 func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	c := Context{_c}
-	req := userIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -234,7 +234,7 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 // GetContests GET /users/:userID/contests
 func (handler *UserHandler) GetContests(_c echo.Context) error {
 	c := Context{_c}
-	req := userIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -262,7 +262,7 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 // GetEvents GET /users/:userID/events
 func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	c := Context{_c}
-	req := userIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
