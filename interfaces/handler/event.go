@@ -78,7 +78,7 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	patchReq := repository.UpdateEventArg{
-		// Level: *req.EventLevel, // TODO
+		Level: domain.EventLevel(*req.EventLevel),
 	}
 
 	if err := h.srv.UpdateEvent(ctx, req.EventID, &patchReq); err != nil {
@@ -88,16 +88,16 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 }
 
 func formatUserDetail(event *domain.EventDetail) *EventDetail {
-	userRes := make([]*User, 0, len(event.HostName))
-	for _, user := range event.HostName {
-		userRes = append(userRes, &User{
+	userRes := make([]User, 0, len(event.HostName))
+	for i, user := range event.HostName {
+		userRes[i] = User{
 			Id:       user.ID,
 			Name:     user.Name,
 			RealName: &user.RealName,
-		},
-		)
+		}
 	}
 
+	el := EventLevel(event.Level)
 	res := &EventDetail{
 		Event: Event{
 			Id:   event.ID,
@@ -109,8 +109,8 @@ func formatUserDetail(event *domain.EventDetail) *EventDetail {
 		},
 		Description: event.Description,
 		Place:       event.Place,
-		// Hostname:    userRes, // TODO
-		// EventLevel:  EventLevel(event.Level), // TODO
+		Hostname:    &userRes,
+		EventLevel:  &el,
 	}
 	return res
 }
