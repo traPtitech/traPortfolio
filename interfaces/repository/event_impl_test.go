@@ -317,7 +317,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 			},
 			want: []*domain.Event{
 				{
