@@ -95,3 +95,25 @@ comments:
   #   columnComments:
   #     achievement_id: 実績UUID
   #     user_id: ユーザーUUID
+  - table: groups
+    tableComment: グループテーブル
+    columnComments:
+      group_id: グループUUID
+      name: グループ名
+      link: グループのリンク
+      Leader: グループリーダーのユーザーUUID
+  - table: group_users
+    tableComment: グループ所属者テーブル
+    columnComments:
+      user_id: ユーザーUUID
+      name: ユーザー名
+      realname: ユーザー実名
+  - table: group_user_belongings
+    tableComment: グループとユーザー関係テーブル
+    columnComments:
+      user_id: ユーザーUUID
+      group_id: グループUUID
+      since_year: ユーザー所属開始年
+      since_semester: ユーザー所属開始学期
+      until_year: ユーザー所属終了年
+      until_semester: ユーザー所属終了学期
