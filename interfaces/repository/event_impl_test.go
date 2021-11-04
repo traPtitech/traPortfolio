@@ -301,3 +301,54 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		})
 	}
 }
+
+func TestEventRepository_GetUserEvents(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		id uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      []*domain.Event
+		setup     func(f mockEventRepositoryFields, args args, want []*domain.Event)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				id: sampleUUID,
+			},
+			want: []*domain.Event{
+				{
+					ID:        sampleUUID,
+					Name:      "第n回進捗回",
+					TimeStart: sampleTime,
+					TimeEnd:   sampleTime,
+				},
+				{
+					ID:        sample2UUID,
+					Name:      "sample event",
+					TimeStart: sampleTime,
+					TimeEnd:   sampleTime,
+				},
+			},
+			setup:     func(f mockEventRepositoryFields, args args, want []*domain.Event) {},
+			assertion: assert.NoError,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			f := newMockEventRepositoryFields()
+			tt.setup(f, tt.args, tt.want)
+			repo := NewEventRepository(f.h, f.api)
+			// Assertion
+			got, err := repo.GetUserEvents(tt.args.id)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
