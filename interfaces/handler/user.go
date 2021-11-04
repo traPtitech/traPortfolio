@@ -172,10 +172,14 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.UpdateAccountArgs{
-		Name:        optional.StringFrom(req.Id),
-		Type:        optional.NewInt64(int64(*req.Type), req.Type != nil), // TODO: req.Typeがnilのときpanicする
-		URL:         optional.StringFrom(req.Url),
-		PrPermitted: optional.NewBool(bool(*req.PrPermitted), req.PrPermitted != nil), // TODO: 同上
+		Name: optional.StringFrom(req.Id),
+		URL:  optional.StringFrom(req.Url),
+	}
+	if req.Type != nil {
+		args.Type = optional.NewInt64(int64(*req.Type), true)
+	}
+	if req.PrPermitted != nil {
+		args.PrPermitted = optional.NewBool(bool(*req.PrPermitted), true)
 	}
 	err = handler.srv.EditAccount(ctx, req.AccountID, req.UserID, &args)
 	if err != nil {
