@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
@@ -67,9 +68,9 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 			Name:     user.Name,
 			RealName: &user.RealName,
 		},
-		State: UserAccountState(user.State),
-		Bio:   user.Bio,
-		// Accounts: user.Accounts, // TODO
+		State:    UserAccountState(user.State),
+		Bio:      user.Bio,
+		Accounts: convertAccounts(user.Accounts),
 	})
 }
 
@@ -172,7 +173,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	ctx := c.Request().Context()
 	args := repository.UpdateAccountArgs{
 		Name:        optional.StringFrom(req.Id),
-		Type:        optional.NewInt64(int64(*req.Type), req.Type != nil), // TODO: req.TypeがAccountType型なのでInt64Fromが使えない
+		Type:        optional.NewInt64(int64(*req.Type), req.Type != nil), // TODO: req.Typeがnilのときpanicする
 		URL:         optional.StringFrom(req.Url),
 		PrPermitted: optional.NewBool(bool(*req.PrPermitted), req.PrPermitted != nil), // TODO: 同上
 	}
@@ -285,4 +286,17 @@ func (handler *UserHandler) GetEvents(_c echo.Context) error {
 		res = append(res, e)
 	}
 	return c.JSON(http.StatusOK, res)
+}
+
+func convertAccounts(a []*domain.Account) []Account {
+	res := make([]Account, len(a))
+	for i, v := range a {
+		res[i] = Account{
+			Id:          v.Name, // TODO: 変数名変える
+			Type:        AccountType(v.Type),
+			PrPermitted: PrPermitted(v.PrPermitted),
+			Url:         v.URL,
+		}
+	}
+	return res
 }
