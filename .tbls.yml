@@ -101,7 +101,7 @@ comments:
       group_id: グループUUID
       name: グループ名
       link: グループのリンク
-      Leader: グループリーダーのユーザーUUID
+      leader: グループリーダーのユーザーUUID
   - table: group_users
     tableComment: グループ所属者テーブル
     columnComments:
