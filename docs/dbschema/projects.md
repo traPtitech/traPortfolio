@@ -11,14 +11,14 @@
 CREATE TABLE `projects` (
   `id` char(36) NOT NULL,
   `name` varchar(32) DEFAULT NULL,
-  `description` text,
-  `link` text,
+  `description` text DEFAULT NULL,
+  `link` text DEFAULT NULL,
   `since` datetime(6) DEFAULT NULL,
   `until` datetime(6) DEFAULT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>
@@ -28,13 +28,13 @@ CREATE TABLE `projects` (
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [project_members](project_members.md) |  | プロジェクトUUID |
-| name | varchar(32) |  | true |  |  | プロジェクト名 |
-| description | text |  | true |  |  | プロジェクト説明 |
-| link | text |  | true |  |  | プロジェクト情報のリンク |
-| since | datetime(6) |  | true |  |  | プロジェクト開始期間 |
-| until | datetime(6) |  | true |  |  | プロジェクト終了期間 |
-| created_at | datetime(6) |  | true |  |  | プロジェクト作成日時 |
-| updated_at | datetime(6) |  | true |  |  | プロジェクト更新日時 |
+| name | varchar(32) | NULL | true |  |  | プロジェクト名 |
+| description | text | NULL | true |  |  | プロジェクト説明 |
+| link | text | NULL | true |  |  | プロジェクト情報のリンク |
+| since | datetime(6) | NULL | true |  |  | プロジェクト開始期間 |
+| until | datetime(6) | NULL | true |  |  | プロジェクト終了期間 |
+| created_at | datetime(6) | NULL | true |  |  | プロジェクト作成日時 |
+| updated_at | datetime(6) | NULL | true |  |  | プロジェクト更新日時 |
 
 ## Constraints
 

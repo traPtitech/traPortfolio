@@ -1,16 +1,16 @@
-# migrations
+# group_users
 
 ## Description
-
-gormigrate用のデータベースバージョンテーブル
 
 <details>
 <summary><strong>Table Definition</strong></summary>
 
 ```sql
-CREATE TABLE `migrations` (
-  `id` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE `group_users` (
+  `user_id` char(36) NOT NULL,
+  `name` varchar(32) DEFAULT NULL,
+  `realname` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -20,23 +20,25 @@ CREATE TABLE `migrations` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | varchar(255) |  | false |  |  |  |
+| user_id | char(36) |  | false |  |  |  |
+| name | varchar(32) | NULL | true |  |  |  |
+| realname | varchar(32) | NULL | true |  |  |  |
 
 ## Constraints
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
-| PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
+| PRIMARY | PRIMARY KEY | PRIMARY KEY (user_id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| PRIMARY | PRIMARY KEY (id) USING BTREE |
+| PRIMARY | PRIMARY KEY (user_id) USING BTREE |
 
 ## Relations
 
-![er](migrations.svg)
+![er](group_users.svg)
 
 ---
 
