@@ -4,16 +4,17 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type ContestRepository struct {
 	h      database.SQLHandler
-	portal repository.PortalRepository
+	portal external.PortalAPI
 }
 
-func NewContestRepository(sql database.SQLHandler, portal repository.PortalRepository) repository.ContestRepository {
+func NewContestRepository(sql database.SQLHandler, portal external.PortalAPI) repository.ContestRepository {
 	return &ContestRepository{h: sql, portal: portal}
 }
 
@@ -235,7 +236,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 		return nil, convertError(err)
 	}
 	result := make([]*domain.User, 0, len(belongings))
-	portalMp, err := repo.portal.MakeUserMp()
+	portalMap, err := repo.makePortalUserMap()
 
 	if err != nil {
 		return nil, convertError(err)
@@ -243,7 +244,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 
 	for _, v := range belongings {
 		u := v.User
-		portalUser, ok := portalMp[u.Name]
+		portalUser, ok := portalMap[u.Name]
 		name := ""
 		if ok {
 			name = portalUser.Name
@@ -330,6 +331,24 @@ func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, member
 	}
 	return nil
 
+}
+
+func (repo *ContestRepository) makePortalUserMap() (map[string]*domain.PortalUser, error) {
+	users, err := repo.portal.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	mp := make(map[string]*domain.PortalUser, len(users))
+
+	for _, v := range users {
+		mp[v.TraQID] = &domain.PortalUser{
+			ID:             v.TraQID,
+			Name:           v.RealName,
+			AlphabeticName: v.AlphabeticName,
+		}
+	}
+	return mp, nil
 }
 
 // Interface guards

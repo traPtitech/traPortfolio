@@ -64,18 +64,3 @@ func (mr *MockPortalRepositoryMockRecorder) GetUsers(ctx interface{}) *gomock.Ca
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockPortalRepository)(nil).GetUsers), ctx)
 }
-
-// MakeUserMp mocks base method.
-func (m *MockPortalRepository) MakeUserMp() (map[string]*domain.PortalUser, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MakeUserMp")
-	ret0, _ := ret[0].(map[string]*domain.PortalUser)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// MakeUserMp indicates an expected call of MakeUserMp.
-func (mr *MockPortalRepositoryMockRecorder) MakeUserMp() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeUserMp", reflect.TypeOf((*MockPortalRepository)(nil).MakeUserMp))
-}
