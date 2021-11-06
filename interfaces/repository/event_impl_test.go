@@ -3,7 +3,6 @@ package repository
 import (
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
@@ -20,7 +19,6 @@ import (
 var (
 	sampleUUID  = uuid.FromStringOrNil("3fa85f64-5717-4562-b3fc-2c963f66afa6")
 	sample2UUID = uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111")
-	sampleTime  = time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC)
 )
 
 type mockEventRepositoryFields struct {

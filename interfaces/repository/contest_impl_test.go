@@ -3,7 +3,6 @@ package repository
 import (
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
@@ -43,8 +42,8 @@ func TestContestRepository_GetContests(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(5),
-					TimeStart: time.Now(),
-					TimeEnd:   time.Now(),
+					TimeStart: sampleTime,
+					TimeEnd:   sampleTime,
 				},
 			},
 			setup: func(f mockContestRepositoryFields, want []*domain.Contest) {
@@ -110,8 +109,8 @@ func TestContestRepository_GetContest(t *testing.T) {
 				Contest: domain.Contest{
 					ID:        cid,
 					Name:      random.AlphaNumeric(5),
-					TimeStart: time.Now(),
-					TimeEnd:   time.Now(),
+					TimeStart: sampleTime,
+					TimeEnd:   sampleTime,
 				},
 				Link:        random.AlphaNumeric(5),
 				Description: random.AlphaNumeric(10),
@@ -163,6 +162,8 @@ func TestContestRepository_GetContest(t *testing.T) {
 }
 
 func TestContestRepository_CreateContest(t *testing.T) {
+	cname := random.AlphaNumeric(5) // Successで使用するContest.Name
+
 	t.Parallel()
 	type args struct {
 		args *repository.CreateContestArgs
@@ -174,7 +175,57 @@ func TestContestRepository_CreateContest(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args, want *domain.Contest)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				args: &repository.CreateContestArgs{
+					Name:        cname,
+					Description: random.AlphaNumeric(10),
+					Link:        random.AlphaNumeric(5),
+					Since:       sampleTime,
+					Until:       sampleTime,
+				},
+			},
+			want: &domain.Contest{
+				// ID: 比較しない
+				Name:      cname,
+				TimeStart: sampleTime,
+				TimeEnd:   sampleTime,
+			},
+			setup: func(f mockContestRepositoryFields, args args, want *domain.Contest) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				args: &repository.CreateContestArgs{
+					Name:        random.AlphaNumeric(5),
+					Description: random.AlphaNumeric(10),
+					Link:        random.AlphaNumeric(5),
+					Since:       sampleTime,
+					Until:       sampleTime,
+				},
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want *domain.Contest) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -187,7 +238,14 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
 			tt.assertion(t, err)
-			assert.Equal(t, tt.want, got)
+			if got == nil {
+				assert.Equal(t, tt.want, got)
+			} else {
+				// IDは比較しない
+				assert.Equal(t, tt.want.Name, got.Name)
+				assert.Equal(t, tt.want.TimeStart, got.TimeStart)
+				assert.Equal(t, tt.want.TimeEnd, got.TimeEnd)
+			}
 		})
 	}
 }
