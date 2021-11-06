@@ -1,8 +1,11 @@
 package repository
 
 import (
+	"regexp"
 	"testing"
+	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -11,6 +14,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 type mockContestRepositoryFields struct {
@@ -33,7 +37,39 @@ func TestContestRepository_GetContests(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, want []*domain.Contest)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			want: []*domain.Contest{
+				{
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(5),
+					TimeStart: time.Now(),
+					TimeEnd:   time.Now(),
+				},
+			},
+			setup: func(f mockContestRepositoryFields, want []*domain.Contest) {
+				rows := sqlmock.NewRows([]string{"id", "name", "since", "until"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.Name, v.TimeStart, v.TimeEnd)
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests`")).
+					WillReturnRows(rows)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			want: nil,
+			setup: func(f mockContestRepositoryFields, want []*domain.Contest) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests`")).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
