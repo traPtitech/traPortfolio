@@ -34,6 +34,14 @@ func (s *ContestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.
 	if err != nil {
 		return nil, err
 	}
+
+	teams, err := s.repo.GetContestTeams(id)
+	if err != nil {
+		return nil, err
+	}
+
+	contest.Teams = teams
+
 	return contest, nil
 }
 
