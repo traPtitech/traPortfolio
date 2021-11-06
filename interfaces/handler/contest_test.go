@@ -152,7 +152,18 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Success",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
 				want, hres := makeContest()
-				th.Repository.MockContestRepository.EXPECT().GetContest(want.ID).Return(want, nil)
+				th.Repository.MockContestRepository.EXPECT().GetContest(want.ID).Return(&domain.ContestDetail{
+					Contest: domain.Contest{
+						ID:        want.ID,
+						Name:      want.Name,
+						TimeStart: want.TimeStart,
+						TimeEnd:   want.TimeEnd,
+					},
+					Link:        want.Link,
+					Description: want.Description,
+					// Teams:
+				}, nil)
+				th.Repository.MockContestRepository.EXPECT().GetContestTeams(want.ID).Return(want.Teams, nil)
 				path := fmt.Sprintf("/api/v1/contests/%s", want.ID.String())
 
 				return want, hres, path
