@@ -51,4 +51,3 @@ rm-test-db:
 .PHONY: go-gen
 go-gen:
 	@go generate ./...
-	@go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest -generate types -package handler ./docs/swagger/traPortfolio.v1.yaml > interfaces/handler/types_gen.go
