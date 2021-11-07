@@ -99,7 +99,7 @@ type ContestDetail struct {
 	Description string `json:"description"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// コンテストチーム
 	Teams []ContestTeam `json:"teams"`
@@ -126,7 +126,7 @@ type ContestTeamDetail struct {
 	Description string `json:"description"`
 
 	// コンテストチームの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// チームメンバーのUUID
 	Members []User `json:"members"`
@@ -175,7 +175,7 @@ type EditContest struct {
 	Duration *Duration `json:"duration,omitempty"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// コンテスト名
 	Name *string `json:"name,omitempty"`
@@ -187,7 +187,7 @@ type EditContestTeam struct {
 	Description *string `json:"description,omitempty"`
 
 	// コンテストチームの説明が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// チーム名
 	Name *string `json:"name,omitempty"`
@@ -215,7 +215,7 @@ type EditProject struct {
 	Duration *ProjectDuration `json:"duration,omitempty"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// プロジェクト名
 	Name *string `json:"name,omitempty"`
@@ -292,7 +292,7 @@ type GroupDetail struct {
 	Leader User `json:"leader"`
 
 	// 班の詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// 班メンバー
 	Members []GroupMember `json:"members"`
@@ -350,7 +350,7 @@ type ProjectDetail struct {
 	Description string `json:"description"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty"`
+	Link *string `json:"link,omitempty" validate:"url"`
 
 	// プロジェクトメンバー
 	Members []ProjectMember `json:"members"`

@@ -198,109 +198,115 @@ func TestContestHandler_GetContest(t *testing.T) {
 	}
 }
 
-// func TestContestHandler_PostContest(t *testing.T) {
-// 	tests := []struct {
-// 		name       string
-// 		setup      func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string)
-// 		statusCode int
-// 	}{
-// 		{
-// 			name: "Success",
-// 			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
-// 				reqBody = &handler.PostContestJSONRequestBody{
-// 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-// 					Duration: handler.Duration{
-// 						Since: random.Time(),
-// 						Until: random.Time(),
-// 					},
-// 					Name: random.AlphaNumeric(rand.Intn(30) + 1),
-// 					Link: random.RandURLString(),
-// 				}
-// 				args := repository.CreateContestArgs{
-// 					Name:        reqBody.Name,
-// 					Description: reqBody.Description,
-// 					Link:        reqBody.Link,
-// 					Since:       reqBody.Duration.Since,
-// 					Until:       reqBody.Duration.Until,
-// 				}
-// 				want := domain.Contest{
-// 					ID:        random.UUID(),
-// 					Name:      args.Name,
-// 					TimeStart: args.Since,
-// 					TimeEnd:   args.Until,
-// 				}
-// 				expectedResBody = &handler.Contest{
-// 					Id:   want.ID,
-// 					Name: want.Name,
-// 					Duration: handler.Duration{
-// 						Since: want.TimeStart,
-// 						Until: &want.TimeEnd,
-// 					},
-// 				}
-// 				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(&want, nil)
-// 				path = "/api/v1/contests"
-// 				return reqBody, expectedResBody, &handler.Contest{}, path
-// 			},
-// 			statusCode: http.StatusCreated,
-// 		},
-// 		{
-// 			name: "Bad Request: invalid url",
-// 			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
-// 				reqBody = &handler.PostContestJSONRequestBody{
-// 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-// 					Duration: handler.Duration{
-// 						Since: random.Time(),
-// 						Until: random.Time(),
-// 					},
-// 					Name: random.AlphaNumeric(rand.Intn(30) + 1),
-// 					Link: random.AlphaNumeric(rand.Intn(30) + 1),
-// 				}
-// 				path = "/api/v1/contests"
-// 				return reqBody, nil, nil, path
-// 			},
-// 			statusCode: http.StatusBadRequest,
-// 		},
-// 		{
-// 			name: "Conflict",
-// 			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
-// 				reqBody = &handler.PostContestJSONRequestBody{
-// 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-// 					Duration: handler.Duration{
-// 						Since: random.Time(),
-// 						Until: random.Time(),
-// 					},
-// 					Name: random.AlphaNumeric(rand.Intn(30) + 1),
-// 					Link: random.RandURLString(),
-// 				}
-// 				args := repository.CreateContestArgs{
-// 					Name:        reqBody.Name,
-// 					Description: reqBody.Description,
-// 					Link:        reqBody.Link,
-// 					Since:       reqBody.Duration.Since,
-// 					Until:       reqBody.Duration.Until,
-// 				}
-// 				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(nil, repository.ErrAlreadyExists)
-// 				return reqBody, nil, nil, "/api/v1/contests"
-// 			},
-// 			statusCode: http.StatusConflict,
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Setup mock
-// 			ctrl := gomock.NewController(t)
-// 			handlers := SetupTestHandlers(t, ctrl)
+func makePostContestRequest(description string, since time.Time, until time.Time, name string, link string) *handler.PostContestJSONRequestBody {
+	return &handler.PostContestJSONRequestBody{
+		Description: &description,
+		Duration: &handler.Duration{
+			Since: since,
+			Until: &until,
+		},
+		Name: &name,
+		Link: &link,
+	}
+}
 
-// 			reqBody, res, resBody, path := tt.setup(&handlers)
+func TestContestHandler_PostContest(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
+				reqBody = makePostContestRequest(
+					random.AlphaNumeric(rand.Intn(30)+1),
+					random.Time(),
+					random.Time(),
+					random.AlphaNumeric(rand.Intn(30)+1),
+					random.RandURLString(),
+				)
+				args := repository.CreateContestArgs{
+					Name:        *reqBody.Name,
+					Description: *reqBody.Description,
+					Link:        *reqBody.Link,
+					Since:       reqBody.Duration.Since,
+					Until:       *reqBody.Duration.Until,
+				}
+				want := domain.Contest{
+					ID:        random.UUID(),
+					Name:      args.Name,
+					TimeStart: args.Since,
+					TimeEnd:   args.Until,
+				}
+				expectedResBody = &handler.Contest{
+					Id:   want.ID,
+					Name: want.Name,
+					Duration: handler.Duration{
+						Since: want.TimeStart,
+						Until: &want.TimeEnd,
+					},
+				}
+				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(&want, nil)
+				path = "/api/v1/contests"
+				return reqBody, expectedResBody, &handler.Contest{}, path
+			},
+			statusCode: http.StatusCreated,
+		},
+		{
+			name: "Bad Request: invalid url",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
+				reqBody = makePostContestRequest(
+					random.AlphaNumeric(rand.Intn(30)+1),
+					random.Time(),
+					random.Time(),
+					random.AlphaNumeric(rand.Intn(30)+1),
+					random.AlphaNumeric(rand.Intn(30)+1),
+				)
+				path = "/api/v1/contests"
+				return reqBody, nil, nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
+				reqBody = makePostContestRequest(
+					random.AlphaNumeric(rand.Intn(30)+1),
+					random.Time(),
+					random.Time(),
+					random.AlphaNumeric(rand.Intn(30)+1),
+					random.RandURLString(),
+				)
+				args := repository.CreateContestArgs{
+					Name:        *reqBody.Name,
+					Description: *reqBody.Description,
+					Link:        *reqBody.Link,
+					Since:       reqBody.Duration.Since,
+					Until:       *reqBody.Duration.Until,
+				}
+				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(nil, repository.ErrAlreadyExists)
+				return reqBody, nil, nil, "/api/v1/contests"
+			},
+			statusCode: http.StatusConflict,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
 
-// 			statusCode, _ := doRequest(t, handlers.API, http.MethodPost, path, reqBody, resBody)
+			reqBody, res, resBody, path := tt.setup(&handlers)
 
-// 			// Assertion
-// 			assert.Equal(t, tt.statusCode, statusCode)
-// 			assert.Equal(t, res, resBody)
-// 		})
-// 	}
-// }
+			statusCode, _ := doRequest(t, handlers.API, http.MethodPost, path, reqBody, resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, res, resBody)
+		})
+	}
+}
 
 // func TestContestHandler_PatchContest(t *testing.T) {
 // 	type fields struct {
