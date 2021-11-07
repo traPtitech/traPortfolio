@@ -529,6 +529,9 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 }
 
 func TestContestRepository_GetContestTeam(t *testing.T) {
+	cid := random.UUID() // Successで使うcontestID
+	tid := random.UUID() // Successで使うteamID
+
 	t.Parallel()
 	type args struct {
 		contestID uuid.UUID
@@ -541,7 +544,51 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				contestID: cid,
+				teamID:    tid,
+			},
+			want: &domain.ContestTeamDetail{
+				ContestTeam: domain.ContestTeam{
+					ID:        tid,
+					ContestID: cid,
+					Name:      random.AlphaNumeric(5),
+					Result:    random.AlphaNumeric(5),
+				},
+				Link:        random.AlphaNumeric(5),
+				Description: random.AlphaNumeric(10),
+				// Members
+			},
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID, args.contestID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id", "name", "result", "link", "description"}).
+							AddRow(want.ContestTeam.ID, want.ContestTeam.ContestID, want.ContestTeam.Name, want.ContestTeam.Result, want.Link, want.Description),
+					)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "NotFound",
+			args: args{
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID, args.contestID).
+					WillReturnError(repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
