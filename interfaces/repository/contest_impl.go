@@ -109,22 +109,21 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, changes map[string]in
 }
 
 func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
-	err := repo.h.First(&model.Contest{ID: id}).Error()
-	if err != nil {
-		return convertError(err)
-	}
-
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
-		err = tx.Delete(&model.Contest{}, &model.Contest{ID: id}).Error()
-		if err != nil {
-			return err
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := repo.h.First(&model.Contest{ID: id}).Error(); err != nil {
+			return convertError(err)
 		}
+
+		if err := tx.Delete(&model.Contest{}, &model.Contest{ID: id}).Error(); err != nil {
+			return convertError(err)
+		}
+
 		return nil
 	})
-
 	if err != nil {
 		return convertError(err)
 	}
+
 	return nil
 }
 
