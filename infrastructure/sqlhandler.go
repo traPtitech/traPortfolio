@@ -104,6 +104,11 @@ func (handler *SQLHandler) Model(value interface{}) database.SQLHandler {
 	return &SQLHandler{conn: db}
 }
 
+func (handler *SQLHandler) Update(column string, value interface{}) database.SQLHandler {
+	db := handler.conn.Update(column, value)
+	return &SQLHandler{conn: db}
+}
+
 func (handler *SQLHandler) Updates(values interface{}) database.SQLHandler {
 	db := handler.conn.Updates(values)
 	return &SQLHandler{conn: db}

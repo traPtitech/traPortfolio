@@ -77,11 +77,11 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	patchReq := repository.UpdateEventArg{
-		// Level: *req.EventLevel, // TODO
+	patchReq := repository.UpdateEventLevelArg{
+		Level: domain.EventLevel(*req.EventLevel),
 	}
 
-	if err := h.srv.UpdateEvent(ctx, req.EventID, &patchReq); err != nil {
+	if err := h.srv.UpdateEventLevel(ctx, req.EventID, &patchReq); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
