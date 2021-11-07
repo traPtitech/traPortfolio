@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen@latest -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+
 package service
 
 import (
@@ -8,16 +10,30 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type UserService struct {
+type UserService interface {
+	GetUsers(ctx context.Context) ([]*domain.User, error)
+	GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error)
+	Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error
+	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
+	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
+	CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error)
+	EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error
+	DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error
+	GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
+	GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error)
+	GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error)
+}
+
+type userService struct {
 	repo  repository.UserRepository
 	event repository.EventRepository
 }
 
 func NewUserService(userRepository repository.UserRepository, eventRepository repository.EventRepository) UserService {
-	return UserService{repo: userRepository, event: eventRepository}
+	return &userService{repo: userRepository, event: eventRepository}
 }
 
-func (s *UserService) GetUsers(ctx context.Context) ([]*domain.User, error) {
+func (s *userService) GetUsers(ctx context.Context) ([]*domain.User, error) {
 	users, err := s.repo.GetUsers()
 	if err != nil {
 		return nil, err
@@ -25,7 +41,7 @@ func (s *UserService) GetUsers(ctx context.Context) ([]*domain.User, error) {
 	return users, nil
 }
 
-func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error) {
+func (s *userService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error) {
 	user, err := s.repo.GetUser(id)
 	if err != nil {
 		return nil, err
@@ -33,7 +49,7 @@ func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 	return user, nil
 }
 
-func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
+func (s *userService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
 	changes := map[string]interface{}{}
 	if args.Description.Valid {
 		changes["description"] = args.Description.String
@@ -50,15 +66,15 @@ func (s *UserService) Update(ctx context.Context, id uuid.UUID, args *repository
 	return nil
 }
 
-func (s *UserService) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
+func (s *userService) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
 	return s.repo.GetAccount(userID, accountID)
 }
 
-func (s *UserService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
+func (s *userService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	return s.repo.GetAccounts(userID)
 }
 
-func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
+func (s *userService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
@@ -78,7 +94,7 @@ func (s *UserService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 
 }
 
-func (s *UserService) EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
+func (s *userService) EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -101,7 +117,7 @@ func (s *UserService) EditAccount(ctx context.Context, accountID uuid.UUID, user
 	return nil
 }
 
-func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
+func (s *userService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
@@ -112,7 +128,7 @@ func (s *UserService) DeleteAccount(ctx context.Context, accountid uuid.UUID, us
 
 }
 
-func (s *UserService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {
+func (s *userService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {
 	projects, err := s.repo.GetProjects(userID)
 	if err != nil {
 		return nil, err
@@ -120,7 +136,7 @@ func (s *UserService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]
 	return projects, nil
 }
 
-func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error) {
+func (s *userService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error) {
 	contests, err := s.repo.GetContests(userID)
 	if err != nil {
 		return nil, err
@@ -128,10 +144,15 @@ func (s *UserService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 	return contests, nil
 }
 
-func (s *UserService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
+func (s *userService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
 	events, err := s.event.GetUserEvents(userID)
 	if err != nil {
 		return nil, err
 	}
 	return events, nil
 }
+
+// Interface guards
+var (
+	_ UserService = (*userService)(nil)
+)

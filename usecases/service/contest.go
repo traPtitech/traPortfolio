@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen@latest -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+
 package service
 
 import (
@@ -10,17 +12,32 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type ContestService struct {
+type ContestService interface {
+	GetContests(ctx context.Context) ([]*domain.Contest, error)
+	GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error)
+	CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error)
+	UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error
+	DeleteContest(ctx context.Context, id uuid.UUID) error
+	GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error)
+	GetContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error)
+	CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
+	UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error
+	GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)
+	AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
+	DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
+}
+
+type contestService struct {
 	repo repository.ContestRepository
 }
 
 func NewContestService(repo repository.ContestRepository) ContestService {
-	return ContestService{
+	return &contestService{
 		repo,
 	}
 }
 
-func (s *ContestService) GetContests(ctx context.Context) ([]*domain.Contest, error) {
+func (s *contestService) GetContests(ctx context.Context) ([]*domain.Contest, error) {
 	contest, err := s.repo.GetContests()
 	if err != nil {
 		return nil, err
@@ -29,7 +46,7 @@ func (s *ContestService) GetContests(ctx context.Context) ([]*domain.Contest, er
 	return contest, nil
 }
 
-func (s *ContestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error) {
+func (s *contestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error) {
 	contest, err := s.repo.GetContest(id)
 	if err != nil {
 		return nil, err
@@ -37,7 +54,7 @@ func (s *ContestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.
 	return contest, nil
 }
 
-func (s *ContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (s *contestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
 	contest, err := s.repo.CreateContest(args)
 	if err != nil {
 		return nil, err
@@ -45,7 +62,7 @@ func (s *ContestService) CreateContest(ctx context.Context, args *repository.Cre
 	return contest, nil
 }
 
-func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
+func (s *contestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -71,7 +88,7 @@ func (s *ContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *
 	return nil
 }
 
-func (s *ContestService) DeleteContest(ctx context.Context, id uuid.UUID) error {
+func (s *contestService) DeleteContest(ctx context.Context, id uuid.UUID) error {
 	if err := s.repo.DeleteContest(id); err != nil {
 		return err
 	}
@@ -79,7 +96,7 @@ func (s *ContestService) DeleteContest(ctx context.Context, id uuid.UUID) error 
 	return nil
 }
 
-func (s *ContestService) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+func (s *contestService) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
 	contestTeams, err := s.repo.GetContestTeams(contestID)
 	if err != nil {
 		return nil, err
@@ -87,7 +104,7 @@ func (s *ContestService) GetContestTeams(ctx context.Context, contestID uuid.UUI
 	return contestTeams, nil
 }
 
-func (s *ContestService) GetContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
+func (s *contestService) GetContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
 	contestTeam, err := s.repo.GetContestTeam(contestID, teamID)
 	if err != nil {
 		return nil, err
@@ -103,7 +120,7 @@ func (s *ContestService) GetContestTeam(ctx context.Context, contestID uuid.UUID
 	return contestTeam, nil
 }
 
-func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
+func (s *contestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam, err := s.repo.CreateContestTeam(contestID, args)
 	if err != nil {
 		return nil, err
@@ -111,7 +128,7 @@ func (s *ContestService) CreateContestTeam(ctx context.Context, contestID uuid.U
 	return contestTeam, nil
 }
 
-func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
+func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -134,16 +151,21 @@ func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 	return nil
 }
 
-func (s *ContestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
 	return s.repo.GetContestTeamMembers(contestID, teamID)
 }
 
-func (s *ContestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	err := s.repo.AddContestTeamMembers(teamID, memberIDs)
 	return err
 }
 
-func (s *ContestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+func (s *contestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	err := s.repo.DeleteContestTeamMembers(teamID, memberIDs)
 	return err
 }
+
+// Interface guards
+var (
+	_ ContestService = (*contestService)(nil)
+)
