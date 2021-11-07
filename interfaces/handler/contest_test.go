@@ -36,7 +36,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 		{
 			name: "success",
 			setup: func(th *handler.TestHandlers, want []*domain.Contest) string {
-				th.Repository.MockContestRepository.EXPECT().GetContests().Return(want, nil)
+				th.Service.MockContestService.EXPECT().GetContests(gomock.Any()).Return(want, nil)
 				return "/api/v1/contests"
 			},
 			statusCode: http.StatusOK,
@@ -152,7 +152,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Success",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
 				want, hres := makeContest()
-				th.Repository.MockContestRepository.EXPECT().GetContest(want.ID).Return(want, nil)
+				th.Service.MockContestService.EXPECT().GetContest(gomock.Any(), want.ID).Return(want, nil)
 				path := fmt.Sprintf("/api/v1/contests/%s", want.ID.String())
 
 				return want, hres, path
@@ -171,7 +171,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Not Found",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
 				uid := random.UUID()
-				th.Repository.MockContestRepository.EXPECT().GetContest(uid).Return(nil, repository.ErrNotFound)
+				th.Service.MockContestService.EXPECT().GetContest(gomock.Any(), uid).Return(nil, repository.ErrNotFound)
 
 				return &domain.ContestDetail{}, &handler.ContestDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s", uid)
 			},
@@ -235,7 +235,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 						Until: want.TimeEnd,
 					},
 				}
-				th.Repository.MockContestRepository.EXPECT().CreateContest(&args).Return(&want, nil)
+				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(&want, nil)
 				path = "/api/v1/contests"
 				return reqBody, expectedResBody, &handler.ContestResponse{}, path
 			},
@@ -277,7 +277,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 					Since:       reqBody.Duration.Since,
 					Until:       reqBody.Duration.Until,
 				}
-				th.Repository.MockContestRepository.EXPECT().CreateContest(&args).Return(nil, repository.ErrAlreadyExists)
+				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, nil, nil, "/api/v1/contests"
 			},
 			statusCode: http.StatusConflict,
