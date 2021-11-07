@@ -65,13 +65,13 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	teams := make([]*ContestTeam, 0, len(contest.Teams))
-	for _, v := range contest.Teams {
-		teams = append(teams, &ContestTeam{
+	teams := make([]ContestTeam, len(contest.Teams))
+	for i, v := range contest.Teams {
+		teams[i] = ContestTeam{
 			Id:     v.ID,
 			Name:   v.Name,
 			Result: &v.Result,
-		})
+		}
 	}
 
 	res := &ContestDetail{
@@ -85,7 +85,7 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		},
 		Link:        &contest.Link,
 		Description: contest.Description,
-		// Teams:       teams, //TODO
+		Teams:       teams,
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -208,13 +208,13 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	members := make([]*User, 0, len(contestTeam.Members))
-	for _, user := range contestTeam.Members {
-		members = append(members, &User{
+	members := make([]User, len(contestTeam.Members))
+	for i, user := range contestTeam.Members {
+		members[i] = User{
 			Id:       user.ID,
 			Name:     user.Name,
 			RealName: &user.RealName,
-		})
+		}
 	}
 
 	res := &ContestTeamDetail{
@@ -225,7 +225,7 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		},
 		Link:        &contestTeam.Link,
 		Description: contestTeam.Description,
-		// Members:     members, //TODO
+		Members:     members,
 	}
 	return c.JSON(http.StatusOK, res)
 }

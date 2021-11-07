@@ -88,14 +88,13 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 }
 
 func formatUserDetail(event *domain.EventDetail) *EventDetail {
-	userRes := make([]*User, 0, len(event.HostName))
-	for _, user := range event.HostName {
-		userRes = append(userRes, &User{
+	userRes := make([]User, len(event.HostName))
+	for i, user := range event.HostName {
+		userRes[i] = User{
 			Id:       user.ID,
 			Name:     user.Name,
 			RealName: &user.RealName,
-		},
-		)
+		}
 	}
 
 	res := &EventDetail{
