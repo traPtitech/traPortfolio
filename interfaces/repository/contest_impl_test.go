@@ -457,6 +457,8 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 }
 
 func TestContestRepository_GetContestTeams(t *testing.T) {
+	cid := random.UUID() // Successで使うcontestID
+
 	t.Parallel()
 	type args struct {
 		contestID uuid.UUID
@@ -468,7 +470,47 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				contestID: cid,
+			},
+			want: []*domain.ContestTeam{
+				{
+					ID:        random.UUID(),
+					ContestID: cid,
+					Name:      random.AlphaNumeric(5),
+					Result:    random.AlphaNumeric(5),
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
+				rows := sqlmock.NewRows([]string{"id", "contest_id", "name", "result"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.ContestID, v.Name, v.Result)
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
+					WithArgs(args.contestID).
+					WillReturnRows(rows)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				contestID: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
+					WithArgs(args.contestID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
