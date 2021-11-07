@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -62,6 +61,25 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
+
+	members := make([]ProjectMember, len(project.Members))
+	for i, v := range project.Members {
+		until := timeToSem(v.Until)
+		members[i] = ProjectMember{
+			User: User{
+				Id:       v.UserID,
+				Name:     v.Name,
+				RealName: &v.RealName,
+			},
+			Duration: []ProjectDuration{
+				{
+					Since: timeToSem(v.Since),
+					Until: &until,
+				},
+			},
+		}
+	}
+
 	res := &ProjectDetail{
 		Project: Project{
 			Id:       project.ID,
@@ -70,7 +88,7 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 		},
 		Link:        &project.Link,
 		Description: project.Description,
-		Members:     convertToProjectMembers(project.Members),
+		Members:     members,
 		CreatedAt:   &project.CreatedAt,
 		UpdatedAt:   &project.UpdatedAt,
 	}
@@ -217,26 +235,4 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
-}
-
-// TODO:あとでけす
-func convertToProjectMembers(members []*domain.ProjectMember) []ProjectMember {
-	res := make([]ProjectMember, len(members))
-	for i, v := range members {
-		until := timeToSem(v.Until)
-		res[i] = ProjectMember{
-			User: User{
-				Id:       v.UserID,
-				Name:     v.Name,
-				RealName: &v.RealName,
-			},
-			Duration: []ProjectDuration{
-				{
-					Since: timeToSem(v.Since),
-					Until: &until,
-				},
-			},
-		}
-	}
-	return res
 }
