@@ -256,10 +256,10 @@ type EventDetail struct {
 	// 0 イベント企画者の名前を伏せて公開
 	// 1 全て公開
 	// 2 外部に非公開
-	EventLevel *EventLevel `json:"eventLevel,omitempty"`
+	EventLevel EventLevel `json:"eventLevel"`
 
 	// 主催者
-	Hostname *[]User `json:"hostname,omitempty"`
+	Hostname []User `json:"hostname"`
 
 	// 大学、オンラインなどの大まかな場所
 	Place string `json:"place"`

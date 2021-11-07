@@ -1008,6 +1008,8 @@ components:
           required:
             - description
             - place
+            - hostname
+            - eventLevel
       type: object
     Contest:
       title: Contest

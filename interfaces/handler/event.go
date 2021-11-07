@@ -108,8 +108,8 @@ func formatUserDetail(event *domain.EventDetail) *EventDetail {
 		},
 		Description: event.Description,
 		Place:       event.Place,
-		// Hostname:    userRes, // TODO
-		// EventLevel:  EventLevel(event.Level), // TODO
+		Hostname:    userRes,
+		EventLevel:  EventLevel(event.Level),
 	}
 	return res
 }
