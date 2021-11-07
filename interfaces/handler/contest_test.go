@@ -26,6 +26,8 @@ func mustParseTime(layout, value string) time.Time {
 }
 
 func TestContestHandler_GetContests(t *testing.T) {
+	until := mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00")
+
 	tests := []struct {
 		name         string
 		setup        func(th *handler.TestHandlers, want []*domain.Contest) (path string)
@@ -53,7 +55,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 					Name: "test1",
 					Duration: handler.Duration{
 						Since: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
-						// Until: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"), //TODO
+						Until: &until,
 					},
 				},
 			},
@@ -116,7 +118,7 @@ func makeContest() (*domain.ContestDetail, *handler.ContestDetail) {
 		},
 	}
 
-	teams := make([]handler.ContestTeam, 0, len(d.Teams))
+	teams := make([]handler.ContestTeam, len(d.Teams))
 	for i, v := range d.Teams {
 		teams[i] = handler.ContestTeam{
 			Id:     v.ID,
