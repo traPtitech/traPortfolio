@@ -61,15 +61,26 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 		return convertError(err)
 	}
 
+	accounts := make([]Account, len(user.Accounts))
+	for i, v := range user.Accounts {
+		accounts[i] = Account{
+			Id:          v.ID,
+			Name:        v.Name,
+			Type:        AccountType(v.Type),
+			Url:         v.URL,
+			PrPermitted: PrPermitted(v.PrPermitted),
+		}
+	}
+
 	return c.JSON(http.StatusOK, &UserDetail{
 		User: User{
 			Id:       user.ID,
 			Name:     user.Name,
 			RealName: &user.RealName,
 		},
-		State: UserAccountState(user.State),
-		Bio:   user.Bio,
-		// Accounts: user.Accounts, // TODO
+		State:    UserAccountState(user.State),
+		Bio:      user.Bio,
+		Accounts: accounts,
 	})
 }
 

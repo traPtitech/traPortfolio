@@ -831,6 +831,11 @@ components:
       properties:
         id:
           type: string
+          description: アカウントUUID
+          format: uuid
+          x-go-type: uuid.UUID
+        name:
+          type: string
           description: アカウントID
         type:
           $ref: '#/components/schemas/AccountType'
@@ -841,6 +846,7 @@ components:
           description: アカウントurl
       required:
         - id
+        - name
         - type
         - prPermitted
         - url

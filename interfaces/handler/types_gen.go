@@ -57,8 +57,11 @@ const (
 
 // アカウントへのリンク
 type Account struct {
+	// アカウントUUID
+	Id uuid.UUID `json:"id"`
+
 	// アカウントID
-	Id string `json:"id"`
+	Name string `json:"name"`
 
 	// 広報での利用が許可されているかどうか
 	PrPermitted PrPermitted `json:"prPermitted"`
