@@ -12,15 +12,15 @@ CREATE TABLE `contest_teams` (
   `id` char(36) NOT NULL,
   `contest_id` char(36) NOT NULL,
   `name` varchar(32) DEFAULT NULL,
-  `description` text,
-  `result` text,
-  `link` text,
+  `description` text DEFAULT NULL,
+  `result` text DEFAULT NULL,
+  `link` text DEFAULT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_contest_teams_contest` (`contest_id`),
   CONSTRAINT `fk_contest_teams_contest` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>
@@ -31,12 +31,12 @@ CREATE TABLE `contest_teams` (
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [contest_team_user_belongings](contest_team_user_belongings.md) |  | コンテストチームUUID |
 | contest_id | char(36) |  | false |  | [contests](contests.md) | コンテストUUID |
-| name | varchar(32) |  | true |  |  | チーム名 |
-| description | text |  | true |  |  | チーム情報 |
-| result | text |  | true |  |  | 順位などの結果 |
-| link | text |  | true |  |  | コンテストチームの詳細が載っているページへのリンク |
-| created_at | datetime(6) |  | true |  |  | コンテストチーム作成日時 |
-| updated_at | datetime(6) |  | true |  |  | コンテストチーム更新日時 |
+| name | varchar(32) | NULL | true |  |  | チーム名 |
+| description | text | NULL | true |  |  | チーム情報 |
+| result | text | NULL | true |  |  | 順位などの結果 |
+| link | text | NULL | true |  |  | コンテストチームの詳細が載っているページへのリンク |
+| created_at | datetime(6) | NULL | true |  |  | コンテストチーム作成日時 |
+| updated_at | datetime(6) | NULL | true |  |  | コンテストチーム更新日時 |
 
 ## Constraints
 

@@ -36,7 +36,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 		{
 			name: "success",
 			setup: func(th *handler.TestHandlers, want []*domain.Contest) string {
-				th.Repository.MockContestRepository.EXPECT().GetContests().Return(want, nil)
+				th.Service.MockContestService.EXPECT().GetContests(gomock.Any()).Return(want, nil)
 				return "/api/v1/contests"
 			},
 			statusCode: http.StatusOK,
@@ -152,7 +152,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Success",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
 				want, hres := makeContest()
-				th.Repository.MockContestRepository.EXPECT().GetContest(want.ID).Return(want, nil)
+				th.Service.MockContestService.EXPECT().GetContest(gomock.Any(), want.ID).Return(want, nil)
 				path := fmt.Sprintf("/api/v1/contests/%s", want.ID.String())
 
 				return want, hres, path
@@ -171,7 +171,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Not Found",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
 				uid := random.UUID()
-				th.Repository.MockContestRepository.EXPECT().GetContest(uid).Return(nil, repository.ErrNotFound)
+				th.Service.MockContestService.EXPECT().GetContest(gomock.Any(), uid).Return(nil, repository.ErrNotFound)
 
 				return &domain.ContestDetail{}, &handler.ContestDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s", uid)
 			},
@@ -196,36 +196,109 @@ func TestContestHandler_GetContest(t *testing.T) {
 	}
 }
 
-// func TestContestHandler_PostContest(t *testing.T) {
-// 	type fields struct {
-// 		srv service.ContestService
-// 	}
-// 	type args struct {
-// 		_c echo.Context
-// 	}
-// 	tests := []struct {
-// 		name      string
-// 		fields    fields
-// 		args      args
-// 		setup     func(f fields, args args)
-// 		assertion assert.ErrorAssertionFunc
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Setup mock
-// 			ctrl := gomock.NewController(t)
-// 			tt.fields = fields{
-// 				srv: mock_service.NewMockContestService(ctrl),
-// 			}
-// 			tt.setup(tt.fields, tt.args)
-// 			h := NewContestHandler(tt.fields.srv)
-// 			// Assertion
-// 			tt.assertion(t, h.PostContest(tt.args._c))
-// 		})
-// 	}
-// }
+func TestContestHandler_PostContest(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(th *handler.TestHandlers) (reqBody *handler.PostContestRequest, expectedResBody *handler.ContestResponse, resBody *handler.ContestResponse, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestRequest, expectedResBody *handler.ContestResponse, resBody *handler.ContestResponse, path string) {
+				reqBody = &handler.PostContestRequest{
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Duration: handler.Duration{
+						Since: random.Time(),
+						Until: random.Time(),
+					},
+					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link: random.RandURLString(),
+				}
+				args := repository.CreateContestArgs{
+					Name:        reqBody.Name,
+					Description: reqBody.Description,
+					Link:        reqBody.Link,
+					Since:       reqBody.Duration.Since,
+					Until:       reqBody.Duration.Until,
+				}
+				want := domain.Contest{
+					ID:        random.UUID(),
+					Name:      args.Name,
+					TimeStart: args.Since,
+					TimeEnd:   args.Until,
+				}
+				expectedResBody = &handler.ContestResponse{
+					ID:   want.ID,
+					Name: want.Name,
+					Duration: handler.Duration{
+						Since: want.TimeStart,
+						Until: want.TimeEnd,
+					},
+				}
+				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(&want, nil)
+				path = "/api/v1/contests"
+				return reqBody, expectedResBody, &handler.ContestResponse{}, path
+			},
+			statusCode: http.StatusCreated,
+		},
+		{
+			name: "Bad Request: invalid url",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestRequest, expectedResBody *handler.ContestResponse, resBody *handler.ContestResponse, path string) {
+				reqBody = &handler.PostContestRequest{
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Duration: handler.Duration{
+						Since: random.Time(),
+						Until: random.Time(),
+					},
+					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link: random.AlphaNumeric(rand.Intn(30) + 1),
+				}
+				path = "/api/v1/contests"
+				return reqBody, nil, nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.PostContestRequest, expectedResBody *handler.ContestResponse, resBody *handler.ContestResponse, path string) {
+				reqBody = &handler.PostContestRequest{
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Duration: handler.Duration{
+						Since: random.Time(),
+						Until: random.Time(),
+					},
+					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link: random.RandURLString(),
+				}
+				args := repository.CreateContestArgs{
+					Name:        reqBody.Name,
+					Description: reqBody.Description,
+					Link:        reqBody.Link,
+					Since:       reqBody.Duration.Since,
+					Until:       reqBody.Duration.Until,
+				}
+				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(nil, repository.ErrAlreadyExists)
+				return reqBody, nil, nil, "/api/v1/contests"
+			},
+			statusCode: http.StatusConflict,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			reqBody, res, resBody, path := tt.setup(&handlers)
+
+			statusCode, _ := doRequest(t, handlers.API, http.MethodPost, path, reqBody, resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, res, resBody)
+		})
+	}
+}
 
 // func TestContestHandler_PatchContest(t *testing.T) {
 // 	type fields struct {

@@ -11,14 +11,14 @@
 CREATE TABLE `contests` (
   `id` char(36) NOT NULL,
   `name` varchar(32) DEFAULT NULL,
-  `description` text,
-  `link` text,
+  `description` text DEFAULT NULL,
+  `link` text DEFAULT NULL,
   `since` datetime(6) DEFAULT NULL,
   `until` datetime(6) DEFAULT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>
@@ -28,13 +28,13 @@ CREATE TABLE `contests` (
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [contest_teams](contest_teams.md) |  | コンテストUUID |
-| name | varchar(32) |  | true |  |  | コンテスト名 |
-| description | text |  | true |  |  | コンテスト説明 |
-| link | text |  | true |  |  | コンテスト情報のリンク |
-| since | datetime(6) |  | true |  |  | 期間始まり |
-| until | datetime(6) |  | true |  |  | 期間終わり |
-| created_at | datetime(6) |  | true |  |  | コンテスト作成日時 |
-| updated_at | datetime(6) |  | true |  |  | コンテスト更新日時 |
+| name | varchar(32) | NULL | true |  |  | コンテスト名 |
+| description | text | NULL | true |  |  | コンテスト説明 |
+| link | text | NULL | true |  |  | コンテスト情報のリンク |
+| since | datetime(6) | NULL | true |  |  | 期間始まり |
+| until | datetime(6) | NULL | true |  |  | 期間終わり |
+| created_at | datetime(6) | NULL | true |  |  | コンテスト作成日時 |
+| updated_at | datetime(6) | NULL | true |  |  | コンテスト更新日時 |
 
 ## Constraints
 

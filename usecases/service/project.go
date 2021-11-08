@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen@latest -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+
 package service
 
 import (
@@ -9,19 +11,29 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type ProjectService struct {
+type ProjectService interface {
+	GetProjects(ctx context.Context) ([]*domain.Project, error)
+	GetProject(ctx context.Context, id uuid.UUID) (*domain.Project, error)
+	CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error)
+	UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error
+	GetProjectMembers(ctx context.Context, id uuid.UUID) ([]*domain.User, error)
+	AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error
+	DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error
+}
+
+type projectService struct {
 	repo   repository.ProjectRepository
 	portal repository.PortalRepository
 }
 
 func NewProjectService(projectRepository repository.ProjectRepository, portalRepository repository.PortalRepository) ProjectService {
-	return ProjectService{
+	return &projectService{
 		repo:   projectRepository,
 		portal: portalRepository,
 	}
 }
 
-func (s *ProjectService) GetProjects(ctx context.Context) ([]*domain.Project, error) {
+func (s *projectService) GetProjects(ctx context.Context) ([]*domain.Project, error) {
 	res, err := s.repo.GetProjects()
 	if err != nil {
 		return nil, err
@@ -29,7 +41,7 @@ func (s *ProjectService) GetProjects(ctx context.Context) ([]*domain.Project, er
 	return res, nil
 }
 
-func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.Project, error) {
+func (s *projectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.Project, error) {
 	project, err := s.repo.GetProject(id)
 	if err != nil {
 		return nil, err
@@ -48,7 +60,7 @@ func (s *ProjectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 	return project, nil
 }
 
-func (s *ProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
+func (s *projectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
 	uid := uuid.Must(uuid.NewV4())
 	project := &model.Project{
 		ID:          uid,
@@ -65,7 +77,7 @@ func (s *ProjectService) CreateProject(ctx context.Context, args *repository.Cre
 	return res, nil
 }
 
-func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {
+func (s *projectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -91,7 +103,7 @@ func (s *ProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 	return nil
 }
 
-func (s *ProjectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([]*domain.User, error) {
+func (s *projectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([]*domain.User, error) {
 	members, err := s.repo.GetProjectMembers(id)
 	if err != nil {
 		return nil, err
@@ -110,7 +122,7 @@ func (s *ProjectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([
 	return members, nil
 }
 
-func (s *ProjectService) AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
+func (s *projectService) AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
 	err := s.repo.AddProjectMembers(projectID, args)
 	if err != nil {
 		return err
@@ -118,10 +130,15 @@ func (s *ProjectService) AddProjectMembers(ctx context.Context, projectID uuid.U
 	return nil
 }
 
-func (s *ProjectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
+func (s *projectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
 	err := s.repo.DeleteProjectMembers(projectID, memberIDs)
 	if err != nil {
 		return err
 	}
 	return err
 }
+
+// Interface guards
+var (
+	_ ProjectService = (*projectService)(nil)
+)
