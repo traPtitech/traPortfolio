@@ -102,12 +102,6 @@ comments:
       name: グループ名
       link: グループのリンク
       leader: グループリーダーのユーザーUUID
-  - table: group_users
-    tableComment: グループ所属者テーブル
-    columnComments:
-      user_id: ユーザーUUID
-      name: ユーザー名
-      realname: ユーザー実名
   - table: group_user_belongings
     tableComment: グループとユーザー関係テーブル
     columnComments:

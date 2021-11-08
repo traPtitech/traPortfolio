@@ -23,7 +23,6 @@ func AllTables() []interface{} {
 		model.ContestTeam{},
 		model.ContestTeamUserBelonging{},
 		model.Group{},
-		model.GroupUser{},
 		model.GroupUserBelonging{},
 	}
 }

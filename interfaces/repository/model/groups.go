@@ -15,16 +15,6 @@ func (*Group) TableName() string {
 	return "groups"
 }
 
-type GroupUser struct {
-	UserID   uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Name     string    `gorm:"type:varchar(32)"`
-	Realname string    `gorm:"type:varchar(32)"`
-}
-
-func (*GroupUser) TableName() string {
-	return "group_users"
-}
-
 type GroupUserBelonging struct {
 	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	GroupID       uuid.UUID `gorm:"type:char(36);not null"`
