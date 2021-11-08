@@ -188,7 +188,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	return c.NoContent(http.StatusCreated)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteContest DELETE /contests/:contestID
