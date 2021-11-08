@@ -24,6 +24,7 @@ type GroupUserBelonging struct {
 	UntilSemester uint      `gorm:"type:tinyint(1);not null"`
 
 	Group Group `gorm:"foreignKey:GroupID"`
+	User  User  `gorm:"foreignKey:UserID"`
 }
 
 func (*GroupUserBelonging) TableName() string {
