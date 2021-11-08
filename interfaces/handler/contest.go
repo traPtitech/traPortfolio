@@ -39,10 +39,12 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
+
 	res := make([]Contest, len(contests))
 	for i, v := range contests {
 		res[i] = newContest(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -61,11 +63,7 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 
 	teams := make([]ContestTeam, len(contest.Teams))
 	for i, v := range contest.Teams {
-		teams[i] = ContestTeam{
-			Id:     v.ID,
-			Name:   v.Name,
-			Result: &v.Result,
-		}
+		teams[i] = newContestTeam(v.ID, v.Name, v.Result)
 	}
 
 	res := newContestDetail(
@@ -100,14 +98,9 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := Contest{
-		Id:   contest.ID,
-		Name: contest.Name,
-		Duration: Duration{
-			Since: contest.TimeStart,
-			Until: &contest.TimeEnd,
-		},
-	}
+
+	res := newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd)
+
 	return c.JSON(http.StatusCreated, res)
 }
 
@@ -162,20 +155,17 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
+
 	contestTeams, err := h.srv.GetContestTeams(ctx, req.ContestID)
 	if err != nil {
 		return convertError(err)
 	}
 
-	res := make([]*ContestTeam, 0, len(contestTeams))
-	for _, v := range contestTeams {
-		ct := &ContestTeam{
-			Id:     v.ID,
-			Name:   v.Name,
-			Result: &v.Result,
-		}
-		res = append(res, ct)
+	res := make([]ContestTeam, len(contestTeams))
+	for i, v := range contestTeams {
+		res[i] = newContestTeam(v.ID, v.Name, v.Result)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -204,16 +194,13 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		}
 	}
 
-	res := &ContestTeamDetail{
-		ContestTeam: ContestTeam{
-			Id:     contestTeam.ID,
-			Name:   contestTeam.Name,
-			Result: &contestTeam.Result,
-		},
-		Link:        &contestTeam.Link,
-		Description: contestTeam.Description,
-		Members:     members,
-	}
+	res := newContestTeamDetail(
+		newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result),
+		contestTeam.Link,
+		contestTeam.Description,
+		members,
+	)
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -240,11 +227,8 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := &ContestTeam{
-		Id:     contestTeam.ID,
-		Name:   contestTeam.Name,
-		Result: &contestTeam.Result,
-	}
+	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result)
+
 	return c.JSON(http.StatusCreated, res)
 }
 
@@ -364,5 +348,22 @@ func newContestDetail(contest Contest, link string, description string, teams []
 		Link:        &link,
 		Description: description,
 		Teams:       teams,
+	}
+}
+
+func newContestTeam(id uuid.UUID, name string, result string) ContestTeam {
+	return ContestTeam{
+		Id:     id,
+		Name:   name,
+		Result: &result,
+	}
+}
+
+func newContestTeamDetail(team ContestTeam, link string, description string, members []User) ContestTeamDetail {
+	return ContestTeamDetail{
+		ContestTeam: team,
+		Link:        &link,
+		Description: description,
+		Members:     members,
 	}
 }
