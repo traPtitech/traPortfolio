@@ -225,25 +225,21 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 }
 
 func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uuid.UUID) error {
-	if contestID == uuid.Nil || teamID == uuid.Nil {
-		return repository.ErrNilID
-	}
-
 	err := repo.h.First(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
 		err = tx.Delete(&model.ContestTeam{}, &model.ContestTeam{ID: teamID}).Error()
 		if err != nil {
-			return err
+			return convertError(err)
 		}
 		return nil
 	})
 
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
