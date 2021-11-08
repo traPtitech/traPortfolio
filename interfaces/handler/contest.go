@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
@@ -38,16 +39,9 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*Contest, 0, len(contests))
-	for _, v := range contests {
-		res = append(res, &Contest{
-			Id:   v.ID,
-			Name: v.Name,
-			Duration: Duration{
-				Since: v.TimeStart,
-				Until: &v.TimeEnd,
-			},
-		})
+	res := make([]Contest, len(contests))
+	for i, v := range contests {
+		res[i] = newContest(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
 	return c.JSON(http.StatusOK, res)
 }
@@ -74,19 +68,12 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		}
 	}
 
-	res := &ContestDetail{
-		Contest: Contest{
-			Id:   contest.ID,
-			Name: contest.Name,
-			Duration: Duration{
-				Since: contest.TimeStart,
-				Until: &contest.TimeEnd,
-			},
-		},
-		Link:        &contest.Link,
-		Description: contest.Description,
-		Teams:       teams,
-	}
+	res := newContestDetail(
+		newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd),
+		contest.Link,
+		contest.Description,
+		teams,
+	)
 
 	return c.JSON(http.StatusOK, res)
 }
@@ -358,4 +345,24 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func newContest(id uuid.UUID, name string, since time.Time, until time.Time) Contest {
+	return Contest{
+		Id:   id,
+		Name: name,
+		Duration: Duration{
+			Since: since,
+			Until: &until,
+		},
+	}
+}
+
+func newContestDetail(contest Contest, link string, description string, teams []ContestTeam) ContestDetail {
+	return ContestDetail{
+		Contest:     contest,
+		Link:        &link,
+		Description: description,
+		Teams:       teams,
+	}
 }
