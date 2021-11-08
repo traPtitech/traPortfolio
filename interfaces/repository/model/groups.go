@@ -17,7 +17,7 @@ func (*Group) TableName() string {
 
 type GroupUserBelonging struct {
 	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	GroupID       uuid.UUID `gorm:"type:char(36);not null"`
+	GroupID       uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	SinceYear     uint      `gorm:"type:tinyint(1);not null"`
 	SinceSemester uint      `gorm:"type:tinyint(1);not null"`
 	UntilYear     uint      `gorm:"type:tinyint(1);not null"`
