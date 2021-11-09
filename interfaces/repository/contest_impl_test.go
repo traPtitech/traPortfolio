@@ -607,6 +607,14 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 }
 
 func TestContestRepository_CreateContestTeam(t *testing.T) {
+	cid := random.UUID() // Successで使うcontestID
+	successArgs := repository.CreateContestTeamArgs{
+		Name:        random.AlphaNumeric(5),
+		Result:      random.AlphaNumeric(5),
+		Link:        random.AlphaNumeric(5),
+		Description: random.AlphaNumeric(10),
+	}
+
 	t.Parallel()
 	type args struct {
 		contestID    uuid.UUID
@@ -619,7 +627,57 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				contestID:    cid,
+				_contestTeam: &successArgs,
+			},
+			want: &domain.ContestTeamDetail{
+				ContestTeam: domain.ContestTeam{
+					// ID: Assertion前にgot.IDと合わせる
+					ContestID: cid,
+					Name:      successArgs.Name,
+					Result:    successArgs.Result,
+				},
+				Link:        successArgs.Link,
+				Description: successArgs.Description,
+				Members:     nil,
+			},
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `contest_teams` (`id`,`contest_id`,`name`,`description`,`result`,`link`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.contestID, args._contestTeam.Name, args._contestTeam.Description, args._contestTeam.Result, args._contestTeam.Link, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				contestID: cid,
+				_contestTeam: &repository.CreateContestTeamArgs{
+					Name:        random.AlphaNumeric(5),
+					Result:      random.AlphaNumeric(5),
+					Link:        random.AlphaNumeric(5),
+					Description: random.AlphaNumeric(10),
+				},
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `contest_teams` (`id`,`contest_id`,`name`,`description`,`result`,`link`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.contestID, args._contestTeam.Name, args._contestTeam.Description, args._contestTeam.Result, args._contestTeam.Link, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -631,6 +689,9 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContestTeam(tt.args.contestID, tt.args._contestTeam)
+			if tt.want != nil && got != nil {
+				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
+			}
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
