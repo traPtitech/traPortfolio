@@ -188,7 +188,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				},
 			},
 			want: &domain.Contest{
-				// ID: 比較しない
+				// ID: Assertion時にgot.IDと合わせる
 				Name:      cname,
 				TimeStart: sampleTime,
 				TimeEnd:   sampleTime,
@@ -238,15 +238,11 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
-			tt.assertion(t, err)
-			if got == nil {
-				assert.Equal(t, tt.want, got)
-			} else {
-				// IDは比較しない
-				assert.Equal(t, tt.want.Name, got.Name)
-				assert.Equal(t, tt.want.TimeStart, got.TimeStart)
-				assert.Equal(t, tt.want.TimeEnd, got.TimeEnd)
+			if tt.want != nil && got != nil {
+				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
 			}
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -635,7 +631,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			},
 			want: &domain.ContestTeamDetail{
 				ContestTeam: domain.ContestTeam{
-					// ID: Assertion前にgot.IDと合わせる
+					// ID: Assertion時にgot.IDと合わせる
 					ContestID: cid,
 					Name:      successArgs.Name,
 					Result:    successArgs.Result,
