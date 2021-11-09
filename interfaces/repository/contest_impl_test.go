@@ -1088,7 +1088,109 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				for _, member := range args.members {
+					rows.AddRow(args.teamID, member)
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, random.UUID()),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(rows)
+				h.Mock.ExpectBegin()
+				for _, v := range args.members {
+					h.Mock.
+						ExpectExec(regexp.QuoteMeta("DELETE FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ? AND `contest_team_user_belongings`.`user_id` = ?")).
+						WithArgs(args.teamID, v).
+						WillReturnResult(sqlmock.NewResult(1, 1))
+				}
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ContestTeamNotFound",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnError(repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindBelongings",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, random.UUID()),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_DeleteBelongings",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				for _, member := range args.members {
+					rows.AddRow(args.teamID, member)
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, random.UUID()),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(rows)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("DELETE FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ? AND `contest_team_user_belongings`.`user_id` = ?")).
+					WithArgs(args.teamID, args.members[0]).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt

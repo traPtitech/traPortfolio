@@ -296,19 +296,19 @@ func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, member
 		return err
 	}
 
-	curMp := make(map[uuid.UUID]struct{}, len(members))
-	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(_cur).Error()
+	belongings := make(map[uuid.UUID]struct{}, len(members))
+	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
+	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(&_belongings).Error()
 	if err != nil {
 		return err
 	}
-	for _, v := range _cur {
-		curMp[v.UserID] = struct{}{}
+	for _, v := range _belongings {
+		belongings[v.UserID] = struct{}{}
 	}
 
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
 		for _, memberID := range members {
-			if _, ok := curMp[memberID]; ok {
+			if _, ok := belongings[memberID]; ok {
 				err = tx.Delete(&model.ContestTeamUserBelonging{}, &model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
 				if err != nil {
 					return err
