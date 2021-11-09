@@ -113,7 +113,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 					TimeStart: sampleTime,
 					TimeEnd:   sampleTime,
 				},
-				Link:        random.AlphaNumeric(5),
+				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(10),
 				// Teams:
 			},
@@ -182,7 +182,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(5),
+					Link:        random.RandURLString(),
 					Since:       sampleTime,
 					Until:       sampleTime,
 				},
@@ -210,7 +210,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(5),
 					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(5),
+					Link:        random.RandURLString(),
 					Since:       sampleTime,
 					Until:       sampleTime,
 				},
@@ -553,7 +553,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 					Name:      random.AlphaNumeric(5),
 					Result:    random.AlphaNumeric(5),
 				},
-				Link:        random.AlphaNumeric(5),
+				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(10),
 				// Members
 			},
@@ -607,7 +607,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(5),
 		Result:      random.AlphaNumeric(5),
-		Link:        random.AlphaNumeric(5),
+		Link:        random.RandURLString(),
 		Description: random.AlphaNumeric(10),
 	}
 
@@ -658,7 +658,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(5),
 					Result:      random.AlphaNumeric(5),
-					Link:        random.AlphaNumeric(5),
+					Link:        random.RandURLString(),
 					Description: random.AlphaNumeric(10),
 				},
 			},
