@@ -217,7 +217,7 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 }
 
 func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	belongings := make([]*model.ContestTeamUserBelonging, 0)
+	var belongings []*model.ContestTeamUserBelonging
 	err := repo.h.
 		Preload("User").
 		Where(model.ContestTeamUserBelonging{TeamID: teamID}).
@@ -235,16 +235,15 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 
 	for _, v := range belongings {
 		u := v.User
-		portalUser, ok := portalMap[u.Name]
-		name := ""
-		if ok {
-			name = portalUser.Name
+		newUser := domain.User{
+			ID:   u.ID,
+			Name: u.Name,
 		}
-		result = append(result, &domain.User{
-			ID:       u.ID,
-			Name:     u.Name,
-			RealName: name,
-		})
+		portalUser, ok := portalMap[u.Name]
+		if ok {
+			newUser.RealName = portalUser.Name
+		}
+		result = append(result, &newUser)
 	}
 	return result, nil
 }

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql/driver"
 	"regexp"
 	"testing"
 	"time"
@@ -822,7 +823,96 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success_Single",
+			args: args{
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     "user1",
+					RealName: "ユーザー1 ユーザー1",
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
+				u := want[0]
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"team_id", "user_id"}).
+							AddRow(args.teamID, u.ID),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					WithArgs(u.ID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).
+							AddRow(u.ID, u.Name),
+					)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success_Multiple",
+			args: args{
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     "user1",
+					RealName: "ユーザー1 ユーザー1",
+				},
+				{
+					ID:       random.UUID(),
+					Name:     "user2",
+					RealName: "ユーザー2 ユーザー2",
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				belongingRows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				for _, u := range want {
+					belongingRows.AddRow(args.teamID, u.ID)
+				}
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(belongingRows)
+				userIDs := make([]driver.Value, len(want))
+				userRows := sqlmock.NewRows([]string{"id", "name"})
+				for i, u := range want {
+					userIDs[i] = u.ID
+					userRows.AddRow(u.ID, u.Name)
+				}
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
+					WithArgs(userIDs...).
+					WillReturnRows(userRows)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
