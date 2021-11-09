@@ -10,9 +10,9 @@ knoQイベントと公開レベルの関係テーブル
 ```sql
 CREATE TABLE `event_level_relations` (
   `id` char(36) NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>

@@ -19,7 +19,7 @@ CREATE TABLE `project_members` (
   KEY `fk_project_members_user` (`user_id`),
   CONSTRAINT `fk_project_members_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`),
   CONSTRAINT `fk_project_members_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>
@@ -31,8 +31,8 @@ CREATE TABLE `project_members` (
 | id | char(36) |  | false |  |  |  |
 | project_id | char(36) |  | false |  | [projects](projects.md) | プロジェクトUUID |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
-| since | datetime(6) |  | true |  |  | プロジェクト所属開始時期 |
-| until | datetime(6) |  | true |  |  | プロジェクト所属終了時期 |
+| since | datetime(6) | NULL | true |  |  | プロジェクト所属開始時期 |
+| until | datetime(6) | NULL | true |  |  | プロジェクト所属終了時期 |
 
 ## Constraints
 
