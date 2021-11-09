@@ -249,7 +249,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 }
 
 func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
-	if members == nil {
+	if len(members) == 0 {
 		return repository.ErrInvalidArg
 	}
 
@@ -259,19 +259,20 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 		return err
 	}
 
-	curMp := make(map[uuid.UUID]struct{}, len(members))
-	_cur := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(&_cur).Error()
+	// 既に所属しているメンバーを検索
+	belongingsMap := make(map[uuid.UUID]struct{}, len(members))
+	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
+	err = repo.h.Where(&model.ContestTeamUserBelonging{TeamID: teamID}).Find(&_belongings).Error()
 	if err != nil {
 		return err
 	}
-	for _, v := range _cur {
-		curMp[v.UserID] = struct{}{}
+	for _, v := range _belongings {
+		belongingsMap[v.UserID] = struct{}{}
 	}
 
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
 		for _, memberID := range members {
-			if _, ok := curMp[memberID]; ok {
+			if _, ok := belongingsMap[memberID]; ok {
 				continue
 			}
 			err = tx.Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()

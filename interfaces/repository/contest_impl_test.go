@@ -942,7 +942,125 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				teamID: random.UUID(),
+				members: []uuid.UUID{
+					random.UUID(), // 新たに追加するメンバー
+					random.UUID(), // すでに存在するメンバー
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				newUsers := make([]uuid.UUID, 0, len(args.members))
+				for i, u := range args.members {
+					if i%2 == 0 {
+						rows.AddRow(args.teamID, u)
+					} else {
+						newUsers = append(newUsers, u)
+					}
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, random.UUID()),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(rows)
+				h.Mock.ExpectBegin()
+				for _, u := range newUsers {
+					h.Mock.
+						ExpectExec(regexp.QuoteMeta("INSERT INTO `contest_team_user_belongings` (`team_id`,`user_id`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
+						WithArgs(args.teamID, u, anyTime{}, anyTime{}).
+						WillReturnResult(sqlmock.NewResult(1, 1))
+				}
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ZeroMembers",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{},
+			},
+			setup:     func(f mockContestRepositoryFields, args args) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "ContestTeamNotFound",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnError(repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindBelongings",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, random.UUID()),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_CreateNewBelongings",
+			args: args{
+				teamID:  random.UUID(),
+				members: []uuid.UUID{random.UUID()},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, random.UUID()),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "team_id", "user_id"}).
+							AddRow(random.UUID(), args.teamID, random.UUID()),
+					)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `contest_team_user_belongings` (`team_id`,`user_id`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
+					WithArgs(args.teamID, args.members[0], anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
