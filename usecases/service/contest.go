@@ -134,6 +134,10 @@ func (s *ContestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 	return nil
 }
 
+func (s *ContestService) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
+	return s.repo.DeleteContestTeam(contestID, teamID)
+}
+
 func (s *ContestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
 	return s.repo.GetContestTeamMembers(contestID, teamID)
 }

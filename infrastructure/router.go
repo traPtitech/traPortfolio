@@ -133,7 +133,7 @@ func Setup(e *echo.Echo, api handler.API) {
 
 						apiContestsCIDTeamsTID.GET("", api.Contest.GetContestTeam)
 						apiContestsCIDTeamsTID.PATCH("", api.Contest.PatchContestTeam)
-						// apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
+						apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
 						{
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
