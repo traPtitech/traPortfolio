@@ -195,8 +195,8 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 
 func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error {
 	var (
-		old model.Contest
-		new model.Contest
+		old model.ContestTeam
+		new model.ContestTeam
 	)
 
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
@@ -206,7 +206,7 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[s
 		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
 			return err
 		}
-		err := tx.Where(&model.ContestTeam{ID: teamID}).First(&new).Error()
+		err := tx.First(&new, &model.ContestTeam{ID: teamID}).Error()
 
 		return err
 	})

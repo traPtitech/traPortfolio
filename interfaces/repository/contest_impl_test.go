@@ -706,7 +706,94 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 		setup     func(f mockContestRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				teamID: random.UUID(),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(5),
+					"description": random.AlphaNumeric(10),
+					"link":        random.RandURLString(),
+					"result":      random.AlphaNumeric(5),
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				cid := random.UUID()
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
+							AddRow(args.teamID, cid, "", "", "", "", time.Time{}, time.Time{}),
+					)
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["result"], anyTime{}, args.teamID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
+							AddRow(args.teamID, cid, args.changes["name"], args.changes["description"], args.changes["result"], args.changes["link"], time.Time{}, time.Time{}),
+					)
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "NotFound",
+			args: args{
+				teamID: random.UUID(),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(5),
+					"description": random.AlphaNumeric(10),
+					"link":        random.RandURLString(),
+					"result":      random.AlphaNumeric(5),
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnError(repository.ErrNotFound)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				teamID: random.UUID(),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(5),
+					"description": random.AlphaNumeric(10),
+					"link":        random.RandURLString(),
+					"result":      random.AlphaNumeric(5),
+				},
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
+							AddRow(args.teamID, random.UUID(), "", "", "", "", time.Time{}, time.Time{}),
+					)
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["result"], anyTime{}, args.teamID).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
