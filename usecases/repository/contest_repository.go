@@ -30,8 +30,8 @@ type UpdateContestArgs struct {
 
 type CreateContestTeamArgs struct {
 	Name        string
-	Result      string
-	Link        string
+	Result      optional.String
+	Link        optional.String
 	Description string
 }
 

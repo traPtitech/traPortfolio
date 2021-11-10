@@ -146,18 +146,25 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		return convertError(err)
 	}
 
+	patchReq := repository.UpdateProjectArgs{}
+	if req.Name != nil {
+		patchReq.Name = optional.StringFrom(*req.Name)
+	}
+	if req.Description != nil {
+		patchReq.Description = optional.StringFrom(*req.Description)
+	}
+	if req.Link != nil {
+		patchReq.Link = optional.StringFrom(*req.Link)
+	}
 	since := optionalSemToTime(req.Duration.Since)
-	until := optionalSemToTime(*req.Duration.Until)
-	if since.Valid && until.Valid && since.Time.After(until.Time) {
-		return convertError(repository.ErrInvalidArg)
+	if req.Duration.Until != nil {
+		until := optionalSemToTime(*req.Duration.Until)
+		if since.Valid && until.Valid && since.Time.After(until.Time) {
+			return convertError(repository.ErrInvalidArg)
+		}
+		patchReq.Until = until
 	}
-	patchReq := repository.UpdateProjectArgs{
-		Name:        optional.StringFrom(*req.Name),
-		Description: optional.StringFrom(*req.Description),
-		Link:        optional.StringFrom(*req.Link),
-		Since:       since,
-		Until:       until,
-	}
+	patchReq.Since = since
 
 	err = h.service.UpdateProject(ctx, req.ProjectID, &patchReq)
 	if err != nil {
@@ -206,13 +213,21 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
+
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
 		m := &repository.CreateProjectMemberArgs{
 			UserID: v.UserId,
-			Since:  semToTime(v.Duration.Since),
-			Until:  semToTime(*v.Duration.Until),
 		}
+		since := semToTime(v.Duration.Since)
+		if v.Duration.Until != nil {
+			until := semToTime(*v.Duration.Until)
+			if since.After(until) {
+				return convertError(repository.ErrInvalidArg)
+			}
+			m.Until = until
+		}
+		m.Since = since
 		createReq = append(createReq, m)
 	}
 	err = h.service.AddProjectMembers(ctx, req.ProjectID, createReq)

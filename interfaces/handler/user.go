@@ -96,9 +96,12 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	u := repository.UpdateUserArgs{
-		Description: optional.StringFrom(*req.Bio), //TODO: valid: falseを追加する
-		Check:       optional.BoolFrom(*req.Check),
+	u := repository.UpdateUserArgs{}
+	if req.Bio != nil {
+		u.Description = optional.StringFrom(*req.Bio)
+	}
+	if req.Check != nil {
+		u.Check = optional.BoolFrom(*req.Check)
 	}
 	err := handler.srv.Update(ctx, req.UserID, &u)
 	if err != nil {
@@ -181,11 +184,18 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	args := repository.UpdateAccountArgs{
-		Name:        optional.StringFrom(*req.Id), // TODO
-		Type:        optional.Int64From(int64(*req.Type)),
-		URL:         optional.StringFrom(*req.Url),
-		PrPermitted: optional.BoolFrom(bool(*req.PrPermitted)),
+	args := repository.UpdateAccountArgs{}
+	if req.Id != nil {
+		args.Name = optional.StringFrom(*req.Id)
+	}
+	if req.Type != nil {
+		args.Type = optional.Int64From(int64(*req.Type))
+	}
+	if req.Url != nil {
+		args.URL = optional.StringFrom(*req.Url)
+	}
+	if req.PrPermitted != nil {
+		args.PrPermitted = optional.BoolFrom(bool(*req.PrPermitted))
 	}
 	err = handler.srv.EditAccount(ctx, req.AccountID, req.UserID, &args)
 	if err != nil {

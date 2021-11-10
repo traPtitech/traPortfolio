@@ -176,8 +176,12 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 		ContestID:   contestID,
 		Name:        _contestTeam.Name,
 		Description: _contestTeam.Description,
-		Result:      _contestTeam.Result,
-		Link:        _contestTeam.Link,
+	}
+	if _contestTeam.Result.Valid {
+		contestTeam.Result = _contestTeam.Result.String
+	}
+	if _contestTeam.Link.Valid {
+		contestTeam.Link = _contestTeam.Link.String
 	}
 	err := repo.h.Create(contestTeam).Error()
 	if err != nil {

@@ -229,12 +229,18 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
+
 	args := repository.CreateContestTeamArgs{
 		Name:        req.Name,
-		Result:      *req.Result,
-		Link:        *req.Link,
 		Description: req.Description,
 	}
+	if req.Result != nil {
+		args.Result = optional.StringFrom(*req.Result)
+	}
+	if req.Link != nil {
+		args.Link = optional.StringFrom(*req.Link)
+	}
+
 	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
 	if err != nil {
 		return convertError(err)
@@ -259,11 +265,18 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-	args := repository.UpdateContestTeamArgs{
-		Name:        optional.StringFrom(*req.Name),
-		Result:      optional.StringFrom(*req.Result),
-		Link:        optional.StringFrom(*req.Link),
-		Description: optional.StringFrom(*req.Description),
+	args := repository.UpdateContestTeamArgs{}
+	if req.Name != nil {
+		args.Name = optional.StringFrom(*req.Name)
+	}
+	if req.Result != nil {
+		args.Result = optional.StringFrom(*req.Result)
+	}
+	if req.Link != nil {
+		args.Link = optional.StringFrom(*req.Link)
+	}
+	if req.Description != nil {
+		args.Description = optional.StringFrom(*req.Description)
 	}
 
 	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)

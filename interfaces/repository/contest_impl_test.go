@@ -608,8 +608,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(5),
-		Result:      random.AlphaNumeric(5),
-		Link:        random.RandURLString(),
+		Result:      optional.StringFrom(random.AlphaNumeric(5)),
+		Link:        optional.StringFrom(random.RandURLString()),
 		Description: random.AlphaNumeric(10),
 	}
 
@@ -636,9 +636,9 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 					// ID: Assertion時にgot.IDと合わせる
 					ContestID: cid,
 					Name:      successArgs.Name,
-					Result:    successArgs.Result,
+					Result:    successArgs.Result.String,
 				},
-				Link:        successArgs.Link,
+				Link:        successArgs.Link.String,
 				Description: successArgs.Description,
 				Members:     nil,
 			},
@@ -659,8 +659,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(5),
-					Result:      random.AlphaNumeric(5),
-					Link:        random.RandURLString(),
+					Result:      optional.StringFrom(random.AlphaNumeric(5)),
+					Link:        optional.StringFrom(random.RandURLString()),
 					Description: random.AlphaNumeric(10),
 				},
 			},
