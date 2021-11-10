@@ -9,7 +9,6 @@ require (
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.5.0
 	github.com/google/wire v0.5.0
-	github.com/jinzhu/gorm v1.9.16
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo/v4 v4.6.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible

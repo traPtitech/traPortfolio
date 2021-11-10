@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/traPtitech/traPortfolio/util/random"
+	"gorm.io/gorm"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
@@ -397,7 +398,7 @@ func TestUserRepository_Update(t *testing.T) {
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(gorm.ErrRecordNotFound)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectCommit()
 			},
@@ -512,7 +513,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(gorm.ErrRecordNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -592,7 +593,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.accountID, args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(gorm.ErrRecordNotFound)
 				sqlhandler.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,

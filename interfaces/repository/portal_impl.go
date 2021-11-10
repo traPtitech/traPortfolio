@@ -19,7 +19,7 @@ func NewPortalRepository(api external.PortalAPI) repository.PortalRepository {
 func (repo *PortalRepository) GetUsers(ctx context.Context) ([]*domain.PortalUser, error) {
 	users, err := repo.api.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	result := make([]*domain.PortalUser, 0, len(users))
 	for _, v := range users {
@@ -35,7 +35,7 @@ func (repo *PortalRepository) GetUsers(ctx context.Context) ([]*domain.PortalUse
 func (repo *PortalRepository) GetUser(ctx context.Context, name string) (*domain.PortalUser, error) {
 	users, err := repo.api.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	for _, v := range users {
