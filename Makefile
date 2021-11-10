@@ -1,5 +1,5 @@
 TEST_DB_PORT := 3307
-TBLS_VERSION := v1.52.0
+TBLS_VERSION := 1.49.6
 
 GOFILES=$(wildcard *.go **/*.go)
 
