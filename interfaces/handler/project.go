@@ -105,18 +105,23 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	since := semToTime(req.Duration.Since)
-	until := semToTime(*req.Duration.Until)
-	if since.After(until) {
-		return convertError(repository.ErrInvalidArg)
-	}
 	createReq := repository.CreateProjectArgs{
-		Name:        *req.Name,
-		Description: *req.Description,
-		Link:        *req.Link,
-		Since:       since,
-		Until:       until,
+		Name:        req.Name,
+		Description: req.Description,
 	}
+	if req.Link != nil {
+		createReq.Link = optional.StringFrom(*req.Link)
+	}
+	since := semToTime(req.Duration.Since)
+	if req.Duration.Until != nil {
+		until := semToTime(*req.Duration.Until)
+		if since.After(until) {
+			return convertError(repository.ErrInvalidArg)
+		}
+		createReq.Until = until
+	}
+	createReq.Since = since
+
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
 		return convertError(err)

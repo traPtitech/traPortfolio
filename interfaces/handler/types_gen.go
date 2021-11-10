@@ -70,11 +70,72 @@ type Account struct {
 	Type AccountType `json:"type"`
 
 	// アカウントurl
-	Url string `json:"url"`
+	Url string `json:"url" validate:"url"`
 }
 
 // アカウントの種類
 type AccountType int
+
+// 新規アカウントリクエスト
+type AddAccount struct {
+	// アカウントID
+	Id string `json:"id"`
+
+	// 広報での利用が許可されているかどうか
+	PrPermitted PrPermitted `json:"prPermitted"`
+
+	// アカウントの種類
+	Type AccountType `json:"type"`
+
+	// アカウントurl
+	Url string `json:"url" validate:"url"`
+}
+
+// 新規コンテストリクエスト
+type AddContest struct {
+	// コンテスト説明
+	Description string `json:"description"`
+
+	// イベントやコンテストなどの存続期間
+	Duration Duration `json:"duration"`
+
+	// コンテストの詳細が載っているページへのリンク
+	Link *string `json:"link,omitempty" validate:"url"`
+
+	// コンテスト名
+	Name string `json:"name"`
+}
+
+// 新規コンテストチームリクエスト
+type AddContestTeam struct {
+	// チーム情報
+	Description string `json:"description"`
+
+	// コンテストチームの説明が載っているページへのリンク
+	Link *string `json:"link,omitempty" validate:"url"`
+
+	// チーム名
+	Name string `json:"name"`
+
+	// 順位などの結果
+	Result *string `json:"result,omitempty"`
+}
+
+// 新規プロジェクトリクエスト
+type AddProject struct {
+	// プロジェクト説明
+	Description string `json:"description"`
+
+	// 班やプロジェクトの期間
+	// untilがなかった場合存続中
+	Duration ProjectDuration `json:"duration"`
+
+	// プロジェクトの詳細が載っているページへのリンク
+	Link *string `json:"link,omitempty" validate:"url"`
+
+	// プロジェクト名
+	Name string `json:"name"`
+}
 
 // プロジェクトメンバー追加リクエスト
 type AddProjectMembers struct {
@@ -166,7 +227,7 @@ type EditAccount struct {
 	Type *AccountType `json:"type,omitempty"`
 
 	// アカウントurl
-	Url *string `json:"url,omitempty"`
+	Url *string `json:"url,omitempty" validate:"url"`
 }
 
 // コンテスト情報変更リクエスト
@@ -184,7 +245,7 @@ type EditContest struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// コンテストチーム登録リクエスト
+// コンテストチーム情報修正リクエスト
 type EditContestTeam struct {
 	// チーム情報
 	Description *string `json:"description,omitempty"`
@@ -472,13 +533,13 @@ type TeamIdInPath uuid.UUID
 type UserIdInPath uuid.UUID
 
 // PostContestJSONBody defines parameters for PostContest.
-type PostContestJSONBody EditContest
+type PostContestJSONBody AddContest
 
 // EditContestJSONBody defines parameters for EditContest.
 type EditContestJSONBody EditContest
 
 // PostContestTeamJSONBody defines parameters for PostContestTeam.
-type PostContestTeamJSONBody EditContestTeam
+type PostContestTeamJSONBody AddContestTeam
 
 // EditContestTeamJSONBody defines parameters for EditContestTeam.
 type EditContestTeamJSONBody EditContestTeam
@@ -493,7 +554,7 @@ type PostContestTeamMembersJSONBody MemberIDs
 type EditEventJSONBody EditEvent
 
 // PostProjectJSONBody defines parameters for PostProject.
-type PostProjectJSONBody EditProject
+type PostProjectJSONBody AddProject
 
 // EditProjectJSONBody defines parameters for EditProject.
 type EditProjectJSONBody EditProject
@@ -517,7 +578,7 @@ type GetUsersParams struct {
 type EditUserJSONBody EditUser
 
 // AddAccountJSONBody defines parameters for AddAccount.
-type AddAccountJSONBody EditAccount
+type AddAccountJSONBody AddAccount
 
 // EditUserAccountJSONBody defines parameters for EditUserAccount.
 type EditUserAccountJSONBody EditAccount

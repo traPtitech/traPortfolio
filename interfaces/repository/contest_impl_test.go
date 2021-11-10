@@ -15,6 +15,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -183,9 +184,9 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(10),
-					Link:        random.RandURLString(),
+					Link:        optional.StringFrom(random.RandURLString()),
 					Since:       sampleTime,
-					Until:       sampleTime,
+					Until:       optional.TimeFrom(sampleTime),
 				},
 			},
 			want: &domain.Contest{
@@ -211,9 +212,9 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(5),
 					Description: random.AlphaNumeric(10),
-					Link:        random.RandURLString(),
+					Link:        optional.StringFrom(random.RandURLString()),
 					Since:       sampleTime,
-					Until:       sampleTime,
+					Until:       optional.TimeFrom(sampleTime),
 				},
 			},
 			want: nil,

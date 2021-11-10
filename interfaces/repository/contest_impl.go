@@ -66,9 +66,13 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
 		Description: args.Description,
-		Link:        args.Link,
 		Since:       args.Since,
-		Until:       args.Until,
+	}
+	if args.Link.Valid {
+		contest.Link = args.Link.String
+	}
+	if args.Until.Valid {
+		contest.Until = args.Until.Time
 	}
 	err := repo.h.Create(contest).Error()
 	if err != nil {

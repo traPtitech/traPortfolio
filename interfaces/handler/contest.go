@@ -87,11 +87,15 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 	}
 
 	createReq := repository.CreateContestArgs{
-		Name:        *req.Name,
-		Description: *req.Description,
-		Link:        *req.Link,
+		Name:        req.Name,
+		Description: req.Description,
 		Since:       req.Duration.Since,
-		Until:       *req.Duration.Until,
+	}
+	if req.Link != nil {
+		createReq.Link = optional.StringFrom(*req.Link)
+	}
+	if req.Duration.Until != nil {
+		createReq.Until = optional.TimeFrom(*req.Duration.Until)
 	}
 
 	contest, err := h.srv.CreateContest(ctx, &createReq)
@@ -117,12 +121,21 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	patchReq := repository.UpdateContestArgs{
-		Name:        optional.StringFrom(*req.Name),
-		Description: optional.StringFrom(*req.Description),
-		Link:        optional.StringFrom(*req.Link),
-		Since:       optional.TimeFrom(req.Duration.Since),
-		Until:       optional.TimeFrom(*req.Duration.Until),
+	patchReq := repository.UpdateContestArgs{}
+	if req.Name != nil {
+		patchReq.Name = optional.StringFrom(*req.Name)
+	}
+	if req.Description != nil {
+		patchReq.Description = optional.StringFrom(*req.Description)
+	}
+	if req.Link != nil {
+		patchReq.Link = optional.StringFrom(*req.Link)
+	}
+	if req.Duration != nil {
+		patchReq.Since = optional.TimeFrom(req.Duration.Since)
+		if req.Duration.Until != nil {
+			patchReq.Until = optional.TimeFrom(*req.Duration.Until)
+		}
 	}
 
 	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
@@ -217,10 +230,10 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	args := repository.CreateContestTeamArgs{
-		Name:        *req.Name,
+		Name:        req.Name,
 		Result:      *req.Result,
 		Link:        *req.Link,
-		Description: *req.Description,
+		Description: req.Description,
 	}
 	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
 	if err != nil {

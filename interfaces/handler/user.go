@@ -155,10 +155,10 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
-		ID:          *req.Id,
-		Type:        uint(*req.Type),
-		PrPermitted: bool(*req.PrPermitted),
-		URL:         *req.Url,
+		ID:          req.Id,
+		Type:        uint(req.Type),
+		PrPermitted: bool(req.PrPermitted),
+		URL:         req.Url,
 	}
 	account, err := handler.srv.CreateAccount(ctx, req.UserID, &args)
 	if err != nil {

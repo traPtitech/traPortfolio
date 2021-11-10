@@ -14,7 +14,7 @@ import (
 type CreateProjectArgs struct {
 	Name        string
 	Description string
-	Link        string
+	Link        optional.String
 	Since       time.Time
 	Until       time.Time
 }

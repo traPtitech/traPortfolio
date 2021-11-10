@@ -202,7 +202,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:        random.AlphaNumeric(5),
 					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(10),
+					Link:        optional.StringFrom(random.AlphaNumeric(10)),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
@@ -220,9 +220,11 @@ func TestProjectService_CreateProject(t *testing.T) {
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
 				want.Name = args.args.Name
 				want.Description = args.args.Description
-				want.Link = args.args.Link
 				want.Since = args.args.Since
 				want.Until = args.args.Until
+				if args.args.Link.Valid {
+					want.Link = args.args.Link.String
+				}
 				repo.EXPECT().CreateProject(gomock.Any()).Return(want, nil) // TODO: CreateProject内でuuid.NewV4するのでテストができない？
 			},
 			assertion: assert.NoError,
@@ -234,7 +236,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:        random.AlphaNumeric(5),
 					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(10),
+					Link:        optional.StringFrom(random.AlphaNumeric(10)),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
