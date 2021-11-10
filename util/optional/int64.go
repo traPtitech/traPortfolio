@@ -11,12 +11,8 @@ type Int64 struct {
 	sql.NullInt64
 }
 
-func Int64From(i *int64) Int64 {
-	if i == nil {
-		return NewInt64(0, false)
-	}
-
-	return NewInt64(*i, true)
+func Int64From(i int64) Int64 {
+	return NewInt64(i, true)
 }
 
 func NewInt64(i int64, valid bool) Int64 {

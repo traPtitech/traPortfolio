@@ -12,12 +12,8 @@ type Time struct {
 	sql.NullTime
 }
 
-func TimeFrom(t *time.Time) Time {
-	if t == nil {
-		return NewTime(time.Time{}, false)
-	}
-
-	return NewTime(*t, true)
+func TimeFrom(t time.Time) Time {
+	return NewTime(t, true)
 }
 
 func NewTime(t time.Time, valid bool) Time {

@@ -285,11 +285,11 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.NewString(random.AlphaNumeric(5), true),
-					Description: optional.NewString(random.AlphaNumeric(10), true),
-					Link:        optional.NewString(random.AlphaNumeric(10), true),
-					Since:       optional.NewTime(time.Now(), true),
-					Until:       optional.NewTime(time.Now(), true),
+					Name:        optional.StringFrom(random.AlphaNumeric(5)),
+					Description: optional.StringFrom(random.AlphaNumeric(10)),
+					Link:        optional.StringFrom(random.AlphaNumeric(10)),
+					Since:       optional.TimeFrom(time.Now()),
+					Until:       optional.TimeFrom(time.Now()),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
@@ -310,11 +310,11 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.NewString(random.AlphaNumeric(5), true),
-					Description: optional.NewString(random.AlphaNumeric(10), true),
-					Link:        optional.NewString(random.AlphaNumeric(10), true),
-					Since:       optional.NewTime(time.Now(), true),
-					Until:       optional.NewTime(time.Now(), true),
+					Name:        optional.StringFrom(random.AlphaNumeric(5)),
+					Description: optional.StringFrom(random.AlphaNumeric(10)),
+					Link:        optional.StringFrom(random.AlphaNumeric(10)),
+					Since:       optional.TimeFrom(time.Now()),
+					Until:       optional.TimeFrom(time.Now()),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
