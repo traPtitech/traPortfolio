@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
@@ -34,17 +35,11 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*Event, 0, len(events))
-	for _, event := range events {
-		res = append(res, &Event{
-			Id:   event.ID,
-			Name: event.Name,
-			Duration: Duration{
-				Since: event.TimeStart,
-				Until: &event.TimeEnd,
-			},
-		})
+	res := make([]Event, len(events))
+	for i, v := range events {
+		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -62,7 +57,18 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, formatUserDetail(event))
+	hostname := make([]User, len(event.HostName))
+	for i, v := range event.HostName {
+		hostname[i] = newUser(v.ID, v.Name, v.RealName)
+	}
+
+	return c.JSON(http.StatusOK, newEventDetail(
+		newEvent(event.ID, event.Name, event.TimeStart, event.TimeEnd),
+		event.Description,
+		event.Level,
+		hostname,
+		event.Place,
+	))
 }
 
 // PatchEvent PATCH /events/:eventID
@@ -87,29 +93,23 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func formatUserDetail(event *domain.EventDetail) *EventDetail {
-	userRes := make([]User, len(event.HostName))
-	for i, user := range event.HostName {
-		userRes[i] = User{
-			Id:       user.ID,
-			Name:     user.Name,
-			RealName: &user.RealName,
-		}
-	}
-
-	res := &EventDetail{
-		Event: Event{
-			Id:   event.ID,
-			Name: event.Name,
-			Duration: Duration{
-				Since: event.TimeStart,
-				Until: &event.TimeEnd,
-			},
+func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) Event {
+	return Event{
+		Id:   id,
+		Name: name,
+		Duration: Duration{
+			Since: since,
+			Until: &until,
 		},
-		Description: event.Description,
-		Place:       event.Place,
-		Hostname:    userRes,
-		EventLevel:  EventLevel(event.Level),
 	}
-	return res
+}
+
+func newEventDetail(event Event, description string, eventLevel domain.EventLevel, hostname []User, place string) EventDetail {
+	return EventDetail{
+		Event:       event,
+		Description: description,
+		EventLevel:  EventLevel(eventLevel),
+		Hostname:    hostname,
+		Place:       place,
+	}
 }

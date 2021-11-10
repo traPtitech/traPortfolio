@@ -2,7 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
@@ -36,14 +38,11 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*User, 0, len(users))
-	for _, user := range users {
-		res = append(res, &User{
-			Id:       user.ID,
-			Name:     user.Name,
-			RealName: &user.RealName,
-		})
+	res := make([]User, len(users))
+	for i, v := range users {
+		res[i] = newUser(v.ID, v.Name, v.RealName)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -63,25 +62,15 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 
 	accounts := make([]Account, len(user.Accounts))
 	for i, v := range user.Accounts {
-		accounts[i] = Account{
-			Id:          v.ID,
-			Name:        v.Name,
-			Type:        AccountType(v.Type),
-			Url:         v.URL,
-			PrPermitted: PrPermitted(v.PrPermitted),
-		}
+		accounts[i] = newAccount(v.ID, v.Name, v.Type, v.URL, v.PrPermitted)
 	}
 
-	return c.JSON(http.StatusOK, &UserDetail{
-		User: User{
-			Id:       user.ID,
-			Name:     user.Name,
-			RealName: &user.RealName,
-		},
-		State:    UserAccountState(user.State),
-		Bio:      user.Bio,
-		Accounts: accounts,
-	})
+	return c.JSON(http.StatusOK, newUserDetail(
+		newUser(user.ID, user.Name, user.RealName),
+		accounts,
+		user.Bio,
+		user.State,
+	))
 }
 
 // Update PATCH /users/:userID
@@ -123,6 +112,11 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 		return convertError(err)
 	}
 
+	res := make([]Account, len(accounts))
+	for i, v := range accounts {
+		res[i] = newAccount(v.ID, v.Name, v.Type, v.URL, v.PrPermitted)
+	}
+
 	return c.JSON(http.StatusOK, accounts)
 }
 
@@ -142,7 +136,7 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, account)
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
 }
 
 // AddAccount POST /users/:userID/accounts
@@ -167,7 +161,8 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	return c.JSON(http.StatusOK, account)
+
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
 }
 
 // PatchAccount PATCH /users/:userID/accounts/:accountID
@@ -237,18 +232,11 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*UserProject, 0, len(projects))
-	for _, v := range projects {
-		up := &UserProject{
-			Project: Project{
-				Id:       v.ID,
-				Name:     v.Name,
-				Duration: convertToProjectDuration(v.Since, v.Until),
-			},
-			UserDuration: []ProjectDuration{convertToProjectDuration(v.UserSince, v.UserUntil)}, //TODO: objectでいいはず
-		}
-		res = append(res, up)
+	res := make([]UserProject, len(projects))
+	for i, v := range projects {
+		res[i] = newUserProject(v.ID, v.Name, v.Since, v.Until, v.UserSince, v.UserUntil)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -265,18 +253,15 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*ContestTeamWithContestName, 0, len(contests))
-	for _, v := range contests {
-		uc := &ContestTeamWithContestName{
-			ContestTeam: ContestTeam{
-				Id:     v.ID,
-				Name:   v.Name,
-				Result: &v.Result,
-			},
-			ContestName: v.ContestName,
-		}
-		res = append(res, uc)
+
+	res := make([]ContestTeamWithContestName, 0, len(contests))
+	for i, v := range contests {
+		res[i] = newContestTeamWithContestName(
+			newContestTeam(v.ID, v.Name, v.Result),
+			v.ContestName,
+		)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -293,17 +278,59 @@ func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*Event, 0, len(events))
-	for _, v := range events {
-		e := &Event{
-			Id:   v.ID,
-			Name: v.Name,
-			Duration: Duration{
-				Since: v.TimeStart,
-				Until: &v.TimeEnd,
-			},
-		}
-		res = append(res, e)
+
+	res := make([]Event, len(events))
+	for i, v := range events {
+		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
+
 	return c.JSON(http.StatusOK, res)
+}
+
+func newUser(id uuid.UUID, name string, realName string) User {
+	return User{
+		Id:       id,
+		Name:     name,
+		RealName: &realName,
+	}
+}
+
+func newUserDetail(user User, accounts []Account, bio string, state domain.TraQState) UserDetail {
+	return UserDetail{
+		User:     user,
+		Accounts: accounts,
+		Bio:      bio,
+		State:    UserAccountState(state),
+	}
+}
+
+func newAccount(id uuid.UUID, name string, atype uint, url string, prPermitted bool) Account {
+	return Account{
+		Id:          id,
+		Name:        name,
+		Type:        AccountType(atype),
+		Url:         url,
+		PrPermitted: PrPermitted(prPermitted),
+	}
+}
+
+func newUserProject(id uuid.UUID, name string, since time.Time, until time.Time, userSince time.Time, userUntil time.Time) UserProject {
+	return UserProject{
+		Project: Project{
+			Id:       id,
+			Name:     name,
+			Duration: convertToProjectDuration(since, until),
+		},
+		UserDuration: []ProjectDuration{
+			convertToProjectDuration(userSince, userUntil), //TODO: objectでよさそう
+		},
+	}
+}
+
+// TODO: UserContestのほうがいいかも
+func newContestTeamWithContestName(contestTeam ContestTeam, contestName string) ContestTeamWithContestName {
+	return ContestTeamWithContestName{
+		ContestTeam: contestTeam,
+		ContestName: contestName,
+	}
 }

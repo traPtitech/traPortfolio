@@ -36,15 +36,12 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*Project, 0, len(projects))
-	for _, v := range projects {
-		p := &Project{
-			Id:       v.ID,
-			Name:     v.Name,
-			Duration: convertToProjectDuration(v.Since, v.Until),
-		}
-		res = append(res, p)
+
+	res := make([]Project, len(projects))
+	for i, v := range projects {
+		res[i] = newProject(v.ID, v.Name, convertToProjectDuration(v.Since, v.Until))
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -64,35 +61,20 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 
 	members := make([]ProjectMember, len(project.Members))
 	for i, v := range project.Members {
-		until := timeToSem(v.Until)
-		members[i] = ProjectMember{
-			User: User{
-				Id:       v.UserID,
-				Name:     v.Name,
-				RealName: &v.RealName,
-			},
-			Duration: []ProjectDuration{
-				{
-					Since: timeToSem(v.Since),
-					Until: &until,
-				},
-			},
-		}
+		members[i] = newProjectMember(
+			newUser(v.UserID, v.Name, v.RealName),
+			[]ProjectDuration{newProjectDuration(timeToSem(v.Since), timeToSem(v.Until))},
+		)
 	}
 
-	res := &ProjectDetail{
-		Project: Project{
-			Id:       project.ID,
-			Name:     project.Name,
-			Duration: convertToProjectDuration(project.Since, project.Until),
-		},
-		Link:        &project.Link,
-		Description: project.Description,
-		Members:     members,
-		CreatedAt:   &project.CreatedAt,
-		UpdatedAt:   &project.UpdatedAt,
-	}
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, newProjectDetail(
+		newProject(project.ID, project.Name, convertToProjectDuration(project.Since, project.Until)),
+		project.Description,
+		project.Link,
+		members,
+		project.CreatedAt,
+		project.UpdatedAt,
+	))
 }
 
 // PostProject POST /projects
@@ -126,12 +108,12 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := Project{
-		Id:       project.ID,
-		Name:     project.Name,
-		Duration: convertToProjectDuration(project.Since, project.Until),
-	}
-	return c.JSON(http.StatusCreated, res)
+
+	return c.JSON(http.StatusCreated, newProject(
+		project.ID,
+		project.Name,
+		convertToProjectDuration(project.Since, project.Until),
+	))
 }
 
 func (h *ProjectHandler) PatchProject(_c echo.Context) error {
@@ -186,18 +168,15 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*ProjectMember, 0, len(members))
-	for _, v := range members {
-		m := &ProjectMember{
-			User: User{
-				Id:       v.ID,
-				Name:     v.Name,
-				RealName: &v.RealName,
-			},
-			// Duration: , //TODO
-		}
-		res = append(res, m)
+
+	res := make([]ProjectMember, len(members))
+	for i, v := range members {
+		res[i] = newProjectMember(
+			newUser(v.ID, v.Name, v.RealName),
+			[]ProjectDuration{}, // TODO: 追加する
+		)
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -255,4 +234,37 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func newProject(id uuid.UUID, name string, duration ProjectDuration) Project {
+	return Project{
+		Id:       id,
+		Name:     name,
+		Duration: duration,
+	}
+}
+
+func newProjectDetail(project Project, description string, link string, members []ProjectMember, createdAt time.Time, updatedAt time.Time) ProjectDetail {
+	return ProjectDetail{
+		Project:     project,
+		Description: description,
+		Link:        &link,
+		Members:     members,
+		CreatedAt:   &createdAt,
+		UpdatedAt:   &updatedAt,
+	}
+}
+
+func newProjectMember(user User, duration []ProjectDuration) ProjectMember {
+	return ProjectMember{
+		User:     user,
+		Duration: duration,
+	}
+}
+
+func newProjectDuration(since YearWithSemester, until YearWithSemester) ProjectDuration {
+	return ProjectDuration{
+		Since: since,
+		Until: &until,
+	}
 }
