@@ -304,9 +304,9 @@ func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*eventResponse, 0, len(events))
+	res := make([]*EventResponse, 0, len(events))
 	for _, v := range events {
-		e := &eventResponse{
+		e := &EventResponse{
 			ID:   v.ID,
 			Name: v.Name,
 			Duration: Duration{
