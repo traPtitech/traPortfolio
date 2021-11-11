@@ -953,7 +953,6 @@ components:
               type: string
               format: date-time
               description: 変更日時
-              x-go-type: time.Time
           required:
             - description
             - members
