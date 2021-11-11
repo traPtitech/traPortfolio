@@ -1,4 +1,4 @@
-//go:generate mockgen -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+//go:generate go run github.com/golang/mock/mockgen@v1.6.0 -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
 
 package repository
 
@@ -21,7 +21,7 @@ type CreateAccountArgs struct {
 }
 
 type UpdateAccountArgs struct {
-	ID          optional.String // traqID
+	Name        optional.String // Twitter等のアカウントID
 	Type        optional.Int64
 	URL         optional.String
 	PrPermitted optional.Bool

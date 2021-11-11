@@ -9,72 +9,48 @@ package handler
 import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/wire"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
+	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 )
 
 // Injectors from test_wire.go:
 
 func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 	pingHandler := NewPingHandler()
-	mockUserRepository := mock_repository.NewMockUserRepository(ctrl)
-	mockEventRepository := mock_repository.NewMockEventRepository(ctrl)
-	userService := service.NewUserService(mockUserRepository, mockEventRepository)
-	userHandler := NewUserHandler(userService)
-	mockProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
-	mockPortalRepository := mock_repository.NewMockPortalRepository(ctrl)
-	projectService := service.NewProjectService(mockProjectRepository, mockPortalRepository)
-	projectHandler := NewProjectHandler(projectService)
-	eventService := service.NewEventService(mockEventRepository)
-	eventHandler := NewEventHandler(eventService)
-	mockContestRepository := mock_repository.NewMockContestRepository(ctrl)
-	contestService := service.NewContestService(mockContestRepository)
-	contestHandler := NewContestHandler(contestService)
-	mockGroupRepository := mock_repository.NewMockGroupRepository(ctrl)
-	groupService := service.NewGroupService(mockGroupRepository)
-	groupHandler := NewGroupHandler(groupService)
-	api := NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
-	mockKnoqRepository := mock_repository.NewMockKnoqRepository(ctrl)
-	mockTraQRepository := mock_repository.NewMockTraQRepository(ctrl)
-	testRepository := TestRepository{
-		MockContestRepository: mockContestRepository,
-		MockEventRepository:   mockEventRepository,
-		MockKnoqRepository:    mockKnoqRepository,
-		MockPortalRepository:  mockPortalRepository,
-		MockProjectRepository: mockProjectRepository,
-		MockTraQRepository:    mockTraQRepository,
-		MockUserRepository:    mockUserRepository,
+	mockUserService := mock_service.NewMockUserService(ctrl)
+	userHandler := NewUserHandler(mockUserService)
+	mockProjectService := mock_service.NewMockProjectService(ctrl)
+	projectHandler := NewProjectHandler(mockProjectService)
+	mockEventService := mock_service.NewMockEventService(ctrl)
+	eventHandler := NewEventHandler(mockEventService)
+	mockContestService := mock_service.NewMockContestService(ctrl)
+	contestHandler := NewContestHandler(mockContestService)
+	api := NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)
+	testService := TestService{
+		MockContestService: mockContestService,
+		MockEventService:   mockEventService,
+		MockProjectService: mockProjectService,
+		MockUserService:    mockUserService,
 	}
 	testHandlers := TestHandlers{
-		API:        api,
-		Repository: testRepository,
+		API:     api,
+		Service: testService,
 	}
 	return testHandlers
 }
 
 // test_wire.go:
 
-var mockPortalSet = wire.NewSet(mock_repository.NewMockPortalRepository, wire.Bind(new(repository.PortalRepository), new(*mock_repository.MockPortalRepository)))
-
-var mockTraQSet = wire.NewSet(mock_repository.NewMockTraQRepository, wire.Bind(new(repository.TraQRepository), new(*mock_repository.MockTraQRepository)))
-
 var mockPingSet = wire.NewSet(
 	NewPingHandler,
 )
 
-var mockUserSet = wire.NewSet(mock_repository.NewMockUserRepository, service.NewUserService, NewUserHandler, wire.Bind(new(repository.UserRepository), new(*mock_repository.MockUserRepository)))
+var mockUserSet = wire.NewSet(mock_service.NewMockUserService, NewUserHandler, wire.Bind(new(service.UserService), new(*mock_service.MockUserService)))
 
-var mockProjectSet = wire.NewSet(mock_repository.NewMockProjectRepository, service.NewProjectService, NewProjectHandler, wire.Bind(new(repository.ProjectRepository), new(*mock_repository.MockProjectRepository)))
+var mockProjectSet = wire.NewSet(mock_service.NewMockProjectService, NewProjectHandler, wire.Bind(new(service.ProjectService), new(*mock_service.MockProjectService)))
 
-var mockKnoQSet = wire.NewSet(mock_repository.NewMockKnoqRepository, wire.Bind(new(repository.KnoqRepository), new(*mock_repository.MockKnoqRepository)))
+var mockEventSet = wire.NewSet(mock_service.NewMockEventService, NewEventHandler, wire.Bind(new(service.EventService), new(*mock_service.MockEventService)))
 
-var mockEventSet = wire.NewSet(
-	mockKnoQSet, mock_repository.NewMockEventRepository, service.NewEventService, NewEventHandler, wire.Bind(new(repository.EventRepository), new(*mock_repository.MockEventRepository)),
-)
-
-var mockGroupSet = wire.NewSet(mock_repository.NewMockGroupRepository, service.NewGroupService, NewGroupHandler, wire.Bind(new(repository.GroupRepository), new(*mock_repository.MockGroupRepository)))
-
-var mockContestSet = wire.NewSet(mock_repository.NewMockContestRepository, service.NewContestService, NewContestHandler, wire.Bind(new(repository.ContestRepository), new(*mock_repository.MockContestRepository)))
+var mockContestSet = wire.NewSet(mock_service.NewMockContestService, NewContestHandler, wire.Bind(new(service.ContestService), new(*mock_service.MockContestService)))
 
 var mockApiSet = wire.NewSet(NewAPI)

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -44,9 +46,10 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 		return nil, err
 	}
 
-	elv, err := repo.getEventLevelByID(id)
-	if err != nil && err != repository.ErrNotFound {
-		return nil, err
+	// IDのリストだけ取得、Name,RealNameはPortalから取得する
+	hostName := make([]*domain.User, 0, len(er.Admins))
+	for _, aid := range er.Admins {
+		hostName = append(hostName, &domain.User{ID: aid})
 	}
 
 	result := &domain.EventDetail{
@@ -55,42 +58,45 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 			Name:      er.Name,
 			TimeStart: er.TimeStart,
 			TimeEnd:   er.TimeEnd,
-			// TODO: HostName:
 		},
 		Description: er.Description,
-		GroupID:     er.GroupID,
-		RoomID:      er.RoomID,
+		Place:       er.Place,
+		// Level:
+		HostName: hostName,
+		GroupID:  er.GroupID,
+		RoomID:   er.RoomID,
 	}
 
+	elv, err := repo.getEventLevelByID(id)
 	if err == nil {
-		result.Level = *elv.Level
+		result.Level = elv.Level
+	} else if errors.Is(err, repository.ErrNotFound) {
+		result.Level = domain.EventLevelAnonymous
+	} else {
+		return nil, err
 	}
 
 	return result, nil
 }
 
-func (repo *EventRepository) UpdateEvent(id uuid.UUID, arg *repository.UpdateEventArg) error {
-	var (
-		old model.EventLevelRelation
-		new model.EventLevelRelation
-	)
-
+func (repo *EventRepository) UpdateEventLevel(id uuid.UUID, arg *repository.UpdateEventLevelArg) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if err := tx.First(&old, &model.EventLevelRelation{ID: id}).Error(); err != nil {
-			if err != nil {
-				return err
-			}
+		if elv, err := repo.getEventLevelByID(id); err != nil {
+			return err
+		} else if elv.Level == arg.Level {
+			return nil // updateする必要がないのでここでcommitする
 		}
-		if err := tx.Model(&old).Updates(arg).Error(); err != nil {
+
+		if err := tx.Model(&model.EventLevelRelation{ID: id}).Update("level", arg.Level).Error(); err != nil {
 			return err
 		}
-		err := tx.Where(&model.EventLevelRelation{ID: id}).First(&new).Error()
 
-		return err
+		return nil
 	})
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

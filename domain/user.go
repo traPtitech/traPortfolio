@@ -36,7 +36,7 @@ type UserProject struct {
 
 type UserContest struct {
 	ID          uuid.UUID
-	Name        string
+	Name        string // チーム名
 	Result      string
 	ContestName string
 }

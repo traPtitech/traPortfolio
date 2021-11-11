@@ -36,7 +36,7 @@ type SQLHandler struct {
 
 func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 	engine, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci&loc=Local", conf.user, conf.password, conf.host, conf.port, conf.dbname),
+		DSN: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", conf.user, conf.password, conf.host, conf.port, conf.dbname),
 	}), &gorm.Config{
 		NowFunc: func() time.Time {
 			return time.Now().Truncate(time.Microsecond)
@@ -101,6 +101,11 @@ func (handler *SQLHandler) Where(query interface{}, args ...interface{}) databas
 
 func (handler *SQLHandler) Model(value interface{}) database.SQLHandler {
 	db := handler.conn.Model(value)
+	return &SQLHandler{conn: db}
+}
+
+func (handler *SQLHandler) Update(column string, value interface{}) database.SQLHandler {
+	db := handler.conn.Update(column, value)
 	return &SQLHandler{conn: db}
 }
 

@@ -1,3 +1,4 @@
+//go:generate go run github.com/google/wire/cmd/wire@v0.5.0
 //go:build wireinject
 
 package handler
@@ -5,19 +6,8 @@ package handler
 import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/wire"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
-)
-
-var mockPortalSet = wire.NewSet(
-	mock_repository.NewMockPortalRepository,
-	wire.Bind(new(repository.PortalRepository), new(*mock_repository.MockPortalRepository)),
-)
-
-var mockTraQSet = wire.NewSet(
-	mock_repository.NewMockTraQRepository,
-	wire.Bind(new(repository.TraQRepository), new(*mock_repository.MockTraQRepository)),
+	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 )
 
 var mockPingSet = wire.NewSet(
@@ -25,30 +15,21 @@ var mockPingSet = wire.NewSet(
 )
 
 var mockUserSet = wire.NewSet(
-	mock_repository.NewMockUserRepository,
-	service.NewUserService,
+	mock_service.NewMockUserService,
 	NewUserHandler,
-	wire.Bind(new(repository.UserRepository), new(*mock_repository.MockUserRepository)),
+	wire.Bind(new(service.UserService), new(*mock_service.MockUserService)),
 )
 
 var mockProjectSet = wire.NewSet(
-	mock_repository.NewMockProjectRepository,
-	service.NewProjectService,
+	mock_service.NewMockProjectService,
 	NewProjectHandler,
-	wire.Bind(new(repository.ProjectRepository), new(*mock_repository.MockProjectRepository)),
-)
-
-var mockKnoQSet = wire.NewSet(
-	mock_repository.NewMockKnoqRepository,
-	wire.Bind(new(repository.KnoqRepository), new(*mock_repository.MockKnoqRepository)),
+	wire.Bind(new(service.ProjectService), new(*mock_service.MockProjectService)),
 )
 
 var mockEventSet = wire.NewSet(
-	mockKnoQSet,
-	mock_repository.NewMockEventRepository,
-	service.NewEventService,
+	mock_service.NewMockEventService,
 	NewEventHandler,
-	wire.Bind(new(repository.EventRepository), new(*mock_repository.MockEventRepository)),
+	wire.Bind(new(service.EventService), new(*mock_service.MockEventService)),
 )
 
 var mockGroupSet = wire.NewSet(
@@ -59,25 +40,22 @@ var mockGroupSet = wire.NewSet(
 )
 
 var mockContestSet = wire.NewSet(
-	mock_repository.NewMockContestRepository,
-	service.NewContestService,
+	mock_service.NewMockContestService,
 	NewContestHandler,
-	wire.Bind(new(repository.ContestRepository), new(*mock_repository.MockContestRepository)),
+	wire.Bind(new(service.ContestService), new(*mock_service.MockContestService)),
 )
 
 var mockApiSet = wire.NewSet(NewAPI)
 
 func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 	wire.Build(
-		wire.Struct(new(TestRepository), "*"),
+		wire.Struct(new(TestService), "*"),
 		wire.Struct(new(TestHandlers), "*"),
 		mockPingSet,
 		mockUserSet,
 		mockProjectSet,
 		mockEventSet,
 		mockApiSet,
-		mockPortalSet,
-		mockTraQSet,
 		mockContestSet,
 		mockGroupSet,
 	)

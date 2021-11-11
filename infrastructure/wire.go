@@ -1,5 +1,5 @@
+//go:generate go run github.com/google/wire/cmd/wire@v0.5.0
 //go:build wireinject
-// +build wireinject
 
 package infrastructure
 

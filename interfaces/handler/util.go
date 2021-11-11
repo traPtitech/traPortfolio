@@ -37,7 +37,7 @@ func convertToProjectDuration(since, until time.Time) domain.ProjectDuration {
 func semToTime(date domain.YearWithSemester) time.Time {
 	year := int(date.Year)
 	month := semesterToMonth[date.Semester]
-	return time.Date(year, month, 1, 0, 0, 0, 0, &time.Location{})
+	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 }
 
 func timeToSem(t time.Time) domain.YearWithSemester {
@@ -59,7 +59,7 @@ func optionalSemToTime(date OptionalYearWithSemester) optional.Time {
 	if date.Year.Valid && date.Semester.Valid {
 		year := int(date.Year.Int64)
 		month := semesterToMonth[date.Semester.Int64]
-		t.Time, t.Valid = time.Date(year, month, 1, 0, 0, 0, 0, &time.Location{}), true
+		t.Time, t.Valid = time.Date(year, month, 1, 0, 0, 0, 0, time.UTC), true
 	} else {
 		t.Valid = false
 	}
