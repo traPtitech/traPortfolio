@@ -338,7 +338,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	return c.NoContent(http.StatusCreated)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
