@@ -2,7 +2,9 @@ package handler_test
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -32,7 +34,8 @@ func doRequest(t *testing.T, api handler.API, method, path string, reqBody inter
 	infrastructure.Setup(e, api)
 	e.ServeHTTP(rec, req)
 
-	if resBody != nil {
+	// ここ決め打ちじゃないほうが良いかもしれない
+	if (rec.Code == http.StatusOK || rec.Code == http.StatusCreated) && !(resBody == nil || reflect.ValueOf(resBody).IsNil()) {
 		responseDecode(t, rec, resBody)
 	}
 

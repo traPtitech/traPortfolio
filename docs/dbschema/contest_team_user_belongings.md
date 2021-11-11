@@ -17,7 +17,7 @@ CREATE TABLE `contest_team_user_belongings` (
   KEY `fk_contest_team_user_belongings_user` (`user_id`),
   CONSTRAINT `fk_contest_team_user_belongings_contest_team` FOREIGN KEY (`team_id`) REFERENCES `contest_teams` (`id`),
   CONSTRAINT `fk_contest_team_user_belongings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>
@@ -28,8 +28,8 @@ CREATE TABLE `contest_team_user_belongings` (
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | team_id | char(36) |  | false |  | [contest_teams](contest_teams.md) | コンテストチームUUID |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
-| created_at | datetime(6) |  | true |  |  | 関係テーブル作成日時 |
-| updated_at | datetime(6) |  | true |  |  | 関係テーブル更新日時 |
+| created_at | datetime(6) | NULL | true |  |  | 関係テーブル作成日時 |
+| updated_at | datetime(6) | NULL | true |  |  | 関係テーブル更新日時 |
 
 ## Constraints
 

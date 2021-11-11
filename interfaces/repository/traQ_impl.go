@@ -24,7 +24,7 @@ func NewTraQRepository(api external.TraQAPI) repository.TraQRepository {
 func (repo *TraQRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.TraQUser, error) {
 	ures, err := repo.api.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	return &domain.TraQUser{
 		State:       ures.State,

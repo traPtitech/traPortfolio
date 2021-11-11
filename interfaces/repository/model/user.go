@@ -31,3 +31,7 @@ type Account struct {
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
 }
+
+func (*Account) TableName() string {
+	return "accounts"
+}
