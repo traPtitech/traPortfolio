@@ -92,7 +92,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 					},
 				}
 
-				th.Repository.MockEventRepository.EXPECT().GetEvents().Return(repoEvents, nil)
+				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(repoEvents, nil)
 				return hresEvents, "/api/v1/events"
 			},
 			statusCode: http.StatusOK,
