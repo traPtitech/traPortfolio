@@ -61,7 +61,7 @@ type ContestTeamDetailResponse struct {
 	ContestTeamResponse
 	Link        string          `json:"link"`
 	Description string          `json:"description"`
-	Members     []*userResponse `json:"members"`
+	Members     []*UserResponse `json:"members"`
 }
 
 // GetContests GET /contests
@@ -244,9 +244,9 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	members := make([]*userResponse, 0, len(contestTeam.Members))
+	members := make([]*UserResponse, 0, len(contestTeam.Members))
 	for _, user := range contestTeam.Members {
-		members = append(members, &userResponse{
+		members = append(members, &UserResponse{
 			ID:       user.ID,
 			Name:     user.Name,
 			RealName: user.RealName,
@@ -354,9 +354,9 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*userResponse, 0, len(users))
+	res := make([]*UserResponse, 0, len(users))
 	for _, v := range users {
-		res = append(res, &userResponse{
+		res = append(res, &UserResponse{
 			ID:       v.ID,
 			Name:     v.Name,
 			RealName: v.RealName,
