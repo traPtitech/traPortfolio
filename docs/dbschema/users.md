@@ -11,13 +11,13 @@
 CREATE TABLE `users` (
   `id` char(36) NOT NULL,
   `description` text NOT NULL,
-  `check` tinyint(1) NOT NULL DEFAULT '0',
+  `check` tinyint(1) NOT NULL DEFAULT 0,
   `name` varchar(32) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
 </details>
@@ -26,12 +26,12 @@ CREATE TABLE `users` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | char(36) |  | false | [accounts](accounts.md) [contest_team_user_belongings](contest_team_user_belongings.md) [project_members](project_members.md) |  | ユーザーUUID |
+| id | char(36) |  | false | [accounts](accounts.md) [contest_team_user_belongings](contest_team_user_belongings.md) [group_user_belongings](group_user_belongings.md) [project_members](project_members.md) |  | ユーザーUUID |
 | description | text |  | false |  |  | 自己紹介文 |
 | check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 |
 | name | varchar(32) |  | false |  |  | ユーザー名 |
-| created_at | datetime(6) |  | true |  |  |  |
-| updated_at | datetime(6) |  | true |  |  |  |
+| created_at | datetime(6) | NULL | true |  |  |  |
+| updated_at | datetime(6) | NULL | true |  |  |  |
 
 ## Constraints
 

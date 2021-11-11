@@ -17,6 +17,10 @@ type Project struct {
 	UpdatedAt   time.Time `gorm:"precision:6"`
 }
 
+func (*Project) TableName() string {
+	return "projects"
+}
+
 type ProjectMember struct {
 	ID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	ProjectID uuid.UUID `gorm:"type:char(36);not null"`
@@ -26,4 +30,8 @@ type ProjectMember struct {
 
 	Project Project `gorm:"foreignKey:ProjectID"`
 	User    User    `gorm:"foreignKey:UserID"`
+}
+
+func (*ProjectMember) TableName() string {
+	return "project_members"
 }

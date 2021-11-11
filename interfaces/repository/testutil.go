@@ -9,7 +9,11 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-var errUnexpected = errors.New("unexpected error")
+var (
+	sampleTime = time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC)
+
+	errUnexpected = errors.New("unexpected error")
+)
 
 type anyTime struct{}
 

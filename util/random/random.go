@@ -1,7 +1,10 @@
 package random
 
 import (
+	"fmt"
 	"math/rand"
+	"net/url"
+	"time"
 	"unsafe"
 
 	"github.com/gofrs/uuid"
@@ -37,4 +40,32 @@ func AlphaNumeric(n int) string {
 // UUID ランダムなUUIDを生成します
 func UUID() uuid.UUID {
 	return uuid.Must(uuid.NewV4())
+}
+
+func Time() time.Time {
+	min := time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
+	max := time.Date(2070, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
+	delta := max - min
+
+	sec := rand.Int63n(delta) + min
+	return time.UnixMicro(sec).In(time.UTC)
+}
+
+func URL(useHTTPS bool, domainLength uint16) *url.URL {
+	scheme := "https"
+	if !useHTTPS {
+		scheme = "http"
+	}
+	scheme += "://"
+
+	scheme += fmt.Sprintf("%s%s", scheme, AlphaNumeric(int(domainLength)))
+	url, err := url.Parse(scheme)
+	if err != nil {
+		panic(err)
+	}
+	return url
+}
+
+func RandURLString() string {
+	return URL(rand.Intn(2) < 1, uint16(rand.Intn(20)+1)).String()
 }

@@ -1,5 +1,5 @@
 TEST_DB_PORT := 3307
-TBLS_VERSION := 1.38.3
+TBLS_VERSION := 1.49.6
 
 GOFILES=$(wildcard *.go **/*.go)
 
@@ -37,12 +37,12 @@ db-gen-docs:
 		rm -r ./docs/dbschema; \
 	fi
 	DB_HOST=localhost DB_PORT=$(TEST_DB_PORT) go run main.go -migrate true
-	docker run -u $$(id -u) --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
+	docker run -u $$(id -u) --rm --net=host -e TBLS_DSN="mariadb://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
 
 .PHONY: db-lint
 db-lint:
 	DB_HOST=localhost DB_PORT=$(TEST_DB_PORT) go run main.go -migrate true
-	docker run --rm --net=host -e TBLS_DSN="mysql://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
+	docker run --rm --net=host -e TBLS_DSN="mariadb://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
 
 .PHONY: rm-test-db
 rm-test-db:

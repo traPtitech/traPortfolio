@@ -3,8 +3,8 @@ package repository
 import (
 	"errors"
 
-	"github.com/jinzhu/gorm"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"gorm.io/gorm"
 )
 
 func convertError(err error) error {

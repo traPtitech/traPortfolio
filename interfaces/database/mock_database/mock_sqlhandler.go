@@ -9,13 +9,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
-
-// TODO 適切な場所に書く
-func init() {
-	gorm.ErrRecordNotFound = repository.ErrNotFound
-}
 
 type MockSQLHandler struct {
 	Conn *gorm.DB
@@ -58,6 +52,11 @@ func (handler *MockSQLHandler) Create(value interface{}) database.SQLHandler {
 
 func (handler *MockSQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
 	db := handler.Conn.Delete(value, where...)
+	return &MockSQLHandler{Conn: db}
+}
+
+func (handler *MockSQLHandler) Update(column string, value interface{}) database.SQLHandler {
+	db := handler.Conn.Update(column, value)
 	return &MockSQLHandler{Conn: db}
 }
 
