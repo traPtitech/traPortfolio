@@ -216,8 +216,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "level"}).
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
-				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=? WHERE `id` = ?")).
-					WithArgs(args.arg.Level, args.id).
+				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.arg.Level, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.ExpectCommit()
 			},
@@ -279,8 +279,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "level"}).
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
-				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=? WHERE `id` = ?")).
-					WithArgs(args.arg.Level, args.id).
+				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.arg.Level, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
