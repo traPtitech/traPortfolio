@@ -791,36 +791,82 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 	}
 }
 
-// func TestContestHandler_GetContestTeamMember(t *testing.T) {
-// 	type fields struct {
-// 		srv service.ContestService
-// 	}
-// 	type args struct {
-// 		_c echo.Context
-// 	}
-// 	tests := []struct {
-// 		name      string
-// 		fields    fields
-// 		args      args
-// 		setup     func(f fields, args args)
-// 		assertion assert.ErrorAssertionFunc
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Setup mock
-// 			ctrl := gomock.NewController(t)
-// 			tt.fields = fields{
-// 				srv: mock_service.NewMockContestService(ctrl),
-// 			}
-// 			tt.setup(tt.fields, tt.args)
-// 			h := NewContestHandler(tt.fields.srv)
-// 			// Assertion
-// 			tt.assertion(t, h.GetContestTeamMember(tt.args._c))
-// 		})
-// 	}
-// }
+func TestContestHandler_GetContestTeamMember(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(th *handler.TestHandlers) (hres []*handler.UserResponse, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(th *handler.TestHandlers) ([]*handler.UserResponse, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				users := []*domain.User{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					},
+				}
+				hres := make([]*handler.UserResponse, len(users))
+				for i, user := range users {
+					hres[i] = &handler.UserResponse{
+						ID:       user.ID,
+						Name:     user.Name,
+						RealName: user.RealName,
+					}
+				}
+
+				th.Service.MockContestService.EXPECT().GetContestTeamMembers(gomock.Any(), contestID, teamID).Return(users, nil)
+				return hres, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "BadRequest: Invalid contest ID",
+			setup: func(th *handler.TestHandlers) ([]*handler.UserResponse, string) {
+				teamID := random.UUID()
+				return nil, fmt.Sprintf("/api/v1/contests/invalid/teams/%s/members", teamID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid team ID",
+			setup: func(th *handler.TestHandlers) ([]*handler.UserResponse, string) {
+				contestID := random.UUID()
+				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/invalid/members", contestID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Contest not exist",
+			setup: func(th *handler.TestHandlers) ([]*handler.UserResponse, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				th.Service.MockContestService.EXPECT().GetContestTeamMembers(gomock.Any(), contestID, teamID).Return(nil, repository.ErrNotFound)
+				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
+			},
+			statusCode: http.StatusNotFound,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			expectedHres, path := tt.setup(&handlers)
+
+			var hres []*handler.UserResponse
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &hres)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, expectedHres, hres)
+		})
+	}
+}
 
 // func TestContestHandler_PostContestTeamMember(t *testing.T) {
 // 	type fields struct {
