@@ -14,6 +14,8 @@ CREATE TABLE `project_members` (
   `user_id` char(36) NOT NULL,
   `since` datetime(6) DEFAULT NULL,
   `until` datetime(6) DEFAULT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_project_members_project` (`project_id`),
   KEY `fk_project_members_user` (`user_id`),
@@ -33,6 +35,8 @@ CREATE TABLE `project_members` (
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
 | since | datetime(6) | NULL | true |  |  | プロジェクト所属開始時期 |
 | until | datetime(6) | NULL | true |  |  | プロジェクト所属終了時期 |
+| created_at | datetime(6) | NULL | true |  |  |  |
+| updated_at | datetime(6) | NULL | true |  |  |  |
 
 ## Constraints
 
