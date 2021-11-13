@@ -59,7 +59,7 @@ type eventDetailResponse struct {
 	eventResponse
 	Description string            `json:"description"`
 	Place       string            `json:"place"`
-	HostName    []*userResponse   `json:"hostname"`
+	HostName    []*UserResponse   `json:"hostname"`
 	EventLevel  domain.EventLevel `json:"eventLevel"`
 }
 
@@ -105,9 +105,9 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 }
 
 func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
-	userRes := make([]*userResponse, 0, len(event.HostName))
+	userRes := make([]*UserResponse, 0, len(event.HostName))
 	for _, user := range event.HostName {
-		userRes = append(userRes, &userResponse{
+		userRes = append(userRes, &UserResponse{
 			ID:       user.ID,
 			Name:     user.Name,
 			RealName: user.RealName,
