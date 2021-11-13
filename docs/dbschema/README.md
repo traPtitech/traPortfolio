@@ -8,12 +8,12 @@
 | [contests](contests.md) | 8 | コンテストテーブル | BASE TABLE |
 | [contest_teams](contest_teams.md) | 8 | コンテスト参加チームテーブル | BASE TABLE |
 | [contest_team_user_belongings](contest_team_user_belongings.md) | 4 | コンテストチームとユーザー関係テーブル | BASE TABLE |
-| [event_level_relations](event_level_relations.md) | 2 | knoQイベントと公開レベルの関係テーブル | BASE TABLE |
-| [groups](groups.md) | 4 | グループテーブル | BASE TABLE |
-| [group_user_belongings](group_user_belongings.md) | 6 | グループとユーザー関係テーブル | BASE TABLE |
+| [event_level_relations](event_level_relations.md) | 4 | knoQイベントと公開レベルの関係テーブル | BASE TABLE |
+| [groups](groups.md) | 6 | グループテーブル | BASE TABLE |
+| [group_user_belongings](group_user_belongings.md) | 8 | グループとユーザー関係テーブル | BASE TABLE |
 | [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブル | BASE TABLE |
 | [projects](projects.md) | 8 | プロジェクトテーブル | BASE TABLE |
-| [project_members](project_members.md) | 5 | プロジェクト所属者テーブル | BASE TABLE |
+| [project_members](project_members.md) | 7 | プロジェクト所属者テーブル | BASE TABLE |
 | [users](users.md) | 6 | ユーザーテーブル | BASE TABLE |
 
 ## Relations

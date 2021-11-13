@@ -283,7 +283,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	return c.NoContent(http.StatusCreated)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
@@ -302,6 +302,7 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
+
 	res := make([]*User, 0, len(users))
 	for _, v := range users {
 		res = append(res, &User{

@@ -109,19 +109,19 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]in
 		}
 	}()
 	if err := tx.Error(); err != nil {
-		return err
+		return convertError(err)
 	}
 	if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
 		tx.Rollback()
-		return err
+		return convertError(err)
 	}
 	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
 		tx.Rollback()
-		return err
+		return convertError(err)
 	}
 	if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
 		tx.Rollback()
-		return err
+		return convertError(err)
 	}
 	tx.Commit()
 	return nil

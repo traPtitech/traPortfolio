@@ -18,7 +18,7 @@ func NewKnoqRepository(api external.KnoqAPI) repository.KnoqRepository {
 func (repo *KnoqRepository) GetAll() ([]*domain.KnoQEvent, error) {
 	eres, err := repo.api.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	result := make([]*domain.KnoQEvent, 0, len(eres))
 	for _, v := range eres {
@@ -39,7 +39,7 @@ func (repo *KnoqRepository) GetAll() ([]*domain.KnoQEvent, error) {
 func (repo *KnoqRepository) GetByID(id uuid.UUID) (*domain.KnoQEvent, error) {
 	eres, err := repo.api.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	return &domain.KnoQEvent{

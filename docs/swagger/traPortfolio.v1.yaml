@@ -945,14 +945,6 @@ components:
               description: プロジェクトメンバー
               items:
                 $ref: '#/components/schemas/ProjectMember'
-            createdAt: # TODO: いらないかも
-              type: string
-              format: date-time
-              description: 作成日時
-            updatedAt: # TODO: いらないかも
-              type: string
-              format: date-time
-              description: 変更日時
           required:
             - description
             - members

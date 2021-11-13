@@ -1,14 +1,18 @@
 package model
 
 import (
+	"time"
+
 	"github.com/gofrs/uuid"
 )
 
 type Group struct {
-	GroupID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Name    string    `gorm:"type:varchar(32)"`
-	Link    string    `gorm:"type:text"`
-	Leader  uuid.UUID `gorm:"type:char(36);not null"`
+	GroupID   uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Name      string    `gorm:"type:varchar(32)"`
+	Link      string    `gorm:"type:text"`
+	Leader    uuid.UUID `gorm:"type:char(36);not null"`
+	CreatedAt time.Time `gorm:"precision:6"`
+	UpdatedAt time.Time `gorm:"precision:6"`
 }
 
 func (*Group) TableName() string {
@@ -22,6 +26,8 @@ type GroupUserBelonging struct {
 	SinceSemester uint      `gorm:"type:tinyint(1);not null"`
 	UntilYear     uint      `gorm:"type:tinyint(1);not null"`
 	UntilSemester uint      `gorm:"type:tinyint(1);not null"`
+	CreatedAt     time.Time `gorm:"precision:6"`
+	UpdatedAt     time.Time `gorm:"precision:6"`
 
 	Group Group `gorm:"foreignKey:GroupID"`
 	User  User  `gorm:"foreignKey:UserID"`
