@@ -555,14 +555,14 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 		{
 			name: "BadRequest: Invalid team ID",
 			setup: func(th *handler.TestHandlers) (handler.ContestTeamDetailResponse, string) {
-				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/invalid/teams/%s", random.UUID().String())
+				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/invalid/teams/%s", random.UUID())
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
 			setup: func(th *handler.TestHandlers) (handler.ContestTeamDetailResponse, string) {
-				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams/invalid", random.UUID().String())
+				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams/invalid", random.UUID())
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -665,7 +665,13 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 					Result:      random.AlphaNumeric(rand.Intn(30) + 1),
 				}
-				th.Service.MockContestService.EXPECT().CreateContestTeam(gomock.Any(), contestID, gomock.Any()).Return(nil, repository.ErrNotFound)
+				args := repository.CreateContestTeamArgs{
+					Name:        reqBody.Name,
+					Result:      reqBody.Result,
+					Link:        reqBody.Link,
+					Description: reqBody.Description,
+				}
+				th.Service.MockContestService.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(nil, repository.ErrNotFound)
 				return reqBody, handler.PostContestTeamResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusNotFound,
@@ -681,7 +687,13 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 					Result:      random.AlphaNumeric(rand.Intn(30) + 1),
 				}
-				th.Service.MockContestService.EXPECT().CreateContestTeam(gomock.Any(), contestID, gomock.Any()).Return(nil, repository.ErrAlreadyExists)
+				args := repository.CreateContestTeamArgs{
+					Name:        reqBody.Name,
+					Result:      reqBody.Result,
+					Link:        reqBody.Link,
+					Description: reqBody.Description,
+				}
+				th.Service.MockContestService.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, handler.PostContestTeamResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusConflict,
