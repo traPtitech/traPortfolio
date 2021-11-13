@@ -31,6 +31,7 @@ func mustParseTime(layout, value string) time.Time {
 }
 
 func TestContestHandler_GetContests(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name         string
 		setup        func(th *handler.TestHandlers, want []*domain.Contest) (path string)
@@ -65,6 +66,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -95,7 +97,9 @@ var (
 	}
 )
 
-func makeContest() (*domain.ContestDetail, *handler.ContestDetailResponse) {
+func makeContest(t *testing.T) (*domain.ContestDetail, *handler.ContestDetailResponse) {
+	t.Helper()
+
 	d := domain.ContestDetail{
 		Contest: domain.Contest{
 			ID:        getContestID[0],
@@ -148,6 +152,7 @@ func makeContest() (*domain.ContestDetail, *handler.ContestDetailResponse) {
 }
 
 func TestContestHandler_GetContest(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (repoContest *domain.ContestDetail, hresContest *handler.ContestDetailResponse, path string)
@@ -156,7 +161,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
-				want, hres := makeContest()
+				want, hres := makeContest(t)
 				th.Service.MockContestService.EXPECT().GetContest(gomock.Any(), want.ID).Return(want, nil)
 				path := fmt.Sprintf("/api/v1/contests/%s", want.ID.String())
 
@@ -184,6 +189,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -202,6 +208,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 }
 
 func TestContestHandler_PostContest(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (reqBody *handler.PostContestRequest, expectedResBody *handler.ContestResponse, resBody *handler.ContestResponse, path string)
@@ -289,6 +296,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -306,6 +314,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 }
 
 func TestContestHandler_PatchContest(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (reqBody *handler.PatchContestRequest, path string)
@@ -377,6 +386,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		// },
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -393,6 +403,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 }
 
 func TestContestHandler_DeleteContest(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (path string)
@@ -416,6 +427,7 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -432,6 +444,7 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 }
 
 func TestContestHandler_GetContestTeams(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (hres []*handler.ContestTeamResponse, path string)
@@ -481,6 +494,7 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -499,6 +513,7 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 }
 
 func TestContestHandler_GetContestTeam(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (hres handler.ContestTeamDetailResponse, path string)
@@ -582,6 +597,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -600,6 +616,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 }
 
 func TestContestHandler_PostContestTeam(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (reqBody *handler.PostContestTeamRequest, expectedResBody handler.PostContestTeamResponse, path string)
@@ -704,6 +721,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -722,6 +740,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 }
 
 func TestContestHandler_PatchContestTeam(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (reqBody *handler.PatchContestTeamRequest, path string)
@@ -807,6 +826,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
@@ -823,6 +843,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 }
 
 func TestContestHandler_GetContestTeamMember(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func(th *handler.TestHandlers) (hres []*handler.UserResponse, path string)
@@ -882,6 +903,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
