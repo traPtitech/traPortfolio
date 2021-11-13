@@ -763,6 +763,7 @@ components:
       required:
         - id
         - name
+        - realName
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -804,9 +805,7 @@ components:
               items:
                 $ref: '#/components/schemas/Account'
           required:
-            - id
             - state
-            - name
             - bio
             - accounts
     EditUser:
@@ -946,6 +945,7 @@ components:
               items:
                 $ref: '#/components/schemas/ProjectMember'
           required:
+            - link
             - description
             - members
     ProjectMember:
@@ -1056,6 +1056,7 @@ components:
               items:
                 $ref: '#/components/schemas/ContestTeam'
           required:
+            - link
             - description
             - teams
     ContestTeam:
@@ -1077,6 +1078,7 @@ components:
       required:
         - id
         - name
+        - result
     ContestTeamDetail:
       title: ContestTeamDetail
       type: object
@@ -1100,6 +1102,7 @@ components:
               items:
                 $ref: '#/components/schemas/User'
           required:
+            - link
             - description
             - members
     ContestTeamWithContestName:
@@ -1173,6 +1176,7 @@ components:
               type: string
               description: 班説明
           required:
+            - link
             - leader
             - members
             - description

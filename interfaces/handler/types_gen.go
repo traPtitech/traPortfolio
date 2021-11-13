@@ -163,7 +163,7 @@ type ContestDetail struct {
 	Description string `json:"description"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link string `json:"link" validate:"url"`
 
 	// コンテストチーム
 	Teams []ContestTeam `json:"teams"`
@@ -178,7 +178,7 @@ type ContestTeam struct {
 	Name string `json:"name"`
 
 	// 順位などの結果
-	Result *string `json:"result,omitempty"`
+	Result string `json:"result"`
 }
 
 // ContestTeamDetail defines model for ContestTeamDetail.
@@ -190,7 +190,7 @@ type ContestTeamDetail struct {
 	Description string `json:"description"`
 
 	// コンテストチームの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link string `json:"link" validate:"url"`
 
 	// チームメンバーのUUID
 	Members []User `json:"members"`
@@ -356,7 +356,7 @@ type GroupDetail struct {
 	Leader User `json:"leader"`
 
 	// 班の詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link string `json:"link" validate:"url"`
 
 	// 班メンバー
 	Members []GroupMember `json:"members"`
@@ -407,20 +407,14 @@ type ProjectDetail struct {
 	// Embedded struct due to allOf(#/components/schemas/Project)
 	Project `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	// 作成日時
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
-
 	// プロジェクト説明
 	Description string `json:"description"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link string `json:"link" validate:"url"`
 
 	// プロジェクトメンバー
 	Members []ProjectMember `json:"members"`
-
-	// 変更日時
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
 // 班やプロジェクトの期間
@@ -456,7 +450,7 @@ type User struct {
 	Name string `json:"name"`
 
 	// 本名
-	RealName *string `json:"realName,omitempty"`
+	RealName string `json:"realName"`
 }
 
 // ユーザーアカウント状態

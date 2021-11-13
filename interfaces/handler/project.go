@@ -246,7 +246,7 @@ func newProjectDetail(project Project, description string, link string, members 
 	return ProjectDetail{
 		Project:     project,
 		Description: description,
-		Link:        &link,
+		Link:        link,
 		Members:     members,
 	}
 }

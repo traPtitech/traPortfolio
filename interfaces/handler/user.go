@@ -291,7 +291,7 @@ func newUser(id uuid.UUID, name string, realName string) User {
 	return User{
 		Id:       id,
 		Name:     name,
-		RealName: &realName,
+		RealName: realName,
 	}
 }
 

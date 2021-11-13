@@ -199,12 +199,8 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	}
 
 	members := make([]User, len(contestTeam.Members))
-	for i, user := range contestTeam.Members {
-		members[i] = User{
-			Id:       user.ID,
-			Name:     user.Name,
-			RealName: &user.RealName,
-		}
+	for i, v := range contestTeam.Members {
+		members[i] = newUser(v.ID, v.Name, v.RealName)
 	}
 
 	res := newContestTeamDetail(
@@ -308,7 +304,7 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 		res = append(res, &User{
 			Id:       v.ID,
 			Name:     v.Name,
-			RealName: &v.RealName,
+			RealName: v.RealName,
 		})
 	}
 	return c.JSON(http.StatusOK, res)
@@ -372,7 +368,7 @@ func newContest(id uuid.UUID, name string, since time.Time, until time.Time) Con
 func newContestDetail(contest Contest, link string, description string, teams []ContestTeam) ContestDetail {
 	return ContestDetail{
 		Contest:     contest,
-		Link:        &link,
+		Link:        link,
 		Description: description,
 		Teams:       teams,
 	}
@@ -382,14 +378,14 @@ func newContestTeam(id uuid.UUID, name string, result string) ContestTeam {
 	return ContestTeam{
 		Id:     id,
 		Name:   name,
-		Result: &result,
+		Result: result,
 	}
 }
 
 func newContestTeamDetail(team ContestTeam, link string, description string, members []User) ContestTeamDetail {
 	return ContestTeamDetail{
 		ContestTeam: team,
-		Link:        &link,
+		Link:        link,
 		Description: description,
 		Members:     members,
 	}
