@@ -214,8 +214,6 @@ func TestProjectService_CreateProject(t *testing.T) {
 				Link:        "",
 				Since:       time.Time{},
 				Until:       time.Time{},
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
 				want.Name = args.args.Name

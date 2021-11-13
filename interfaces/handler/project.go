@@ -72,8 +72,6 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 		project.Description,
 		project.Link,
 		members,
-		project.CreatedAt,
-		project.UpdatedAt,
 	))
 }
 
@@ -244,14 +242,12 @@ func newProject(id uuid.UUID, name string, duration ProjectDuration) Project {
 	}
 }
 
-func newProjectDetail(project Project, description string, link string, members []ProjectMember, createdAt time.Time, updatedAt time.Time) ProjectDetail {
+func newProjectDetail(project Project, description string, link string, members []ProjectMember) ProjectDetail {
 	return ProjectDetail{
 		Project:     project,
 		Description: description,
 		Link:        &link,
 		Members:     members,
-		CreatedAt:   &createdAt,
-		UpdatedAt:   &updatedAt,
 	}
 }
 
