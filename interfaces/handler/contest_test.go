@@ -538,7 +538,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 
 				hres := handler.ContestTeamDetailResponse{
 					ContestTeamResponse: handler.ContestTeamResponse{
-						ID:     repoContestTeamDetail.ContestTeam.ID,
+						ID:     repoContestTeamDetail.ID,
 						Name:   repoContestTeamDetail.Name,
 						Result: repoContestTeamDetail.Result,
 					},
