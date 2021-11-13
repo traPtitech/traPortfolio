@@ -18,6 +18,10 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
+const (
+	invalidID = "invalid"
+)
+
 func mustParseTime(layout, value string) time.Time {
 	t, err := time.Parse(layout, value)
 	if err != nil {
@@ -163,7 +167,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		{
 			name: "Invalid ID",
 			setup: func(th *handler.TestHandlers) (*domain.ContestDetail, *handler.ContestDetailResponse, string) {
-				path := "/api/v1/contests/invalid"
+				path := fmt.Sprintf("/api/v1/contests/%s", invalidID)
 				return &domain.ContestDetail{}, &handler.ContestDetailResponse{}, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -337,7 +341,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		{
 			name: "BadRequest: Invalid ID",
 			setup: func(th *handler.TestHandlers) (*handler.PatchContestRequest, string) {
-				path := "/api/v1/contests/invalid"
+				path := fmt.Sprintf("/api/v1/contests/%s", invalidID)
 				return &handler.PatchContestRequest{}, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -406,7 +410,7 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 		{
 			name: "BadRequest: Invalid ID",
 			setup: func(th *handler.TestHandlers) string {
-				return "/api/v1/contests/invalid"
+				return fmt.Sprintf("/api/v1/contests/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -471,7 +475,7 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 		{
 			name: "BadRequest: Invalid ID",
 			setup: func(th *handler.TestHandlers) (hres []*handler.ContestTeamResponse, path string) {
-				return []*handler.ContestTeamResponse{}, "/api/v1/contests/invalid/teams"
+				return []*handler.ContestTeamResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -555,14 +559,14 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 		{
 			name: "BadRequest: Invalid team ID",
 			setup: func(th *handler.TestHandlers) (handler.ContestTeamDetailResponse, string) {
-				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/invalid/teams/%s", random.UUID())
+				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s", invalidID, random.UUID())
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
 			setup: func(th *handler.TestHandlers) (handler.ContestTeamDetailResponse, string) {
-				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams/invalid", random.UUID())
+				return handler.ContestTeamDetailResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -650,7 +654,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 					Result:      random.AlphaNumeric(rand.Intn(30) + 1),
 				}
-				return reqBody, handler.PostContestTeamResponse{}, "/api/v1/contests/invalid/teams"
+				return reqBody, handler.PostContestTeamResponse{}, fmt.Sprintf("/api/v1/contests/%s/teams", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -758,7 +762,22 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Result:      optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
 					Description: optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
 				}
-				return reqBody, "/api/v1/contests/invalid/teams/invalid"
+				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", invalidID, random.UUID())
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid team ID",
+			setup: func(th *handler.TestHandlers) (*handler.PatchContestTeamRequest, string) {
+				reqBody := &handler.PatchContestTeamRequest{
+					ContestID:   random.UUID(),
+					TeamID:      random.UUID(),
+					Name:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+					Link:        optional.StringFrom(random.RandURLString()),
+					Result:      optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+					Description: optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+				}
+				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -839,7 +858,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 			name: "BadRequest: Invalid contest ID",
 			setup: func(th *handler.TestHandlers) ([]*handler.UserResponse, string) {
 				teamID := random.UUID()
-				return nil, fmt.Sprintf("/api/v1/contests/invalid/teams/%s/members", teamID)
+				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -847,7 +866,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 			name: "BadRequest: Invalid team ID",
 			setup: func(th *handler.TestHandlers) ([]*handler.UserResponse, string) {
 				contestID := random.UUID()
-				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/invalid/members", contestID)
+				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
