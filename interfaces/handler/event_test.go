@@ -58,38 +58,29 @@ func TestEventHandler_GetAll(t *testing.T) {
 			name: "success",
 			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
 
-				repoEvents := []*domain.Event{
-					{
-						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
-					},
-					{
-						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
-					},
-				}
+				casenum := 2
+				repoEvents := []*domain.Event{}
+				hresEvents := []*handler.EventResponse{}
 
-				hresEvents := []*handler.EventResponse{
-					{
-						ID:   repoEvents[0].ID,
-						Name: repoEvents[0].Name,
+				for i := 0; i < casenum; i++ {
+					revent := domain.Event{
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						TimeStart: random.Time(),
+						TimeEnd:   random.Time(),
+					}
+					hevent := handler.EventResponse{
+						ID:   revent.ID,
+						Name: revent.Name,
 						Duration: handler.Duration{
-							Since: repoEvents[0].TimeStart,
-							Until: repoEvents[0].TimeEnd,
+							Since: revent.TimeStart,
+							Until: revent.TimeEnd,
 						},
-					},
-					{
-						ID:   repoEvents[1].ID,
-						Name: repoEvents[1].Name,
-						Duration: handler.Duration{
-							Since: repoEvents[1].TimeStart,
-							Until: repoEvents[1].TimeEnd,
-						},
-					},
+					}
+
+					repoEvents = append(repoEvents, &revent)
+					hresEvents = append(hresEvents, &hevent)
+
 				}
 
 				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(repoEvents, nil)
