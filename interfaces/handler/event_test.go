@@ -92,7 +92,6 @@ func TestEventHandler_GetAll(t *testing.T) {
 		{
 			name: "internal error",
 			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
-
 				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
