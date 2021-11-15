@@ -341,7 +341,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
-// DeleteContestTeam DELETE /contests/:teamID/teams/:teamID
+// DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
 func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
