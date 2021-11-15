@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"errors"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -88,14 +89,18 @@ func TestEventHandler_GetAll(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
-		/*{
+		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers, want []*domain.Event) string {
-				th.Repository.MockEventRepository.EXPECT().GetEvents().Return(nil, err?)
-				return "/api/v1/events"
+			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
+
+				repoEvents := []*domain.Event{}
+				hresEvents := []*handler.EventResponse(nil)
+
+				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(repoEvents, errors.New("Internal Server Error"))
+				return hresEvents, "/api/v1/events"
 			},
-			statusCode: 500,
-		},*/
+			statusCode: http.StatusInternalServerError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
