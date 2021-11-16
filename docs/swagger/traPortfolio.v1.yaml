@@ -843,8 +843,6 @@ components:
         url:
           type: string
           description: アカウントurl
-          x-oapi-codegen-extra-tags:
-            validate: url
       required:
         - id
         - name
@@ -934,8 +932,6 @@ components:
               type: string
               format: uri
               description: プロジェクトの詳細が載っているページへのリンク
-              x-oapi-codegen-extra-tags:
-                validate: url
             description:
               type: string
               description: プロジェクト説明
@@ -1045,8 +1041,6 @@ components:
               type: string
               format: uri
               description: コンテストの詳細が載っているページへのリンク
-              x-oapi-codegen-extra-tags:
-                validate: url
             description:
               type: string
               description: コンテストの説明
@@ -1091,8 +1085,6 @@ components:
               type: string
               format: uri
               description: コンテストチームの詳細が載っているページへのリンク
-              x-oapi-codegen-extra-tags:
-                validate: url
             description:
               type: string
               description: チーム情報
@@ -1163,8 +1155,6 @@ components:
               type: string
               format: uri
               description: 班の詳細が載っているページへのリンク
-              x-oapi-codegen-extra-tags:
-                validate: url
             leader:
               $ref: '#/components/schemas/User'
             members:

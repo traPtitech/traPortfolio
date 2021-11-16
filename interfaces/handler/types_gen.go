@@ -70,7 +70,7 @@ type Account struct {
 	Type AccountType `json:"type"`
 
 	// アカウントurl
-	Url string `json:"url" validate:"url"`
+	Url string `json:"url"`
 }
 
 // アカウントの種類
@@ -163,7 +163,7 @@ type ContestDetail struct {
 	Description string `json:"description"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link string `json:"link" validate:"url"`
+	Link string `json:"link"`
 
 	// コンテストチーム
 	Teams []ContestTeam `json:"teams"`
@@ -190,7 +190,7 @@ type ContestTeamDetail struct {
 	Description string `json:"description"`
 
 	// コンテストチームの詳細が載っているページへのリンク
-	Link string `json:"link" validate:"url"`
+	Link string `json:"link"`
 
 	// チームメンバーのUUID
 	Members []User `json:"members"`
@@ -356,7 +356,7 @@ type GroupDetail struct {
 	Leader User `json:"leader"`
 
 	// 班の詳細が載っているページへのリンク
-	Link string `json:"link" validate:"url"`
+	Link string `json:"link"`
 
 	// 班メンバー
 	Members []GroupMember `json:"members"`
@@ -411,7 +411,7 @@ type ProjectDetail struct {
 	Description string `json:"description"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link string `json:"link" validate:"url"`
+	Link string `json:"link"`
 
 	// プロジェクトメンバー
 	Members []ProjectMember `json:"members"`
