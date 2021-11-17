@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"math/rand"
 	"regexp"
 	"testing"
 	"time"
@@ -130,7 +131,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					RealName: "ユーザー1 ユーザー1",
 				},
 				State: domain.TraqStateActive,
-				Bio:   random.AlphaNumeric(5),
+				Bio:   random.AlphaNumeric(rand.Intn(30) + 1),
 				Accounts: []*domain.Account{
 					{
 						ID:          random.UUID(),
@@ -359,7 +360,7 @@ func TestUserRepository_Update(t *testing.T) {
 			args: args{
 				id: ids[0],
 				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(10),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
 					"check":       true,
 				},
 			},
@@ -388,7 +389,7 @@ func TestUserRepository_Update(t *testing.T) {
 			args: args{
 				id: ids[0],
 				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(10),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
 					"check":       true,
 				},
 			},
@@ -438,9 +439,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(5),
+					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
-					URL:         random.AlphaNumeric(5),
+					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
 				},
 			},
@@ -472,9 +473,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(5),
+					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
-					URL:         random.AlphaNumeric(5),
+					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
 				},
 			},
@@ -495,9 +496,9 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: ids[0],
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(5),
+					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
-					URL:         random.AlphaNumeric(5),
+					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
 				},
 			},
@@ -553,8 +554,8 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    ids[0],
 				accountID: random.UUID(),
 				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(5),
-					"url":   random.AlphaNumeric(5),
+					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
+					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
 					"check": true,
 					"type":  domain.HOMEPAGE,
 				},
@@ -581,8 +582,8 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    ids[0],
 				accountID: random.UUID(),
 				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(5),
-					"url":   random.AlphaNumeric(5),
+					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
+					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
 					"check": true,
 					"type":  domain.HOMEPAGE,
 				},
@@ -691,7 +692,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			want: []*domain.UserProject{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(5),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
 					Since:     time.Now(),
 					Until:     time.Now(),
 					UserSince: time.Now(),
@@ -713,7 +714,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 						WithArgs(v.ID).
 						WillReturnRows(
 							sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-								AddRow(v.ID, v.Name, random.AlphaNumeric(10), random.AlphaNumeric(5), v.Since, v.Until, time.Now(), time.Now()),
+								AddRow(v.ID, v.Name, random.AlphaNumeric(rand.Intn(30)+1), random.AlphaNumeric(rand.Intn(30)+1), v.Since, v.Until, time.Now(), time.Now()),
 						)
 				}
 			},
@@ -767,9 +768,9 @@ func TestUserRepository_GetContests(t *testing.T) {
 			want: []*domain.UserContest{
 				{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(5),
-					Result:      random.AlphaNumeric(5),
-					ContestName: random.AlphaNumeric(5),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Result:      random.AlphaNumeric(rand.Intn(30) + 1),
+					ContestName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {

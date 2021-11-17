@@ -263,7 +263,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 						Until: random.Time(),
 					},
 					Name: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link: random.RandURLString(),
 				}
 				path = "/api/v1/contests"
 				return reqBody, nil, nil, path
@@ -531,7 +531,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
 						Result:    random.AlphaNumeric(rand.Intn(30) + 1),
 					},
-					Link:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        random.RandURLString(),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 					Members: []*domain.User{
 						{
