@@ -1,7 +1,6 @@
 package random
 
 import (
-	"fmt"
 	"math/rand"
 	"net/url"
 	"time"
@@ -58,7 +57,7 @@ func URL(useHTTPS bool, domainLength uint16) *url.URL {
 	}
 	scheme += "://"
 
-	scheme += fmt.Sprintf("%s%s", scheme, AlphaNumeric(int(domainLength)))
+	scheme += AlphaNumeric(int(domainLength))
 	url, err := url.Parse(scheme)
 	if err != nil {
 		panic(err)
