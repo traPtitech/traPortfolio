@@ -292,7 +292,7 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 }
 
 // GetGroups by UserID GET /users/:userID/groups
-func (h *UserHandler) GetGroupsByUserID(_c echo.Context) error {
+func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	c := Context{_c}
 	req := groupParam{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -300,7 +300,7 @@ func (h *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	groups, err := h.srv.GetGroupsByUserID(ctx, req.GroupID)
+	groups, err := handler.srv.GetGroupsByUserID(ctx, req.GroupID)
 	if err != nil {
 		return convertError(err)
 	}
