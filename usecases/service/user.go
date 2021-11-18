@@ -21,6 +21,7 @@ type UserService interface {
 	DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error
 	GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
 	GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error)
+	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error)
 	GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error)
 }
 
@@ -144,7 +145,7 @@ func (s *userService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 	return contests, nil
 }
 
-func (s *UserService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
+func (s *userService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
 	groups, err := s.repo.GetGroupsByUserID(userID)
 	if err != nil {
 		return nil, err
@@ -152,7 +153,7 @@ func (s *UserService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) (
 	return groups, nil
 }
 
-func (s *UserService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
+func (s *userService) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
 	events, err := s.event.GetUserEvents(userID)
 	if err != nil {
 		return nil, err
