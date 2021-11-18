@@ -65,7 +65,7 @@ type groupDetailResponse struct {
 	ID          uuid.UUID
 	Name        string
 	Link        string
-	Leader      *userResponse
+	Leader      *UserResponse
 	Members     []*GroupMemberDetailResponse
 	Description string
 }
@@ -110,7 +110,7 @@ func formatGetGroup(group *domain.GroupDetail) *groupDetailResponse {
 		ID:   group.ID,
 		Name: group.Name,
 		Link: group.Link,
-		Leader: &userResponse{
+		Leader: &UserResponse{
 			ID:       group.Leader.ID,
 			Name:     group.Leader.Name,
 			RealName: group.Leader.RealName,
