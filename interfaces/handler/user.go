@@ -28,8 +28,8 @@ type EditUserRequest struct {
 	Check  optional.Bool   `json:"check"`
 }
 
-// userResponse Portfolioのレスポンスで使うイベント情報
-type userResponse struct {
+// UserResponse Portfolioのレスポンスで使うイベント情報
+type UserResponse struct {
 	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`
 	RealName string    `json:"realName"`
@@ -91,9 +91,9 @@ func (handler *UserHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*userResponse, 0, len(users))
+	res := make([]*UserResponse, 0, len(users))
 	for _, user := range users {
-		res = append(res, &userResponse{
+		res = append(res, &UserResponse{
 			ID:       user.ID,
 			Name:     user.Name,
 			RealName: user.RealName,

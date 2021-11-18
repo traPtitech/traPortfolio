@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -116,7 +117,271 @@ func TestEventHandler_GetAll(t *testing.T) {
 	}
 }
 
-/*func TestEventHandler_GetByID(t *testing.T) {
+func TestEventHandler_GetByID(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string)
+		statusCode int
+	}{
+		{
+			name: "success 1",
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+
+				//1人
+				hostnum := 1
+				rHost := []*domain.User{}
+				hHost := []*handler.UserResponse{}
+
+				for i := 0; i < hostnum; i++ {
+					rhost := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					}
+					hhost := handler.UserResponse{
+						ID:       rhost.ID,
+						Name:     rhost.Name,
+						RealName: rhost.RealName,
+					}
+
+					rHost = append(rHost, &rhost)
+					hHost = append(hHost, &hhost)
+
+				}
+
+				revent := domain.EventDetail{
+
+					Event: domain.Event{
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						TimeStart: random.Time(),
+						TimeEnd:   random.Time(),
+					},
+
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+					HostName:    rHost,
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+					/*HostName: []*domain.User{
+						{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						},
+						{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						},
+					},*/
+				}
+
+				hevent := handler.EventDetailResponse{
+					EventResponse: handler.EventResponse{
+						ID:   revent.Event.ID,
+						Name: revent.Event.Name,
+						Duration: handler.Duration{
+							Since: revent.Event.TimeStart,
+							Until: revent.Event.TimeEnd,
+						},
+					},
+
+					Description: revent.Description,
+					Place:       revent.Place,
+					HostName:    hHost,
+					EventLevel:  revent.Level,
+					/*HostName: []*handler.UserResponse{
+						{
+							ID:       revent.HostName[0].ID,
+							Name:     revent.HostName[0].Name,
+							RealName: revent.HostName[0].RealName,
+						},
+						{
+							ID:       revent.HostName[1].ID,
+							Name:     revent.HostName[1].Name,
+							RealName: revent.HostName[1].RealName,
+						},
+					},*/
+				}
+
+				repoEvent := &revent
+				hresEvent := &hevent
+
+				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
+				path_ := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path_
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 2",
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+
+				//2人
+				hostnum := 2
+				rHost := []*domain.User{}
+				hHost := []*handler.UserResponse{}
+
+				for i := 0; i < hostnum; i++ {
+					rhost := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					}
+					hhost := handler.UserResponse{
+						ID:       rhost.ID,
+						Name:     rhost.Name,
+						RealName: rhost.RealName,
+					}
+
+					rHost = append(rHost, &rhost)
+					hHost = append(hHost, &hhost)
+
+				}
+
+				revent := domain.EventDetail{
+
+					Event: domain.Event{
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						TimeStart: random.Time(),
+						TimeEnd:   random.Time(),
+					},
+
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+					HostName:    rHost,
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+				}
+
+				hevent := handler.EventDetailResponse{
+					EventResponse: handler.EventResponse{
+						ID:   revent.Event.ID,
+						Name: revent.Event.Name,
+						Duration: handler.Duration{
+							Since: revent.Event.TimeStart,
+							Until: revent.Event.TimeEnd,
+						},
+					},
+
+					Description: revent.Description,
+					Place:       revent.Place,
+					HostName:    hHost,
+					EventLevel:  revent.Level,
+				}
+
+				repoEvent := &revent
+				hresEvent := &hevent
+
+				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
+				path_ := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path_
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 3",
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+
+				//32人
+				hostnum := 32
+				rHost := []*domain.User{}
+				hHost := []*handler.UserResponse{}
+
+				for i := 0; i < hostnum; i++ {
+					rhost := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					}
+					hhost := handler.UserResponse{
+						ID:       rhost.ID,
+						Name:     rhost.Name,
+						RealName: rhost.RealName,
+					}
+
+					rHost = append(rHost, &rhost)
+					hHost = append(hHost, &hhost)
+
+				}
+
+				revent := domain.EventDetail{
+
+					Event: domain.Event{
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						TimeStart: random.Time(),
+						TimeEnd:   random.Time(),
+					},
+
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+					HostName:    rHost,
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+				}
+
+				hevent := handler.EventDetailResponse{
+					EventResponse: handler.EventResponse{
+						ID:   revent.Event.ID,
+						Name: revent.Event.Name,
+						Duration: handler.Duration{
+							Since: revent.Event.TimeStart,
+							Until: revent.Event.TimeEnd,
+						},
+					},
+
+					Description: revent.Description,
+					Place:       revent.Place,
+					HostName:    hHost,
+					EventLevel:  revent.Level,
+				}
+
+				repoEvent := &revent
+				hresEvent := &hevent
+
+				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
+				path_ := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path_
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "internal error",
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+				id := random.UUID()
+				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
+				path_ := fmt.Sprintf("/api/v1/events/%s", id)
+				return nil, path_
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			hresEvent, path := tt.setup(&handlers)
+
+			var resBody *handler.EventDetailResponse
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresEvent, resBody)
+		})
+	}
+}
+
+/*
+func TestEventHandler_GetByID(t *testing.T) {
 	type fields struct {
 		srv service.EventService
 	}
@@ -142,7 +407,9 @@ func TestEventHandler_GetAll(t *testing.T) {
 		})
 	}
 }
+*/
 
+/*
 func TestEventHandler_PatchEvent(t *testing.T) {
 	type fields struct {
 		srv service.EventService
