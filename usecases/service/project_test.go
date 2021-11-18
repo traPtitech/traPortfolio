@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -36,16 +37,16 @@ func TestProjectService_GetProjects(t *testing.T) {
 			want: []*domain.Project{
 				{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(5),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Since:       time.Now(),
 					Until:       time.Now(),
-					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(10),
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
 						{
 							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(5),
-							RealName: random.AlphaNumeric(5),
+							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 							Since:    time.Now(),
 							Until:    time.Now(),
 						},
@@ -108,16 +109,16 @@ func TestProjectService_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          random.UUID(),
-				Name:        random.AlphaNumeric(5),
+				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 				Since:       time.Now(),
 				Until:       time.Now(),
-				Description: random.AlphaNumeric(10),
-				Link:        random.AlphaNumeric(10),
+				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(5),
-						RealName: random.AlphaNumeric(5),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 						Since:    time.Now(),
 						Until:    time.Now(),
 					},
@@ -200,9 +201,9 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:        random.AlphaNumeric(5),
-					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(10),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        random.RandURLString(),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
@@ -232,9 +233,9 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:        random.AlphaNumeric(5),
-					Description: random.AlphaNumeric(10),
-					Link:        random.AlphaNumeric(10),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        random.RandURLString(),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
@@ -285,9 +286,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.StringFrom(random.AlphaNumeric(5)),
-					Description: optional.StringFrom(random.AlphaNumeric(10)),
-					Link:        optional.StringFrom(random.AlphaNumeric(10)),
+					Name:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+					Description: optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+					Link:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
 					Since:       optional.TimeFrom(time.Now()),
 					Until:       optional.TimeFrom(time.Now()),
 				},
@@ -310,9 +311,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.StringFrom(random.AlphaNumeric(5)),
-					Description: optional.StringFrom(random.AlphaNumeric(10)),
-					Link:        optional.StringFrom(random.AlphaNumeric(10)),
+					Name:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+					Description: optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
+					Link:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
 					Since:       optional.TimeFrom(time.Now()),
 					Until:       optional.TimeFrom(time.Now()),
 				},
@@ -371,8 +372,8 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(5),
-					RealName: random.AlphaNumeric(5),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
