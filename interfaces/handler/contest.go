@@ -286,7 +286,10 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := teamParams{}
+	req := struct {
+		ContestIDInPath
+		TeamIDInPath
+	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())

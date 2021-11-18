@@ -52,16 +52,16 @@ func TestEventHandler_GetAll(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string)
+		setup      func(th *handler.TestHandlers) (hres []*handler.Event, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
+			setup: func(th *handler.TestHandlers) (hres []*handler.Event, path string) {
 
 				casenum := 2
 				repoEvents := []*domain.Event{}
-				hresEvents := []*handler.EventResponse{}
+				hresEvents := []*handler.Event{}
 
 				for i := 0; i < casenum; i++ {
 					revent := domain.Event{
@@ -70,12 +70,12 @@ func TestEventHandler_GetAll(t *testing.T) {
 						TimeStart: random.Time(),
 						TimeEnd:   random.Time(),
 					}
-					hevent := handler.EventResponse{
-						ID:   revent.ID,
+					hevent := handler.Event{
+						Id:   revent.ID,
 						Name: revent.Name,
 						Duration: handler.Duration{
 							Since: revent.TimeStart,
-							Until: revent.TimeEnd,
+							Until: &revent.TimeEnd,
 						},
 					}
 
@@ -91,7 +91,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
+			setup: func(th *handler.TestHandlers) (hres []*handler.Event, path string) {
 				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
@@ -106,7 +106,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 
 			hresEvents, path := tt.setup(&handlers)
 
-			var resBody []*handler.EventResponse
+			var resBody []*handler.Event
 			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
