@@ -282,6 +282,23 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
+func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
+	c := Context{_c}
+	ctx := c.Request().Context()
+	req := teamParams{}
+	err := c.BindAndValidate(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	err = h.srv.DeleteContestTeam(ctx, req.ContestID, req.TeamID)
+	if err != nil {
+		return convertError(err)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 // GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
 func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
