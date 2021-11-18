@@ -39,8 +39,8 @@ type GroupMemberDetailResponse struct {
 }
 
 // GroupResponse Portfolioのレスポンスで使う班情報
-type groupsResponse struct {
-	ID   uuid.UUID `json:"groupId"`
+type GroupsResponse struct {
+	ID   uuid.UUID `json:"id"`
 	Name string    `json:"name"`
 }
 
@@ -51,9 +51,9 @@ func (h *GroupHandler) GetAllGroups(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*groupsResponse, 0, len(groups))
+	res := make([]*GroupsResponse, 0, len(groups))
 	for _, group := range groups {
-		res = append(res, &groupsResponse{
+		res = append(res, &GroupsResponse{
 			ID:   group.ID,
 			Name: group.Name,
 		})

@@ -305,9 +305,9 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*groupUserResponse, 0, len(groups))
+	res := make([]*GroupUserResponse, 0, len(groups))
 	for _, group := range groups {
-		res = append(res, &groupUserResponse{
+		res = append(res, &GroupUserResponse{
 			ID:   group.ID,
 			Name: group.Name,
 			Duration: domain.GroupDuration{

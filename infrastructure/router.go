@@ -110,8 +110,6 @@ func Setup(e *echo.Echo, api handler.API) {
 
 			apiGroups.GET("", api.Group.GetAllGroups)
 			apiGroups.GET("/:groupID", api.Group.GetGroup)
-			// here will be deleted
-			// apiGroups.GET("/:userID/groups", api.Group.GetGroupsByUserID)
 		}
 
 		{
