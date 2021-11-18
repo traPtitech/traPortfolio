@@ -120,12 +120,12 @@ func TestEventHandler_GetAll(t *testing.T) {
 func TestEventHandler_GetByID(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string)
+		setup      func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, eventpath string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, eventpath string) {
 
 				//1人
 				hostnum := 1
@@ -210,14 +210,14 @@ func TestEventHandler_GetByID(t *testing.T) {
 				hresEvent := &hevent
 
 				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
-				path_ := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
-				return hresEvent, path_
+				path := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, eventpath string) {
 
 				//2人
 				hostnum := 2
@@ -278,14 +278,14 @@ func TestEventHandler_GetByID(t *testing.T) {
 				hresEvent := &hevent
 
 				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
-				path_ := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
-				return hresEvent, path_
+				path := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 3",
-			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, eventpath string) {
 
 				//32人
 				hostnum := 32
@@ -346,18 +346,18 @@ func TestEventHandler_GetByID(t *testing.T) {
 				hresEvent := &hevent
 
 				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
-				path_ := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
-				return hresEvent, path_
+				path := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, path string) {
+			setup: func(th *handler.TestHandlers) (hres *handler.EventDetailResponse, eventpath string) {
 				id := random.UUID()
 				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
-				path_ := fmt.Sprintf("/api/v1/events/%s", id)
-				return nil, path_
+				path := fmt.Sprintf("/api/v1/events/%s", id)
+				return nil, path
 			},
 			statusCode: http.StatusInternalServerError,
 		},
@@ -368,10 +368,10 @@ func TestEventHandler_GetByID(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			handlers := SetupTestHandlers(t, ctrl)
 
-			hresEvent, path := tt.setup(&handlers)
+			hresEvent, eventpath := tt.setup(&handlers)
 
 			var resBody *handler.EventDetailResponse
-			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, eventpath, nil, &resBody)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
