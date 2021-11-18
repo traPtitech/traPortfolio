@@ -27,6 +27,8 @@ type ProjectMember struct {
 	UserID    uuid.UUID `gorm:"type:char(36);not null"`
 	Since     time.Time `gorm:"precision:6"`
 	Until     time.Time `gorm:"precision:6"`
+	CreatedAt time.Time `gorm:"precision:6"`
+	UpdatedAt time.Time `gorm:"precision:6"`
 
 	Project Project `gorm:"foreignKey:ProjectID"`
 	User    User    `gorm:"foreignKey:UserID"`

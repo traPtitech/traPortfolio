@@ -26,6 +26,8 @@ comments:
     columnComments:
       id: knoQイベントUUID
       level: 公開レベル。0なら匿名、1ならそのまま公開、2なら外部に非公開
+      created_at: 関係テーブル作成日時
+      updated_at: 関係テーブル更新日時
   - table: contests
     tableComment: コンテストテーブル
     columnComments:
@@ -102,6 +104,8 @@ comments:
       name: グループ名
       link: グループのリンク
       leader: グループリーダーのユーザーUUID
+      created_at: グループ作成日時
+      updated_at: グループ更新日時
   - table: group_user_belongings
     tableComment: グループとユーザー関係テーブル
     columnComments:
@@ -111,3 +115,5 @@ comments:
       since_semester: ユーザー所属開始学期
       until_year: ユーザー所属終了年
       until_semester: ユーザー所属終了学期
+      created_at: 関係テーブル作成日時
+      updated_at: 関係テーブル更新日時
