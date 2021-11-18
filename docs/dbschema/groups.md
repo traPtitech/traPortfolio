@@ -13,6 +13,8 @@ CREATE TABLE `groups` (
   `name` varchar(32) DEFAULT NULL,
   `link` text DEFAULT NULL,
   `leader` char(36) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
@@ -27,6 +29,8 @@ CREATE TABLE `groups` (
 | name | varchar(32) | NULL | true |  |  | グループ名 |
 | link | text | NULL | true |  |  | グループのリンク |
 | leader | char(36) |  | false |  |  | グループリーダーのユーザーUUID |
+| created_at | datetime(6) | NULL | true |  |  | グループ作成日時 |
+| updated_at | datetime(6) | NULL | true |  |  | グループ更新日時 |
 
 ## Constraints
 

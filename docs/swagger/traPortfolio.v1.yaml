@@ -104,7 +104,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditAccount'
+              $ref: '#/components/schemas/AddAccount'
     get:
       summary: ユーザーアカウントのリストを取得
       operationId: getUserAccounts
@@ -244,7 +244,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditProject'
+              $ref: '#/components/schemas/AddProject'
   '/projects/{projectId}':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
@@ -406,7 +406,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContest'
+              $ref: '#/components/schemas/AddContest'
       tags:
         - contest
       description: コンテストを作成します
@@ -503,7 +503,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContestTeam'
+              $ref: '#/components/schemas/AddContestTeam'
       tags:
         - contest
   '/contests/{contestId}/teams/{teamId}':
@@ -701,7 +701,7 @@ paths:
       description: プロジェクトメンバーを取得します
     post:
       summary: プロジェクトメンバーの追加
-      operationId: addProjectMenbers
+      operationId: addProjectMembers
       description: プロジェクトメンバーを追加します
       responses:
         '204':
@@ -823,9 +823,6 @@ components:
             true: 公開
             false: 非公開
           default: true
-      required:
-        - bio
-        - check
     Account:
       title: Account
       type: object
@@ -926,7 +923,7 @@ components:
           properties:
             link:
               type: string
-              format: url
+              format: uri
               description: プロジェクトの詳細が載っているページへのリンク
             description:
               type: string
@@ -936,12 +933,6 @@ components:
               description: プロジェクトメンバー
               items:
                 $ref: '#/components/schemas/ProjectMember'
-            createdAt:
-              type: string
-              description: 作成日時
-            updatedAt:
-              type: string
-              description: 変更日時
           required:
             - description
             - members
@@ -977,9 +968,8 @@ components:
           example: 第n回進捗会
           description: イベント名
         duration:
-          description: イベントの開催期間
-          allOf:
-            - $ref: '#/components/schemas/Duration'
+          # description: イベントの開催期間
+          $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
@@ -1021,9 +1011,8 @@ components:
           type: string
           description: コンテスト名
         duration:
-          description: コンテストの開催期間
-          allOf:
-            - $ref: '#/components/schemas/Duration'
+          # description: コンテストの開催期間
+          $ref: '#/components/schemas/Duration'
       required:
         - id
         - name
@@ -1038,7 +1027,7 @@ components:
           properties:
             link:
               type: string
-              format: url
+              format: uri
               description: コンテストの詳細が載っているページへのリンク
             description:
               type: string
@@ -1079,7 +1068,7 @@ components:
           properties:
             link:
               type: string
-              format: url
+              format: uri
               description: コンテストチームの詳細が載っているページへのリンク
             description:
               type: string
@@ -1147,7 +1136,7 @@ components:
           properties:
             link:
               type: string
-              format: url
+              format: uri
               description: 班の詳細が載っているページへのリンク
             leader:
               $ref: '#/components/schemas/User'
@@ -1180,8 +1169,31 @@ components:
                 $ref: '#/components/schemas/ProjectDuration'
           required:
             - duration
+    AddProject:
+      title: AddProject
+      type: object
+      description: 新規プロジェクトリクエスト
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: プロジェクト名
+        link:
+          type: string
+          format: uri
+          description: プロジェクトの詳細が載っているページへのリンク
+        description:
+          type: string
+          description: プロジェクト説明
+        duration:
+          $ref: '#/components/schemas/ProjectDuration'
+      required:
+        - name
+        - description
+        - duration
     EditProject:
-      title: PatchProject
+      title: EditProject
       type: object
       description: プロジェクト変更リクエスト
       properties:
@@ -1192,13 +1204,35 @@ components:
           description: プロジェクト名
         link:
           type: string
-          format: url
+          format: uri
           description: プロジェクトの詳細が載っているページへのリンク
         description:
           type: string
           description: プロジェクト説明
         duration:
           $ref: '#/components/schemas/ProjectDuration'
+    AddContest:
+      title: AddContest
+      type: object
+      description: 新規コンテストリクエスト
+      properties:
+        name:
+          type: string
+          description: コンテスト名
+        link:
+          type: string
+          format: uri
+          description: コンテストの詳細が載っているページへのリンク
+        description:
+          type: string
+          description: コンテスト説明
+        duration:
+          # description: コンテストの開催期間
+          $ref: '#/components/schemas/Duration'
+      required:
+        - name
+        - description
+        - duration
     EditContest:
       title: EditContest
       type: object
@@ -1209,26 +1243,46 @@ components:
           description: コンテスト名
         link:
           type: string
-          format: url
+          format: uri
           description: コンテストの詳細が載っているページへのリンク
         description:
           type: string
           description: コンテスト説明
         duration:
-          description: コンテストの開催期間
-          allOf:
-            - $ref: '#/components/schemas/Duration'
-    EditContestTeam:
-      title: PostContestTeam
+          # description: コンテストの開催期間
+          $ref: '#/components/schemas/Duration'
+    AddContestTeam:
+      title: AddContestTeam
       type: object
-      description: コンテストチーム登録リクエスト
+      description: 新規コンテストチームリクエスト
       properties:
         name:
           type: string
           description: チーム名
         link:
           type: string
-          format: url
+          format: uri
+          description: コンテストチームの説明が載っているページへのリンク
+        description:
+          type: string
+          description: チーム情報
+        result:
+          type: string
+          description: 順位などの結果
+      required:
+        - name
+        - description
+    EditContestTeam:
+      title: EditContestTeam
+      type: object
+      description: コンテストチーム情報修正リクエスト
+      properties:
+        name:
+          type: string
+          description: チーム名
+        link:
+          type: string
+          format: uri
           description: コンテストチームの説明が載っているページへのリンク
         description:
           type: string
@@ -1343,7 +1397,7 @@ components:
         duration:
           $ref: '#/components/schemas/ProjectDuration'
       required:
-        - user_id
+        - userId
         - duration
     MemberIDs:
       title: MemberIDs
@@ -1358,6 +1412,27 @@ components:
             format: uuid
       required:
         - members
+    AddAccount:
+      title: AddAccount
+      type: object
+      description: 新規アカウントリクエスト
+      properties:
+        type:
+          $ref: '#/components/schemas/AccountType'
+        prPermitted:
+          $ref: '#/components/schemas/PrPermitted'
+        url:
+          type: string
+          description: アカウントurl
+          format: uri
+        id:
+          type: string
+          description: アカウントID
+      required:
+        - type
+        - prPermitted
+        - url
+        - id
     EditAccount:
       title: EditAccount
       type: object

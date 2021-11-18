@@ -3,7 +3,6 @@ package repository
 import (
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
@@ -15,12 +14,12 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
+	"gorm.io/gorm"
 )
 
 var (
 	sampleUUID  = uuid.FromStringOrNil("3fa85f64-5717-4562-b3fc-2c963f66afa6")
 	sample2UUID = uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111")
-	sampleTime  = time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC)
 )
 
 type mockEventRepositoryFields struct {
@@ -144,7 +143,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(gorm.ErrRecordNotFound)
 			},
 			assertion: assert.NoError,
 		},
@@ -217,8 +216,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "level"}).
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
-				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=? WHERE `id` = ?")).
-					WithArgs(args.arg.Level, args.id).
+				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.arg.Level, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.ExpectCommit()
 			},
@@ -237,7 +236,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 				h.Mock.ExpectBegin()
 				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(gorm.ErrRecordNotFound)
 				h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -280,8 +279,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "level"}).
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
-				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=? WHERE `id` = ?")).
-					WithArgs(args.arg.Level, args.id).
+				h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.arg.Level, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},

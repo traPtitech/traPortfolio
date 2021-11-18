@@ -94,6 +94,20 @@ func (mr *MockContestRepositoryMockRecorder) DeleteContest(id interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContest", reflect.TypeOf((*MockContestRepository)(nil).DeleteContest), id)
 }
 
+// DeleteContestTeam mocks base method.
+func (m *MockContestRepository) DeleteContestTeam(contestID, teamID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteContestTeam", contestID, teamID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteContestTeam indicates an expected call of DeleteContestTeam.
+func (mr *MockContestRepositoryMockRecorder) DeleteContestTeam(contestID, teamID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContestTeam", reflect.TypeOf((*MockContestRepository)(nil).DeleteContestTeam), contestID, teamID)
+}
+
 // DeleteContestTeamMembers mocks base method.
 func (m *MockContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	m.ctrl.T.Helper()

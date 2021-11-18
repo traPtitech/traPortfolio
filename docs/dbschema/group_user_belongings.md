@@ -15,6 +15,8 @@ CREATE TABLE `group_user_belongings` (
   `since_semester` tinyint(1) NOT NULL,
   `until_year` tinyint(1) NOT NULL,
   `until_semester` tinyint(1) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
   KEY `fk_group_user_belongings_group` (`group_id`),
   CONSTRAINT `fk_group_user_belongings_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`),
@@ -34,6 +36,8 @@ CREATE TABLE `group_user_belongings` (
 | since_semester | tinyint(1) |  | false |  |  | ユーザー所属開始学期 |
 | until_year | tinyint(1) |  | false |  |  | ユーザー所属終了年 |
 | until_semester | tinyint(1) |  | false |  |  | ユーザー所属終了学期 |
+| created_at | datetime(6) | NULL | true |  |  | 関係テーブル作成日時 |
+| updated_at | datetime(6) | NULL | true |  |  | 関係テーブル更新日時 |
 
 ## Constraints
 

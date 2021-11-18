@@ -18,7 +18,7 @@ type EventHandler struct {
 }
 
 // EventResponse Portfolioのレスポンスで使うイベント情報
-type eventResponse struct {
+type EventResponse struct {
 	ID       uuid.UUID `json:"eventId"`
 	Name     string    `json:"name"`
 	Duration Duration
@@ -37,9 +37,9 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*eventResponse, 0, len(events))
+	res := make([]*EventResponse, 0, len(events))
 	for _, event := range events {
-		res = append(res, &eventResponse{
+		res = append(res, &EventResponse{
 			ID:   event.ID,
 			Name: event.Name,
 			Duration: Duration{
@@ -56,10 +56,10 @@ type eventParam struct {
 }
 
 type eventDetailResponse struct {
-	eventResponse
+	EventResponse
 	Description string            `json:"description"`
 	Place       string            `json:"place"`
-	HostName    []*userResponse   `json:"hostname"`
+	HostName    []*UserResponse   `json:"hostname"`
 	EventLevel  domain.EventLevel `json:"eventLevel"`
 }
 
@@ -105,9 +105,9 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 }
 
 func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
-	userRes := make([]*userResponse, 0, len(event.HostName))
+	userRes := make([]*UserResponse, 0, len(event.HostName))
 	for _, user := range event.HostName {
-		userRes = append(userRes, &userResponse{
+		userRes = append(userRes, &UserResponse{
 			ID:       user.ID,
 			Name:     user.Name,
 			RealName: user.RealName,
@@ -116,7 +116,7 @@ func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
 	}
 
 	res := &eventDetailResponse{
-		eventResponse: eventResponse{
+		EventResponse: EventResponse{
 			ID:   event.ID,
 			Name: event.Name,
 			Duration: Duration{

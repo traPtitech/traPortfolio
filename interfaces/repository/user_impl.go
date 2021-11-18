@@ -27,8 +27,9 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 	users := make([]*model.User, 0)
 	err := repo.Find(&users).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
+
 	idMap := make(map[string]uuid.UUID, len(users))
 	for _, v := range users {
 		idMap[v.Name] = v.ID
@@ -36,7 +37,7 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 
 	portalUsers, err := repo.portal.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	result := make([]*domain.User, 0, len(users))
@@ -59,7 +60,7 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 		First(&user).
 		Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	accounts := make([]*domain.Account, 0, len(user.Accounts))
@@ -73,12 +74,12 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 
 	portalUser, err := repo.portal.GetByID(user.Name)
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	traQUser, err := repo.traQ.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	result := domain.UserDetail{
@@ -99,7 +100,7 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 	accounts := make([]*model.Account, 0)
 	err := repo.Find(&accounts, "user_id = ?", userID).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	result := make([]*domain.Account, 0, len(accounts))
@@ -117,7 +118,7 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	account := &model.Account{}
 	err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	result := &domain.Account{
@@ -133,20 +134,18 @@ func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{})
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := &model.User{ID: id}
 		err := repo.First(user).Error()
-		if err == repository.ErrNotFound {
-			return repository.ErrNotFound
-		} else if err != nil {
-			return err
+		if err != nil {
+			return convertError(err)
 		}
 
 		err = repo.Model(user).Updates(changes).Error()
 		if err != nil {
-			return err
+			return convertError(err)
 		}
 		return nil
 	})
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
@@ -163,13 +162,13 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 	}
 	err := repo.Create(&account).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	ver := &model.Account{}
 	err = repo.First(ver, &model.Account{ID: account.ID}).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	return &domain.Account{
@@ -183,26 +182,24 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := &model.Account{}
 		err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
-		if err == repository.ErrNotFound {
-			return repository.ErrNotFound
-		} else if err != nil {
-			return err
+		if err != nil {
+			return convertError(err)
 		}
 
 		err = repo.Model(account).Updates(changes).Error()
 		if err != nil {
-			return err
+			return convertError(err)
 		}
 		return nil
 	})
-	return err
+	return convertError(err)
 }
 
 func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
 
 	err := repo.Delete(&domain.Account{}, &model.Account{ID: accountID, UserID: userID}).Error()
 
-	return err
+	return convertError(err)
 
 }
 
@@ -214,7 +211,7 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 		Find(&projects).
 		Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	res := make([]*domain.UserProject, 0, len(projects))
@@ -271,7 +268,7 @@ func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest
 		Find(&contests).
 		Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	res := make([]*domain.UserContest, 0, len(contests))

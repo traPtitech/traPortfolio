@@ -9,7 +9,6 @@ import (
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type SQLConfig struct {
@@ -64,8 +63,6 @@ func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 
 // initDB データベースのスキーマを更新
 func initDB(db *gorm.DB) error {
-	// gormのエラーの上書き
-	gorm.ErrRecordNotFound = repository.ErrNotFound
 	// db.Logger = db.Logger.LogMode(logger.Info)
 	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
