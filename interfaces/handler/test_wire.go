@@ -33,16 +33,9 @@ var mockEventSet = wire.NewSet(
 )
 
 var mockGroupSet = wire.NewSet(
-	mock_repository.NewMockGroupRepository,
-	service.NewGroupService,
+	mock_service.NewMockGroupService,
 	NewGroupHandler,
-	wire.Bind(new(repository.GroupRepository), new(*mock_repository.MockGroupRepository)),
-	/*
-		mock_service.NewMockGroupService,
-		service.NewGroupService,
-		NewGroupHandler,
-		wire.Bind(new(service.GroupService), new(*mock_service.MockGroupService)),
-	*/
+	wire.Bind(new(service.GroupService), new(*mock_service.MockGroupService)),
 )
 
 var mockContestSet = wire.NewSet(

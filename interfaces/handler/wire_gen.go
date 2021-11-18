@@ -25,7 +25,9 @@ func SetupTestApi(ctrl *gomock.Controller) TestHandlers {
 	eventHandler := NewEventHandler(mockEventService)
 	mockContestService := mock_service.NewMockContestService(ctrl)
 	contestHandler := NewContestHandler(mockContestService)
-	api := NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)
+	mockGroupService := mock_service.NewMockGroupService(ctrl)
+	groupHandler := NewGroupHandler(mockGroupService)
+	api := NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
 	testService := TestService{
 		MockContestService: mockContestService,
 		MockEventService:   mockEventService,
@@ -50,6 +52,8 @@ var mockUserSet = wire.NewSet(mock_service.NewMockUserService, NewUserHandler, w
 var mockProjectSet = wire.NewSet(mock_service.NewMockProjectService, NewProjectHandler, wire.Bind(new(service.ProjectService), new(*mock_service.MockProjectService)))
 
 var mockEventSet = wire.NewSet(mock_service.NewMockEventService, NewEventHandler, wire.Bind(new(service.EventService), new(*mock_service.MockEventService)))
+
+var mockGroupSet = wire.NewSet(mock_service.NewMockGroupService, NewGroupHandler, wire.Bind(new(service.GroupService), new(*mock_service.MockGroupService)))
 
 var mockContestSet = wire.NewSet(mock_service.NewMockContestService, NewContestHandler, wire.Bind(new(service.ContestService), new(*mock_service.MockContestService)))
 

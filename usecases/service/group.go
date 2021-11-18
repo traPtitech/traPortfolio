@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen@latest -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+
 package service
 
 import (
@@ -8,20 +10,30 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type GroupService struct {
+type GroupService interface {
+	GetAllGroups(ctx context.Context) ([]*domain.Group, error)
+	GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error)
+}
+
+type groupService struct {
 	repo repository.GroupRepository
 }
 
 func NewGroupService(repo repository.GroupRepository) GroupService {
-	return GroupService{
+	return &groupService{
 		repo,
 	}
 }
 
-func (s *GroupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
+func (s *groupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
 	return s.repo.GetAllGroups()
 }
 
-func (s *GroupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
+func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
 	return s.repo.GetGroup(groupID)
 }
+
+// Interface guards
+var (
+	_ GroupService = (*groupService)(nil)
+)
