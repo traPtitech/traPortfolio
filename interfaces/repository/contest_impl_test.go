@@ -186,9 +186,9 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        optional.StringFrom(random.RandURLString()),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
-					Until:       optional.TimeFrom(sampleTime),
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			want: &domain.Contest{
@@ -214,9 +214,9 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        optional.StringFrom(random.RandURLString()),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
-					Until:       optional.TimeFrom(sampleTime),
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			want: nil,
@@ -610,8 +610,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-		Result:      optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-		Link:        optional.StringFrom(random.RandURLString()),
+		Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30) + 1), true),
+		Link:        optional.NewString(random.RandURLString(), true),
 		Description: random.AlphaNumeric(rand.Intn(30) + 1),
 	}
 
@@ -661,8 +661,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:      optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Link:        optional.StringFrom(random.RandURLString()),
+					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30) + 1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},

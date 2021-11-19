@@ -89,13 +89,9 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 	createReq := repository.CreateContestArgs{
 		Name:        req.Name,
 		Description: req.Description,
+		Link:        optional.StringFrom(req.Link),
 		Since:       req.Duration.Since,
-	}
-	if req.Link != nil {
-		createReq.Link = optional.StringFrom(*req.Link)
-	}
-	if req.Duration.Until != nil {
-		createReq.Until = optional.TimeFrom(*req.Duration.Until)
+		Until:       optional.TimeFrom(req.Duration.Until),
 	}
 
 	contest, err := h.srv.CreateContest(ctx, &createReq)
@@ -121,21 +117,14 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	patchReq := repository.UpdateContestArgs{}
-	if req.Name != nil {
-		patchReq.Name = optional.StringFrom(*req.Name)
-	}
-	if req.Description != nil {
-		patchReq.Description = optional.StringFrom(*req.Description)
-	}
-	if req.Link != nil {
-		patchReq.Link = optional.StringFrom(*req.Link)
+	patchReq := repository.UpdateContestArgs{
+		Name:        optional.StringFrom(req.Name),
+		Description: optional.StringFrom(req.Description),
+		Link:        optional.StringFrom(req.Link),
 	}
 	if req.Duration != nil {
-		patchReq.Since = optional.TimeFrom(req.Duration.Since)
-		if req.Duration.Until != nil {
-			patchReq.Until = optional.TimeFrom(*req.Duration.Until)
-		}
+		patchReq.Since = optional.TimeFrom(&req.Duration.Since)
+		patchReq.Until = optional.TimeFrom(req.Duration.Until)
 	}
 
 	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
@@ -228,13 +217,9 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 
 	args := repository.CreateContestTeamArgs{
 		Name:        req.Name,
+		Result:      optional.StringFrom(req.Result),
+		Link:        optional.StringFrom(req.Link),
 		Description: req.Description,
-	}
-	if req.Result != nil {
-		args.Result = optional.StringFrom(*req.Result)
-	}
-	if req.Link != nil {
-		args.Link = optional.StringFrom(*req.Link)
 	}
 
 	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
@@ -261,18 +246,11 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-	args := repository.UpdateContestTeamArgs{}
-	if req.Name != nil {
-		args.Name = optional.StringFrom(*req.Name)
-	}
-	if req.Result != nil {
-		args.Result = optional.StringFrom(*req.Result)
-	}
-	if req.Link != nil {
-		args.Link = optional.StringFrom(*req.Link)
-	}
-	if req.Description != nil {
-		args.Description = optional.StringFrom(*req.Description)
+	args := repository.UpdateContestTeamArgs{
+		Name:        optional.StringFrom(req.Name),
+		Result:      optional.StringFrom(req.Result),
+		Link:        optional.StringFrom(req.Link),
+		Description: optional.StringFrom(req.Description),
 	}
 
 	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)

@@ -11,8 +11,12 @@ type String struct {
 	sql.NullString
 }
 
-func StringFrom(s string) String {
-	return NewString(s, true)
+func StringFrom(s *string) String {
+	if s == nil {
+		return String{}
+	}
+	
+	return NewString(*s, true)
 }
 
 func NewString(s string, valid bool) String {

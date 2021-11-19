@@ -241,9 +241,9 @@ func TestContestHandler_PostContest(t *testing.T) {
 				args := repository.CreateContestArgs{
 					Name:        reqBody.Name,
 					Description: reqBody.Description,
-					Link:        optional.StringFrom(*reqBody.Link),
+					Link:        optional.StringFrom(reqBody.Link),
 					Since:       reqBody.Duration.Since,
-					Until:       optional.TimeFrom(*reqBody.Duration.Until),
+					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
 				want := domain.Contest{
 					ID:        random.UUID(),
@@ -293,9 +293,9 @@ func TestContestHandler_PostContest(t *testing.T) {
 				args := repository.CreateContestArgs{
 					Name:        reqBody.Name,
 					Description: reqBody.Description,
-					Link:        optional.StringFrom(*reqBody.Link),
+					Link:        optional.StringFrom(reqBody.Link),
 					Since:       reqBody.Duration.Since,
-					Until:       optional.TimeFrom(*reqBody.Duration.Until),
+					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
 				th.Service.MockContestService.EXPECT().CreateContest(gomock.Any(), &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, nil, nil, "/api/v1/contests"
@@ -347,11 +347,11 @@ func TestContestHandler_PatchContest(t *testing.T) {
 					},
 				}
 				args := repository.UpdateContestArgs{
-					Name:        optional.StringFrom(*reqBody.Name),
-					Description: optional.StringFrom(*reqBody.Description),
-					Link:        optional.StringFrom(*reqBody.Link),
-					Since:       optional.TimeFrom(reqBody.Duration.Since),
-					Until:       optional.TimeFrom(*reqBody.Duration.Until),
+					Name:        optional.StringFrom(reqBody.Name),
+					Description: optional.StringFrom(reqBody.Description),
+					Link:        optional.StringFrom(reqBody.Link),
+					Since:       optional.TimeFrom(&reqBody.Duration.Since),
+					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
 				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
 				th.Service.MockContestService.EXPECT().UpdateContest(gomock.Any(), contestID, &args).Return(nil)
@@ -647,8 +647,8 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
-					Result:      optional.StringFrom(*reqBody.Result),
-					Link:        optional.StringFrom(*reqBody.Link),
+					Result:      optional.StringFrom(reqBody.Result),
+					Link:        optional.StringFrom(reqBody.Link),
 					Description: reqBody.Description,
 				}
 				want := domain.ContestTeamDetail{
@@ -697,8 +697,8 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
-					Result:      optional.StringFrom(*reqBody.Result),
-					Link:        optional.StringFrom(*reqBody.Link),
+					Result:      optional.StringFrom(reqBody.Result),
+					Link:        optional.StringFrom(reqBody.Link),
 					Description: reqBody.Description,
 				}
 				th.Service.MockContestService.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(nil, repository.ErrNotFound)
@@ -718,8 +718,8 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
-					Result:      optional.StringFrom(*reqBody.Result),
-					Link:        optional.StringFrom(*reqBody.Link),
+					Result:      optional.StringFrom(reqBody.Result),
+					Link:        optional.StringFrom(reqBody.Link),
 					Description: reqBody.Description,
 				}
 				th.Service.MockContestService.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(nil, repository.ErrAlreadyExists)
@@ -766,10 +766,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Description: ptr(t, random.AlphaNumeric(rand.Intn(30)+1)),
 				}
 				args := repository.UpdateContestTeamArgs{
-					Name:        optional.StringFrom(*reqBody.Name),
-					Link:        optional.StringFrom(*reqBody.Link),
-					Result:      optional.StringFrom(*reqBody.Result),
-					Description: optional.StringFrom(*reqBody.Description),
+					Name:        optional.StringFrom(reqBody.Name),
+					Link:        optional.StringFrom(reqBody.Link),
+					Result:      optional.StringFrom(reqBody.Result),
+					Description: optional.StringFrom(reqBody.Description),
 				}
 				th.Service.MockContestService.EXPECT().UpdateContestTeam(gomock.Any(), teamID, &args).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)
@@ -814,10 +814,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Description: ptr(t, random.AlphaNumeric(rand.Intn(30)+1)),
 				}
 				args := repository.UpdateContestTeamArgs{
-					Name:        optional.StringFrom(*reqBody.Name),
-					Link:        optional.StringFrom(*reqBody.Link),
-					Result:      optional.StringFrom(*reqBody.Result),
-					Description: optional.StringFrom(*reqBody.Description),
+					Name:        optional.StringFrom(reqBody.Name),
+					Link:        optional.StringFrom(reqBody.Link),
+					Result:      optional.StringFrom(reqBody.Result),
+					Description: optional.StringFrom(reqBody.Description),
 				}
 				th.Service.MockContestService.EXPECT().UpdateContestTeam(gomock.Any(), teamID, &args).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)

@@ -9,27 +9,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// Defines values for AccountType.
-const (
-	AccountTypeN0 AccountType = 0
-
-	AccountTypeN1 AccountType = 1
-
-	AccountTypeN2 AccountType = 2
-
-	AccountTypeN3 AccountType = 3
-
-	AccountTypeN4 AccountType = 4
-
-	AccountTypeN5 AccountType = 5
-
-	AccountTypeN6 AccountType = 6
-
-	AccountTypeN7 AccountType = 7
-
-	AccountTypeN8 AccountType = 8
-)
-
 // Defines values for EventLevel.
 const (
 	EventLevelN0 EventLevel = 0
@@ -74,7 +53,7 @@ type Account struct {
 }
 
 // アカウントの種類
-type AccountType int
+type AccountType int64
 
 // 新規アカウントリクエスト
 type AddAccount struct {

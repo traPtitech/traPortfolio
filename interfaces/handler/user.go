@@ -85,13 +85,11 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	u := repository.UpdateUserArgs{}
-	if req.Bio != nil {
-		u.Description = optional.StringFrom(*req.Bio)
+	u := repository.UpdateUserArgs{
+		Description: optional.StringFrom(req.Bio),
+		Check:       optional.BoolFrom(req.Check),
 	}
-	if req.Check != nil {
-		u.Check = optional.BoolFrom(*req.Check)
-	}
+
 	err := handler.srv.Update(ctx, req.UserID, &u)
 	if err != nil {
 		return convertError(err)
@@ -179,19 +177,13 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	args := repository.UpdateAccountArgs{}
-	if req.Id != nil {
-		args.Name = optional.StringFrom(*req.Id)
+	args := repository.UpdateAccountArgs{
+		Name:        optional.StringFrom(req.Id),
+		Type:        optional.Int64From(((*int64)(req.Type))),
+		URL:         optional.StringFrom(req.Url),
+		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
 	}
-	if req.Type != nil {
-		args.Type = optional.Int64From(int64(*req.Type))
-	}
-	if req.Url != nil {
-		args.URL = optional.StringFrom(*req.Url)
-	}
-	if req.PrPermitted != nil {
-		args.PrPermitted = optional.BoolFrom(bool(*req.PrPermitted))
-	}
+
 	err = handler.srv.EditAccount(ctx, req.AccountID, req.UserID, &args)
 	if err != nil {
 		return convertError(err)

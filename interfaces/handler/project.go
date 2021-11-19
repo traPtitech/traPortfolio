@@ -88,9 +88,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	createReq := repository.CreateProjectArgs{
 		Name:        req.Name,
 		Description: req.Description,
-	}
-	if req.Link != nil {
-		createReq.Link = optional.StringFrom(*req.Link)
+		Link:        optional.StringFrom(req.Link),
 	}
 	since := semToTime(req.Duration.Since)
 	if req.Duration.Until != nil {
@@ -126,15 +124,10 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	patchReq := repository.UpdateProjectArgs{}
-	if req.Name != nil {
-		patchReq.Name = optional.StringFrom(*req.Name)
-	}
-	if req.Description != nil {
-		patchReq.Description = optional.StringFrom(*req.Description)
-	}
-	if req.Link != nil {
-		patchReq.Link = optional.StringFrom(*req.Link)
+	patchReq := repository.UpdateProjectArgs{
+		Name:        optional.StringFrom(req.Name),
+		Description: optional.StringFrom(req.Description),
+		Link:        optional.StringFrom(req.Link),
 	}
 	since := optionalSemToTime(req.Duration.Since)
 	if req.Duration.Until != nil {
