@@ -610,7 +610,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-		Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30) + 1), true),
+		Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 		Link:        optional.NewString(random.RandURLString(), true),
 		Description: random.AlphaNumeric(rand.Intn(30) + 1),
 	}
@@ -661,7 +661,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30) + 1), true),
+					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
