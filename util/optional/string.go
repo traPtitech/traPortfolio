@@ -15,12 +15,20 @@ func StringFrom(s *string) String {
 	if s == nil {
 		return String{}
 	}
-	
+
 	return NewString(*s, true)
 }
 
 func NewString(s string, valid bool) String {
 	return String{NullString: sql.NullString{String: s, Valid: valid}}
+}
+
+func (s *String) ValueOrZero() (zero string) {
+	if s.Valid {
+		return s.String
+	}
+
+	return
 }
 
 func (s *String) UnmarshalJSON(data []byte) error {

@@ -24,6 +24,14 @@ func NewTime(t time.Time, valid bool) Time {
 	return Time{NullTime: sql.NullTime{Time: t, Valid: valid}}
 }
 
+func (t *Time) ValueOrZero() (zero time.Time) {
+	if t.Valid {
+		return t.Time
+	}
+
+	return
+}
+
 func (t *Time) UnmarshalJSON(data []byte) error {
 	if bytes.Equal(data, []byte("null")) {
 		t.Time, t.Valid = time.Time{}, false

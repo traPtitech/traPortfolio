@@ -66,14 +66,11 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
 		Description: args.Description,
+		Link:        args.Link.ValueOrZero(),
 		Since:       args.Since,
+		Until:       args.Until.ValueOrZero(),
 	}
-	if args.Link.Valid {
-		contest.Link = args.Link.String
-	}
-	if args.Until.Valid {
-		contest.Until = args.Until.Time
-	}
+
 	err := repo.h.Create(contest).Error()
 	if err != nil {
 		return nil, convertError(err)
@@ -176,13 +173,10 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 		ContestID:   contestID,
 		Name:        _contestTeam.Name,
 		Description: _contestTeam.Description,
+		Result:      _contestTeam.Result.ValueOrZero(),
+		Link:        _contestTeam.Link.ValueOrZero(),
 	}
-	if _contestTeam.Result.Valid {
-		contestTeam.Result = _contestTeam.Result.String
-	}
-	if _contestTeam.Link.Valid {
-		contestTeam.Link = _contestTeam.Link.String
-	}
+
 	err := repo.h.Create(contestTeam).Error()
 	if err != nil {
 		return nil, convertError(err)
