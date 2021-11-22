@@ -210,8 +210,8 @@ func TestEventHandler_GetByID(t *testing.T) {
 			casenum := []int{1, 2, 32}
 			var resBody *handler.EventDetailResponse
 
-			for _, case_ := range casenum {
-				hresEvent, eventpath := tt.setup(&handlers, case_)
+			for _, testcase := range casenum {
+				hresEvent, eventpath := tt.setup(&handlers, testcase)
 
 				statusCode, _ := doRequest(t, handlers.API, http.MethodGet, eventpath, nil, &resBody)
 
