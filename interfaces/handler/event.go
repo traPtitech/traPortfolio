@@ -55,7 +55,7 @@ type eventParam struct {
 	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
 }
 
-type eventDetailResponse struct {
+type EventDetailResponse struct {
 	EventResponse
 	Description string            `json:"description"`
 	Place       string            `json:"place"`
@@ -104,7 +104,7 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
+func formatUserDetail(event *domain.EventDetail) *EventDetailResponse {
 	userRes := make([]*UserResponse, 0, len(event.HostName))
 	for _, user := range event.HostName {
 		userRes = append(userRes, &UserResponse{
@@ -115,7 +115,7 @@ func formatUserDetail(event *domain.EventDetail) *eventDetailResponse {
 		)
 	}
 
-	res := &eventDetailResponse{
+	res := &EventDetailResponse{
 		EventResponse: EventResponse{
 			ID:   event.ID,
 			Name: event.Name,
