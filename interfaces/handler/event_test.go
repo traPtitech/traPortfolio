@@ -164,18 +164,6 @@ func TestEventHandler_GetByID(t *testing.T) {
 					HostName:    rHost,
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
-					/*HostName: []*domain.User{
-						{
-							ID:       random.UUID(),
-							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-						},
-						{
-							ID:       random.UUID(),
-							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-						},
-					},*/
 				}
 
 				hevent := handler.EventDetailResponse{
@@ -192,18 +180,6 @@ func TestEventHandler_GetByID(t *testing.T) {
 					Place:       revent.Place,
 					HostName:    hHost,
 					EventLevel:  revent.Level,
-					/*HostName: []*handler.UserResponse{
-						{
-							ID:       revent.HostName[0].ID,
-							Name:     revent.HostName[0].Name,
-							RealName: revent.HostName[0].RealName,
-						},
-						{
-							ID:       revent.HostName[1].ID,
-							Name:     revent.HostName[1].Name,
-							RealName: revent.HostName[1].RealName,
-						},
-					},*/
 				}
 
 				repoEvent := &revent
@@ -379,35 +355,6 @@ func TestEventHandler_GetByID(t *testing.T) {
 		})
 	}
 }
-
-/*
-func TestEventHandler_GetByID(t *testing.T) {
-	type fields struct {
-		srv service.EventService
-	}
-	type args struct {
-		_c echo.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			h := &EventHandler{
-				srv: tt.fields.srv,
-			}
-			if err := h.GetByID(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("EventHandler.GetByID() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-*/
 
 /*
 func TestEventHandler_PatchEvent(t *testing.T) {
