@@ -244,7 +244,7 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.Group
 		gr := v.Group
 		result = append(result, &domain.GroupUser{
 			ID:   gr.GroupID,
-			Name: gr.Name, // GroupID から GroupNameを持ってきてここに代入
+			Name: gr.Name, // GroupNameが入れられている
 			Duration: domain.GroupDuration{
 				Since: domain.YearWithSemester{
 					Year:     v.SinceYear,

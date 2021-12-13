@@ -68,6 +68,13 @@ type UserProjectResponse struct {
 	UserDuration domain.ProjectDuration `json:"user_duration"`
 }
 
+type UserGroupResponse struct {
+	ID       uuid.UUID            `json:"id"`
+	Name     string               `json:"name"`
+	Duration domain.GroupDuration `json:"duration"`
+	// UserDuration domain.GroupDuration `json:"user_duration"`
+}
+
 type ContestTeamWithContestNameResponse struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
@@ -305,9 +312,9 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*GroupUserResponse, 0, len(groups))
+	res := make([]*UserGroupResponse, 0, len(groups))
 	for _, group := range groups {
-		res = append(res, &GroupUserResponse{
+		res = append(res, &UserGroupResponse{
 			ID:   group.ID,
 			Name: group.Name,
 			Duration: domain.GroupDuration{

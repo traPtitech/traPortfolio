@@ -25,10 +25,15 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 	return &GroupHandler{service}
 }
 
-type groupUserResponse struct {
-	ID       uuid.UUID
-	Name     string
+type GroupUserResponse struct {
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"Name"`
 	Duration domain.GroupDuration
+}
+
+// NewGroupUserRespoce creates a GroupUserResponse
+func NewGroupUserResponse(id uuid.UUID, name string, dur domain.GroupDuration) *GroupUserResponse {
+	return &GroupUserResponse{ID: id, Name: name, Duration: dur}
 }
 
 type GroupMemberDetailResponse struct {
@@ -42,6 +47,11 @@ type GroupMemberDetailResponse struct {
 type GroupsResponse struct {
 	ID   uuid.UUID `json:"id"`
 	Name string    `json:"name"`
+}
+
+// NewGroupResponse creates a GroupHandler
+func NewGroupResponse(id uuid.UUID, name string) *GroupsResponse {
+	return &GroupsResponse{ID: id, Name: name}
 }
 
 func (h *GroupHandler) GetAllGroups(c echo.Context) error {
