@@ -382,7 +382,7 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-type PostContestTeamMember struct {
+type PostContestTeamMemberRequest struct {
 	ContestID uuid.UUID   `param:"contestID" validate:"is-uuid"`
 	TeamID    uuid.UUID   `param:"teamID" validate:"is-uuid"`
 	Members   []uuid.UUID `json:"members" validate:"required"`
@@ -393,7 +393,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
-	req := PostContestTeamMember{}
+	req := PostContestTeamMemberRequest{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -411,7 +411,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
-	req := PostContestTeamMember{} // TODO: 構造体分けたいかも
+	req := PostContestTeamMemberRequest{} // TODO: 構造体分けたいかも
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
