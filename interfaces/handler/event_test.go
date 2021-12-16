@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -116,33 +117,113 @@ func TestEventHandler_GetAll(t *testing.T) {
 	}
 }
 
-/*func TestEventHandler_GetByID(t *testing.T) {
-	type fields struct {
-		srv service.EventService
-	}
-	type args struct {
-		_c echo.Context
-	}
+func TestEventHandler_GetByID(t *testing.T) {
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetailResponse, eventpath string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success random",
+			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetailResponse, eventpath string) {
+
+				rHost := []*domain.User{}
+				hHost := []*handler.UserResponse{}
+
+				for i := 0; i < hostnum; i++ {
+					rhost := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					}
+					hhost := handler.UserResponse{
+						ID:       rhost.ID,
+						Name:     rhost.Name,
+						RealName: rhost.RealName,
+					}
+
+					rHost = append(rHost, &rhost)
+					hHost = append(hHost, &hhost)
+
+				}
+
+				revent := domain.EventDetail{
+
+					Event: domain.Event{
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						TimeStart: random.Time(),
+						TimeEnd:   random.Time(),
+					},
+
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+					HostName:    rHost,
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+				}
+
+				hevent := handler.EventDetailResponse{
+					EventResponse: handler.EventResponse{
+						ID:   revent.Event.ID,
+						Name: revent.Event.Name,
+						Duration: handler.Duration{
+							Since: revent.Event.TimeStart,
+							Until: revent.Event.TimeEnd,
+						},
+					},
+
+					Description: revent.Description,
+					Place:       revent.Place,
+					HostName:    hHost,
+					EventLevel:  revent.Level,
+				}
+
+				repoEvent := &revent
+				hresEvent := &hevent
+
+				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
+				path := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
+				return hresEvent, path
+			},
+			statusCode: http.StatusOK,
+		},
+
+		{
+			name: "internal error",
+			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetailResponse, eventpath string) {
+				id := random.UUID()
+				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
+				path := fmt.Sprintf("/api/v1/events/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusInternalServerError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &EventHandler{
-				srv: tt.fields.srv,
-			}
-			if err := h.GetByID(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("EventHandler.GetByID() error = %v, wantErr %v", err, tt.wantErr)
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			casenum := []int{1, 2, 32}
+			var resBody *handler.EventDetailResponse
+
+			for _, testcase := range casenum {
+				hresEvent, eventpath := tt.setup(&handlers, testcase)
+
+				statusCode, _ := doRequest(t, handlers.API, http.MethodGet, eventpath, nil, &resBody)
+
+				// Assertion
+				assert.Equal(t, tt.statusCode, statusCode)
+				assert.Equal(t, hresEvent, resBody)
 			}
 		})
 	}
 }
 
+/*
 func TestEventHandler_PatchEvent(t *testing.T) {
 	type fields struct {
 		srv service.EventService

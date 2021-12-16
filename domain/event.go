@@ -30,4 +30,5 @@ const (
 	EventLevelAnonymous = iota // 匿名で公開
 	EventLevelPublic           // 全て公開
 	EventLevelPrivate          // 外部に非公開
+	EventLevelLimit
 )
