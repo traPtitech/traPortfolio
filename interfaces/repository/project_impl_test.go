@@ -272,6 +272,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 }
 
 func TestProjectRepository_CreateProject(t *testing.T) {
+	project := &model.Project{
+		ID:          random.UUID(),
+		Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+		Description: random.AlphaNumeric(rand.Intn(30) + 1),
+		Link:        random.RandURLString(),
+		Since:       time.Now(),
+		Until:       time.Now(),
+	}
+
 	t.Parallel()
 	type args struct {
 		project *model.Project
@@ -283,7 +292,49 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 		setup     func(f mockProjectRepositoryFields, args args, want *domain.Project)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				project: project,
+			},
+			want: &domain.Project{
+				ID:          project.ID,
+				Name:        project.Name,
+				Description: project.Description,
+				Link:        project.Link,
+				Since:       project.Since,
+				Until:       project.Until,
+			},
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				p := args.project
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(p.ID, p.Name, p.Description, p.Link, p.Since, p.Until, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				project: project,
+			},
+			want: nil,
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				p := args.project
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(p.ID, p.Name, p.Description, p.Link, p.Since, p.Until, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
