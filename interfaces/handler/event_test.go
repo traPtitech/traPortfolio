@@ -120,15 +120,15 @@ func TestEventHandler_GetAll(t *testing.T) {
 func TestEventHandler_GetByID(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetailResponse, eventpath string)
+		setup      func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetail, eventpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetailResponse, eventpath string) {
+			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetail, eventpath string) {
 
 				rHost := []*domain.User{}
-				hHost := []*handler.UserResponse{}
+				hHost := []handler.User{}
 
 				for i := 0; i < hostnum; i++ {
 					rhost := domain.User{
@@ -136,14 +136,14 @@ func TestEventHandler_GetByID(t *testing.T) {
 						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 					}
-					hhost := handler.UserResponse{
-						ID:       rhost.ID,
+					hhost := handler.User{
+						Id:       rhost.ID,
 						Name:     rhost.Name,
 						RealName: rhost.RealName,
 					}
 
 					rHost = append(rHost, &rhost)
-					hHost = append(hHost, &hhost)
+					hHost = append(hHost, hhost)
 
 				}
 
@@ -164,20 +164,20 @@ func TestEventHandler_GetByID(t *testing.T) {
 					RoomID:      random.UUID(),
 				}
 
-				hevent := handler.EventDetailResponse{
-					EventResponse: handler.EventResponse{
-						ID:   revent.Event.ID,
+				hevent := handler.EventDetail{
+					Event: handler.Event{
+						Id:   revent.Event.ID,
 						Name: revent.Event.Name,
 						Duration: handler.Duration{
 							Since: revent.Event.TimeStart,
-							Until: revent.Event.TimeEnd,
+							Until: &revent.Event.TimeEnd,
 						},
 					},
 
 					Description: revent.Description,
 					Place:       revent.Place,
-					HostName:    hHost,
-					EventLevel:  revent.Level,
+					Hostname:    hHost,
+					EventLevel:  handler.EventLevel(revent.Level),
 				}
 
 				repoEvent := &revent
@@ -192,7 +192,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetailResponse, eventpath string) {
+			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetail, eventpath string) {
 				id := random.UUID()
 				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
@@ -208,7 +208,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 			handlers := SetupTestHandlers(t, ctrl)
 
 			casenum := []int{1, 2, 32}
-			var resBody *handler.EventDetailResponse
+			var resBody *handler.EventDetail
 
 			for _, testcase := range casenum {
 				hresEvent, eventpath := tt.setup(&handlers, testcase)
