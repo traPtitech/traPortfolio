@@ -38,8 +38,8 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 }
 
 func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
-	project := &model.Project{ID: id}
-	if err := repo.h.First(&project).Error(); err != nil {
+	project := new(model.Project)
+	if err := repo.h.First(project, &model.Project{ID: id}).Error(); err != nil {
 		return nil, convertError(err)
 	}
 
