@@ -38,4 +38,5 @@ type UserRepository interface {
 	DeleteAccount(id uuid.UUID, accountID uuid.UUID) error
 	GetProjects(id uuid.UUID) ([]*domain.UserProject, error)
 	GetContests(id uuid.UUID) ([]*domain.UserContest, error)
+	GetGroupsByUserID(id uuid.UUID) ([]*domain.GroupUser, error)
 }

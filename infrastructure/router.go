@@ -64,9 +64,9 @@ func Setup(e *echo.Echo, api handler.API) {
 
 					apiUsersUIDContests.GET("", api.User.GetContests)
 
-					// apiUsersUIDGroups := apiUsersUID.Group("/groups")
+					apiUsersUIDGroups := apiUsersUID.Group("/groups")
 
-					// apiUsersUIDGroups.GET("", api.User.GetGroups)
+					apiUsersUIDGroups.GET("", api.User.GetGroupsByUserID)
 
 					apiUsersUIDEvents := apiUsersUID.Group("/events")
 
@@ -104,13 +104,6 @@ func Setup(e *echo.Echo, api handler.API) {
 			apiEventsEID.GET("", api.Event.GetByID)
 			apiEventsEID.PATCH("", api.Event.PatchEvent)
 		}
-
-		// {
-		// 	apiGroups := v1.Group("/groups")
-
-		// 	apiGroups.GET("", api.Group.GetAll)
-		// 	apiGroups.GET("/:groupID", api.Group.GetByID)
-		// }
 
 		{
 			apiContests := v1.Group("/contests")

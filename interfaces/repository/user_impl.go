@@ -228,6 +228,38 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 	return res, nil
 }
 
+func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
+	groups := make([]*model.GroupUserBelonging, 0)
+	err := repo.
+		Preload("Group").
+		Where(&model.GroupUserBelonging{UserID: userID}).
+		Find(&groups).
+		Error()
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*domain.GroupUser, 0, len(groups))
+	for _, v := range groups {
+		gr := v.Group
+		result = append(result, &domain.GroupUser{
+			ID:   gr.GroupID,
+			Name: gr.Name,
+			Duration: domain.GroupDuration{
+				Since: domain.YearWithSemester{
+					Year:     v.SinceYear,
+					Semester: v.SinceSemester,
+				},
+				Until: domain.YearWithSemester{
+					Year:     v.UntilYear,
+					Semester: v.UntilSemester,
+				},
+			},
+		})
+	}
+	return result, nil
+}
+
 func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
 	contests := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.

@@ -17,6 +17,10 @@ type userParam struct {
 	UserID uuid.UUID `param:"userID" validate:"is-uuid"`
 }
 
+type groupParam struct {
+	GroupID uuid.UUID `param:"groupID" validate:"is-uuid"`
+}
+
 type accountParams struct {
 	UserID    uuid.UUID `param:"userID" validate:"is-uuid"`
 	AccountID uuid.UUID `param:"accountID" validate:"is-uuid"`
@@ -66,6 +70,13 @@ type UserProjectResponse struct {
 	Name         string                 `json:"name"`
 	Duration     domain.ProjectDuration `json:"duration"`
 	UserDuration domain.ProjectDuration `json:"user_duration"`
+}
+
+type UserGroupResponse struct {
+	ID       uuid.UUID            `json:"id"`
+	Name     string               `json:"name"`
+	Duration domain.GroupDuration `json:"duration"`
+	// UserDuration domain.GroupDuration `json:"user_duration"`
 }
 
 type ContestTeamWithContestNameResponse struct {
@@ -287,6 +298,40 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 			ContestName: v.ContestName,
 		}
 		res = append(res, uc)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+// GetGroups by UserID GET /users/:userID/groups
+func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
+	c := Context{_c}
+	req := groupParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	groups, err := handler.srv.GetGroupsByUserID(ctx, req.GroupID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	res := make([]*UserGroupResponse, 0, len(groups))
+	for _, group := range groups {
+		res = append(res, &UserGroupResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Duration: domain.GroupDuration{
+				Since: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+				Until: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+			},
+		})
 	}
 	return c.JSON(http.StatusOK, res)
 }
