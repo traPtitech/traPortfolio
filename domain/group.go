@@ -4,9 +4,10 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// GroupUser indicates Group which User belongs
 type GroupUser struct {
-	ID       uuid.UUID
-	Name     string
+	ID       uuid.UUID // Group ID
+	Name     string    // Group name
 	Duration GroupDuration
 }
 

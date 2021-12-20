@@ -27,7 +27,7 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 
 type GroupUserResponse struct {
 	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"Name"`
+	Name     string    `json:"name"`
 	Duration domain.GroupDuration
 }
 

@@ -41,9 +41,10 @@ type UserContest struct {
 	ContestName string
 }
 
+// UserGroup indicates User who belongs to Group
 type UserGroup struct {
-	ID       uuid.UUID
-	Name     string
+	ID       uuid.UUID // User ID
+	Name     string    // User Name
 	RealName string
 	Duration GroupDuration
 }
