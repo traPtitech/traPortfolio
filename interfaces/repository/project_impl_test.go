@@ -339,7 +339,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			// t.Parallel() // FIXME: サブテストを並行に行うとWARNING: DATA RACEが出る
+			t.Parallel()
 			// Setup mock
 			f := newMockProjectRepositoryFields()
 			tt.setup(f, tt.args, tt.want)
