@@ -223,6 +223,57 @@ func TestEventHandler_GetByID(t *testing.T) {
 	}
 }
 
+func TestEventHandler_PatchEvent(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(th *handler.TestHandlers) (reqBody *handler.EditEventRequest, path string)
+		statusCode int
+	}{
+		{
+			name: "success",
+			setup: func(th *handler.TestHandlers) (reqBody *handler.EditEventRequest, path string) {
+
+				EventID := random.UUID()
+				reqBody := &handler.EditEventRequest{
+					EventID: EventID,
+					EventLevel: domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: reqBody.EventLevel,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", random.UUID())
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), EventID, &args).Return(nil)
+				return reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		/*{
+			name: "internal error",
+			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
+				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				return nil, "/api/v1/events"
+			},
+			statusCode: http.StatusInternalServerError,
+		},*/
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			path := tt.setup(&handlers)
+
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+		})
+	}
+}
+
 /*
 func TestEventHandler_PatchEvent(t *testing.T) {
 	type fields struct {
