@@ -120,7 +120,7 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
-		Where(model.ProjectMember{ProjectID: id}).
+		Where(&model.ProjectMember{ProjectID: id}).
 		Find(&members).
 		Error()
 	if err != nil {
