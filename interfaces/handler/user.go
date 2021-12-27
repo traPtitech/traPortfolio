@@ -275,26 +275,23 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*UserGroup, 0, len(groups))
-	for _, group := range groups {
-		res = append(res, &UserGroup{
-			Group: Group{
-				Id:   group.ID,
-				Name: group.Name,
-			},
-			Duration: []ProjectDuration{
-				{
-					Since: YearWithSemester{
+	res := make([]UserGroup, len(groups))
+	for i, group := range groups {
+		res[i] = newUserGroup(
+			newGroup(group.ID, group.Name),
+			[]ProjectDuration{
+				newProjectDuration(
+					YearWithSemester{
 						Semester: Semester(group.Duration.Since.Semester),
 						Year:     int(group.Duration.Since.Year),
 					},
-					Until: &YearWithSemester{
+					YearWithSemester{
 						Semester: Semester(group.Duration.Since.Semester),
 						Year:     int(group.Duration.Since.Year),
 					},
-				},
+				),
 			},
-		})
+		)
 	}
 	return c.JSON(http.StatusOK, res)
 }
@@ -366,5 +363,19 @@ func newContestTeamWithContestName(contestTeam ContestTeam, contestName string) 
 	return ContestTeamWithContestName{
 		ContestTeam: contestTeam,
 		ContestName: contestName,
+	}
+}
+
+func newGroup(id uuid.UUID, name string) Group {
+	return Group{
+		Id:   id,
+		Name: name,
+	}
+}
+
+func newUserGroup(group Group, Duration []ProjectDuration) UserGroup {
+	return UserGroup{
+		Group:    group,
+		Duration: Duration,
 	}
 }
