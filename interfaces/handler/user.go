@@ -22,6 +22,10 @@ type AccountIDInPath struct {
 	AccountID uuid.UUID `param:"accountID" validate:"is-uuid"`
 }
 
+type GroupIDInPath struct {
+	GroupID uuid.UUID `param:"groupID" validate:"is-uuid"`
+}
+
 type UserHandler struct {
 	srv service.UserService
 }
@@ -260,7 +264,7 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 // GetGroups by UserID GET /users/:userID/groups
 func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	c := Context{_c}
-	req := groupParam{}
+	req := GroupIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -271,19 +275,23 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*UserGroupResponse, 0, len(groups))
+	res := make([]*UserGroup, 0, len(groups))
 	for _, group := range groups {
-		res = append(res, &UserGroupResponse{
-			ID:   group.ID,
-			Name: group.Name,
-			Duration: domain.GroupDuration{
-				Since: domain.YearWithSemester{
-					Year:     group.Duration.Since.Year,
-					Semester: group.Duration.Since.Semester,
-				},
-				Until: domain.YearWithSemester{
-					Year:     group.Duration.Since.Year,
-					Semester: group.Duration.Since.Semester,
+		res = append(res, &UserGroup{
+			Group: Group{
+				Id:   group.ID,
+				Name: group.Name,
+			},
+			Duration: []ProjectDuration{
+				{
+					Since: YearWithSemester{
+						Semester: Semester(group.Duration.Since.Semester),
+						Year:     int(group.Duration.Since.Year),
+					},
+					Until: &YearWithSemester{
+						Semester: Semester(group.Duration.Since.Semester),
+						Year:     int(group.Duration.Since.Year),
+					},
 				},
 			},
 		})
