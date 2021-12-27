@@ -272,14 +272,14 @@ func TestProjectRepository_GetProject(t *testing.T) {
 }
 
 func TestProjectRepository_CreateProject(t *testing.T) {
-	project := &model.Project{
+	successProject := &model.Project{
 		ID:          random.UUID(),
 		Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 		Description: random.AlphaNumeric(rand.Intn(30) + 1),
 		Link:        random.RandURLString(),
 		Since:       time.Now(),
 		Until:       time.Now(),
-	}
+	} // Successで使うProject
 
 	t.Parallel()
 	type args struct {
@@ -295,15 +295,15 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				project: project,
+				project: successProject,
 			},
 			want: &domain.Project{
-				ID:          project.ID,
-				Name:        project.Name,
-				Description: project.Description,
-				Link:        project.Link,
-				Since:       project.Since,
-				Until:       project.Until,
+				ID:          successProject.ID,
+				Name:        successProject.Name,
+				Description: successProject.Description,
+				Link:        successProject.Link,
+				Since:       successProject.Since,
+				Until:       successProject.Until,
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
 				h := f.h.(*mock_database.MockSQLHandler)
@@ -320,7 +320,14 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				project: project,
+				project: &model.Project{
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        random.RandURLString(),
+					Since:       time.Now(),
+					Until:       time.Now(),
+				},
 			},
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
