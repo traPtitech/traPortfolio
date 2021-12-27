@@ -14,8 +14,6 @@ type Project struct {
 	Description string
 	Link        string
 	Members     []*ProjectMember
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 type ProjectMember struct {

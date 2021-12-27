@@ -31,8 +31,6 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 			Until:       v.Until,
 			Description: v.Description,
 			Link:        v.Link,
-			CreatedAt:   v.CreatedAt,
-			UpdatedAt:   v.CreatedAt,
 		}
 		res = append(res, p)
 	}
@@ -72,8 +70,6 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 		Description: project.Description,
 		Link:        project.Link,
 		Members:     m,
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.CreatedAt,
 	}
 	return res, nil
 }
@@ -90,8 +86,6 @@ func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Pr
 		Until:       project.Until,
 		Description: project.Description,
 		Link:        project.Link,
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.CreatedAt,
 	}
 	return res, nil
 }

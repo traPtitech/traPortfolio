@@ -203,7 +203,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        random.RandURLString(),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
@@ -215,15 +215,15 @@ func TestProjectService_CreateProject(t *testing.T) {
 				Link:        "",
 				Since:       time.Time{},
 				Until:       time.Time{},
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
 				want.Name = args.args.Name
 				want.Description = args.args.Description
-				want.Link = args.args.Link
 				want.Since = args.args.Since
 				want.Until = args.args.Until
+				if args.args.Link.Valid {
+					want.Link = args.args.Link.String
+				}
 				repo.EXPECT().CreateProject(gomock.Any()).Return(want, nil) // TODO: CreateProject内でuuid.NewV4するのでテストができない？
 			},
 			assertion: assert.NoError,
@@ -235,7 +235,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        random.RandURLString(),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       time.Now(),
 					Until:       time.Now(),
 				},
@@ -286,11 +286,11 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Description: optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Link:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Since:       optional.TimeFrom(time.Now()),
-					Until:       optional.TimeFrom(time.Now()),
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Since:       optional.NewTime(time.Now(), true),
+					Until:       optional.NewTime(time.Now(), true),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
@@ -311,11 +311,11 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Description: optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Link:        optional.StringFrom(random.AlphaNumeric(rand.Intn(30) + 1)),
-					Since:       optional.TimeFrom(time.Now()),
-					Until:       optional.TimeFrom(time.Now()),
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Since:       optional.NewTime(time.Now(), true),
+					Until:       optional.NewTime(time.Now(), true),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {

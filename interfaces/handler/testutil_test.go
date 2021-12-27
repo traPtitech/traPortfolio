@@ -57,3 +57,10 @@ func responseDecode(t *testing.T, rec *httptest.ResponseRecorder, i interface{})
 	err := json.Unmarshal(rec.Body.Bytes(), i)
 	require.NoError(t, err)
 }
+
+// FIXME: 暫定対処
+func ptr(t *testing.T, s string) *string {
+	t.Helper()
+
+	return &s
+}

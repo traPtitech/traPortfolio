@@ -14,8 +14,10 @@ type User struct {
 
 type Account struct {
 	ID          uuid.UUID
+	Name        string
 	Type        uint
 	PrPermitted bool
+	URL         string
 }
 
 type UserDetail struct {

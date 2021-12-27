@@ -66,9 +66,11 @@ func (s *projectService) CreateProject(ctx context.Context, args *repository.Cre
 		ID:          uid,
 		Name:        args.Name,
 		Description: args.Description,
-		Link:        args.Link,
 		Since:       args.Since,
 		Until:       args.Until,
+	}
+	if args.Link.Valid {
+		project.Link = args.Link.String
 	}
 	res, err := s.repo.CreateProject(project)
 	if err != nil {
