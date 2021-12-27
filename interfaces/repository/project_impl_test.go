@@ -364,7 +364,155 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		setup     func(f mockProjectRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success_AllParameterWillBeChanged",
+			args: args{
+				id: random.UUID(),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"since":       time.Now(),
+					"until":       time.Now(),
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				var (
+					name        = random.AlphaNumeric(rand.Intn(30) + 1)
+					description = random.AlphaNumeric(rand.Intn(30) + 1)
+					link        = random.RandURLString()
+					since       = time.Now()
+					until       = time.Now()
+				)
+
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
+							AddRow(args.id, name, description, link, since, until),
+					)
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+
+				name = args.changes["name"].(string)
+				description = args.changes["description"].(string)
+				link = args.changes["link"].(string)
+				since = args.changes["since"].(time.Time)
+				until = args.changes["until"].(time.Time)
+
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
+							AddRow(args.id, name, description, link, since, until),
+					)
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrorFirstOldProject",
+			args: args{
+				id:      random.UUID(),
+				changes: map[string]interface{}{},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "ErrorUpdate",
+			args: args{
+				id: random.UUID(),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"since":       time.Now(),
+					"until":       time.Now(),
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
+							AddRow(
+								args.id,
+								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(rand.Intn(30)+1),
+								random.RandURLString(),
+								time.Now(),
+								time.Now(),
+							),
+					)
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "ErrorFirstNewProject",
+			args: args{
+				id: random.UUID(),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"since":       time.Now(),
+					"until":       time.Now(),
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				var (
+					name        = random.AlphaNumeric(rand.Intn(30) + 1)
+					description = random.AlphaNumeric(rand.Intn(30) + 1)
+					link        = random.RandURLString()
+					since       = time.Now()
+					until       = time.Now()
+				)
+
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
+							AddRow(args.id, name, description, link, since, until),
+					)
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt

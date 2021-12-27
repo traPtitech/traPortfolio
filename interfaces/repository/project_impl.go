@@ -96,28 +96,23 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]in
 		new model.Project
 	)
 
-	tx := repo.h.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
+			return convertError(err)
 		}
-	}()
-	if err := tx.Error(); err != nil {
+		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+			return convertError(err)
+		}
+		if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
+			return convertError(err)
+		}
+
+		return nil
+	})
+	if err != nil {
 		return convertError(err)
 	}
-	if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
-		tx.Rollback()
-		return convertError(err)
-	}
-	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-		tx.Rollback()
-		return convertError(err)
-	}
-	if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
-		tx.Rollback()
-		return convertError(err)
-	}
-	tx.Commit()
+
 	return nil
 }
 
