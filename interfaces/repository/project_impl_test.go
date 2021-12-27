@@ -540,7 +540,93 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		setup     func(f mockProjectRepositoryFields, args args, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success_Single",
+			args: args{
+				id: random.UUID(),
+			},
+			want: []*domain.User{
+				{
+					ID:   random.UUID(),
+					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					// RealName:
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+				rows := sqlmock.NewRows([]string{"user_id"})
+				for _, u := range want {
+					rows.AddRow(u.ID)
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(rows)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					WithArgs(want[0].ID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).
+							AddRow(want[0].ID, want[0].Name),
+					)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success_Multiple",
+			args: args{
+				id: random.UUID(),
+			},
+			want: []*domain.User{
+				{
+					ID:   random.UUID(),
+					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					// RealName:
+				},
+				{
+					ID:   random.UUID(),
+					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+				rows := sqlmock.NewRows([]string{"user_id"})
+				for _, u := range want {
+					rows.AddRow(u.ID)
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(rows)
+				userIDs := make([]driver.Value, len(want))
+				userRows := sqlmock.NewRows([]string{"id", "name"})
+				for i, v := range want {
+					userIDs[i] = v.ID
+					userRows.AddRow(v.ID, v.Name)
+				}
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
+					WithArgs(userIDs...).
+					WillReturnRows(userRows)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				id: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.id).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
