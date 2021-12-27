@@ -257,6 +257,40 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// GetGroups by UserID GET /users/:userID/groups
+func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
+	c := Context{_c}
+	req := groupParam{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	groups, err := handler.srv.GetGroupsByUserID(ctx, req.GroupID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	res := make([]*UserGroupResponse, 0, len(groups))
+	for _, group := range groups {
+		res = append(res, &UserGroupResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Duration: domain.GroupDuration{
+				Since: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+				Until: domain.YearWithSemester{
+					Year:     group.Duration.Since.Year,
+					Semester: group.Duration.Since.Semester,
+				},
+			},
+		})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
 // GetEvents GET /users/:userID/events
 func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	c := Context{_c}
