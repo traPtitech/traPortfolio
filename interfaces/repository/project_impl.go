@@ -139,7 +139,11 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 }
 
 func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
-	//存在チェック
+	if len(projectMembers) == 0 {
+		return repository.ErrInvalidArg
+	}
+
+	// プロジェクトの存在チェック
 	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
 	if err != nil {
 		return convertError(err)
