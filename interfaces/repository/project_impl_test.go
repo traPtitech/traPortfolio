@@ -663,7 +663,176 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 		setup     func(f mockProjectRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				newUsers := make([]*repository.CreateProjectMemberArgs, 0, len(args.projectMembers))
+				for i, u := range args.projectMembers {
+					if i%2 == 0 {
+						rows.AddRow(args.projectID, u.UserID)
+					} else {
+						newUsers = append(newUsers, u)
+					}
+				}
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.projectID).
+					WillReturnRows(rows)
+				h.Mock.ExpectBegin()
+				for _, u := range newUsers {
+					h.Mock.
+						ExpectExec(regexp.QuoteMeta("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?)")).
+						WithArgs(anyUUID{}, args.projectID, u.UserID, u.Since, u.Until, anyTime{}, anyTime{}).
+						WillReturnResult(sqlmock.NewResult(1, 1))
+				}
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ZeroMembers",
+			args: args{
+				projectID:      random.UUID(),
+				projectMembers: nil,
+			},
+			setup:     func(f mockProjectRepositoryFields, args args) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindProject",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindProjectMembers",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.projectID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_AddProjectMembers",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+					{
+						UserID: random.UUID(),
+						Since:  time.Now(),
+						Until:  time.Now(),
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.projectID, anyUUID{}, anyTime{}, anyTime{}, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
