@@ -192,6 +192,10 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 }
 
 func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
+	if len(members) == 0 {
+		return repository.ErrInvalidArg
+	}
+
 	// 存在チェック
 	err := repo.h.First(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID}).Error()
 	if err != nil {
