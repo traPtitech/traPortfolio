@@ -196,36 +196,21 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 		return repository.ErrInvalidArg
 	}
 
-	// 存在チェック
-	err := repo.h.First(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID}).Error()
+	// プロジェクトの存在チェック
+	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
 	if err != nil {
 		return convertError(err)
 	}
 
-	mmbsMp := make(map[uuid.UUID]struct{}, len(members))
-	_mmbs := make([]*model.ProjectMember, 0, len(members))
-	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
+	err = repo.h.
+		Where(&model.ProjectMember{ProjectID: projectID}).
+		Where("user_id IN ?", members).
+		Delete(&model.ProjectMember{}).
+		Error()
 	if err != nil {
 		return convertError(err)
-	}
-	for _, v := range _mmbs {
-		mmbsMp[v.UserID] = struct{}{}
 	}
 
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
-		for _, memberID := range members {
-			if _, ok := mmbsMp[memberID]; ok {
-				err = tx.Delete(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID, UserID: memberID}).Error()
-				if err != nil {
-					return convertError(err)
-				}
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return convertError(err)
-	}
 	return nil
 }
 
