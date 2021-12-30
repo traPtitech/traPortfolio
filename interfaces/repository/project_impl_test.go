@@ -860,7 +860,87 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		setup     func(f mockProjectRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			args: args{
+				projectID: random.UUID(),
+				members: []uuid.UUID{
+					random.UUID(), // 元のメンバーであるため削除対象となる
+					random.UUID(), // 元のメンバーでないため削除対象とならない
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND user_id IN (?,?)")).
+					WithArgs(args.projectID, args.members[0], args.members[1]).
+					WillReturnResult(sqlmock.NewResult(0, int64(len(args.members)+1)/2))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ZeroMembers",
+			args: args{
+				projectID: random.UUID(),
+				members:   []uuid.UUID{},
+			},
+			setup:     func(f mockProjectRepositoryFields, args args) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindProject",
+			args: args{
+				projectID: random.UUID(),
+				members: []uuid.UUID{
+					random.UUID(),
+					random.UUID(),
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_DeleteMembers",
+			args: args{
+				projectID: random.UUID(),
+				members: []uuid.UUID{
+					random.UUID(),
+					random.UUID(),
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND user_id IN (?,?)")).
+					WithArgs(args.projectID, args.members[0], args.members[1]).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
