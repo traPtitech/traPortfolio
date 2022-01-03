@@ -38,8 +38,8 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 }
 
 func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
-	project := &model.Project{ID: id}
-	if err := repo.h.First(&project).Error(); err != nil {
+	project := new(model.Project)
+	if err := repo.h.First(project, &model.Project{ID: id}).Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -96,28 +96,23 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]in
 		new model.Project
 	)
 
-	tx := repo.h.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
+			return convertError(err)
 		}
-	}()
-	if err := tx.Error(); err != nil {
+		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
+			return convertError(err)
+		}
+		if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
+			return convertError(err)
+		}
+
+		return nil
+	})
+	if err != nil {
 		return convertError(err)
 	}
-	if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
-		tx.Rollback()
-		return convertError(err)
-	}
-	if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-		tx.Rollback()
-		return convertError(err)
-	}
-	if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
-		tx.Rollback()
-		return convertError(err)
-	}
-	tx.Commit()
+
 	return nil
 }
 
@@ -125,7 +120,7 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
-		Where(model.ProjectMember{ProjectID: id}).
+		Where(&model.ProjectMember{ProjectID: id}).
 		Find(&members).
 		Error()
 	if err != nil {
@@ -144,7 +139,11 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 }
 
 func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
-	//存在チェック
+	if len(projectMembers) == 0 {
+		return repository.ErrInvalidArg
+	}
+
+	// プロジェクトの存在チェック
 	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
 	if err != nil {
 		return convertError(err)
@@ -193,36 +192,25 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 }
 
 func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
-	// 存在チェック
-	err := repo.h.First(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID}).Error()
+	if len(members) == 0 {
+		return repository.ErrInvalidArg
+	}
+
+	// プロジェクトの存在チェック
+	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
 	if err != nil {
 		return convertError(err)
 	}
 
-	mmbsMp := make(map[uuid.UUID]struct{}, len(members))
-	_mmbs := make([]*model.ProjectMember, 0, len(members))
-	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
+	err = repo.h.
+		Where(&model.ProjectMember{ProjectID: projectID}).
+		Where("user_id IN ?", members).
+		Delete(&model.ProjectMember{}).
+		Error()
 	if err != nil {
 		return convertError(err)
-	}
-	for _, v := range _mmbs {
-		mmbsMp[v.UserID] = struct{}{}
 	}
 
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
-		for _, memberID := range members {
-			if _, ok := mmbsMp[memberID]; ok {
-				err = tx.Delete(&model.ProjectMember{}, &model.ProjectMember{ProjectID: projectID, UserID: memberID}).Error()
-				if err != nil {
-					return convertError(err)
-				}
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return convertError(err)
-	}
 	return nil
 }
 
