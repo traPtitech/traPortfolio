@@ -13,7 +13,7 @@ type OptionalDuration struct {
 	Until optional.Time `json:"until"`
 }
 
-type OptionalProjectDuration struct {
+type OptionalYearWithSemesterDuration struct {
 	Since OptionalYearWithSemester
 	Until OptionalYearWithSemester
 }
@@ -23,10 +23,10 @@ type OptionalYearWithSemester struct {
 	Semester optional.Int64
 }
 
-func convertToProjectDuration(since, until time.Time) ProjectDuration {
+func convertToYearWithSemesterDuration(since, until time.Time) YearWithSemesterDuration {
 	s := timeToSem(since)
 	u := timeToSem(until)
-	return ProjectDuration{
+	return YearWithSemesterDuration{
 		Since: s,
 		Until: &u,
 	}
