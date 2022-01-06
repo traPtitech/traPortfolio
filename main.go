@@ -26,8 +26,9 @@ func main() {
 		t := traQConf(isDevelopment)
 		p := portalConf(isDevelopment)
 		k := knoQConf(isDevelopment)
+		g := groupConf(isDevelopment)
 
-		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
+		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k, &g)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -90,4 +91,10 @@ func portalConf(isDevelopment bool) infrastructure.PortalConfig {
 	portalCookie := os.Getenv("PORTAL_COOKIE")
 	portalAPIEndpoint := os.Getenv("PORTAL_API_ENDPOINT")
 	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint, isDevelopment)
+}
+
+func groupConf(isDevelopment bool) infrastructure.GroupConfig {
+	traQCookie := os.Getenv("TRAQ_COOKIE")
+	traQAPIEndpoint := os.Getenv("TRAQ_API_ENDPOINT")
+	return infrastructure.NewgGoupConfig(traQCookie, traQAPIEndpoint, isDevelopment)
 }

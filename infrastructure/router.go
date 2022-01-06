@@ -106,6 +106,12 @@ func Setup(e *echo.Echo, api handler.API) {
 		}
 
 		{
+			apiGroups := v1.Group("/groups")
+
+			apiGroups.GET("", api.Group.GetAllGroups)
+			apiGroups.GET("/:groupID", api.Group.GetGroup)
+		}
+		{
 			apiContests := v1.Group("/contests")
 
 			apiContests.GET("", api.Contest.GetContests)
