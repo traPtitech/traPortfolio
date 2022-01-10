@@ -49,7 +49,6 @@ var eventSet = wire.NewSet(
 )
 
 var groupSet = wire.NewSet(
-	NewGroupAPI,
 	impl.NewGroupRepository,
 	service.NewGroupService,
 	handler.NewGroupHandler,
@@ -67,7 +66,7 @@ var sqlSet = wire.NewSet(
 
 var apiSet = wire.NewSet(handler.NewAPI)
 
-func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig, g *GroupConfig) (handler.API, error) {
+func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

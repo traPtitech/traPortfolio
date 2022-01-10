@@ -35,8 +35,3 @@ type GroupDetailResponse struct {
 type TraQAPI interface {
 	GetByID(id uuid.UUID) (*TraQUserResponse, error)
 }
-
-type GroupAPI interface {
-	GetAllGroups() ([]*GroupsResponse, error)
-	GetGroup(groupID uuid.UUID) (*GroupDetailResponse, error)
-}

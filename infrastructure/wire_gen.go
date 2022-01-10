@@ -15,7 +15,7 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig, g *GroupConfig) (handler.API, error) {
+func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
 	sqlHandler, err := NewSQLHandler(s)
 	if err != nil {
@@ -46,11 +46,7 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 	contestRepository := repository.NewContestRepository(sqlHandler, portalAPI)
 	contestService := service.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestService)
-	groupAPI, err := NewGroupAPI(g)
-	if err != nil {
-		return handler.API{}, err
-	}
-	groupRepository := repository.NewGroupRepository(groupAPI)
+	groupRepository := repository.NewGroupRepository(sqlHandler)
 	groupService := service.NewGroupService(groupRepository)
 	groupHandler := handler.NewGroupHandler(groupService)
 	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
@@ -81,9 +77,7 @@ var eventSet = wire.NewSet(
 	knoQSet, repository.NewEventRepository, service.NewEventService, handler.NewEventHandler,
 )
 
-var groupSet = wire.NewSet(
-	NewGroupAPI, repository.NewGroupRepository, service.NewGroupService, handler.NewGroupHandler,
-)
+var groupSet = wire.NewSet(repository.NewGroupRepository, service.NewGroupService, handler.NewGroupHandler)
 
 var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
 

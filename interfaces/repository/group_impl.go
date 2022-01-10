@@ -3,69 +3,88 @@ package repository
 import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type GroupRepository struct {
-	api external.GroupAPI
+	h database.SQLHandler
 }
 
-func NewGroupRepository(api external.GroupAPI) repository.GroupRepository {
-	return &GroupRepository{api}
+func NewGroupRepository(sql database.SQLHandler) repository.GroupRepository {
+	return &GroupRepository{h: sql}
 }
 
 func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
-	eres, err := repo.api.GetAllGroups()
-	if err != nil {
-		return nil, err
+	groups := make([]*model.GroupUserBelonging, 0)
+	if err := repo.h.Preload("Group").Find(&groups).Error(); err != nil {
+		return nil, convertError(err)
 	}
-	result := make([]*domain.Group, 0, len(eres))
-	for _, v := range eres {
+
+	result := make([]*domain.Group, 0, len(groups))
+	for _, v := range groups {
+		group := make([]*model.Group, 0)
+		if err := repo.h.Where(model.Group{GroupID: v.GroupID}).Find(&group).Error(); err != nil {
+			return nil, convertError(err)
+		}
+
 		result = append(result, &domain.Group{
-			ID:   v.ID,
-			Name: v.Name,
+			ID:   v.UserID,
+			Name: group[0].Name,
 		})
 	}
 	return result, nil
 }
 
 func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
-	eres, err := repo.api.GetGroup(groupID)
-	if err != nil {
-		return nil, err
+	users := make([]*model.GroupUserBelonging, 0)
+	if err := repo.h.Preload("Group").Where(model.GroupUserBelonging{GroupID: groupID}).Find(&users).Error(); err != nil {
+		return nil, convertError(err)
 	}
 
-	erMembers := make([]*domain.UserGroup, 0, len(eres.Members))
-	for _, v := range eres.Members {
+	erMembers := make([]*domain.UserGroup, 0, len(users))
+	for _, v := range users {
+		group := make([]*model.Group, 0)
+		if err := repo.h.Where(model.Group{GroupID: v.GroupID}).Find(&group).Error(); err != nil {
+			return nil, convertError(err)
+		}
+
+		// Name,RealNameはPortalから取得する
 		erMembers = append(erMembers, &domain.UserGroup{
-			ID:       v.ID,
-			Name:     v.Name,
-			RealName: v.RealName,
+			ID: v.UserID,
+			// Name:     v.Name,
+			// RealName: v.RealName,
 			Duration: domain.GroupDuration{
 				Since: domain.YearWithSemester{
-					Year:     v.Duration.Since.Year,
-					Semester: v.Duration.Since.Semester,
+					Year:     v.SinceYear,
+					Semester: v.SinceSemester,
 				},
 				Until: domain.YearWithSemester{
-					Year:     v.Duration.Since.Year,
-					Semester: v.Duration.Since.Semester,
+					Year:     v.UntilYear,
+					Semester: v.UntilSemester,
 				},
 			},
 		})
 	}
+	group := make([]*model.Group, 0)
+	if err := repo.h.Where(model.Group{GroupID: groupID}).Find(&group).Error(); err != nil {
+		return nil, convertError(err)
+	}
 
+	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
 		ID:   groupID,
-		Name: eres.Name,
-		Link: eres.Link,
+		Name: group[0].Name,
+		Link: group[0].Link,
 		Leader: &domain.User{
-			ID:       eres.Leader.ID,
-			Name:     eres.Leader.Name,
-			RealName: eres.Leader.RealName,
+			ID: group[0].Leader,
+			// Name:     eres.Leader.Name,
+			// RealName: eres.Leader.RealName,
 		},
-		Members:     erMembers,
-		Description: eres.Description,
+		Members: erMembers,
+		// GroupのテーブルにDescription入れるの忘れたのでとりあえずnullで返す
+		// Description: group[0].Description,
 	}
 	return result, nil
 }
