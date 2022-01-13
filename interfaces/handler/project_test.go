@@ -158,8 +158,8 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 							UserID:   random.UUID(),
 							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-							Since:    random.Time(),
-							Until:    random.Time(),
+							Since:    makeSemesterTime(sinceSem),
+							Until:    makeSemesterTime(untilSem),
 						},
 					},
 				}
