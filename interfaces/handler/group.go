@@ -99,8 +99,8 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 	for i, v := range group.Members {
 		groupRes[i] = newGroupMember(
 			newUser(v.ID, v.Name, v.RealName),
-			[]ProjectDuration{
-				newProjectDuration(
+			[]YearWithSemesterDuration{
+				newYearWithSemesterDuration(
 					YearWithSemester{
 						Semester: Semester(v.Duration.Since.Semester),
 						Year:     int(v.Duration.Since.Year),
@@ -125,7 +125,7 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 	return res
 }
 
-func newGroupMember(user User, Duration []ProjectDuration) GroupMember {
+func newGroupMember(user User, Duration []YearWithSemesterDuration) GroupMember {
 	return GroupMember{
 		User:     user,
 		Duration: Duration,
