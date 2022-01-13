@@ -279,18 +279,16 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	for i, group := range groups {
 		res[i] = newUserGroup(
 			newGroup(group.ID, group.Name),
-			[]YearWithSemesterDuration{
-				newYearWithSemesterDuration(
-					YearWithSemester{
-						Semester: Semester(group.Duration.Since.Semester),
-						Year:     int(group.Duration.Since.Year),
-					},
-					YearWithSemester{
-						Semester: Semester(group.Duration.Since.Semester),
-						Year:     int(group.Duration.Since.Year),
-					},
-				),
-			},
+			newYearWithSemesterDuration(
+				YearWithSemester{
+					Semester: Semester(group.Duration.Since.Semester),
+					Year:     int(group.Duration.Since.Year),
+				},
+				YearWithSemester{
+					Semester: Semester(group.Duration.Since.Semester),
+					Year:     int(group.Duration.Since.Year),
+				},
+			),
 		)
 	}
 	return c.JSON(http.StatusOK, res)
@@ -352,9 +350,7 @@ func newUserProject(id uuid.UUID, name string, since time.Time, until time.Time,
 			Name:     name,
 			Duration: convertToYearWithSemesterDuration(since, until),
 		},
-		UserDuration: []YearWithSemesterDuration{
-			convertToYearWithSemesterDuration(userSince, userUntil), //TODO: objectでよさそう
-		},
+		UserDuration: convertToYearWithSemesterDuration(userSince, userUntil), //TODO: objectでよさそう
 	}
 }
 
@@ -373,7 +369,7 @@ func newGroup(id uuid.UUID, name string) Group {
 	}
 }
 
-func newUserGroup(group Group, Duration []YearWithSemesterDuration) UserGroup {
+func newUserGroup(group Group, Duration YearWithSemesterDuration) UserGroup {
 	return UserGroup{
 		Group:    group,
 		Duration: Duration,

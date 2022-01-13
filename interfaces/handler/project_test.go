@@ -158,8 +158,8 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 							UserID:   random.UUID(),
 							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-							Since:    random.Time(),
-							Until:    random.Time(),
+							Since:    makeSemesterTime(sinceSem),
+							Until:    makeSemesterTime(untilSem),
 						},
 					},
 				}
@@ -172,16 +172,14 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 							Name:     v.Name,
 							RealName: v.RealName,
 						},
-						Duration: []handler.YearWithSemesterDuration{
-							{
-								Since: handler.YearWithSemester{
-									Semester: handler.Semester(sinceSem),
-									Year:     v.Since.Year(),
-								},
-								Until: &handler.YearWithSemester{
-									Semester: handler.Semester(untilSem),
-									Year:     v.Until.Year(),
-								},
+						Duration: handler.YearWithSemesterDuration{
+							Since: handler.YearWithSemester{
+								Semester: handler.Semester(sinceSem),
+								Year:     v.Since.Year(),
+							},
+							Until: &handler.YearWithSemester{
+								Semester: handler.Semester(untilSem),
+								Year:     v.Until.Year(),
 							},
 						},
 					})

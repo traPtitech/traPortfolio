@@ -29,7 +29,7 @@ paths:
       parameters:
         - schema:
             type: boolean
-            default: 'false'
+            default: false
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
@@ -912,13 +912,7 @@ components:
         - type: object
           properties:
             userDuration:
-              format: date-time
-              description: |-
-                プロジェクトに所属している期間の配列
-                untilがなかったらまだ所属している
-              type: array
-              items:
-                $ref: '#/components/schemas/YearWithSemesterDuration'
+              $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - userDuration
     ProjectDetail:
@@ -954,13 +948,7 @@ components:
         - type: object
           properties:
             duration:
-              format: date-time
-              description: |-
-                プロジェクトに所属している期間の配列
-                untilがなかったらまだ所属している
-              type: array
-              items:
-                $ref: '#/components/schemas/YearWithSemesterDuration'
+              $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
     Event:
@@ -1136,12 +1124,7 @@ components:
         - type: object
           properties:
             duration:
-              description: |-
-                班に入っている期間の配列
-                untilがないところはまだ継続して入っている
-              type: array
-              items:
-                $ref: '#/components/schemas/YearWithSemesterDuration'
+              $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
     GroupDetail:
@@ -1180,12 +1163,7 @@ components:
         - type: object
           properties:
             duration:
-              description: |-
-                班に入っている期間の配列
-                untilがないところはまだ継続して入っている
-              type: array
-              items:
-                $ref: '#/components/schemas/YearWithSemesterDuration'
+              $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
     AddProject:
