@@ -18,7 +18,8 @@ func NewGroupRepository(sql database.SQLHandler) repository.GroupRepository {
 
 func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	groups := make([]*model.GroupUserBelonging, 0)
-	if err := repo.h.Preload("Group").Find(&groups).Error(); err != nil {
+	err := repo.h.Preload("Group").Find(&groups).Error()
+	if err != nil {
 		return nil, convertError(err)
 	}
 
@@ -39,18 +40,14 @@ func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 
 func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
 	users := make([]*model.GroupUserBelonging, 0)
-	if err := repo.h.Preload("Group").Where(model.GroupUserBelonging{GroupID: groupID}).Find(&users).Error(); err != nil {
+	err := repo.h.Preload("Group").Where(model.GroupUserBelonging{GroupID: groupID}).Find(&users).Error()
+	if err != nil {
 		return nil, convertError(err)
 	}
 
 	erMembers := make([]*domain.UserGroup, 0, len(users))
 	for _, v := range users {
-		group := make([]*model.Group, 0)
-		if err := repo.h.Where(model.Group{GroupID: v.GroupID}).Find(&group).Error(); err != nil {
-			return nil, convertError(err)
-		}
-
-		// Name,RealNameはPortalから取得する
+		// Name,RealNameはusercaseでPortalから取得する
 		erMembers = append(erMembers, &domain.UserGroup{
 			ID: v.UserID,
 			// Name:     v.Name,
@@ -67,6 +64,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 			},
 		})
 	}
+
 	group := make([]*model.Group, 0)
 	if err := repo.h.Where(model.Group{GroupID: groupID}).Find(&group).Error(); err != nil {
 		return nil, convertError(err)
@@ -79,11 +77,11 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		Link: group[0].Link,
 		Leader: &domain.User{
 			ID: group[0].Leader,
-			// Name:     eres.Leader.Name,
-			// RealName: eres.Leader.RealName,
+			// Name: later,
+			// RealName: later,
 		},
 		Members: erMembers,
-		// GroupのテーブルにDescription入れるの忘れたのでとりあえずnullで返す
+		// GroupのテーブルにDescription入ってないのでとりあえずnullで返す
 		// Description: group[0].Description,
 	}
 	return result, nil

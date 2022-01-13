@@ -16,21 +16,52 @@ type GroupService interface {
 }
 
 type groupService struct {
-	repo repository.GroupRepository
+	group repository.GroupRepository
+	user  repository.UserRepository
 }
 
-func NewGroupService(repo repository.GroupRepository) GroupService {
+func NewGroupService(group repository.GroupRepository, user repository.UserRepository) GroupService {
 	return &groupService{
-		repo,
+		group, user,
 	}
 }
 
 func (s *groupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
-	return s.repo.GetAllGroups()
+	return s.group.GetAllGroups()
 }
 
 func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
-	return s.repo.GetGroup(groupID)
+	groups, err := s.group.GetGroup(groupID)
+	if err != nil {
+		return nil, err
+	}
+
+	// pick all users info
+	users, err := s.user.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	umap := make(map[uuid.UUID]*domain.User)
+	for _, u := range users {
+		umap[u.ID] = u
+	}
+
+	// fill members info
+	for i, v := range groups.Members {
+		if u, ok := umap[v.ID]; ok {
+			groups.Members[i].Name = u.Name
+			groups.Members[i].RealName = u.RealName
+		}
+	}
+
+	// fill leader info
+	if u, ok := umap[groups.Leader.ID]; ok {
+		groups.Leader.Name = u.Name
+		groups.Leader.RealName = u.RealName
+	}
+
+	return groups, nil
 }
 
 // Interface guards

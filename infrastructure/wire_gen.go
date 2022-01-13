@@ -47,7 +47,7 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 	contestService := service.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestService)
 	groupRepository := repository.NewGroupRepository(sqlHandler)
-	groupService := service.NewGroupService(groupRepository)
+	groupService := service.NewGroupService(groupRepository, userRepository)
 	groupHandler := handler.NewGroupHandler(groupService)
 	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
 	return api, nil
