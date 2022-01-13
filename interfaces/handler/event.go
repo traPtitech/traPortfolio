@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
@@ -13,15 +14,12 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type EventHandler struct {
-	srv service.EventService
+type EventIDInPath struct {
+	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
 }
 
-// EventResponse Portfolioのレスポンスで使うイベント情報
-type EventResponse struct {
-	ID       uuid.UUID `json:"eventId"`
-	Name     string    `json:"name"`
-	Duration Duration
+type EventHandler struct {
+	srv service.EventService
 }
 
 // NewEventHandler creates a EventHandler
@@ -37,36 +35,18 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]*EventResponse, 0, len(events))
-	for _, event := range events {
-		res = append(res, &EventResponse{
-			ID:   event.ID,
-			Name: event.Name,
-			Duration: Duration{
-				Since: event.TimeStart,
-				Until: event.TimeEnd,
-			},
-		})
+	res := make([]Event, len(events))
+	for i, v := range events {
+		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
+
 	return c.JSON(http.StatusOK, res)
-}
-
-type eventParam struct {
-	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
-}
-
-type EventDetailResponse struct {
-	EventResponse
-	Description string            `json:"description"`
-	Place       string            `json:"place"`
-	HostName    []*UserResponse   `json:"hostname"`
-	EventLevel  domain.EventLevel `json:"eventLevel"`
 }
 
 // GetByID GET /events/:eventID
 func (h *EventHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := eventParam{}
+	req := EventIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -77,25 +57,34 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, formatUserDetail(event))
-}
+	hostname := make([]User, len(event.HostName))
+	for i, v := range event.HostName {
+		hostname[i] = newUser(v.ID, v.Name, v.RealName)
+	}
 
-type EditEventRequest struct {
-	EventID    uuid.UUID `param:"eventID" validate:"is-uuid"`
-	EventLevel *domain.EventLevel
+	return c.JSON(http.StatusOK, newEventDetail(
+		newEvent(event.ID, event.Name, event.TimeStart, event.TimeEnd),
+		event.Description,
+		event.Level,
+		hostname,
+		event.Place,
+	))
 }
 
 // PatchEvent PATCH /events/:eventID
 func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	c := Context{_c}
-	req := &EditEventRequest{}
+	req := struct {
+		EventIDInPath
+		EditEventJSONRequestBody
+	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
 	patchReq := repository.UpdateEventLevelArg{
-		Level: *req.EventLevel,
+		Level: domain.EventLevel(*req.EventLevel),
 	}
 
 	if err := h.srv.UpdateEventLevel(ctx, req.EventID, &patchReq); err != nil {
@@ -104,30 +93,23 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func formatUserDetail(event *domain.EventDetail) *EventDetailResponse {
-	userRes := make([]*UserResponse, 0, len(event.HostName))
-	for _, user := range event.HostName {
-		userRes = append(userRes, &UserResponse{
-			ID:       user.ID,
-			Name:     user.Name,
-			RealName: user.RealName,
+func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) Event {
+	return Event{
+		Id:   id,
+		Name: name,
+		Duration: Duration{
+			Since: since,
+			Until: &until,
 		},
-		)
 	}
+}
 
-	res := &EventDetailResponse{
-		EventResponse: EventResponse{
-			ID:   event.ID,
-			Name: event.Name,
-			Duration: Duration{
-				Since: event.TimeStart,
-				Until: event.TimeEnd,
-			},
-		},
-		Description: event.Description,
-		Place:       event.Place,
-		HostName:    userRes,
-		EventLevel:  event.Level,
+func newEventDetail(event Event, description string, eventLevel domain.EventLevel, hostname []User, place string) EventDetail {
+	return EventDetail{
+		Event:       event,
+		Description: description,
+		EventLevel:  EventLevel(eventLevel),
+		Hostname:    hostname,
+		Place:       place,
 	}
-	return res
 }

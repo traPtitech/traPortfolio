@@ -752,6 +752,7 @@ components:
           type: string
           description: ユーザーUUID
           format: uuid
+          x-go-type: uuid.UUID
         name:
           type: string
           pattern: '^[a-zA-Z0-9_-]{1,32}$'
@@ -762,6 +763,7 @@ components:
       required:
         - id
         - name
+        - realName
     UserAccountState:
       type: integer
       title: UserAccountState
@@ -803,9 +805,7 @@ components:
               items:
                 $ref: '#/components/schemas/Account'
           required:
-            - id
             - state
-            - name
             - bio
             - accounts
     EditUser:
@@ -830,6 +830,11 @@ components:
       properties:
         id:
           type: string
+          description: アカウントUUID
+          format: uuid
+          x-go-type: uuid.UUID
+        name:
+          type: string
           description: アカウントID
         type:
           $ref: '#/components/schemas/AccountType'
@@ -840,6 +845,7 @@ components:
           description: アカウントurl
       required:
         - id
+        - name
         - type
         - prPermitted
         - url
@@ -877,6 +883,7 @@ components:
         - Qiita (@は含まない)
         - AtCoder
         - SoundCloud
+      x-go-type: int64
     Project:
       title: Project
       type: object
@@ -885,12 +892,13 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: プロジェクトuuid
         name:
           type: string
           description: プロジェクト名
         duration:
-          $ref: '#/components/schemas/ProjectDuration'
+          $ref: '#/components/schemas/YearWithSemesterDuration'
       required:
         - id
         - name
@@ -910,7 +918,7 @@ components:
                 untilがなかったらまだ所属している
               type: array
               items:
-                $ref: '#/components/schemas/ProjectDuration'
+                $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - userDuration
     ProjectDetail:
@@ -934,6 +942,7 @@ components:
               items:
                 $ref: '#/components/schemas/ProjectMember'
           required:
+            - link
             - description
             - members
     ProjectMember:
@@ -951,7 +960,7 @@ components:
                 untilがなかったらまだ所属している
               type: array
               items:
-                $ref: '#/components/schemas/ProjectDuration'
+                $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
     Event:
@@ -962,6 +971,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: イベントuuid
         name:
           type: string
@@ -997,6 +1007,8 @@ components:
           required:
             - description
             - place
+            - hostname
+            - eventLevel
       type: object
     Contest:
       title: Contest
@@ -1006,6 +1018,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: コンテストuuid
         name:
           type: string
@@ -1038,6 +1051,7 @@ components:
               items:
                 $ref: '#/components/schemas/ContestTeam'
           required:
+            - link
             - description
             - teams
     ContestTeam:
@@ -1048,6 +1062,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: コンテストチームuuid
         name:
           type: string
@@ -1058,6 +1073,7 @@ components:
       required:
         - id
         - name
+        - result
     ContestTeamDetail:
       title: ContestTeamDetail
       type: object
@@ -1079,6 +1095,7 @@ components:
               items:
                 $ref: '#/components/schemas/User'
           required:
+            - link
             - description
             - members
     ContestTeamWithContestName:
@@ -1102,6 +1119,7 @@ components:
         id:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
           description: 班uuid
         name:
           type: string
@@ -1123,7 +1141,7 @@ components:
                 untilがないところはまだ継続して入っている
               type: array
               items:
-                $ref: '#/components/schemas/ProjectDuration'
+                $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
     GroupDetail:
@@ -1149,6 +1167,7 @@ components:
               type: string
               description: 班説明
           required:
+            - link
             - leader
             - members
             - description
@@ -1166,7 +1185,7 @@ components:
                 untilがないところはまだ継続して入っている
               type: array
               items:
-                $ref: '#/components/schemas/ProjectDuration'
+                $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
     AddProject:
@@ -1183,11 +1202,13 @@ components:
           type: string
           format: uri
           description: プロジェクトの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
         description:
           type: string
           description: プロジェクト説明
         duration:
-          $ref: '#/components/schemas/ProjectDuration'
+          $ref: '#/components/schemas/YearWithSemesterDuration'
       required:
         - name
         - description
@@ -1206,11 +1227,13 @@ components:
           type: string
           format: uri
           description: プロジェクトの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
         description:
           type: string
           description: プロジェクト説明
         duration:
-          $ref: '#/components/schemas/ProjectDuration'
+          $ref: '#/components/schemas/YearWithSemesterDuration'
     AddContest:
       title: AddContest
       type: object
@@ -1223,6 +1246,8 @@ components:
           type: string
           format: uri
           description: コンテストの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
         description:
           type: string
           description: コンテスト説明
@@ -1245,6 +1270,8 @@ components:
           type: string
           format: uri
           description: コンテストの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
         description:
           type: string
           description: コンテスト説明
@@ -1263,6 +1290,8 @@ components:
           type: string
           format: uri
           description: コンテストチームの説明が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
         description:
           type: string
           description: チーム情報
@@ -1284,6 +1313,8 @@ components:
           type: string
           format: uri
           description: コンテストチームの説明が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
         description:
           type: string
           description: チーム情報
@@ -1327,8 +1358,8 @@ components:
       required:
         - since
       description: イベントやコンテストなどの存続期間
-    ProjectDuration:
-      title: ProjectDuration
+    YearWithSemesterDuration:
+      title: YearWithSemesterDuration
       type: object
       properties:
         since:
@@ -1339,6 +1370,7 @@ components:
         - since
       description: |-
         班やプロジェクトの期間
+        年と前期/後期がある
         untilがなかった場合存続中
     YearWithSemester:
       title: YearWithSemester
@@ -1383,19 +1415,20 @@ components:
         members:
           type: array
           items:
-            $ref: '#/components/schemas/MemberIDWithProjectDuration'
+            $ref: '#/components/schemas/MemberIDWithYearWithSemesterDuration'
       required:
         - members
-    MemberIDWithProjectDuration:
-      title: MemberIDWithProjectDuration
+    MemberIDWithYearWithSemesterDuration:
+      title: MemberIDWithYearWithSemesterDuration
       type: object
       description: プロジェクトメンバーのユーザーUUID(期間含む)
       properties:
         userId:
           type: string
           format: uuid
+          x-go-type: uuid.UUID
         duration:
-          $ref: '#/components/schemas/ProjectDuration'
+          $ref: '#/components/schemas/YearWithSemesterDuration'
       required:
         - userId
         - duration
@@ -1410,6 +1443,7 @@ components:
           items:
             type: string
             format: uuid
+            x-go-type: uuid.UUID
       required:
         - members
     AddAccount:
@@ -1425,6 +1459,8 @@ components:
           type: string
           description: アカウントurl
           format: uri
+          x-oapi-codegen-extra-tags:
+            validate: url
         id:
           type: string
           description: アカウントID
@@ -1446,6 +1482,8 @@ components:
           type: string
           description: アカウントurl
           format: uri
+          x-oapi-codegen-extra-tags:
+            validate: url
         id:
           type: string
           description: アカウントID
@@ -1462,6 +1500,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     groupIdInPath:
       name: groupId
       in: path
@@ -1470,6 +1509,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     projectIdInPath:
       name: projectId
       in: path
@@ -1478,6 +1518,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     eventIdInPath:
       name: eventId
       in: path
@@ -1486,6 +1527,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     contestIdInPath:
       name: contestId
       in: path
@@ -1494,6 +1536,7 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     teamIdInPath:
       name: teamId
       in: path
@@ -1502,12 +1545,14 @@ components:
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
     accountIdInPath:
       name: accountId
       in: path
       schema:
         type: string
         format: uuid
+        x-go-type: uuid.UUID
       description: アカウントUUID
       required: true
 tags:

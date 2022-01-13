@@ -15,9 +15,9 @@ import (
 type CreateContestArgs struct {
 	Name        string
 	Description string
-	Link        string
+	Link        optional.String
 	Since       time.Time
-	Until       time.Time
+	Until       optional.Time
 }
 
 type UpdateContestArgs struct {
@@ -30,8 +30,8 @@ type UpdateContestArgs struct {
 
 type CreateContestTeamArgs struct {
 	Name        string
-	Result      string
-	Link        string
+	Result      optional.String
+	Link        optional.String
 	Description string
 }
 

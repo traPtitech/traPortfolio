@@ -12,8 +12,12 @@ type Bool struct {
 	sql.NullBool
 }
 
-func BoolFrom(v bool) Bool {
-	return NewBool(v, true)
+func BoolFrom(v *bool) Bool {
+	if v == nil {
+		return Bool{}
+	}
+
+	return NewBool(*v, true)
 }
 
 func NewBool(v bool, valid bool) Bool {

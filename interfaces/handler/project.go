@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -17,39 +16,8 @@ var (
 	semesterToMonth = [2]time.Month{time.August, time.December}
 )
 
-type projectParams struct {
+type ProjectIDInPath struct {
 	ProjectID uuid.UUID `param:"projectID" validate:"is-uuid"`
-}
-
-// ProjectResponse Portfolioのレスポンスで使うイベント情報
-type ProjectResponse struct {
-	ID       uuid.UUID              `json:"id"`
-	Name     string                 `json:"name"`
-	Duration domain.ProjectDuration `json:"duration"`
-}
-
-type ProjectDetailResponse struct {
-	ID          uuid.UUID                      `json:"id"`
-	Name        string                         `json:"name"`
-	Duration    domain.ProjectDuration         `json:"duration"`
-	Link        string                         `json:"link"`
-	Description string                         `json:"description"`
-	Members     []*ProjectMemberDetailResponse `json:"members"`
-	CreatedAt   time.Time                      `json:"created_at"`
-	UpdatedAt   time.Time                      `json:"updated_at"`
-}
-
-type ProjectMemberResponse struct {
-	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"name"`
-	RealName string    `json:"real_name"`
-}
-
-type ProjectMemberDetailResponse struct {
-	ID       uuid.UUID              `json:"id"`
-	Name     string                 `json:"name"`
-	RealName string                 `json:"real_name"`
-	Duration domain.ProjectDuration `json:"duration"`
 }
 
 type ProjectHandler struct {
@@ -68,22 +36,19 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*ProjectResponse, 0, len(projects))
-	for _, v := range projects {
-		p := &ProjectResponse{
-			ID:       v.ID,
-			Name:     v.Name,
-			Duration: convertToProjectDuration(v.Since, v.Until),
-		}
-		res = append(res, p)
+
+	res := make([]Project, len(projects))
+	for i, v := range projects {
+		res[i] = newProject(v.ID, v.Name, convertToYearWithSemesterDuration(v.Since, v.Until))
 	}
+
 	return c.JSON(http.StatusOK, res)
 }
 
 // GetByID GET /projects/:projectID
 func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
-	req := projectParams{}
+	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -93,89 +58,86 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := &ProjectDetailResponse{
-		ID:          project.ID,
-		Name:        project.Name,
-		Duration:    convertToProjectDuration(project.Since, project.Until),
-		Link:        project.Link,
-		Description: project.Description,
-		Members:     convertToProjectMembersDetail(project.Members),
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.UpdatedAt,
-	}
-	return c.JSON(http.StatusOK, res)
-}
 
-type PostProjectRequest struct {
-	Name        string                 `json:"name"`
-	Link        string                 `json:"link"`
-	Description string                 `json:"description"`
-	Duration    domain.ProjectDuration `json:"duration"`
+	members := make([]ProjectMember, len(project.Members))
+	for i, v := range project.Members {
+		members[i] = newProjectMember(
+			newUser(v.UserID, v.Name, v.RealName),
+			[]YearWithSemesterDuration{newYearWithSemesterDuration(timeToSem(v.Since), timeToSem(v.Until))},
+		)
+	}
+
+	return c.JSON(http.StatusOK, newProjectDetail(
+		newProject(project.ID, project.Name, convertToYearWithSemesterDuration(project.Since, project.Until)),
+		project.Description,
+		project.Link,
+		members,
+	))
 }
 
 // PostProject POST /projects
 func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := PostProjectRequest{}
+	req := PostProjectJSONRequestBody{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
 
-	since := semToTime(req.Duration.Since)
-	until := semToTime(req.Duration.Until)
-	if since.After(until) {
-		return convertError(repository.ErrInvalidArg)
-	}
 	createReq := repository.CreateProjectArgs{
 		Name:        req.Name,
 		Description: req.Description,
-		Link:        req.Link,
-		Since:       since,
-		Until:       until,
+		Link:        optional.StringFrom(req.Link),
 	}
+	since := semToTime(req.Duration.Since)
+	if req.Duration.Until != nil {
+		until := semToTime(*req.Duration.Until)
+		if since.After(until) {
+			return convertError(repository.ErrInvalidArg)
+		}
+		createReq.Until = until
+	}
+	createReq.Since = since
+
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
 		return convertError(err)
 	}
-	res := ProjectResponse{
-		ID:       project.ID,
-		Name:     project.Name,
-		Duration: convertToProjectDuration(project.Since, project.Until),
-	}
-	return c.JSON(http.StatusCreated, res)
-}
 
-type PatchProjectRequest struct {
-	ProjectID   uuid.UUID       `param:"projectID" validate:"is-uuid"`
-	Name        optional.String `json:"name"`
-	Link        optional.String `json:"link"`
-	Description optional.String `json:"description"`
-	Duration    OptionalProjectDuration
+	return c.JSON(http.StatusCreated, newProject(
+		project.ID,
+		project.Name,
+		convertToYearWithSemesterDuration(project.Since, project.Until),
+	))
 }
 
 func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := PatchProjectRequest{}
+	req := struct {
+		ProjectIDInPath
+		EditProjectJSONRequestBody
+	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
 
-	since := optionalSemToTime(req.Duration.Since)
-	until := optionalSemToTime(req.Duration.Until)
-	if since.Valid && until.Valid && since.Time.After(until.Time) {
-		return convertError(repository.ErrInvalidArg)
-	}
 	patchReq := repository.UpdateProjectArgs{
-		Name:        req.Name,
-		Description: req.Description,
-		Link:        req.Link,
-		Since:       since,
-		Until:       until,
+		Name:        optional.StringFrom(req.Name),
+		Description: optional.StringFrom(req.Description),
+		Link:        optional.StringFrom(req.Link),
 	}
+	since := optionalSemToTime(req.Duration.Since)
+	if req.Duration.Until != nil {
+		until := optionalSemToTime(*req.Duration.Until)
+		if since.Valid && until.Valid && since.Time.After(until.Time) {
+			return convertError(repository.ErrInvalidArg)
+		}
+		patchReq.Until = until
+	}
+	patchReq.Since = since
 
 	err = h.service.UpdateProject(ctx, req.ProjectID, &patchReq)
 	if err != nil {
@@ -187,7 +149,7 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 // GetProjectMembers GET /projects/:projectID/members
 func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	c := Context{_c}
-	req := projectParams{}
+	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -197,44 +159,45 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	res := make([]*ProjectMemberResponse, 0, len(members))
-	for _, v := range members {
-		m := &ProjectMemberResponse{
-			ID:       v.ID,
-			Name:     v.Name,
-			RealName: v.RealName,
-		}
-		res = append(res, m)
+
+	res := make([]ProjectMember, len(members))
+	for i, v := range members {
+		res[i] = newProjectMember(
+			newUser(v.ID, v.Name, v.RealName),
+			[]YearWithSemesterDuration{}, // TODO: 追加する
+		)
 	}
+
 	return c.JSON(http.StatusOK, res)
-}
-
-type AddProjectMembersRequest struct {
-	ProjectID uuid.UUID                      `param:"projectID" validate:"is-uuid"`
-	Members   []*MemberIDWithProjectDuration `json:"members" validate:"dive"`
-}
-
-type MemberIDWithProjectDuration struct {
-	UserID   uuid.UUID              `json:"userID" validate:"is-uuid"`
-	Duration domain.ProjectDuration `json:"duration"`
 }
 
 // AddProjectMembers POST /projects/:projectID/members
 func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := AddProjectMembersRequest{}
+	req := struct {
+		ProjectIDInPath
+		AddProjectMembersJSONRequestBody
+	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
+
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
 		m := &repository.CreateProjectMemberArgs{
-			UserID: v.UserID,
-			Since:  semToTime(v.Duration.Since),
-			Until:  semToTime(v.Duration.Until),
+			UserID: v.UserId,
 		}
+		since := semToTime(v.Duration.Since)
+		if v.Duration.Until != nil {
+			until := semToTime(*v.Duration.Until)
+			if since.After(until) {
+				return convertError(repository.ErrInvalidArg)
+			}
+			m.Until = until
+		}
+		m.Since = since
 		createReq = append(createReq, m)
 	}
 	err = h.service.AddProjectMembers(ctx, req.ProjectID, createReq)
@@ -244,16 +207,14 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	return nil
 }
 
-type PutProjectMembersRequest struct {
-	ProjectID uuid.UUID   `param:"projectID" validate:"is-uuid"`
-	Members   []uuid.UUID `json:"members"`
-}
-
 // DeleteProjectMembers DELETE /projects/:projectID/members
 func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	c := Context{_c}
 	ctx := c.Request().Context()
-	req := PutProjectMembersRequest{}
+	req := struct {
+		ProjectIDInPath
+		DeleteProjectMembersJSONRequestBody
+	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
@@ -266,19 +227,33 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func convertToProjectMembersDetail(members []*domain.ProjectMember) []*ProjectMemberDetailResponse {
-	res := make([]*ProjectMemberDetailResponse, 0, len(members))
-	for _, v := range members {
-		m := &ProjectMemberDetailResponse{
-			ID:       v.UserID,
-			Name:     v.Name,
-			RealName: v.RealName,
-			Duration: domain.ProjectDuration{
-				Since: timeToSem(v.Since),
-				Until: timeToSem(v.Until),
-			},
-		}
-		res = append(res, m)
+func newProject(id uuid.UUID, name string, duration YearWithSemesterDuration) Project {
+	return Project{
+		Id:       id,
+		Name:     name,
+		Duration: duration,
 	}
-	return res
+}
+
+func newProjectDetail(project Project, description string, link string, members []ProjectMember) ProjectDetail {
+	return ProjectDetail{
+		Project:     project,
+		Description: description,
+		Link:        link,
+		Members:     members,
+	}
+}
+
+func newProjectMember(user User, duration []YearWithSemesterDuration) ProjectMember {
+	return ProjectMember{
+		User:     user,
+		Duration: duration,
+	}
+}
+
+func newYearWithSemesterDuration(since YearWithSemester, until YearWithSemester) YearWithSemesterDuration {
+	return YearWithSemesterDuration{
+		Since: since,
+		Until: &until,
+	}
 }

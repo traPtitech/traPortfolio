@@ -110,6 +110,21 @@ func (mr *MockUserServiceMockRecorder) GetAccounts(userID interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccounts", reflect.TypeOf((*MockUserService)(nil).GetAccounts), userID)
 }
 
+// GetGroupsByUserID mocks base method.
+func (m *MockUserService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroupsByUserID", ctx, userID)
+	ret0, _ := ret[0].([]*domain.GroupUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGroupsByUserID indicates an expected call of GetGroupsByUserID.
+func (mr *MockUserServiceMockRecorder) GetGroupsByUserID(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupsByUserID", reflect.TypeOf((*MockUserService)(nil).GetGroupsByUserID), ctx, userID)
+}
+
 // GetUser mocks base method.
 func (m *MockUserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error) {
 	m.ctrl.T.Helper()

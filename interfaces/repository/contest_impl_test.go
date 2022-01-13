@@ -16,6 +16,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
 )
@@ -185,9 +186,9 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        random.RandURLString(),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
-					Until:       sampleTime,
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			want: &domain.Contest{
@@ -213,9 +214,9 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        random.RandURLString(),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
-					Until:       sampleTime,
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			want: nil,
@@ -609,8 +610,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-		Result:      random.AlphaNumeric(rand.Intn(30) + 1),
-		Link:        random.RandURLString(),
+		Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+		Link:        optional.NewString(random.RandURLString(), true),
 		Description: random.AlphaNumeric(rand.Intn(30) + 1),
 	}
 
@@ -637,9 +638,9 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 					// ID: Assertion時にgot.IDと合わせる
 					ContestID: cid,
 					Name:      successArgs.Name,
-					Result:    successArgs.Result,
+					Result:    successArgs.Result.String,
 				},
-				Link:        successArgs.Link,
+				Link:        successArgs.Link.String,
 				Description: successArgs.Description,
 				Members:     nil,
 			},
@@ -660,8 +661,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:      random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        random.RandURLString(),
+					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
