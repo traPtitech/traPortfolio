@@ -279,8 +279,8 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	for i, group := range groups {
 		res[i] = newUserGroup(
 			newGroup(group.ID, group.Name),
-			[]ProjectDuration{
-				newProjectDuration(
+			[]YearWithSemesterDuration{
+				newYearWithSemesterDuration(
 					YearWithSemester{
 						Semester: Semester(group.Duration.Since.Semester),
 						Year:     int(group.Duration.Since.Year),
@@ -350,10 +350,10 @@ func newUserProject(id uuid.UUID, name string, since time.Time, until time.Time,
 		Project: Project{
 			Id:       id,
 			Name:     name,
-			Duration: convertToProjectDuration(since, until),
+			Duration: convertToYearWithSemesterDuration(since, until),
 		},
-		UserDuration: []ProjectDuration{
-			convertToProjectDuration(userSince, userUntil), //TODO: objectでよさそう
+		UserDuration: []YearWithSemesterDuration{
+			convertToYearWithSemesterDuration(userSince, userUntil), //TODO: objectでよさそう
 		},
 	}
 }
@@ -373,7 +373,7 @@ func newGroup(id uuid.UUID, name string) Group {
 	}
 }
 
-func newUserGroup(group Group, Duration []ProjectDuration) UserGroup {
+func newUserGroup(group Group, Duration []YearWithSemesterDuration) UserGroup {
 	return UserGroup{
 		Group:    group,
 		Duration: Duration,

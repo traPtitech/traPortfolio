@@ -39,7 +39,7 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 
 	res := make([]Project, len(projects))
 	for i, v := range projects {
-		res[i] = newProject(v.ID, v.Name, convertToProjectDuration(v.Since, v.Until))
+		res[i] = newProject(v.ID, v.Name, convertToYearWithSemesterDuration(v.Since, v.Until))
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -63,12 +63,12 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
 			newUser(v.UserID, v.Name, v.RealName),
-			[]ProjectDuration{newProjectDuration(timeToSem(v.Since), timeToSem(v.Until))},
+			[]YearWithSemesterDuration{newYearWithSemesterDuration(timeToSem(v.Since), timeToSem(v.Until))},
 		)
 	}
 
 	return c.JSON(http.StatusOK, newProjectDetail(
-		newProject(project.ID, project.Name, convertToProjectDuration(project.Since, project.Until)),
+		newProject(project.ID, project.Name, convertToYearWithSemesterDuration(project.Since, project.Until)),
 		project.Description,
 		project.Link,
 		members,
@@ -108,7 +108,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, newProject(
 		project.ID,
 		project.Name,
-		convertToProjectDuration(project.Since, project.Until),
+		convertToYearWithSemesterDuration(project.Since, project.Until),
 	))
 }
 
@@ -164,7 +164,7 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	for i, v := range members {
 		res[i] = newProjectMember(
 			newUser(v.ID, v.Name, v.RealName),
-			[]ProjectDuration{}, // TODO: 追加する
+			[]YearWithSemesterDuration{}, // TODO: 追加する
 		)
 	}
 
@@ -227,7 +227,7 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newProject(id uuid.UUID, name string, duration ProjectDuration) Project {
+func newProject(id uuid.UUID, name string, duration YearWithSemesterDuration) Project {
 	return Project{
 		Id:       id,
 		Name:     name,
@@ -244,15 +244,15 @@ func newProjectDetail(project Project, description string, link string, members 
 	}
 }
 
-func newProjectMember(user User, duration []ProjectDuration) ProjectMember {
+func newProjectMember(user User, duration []YearWithSemesterDuration) ProjectMember {
 	return ProjectMember{
 		User:     user,
 		Duration: duration,
 	}
 }
 
-func newProjectDuration(since YearWithSemester, until YearWithSemester) ProjectDuration {
-	return ProjectDuration{
+func newYearWithSemesterDuration(since YearWithSemester, until YearWithSemester) YearWithSemesterDuration {
+	return YearWithSemesterDuration{
 		Since: since,
 		Until: &until,
 	}
