@@ -29,7 +29,7 @@ paths:
       parameters:
         - schema:
             type: boolean
-            default: 'false'
+            default: false
           in: query
           name: include-suspended
           description: アカウントがアクティブでないユーザーを含めるかどうか
