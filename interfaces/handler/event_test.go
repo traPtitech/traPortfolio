@@ -227,26 +227,27 @@ func TestEventHandler_GetByID(t *testing.T) {
 func TestEventHandler_PatchEvent(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers) (reqBody *handler.EditEventRequest, path string)
+		setup      func(th *handler.TestHandlers) (reqBody *handler.EditEvent, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(th *handler.TestHandlers) (*handler.EditEventRequest, string) {
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel((uint)(rand.Intn(domain.EventLevelLimit)))
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &handler.EditEventRequest{
-					EventID:    eventID,
-					EventLevel: &eventLevel,
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
 				}
 
 				args := repository.UpdateEventLevelArg{
-					Level: eventLevel,
+					Level: eventLevelDomain,
 				}
 
-				path := fmt.Sprintf("/api/v1/events/%s", random.UUID())
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
 				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
 				return reqBody, path
 			},
