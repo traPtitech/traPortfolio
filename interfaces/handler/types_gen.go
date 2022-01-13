@@ -348,9 +348,10 @@ type GroupMember struct {
 	// Embedded struct due to allOf(#/components/schemas/User)
 	User `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	// 班に入っている期間の配列
-	// untilがないところはまだ継続して入っている
-	Duration []YearWithSemesterDuration `json:"duration"`
+	// 班やプロジェクトの期間
+	// 年と前期/後期がある
+	// untilがなかった場合存続中
+	Duration YearWithSemesterDuration `json:"duration"`
 }
 
 // プロジェクトメンバーのユーザーUUID(期間含む)
@@ -405,9 +406,10 @@ type ProjectMember struct {
 	// Embedded struct due to allOf(#/components/schemas/User)
 	User `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	// プロジェクトに所属している期間の配列
-	// untilがなかったらまだ所属している
-	Duration []YearWithSemesterDuration `json:"duration"`
+	// 班やプロジェクトの期間
+	// 年と前期/後期がある
+	// untilがなかった場合存続中
+	Duration YearWithSemesterDuration `json:"duration"`
 }
 
 // 0: 前期
@@ -455,9 +457,10 @@ type UserGroup struct {
 	// Embedded struct due to allOf(#/components/schemas/Group)
 	Group `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	// 班に入っている期間の配列
-	// untilがないところはまだ継続して入っている
-	Duration []YearWithSemesterDuration `json:"duration"`
+	// 班やプロジェクトの期間
+	// 年と前期/後期がある
+	// untilがなかった場合存続中
+	Duration YearWithSemesterDuration `json:"duration"`
 }
 
 // UserProject defines model for UserProject.
@@ -465,9 +468,10 @@ type UserProject struct {
 	// Embedded struct due to allOf(#/components/schemas/Project)
 	Project `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	// プロジェクトに所属している期間の配列
-	// untilがなかったらまだ所属している
-	UserDuration []YearWithSemesterDuration `json:"userDuration"`
+	// 班やプロジェクトの期間
+	// 年と前期/後期がある
+	// untilがなかった場合存続中
+	UserDuration YearWithSemesterDuration `json:"userDuration"`
 }
 
 // 年度と前期/後期
