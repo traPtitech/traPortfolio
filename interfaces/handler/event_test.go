@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -231,20 +232,22 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setup: func(th *handler.TestHandlers) (reqBody *handler.EditEventRequest, path string) {
+			setup: func(th *handler.TestHandlers) (*handler.EditEventRequest, string) {
 
-				EventID := random.UUID()
+				eventID := random.UUID()
+				eventLevel := domain.EventLevel((uint)(rand.Intn(domain.EventLevelLimit)))
+
 				reqBody := &handler.EditEventRequest{
-					EventID: EventID,
-					EventLevel: domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+					EventID:    eventID,
+					EventLevel: &eventLevel,
 				}
 
 				args := repository.UpdateEventLevelArg{
-					Level: reqBody.EventLevel,
+					Level: eventLevel,
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", random.UUID())
-				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), EventID, &args).Return(nil)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
@@ -264,9 +267,9 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			handlers := SetupTestHandlers(t, ctrl)
 
-			path := tt.setup(&handlers)
+			reqBody, path := tt.setup(&handlers)
 
-			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, nil)
+			statusCode, _ := doRequest(t, handlers.API, http.MethodPatch, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
