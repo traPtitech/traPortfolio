@@ -63,7 +63,7 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
 			newUser(v.UserID, v.Name, v.RealName),
-			[]YearWithSemesterDuration{newYearWithSemesterDuration(timeToSem(v.Since), timeToSem(v.Until))},
+			newYearWithSemesterDuration(timeToSem(v.Since), timeToSem(v.Until)),
 		)
 	}
 
@@ -164,7 +164,7 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	for i, v := range members {
 		res[i] = newProjectMember(
 			newUser(v.ID, v.Name, v.RealName),
-			[]YearWithSemesterDuration{}, // TODO: 追加する
+			YearWithSemesterDuration{}, // TODO: 追加する
 		)
 	}
 
@@ -244,7 +244,7 @@ func newProjectDetail(project Project, description string, link string, members 
 	}
 }
 
-func newProjectMember(user User, duration []YearWithSemesterDuration) ProjectMember {
+func newProjectMember(user User, duration YearWithSemesterDuration) ProjectMember {
 	return ProjectMember{
 		User:     user,
 		Duration: duration,
