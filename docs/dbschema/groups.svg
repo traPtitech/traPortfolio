@@ -53,13 +53,13 @@
 <text text-anchor="start" x="108.8534" y="-576.9" font-family="Arial" font-size="14.00" fill="#666666">[char(36)]</text>
 <polygon fill="none" stroke="#000000" points="43.5,-535.5 43.5,-565.5 342.5,-565.5 342.5,-535.5 43.5,-535.5"/>
 <text text-anchor="start" x="50.5" y="-546.9" font-family="Arial" font-size="14.00" fill="#000000">since_year </text>
-<text text-anchor="start" x="122.0708" y="-546.9" font-family="Arial" font-size="14.00" fill="#666666">[tinyint(1)]</text>
+<text text-anchor="start" x="122.0708" y="-546.9" font-family="Arial" font-size="14.00" fill="#666666">[smallint(4)]</text>
 <polygon fill="none" stroke="#000000" points="43.5,-505.5 43.5,-535.5 342.5,-535.5 342.5,-505.5 43.5,-505.5"/>
 <text text-anchor="start" x="50.5" y="-516.9" font-family="Arial" font-size="14.00" fill="#000000">since_semester </text>
 <text text-anchor="start" x="152.4046" y="-516.9" font-family="Arial" font-size="14.00" fill="#666666">[tinyint(1)]</text>
 <polygon fill="none" stroke="#000000" points="43.5,-475.5 43.5,-505.5 342.5,-505.5 342.5,-475.5 43.5,-475.5"/>
 <text text-anchor="start" x="50.5" y="-486.9" font-family="Arial" font-size="14.00" fill="#000000">until_year </text>
-<text text-anchor="start" x="115.068" y="-486.9" font-family="Arial" font-size="14.00" fill="#666666">[tinyint(1)]</text>
+<text text-anchor="start" x="115.068" y="-486.9" font-family="Arial" font-size="14.00" fill="#666666">[smallint(4)]</text>
 <polygon fill="none" stroke="#000000" points="43.5,-445.5 43.5,-475.5 342.5,-475.5 342.5,-445.5 43.5,-445.5"/>
 <text text-anchor="start" x="50.5" y="-456.9" font-family="Arial" font-size="14.00" fill="#000000">until_semester </text>
 <text text-anchor="start" x="145.4018" y="-456.9" font-family="Arial" font-size="14.00" fill="#666666">[tinyint(1)]</text>

@@ -13,8 +13,10 @@ CREATE TABLE `projects` (
   `name` varchar(32) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `link` text DEFAULT NULL,
-  `since` datetime(6) DEFAULT NULL,
-  `until` datetime(6) DEFAULT NULL,
+  `since_year` smallint(4) NOT NULL,
+  `since_semester` tinyint(1) NOT NULL,
+  `until_year` smallint(4) NOT NULL,
+  `until_semester` tinyint(1) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -31,8 +33,10 @@ CREATE TABLE `projects` (
 | name | varchar(32) | NULL | true |  |  | プロジェクト名 |
 | description | text | NULL | true |  |  | プロジェクト説明 |
 | link | text | NULL | true |  |  | プロジェクト情報のリンク |
-| since | datetime(6) | NULL | true |  |  | プロジェクト開始期間 |
-| until | datetime(6) | NULL | true |  |  | プロジェクト終了期間 |
+| since_year | smallint(4) |  | false |  |  | プロジェクト開始年 |
+| since_semester | tinyint(1) |  | false |  |  | プロジェクト開始学期(0:前期 1:後期) |
+| until_year | smallint(4) |  | false |  |  | プロジェクト終了年 |
+| until_semester | tinyint(1) |  | false |  |  | プロジェクト終了学期(0:前期 1:後期) |
 | created_at | datetime(6) | NULL | true |  |  | プロジェクト作成日時 |
 | updated_at | datetime(6) | NULL | true |  |  | プロジェクト更新日時 |
 
