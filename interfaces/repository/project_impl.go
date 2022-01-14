@@ -27,8 +27,7 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 		p := &domain.Project{
 			ID:          v.ID,
 			Name:        v.Name,
-			Since:       v.Since,
-			Until:       v.Until,
+			Duration:    domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 			Description: v.Description,
 			Link:        v.Link,
 		}
@@ -56,17 +55,15 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	m := make([]*domain.ProjectMember, 0, len(members))
 	for _, v := range members {
 		m = append(m, &domain.ProjectMember{
-			UserID: v.UserID,
-			Name:   v.User.Name,
-			Since:  v.Since,
-			Until:  v.Until,
+			UserID:   v.UserID,
+			Name:     v.User.Name,
+			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		})
 	}
 	res := &domain.Project{
 		ID:          id,
 		Name:        project.Name,
-		Since:       project.Since,
-		Until:       project.Until,
+		Duration:    domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
 		Description: project.Description,
 		Link:        project.Link,
 		Members:     m,
@@ -82,8 +79,7 @@ func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Pr
 	res := &domain.Project{
 		ID:          project.ID,
 		Name:        project.Name,
-		Since:       project.Since,
-		Until:       project.Until,
+		Duration:    domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
 		Description: project.Description,
 		Link:        project.Link,
 	}
@@ -163,11 +159,13 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	for _, v := range projectMembers {
 		uid := uuid.Must(uuid.NewV4())
 		m := &model.ProjectMember{
-			ID:        uid,
-			ProjectID: projectID,
-			UserID:    v.UserID,
-			Since:     v.Since,
-			Until:     v.Until,
+			ID:            uid,
+			ProjectID:     projectID,
+			UserID:        v.UserID,
+			SinceYear:     v.SinceYear,
+			SinceSemester: v.SinceSemester,
+			UntilYear:     v.UntilYear,
+			UntilSemester: v.UntilSemester,
 		}
 		members = append(members, m)
 	}

@@ -554,12 +554,10 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			},
 			want: []*domain.UserProject{
 				{
-					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-					Since:     time.Now(),
-					Until:     time.Now(),
-					UserSince: time.Now(),
-					UserUntil: time.Now(),
+					ID:           random.UUID(),
+					Name:         random.AlphaNumeric(rand.Intn(30) + 1),
+					Duration:     random.Duration(),
+					UserDuration: random.Duration(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserProject) {

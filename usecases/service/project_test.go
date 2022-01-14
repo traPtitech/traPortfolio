@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/traPtitech/traPortfolio/util/random"
 
@@ -38,8 +37,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 				{
 					ID:          random.UUID(),
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Since:       time.Now(),
-					Until:       time.Now(),
+					Duration:    random.Duration(),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
@@ -47,8 +45,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 							UserID:   random.UUID(),
 							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-							Since:    time.Now(),
-							Until:    time.Now(),
+							Duration: random.Duration(),
 						},
 					},
 				},
@@ -110,8 +107,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			want: &domain.Project{
 				ID:          random.UUID(),
 				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-				Since:       time.Now(),
-				Until:       time.Now(),
+				Duration:    random.Duration(),
 				Description: random.AlphaNumeric(rand.Intn(30) + 1),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
@@ -119,8 +115,7 @@ func TestProjectService_GetProject(t *testing.T) {
 						UserID:   random.UUID(),
 						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-						Since:    time.Now(),
-						Until:    time.Now(),
+						Duration: random.Duration(),
 					},
 				},
 			},
@@ -201,11 +196,13 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       time.Now(),
-					Until:       time.Now(),
+					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:          optional.NewString(random.RandURLString(), true),
+					SinceYear:     random.Time().Year(),
+					SinceSemester: rand.Intn(2),
+					UntilYear:     random.Time().Year(),
+					UntilSemester: rand.Intn(2),
 				},
 			},
 			want: &domain.Project{
@@ -213,14 +210,21 @@ func TestProjectService_CreateProject(t *testing.T) {
 				Name:        "",
 				Description: "",
 				Link:        "",
-				Since:       time.Time{},
-				Until:       time.Time{},
+				Duration:    random.Duration(),
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
 				want.Name = args.args.Name
 				want.Description = args.args.Description
-				want.Since = args.args.Since
-				want.Until = args.args.Until
+				want.Duration = domain.YearWithSemesterDuration{
+					Since: domain.YearWithSemester{
+						Year:     args.args.SinceYear,
+						Semester: args.args.SinceSemester,
+					},
+					Until: domain.YearWithSemester{
+						Year:     args.args.UntilYear,
+						Semester: args.args.UntilSemester,
+					},
+				}
 				if args.args.Link.Valid {
 					want.Link = args.args.Link.String
 				}
@@ -233,12 +237,13 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       time.Now(),
-					Until:       time.Now(),
-				},
+					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:          optional.NewString(random.RandURLString(), true),
+					SinceYear:     random.Time().Year(),
+					SinceSemester: rand.Intn(2),
+					UntilYear:     random.Time().Year(),
+					UntilSemester: rand.Intn(2)},
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
@@ -286,20 +291,24 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Since:       optional.NewTime(time.Now(), true),
-					Until:       optional.NewTime(time.Now(), true),
+					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
+					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
+					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
 				changes := map[string]interface{}{
-					"name":        args.args.Name.String,
-					"description": args.args.Description.String,
-					"link":        args.args.Link.String,
-					"since":       args.args.Since.Time,
-					"until":       args.args.Until.Time,
+					"name":           args.args.Name.String,
+					"description":    args.args.Description.String,
+					"link":           args.args.Link.String,
+					"since_year":     args.args.SinceYear.Int64,
+					"since_semester": args.args.SinceSemester.Int64,
+					"until_year":     args.args.UntilYear.Int64,
+					"until_semester": args.args.UntilSemester.Int64,
 				}
 				repo.EXPECT().UpdateProject(args.id, changes).Return(nil)
 			},
@@ -311,20 +320,24 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Since:       optional.NewTime(time.Now(), true),
-					Until:       optional.NewTime(time.Now(), true),
+					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
+					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
+					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
 				changes := map[string]interface{}{
-					"name":        args.args.Name.String,
-					"description": args.args.Description.String,
-					"link":        args.args.Link.String,
-					"since":       args.args.Since.Time,
-					"until":       args.args.Until.Time,
+					"name":           args.args.Name.String,
+					"description":    args.args.Description.String,
+					"link":           args.args.Link.String,
+					"since_year":     args.args.SinceYear.Int64,
+					"since_semester": args.args.SinceSemester.Int64,
+					"until_year":     args.args.UntilYear.Int64,
+					"until_semester": args.args.UntilSemester.Int64,
 				}
 				repo.EXPECT().UpdateProject(args.id, changes).Return(gorm.ErrInvalidDB)
 			},
@@ -455,9 +468,11 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 				projectID: random.UUID(),
 				args: []*repository.CreateProjectMemberArgs{
 					{
-						UserID: random.UUID(),
-						Since:  time.Now(),
-						Until:  time.Now(),
+						UserID:        random.UUID(),
+						SinceYear:     random.Time().Year(),
+						SinceSemester: rand.Intn(2),
+						UntilYear:     random.Time().Year(),
+						UntilSemester: rand.Intn(2),
 					},
 				},
 			},
@@ -473,9 +488,11 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 				projectID: random.UUID(),
 				args: []*repository.CreateProjectMemberArgs{
 					{
-						UserID: random.UUID(),
-						Since:  time.Now(),
-						Until:  time.Now(),
+						UserID:        random.UUID(),
+						SinceYear:     random.Time().Year(),
+						SinceSemester: rand.Intn(2),
+						UntilYear:     random.Time().Year(),
+						UntilSemester: rand.Intn(2),
 					},
 				},
 			},

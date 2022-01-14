@@ -63,11 +63,13 @@ func (s *projectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 func (s *projectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
 	uid := uuid.Must(uuid.NewV4())
 	project := &model.Project{
-		ID:          uid,
-		Name:        args.Name,
-		Description: args.Description,
-		Since:       args.Since,
-		Until:       args.Until,
+		ID:            uid,
+		Name:          args.Name,
+		Description:   args.Description,
+		SinceYear:     args.SinceYear,
+		SinceSemester: args.SinceSemester,
+		UntilYear:     args.UntilYear,
+		UntilSemester: args.UntilSemester,
 	}
 	if args.Link.Valid {
 		project.Link = args.Link.String
@@ -90,11 +92,13 @@ func (s *projectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 	if args.Link.Valid {
 		changes["link"] = args.Link.String
 	}
-	if args.Since.Valid {
-		changes["since"] = args.Since.Time
+	if args.SinceYear.Valid && args.SinceSemester.Valid {
+		changes["since_year"] = args.SinceYear.Int64
+		changes["since_semester"] = args.SinceSemester.Int64
 	}
-	if args.Until.Valid {
-		changes["until"] = args.Until.Time
+	if args.UntilYear.Valid && args.UntilSemester.Valid {
+		changes["until_year"] = args.UntilYear.Int64
+		changes["until_semester"] = args.UntilSemester.Int64
 	}
 	if len(changes) > 0 {
 		err := s.repo.UpdateProject(id, changes)

@@ -2,18 +2,12 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
-)
-
-//TODO 何月？
-var (
-	semesterToMonth = [2]time.Month{time.August, time.December}
 )
 
 type ProjectIDInPath struct {
@@ -39,7 +33,7 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 
 	res := make([]Project, len(projects))
 	for i, v := range projects {
-		res[i] = newProject(v.ID, v.Name, convertToYearWithSemesterDuration(v.Since, v.Until))
+		res[i] = newProject(v.ID, v.Name, convertDuration(v.Duration))
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -63,12 +57,12 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
 			newUser(v.UserID, v.Name, v.RealName),
-			newYearWithSemesterDuration(timeToSem(v.Since), timeToSem(v.Until)),
+			convertDuration(v.Duration),
 		)
 	}
 
 	return c.JSON(http.StatusOK, newProjectDetail(
-		newProject(project.ID, project.Name, convertToYearWithSemesterDuration(project.Since, project.Until)),
+		newProject(project.ID, project.Name, convertDuration(project.Duration)),
 		project.Description,
 		project.Link,
 		members,
@@ -86,19 +80,17 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	}
 
 	createReq := repository.CreateProjectArgs{
-		Name:        req.Name,
-		Description: req.Description,
-		Link:        optional.StringFrom(req.Link),
+		Name:          req.Name,
+		Description:   req.Description,
+		Link:          optional.StringFrom(req.Link),
+		SinceYear:     req.Duration.Since.Year,
+		SinceSemester: int(req.Duration.Since.Semester),
 	}
-	since := semToTime(req.Duration.Since)
+
 	if req.Duration.Until != nil {
-		until := semToTime(*req.Duration.Until)
-		if since.After(until) {
-			return convertError(repository.ErrInvalidArg)
-		}
-		createReq.Until = until
+		createReq.UntilYear = req.Duration.Until.Year
+		createReq.UntilSemester = int(req.Duration.Until.Semester)
 	}
-	createReq.Since = since
 
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
@@ -108,7 +100,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, newProject(
 		project.ID,
 		project.Name,
-		convertToYearWithSemesterDuration(project.Since, project.Until),
+		convertDuration(project.Duration),
 	))
 }
 
@@ -129,15 +121,20 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 		Description: optional.StringFrom(req.Description),
 		Link:        optional.StringFrom(req.Link),
 	}
-	since := optionalSemToTime(req.Duration.Since)
-	if req.Duration.Until != nil {
-		until := optionalSemToTime(*req.Duration.Until)
-		if since.Valid && until.Valid && since.Time.After(until.Time) {
-			return convertError(repository.ErrInvalidArg)
+
+	if d := req.Duration; d != nil {
+		sinceYear := int64(d.Since.Year)
+		sinceSemester := int64(d.Since.Semester)
+		patchReq.SinceYear = optional.Int64From(&sinceYear)
+		patchReq.SinceSemester = optional.Int64From(&sinceSemester)
+
+		if d.Until != nil {
+			untilYear := int64(d.Until.Year)
+			untilSemester := int64(d.Until.Semester)
+			patchReq.UntilYear = optional.Int64From(&untilYear)
+			patchReq.UntilSemester = optional.Int64From(&untilSemester)
 		}
-		patchReq.Until = until
 	}
-	patchReq.Since = since
 
 	err = h.service.UpdateProject(ctx, req.ProjectID, &patchReq)
 	if err != nil {
@@ -187,17 +184,16 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
 		m := &repository.CreateProjectMemberArgs{
-			UserID: v.UserId,
+			UserID:        v.UserId,
+			SinceYear:     int(v.Duration.Since.Year),
+			SinceSemester: int(v.Duration.Since.Semester),
 		}
-		since := semToTime(v.Duration.Since)
+
 		if v.Duration.Until != nil {
-			until := semToTime(*v.Duration.Until)
-			if since.After(until) {
-				return convertError(repository.ErrInvalidArg)
-			}
-			m.Until = until
+			m.UntilYear = int(v.Duration.Until.Year)
+			m.UntilSemester = int(v.Duration.Until.Semester)
 		}
-		m.Since = since
+
 		createReq = append(createReq, m)
 	}
 	err = h.service.AddProjectMembers(ctx, req.ProjectID, createReq)
@@ -248,12 +244,5 @@ func newProjectMember(user User, duration YearWithSemesterDuration) ProjectMembe
 	return ProjectMember{
 		User:     user,
 		Duration: duration,
-	}
-}
-
-func newYearWithSemesterDuration(since YearWithSemester, until YearWithSemester) YearWithSemesterDuration {
-	return YearWithSemesterDuration{
-		Since: since,
-		Until: &until,
 	}
 }
