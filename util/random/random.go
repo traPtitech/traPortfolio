@@ -71,14 +71,24 @@ func RandURLString() string {
 }
 
 func Duration() domain.YearWithSemesterDuration {
+	ys1 := domain.YearWithSemester{
+		Year:     Time().Year(),
+		Semester: rand.Intn(2),
+	}
+	ys2 := domain.YearWithSemester{
+		Year:     Time().Year(),
+		Semester: rand.Intn(2),
+	}
+
+	if ys1.After(ys2) {
+		return domain.YearWithSemesterDuration{
+			Since: ys2,
+			Until: ys1,
+		}
+	}
+
 	return domain.YearWithSemesterDuration{
-		Since: domain.YearWithSemester{
-			Year:     Time().Year(),
-			Semester: rand.Intn(2),
-		},
-		Until: domain.YearWithSemester{
-			Year:     Time().Year(),
-			Semester: rand.Intn(2),
-		},
+		Since: ys1,
+		Until: ys2,
 	}
 }

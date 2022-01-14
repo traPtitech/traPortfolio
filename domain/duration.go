@@ -10,6 +10,10 @@ type YearWithSemester struct {
 	Semester int
 }
 
+func (ys YearWithSemester) After(ys2 YearWithSemester) bool {
+	return ys.Year > ys2.Year || (ys.Year == ys2.Year && ys.Semester > ys2.Semester)
+}
+
 func NewYearWithSemesterDuration(sinceYear, sinceSemester, untilYear, untilSemester int) YearWithSemesterDuration {
 	return YearWithSemesterDuration{
 		Since: YearWithSemester{
