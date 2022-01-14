@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"time"
-
 	"github.com/gofrs/uuid"
 )
 
@@ -28,12 +26,10 @@ type UserDetail struct {
 }
 
 type UserProject struct {
-	ID        uuid.UUID
-	Name      string
-	Since     time.Time
-	Until     time.Time
-	UserSince time.Time
-	UserUntil time.Time
+	ID           uuid.UUID
+	Name         string
+	Duration     YearWithSemesterDuration
+	UserDuration YearWithSemesterDuration
 }
 
 type UserContest struct {
