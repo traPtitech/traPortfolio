@@ -1,8 +1,11 @@
 package domain
 
-import "time"
+type YearWithSemesterDuration struct {
+	Since YearWithSemester
+	Until YearWithSemester
+}
 
-type Duration struct {
-	Since time.Time
-	Until time.Time
+type YearWithSemester struct {
+	Year     uint
+	Semester uint
 }
