@@ -6,6 +6,6 @@ type YearWithSemesterDuration struct {
 }
 
 type YearWithSemester struct {
-	Year     uint
-	Semester uint
+	Year     int
+	Semester int
 }
