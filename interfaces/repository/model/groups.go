@@ -22,10 +22,10 @@ func (*Group) TableName() string {
 type GroupUserBelonging struct {
 	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	GroupID       uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	SinceYear     uint      `gorm:"type:smallint(4);not null"`
-	SinceSemester uint      `gorm:"type:tinyint(1);not null"`
-	UntilYear     uint      `gorm:"type:smallint(4);not null"`
-	UntilSemester uint      `gorm:"type:tinyint(1);not null"`
+	SinceYear     int       `gorm:"type:smallint(4);not null"`
+	SinceSemester int       `gorm:"type:tinyint(1);not null"`
+	UntilYear     int       `gorm:"type:smallint(4);not null"`
+	UntilSemester int       `gorm:"type:tinyint(1);not null"`
 	CreatedAt     time.Time `gorm:"precision:6"`
 	UpdatedAt     time.Time `gorm:"precision:6"`
 
