@@ -6,6 +6,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 type ProjectRepository struct {
@@ -71,18 +72,33 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	return res, nil
 }
 
-func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
-	err := repo.h.Create(project).Error()
+func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.Project, error) {
+	p := model.Project{
+		ID:            random.UUID(),
+		Name:          args.Name,
+		Description:   args.Description,
+		SinceYear:     args.SinceYear,
+		SinceSemester: args.SinceSemester,
+		UntilYear:     args.UntilYear,
+		UntilSemester: args.UntilSemester,
+	}
+	if args.Link.Valid {
+		p.Link = args.Link.String
+	}
+
+	err := repo.h.Create(&p).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
+
 	res := &domain.Project{
-		ID:          project.ID,
-		Name:        project.Name,
-		Duration:    domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
-		Description: project.Description,
-		Link:        project.Link,
+		ID:          p.ID,
+		Name:        p.Name,
+		Duration:    domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
+		Description: p.Description,
+		Link:        p.Link,
 	}
+
 	return res, nil
 }
 

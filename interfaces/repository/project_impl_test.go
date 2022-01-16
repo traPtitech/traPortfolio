@@ -13,8 +13,8 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -285,11 +285,10 @@ func TestProjectRepository_GetProject(t *testing.T) {
 }
 
 func TestProjectRepository_CreateProject(t *testing.T) {
-	successProject := &model.Project{
-		ID:            random.UUID(),
+	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 		Description:   random.AlphaNumeric(rand.Intn(30) + 1),
-		Link:          random.RandURLString(),
+		Link:          optional.NewString(random.RandURLString(), true),
 		SinceYear:     random.Time().Year(),
 		SinceSemester: rand.Intn(2),
 		UntilYear:     random.Time().Year(),
@@ -298,7 +297,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 
 	t.Parallel()
 	type args struct {
-		project *model.Project
+		project *repository.CreateProjectArgs
 	}
 	tests := []struct {
 		name      string
@@ -313,7 +312,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: successProject,
 			},
 			want: &domain.Project{
-				ID:   successProject.ID,
+				// ID: 比較しない
 				Name: successProject.Name,
 				Duration: domain.YearWithSemesterDuration{
 					Since: domain.YearWithSemester{
@@ -326,7 +325,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 					},
 				},
 				Description: successProject.Description,
-				Link:        successProject.Link,
+				Link:        successProject.Link.String,
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
 				h := f.h.(*mock_database.MockSQLHandler)
@@ -334,7 +333,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				p := args.project
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?)")).
-					WithArgs(p.ID, p.Name, p.Description, p.Link, p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, p.Name, p.Description, p.Link, p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.ExpectCommit()
 			},
@@ -343,11 +342,10 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				project: &model.Project{
-					ID:            random.UUID(),
+				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:          random.RandURLString(),
+					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     random.Time().Year(),
 					SinceSemester: rand.Intn(2),
 					UntilYear:     random.Time().Year(),
@@ -361,7 +359,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				p := args.project
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?)")).
-					WithArgs(p.ID, p.Name, p.Description, p.Link, p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, p.Name, p.Description, p.Link, p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
@@ -378,6 +376,9 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			repo := NewProjectRepository(f.h)
 			// Assertion
 			got, err := repo.CreateProject(tt.args.project)
+			if tt.want != nil && got != nil {
+				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
+			}
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

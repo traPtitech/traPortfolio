@@ -7,7 +7,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -61,20 +60,7 @@ func (s *projectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 }
 
 func (s *projectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
-	uid := uuid.Must(uuid.NewV4())
-	project := &model.Project{
-		ID:            uid,
-		Name:          args.Name,
-		Description:   args.Description,
-		SinceYear:     args.SinceYear,
-		SinceSemester: args.SinceSemester,
-		UntilYear:     args.UntilYear,
-		UntilSemester: args.UntilSemester,
-	}
-	if args.Link.Valid {
-		project.Link = args.Link.String
-	}
-	res, err := s.repo.CreateProject(project)
+	res, err := s.repo.CreateProject(args)
 	if err != nil {
 		return nil, err
 	}
