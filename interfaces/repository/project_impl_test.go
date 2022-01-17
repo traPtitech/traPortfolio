@@ -285,14 +285,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 }
 
 func TestProjectRepository_CreateProject(t *testing.T) {
+	duration := random.Duration()
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 		Description:   random.AlphaNumeric(rand.Intn(30) + 1),
 		Link:          optional.NewString(random.RandURLString(), true),
-		SinceYear:     random.Time().Year(),
-		SinceSemester: rand.Intn(2),
-		UntilYear:     random.Time().Year(),
-		UntilSemester: rand.Intn(2),
+		SinceYear:     duration.Since.Year,
+		SinceSemester: duration.Since.Semester,
+		UntilYear:     duration.Until.Year,
+		UntilSemester: duration.Until.Semester,
 	} // Successで使うProject
 
 	t.Parallel()
@@ -346,10 +347,10 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     random.Time().Year(),
-					SinceSemester: rand.Intn(2),
-					UntilYear:     random.Time().Year(),
-					UntilSemester: rand.Intn(2),
+					SinceYear:     duration.Since.Year,
+					SinceSemester: duration.Since.Semester,
+					UntilYear:     duration.Until.Year,
+					UntilSemester: duration.Until.Semester,
 				},
 			},
 			want: nil,
@@ -577,6 +578,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 }
 
 func TestProjectRepository_AddProjectMembers(t *testing.T) {
+	duration := random.Duration()
+
 	t.Parallel()
 	type args struct {
 		projectID      uuid.UUID
@@ -595,31 +598,31 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 				projectMembers: []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 				},
 			},
@@ -672,17 +675,17 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 				projectMembers: []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 				},
 			},
@@ -702,17 +705,17 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 				projectMembers: []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 				},
 			},
@@ -739,17 +742,17 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 				projectMembers: []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 					{
 						UserID:        random.UUID(),
-						SinceYear:     random.Time().Year(),
-						SinceSemester: rand.Intn(2),
-						UntilYear:     random.Time().Year(),
-						UntilSemester: rand.Intn(2),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
 					},
 				},
 			},

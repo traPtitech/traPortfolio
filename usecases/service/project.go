@@ -60,14 +60,26 @@ func (s *projectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 }
 
 func (s *projectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
+	d := domain.NewYearWithSemesterDuration(args.SinceYear, args.SinceSemester, args.UntilYear, args.UntilSemester)
+	if !d.IsValid() {
+		return nil, repository.ErrInvalidArg
+	}
+
 	res, err := s.repo.CreateProject(args)
 	if err != nil {
 		return nil, err
 	}
+
 	return res, nil
 }
 
 func (s *projectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {
+	old, err := s.repo.GetProject(id)
+	if err != nil {
+		return err
+	}
+
+	d := old.Duration
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -81,11 +93,20 @@ func (s *projectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 	if args.SinceYear.Valid && args.SinceSemester.Valid {
 		changes["since_year"] = args.SinceYear.Int64
 		changes["since_semester"] = args.SinceSemester.Int64
+		d.Since.Year = int(args.SinceYear.Int64)
+		d.Since.Semester = int(args.SinceSemester.Int64)
 	}
 	if args.UntilYear.Valid && args.UntilSemester.Valid {
 		changes["until_year"] = args.UntilYear.Int64
 		changes["until_semester"] = args.UntilSemester.Int64
+		d.Until.Year = int(args.UntilYear.Int64)
+		d.Until.Semester = int(args.UntilSemester.Int64)
 	}
+
+	if !d.IsValid() {
+		return repository.ErrInvalidArg
+	}
+
 	if len(changes) > 0 {
 		err := s.repo.UpdateProject(id, changes)
 		if err != nil {
@@ -115,6 +136,13 @@ func (s *projectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([
 }
 
 func (s *projectService) AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
+	for _, v := range args {
+		d := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
+		if !d.IsValid() {
+			return repository.ErrInvalidArg
+		}
+	}
+
 	err := s.repo.AddProjectMembers(projectID, args)
 	if err != nil {
 		return err

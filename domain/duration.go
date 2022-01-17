@@ -26,3 +26,7 @@ func NewYearWithSemesterDuration(sinceYear, sinceSemester, untilYear, untilSemes
 		},
 	}
 }
+
+func (d YearWithSemesterDuration) IsValid() bool {
+	return d.Until.After(d.Since) && d.Since.Year >= 1970 && d.Until.Year < 2070 && d.Since.Semester < 2 && d.Until.Semester < 2
+}
