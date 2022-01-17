@@ -103,24 +103,11 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 }
 
 func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
-	var (
-		old model.Project
-		new model.Project
-	)
-
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
-			return convertError(err)
-		}
-		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-			return convertError(err)
-		}
-		if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
-			return convertError(err)
-		}
-
-		return nil
-	})
+	err := repo.h.
+		Model(&model.Project{}).
+		Where(model.Project{ID: id}).
+		Updates(changes).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
