@@ -216,13 +216,12 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 
 	res := make([]*domain.UserProject, 0, len(projects))
 	for _, v := range projects {
+		p := v.Project
 		res = append(res, &domain.UserProject{
-			ID:        v.Project.ID,
-			Name:      v.Project.Name,
-			Since:     v.Project.Since,
-			Until:     v.Project.Until,
-			UserSince: v.Since,
-			UserUntil: v.Until,
+			ID:           v.Project.ID,
+			Name:         v.Project.Name,
+			Duration:     domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
+			UserDuration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		})
 	}
 	return res, nil
@@ -245,7 +244,7 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.Group
 		result = append(result, &domain.GroupUser{
 			ID:   gr.GroupID,
 			Name: gr.Name,
-			Duration: domain.GroupDuration{
+			Duration: domain.YearWithSemesterDuration{
 				Since: domain.YearWithSemester{
 					Year:     v.SinceYear,
 					Semester: v.SinceSemester,

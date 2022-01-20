@@ -691,18 +691,17 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			args: args{userID: ids[0]},
 			want: []*domain.UserProject{
 				{
-					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-					Since:     time.Now(),
-					Until:     time.Now(),
-					UserSince: time.Now(),
-					UserUntil: time.Now(),
+					ID:           random.UUID(),
+					Name:         random.AlphaNumeric(rand.Intn(30) + 1),
+					Duration:     random.Duration(),
+					UserDuration: random.Duration(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserProject) {
-				rows := sqlmock.NewRows([]string{"id", "project_id", "user_id", "since", "until"})
+				rows := sqlmock.NewRows([]string{"id", "project_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, v := range want {
-					rows.AddRow(random.UUID(), v.ID, args.userID, v.UserSince, v.UserUntil)
+					ud := v.UserDuration
+					rows.AddRow(random.UUID(), v.ID, args.userID, ud.Since.Year, ud.Since.Semester, ud.Until.Year, ud.Until.Semester)
 				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
@@ -710,11 +709,12 @@ func TestUserRepository_GetProjects(t *testing.T) {
 					WithArgs(args.userID).
 					WillReturnRows(rows)
 				for _, v := range want {
+					d := v.Duration
 					sqlhandler.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ?")).
 						WithArgs(v.ID).
 						WillReturnRows(
-							sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-								AddRow(v.ID, v.Name, random.AlphaNumeric(rand.Intn(30)+1), random.AlphaNumeric(rand.Intn(30)+1), v.Since, v.Until, time.Now(), time.Now()),
+							sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester", "created_at", "updated_at"}).
+								AddRow(v.ID, v.Name, random.AlphaNumeric(rand.Intn(30)+1), random.AlphaNumeric(rand.Intn(30)+1), d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester, time.Now(), time.Now()),
 						)
 				}
 			},

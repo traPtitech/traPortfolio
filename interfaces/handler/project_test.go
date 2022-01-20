@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -20,16 +19,11 @@ var (
 )
 
 // 0 first semester, 1 second semester
-func makeSemesterTime(s int) time.Time {
-	t := random.Time()
-	var m time.Month
-	if s == 0 {
-		m = time.August
-	} else {
-		m = time.December
+func makeYearWithSemester(s int) domain.YearWithSemester {
+	return domain.YearWithSemester{
+		Year:     random.Time().Year(),
+		Semester: s,
 	}
-	newT := time.Date(t.Year(), m, t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
-	return newT
 }
 
 func TestProjecttHandler_GetAll(t *testing.T) {
@@ -45,12 +39,15 @@ func TestProjecttHandler_GetAll(t *testing.T) {
 			setup: func(th *handler.TestHandlers) ([]*handler.Project, string) {
 				sinceSem := rand.Intn(2)
 				untilSem := rand.Intn(2)
+				duration := domain.YearWithSemesterDuration{
+					Since: makeYearWithSemester(sinceSem),
+					Until: makeYearWithSemester(untilSem),
+				}
 				repo := []*domain.Project{
 					{
 						ID:          random.UUID(),
 						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-						Since:       makeSemesterTime(sinceSem),
-						Until:       makeSemesterTime(untilSem),
+						Duration:    duration,
 						Description: random.AlphaNumeric(rand.Intn(30) + 1),
 						Link:        random.RandURLString(),
 						Members: []*domain.ProjectMember{
@@ -58,16 +55,14 @@ func TestProjecttHandler_GetAll(t *testing.T) {
 								UserID:   random.UUID(),
 								Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 								RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-								Since:    random.Time(),
-								Until:    random.Time(),
+								Duration: random.Duration(),
 							},
 						},
 					},
 					{
 						ID:          random.UUID(),
 						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-						Since:       makeSemesterTime(sinceSem),
-						Until:       makeSemesterTime(untilSem),
+						Duration:    duration,
 						Description: random.AlphaNumeric(rand.Intn(30) + 1),
 						Link:        random.RandURLString(),
 						Members: []*domain.ProjectMember{
@@ -75,8 +70,7 @@ func TestProjecttHandler_GetAll(t *testing.T) {
 								UserID:   random.UUID(),
 								Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 								RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-								Since:    random.Time(),
-								Until:    random.Time(),
+								Duration: random.Duration(),
 							},
 						},
 					},
@@ -88,11 +82,11 @@ func TestProjecttHandler_GetAll(t *testing.T) {
 						Duration: handler.YearWithSemesterDuration{
 							Since: handler.YearWithSemester{
 								Semester: handler.Semester(sinceSem),
-								Year:     v.Since.Year(),
+								Year:     v.Duration.Since.Year,
 							},
 							Until: &handler.YearWithSemester{
 								Semester: handler.Semester(untilSem),
-								Year:     v.Until.Year(),
+								Year:     v.Duration.Until.Year,
 							},
 						},
 						Id:   v.ID,
@@ -145,12 +139,15 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 			setup: func(th *handler.TestHandlers) (handler.ProjectDetail, string) {
 				sinceSem := rand.Intn(2)
 				untilSem := rand.Intn(2)
+				duration := domain.YearWithSemesterDuration{
+					Since: makeYearWithSemester(sinceSem),
+					Until: makeYearWithSemester(untilSem),
+				}
 				projectID := random.UUID()
 				repo := domain.Project{
 					ID:          projectID,
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Since:       makeSemesterTime(sinceSem),
-					Until:       makeSemesterTime(untilSem),
+					Duration:    duration,
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
@@ -158,8 +155,7 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 							UserID:   random.UUID(),
 							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
-							Since:    makeSemesterTime(sinceSem),
-							Until:    makeSemesterTime(untilSem),
+							Duration: random.Duration(),
 						},
 					},
 				}
@@ -174,12 +170,12 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 						},
 						Duration: handler.YearWithSemesterDuration{
 							Since: handler.YearWithSemester{
-								Semester: handler.Semester(sinceSem),
-								Year:     v.Since.Year(),
+								Year:     v.Duration.Since.Year,
+								Semester: handler.Semester(v.Duration.Since.Semester),
 							},
 							Until: &handler.YearWithSemester{
-								Semester: handler.Semester(untilSem),
-								Year:     v.Until.Year(),
+								Year:     v.Duration.Until.Year,
+								Semester: handler.Semester(v.Duration.Until.Semester),
 							},
 						},
 					})
@@ -189,11 +185,11 @@ func TestProjecttHandler_GetByID(t *testing.T) {
 						Duration: handler.YearWithSemesterDuration{
 							Since: handler.YearWithSemester{
 								Semester: handler.Semester(sinceSem),
-								Year:     repo.Since.Year(),
+								Year:     repo.Duration.Since.Year,
 							},
 							Until: &handler.YearWithSemester{
 								Semester: handler.Semester(untilSem),
-								Year:     repo.Until.Year(),
+								Year:     repo.Duration.Until.Year,
 							},
 						},
 						Id:   repo.ID,

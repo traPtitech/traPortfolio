@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -230,7 +229,12 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	}
 	res := make([]UserProject, len(projects))
 	for i, v := range projects {
-		res[i] = newUserProject(v.ID, v.Name, v.Since, v.Until, v.UserSince, v.UserUntil)
+		res[i] = newUserProject(
+			v.ID,
+			v.Name,
+			convertDuration(v.Duration),
+			convertDuration(v.UserDuration),
+		)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -279,16 +283,7 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	for i, group := range groups {
 		res[i] = newUserGroup(
 			newGroup(group.ID, group.Name),
-			newYearWithSemesterDuration(
-				YearWithSemester{
-					Semester: Semester(group.Duration.Since.Semester),
-					Year:     int(group.Duration.Since.Year),
-				},
-				YearWithSemester{
-					Semester: Semester(group.Duration.Since.Semester),
-					Year:     int(group.Duration.Since.Year),
-				},
-			),
+			convertDuration(group.Duration),
 		)
 	}
 	return c.JSON(http.StatusOK, res)
@@ -343,14 +338,14 @@ func newAccount(id uuid.UUID, name string, atype uint, url string, prPermitted b
 	}
 }
 
-func newUserProject(id uuid.UUID, name string, since time.Time, until time.Time, userSince time.Time, userUntil time.Time) UserProject {
+func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration, userDuration YearWithSemesterDuration) UserProject {
 	return UserProject{
 		Project: Project{
 			Id:       id,
 			Name:     name,
-			Duration: convertToYearWithSemesterDuration(since, until),
+			Duration: duration,
 		},
-		UserDuration: convertToYearWithSemesterDuration(userSince, userUntil), //TODO: objectでよさそう
+		UserDuration: userDuration,
 	}
 }
 

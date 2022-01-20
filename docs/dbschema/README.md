@@ -12,8 +12,8 @@
 | [groups](groups.md) | 6 | グループテーブル | BASE TABLE |
 | [group_user_belongings](group_user_belongings.md) | 8 | グループとユーザー関係テーブル | BASE TABLE |
 | [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブル | BASE TABLE |
-| [projects](projects.md) | 8 | プロジェクトテーブル | BASE TABLE |
-| [project_members](project_members.md) | 7 | プロジェクト所属者テーブル | BASE TABLE |
+| [projects](projects.md) | 10 | プロジェクトテーブル | BASE TABLE |
+| [project_members](project_members.md) | 9 | プロジェクト所属者テーブル | BASE TABLE |
 | [users](users.md) | 6 | ユーザーテーブル | BASE TABLE |
 
 ## Relations

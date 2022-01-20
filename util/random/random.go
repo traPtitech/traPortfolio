@@ -7,6 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 )
 
 const (
@@ -67,4 +68,27 @@ func URL(useHTTPS bool, domainLength uint16) *url.URL {
 
 func RandURLString() string {
 	return URL(rand.Intn(2) < 1, uint16(rand.Intn(20)+1)).String()
+}
+
+func Duration() domain.YearWithSemesterDuration {
+	ys1 := domain.YearWithSemester{
+		Year:     Time().Year(),
+		Semester: rand.Intn(2),
+	}
+	ys2 := domain.YearWithSemester{
+		Year:     Time().Year(),
+		Semester: rand.Intn(2),
+	}
+
+	if ys1.After(ys2) {
+		return domain.YearWithSemesterDuration{
+			Since: ys2,
+			Until: ys1,
+		}
+	}
+
+	return domain.YearWithSemesterDuration{
+		Since: ys1,
+		Until: ys2,
+	}
 }

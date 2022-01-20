@@ -6,6 +6,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 type ProjectRepository struct {
@@ -27,8 +28,7 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 		p := &domain.Project{
 			ID:          v.ID,
 			Name:        v.Name,
-			Since:       v.Since,
-			Until:       v.Until,
+			Duration:    domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 			Description: v.Description,
 			Link:        v.Link,
 		}
@@ -56,17 +56,15 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	m := make([]*domain.ProjectMember, 0, len(members))
 	for _, v := range members {
 		m = append(m, &domain.ProjectMember{
-			UserID: v.UserID,
-			Name:   v.User.Name,
-			Since:  v.Since,
-			Until:  v.Until,
+			UserID:   v.UserID,
+			Name:     v.User.Name,
+			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		})
 	}
 	res := &domain.Project{
 		ID:          id,
 		Name:        project.Name,
-		Since:       project.Since,
-		Until:       project.Until,
+		Duration:    domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
 		Description: project.Description,
 		Link:        project.Link,
 		Members:     m,
@@ -74,41 +72,42 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	return res, nil
 }
 
-func (repo *ProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
-	err := repo.h.Create(project).Error()
+func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.Project, error) {
+	p := model.Project{
+		ID:            random.UUID(),
+		Name:          args.Name,
+		Description:   args.Description,
+		SinceYear:     args.SinceYear,
+		SinceSemester: args.SinceSemester,
+		UntilYear:     args.UntilYear,
+		UntilSemester: args.UntilSemester,
+	}
+	if args.Link.Valid {
+		p.Link = args.Link.String
+	}
+
+	err := repo.h.Create(&p).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
+
 	res := &domain.Project{
-		ID:          project.ID,
-		Name:        project.Name,
-		Since:       project.Since,
-		Until:       project.Until,
-		Description: project.Description,
-		Link:        project.Link,
+		ID:          p.ID,
+		Name:        p.Name,
+		Duration:    domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
+		Description: p.Description,
+		Link:        p.Link,
 	}
+
 	return res, nil
 }
 
 func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
-	var (
-		old model.Project
-		new model.Project
-	)
-
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if err := tx.First(&old, model.Project{ID: id}).Error(); err != nil {
-			return convertError(err)
-		}
-		if err := tx.Model(&old).Updates(changes).Error(); err != nil {
-			return convertError(err)
-		}
-		if err := tx.Where(&model.Project{ID: id}).First(&new).Error(); err != nil {
-			return convertError(err)
-		}
-
-		return nil
-	})
+	err := repo.h.
+		Model(&model.Project{}).
+		Where(model.Project{ID: id}).
+		Updates(changes).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
@@ -163,11 +162,13 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	for _, v := range projectMembers {
 		uid := uuid.Must(uuid.NewV4())
 		m := &model.ProjectMember{
-			ID:        uid,
-			ProjectID: projectID,
-			UserID:    v.UserID,
-			Since:     v.Since,
-			Until:     v.Until,
+			ID:            uid,
+			ProjectID:     projectID,
+			UserID:        v.UserID,
+			SinceYear:     v.SinceYear,
+			SinceSemester: v.SinceSemester,
+			UntilYear:     v.UntilYear,
+			UntilSemester: v.UntilSemester,
 		}
 		members = append(members, m)
 	}

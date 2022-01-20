@@ -11,9 +11,9 @@
 CREATE TABLE `group_user_belongings` (
   `user_id` char(36) NOT NULL,
   `group_id` char(36) NOT NULL,
-  `since_year` tinyint(1) NOT NULL,
+  `since_year` smallint(4) NOT NULL,
   `since_semester` tinyint(1) NOT NULL,
-  `until_year` tinyint(1) NOT NULL,
+  `until_year` smallint(4) NOT NULL,
   `until_semester` tinyint(1) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
@@ -32,10 +32,10 @@ CREATE TABLE `group_user_belongings` (
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
 | group_id | char(36) |  | false |  | [groups](groups.md) | グループUUID |
-| since_year | tinyint(1) |  | false |  |  | ユーザー所属開始年 |
-| since_semester | tinyint(1) |  | false |  |  | ユーザー所属開始学期 |
-| until_year | tinyint(1) |  | false |  |  | ユーザー所属終了年 |
-| until_semester | tinyint(1) |  | false |  |  | ユーザー所属終了学期 |
+| since_year | smallint(4) |  | false |  |  | ユーザー所属開始年 |
+| since_semester | tinyint(1) |  | false |  |  | ユーザー所属開始学期(0:前期 1:後期) |
+| until_year | smallint(4) |  | false |  |  | ユーザー所属終了年 |
+| until_semester | tinyint(1) |  | false |  |  | ユーザー所属終了学期(0:前期 1:後期) |
 | created_at | datetime(6) | NULL | true |  |  | 関係テーブル作成日時 |
 | updated_at | datetime(6) | NULL | true |  |  | 関係テーブル更新日時 |
 
