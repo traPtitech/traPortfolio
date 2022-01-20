@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
 
@@ -34,11 +35,11 @@ type mockUserRepositoryFields struct {
 	traq       external.TraQAPI
 }
 
-func newMockUserRepositoryFields() mockUserRepositoryFields {
+func newMockUserRepositoryFields(ctrl *gomock.Controller) mockUserRepositoryFields {
 	return mockUserRepositoryFields{
 		sqlhandler: mock_database.NewMockSQLHandler(),
-		portal:     mock_external.NewMockPortalAPI(),
-		traq:       mock_external.NewMockTraQAPI(),
+		portal:     mock_external.NewMockPortalAPI(ctrl),
+		traq:       mock_external.NewMockTraQAPI(ctrl),
 	}
 }
 
@@ -98,7 +99,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -196,7 +198,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -261,7 +264,8 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -332,7 +336,8 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -412,7 +417,8 @@ func TestUserRepository_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -524,7 +530,8 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -606,7 +613,8 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -665,7 +673,8 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -739,7 +748,8 @@ func TestUserRepository_GetProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
@@ -823,7 +833,8 @@ func TestUserRepository_GetContests(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockUserRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion

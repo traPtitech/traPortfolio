@@ -9,6 +9,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -26,10 +27,10 @@ type mockContestRepositoryFields struct {
 	portal external.PortalAPI
 }
 
-func newMockContestRepositoryFields() mockContestRepositoryFields {
+func newMockContestRepositoryFields(ctrl *gomock.Controller) mockContestRepositoryFields {
 	return mockContestRepositoryFields{
 		h:      mock_database.NewMockSQLHandler(),
-		portal: mock_external.NewMockPortalAPI(),
+		portal: mock_external.NewMockPortalAPI(ctrl),
 	}
 }
 
@@ -80,7 +81,8 @@ func TestContestRepository_GetContests(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -155,7 +157,8 @@ func TestContestRepository_GetContest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -237,7 +240,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -359,7 +363,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -447,7 +452,8 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -517,7 +523,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -595,7 +602,8 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -684,7 +692,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -804,7 +813,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -922,7 +932,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -1070,7 +1081,8 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -1200,7 +1212,8 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockContestRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion

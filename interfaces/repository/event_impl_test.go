@@ -6,6 +6,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -27,10 +28,10 @@ type mockEventRepositoryFields struct {
 	api external.KnoqAPI
 }
 
-func newMockEventRepositoryFields() mockEventRepositoryFields {
+func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFields {
 	return mockEventRepositoryFields{
 		h:   mock_database.NewMockSQLHandler(),
-		api: mock_external.NewMockKnoqAPI(),
+		api: mock_external.NewMockKnoqAPI(ctrl),
 	}
 }
 
@@ -67,7 +68,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
@@ -176,7 +178,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
@@ -292,7 +295,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
@@ -341,7 +345,8 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion

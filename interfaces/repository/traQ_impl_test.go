@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/traPtitech/traPortfolio/util/random"
 
 	"github.com/gofrs/uuid"
@@ -61,8 +62,9 @@ func TestTraQRepository_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
+			ctrl := gomock.NewController(t)
 			tt.fields = fields{
-				api: mock_external.NewMockTraQAPI(),
+				api: mock_external.NewMockTraQAPI(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
 			repo := NewTraQRepository(tt.fields.api)

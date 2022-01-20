@@ -11,7 +11,7 @@ import (
 
 	"github.com/patrickmn/go-cache"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
+	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
 )
 
 const (
@@ -40,7 +40,7 @@ type PortalAPI struct {
 
 func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
 	if conf.isDevelopment {
-		return mock_external.NewMockPortalAPI(), nil
+		return mock_external_e2e.NewMockPortalAPI(), nil
 	}
 
 	jar, err := cookiejar.New(nil)
