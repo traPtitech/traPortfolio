@@ -38,6 +38,39 @@ func validUUIDStr(s string) bool {
 	return err == nil
 }
 
+func makeKnoqEvents(events []*domain.Event) []*external.EventResponse {
+	res := make([]*external.EventResponse, len(events))
+	for i, e := range events {
+		res[i] = &external.EventResponse{
+			ID:        e.ID,
+			Name:      e.Name,
+			TimeStart: e.TimeStart,
+			TimeEnd:   e.TimeEnd,
+		}
+	}
+
+	return res
+}
+
+func makeKnoqEvent(event *domain.EventDetail) *external.EventResponse {
+	admins := make([]uuid.UUID, len(event.HostName))
+	for i, h := range event.HostName {
+		admins[i] = h.ID
+	}
+
+	return &external.EventResponse{
+		ID:          event.ID,
+		Name:        event.Name,
+		Description: event.Description,
+		Place:       event.Place,
+		GroupID:     event.GroupID,
+		RoomID:      event.RoomID,
+		TimeStart:   event.TimeStart,
+		TimeEnd:     event.TimeEnd,
+		Admins:      admins,
+	}
+}
+
 func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
 	res := make([]*external.PortalUserResponse, len(users))
 	for i, u := range users {
