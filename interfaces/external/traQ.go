@@ -12,26 +12,6 @@ type TraQUserResponse struct {
 	Name        string           `json:"name"`
 }
 
-type GroupUserResponse struct {
-	ID       uuid.UUID `json:"groupId"`
-	Name     string    `json:"name"`
-	Duration domain.ProjectDuration
-}
-
-type GroupsResponse struct {
-	ID   uuid.UUID `json:"Id"`
-	Name string    `json:"Name"`
-}
-
-type GroupDetailResponse struct {
-	ID          uuid.UUID `json:"groupId"`
-	Name        string    `json:"name"`
-	Link        string    `json:"link"`
-	Leader      domain.User
-	Members     []domain.UserGroup
-	Description string `json:"description"`
-}
-
 type TraQAPI interface {
 	GetByID(id uuid.UUID) (*TraQUserResponse, error)
 }
