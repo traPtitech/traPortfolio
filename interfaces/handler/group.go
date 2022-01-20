@@ -33,7 +33,7 @@ func (h *GroupHandler) GetAllGroups(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]Group, 0, len(groups))
+	res := make([]Group, len(groups))
 	for i, group := range groups {
 		res[i] = newGroup(group.ID, group.Name)
 	}
@@ -58,7 +58,7 @@ func (h *GroupHandler) GetGroup(_c echo.Context) error {
 }
 
 func formatGetGroup(group *domain.GroupDetail) GroupDetail {
-	groupRes := make([]GroupMember, 0, len(group.Members))
+	groupRes := make([]GroupMember, len(group.Members))
 	for i, v := range group.Members {
 		groupRes[i] = newGroupMember(
 			newUser(v.ID, v.Name, v.RealName),
