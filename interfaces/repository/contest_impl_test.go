@@ -845,8 +845,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     "user1",
-					RealName: "ユーザー1 ユーザー1",
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
@@ -866,6 +866,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(u.ID, u.Name),
 					)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return(makePortalUsers(want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -878,13 +880,13 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     "user1",
-					RealName: "ユーザー1 ユーザー1",
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 				{
 					ID:       random.UUID(),
-					Name:     "user2",
-					RealName: "ユーザー2 ユーザー2",
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
@@ -907,6 +909,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return(makePortalUsers(want), nil)
 			},
 			assertion: assert.NoError,
 		},

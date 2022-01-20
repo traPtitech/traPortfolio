@@ -3,10 +3,14 @@ package repository
 import (
 	"database/sql/driver"
 	"errors"
+	"math/rand"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 var (
@@ -32,6 +36,19 @@ func (a anyUUID) Match(v driver.Value) bool {
 func validUUIDStr(s string) bool {
 	_, err := uuid.FromString(s)
 	return err == nil
+}
+
+func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
+	res := make([]*external.PortalUserResponse, len(users))
+	for i, u := range users {
+		res[i] = &external.PortalUserResponse{
+			TraQID:         u.Name,
+			RealName:       u.RealName,
+			AlphabeticName: random.AlphaNumeric(rand.Intn(30) + 1),
+		}
+	}
+
+	return res
 }
 
 // Interface guards
