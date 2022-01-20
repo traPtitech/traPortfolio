@@ -17,22 +17,17 @@ func NewGroupRepository(sql database.SQLHandler) repository.GroupRepository {
 }
 
 func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
-	groups := make([]*model.GroupUserBelonging, 0)
-	err := repo.h.Preload("Group").Find(&groups).Error()
+	groups := make([]*model.Group, 0)
+	err := repo.h.Find(&groups).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	result := make([]*domain.Group, 0, len(groups))
 	for _, v := range groups {
-		group := make([]*model.Group, 0)
-		if err := repo.h.Where(model.Group{GroupID: v.GroupID}).Find(&group).Error(); err != nil {
-			return nil, convertError(err)
-		}
-
 		result = append(result, &domain.Group{
-			ID:   v.UserID,
-			Name: group[0].Name,
+			ID:   v.GroupID,
+			Name: v.Name,
 		})
 	}
 	return result, nil
@@ -65,7 +60,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		})
 	}
 
-	group := make([]*model.Group, 0)
+	var group *model.Group
 	if err := repo.h.Where(model.Group{GroupID: groupID}).Find(&group).Error(); err != nil {
 		return nil, convertError(err)
 	}
@@ -73,10 +68,10 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
 		ID:   groupID,
-		Name: group[0].Name,
-		Link: group[0].Link,
+		Name: group.Name,
+		Link: group.Link,
 		Leader: &domain.User{
-			ID: group[0].Leader,
+			ID: group.Leader,
 			// Name: later,
 			// RealName: later,
 		},

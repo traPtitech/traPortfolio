@@ -25,35 +25,6 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 	return &GroupHandler{service}
 }
 
-// type GroupUserResponse struct {
-// 	ID       uuid.UUID `json:"id"`
-// 	Name     string    `json:"name"`
-// 	Duration domain.GroupDuration
-// }
-
-// NewGroupUserRespoce creates a GroupUserResponse
-// func NewGroupUserResponse(id uuid.UUID, name string, dur domain.GroupDuration) *GroupUserResponse {
-// 	return &GroupUserResponse{ID: id, Name: name, Duration: dur}
-// }
-
-// type GroupMemberDetailResponse struct {
-// 	ID       uuid.UUID `json:"id"`
-// 	Name     string    `json:"name"`
-// 	RealName string    `json:"real_name"`
-// 	Duration domain.GroupDuration
-// }
-
-// // GroupResponse Portfolioのレスポンスで使う班情報
-// type GroupsResponse struct {
-// 	ID   uuid.UUID `json:"id"`
-// 	Name string    `json:"name"`
-// }
-
-// NewGroupResponse creates a GroupHandler
-// func NewGroupResponse(id uuid.UUID, name string) *GroupsResponse {
-// 	return &GroupsResponse{ID: id, Name: name}
-// }
-
 func (h *GroupHandler) GetAllGroups(c echo.Context) error {
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
@@ -68,15 +39,6 @@ func (h *GroupHandler) GetAllGroups(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, res)
 }
-
-// type groupDetailResponse struct {
-// 	ID          uuid.UUID
-// 	Name        string
-// 	Link        string
-// 	Leader      *UserResponse
-// 	Members     []*GroupMemberDetailResponse
-// 	Description string
-// }
 
 func (h *GroupHandler) GetGroup(_c echo.Context) error {
 	c := Context{_c}
