@@ -75,9 +75,8 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 			// Name: later,
 			// RealName: later,
 		},
-		Members: erMembers,
-		// GroupのテーブルにDescription入ってないのでとりあえずnullで返す
-		// Description: group[0].Description,
+		Members:     erMembers,
+		Description: group.Description,
 	}
 	return result, nil
 }
