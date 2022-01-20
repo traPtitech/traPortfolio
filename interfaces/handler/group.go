@@ -25,7 +25,8 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 	return &GroupHandler{service}
 }
 
-func (h *GroupHandler) GetAllGroups(c echo.Context) error {
+func (h *GroupHandler) GetAllGroups(_c echo.Context) error {
+	c := Context{_c}
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
 	if err != nil {

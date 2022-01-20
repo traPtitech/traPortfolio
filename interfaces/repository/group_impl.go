@@ -61,7 +61,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	var group *model.Group
-	if err := repo.h.Where(model.Group{GroupID: groupID}).Find(&group).Error(); err != nil {
+	if err := repo.h.Where(model.Group{GroupID: groupID}).First(group).Error(); err != nil {
 		return nil, convertError(err)
 	}
 
