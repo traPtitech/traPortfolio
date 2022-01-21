@@ -100,8 +100,8 @@ func (repo *EventRepository) UpdateEventLevel(id uuid.UUID, arg *repository.Upda
 	return nil
 }
 
-func (repo *EventRepository) GetUserEvents(id uuid.UUID) ([]*domain.Event, error) {
-	events, err := repo.api.GetByUserID(id)
+func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
+	events, err := repo.api.GetByUserID(userID)
 	if err != nil {
 		return nil, convertError(err)
 	}

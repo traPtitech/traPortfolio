@@ -59,7 +59,7 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, args *repository
 		changes["check"] = args.Check.Bool
 	}
 	if len(changes) > 0 {
-		err := s.repo.Update(id, changes)
+		err := s.repo.UpdateUser(id, changes)
 		if err != nil {
 			return err
 		}

@@ -249,9 +249,9 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 	if err != nil {
 		return nil, convertError(err)
 	}
+
 	result := make([]*domain.User, 0, len(belongings))
 	portalMap, err := repo.makePortalUserMap()
-
 	if err != nil {
 		return nil, convertError(err)
 	}
