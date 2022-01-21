@@ -487,7 +487,35 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			},
 			assertion: assert.Error,
 		},
-		// TODO: トランザクションエラーのテストを書く
+		{
+			name: "UnexpectedError_Update",
+			args: args{
+				id: random.UUID(),
+				changes: map[string]interface{}{
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"check":       true,
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.id),
+					)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
+					WillReturnError(errUnexpected)
+				sqlhandler.Mock.ExpectCommit()
+				sqlhandler.Mock.ExpectCommit()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt

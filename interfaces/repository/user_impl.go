@@ -133,8 +133,8 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 
 func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
-		user := &model.User{ID: id}
-		err := repo.First(user).Error()
+		user := new(model.User)
+		err := repo.Where(&model.User{ID: id}).First(user).Error()
 		if err != nil {
 			return convertError(err)
 		}
