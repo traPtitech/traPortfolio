@@ -122,8 +122,8 @@ VALUES
   (
     '1543039b-424b-4d67-8c22-774cd9b7cd15',
     '11111111-1111-1111-1111-111111111111',
-    '2021-11-17 18:27:04.061',
-    '2021-11-17 18:27:04.061'
+    NOW(),
+    NOW()
   );
 
 -- event_level_relations --
@@ -154,14 +154,18 @@ INSERT INTO
     `group_id`,
     `name`,
     `link`,
-    `leader`
+    `leader`,
+    `created_at`,
+    `updated_at`
   )
 VALUES
   (
     'f86db5ec-dc02-4885-aa0a-732bb229a1b5',
     'SysAd班',
     'http://http://Jy',
-    '052ace90-7a66-4770-9b86-95fc39e0f434'
+    '052ace90-7a66-4770-9b86-95fc39e0f434',
+    NOW(),
+    NOW()
   );
 
 -- group_user_belongings --
@@ -172,7 +176,9 @@ INSERT INTO
     `since_year`,
     `since_semester`,
     `until_year`,
-    `until_semester`
+    `until_semester`,
+    `created_at`,
+    `updated_at`
   )
 VALUES
   (
@@ -181,7 +187,9 @@ VALUES
     2021,
     0,
     2021,
-    1
+    1,
+    NOW(),
+    NOW()
   );
 
 -- projects --
@@ -191,8 +199,10 @@ INSERT INTO
     `name`,
     `description`,
     `link`,
-    `since`,
-    `until`,
+    `since_year`,
+    `since_semester`,
+    `until_year`,
+    `until_semester`,
     `created_at`,
     `updated_at`
   )
@@ -202,8 +212,10 @@ VALUES
     'K3',
     'q7DOT9tGTOWeLrQKjLxzI3ivH9S71l',
     'http://cbW9wNbeHV6IkP252Z',
-    '2021-08-01 00:00:00',
-    '2021-12-01 00:00:00',
+    2021,
+    0,
+    2021,
+    1,
     NOW(),
     NOW()
   );
@@ -214,8 +226,10 @@ INSERT INTO
     `id`,
     `project_id`,
     `user_id`,
-    `since`,
-    `until`,
+    `since_year`,
+    `since_semester`,
+    `until_year`,
+    `until_semester`,
     `created_at`,
     `updated_at`
   )
@@ -224,8 +238,10 @@ VALUES
     '43f88b23-2d37-4e51-b825-e204c34a6e78',
     '061ea8ba-ca44-48ed-8ace-54752b5e88f0',
     '11111111-1111-1111-1111-111111111111',
-    '2021-08-01 00:00:00',
-    '2021-12-01 00:00:00',
+    2021,
+    0,
+    2021,
+    1,
     NOW(),
     NOW()
   );
