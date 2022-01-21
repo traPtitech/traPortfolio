@@ -109,7 +109,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				p := f.portal.(*mock_external.MockPortalAPI)
 				p.EXPECT().GetAll().Return(nil, errUnexpected)
 			},
-			assertion: assert.NoError,
+			assertion: assert.Error,
 		},
 	}
 	for _, tt := range tests {
