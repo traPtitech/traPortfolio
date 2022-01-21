@@ -176,7 +176,7 @@ func TestUserService_Update(t *testing.T) {
 					"description": args.args.Description.String,
 					"check":       args.args.Check.Bool,
 				}
-				repo.EXPECT().Update(args.id, changes).Return(nil)
+				repo.EXPECT().UpdateUser(args.id, changes).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -195,7 +195,7 @@ func TestUserService_Update(t *testing.T) {
 					"description": args.args.Description.String,
 					"check":       args.args.Check.Bool,
 				}
-				repo.EXPECT().Update(args.id, changes).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateUser(args.id, changes).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},

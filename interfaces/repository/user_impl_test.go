@@ -425,7 +425,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 	}
 }
 
-func TestUserRepository_Update(t *testing.T) {
+func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		id      uuid.UUID
@@ -499,7 +499,7 @@ func TestUserRepository_Update(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.Update(tt.args.id, tt.args.changes))
+			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.changes))
 		})
 	}
 }

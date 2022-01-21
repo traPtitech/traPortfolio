@@ -131,7 +131,7 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := &model.User{ID: id}
 		err := repo.First(user).Error()
