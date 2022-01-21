@@ -54,10 +54,11 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 }
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
-	user := model.User{ID: id}
+	user := new(model.User)
 	err := repo.
 		Preload("Accounts").
-		First(&user).
+		Where(&model.User{ID: id}).
+		First(user).
 		Error()
 	if err != nil {
 		return nil, convertError(err)

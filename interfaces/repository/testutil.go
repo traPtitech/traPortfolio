@@ -74,14 +74,27 @@ func makeKnoqEvent(event *domain.EventDetail) *external.EventResponse {
 func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
 	res := make([]*external.PortalUserResponse, len(users))
 	for i, u := range users {
-		res[i] = &external.PortalUserResponse{
-			TraQID:         u.Name,
-			RealName:       u.RealName,
-			AlphabeticName: random.AlphaNumeric(rand.Intn(30) + 1),
-		}
+		res[i] = makePortalUser(u)
 	}
 
 	return res
+}
+
+func makePortalUser(user *domain.User) *external.PortalUserResponse {
+	return &external.PortalUserResponse{
+		TraQID:         user.Name,
+		RealName:       user.RealName,
+		AlphabeticName: random.AlphaNumeric(rand.Intn(30) + 1),
+	}
+}
+
+func makeTraqUser(user *domain.UserDetail) *external.TraQUserResponse {
+	return &external.TraQUserResponse{
+		State:       user.State,
+		Bot:         false,
+		DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+		Name:        user.Name,
+	}
 }
 
 // Interface guards
