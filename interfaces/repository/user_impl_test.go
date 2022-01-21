@@ -511,8 +511,8 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
 					WillReturnError(errUnexpected)
-				sqlhandler.Mock.ExpectCommit()
-				sqlhandler.Mock.ExpectCommit()
+				sqlhandler.Mock.ExpectRollback()
+				sqlhandler.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
 		},
