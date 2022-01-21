@@ -181,8 +181,8 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
-		account := &model.Account{}
-		err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
+		account := new(model.Account)
+		err := repo.Where(&model.Account{ID: accountID, UserID: userID}).First(account).Error()
 		if err != nil {
 			return convertError(err)
 		}

@@ -711,7 +711,34 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			},
 			assertion: assert.Error,
 		},
-		// TODO: トランザクションエラーのテストを書く
+		{
+			name: "UnexpectedError_Update",
+			args: args{
+				userID:    random.UUID(),
+				accountID: random.UUID(),
+				changes: map[string]interface{}{
+					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
+					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
+					"check": true,
+					"type":  domain.HOMEPAGE,
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(anyUUID{}, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				sqlhandler.Mock.ExpectBegin()
+				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], anyTime{}, args.accountID).
+					WillReturnError(errUnexpected)
+				sqlhandler.Mock.ExpectRollback()
+				sqlhandler.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
