@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"math/rand"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 
 	"github.com/gofrs/uuid"
@@ -35,15 +37,23 @@ func TestTraQRepository_GetUser(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx: context.Background(),
-				id:  uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
+				id:  random.UUID(),
 			},
 			want: &domain.TraQUser{
 				State:       domain.TraqStateActive,
 				Bot:         false,
-				DisplayName: "user1",
-				Name:        "user1",
+				DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 			},
-			setup:     func(f fields, args args, want *domain.TraQUser) {},
+			setup: func(f fields, args args, want *domain.TraQUser) {
+				t := f.api.(*mock_external.MockTraQAPI)
+				t.EXPECT().GetByID(args.id).Return(&external.TraQUserResponse{
+					State:       want.State,
+					Bot:         want.Bot,
+					DisplayName: want.DisplayName,
+					Name:        want.Name,
+				}, nil)
+			},
 			assertion: assert.NoError,
 		},
 		{
@@ -52,8 +62,11 @@ func TestTraQRepository_GetUser(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 			},
-			want:      nil,
-			setup:     func(f fields, args args, want *domain.TraQUser) {},
+			want: nil,
+			setup: func(f fields, args args, want *domain.TraQUser) {
+				t := f.api.(*mock_external.MockTraQAPI)
+				t.EXPECT().GetByID(args.id).Return(nil, repository.ErrNotFound)
+			},
 			assertion: assert.Error,
 		},
 	}
