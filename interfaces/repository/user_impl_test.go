@@ -21,14 +21,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-var (
-	ids = []uuid.UUID{
-		uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
-		uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
-		uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
-	}
-)
-
 type mockUserRepositoryFields struct {
 	sqlhandler database.SQLHandler
 	portal     external.PortalAPI
@@ -55,19 +47,19 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success",
 			want: []*domain.User{
 				{
-					ID:       ids[0],
-					Name:     "user1",
-					RealName: "ユーザー1 ユーザー1",
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 				{
-					ID:       ids[1],
-					Name:     "user2",
-					RealName: "ユーザー2 ユーザー2",
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 				{
-					ID:       ids[2],
-					Name:     "lolico",
-					RealName: "東 工子",
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, want []*domain.User) {
@@ -79,11 +71,13 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				sqlhandler.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
 					WillReturnRows(rows)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return(makePortalUsers(want), nil)
 			},
 			assertion: assert.NoError,
 		},
 		{
-			name: "UnexpectedError",
+			name: "UnexpectedError_Find",
 			want: nil,
 			setup: func(f mockUserRepositoryFields, want []*domain.User) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -92,6 +86,30 @@ func TestUserRepository_GetUsers(t *testing.T) {
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
+		},
+		{
+			name: "PortalError",
+			want: nil,
+			setup: func(f mockUserRepositoryFields, want []*domain.User) {
+				users := []*domain.User{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					},
+				}
+				rows := sqlmock.NewRows([]string{"id", "name"})
+				for _, v := range users {
+					rows.AddRow(v.ID, v.Name)
+				}
+				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
+				sqlhandler.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
+					WillReturnRows(rows)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return(nil, errUnexpected)
+			},
+			assertion: assert.NoError,
 		},
 	}
 	for _, tt := range tests {
@@ -125,12 +143,12 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{ids[0]},
+			args: args{random.UUID()},
 			want: &domain.UserDetail{
 				User: domain.User{
-					ID:       ids[0],
-					Name:     "user1",
-					RealName: "ユーザー1 ユーザー1",
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 				State: domain.TraqStateActive,
 				Bio:   random.AlphaNumeric(rand.Intn(30) + 1),
@@ -168,7 +186,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 		},
 		{
 			name: "NotFound",
-			args: args{ids[0]},
+			args: args{random.UUID()},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -181,7 +199,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			args: args{ids[0]},
+			args: args{random.UUID()},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want *domain.UserDetail) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -224,7 +242,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{ids[0]},
+			args: args{random.UUID()},
 			want: []*domain.Account{
 				{
 					ID:          random.UUID(),
@@ -247,7 +265,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			args: args{ids[0]},
+			args: args{random.UUID()},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.Account) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -294,7 +312,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				userID:    ids[0],
+				userID:    random.UUID(),
 				accountID: aid,
 			},
 			want: &domain.Account{
@@ -317,7 +335,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				userID:    ids[0],
+				userID:    random.UUID(),
 				accountID: random.UUID(),
 			},
 			want: nil,
@@ -363,7 +381,7 @@ func TestUserRepository_Update(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				id: ids[0],
+				id: random.UUID(),
 				changes: map[string]interface{}{
 					"description": random.AlphaNumeric(rand.Intn(30) + 1),
 					"check":       true,
@@ -392,7 +410,7 @@ func TestUserRepository_Update(t *testing.T) {
 		{
 			name: "NotFound",
 			args: args{
-				id: ids[0],
+				id: random.UUID(),
 				changes: map[string]interface{}{
 					"description": random.AlphaNumeric(rand.Intn(30) + 1),
 					"check":       true,
@@ -443,7 +461,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				id: ids[0],
+				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
 					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
@@ -477,7 +495,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				id: ids[0],
+				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
 					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
@@ -500,7 +518,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		{
 			name: "CreatedButNotFound",
 			args: args{
-				id: ids[0],
+				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
 					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
@@ -558,7 +576,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				userID:    ids[0],
+				userID:    random.UUID(),
 				accountID: random.UUID(),
 				changes: map[string]interface{}{
 					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
@@ -586,7 +604,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		{
 			name: "NotFound",
 			args: args{
-				userID:    ids[0],
+				userID:    random.UUID(),
 				accountID: random.UUID(),
 				changes: map[string]interface{}{
 					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
@@ -639,7 +657,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				accountID: random.UUID(),
-				userID:    ids[0],
+				userID:    random.UUID(),
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -655,7 +673,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				accountID: random.UUID(),
-				userID:    ids[0],
+				userID:    random.UUID(),
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -697,7 +715,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{userID: ids[0]},
+			args: args{userID: random.UUID()},
 			want: []*domain.UserProject{
 				{
 					ID:        random.UUID(),
@@ -731,7 +749,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			args: args{userID: ids[0]},
+			args: args{userID: random.UUID()},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserProject) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
@@ -774,7 +792,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{userID: ids[0]},
+			args: args{userID: random.UUID()},
 			want: []*domain.UserContest{
 				{
 					ID:          random.UUID(),
@@ -817,7 +835,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 		},
 		{
 			name: "UnexpectedError",
-			args: args{userID: ids[0]},
+			args: args{userID: random.UUID()},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
