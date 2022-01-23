@@ -187,7 +187,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
 	}
 
-	err = handler.srv.EditAccount(ctx, req.AccountID, req.UserID, &args)
+	err = handler.srv.EditAccount(ctx, req.UserID, req.AccountID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -207,7 +207,7 @@ func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err := handler.srv.DeleteAccount(ctx, req.AccountID, req.UserID)
+	err := handler.srv.DeleteAccount(ctx, req.UserID, req.AccountID)
 	if err != nil {
 		return convertError(err)
 	}
