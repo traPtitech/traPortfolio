@@ -110,7 +110,7 @@ func (s *userService) EditAccount(ctx context.Context, accountID uuid.UUID, user
 		changes["type"] = args.Type.Int64
 	}
 	if len(changes) > 0 {
-		err := s.repo.UpdateAccount(accountID, userID, changes)
+		err := s.repo.UpdateAccount(userID, accountID, changes)
 		if err != nil {
 			return err
 		}
@@ -118,12 +118,12 @@ func (s *userService) EditAccount(ctx context.Context, accountID uuid.UUID, user
 	return nil
 }
 
-func (s *userService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
+func (s *userService) DeleteAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID) error {
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
 
-	err := s.repo.DeleteAccount(accountid, userid)
+	err := s.repo.DeleteAccount(userID, accountID)
 
 	return err
 
