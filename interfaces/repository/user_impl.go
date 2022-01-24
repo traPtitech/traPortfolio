@@ -174,8 +174,10 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 	return &domain.Account{
 		ID:          ver.ID,
+		Name:        ver.Name,
 		Type:        ver.Type,
 		PrPermitted: ver.Check,
+		URL:         ver.URL,
 	}, nil
 }
 
