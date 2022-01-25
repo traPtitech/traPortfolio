@@ -17,8 +17,8 @@ type UserService interface {
 	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
 	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
 	CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error)
-	EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error
-	DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error
+	EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error
+	DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error
 	GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
 	GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error)
 	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error)
@@ -95,7 +95,7 @@ func (s *userService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 
 }
 
-func (s *userService) EditAccount(ctx context.Context, accountID uuid.UUID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
+func (s *userService) EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -110,7 +110,7 @@ func (s *userService) EditAccount(ctx context.Context, accountID uuid.UUID, user
 		changes["type"] = args.Type.Int64
 	}
 	if len(changes) > 0 {
-		err := s.repo.UpdateAccount(accountID, userID, changes)
+		err := s.repo.UpdateAccount(userID, accountID, changes)
 		if err != nil {
 			return err
 		}
@@ -118,12 +118,12 @@ func (s *userService) EditAccount(ctx context.Context, accountID uuid.UUID, user
 	return nil
 }
 
-func (s *userService) DeleteAccount(ctx context.Context, accountid uuid.UUID, userid uuid.UUID) error {
+func (s *userService) DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error {
 
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
 
-	err := s.repo.DeleteAccount(accountid, userid)
+	err := s.repo.DeleteAccount(userID, accountID)
 
 	return err
 
