@@ -254,7 +254,7 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]ContestTeamWithContestName, 0, len(contests))
+	res := make([]ContestTeamWithContestName, len(contests))
 	for i, v := range contests {
 		res[i] = newContestTeamWithContestName(
 			newContestTeam(v.ID, v.Name, v.Result),
