@@ -251,7 +251,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 	}
 
 	result := make([]*domain.User, 0, len(belongings))
-	portalMap, err := repo.makePortalUserMap()
+	nameMap, err := repo.makeUserNameMap()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -259,12 +259,9 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 	for _, v := range belongings {
 		u := v.User
 		newUser := domain.User{
-			ID:   u.ID,
-			Name: u.Name,
-		}
-		portalUser, ok := portalMap[u.Name]
-		if ok {
-			newUser.RealName = portalUser.Name
+			ID:       u.ID,
+			Name:     u.Name,
+			RealName: nameMap[u.Name],
 		}
 		result = append(result, &newUser)
 	}
@@ -347,20 +344,16 @@ func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, member
 
 }
 
-func (repo *ContestRepository) makePortalUserMap() (map[string]*domain.PortalUser, error) {
+func (repo *ContestRepository) makeUserNameMap() (map[string]string, error) {
 	users, err := repo.portal.GetAll()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	mp := make(map[string]*domain.PortalUser, len(users))
+	mp := make(map[string]string, len(users))
 
 	for _, v := range users {
-		mp[v.TraQID] = &domain.PortalUser{
-			ID:             v.TraQID,
-			Name:           v.RealName,
-			AlphabeticName: v.AlphabeticName,
-		}
+		mp[v.TraQID] = v.RealName
 	}
 	return mp, nil
 }
