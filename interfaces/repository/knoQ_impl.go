@@ -31,6 +31,7 @@ func (repo *KnoqRepository) GetAll() ([]*domain.KnoQEvent, error) {
 			SharedRoom:  v.SharedRoom,
 			TimeEnd:     v.TimeEnd,
 			TimeStart:   v.TimeStart,
+			// TODO: placeとadminsがdomain.KnoQEventに含まれていない
 		})
 	}
 	return result, nil
