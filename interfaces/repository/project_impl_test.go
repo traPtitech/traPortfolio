@@ -9,10 +9,13 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -27,12 +30,14 @@ func makeYearWithSemester(s int) domain.YearWithSemester {
 }
 
 type mockProjectRepositoryFields struct {
-	h database.SQLHandler
+	h      database.SQLHandler
+	portal external.PortalAPI
 }
 
-func newMockProjectRepositoryFields() mockProjectRepositoryFields {
+func newMockProjectRepositoryFields(ctrl *gomock.Controller) mockProjectRepositoryFields {
 	return mockProjectRepositoryFields{
-		h: mock_database.NewMockSQLHandler(),
+		h:      mock_database.NewMockSQLHandler(),
+		portal: mock_external.NewMockPortalAPI(ctrl),
 	}
 }
 
@@ -89,9 +94,10 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjects()
 			tt.assertion(t, err)
@@ -127,9 +133,9 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
-						UserID: random.UUID(),
-						Name:   random.AlphaNumeric(rand.Intn(30) + 1),
-						// RealName:
+						UserID:   random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 						Duration: random.Duration(),
 					},
 				},
@@ -155,11 +161,18 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					)
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
-					WithArgs(want.Members[0].UserID).
+					WithArgs(wm.UserID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(want.Members[0].UserID, want.Members[0].Name),
+							AddRow(wm.UserID, wm.Name),
 					)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return([]*external.PortalUserResponse{
+					{
+						TraQID:   wm.Name,
+						RealName: wm.RealName,
+					},
+				}, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -176,15 +189,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
-						UserID: random.UUID(),
-						Name:   random.AlphaNumeric(rand.Intn(30) + 1),
-						// RealName:
+						UserID:   random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 						Duration: random.Duration(),
 					},
 					{
-						UserID: random.UUID(),
-						Name:   random.AlphaNumeric(rand.Intn(30) + 1),
-						// RealName:
+						UserID:   random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 						Duration: random.Duration(),
 					},
 				},
@@ -218,6 +231,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				wp := make([]*external.PortalUserResponse, len(want.Members))
+				for i, v := range want.Members {
+					wp[i] = &external.PortalUserResponse{
+						TraQID:   v.Name,
+						RealName: v.RealName,
+					}
+				}
+				p.EXPECT().GetAll().Return(wp, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -267,15 +289,70 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			assertion: assert.Error,
 		},
+		{
+			name: "PortalError",
+			args: args{
+				id: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(
+								args.id,
+								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(rand.Intn(30)+1),
+								random.RandURLString(),
+								random.Time().Year(),
+								rand.Intn(2),
+								random.Time().Year(),
+								rand.Intn(2),
+							),
+					)
+				uid := random.UUID()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(
+								uid,
+								random.AlphaNumeric(rand.Intn(30)+1),
+								random.Time().Year(),
+								rand.Intn(2),
+								random.Time().Year(),
+								rand.Intn(2),
+							),
+					)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					WithArgs(uid).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).
+							AddRow(
+								uid,
+								random.AlphaNumeric(rand.Intn(30)+1),
+							),
+					)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProject(tt.args.id)
 			tt.assertion(t, err)
@@ -372,9 +449,10 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateProject(tt.args.project)
 			if tt.want != nil && got != nil {
@@ -452,9 +530,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.changes))
 		})
@@ -480,9 +559,9 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 			want: []*domain.User{
 				{
-					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
-					// RealName:
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -502,6 +581,13 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(want[0].ID, want[0].Name),
 					)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return([]*external.PortalUserResponse{
+					{
+						TraQID:   want[0].Name,
+						RealName: want[0].RealName,
+					},
+				}, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -541,6 +627,15 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				wp := make([]*external.PortalUserResponse, len(want))
+				for i, v := range want {
+					wp[i] = &external.PortalUserResponse{
+						TraQID:   v.Name,
+						RealName: v.RealName,
+					}
+				}
+				p.EXPECT().GetAll().Return(wp, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -560,15 +655,45 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 			assertion: assert.Error,
 		},
+		{
+			name: "PortalError",
+			args: args{
+				id: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+				uid := random.UUID()
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(sqlmock.NewRows([]string{"user_id"}).AddRow(uid))
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					WithArgs(uid).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).
+							AddRow(
+								uid,
+								random.AlphaNumeric(rand.Intn(30)+1),
+							),
+					)
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetAll().Return(nil, errUnexpected)
+				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjectMembers(tt.args.id)
 			tt.assertion(t, err)
@@ -787,9 +912,10 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddProjectMembers(tt.args.projectID, tt.args.projectMembers))
 		})
@@ -895,9 +1021,10 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockProjectRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewProjectRepository(f.h)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteProjectMembers(tt.args.projectID, tt.args.members))
 		})

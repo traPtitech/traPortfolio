@@ -4,17 +4,19 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 type ProjectRepository struct {
-	h database.SQLHandler
+	h      database.SQLHandler
+	portal external.PortalAPI
 }
 
-func NewProjectRepository(sql database.SQLHandler) repository.ProjectRepository {
-	return &ProjectRepository{h: sql}
+func NewProjectRepository(h database.SQLHandler, portal external.PortalAPI) repository.ProjectRepository {
+	return &ProjectRepository{h, portal}
 }
 
 func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
@@ -53,14 +55,26 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 		return nil, convertError(err)
 	}
 
+	portalUsers, err := repo.portal.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	nameMap := make(map[string]string, len(portalUsers))
+	for _, v := range portalUsers {
+		nameMap[v.TraQID] = v.RealName
+	}
+
 	m := make([]*domain.ProjectMember, 0, len(members))
 	for _, v := range members {
 		m = append(m, &domain.ProjectMember{
 			UserID:   v.UserID,
 			Name:     v.User.Name,
+			RealName: nameMap[v.User.Name],
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		})
 	}
+
 	res := &domain.Project{
 		ID:          id,
 		Name:        project.Name,
@@ -126,11 +140,22 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 		return nil, convertError(err)
 	}
 
+	portalUsers, err := repo.portal.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	nameMap := make(map[string]string, len(portalUsers))
+	for _, v := range portalUsers {
+		nameMap[v.TraQID] = v.RealName
+	}
+
 	res := make([]*domain.User, 0, len(members))
 	for _, v := range members {
 		res = append(res, &domain.User{
-			ID:   v.UserID,
-			Name: v.User.Name,
+			ID:       v.UserID,
+			Name:     v.User.Name,
+			RealName: nameMap[v.User.Name],
 		})
 	}
 
