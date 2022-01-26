@@ -118,7 +118,33 @@ func TestKnoqRepository_GetByID(t *testing.T) {
 		setup     func(t *testing.T, f fields, args args, want *domain.KnoQEvent)
 		assertion assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			want: &domain.KnoQEvent{
+				ID:          random.UUID(),
+				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				GroupID:     random.UUID(),
+				RoomID:      random.UUID(),
+				TimeStart:   random.Time(),
+				TimeEnd:     random.Time(),
+				SharedRoom:  true,
+			},
+			setup: func(t *testing.T, f fields, args args, want *domain.KnoQEvent) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByID(args.id).Return(convertToEventResponse(t, want), nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			want: nil,
+			setup: func(t *testing.T, f fields, args args, want *domain.KnoQEvent) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByID(args.id).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
