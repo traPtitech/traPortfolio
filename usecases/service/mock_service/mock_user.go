@@ -53,31 +53,31 @@ func (mr *MockUserServiceMockRecorder) CreateAccount(ctx, id, account interface{
 }
 
 // DeleteAccount mocks base method.
-func (m *MockUserService) DeleteAccount(ctx context.Context, accountid, userid uuid.UUID) error {
+func (m *MockUserService) DeleteAccount(ctx context.Context, userID, accountID uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteAccount", ctx, accountid, userid)
+	ret := m.ctrl.Call(m, "DeleteAccount", ctx, userID, accountID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteAccount indicates an expected call of DeleteAccount.
-func (mr *MockUserServiceMockRecorder) DeleteAccount(ctx, accountid, userid interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) DeleteAccount(ctx, userID, accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAccount", reflect.TypeOf((*MockUserService)(nil).DeleteAccount), ctx, accountid, userid)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAccount", reflect.TypeOf((*MockUserService)(nil).DeleteAccount), ctx, userID, accountID)
 }
 
 // EditAccount mocks base method.
-func (m *MockUserService) EditAccount(ctx context.Context, accountID, userID uuid.UUID, args *repository.UpdateAccountArgs) error {
+func (m *MockUserService) EditAccount(ctx context.Context, userID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EditAccount", ctx, accountID, userID, args)
+	ret := m.ctrl.Call(m, "EditAccount", ctx, userID, accountID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // EditAccount indicates an expected call of EditAccount.
-func (mr *MockUserServiceMockRecorder) EditAccount(ctx, accountID, userID, args interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) EditAccount(ctx, userID, accountID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditAccount", reflect.TypeOf((*MockUserService)(nil).EditAccount), ctx, accountID, userID, args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditAccount", reflect.TypeOf((*MockUserService)(nil).EditAccount), ctx, userID, accountID, args)
 }
 
 // GetAccount mocks base method.

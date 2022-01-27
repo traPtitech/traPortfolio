@@ -21,14 +21,12 @@ type ProjectService interface {
 }
 
 type projectService struct {
-	repo   repository.ProjectRepository
-	portal repository.PortalRepository
+	repo repository.ProjectRepository
 }
 
-func NewProjectService(projectRepository repository.ProjectRepository, portalRepository repository.PortalRepository) ProjectService {
+func NewProjectService(projectRepository repository.ProjectRepository) ProjectService {
 	return &projectService{
-		repo:   projectRepository,
-		portal: portalRepository,
+		repo: projectRepository,
 	}
 }
 
@@ -45,17 +43,7 @@ func (s *projectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.
 	if err != nil {
 		return nil, err
 	}
-	portalUsers, err := s.portal.GetUsers(ctx)
-	if err != nil {
-		return nil, err
-	}
-	NameMap := make(map[string]string, len(portalUsers))
-	for _, v := range portalUsers {
-		NameMap[v.ID] = v.Name
-	}
-	for i, v := range project.Members {
-		project.Members[i].RealName = NameMap[v.Name]
-	}
+
 	return project, nil
 }
 
@@ -121,17 +109,7 @@ func (s *projectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([
 	if err != nil {
 		return nil, err
 	}
-	portalUsers, err := s.portal.GetUsers(ctx)
-	if err != nil {
-		return nil, err
-	}
-	NameMap := make(map[string]string, len(portalUsers))
-	for _, v := range portalUsers {
-		NameMap[v.ID] = v.Name
-	}
-	for i, v := range members {
-		members[i].RealName = NameMap[v.Name]
-	}
+
 	return members, nil
 }
 
