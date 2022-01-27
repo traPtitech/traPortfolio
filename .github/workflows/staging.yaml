@@ -26,7 +26,7 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64
-          tags: ghcr.io/traptitech/${{ env.IMAGE_NAME }}:{{ env.IMAGE_TAG }}
+          tags: ghcr.io/traptitech/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
   deploy-staging:
     name: Deploy staging
     runs-on: ubuntu-latest
