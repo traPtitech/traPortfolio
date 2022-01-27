@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -219,6 +220,75 @@ func TestEventHandler_GetByID(t *testing.T) {
 				assert.Equal(t, tt.statusCode, statusCode)
 				assert.Equal(t, hresEvent, resBody)
 			}
+		})
+	}
+}
+
+func TestEventHandler_PatchEvent(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(th *handler.TestHandlers) (reqBody *handler.EditEvent, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
+				return reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrAlreadyExists)
+				return reqBody, path
+			},
+			statusCode: http.StatusConflict,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			reqBody, path := tt.setup(&handlers)
+
+			statusCode, _ := doRequest(t, handlers.API, http.MethodPatch, path, reqBody, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
 		})
 	}
 }
