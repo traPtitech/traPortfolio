@@ -250,20 +250,24 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 		return nil, convertError(err)
 	}
 
-	result := make([]*domain.User, 0, len(belongings))
 	nameMap, err := repo.makeUserNameMap()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	for _, v := range belongings {
+	result := make([]*domain.User, len(belongings))
+	for i, v := range belongings {
 		u := v.User
 		newUser := domain.User{
-			ID:       u.ID,
-			Name:     u.Name,
-			RealName: nameMap[u.Name],
+			ID:   u.ID,
+			Name: u.Name,
 		}
-		result = append(result, &newUser)
+
+		if rn, ok := nameMap[u.Name]; ok {
+			newUser.RealName = rn
+		}
+
+		result[i] = &newUser
 	}
 	return result, nil
 }
