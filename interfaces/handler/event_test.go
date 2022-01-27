@@ -322,6 +322,29 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			},
 			statusCode: http.StatusBadRequest,
 		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrValidate)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
