@@ -65,14 +65,19 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	m := make([]*domain.ProjectMember, 0, len(members))
-	for _, v := range members {
-		m = append(m, &domain.ProjectMember{
+	m := make([]*domain.ProjectMember, len(members))
+	for i, v := range members {
+		pm := domain.ProjectMember{
 			UserID:   v.UserID,
 			Name:     v.User.Name,
-			RealName: nameMap[v.User.Name],
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
-		})
+		}
+
+		if rn, ok := nameMap[v.User.Name]; ok {
+			pm.RealName = rn
+		}
+
+		m[i] = &pm
 	}
 
 	res := &domain.Project{
@@ -150,13 +155,18 @@ func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, 
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	res := make([]*domain.User, 0, len(members))
-	for _, v := range members {
-		res = append(res, &domain.User{
-			ID:       v.UserID,
-			Name:     v.User.Name,
-			RealName: nameMap[v.User.Name],
-		})
+	res := make([]*domain.User, len(members))
+	for i, v := range members {
+		u := domain.User{
+			ID:   v.UserID,
+			Name: v.User.Name,
+		}
+
+		if rn, ok := nameMap[v.User.Name]; ok {
+			u.RealName = rn
+		}
+
+		res[i] = &u
 	}
 
 	return res, nil
