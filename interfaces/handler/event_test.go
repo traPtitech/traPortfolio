@@ -231,7 +231,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name: "success",
+			name: "Success",
 			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
@@ -253,14 +253,29 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			},
 			statusCode: http.StatusNoContent,
 		},
-		/*{
-			name: "internal error",
-			setup: func(th *handler.TestHandlers) (hres []*handler.EventResponse, path string) {
-				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
-				return nil, "/api/v1/events"
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrAlreadyExists)
+				return reqBody, path
 			},
-			statusCode: http.StatusInternalServerError,
-		},*/
+			statusCode: http.StatusConflict,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
