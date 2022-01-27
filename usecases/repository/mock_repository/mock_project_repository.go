@@ -10,7 +10,6 @@ import (
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/traPtitech/traPortfolio/domain"
-	model "github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	repository "github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -52,7 +51,7 @@ func (mr *MockProjectRepositoryMockRecorder) AddProjectMembers(id, args interfac
 }
 
 // CreateProject mocks base method.
-func (m *MockProjectRepository) CreateProject(project *model.Project) (*domain.Project, error) {
+func (m *MockProjectRepository) CreateProject(project *repository.CreateProjectArgs) (*domain.Project, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProject", project)
 	ret0, _ := ret[0].(*domain.Project)

@@ -3,8 +3,7 @@
 package handler
 
 import (
-	"time"
-
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
@@ -23,40 +22,19 @@ type OptionalYearWithSemester struct {
 	Semester optional.Int64
 }
 
-func convertToYearWithSemesterDuration(since, until time.Time) YearWithSemesterDuration {
-	s := timeToSem(since)
-	u := timeToSem(until)
+func convertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {
+	return newYearWithSemesterDuration(d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
+}
+
+func newYearWithSemesterDuration(sinceYear, sinceSemester, untilYear, untilSemester int) YearWithSemesterDuration {
 	return YearWithSemesterDuration{
-		Since: s,
-		Until: &u,
+		Since: YearWithSemester{
+			Year:     sinceYear,
+			Semester: Semester(sinceSemester),
+		},
+		Until: &YearWithSemester{
+			Year:     untilYear,
+			Semester: Semester(untilSemester),
+		},
 	}
-}
-
-func semToTime(date YearWithSemester) time.Time {
-	year := int(date.Year)
-	month := semesterToMonth[date.Semester]
-	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
-}
-
-func timeToSem(t time.Time) YearWithSemester {
-	year := t.Year()
-	var semester Semester
-	for i, v := range semesterToMonth {
-		if v == t.Month() {
-			semester = Semester(i)
-		}
-	}
-	return YearWithSemester{
-		Year:     year,
-		Semester: semester,
-	}
-}
-
-func optionalSemToTime(date YearWithSemester) optional.Time {
-	t := optional.Time{}
-	year := date.Year
-	month := semesterToMonth[date.Semester]
-	t.Time, t.Valid = time.Date(year, month, 1, 0, 0, 0, 0, time.UTC), true
-
-	return t
 }
