@@ -51,32 +51,24 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 
 // wire.go:
 
-var portalSet = wire.NewSet(
-	NewPortalAPI, repository.NewPortalRepository,
-)
-
-var traQSet = wire.NewSet(
-	NewTraQAPI, repository.NewTraQRepository,
-)
-
 var pingSet = wire.NewSet(handler.NewPingHandler)
 
 var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler)
 
 var projectSet = wire.NewSet(repository.NewProjectRepository, service.NewProjectService, handler.NewProjectHandler)
 
-var knoQSet = wire.NewSet(
-	NewKnoqAPI, repository.NewKnoqRepository,
-)
-
-var eventSet = wire.NewSet(
-	knoQSet, repository.NewEventRepository, service.NewEventService, handler.NewEventHandler,
-)
+var eventSet = wire.NewSet(repository.NewEventRepository, service.NewEventService, handler.NewEventHandler)
 
 var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
 
 var sqlSet = wire.NewSet(
 	NewSQLHandler,
+)
+
+var externalSet = wire.NewSet(
+	NewKnoqAPI,
+	NewPortalAPI,
+	NewTraQAPI,
 )
 
 var apiSet = wire.NewSet(handler.NewAPI)
