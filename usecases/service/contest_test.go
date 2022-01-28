@@ -285,3 +285,90 @@ func TestContestService_CreateContest(t *testing.T) {
 		})
 	}
 }
+
+func TestContestService_UpdateContest(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx  context.Context
+		id   uuid.UUID
+		args *repository.UpdateContestArgs
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setup     func(f fields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx: context.Background(),
+				id:  random.UUID(),
+				args: &repository.UpdateContestArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       optional.NewTime(time.Now(), true),
+					Until:       optional.NewTime(time.Now(), true),
+				},
+			},
+			setup: func(f fields, args args) {
+				changes := map[string]interface{}{
+					"name":        args.args.Name.String,
+					"description": args.args.Description.String,
+					"link":        args.args.Link.String,
+					"since":       args.args.Since.Time,
+					"until":       args.args.Until.Time,
+				}
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().UpdateContest(args.id, changes).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrUpdate",
+			args: args{
+				ctx: context.Background(),
+				id:  random.UUID(),
+				args: &repository.UpdateContestArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       optional.NewTime(time.Now(), true),
+					Until:       optional.NewTime(time.Now(), true),
+				},
+			},
+			setup: func(f fields, args args) {
+				changes := map[string]interface{}{
+					"name":        args.args.Name.String,
+					"description": args.args.Description.String,
+					"link":        args.args.Link.String,
+					"since":       args.args.Since.Time,
+					"until":       args.args.Until.Time,
+				}
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().UpdateContest(args.id, changes).Return(repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			tt.assertion(t, s.UpdateContest(tt.args.ctx, tt.args.id, tt.args.args))
+		})
+	}
+}
