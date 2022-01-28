@@ -430,3 +430,75 @@ func TestContestService_DeleteContest(t *testing.T) {
 		})
 	}
 }
+
+func TestContestService_GetContestTeams(t *testing.T) {
+	cid := random.UUID() // contestID
+
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx       context.Context
+		contestID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      []*domain.ContestTeam
+		setup     func(f fields, args args, want []*domain.ContestTeam)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx:       context.Background(),
+				contestID: cid,
+			},
+			want: []*domain.ContestTeam{
+				{
+					ID:        random.UUID(),
+					ContestID: cid,
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Result:    random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			setup: func(f fields, args args, want []*domain.ContestTeam) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeams(args.contestID).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrGetByContestID",
+			args: args{
+				ctx:       context.Background(),
+				contestID: cid,
+			},
+			want: nil,
+			setup: func(f fields, args args, want []*domain.ContestTeam) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeams(args.contestID).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args, tt.want)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			got, err := s.GetContestTeams(tt.args.ctx, tt.args.contestID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
