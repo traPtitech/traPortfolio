@@ -4,6 +4,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/traPtitech/traPortfolio/domain"
 
@@ -54,11 +55,11 @@ func (s *contestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.
 	}
 
 	teams, err := s.repo.GetContestTeams(id)
-	if err != nil {
+	if err != nil && !errors.Is(err, repository.ErrNotFound) {
 		return nil, err
 	}
 
-	contest.Teams = teams
+	contest.Teams = teams // TODO: repositoryで行うべきな気がする
 
 	return contest, nil
 }
