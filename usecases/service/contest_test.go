@@ -12,6 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -197,6 +198,88 @@ func TestContestService_GetContest(t *testing.T) {
 			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.GetContest(tt.args.ctx, tt.args.id)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestContestService_CreateContest(t *testing.T) {
+	cname := random.AlphaNumeric(rand.Intn(30) + 1) // 作成するコンテストのコンテスト名
+
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx  context.Context
+		args *repository.CreateContestArgs
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      *domain.Contest
+		setup     func(f fields, args args, want *domain.Contest)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx: context.Background(),
+				args: &repository.CreateContestArgs{
+					Name:        cname,
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       time.Now(),
+					Until:       optional.NewTime(time.Now(), true),
+				},
+			},
+			want: &domain.Contest{
+				ID:        random.UUID(),
+				Name:      cname,
+				TimeStart: time.Now(),
+				TimeEnd:   time.Now(),
+			},
+			setup: func(f fields, args args, want *domain.Contest) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().CreateContest(args.args).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrCreate",
+			args: args{
+				ctx: context.Background(),
+				args: &repository.CreateContestArgs{
+					Name:        cname,
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Since:       time.Now(),
+					Until:       optional.NewTime(time.Now(), true),
+				},
+			},
+			want: nil,
+			setup: func(f fields, args args, want *domain.Contest) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().CreateContest(args.args).Return(nil, repository.ErrInvalidArg)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args, tt.want)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			got, err := s.CreateContest(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
