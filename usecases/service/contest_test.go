@@ -502,3 +502,119 @@ func TestContestService_GetContestTeams(t *testing.T) {
 		})
 	}
 }
+
+func Test_contestService_GetContestTeam(t *testing.T) {
+	cid := random.UUID()
+	tid := random.UUID()
+
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx       context.Context
+		contestID uuid.UUID
+		teamID    uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      *domain.ContestTeamDetail
+		setup     func(f fields, args args, want *domain.ContestTeamDetail)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx:       context.Background(),
+				contestID: cid,
+				teamID:    tid,
+			},
+			want: &domain.ContestTeamDetail{
+				ContestTeam: domain.ContestTeam{
+					ID:        tid,
+					ContestID: cid,
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Result:    random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Members: []*domain.User{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					},
+				},
+			},
+			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeam(args.contestID, args.teamID).Return(&domain.ContestTeamDetail{
+					ContestTeam: domain.ContestTeam{
+						ID:        args.teamID,
+						ContestID: args.contestID,
+						Name:      want.Name,
+						Result:    want.Result,
+					},
+					Description: want.Description,
+				}, nil)
+				repo.EXPECT().GetContestTeamMembers(args.contestID, args.teamID).Return(want.Members, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrGetContestTeam",
+			args: args{
+				ctx:       context.Background(),
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: nil,
+			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeam(args.contestID, args.teamID).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "ErrGetContestTeamMembers",
+			args: args{
+				ctx:       context.Background(),
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: nil,
+			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeam(args.contestID, args.teamID).Return(&domain.ContestTeamDetail{
+					ContestTeam: domain.ContestTeam{
+						ID:        args.teamID,
+						ContestID: args.contestID,
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						Result:    random.AlphaNumeric(rand.Intn(30) + 1),
+					},
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				}, nil)
+				repo.EXPECT().GetContestTeamMembers(args.contestID, args.teamID).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args, tt.want)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			got, err := s.GetContestTeam(tt.args.ctx, tt.args.contestID, tt.args.teamID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
