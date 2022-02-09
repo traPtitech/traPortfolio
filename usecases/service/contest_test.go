@@ -621,3 +621,108 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 		})
 	}
 }
+
+func TestContestService_CreateContestTeam(t *testing.T) {
+	var (
+		cid         = random.UUID()
+		tid         = random.UUID()
+		name        = random.AlphaNumeric(rand.Intn(30) + 1)
+		result      = random.AlphaNumeric(rand.Intn(30) + 1)
+		link        = random.RandURLString()
+		description = random.AlphaNumeric(rand.Intn(30) + 1)
+	)
+
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx       context.Context
+		contestID uuid.UUID
+		args      *repository.CreateContestTeamArgs
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      *domain.ContestTeamDetail
+		setup     func(f fields, args args, want *domain.ContestTeamDetail)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx:       context.Background(),
+				contestID: cid,
+				args: &repository.CreateContestTeamArgs{
+					Name:        name,
+					Result:      optional.NewString(result, true),
+					Link:        optional.NewString(link, true),
+					Description: description,
+				},
+			},
+			want: &domain.ContestTeamDetail{
+				ContestTeam: domain.ContestTeam{
+					ID:        tid,
+					ContestID: cid,
+					Name:      name,
+					Result:    result,
+				},
+				Link:        link,
+				Description: description,
+				Members:     nil,
+			},
+			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().CreateContestTeam(args.contestID, args.args).Return(&domain.ContestTeamDetail{
+					ContestTeam: domain.ContestTeam{
+						ID:        tid,
+						ContestID: args.contestID,
+						Name:      args.args.Name,
+						Result:    args.args.Result.String,
+					},
+					Link:        args.args.Link.String,
+					Description: args.args.Description,
+					Members:     nil,
+				}, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrCreateContestTeam",
+			args: args{
+				ctx:       context.Background(),
+				contestID: random.UUID(),
+				args: &repository.CreateContestTeamArgs{
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			want: nil,
+			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().CreateContestTeam(args.contestID, args.args).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args, tt.want)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			got, err := s.CreateContestTeam(tt.args.ctx, tt.args.contestID, tt.args.args)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
