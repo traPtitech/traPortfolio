@@ -538,6 +538,7 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
 					Result:    random.AlphaNumeric(rand.Intn(30) + 1),
 				},
+				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(rand.Intn(30) + 1),
 				Members: []*domain.User{
 					{
@@ -556,6 +557,7 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 						Name:      want.Name,
 						Result:    want.Result,
 					},
+					Link:        want.Link,
 					Description: want.Description,
 				}, nil)
 				repo.EXPECT().GetContestTeamMembers(args.contestID, args.teamID).Return(want.Members, nil)
@@ -593,6 +595,7 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
 						Result:    random.AlphaNumeric(rand.Intn(30) + 1),
 					},
+					Link:        random.RandURLString(),
 					Description: random.AlphaNumeric(rand.Intn(30) + 1),
 				}, nil)
 				repo.EXPECT().GetContestTeamMembers(args.contestID, args.teamID).Return(nil, repository.ErrNotFound)
