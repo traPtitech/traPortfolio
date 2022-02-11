@@ -187,8 +187,11 @@ func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.
 }
 
 func (s *contestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.DeleteContestTeamMembers(teamID, memberIDs)
-	return err
+	if err := s.repo.DeleteContestTeamMembers(teamID, memberIDs); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Interface guards

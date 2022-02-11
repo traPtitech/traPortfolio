@@ -1013,3 +1013,64 @@ func TestContestService_AddContestTeamMembers(t *testing.T) {
 		})
 	}
 }
+
+func TestContestService_DeleteContestTeamMembers(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx       context.Context
+		teamID    uuid.UUID
+		memberIDs []uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setup     func(f fields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx:       context.Background(),
+				teamID:    random.UUID(),
+				memberIDs: []uuid.UUID{random.UUID(), random.UUID()},
+			},
+			setup: func(f fields, args args) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().DeleteContestTeamMembers(args.teamID, args.memberIDs).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrDeleteContestTeamMembers",
+			args: args{
+				ctx:       context.Background(),
+				teamID:    random.UUID(),
+				memberIDs: []uuid.UUID{random.UUID(), random.UUID()},
+			},
+			setup: func(f fields, args args) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().DeleteContestTeamMembers(args.teamID, args.memberIDs).Return(repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			tt.assertion(t, s.DeleteContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
+		})
+	}
+}
