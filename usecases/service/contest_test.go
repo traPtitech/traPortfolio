@@ -880,3 +880,75 @@ func Test_contestService_DeleteContestTeam(t *testing.T) {
 		})
 	}
 }
+
+func TestContestService_GetContestTeamMembers(t *testing.T) {
+	t.Parallel()
+	type fields struct {
+		repo repository.ContestRepository
+	}
+	type args struct {
+		ctx       context.Context
+		contestID uuid.UUID
+		teamID    uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		want      []*domain.User
+		setup     func(f fields, args args, want []*domain.User)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx:       context.Background(),
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			setup: func(f fields, args args, want []*domain.User) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeamMembers(args.contestID, args.teamID).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "ErrGetContestTeamMembers",
+			args: args{
+				ctx:       context.Background(),
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			want: nil,
+			setup: func(f fields, args args, want []*domain.User) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().GetContestTeamMembers(args.contestID, args.teamID).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			tt.fields = fields{
+				repo: mock_repository.NewMockContestRepository(ctrl),
+			}
+			tt.setup(tt.fields, tt.args, tt.want)
+			s := NewContestService(tt.fields.repo)
+			// Assertion
+			got, err := s.GetContestTeamMembers(tt.args.ctx, tt.args.contestID, tt.args.teamID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

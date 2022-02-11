@@ -170,7 +170,12 @@ func (s *contestService) DeleteContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	return s.repo.GetContestTeamMembers(contestID, teamID)
+	members, err := s.repo.GetContestTeamMembers(contestID, teamID)
+	if err != nil {
+		return nil, err
+	}
+
+	return members, nil
 }
 
 func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
