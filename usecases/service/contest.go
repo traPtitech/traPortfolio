@@ -179,8 +179,11 @@ func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uu
 }
 
 func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.AddContestTeamMembers(teamID, memberIDs)
-	return err
+	if err := s.repo.AddContestTeamMembers(teamID, memberIDs); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *contestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
