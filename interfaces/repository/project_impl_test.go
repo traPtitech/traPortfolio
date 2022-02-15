@@ -954,7 +954,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 					)
 				h.Mock.ExpectBegin()
 				h.Mock.
-					ExpectExec(regexp.QuoteMeta("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND user_id IN (?,?)")).
+					ExpectExec(regexp.QuoteMeta("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `user_id` IN (?,?)")).
 					WithArgs(args.projectID, args.members[0], args.members[1]).
 					WillReturnResult(sqlmock.NewResult(0, int64(len(args.members)+1)/2))
 				h.Mock.ExpectCommit()
