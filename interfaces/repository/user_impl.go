@@ -99,7 +99,7 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
-	err := repo.Find(&accounts, "user_id = ?", userID).Error()
+	err := repo.Where(&model.Account{UserID: userID}).Find(&accounts).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -117,7 +117,7 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 
 func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
 	account := &model.Account{}
-	err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
+	err := repo.Where(&model.Account{ID: accountID, UserID: userID}).First(account).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -166,8 +166,8 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 		return nil, convertError(err)
 	}
 
-	ver := &model.Account{}
-	err = repo.First(ver, &model.Account{ID: account.ID}).Error()
+	ver := new(model.Account)
+	err = repo.Where(&model.Account{ID: account.ID}).First(ver).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}

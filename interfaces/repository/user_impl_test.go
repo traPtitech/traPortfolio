@@ -316,7 +316,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE user_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnRows(rows)
 			},
