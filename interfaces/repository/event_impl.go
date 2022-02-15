@@ -121,7 +121,7 @@ func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, e
 
 func (repo *EventRepository) getEventLevelByID(id uuid.UUID) (*model.EventLevelRelation, error) {
 	elv := &model.EventLevelRelation{}
-	err := repo.h.First(elv, &model.EventLevelRelation{ID: id}).Error()
+	err := repo.h.Where(&model.EventLevelRelation{ID: id}).First(elv).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
