@@ -47,7 +47,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 			ID: v.UserID,
 			// Name:     v.Name,
 			// RealName: v.RealName,
-			Duration: domain.GroupDuration{
+			Duration: domain.YearWithSemesterDuration{
 				Since: domain.YearWithSemester{
 					Year:     v.SinceYear,
 					Semester: v.SinceSemester,
