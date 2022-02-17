@@ -109,11 +109,9 @@ jobs:
         run: |
           go test ./... -coverprofile=coverage.txt -race -vet=off
       - name: Upload coverage data
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.txt
-          yml: ./codecov.yml
       - uses: actions/upload-artifact@v1
         with:
           name: coverage.txt

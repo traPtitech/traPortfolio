@@ -4,6 +4,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/traPtitech/traPortfolio/domain"
 
@@ -54,11 +55,11 @@ func (s *contestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.
 	}
 
 	teams, err := s.repo.GetContestTeams(id)
-	if err != nil {
+	if err != nil && !errors.Is(err, repository.ErrNotFound) {
 		return nil, err
 	}
 
-	contest.Teams = teams
+	contest.Teams = teams // TODO: repositoryで行うべきな気がする
 
 	return contest, nil
 }
@@ -161,21 +162,36 @@ func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 }
 
 func (s *contestService) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
-	return s.repo.DeleteContestTeam(contestID, teamID)
+	if err := s.repo.DeleteContestTeam(contestID, teamID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	return s.repo.GetContestTeamMembers(contestID, teamID)
+	members, err := s.repo.GetContestTeamMembers(contestID, teamID)
+	if err != nil {
+		return nil, err
+	}
+
+	return members, nil
 }
 
 func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.AddContestTeamMembers(teamID, memberIDs)
-	return err
+	if err := s.repo.AddContestTeamMembers(teamID, memberIDs); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *contestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.DeleteContestTeamMembers(teamID, memberIDs)
-	return err
+	if err := s.repo.DeleteContestTeamMembers(teamID, memberIDs); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Interface guards

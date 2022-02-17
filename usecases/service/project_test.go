@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"testing"
 
@@ -27,7 +26,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 		name      string
 		args      args
 		want      []*domain.Project
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.Project)
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.Project)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -50,7 +49,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 					},
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.Project) {
 				repo.EXPECT().GetProjects().Return(want, nil)
 			},
 			assertion: assert.NoError,
@@ -59,7 +58,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 			name: "ErrInvalidDB",
 			args: args{ctx: context.Background()},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.Project) {
 				repo.EXPECT().GetProjects().Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -74,10 +73,9 @@ func TestProjectService_GetProjects(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args, tt.want)
+			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 			got, err := s.GetProjects(tt.args.ctx)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -95,7 +93,7 @@ func TestProjectService_GetProject(t *testing.T) {
 		name      string
 		args      args
 		want      *domain.Project
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project)
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -119,31 +117,10 @@ func TestProjectService_GetProject(t *testing.T) {
 					},
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project) {
 				repo.EXPECT().GetProject(args.id).Return(want, nil)
-				portalWant := make([]*domain.PortalUser, 0)
-				for _, v := range want.Members {
-					portalWant = append(portalWant, &domain.PortalUser{
-						ID:   v.Name,
-						Name: v.RealName,
-					})
-				}
-				portal.EXPECT().GetUsers(args.ctx).Return(portalWant, nil)
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name: "PortalForbidden",
-			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-			},
-			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
-				repo.EXPECT().GetProject(args.id).Return(want, nil)
-				portal.EXPECT().GetUsers(args.ctx).Return(nil, fmt.Errorf("GET /user failed: %v", "forbidden"))
-			},
-			assertion: assert.Error,
 		},
 		{
 			name: "InvalidDB",
@@ -152,7 +129,7 @@ func TestProjectService_GetProject(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project) {
 				repo.EXPECT().GetProject(args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -167,10 +144,9 @@ func TestProjectService_GetProject(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args, tt.want)
+			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 			got, err := s.GetProject(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -195,7 +171,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 		name      string
 		args      args
 		want      *domain.Project
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project)
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -219,7 +195,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				Link:        link,
 				Duration:    duration,
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project) {
 				if args.args.Link.Valid {
 					want.Link = args.args.Link.String
 				}
@@ -242,7 +218,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project) {
 			},
 			assertion: assert.Error,
 		},
@@ -261,7 +237,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want *domain.Project) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.Project) {
 				repo.EXPECT().CreateProject(args.args).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -276,10 +252,9 @@ func TestProjectService_CreateProject(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args, tt.want)
+			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 			got, err := s.CreateProject(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -299,7 +274,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args)
+		setup     func(repo *mock_repository.MockProjectRepository, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -317,7 +292,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					UntilSemester: optional.NewInt64(int64(duration.Until.Semester), true),
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().GetProject(args.id).Return(&domain.Project{
 					ID:       args.id,
 					Duration: duration,
@@ -342,7 +317,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				id:   random.UUID(),
 				args: nil,
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().GetProject(args.id).Return(nil, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -362,7 +337,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					UntilSemester: optional.NewInt64(int64(duration.Since.Semester), true),
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().GetProject(args.id).Return(&domain.Project{
 					ID:       args.id,
 					Duration: duration,
@@ -385,7 +360,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					UntilSemester: optional.NewInt64(int64(duration.Until.Semester), true),
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().GetProject(args.id).Return(&domain.Project{
 					ID:       args.id,
 					Duration: duration,
@@ -413,10 +388,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args)
+			tt.setup(repo, tt.args)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 
 			tt.assertion(t, s.UpdateProject(tt.args.ctx, tt.args.id, tt.args.args))
 		})
@@ -433,7 +407,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 		name      string
 		args      args
 		want      []*domain.User
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User)
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -449,31 +423,10 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(want, nil)
-				portalWant := make([]*domain.PortalUser, 0)
-				for _, v := range want {
-					portalWant = append(portalWant, &domain.PortalUser{
-						ID:   v.Name,
-						Name: v.RealName,
-					})
-				}
-				portal.EXPECT().GetUsers(args.ctx).Return(portalWant, nil)
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name: "PortalForbidden",
-			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-			},
-			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
-				repo.EXPECT().GetProjectMembers(args.id).Return(want, nil)
-				portal.EXPECT().GetUsers(args.ctx).Return(nil, fmt.Errorf("GET /user failed: %v", "forbidden"))
-			},
-			assertion: assert.Error,
 		},
 		{
 			name: "InvalidDB",
@@ -482,7 +435,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args, want []*domain.User) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -497,10 +450,9 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args, tt.want)
+			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 			got, err := s.GetProjectMembers(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -520,7 +472,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args)
+		setup     func(repo *mock_repository.MockProjectRepository, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -538,7 +490,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 					},
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().AddProjectMembers(args.projectID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
@@ -558,7 +510,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 					},
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 			},
 			assertion: assert.Error,
 		},
@@ -577,7 +529,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 					},
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().AddProjectMembers(args.projectID, args.args).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -592,10 +544,9 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args)
+			tt.setup(repo, tt.args)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 
 			tt.assertion(t, s.AddProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.args))
 		})
@@ -612,7 +563,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		setup     func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args)
+		setup     func(repo *mock_repository.MockProjectRepository, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -622,7 +573,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 				projectID: random.UUID(),
 				memberIDs: []uuid.UUID{random.UUID()},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(nil)
 			},
 			assertion: assert.NoError,
@@ -634,7 +585,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 				projectID: random.UUID(),
 				memberIDs: []uuid.UUID{random.UUID()},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, portal *mock_repository.MockPortalRepository, args args) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args) {
 				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
@@ -649,10 +600,9 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
-			portal := mock_repository.NewMockPortalRepository(ctrl)
-			tt.setup(repo, portal, tt.args)
+			tt.setup(repo, tt.args)
 
-			s := NewProjectService(repo, portal)
+			s := NewProjectService(repo)
 
 			tt.assertion(t, s.DeleteProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.memberIDs))
 		})
