@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"errors"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -48,6 +49,14 @@ func TestUserHandler_GetAll(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
+		{
+			name: "internal error",
+			setup: func(th *handler.TestHandlers) (hres []*handler.User, path string) {
+				th.Service.MockUserService.EXPECT().GetUsers(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				return nil, "/api/v1/users"
+			},
+			statusCode: http.StatusInternalServerError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -94,6 +103,8 @@ func TestUserHandler_GetByID(t *testing.T) {
 		})
 	}
 }
+
+/*
 
 func TestUserHandler_Update(t *testing.T) {
 	type fields struct {
