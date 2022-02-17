@@ -9,6 +9,7 @@ const (
 	TraqStateActive
 	// ユーザーアカウント状態: 一時停止
 	TraqStateSuspended
+	TraqStateLimit
 )
 
 // TraQUser traQ上のユーザー情報

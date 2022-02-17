@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -76,30 +77,106 @@ func TestUserHandler_GetAll(t *testing.T) {
 	}
 }
 
-/*
 func TestUserHandler_GetByID(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(th *handler.TestHandlers) (hres *handler.UserDetail, userpath string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success random",
+			setup: func(th *handler.TestHandlers) (hres *handler.UserDetail, userpath string) {
+
+				const accountNum int = 9
+				rAccounts := []*domain.Account{}
+				hAccounts := []handler.Account{}
+
+				for i := 0; i < accountNum; i++ {
+					prRandom := false
+					if rand.Intn(2) == 1 {
+						prRandom = true
+					}
+
+					raccount := domain.Account{
+						ID:          random.UUID(),
+						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Type:        uint(rand.Intn(int(domain.AccountLimit))),
+						PrPermitted: prRandom,
+						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+					}
+
+					haccount := handler.Account{
+						Id:          raccount.ID,
+						Name:        raccount.Name,
+						PrPermitted: handler.PrPermitted(prRandom),
+						Type:        handler.AccountType(raccount.Type),
+						Url:         raccount.URL,
+					}
+
+					rAccounts = append(rAccounts, &raccount)
+					hAccounts = append(hAccounts, haccount)
+				}
+
+				ruser := domain.UserDetail{
+
+					User: domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					},
+					State:    domain.TraQState(uint8(rand.Intn(int(domain.TraqStateLimit)))),
+					Bio:      random.AlphaNumeric(rand.Intn(256) + 1),
+					Accounts: rAccounts,
+				}
+
+				huser := handler.UserDetail{
+					User: handler.User{
+						Id:       ruser.User.ID,
+						Name:     ruser.User.Name,
+						RealName: ruser.User.RealName,
+					},
+					Accounts: hAccounts,
+					Bio:      ruser.Bio,
+					State:    handler.UserAccountState(ruser.State),
+				}
+
+				repoUser := &ruser
+				hresUser := &huser
+
+				th.Service.MockUserService.EXPECT().GetUser(gomock.Any(), ruser.User.ID).Return(repoUser, nil)
+				path := fmt.Sprintf("/api/v1/users/%s", ruser.User.ID)
+				return hresUser, path
+			},
+			statusCode: http.StatusOK,
+		},
+
+		{
+			name: "internal error",
+			setup: func(th *handler.TestHandlers) (hres *handler.UserDetail, userpath string) {
+				id := random.UUID()
+				th.Service.MockUserService.EXPECT().GetUser(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusInternalServerError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := handler.GetByID(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetByID() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			var resBody *handler.UserDetail
+
+			hresUsers, userpath := tt.setup(&handlers)
+
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, userpath, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
+
 		})
 	}
 }
