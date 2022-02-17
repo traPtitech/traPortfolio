@@ -10,16 +10,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
-var portalSet = wire.NewSet(
-	NewPortalAPI,
-	impl.NewPortalRepository,
-)
-
-var traQSet = wire.NewSet(
-	NewTraQAPI,
-	impl.NewTraQRepository,
-)
-
 var pingSet = wire.NewSet(
 	handler.NewPingHandler,
 )
@@ -36,13 +26,7 @@ var projectSet = wire.NewSet(
 	handler.NewProjectHandler,
 )
 
-var knoQSet = wire.NewSet(
-	NewKnoqAPI,
-	impl.NewKnoqRepository,
-)
-
 var eventSet = wire.NewSet(
-	knoQSet,
 	impl.NewEventRepository,
 	service.NewEventService,
 	handler.NewEventHandler,
@@ -64,6 +48,12 @@ var sqlSet = wire.NewSet(
 	NewSQLHandler,
 )
 
+var externalSet = wire.NewSet(
+	NewKnoqAPI,
+	NewPortalAPI,
+	NewTraQAPI,
+)
+
 var apiSet = wire.NewSet(handler.NewAPI)
 
 func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) (handler.API, error) {
@@ -73,11 +63,10 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 		projectSet,
 		eventSet,
 		groupSet,
-		sqlSet,
-		apiSet,
-		portalSet,
-		traQSet,
 		contestSet,
+		sqlSet,
+		externalSet,
+		apiSet,
 	)
 	return handler.API{}, nil
 }

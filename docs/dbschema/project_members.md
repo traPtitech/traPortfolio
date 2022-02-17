@@ -12,8 +12,10 @@ CREATE TABLE `project_members` (
   `id` char(36) NOT NULL,
   `project_id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
-  `since` datetime(6) DEFAULT NULL,
-  `until` datetime(6) DEFAULT NULL,
+  `since_year` smallint(4) NOT NULL,
+  `since_semester` tinyint(1) NOT NULL,
+  `until_year` smallint(4) NOT NULL,
+  `until_semester` tinyint(1) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -33,8 +35,10 @@ CREATE TABLE `project_members` (
 | id | char(36) |  | false |  |  |  |
 | project_id | char(36) |  | false |  | [projects](projects.md) | プロジェクトUUID |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
-| since | datetime(6) | NULL | true |  |  | プロジェクト所属開始時期 |
-| until | datetime(6) | NULL | true |  |  | プロジェクト所属終了時期 |
+| since_year | smallint(4) |  | false |  |  | プロジェクト所属開始年 |
+| since_semester | tinyint(1) |  | false |  |  | プロジェクト所属開始学期(0:前期 1:後期) |
+| until_year | smallint(4) |  | false |  |  | プロジェクト所属終了年 |
+| until_semester | tinyint(1) |  | false |  |  | プロジェクト所属終了学期(0:前期 1:後期) |
 | created_at | datetime(6) | NULL | true |  |  |  |
 | updated_at | datetime(6) | NULL | true |  |  |  |
 

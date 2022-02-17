@@ -75,8 +75,10 @@ comments:
       name: プロジェクト名
       description: プロジェクト説明
       link: プロジェクト情報のリンク
-      since: プロジェクト開始期間
-      until: プロジェクト終了期間
+      since_year: プロジェクト開始年
+      since_semester: プロジェクト開始学期(0:前期 1:後期)
+      until_year: プロジェクト終了年
+      until_semester: プロジェクト終了学期(0:前期 1:後期)
       created_at: プロジェクト作成日時
       updated_at: プロジェクト更新日時
   # - table: achievements
@@ -90,8 +92,10 @@ comments:
     columnComments:
       project_id: プロジェクトUUID
       user_id: ユーザーUUID
-      since: プロジェクト所属開始時期
-      until: プロジェクト所属終了時期
+      since_year: プロジェクト所属開始年
+      since_semester: プロジェクト所属開始学期(0:前期 1:後期)
+      until_year: プロジェクト所属終了年
+      until_semester: プロジェクト所属終了学期(0:前期 1:後期)
   # - table: achievements_members
   #   tableComments: 実績メンバーテーブル
   #   columnComments:
@@ -113,8 +117,8 @@ comments:
       user_id: ユーザーUUID
       group_id: グループUUID
       since_year: ユーザー所属開始年
-      since_semester: ユーザー所属開始学期
+      since_semester: ユーザー所属開始学期(0:前期 1:後期)
       until_year: ユーザー所属終了年
-      until_semester: ユーザー所属終了学期
+      until_semester: ユーザー所属終了学期(0:前期 1:後期)
       created_at: 関係テーブル作成日時
       updated_at: 関係テーブル更新日時

@@ -54,10 +54,11 @@ func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
 }
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
-	user := model.User{ID: id}
+	user := new(model.User)
 	err := repo.
 		Preload("Accounts").
-		First(&user).
+		Where(&model.User{ID: id}).
+		First(user).
 		Error()
 	if err != nil {
 		return nil, convertError(err)
@@ -130,10 +131,10 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) Update(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
-		user := &model.User{ID: id}
-		err := repo.First(user).Error()
+		user := new(model.User)
+		err := repo.Where(&model.User{ID: id}).First(user).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -173,15 +174,17 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 	return &domain.Account{
 		ID:          ver.ID,
+		Name:        ver.Name,
 		Type:        ver.Type,
 		PrPermitted: ver.Check,
+		URL:         ver.URL,
 	}, nil
 }
 
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
-		account := &model.Account{}
-		err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
+		account := new(model.Account)
+		err := repo.Where(&model.Account{ID: accountID, UserID: userID}).First(account).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -216,13 +219,12 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 
 	res := make([]*domain.UserProject, 0, len(projects))
 	for _, v := range projects {
+		p := v.Project
 		res = append(res, &domain.UserProject{
-			ID:        v.Project.ID,
-			Name:      v.Project.Name,
-			Since:     v.Project.Since,
-			Until:     v.Project.Until,
-			UserSince: v.Since,
-			UserUntil: v.Until,
+			ID:           v.Project.ID,
+			Name:         v.Project.Name,
+			Duration:     domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
+			UserDuration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		})
 	}
 	return res, nil
@@ -245,7 +247,7 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.Group
 		result = append(result, &domain.GroupUser{
 			ID:   gr.GroupID,
 			Name: gr.Name,
-			Duration: domain.GroupDuration{
+			Duration: domain.YearWithSemesterDuration{
 				Since: domain.YearWithSemester{
 					Year:     v.SinceYear,
 					Semester: v.SinceSemester,

@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"math/rand"
 	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -17,20 +19,15 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	sampleUUID  = uuid.FromStringOrNil("3fa85f64-5717-4562-b3fc-2c963f66afa6")
-	sample2UUID = uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111")
-)
-
 type mockEventRepositoryFields struct {
 	h   database.SQLHandler
 	api external.KnoqAPI
 }
 
-func newMockEventRepositoryFields() mockEventRepositoryFields {
+func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFields {
 	return mockEventRepositoryFields{
 		h:   mock_database.NewMockSQLHandler(),
-		api: mock_external.NewMockKnoqAPI(),
+		api: mock_external.NewMockKnoqAPI(ctrl),
 	}
 }
 
@@ -46,20 +43,32 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			name: "Success",
 			want: []*domain.Event{
 				{
-					ID:        sampleUUID,
-					Name:      "第n回進捗回",
-					TimeStart: sampleTime,
-					TimeEnd:   sampleTime,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
 				},
 				{
-					ID:        sample2UUID,
-					Name:      "sample event",
-					TimeStart: sampleTime,
-					TimeEnd:   sampleTime,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
 				},
 			},
-			setup:     func(f mockEventRepositoryFields, want []*domain.Event) {},
+			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetAll().Return(makeKnoqEvents(want), nil)
+			},
 			assertion: assert.NoError,
+		},
+		{
+			name: "KnoqError",
+			want: nil,
+			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetAll().Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
 		},
 	}
 	for _, tt := range tests {
@@ -67,7 +76,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
@@ -93,23 +103,25 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 			},
 			want: &domain.EventDetail{
 				Event: domain.Event{
-					ID:        sampleUUID,
-					Name:      "第n回進捗回",
-					TimeStart: sampleTime,
-					TimeEnd:   sampleTime,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
 				},
-				Place:       "S516",
+				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
 				Level:       domain.EventLevelPrivate,
-				HostName:    []*domain.User{{ID: sampleUUID}},
-				Description: "第n回の進捗会です。",
-				GroupID:     sampleUUID,
-				RoomID:      sampleUUID,
+				HostName:    []*domain.User{{ID: random.UUID()}},
+				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				GroupID:     random.UUID(),
+				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByID(args.id).Return(makeKnoqEvent(want), nil)
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
@@ -121,25 +133,39 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
+			name: "KnoqNotFound",
+			args: args{
+				id: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByID(args.id).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+		{
 			name: "LevelNotFound",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 			},
 			want: &domain.EventDetail{
 				Event: domain.Event{
-					ID:        sampleUUID,
-					Name:      "第n回進捗回",
-					TimeStart: sampleTime,
-					TimeEnd:   sampleTime,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
 				},
-				Place:       "S516",
+				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
 				Level:       domain.EventLevelAnonymous,
-				HostName:    []*domain.User{{ID: sampleUUID}},
-				Description: "第n回の進捗会です。",
-				GroupID:     sampleUUID,
-				RoomID:      sampleUUID,
+				HostName:    []*domain.User{{ID: random.UUID()}},
+				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				GroupID:     random.UUID(),
+				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByID(args.id).Return(makeKnoqEvent(want), nil)
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
@@ -148,21 +174,28 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "KnoqNotFound",
+			name: "UnexpectedError_getEventLevelByID",
 			args: args{
 				id: random.UUID(),
 			},
-			want:      nil,
-			setup:     func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {},
-			assertion: assert.Error,
-		},
-		{
-			name: "UnexpectedError",
-			args: args{
-				id: sampleUUID,
-			},
 			want: nil,
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				ed := domain.EventDetail{
+					Event: domain.Event{
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						TimeStart: random.Time(),
+						TimeEnd:   random.Time(),
+					},
+					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Level:       domain.EventLevelPrivate,
+					HostName:    []*domain.User{{ID: random.UUID()}},
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+				}
+				k.EXPECT().GetByID(args.id).Return(makeKnoqEvent(&ed), nil)
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
@@ -176,7 +209,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
@@ -202,7 +236,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
@@ -226,7 +260,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		{
 			name: "LevelNotFound",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
@@ -244,7 +278,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		{
 			name: "DoNotUpdate",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
@@ -265,7 +299,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		{
 			name: "UpdateError",
 			args: args{
-				id: sampleUUID,
+				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArg{
 					Level: domain.EventLevelPublic,
 				},
@@ -292,7 +326,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
@@ -304,7 +339,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 func TestEventRepository_GetUserEvents(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		id uuid.UUID
+		userID uuid.UUID
 	}
 	tests := []struct {
 		name      string
@@ -316,24 +351,39 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				id: random.UUID(),
+				userID: random.UUID(),
 			},
 			want: []*domain.Event{
 				{
-					ID:        sampleUUID,
-					Name:      "第n回進捗回",
-					TimeStart: sampleTime,
-					TimeEnd:   sampleTime,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
 				},
 				{
-					ID:        sample2UUID,
-					Name:      "sample event",
-					TimeStart: sampleTime,
-					TimeEnd:   sampleTime,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
 				},
 			},
-			setup:     func(f mockEventRepositoryFields, args args, want []*domain.Event) {},
+			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByUserID(args.userID).Return(makeKnoqEvents(want), nil)
+			},
 			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				userID: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
+				k := f.api.(*mock_external.MockKnoqAPI)
+				k.EXPECT().GetByUserID(args.userID).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
 		},
 	}
 	for _, tt := range tests {
@@ -341,11 +391,12 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
-			f := newMockEventRepositoryFields()
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.api)
 			// Assertion
-			got, err := repo.GetUserEvents(tt.args.id)
+			got, err := repo.GetUserEvents(tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

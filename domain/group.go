@@ -8,12 +8,7 @@ import (
 type GroupUser struct {
 	ID       uuid.UUID // Group ID
 	Name     string    // Group name
-	Duration GroupDuration
-}
-
-type GroupDuration struct {
-	Since YearWithSemester
-	Until YearWithSemester
+	Duration YearWithSemesterDuration
 }
 
 type Group struct {

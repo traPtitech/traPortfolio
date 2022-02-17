@@ -11,43 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
-
-func TestNewEventHandler(t *testing.T) {
-	/*tests := []struct {
-		name    string
-		setup   func() *EventHandler
-		service service.EventService
-		want    *EventHandler
-	}{
-		// TODO: Add test cases.
-		{
-			name: "Success",
-			setup: func() *EventHandler {
-				return NewEventHandler(service)
-			},
-			service: service.EventService{
-				event: repository.EventRepository{
-
-				},
-				user:  repository.UserRepository{ae},
-			},
-			want: &EventHandler{service},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			//got := NewEventHandler(tt.setup(t.context))
-			got := tt.setup()
-
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewEventHandler() = %v, want %v", got, tt.want)
-			}
-		})
-	}*/
-}
 
 func TestEventHandler_GetAll(t *testing.T) {
 
@@ -223,51 +189,140 @@ func TestEventHandler_GetByID(t *testing.T) {
 	}
 }
 
-/*
 func TestEventHandler_PatchEvent(t *testing.T) {
-	type fields struct {
-		srv service.EventService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(th *handler.TestHandlers) (reqBody *handler.EditEvent, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			h := &EventHandler{
-				srv: tt.fields.srv,
-			}
-			if err := h.PatchEvent(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("EventHandler.PatchEvent() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
+		{
+			name: "Success",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
 
-func Test_formatUserDetail(t *testing.T) {
-	type args struct {
-		event *domain.EventDetail
-	}
-	tests := []struct {
-		name string
-		args args
-		want *eventDetailResponse
-	}{
-		// TODO: Add test cases.
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
+				return reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrAlreadyExists)
+				return reqBody, path
+			},
+			statusCode: http.StatusConflict,
+		},
+		{
+			name: "Not Found",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrNotFound)
+				return reqBody, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: bind error",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrBind)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+
+				eventID := random.UUID()
+				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
+				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelDomain := domain.EventLevel(eventLevelUint)
+
+				reqBody := &handler.EditEvent{
+					EventLevel: &eventLevelHandler,
+				}
+
+				args := repository.UpdateEventLevelArg{
+					Level: eventLevelDomain,
+				}
+
+				path := fmt.Sprintf("/api/v1/events/%s", eventID)
+				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrValidate)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := formatUserDetail(tt.args.event); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("formatUserDetail() = %v, want %v", got, tt.want)
-			}
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			reqBody, path := tt.setup(&handlers)
+
+			statusCode, _ := doRequest(t, handlers.API, http.MethodPatch, path, reqBody, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
 		})
 	}
 }
-*/
