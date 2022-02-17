@@ -63,14 +63,10 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 		groupRes[i] = newGroupMember(
 			newUser(v.ID, v.Name, v.RealName),
 			newYearWithSemesterDuration(
-				YearWithSemester{
-					Semester: Semester(v.Duration.Since.Semester),
-					Year:     int(v.Duration.Since.Year),
-				},
-				YearWithSemester{
-					Semester: Semester(v.Duration.Until.Semester),
-					Year:     int(v.Duration.Until.Year),
-				},
+				int(v.Duration.Since.Semester),
+				int(v.Duration.Since.Year),
+				int(v.Duration.Until.Semester),
+				int(v.Duration.Until.Year),
 			),
 		)
 	}

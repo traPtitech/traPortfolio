@@ -11,6 +11,11 @@ type GroupUser struct {
 	Duration YearWithSemesterDuration
 }
 
+type GroupDuration struct {
+	Since YearWithSemester
+	Until YearWithSemester
+}
+
 type Group struct {
 	ID   uuid.UUID
 	Name string
