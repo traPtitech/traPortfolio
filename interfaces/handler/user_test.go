@@ -193,11 +193,6 @@ func TestUserHandler_Update(t *testing.T) {
 			name: "Success",
 			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
 
-				/*eventID := random.UUID()
-				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := handler.EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)*/
-
 				userID := random.UUID()
 				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
 				userCheck := false
@@ -220,6 +215,114 @@ func TestUserHandler_Update(t *testing.T) {
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrAlreadyExists)
+				return reqBody, path
+			},
+			statusCode: http.StatusConflict,
+		},
+		{
+			name: "Not Found",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrNotFound)
+				return reqBody, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: bind error",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrBind)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrValidate)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
