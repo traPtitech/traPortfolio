@@ -99,7 +99,10 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
-	err := repo.Find(&accounts, "user_id = ?", userID).Error()
+	err := repo.
+		Where(&model.Account{UserID: userID}).
+		Find(&accounts).
+		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -117,7 +120,10 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 
 func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
 	account := &model.Account{}
-	err := repo.First(account, &model.Account{ID: accountID, UserID: userID}).Error()
+	err := repo.
+		Where(&model.Account{ID: accountID, UserID: userID}).
+		First(account).
+		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -134,7 +140,10 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
-		err := repo.Where(&model.User{ID: id}).First(user).Error()
+		err := repo.
+			Where(&model.User{ID: id}).
+			First(user).
+			Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -166,9 +175,11 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 		return nil, convertError(err)
 	}
 
-	ver := &model.Account{}
-	err = repo.First(ver, &model.Account{ID: account.ID}).Error()
-	if err != nil {
+	ver := new(model.Account)
+	if err := repo.
+		Where(&model.Account{ID: account.ID}).
+		First(ver).
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -184,7 +195,10 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
-		err := repo.Where(&model.Account{ID: accountID, UserID: userID}).First(account).Error()
+		err := repo.
+			Where(&model.Account{ID: accountID, UserID: userID}).
+			First(account).
+			Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -199,11 +213,14 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 }
 
 func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
+	if err := repo.
+		Where(&model.Account{ID: accountID, UserID: userID}).
+		Delete(&domain.Account{}).
+		Error(); err != nil {
+		return convertError(err)
+	}
 
-	err := repo.Delete(&domain.Account{}, &model.Account{ID: accountID, UserID: userID}).Error()
-
-	return convertError(err)
-
+	return nil
 }
 
 func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {

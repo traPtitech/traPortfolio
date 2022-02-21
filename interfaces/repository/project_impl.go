@@ -41,7 +41,10 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 
 func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
 	project := new(model.Project)
-	if err := repo.h.First(project, &model.Project{ID: id}).Error(); err != nil {
+	if err := repo.h.
+		Where(&model.Project{ID: id}).
+		First(project).
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -124,7 +127,7 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
 	err := repo.h.
 		Model(&model.Project{}).
-		Where(model.Project{ID: id}).
+		Where(&model.Project{ID: id}).
 		Updates(changes).
 		Error()
 	if err != nil {
@@ -178,14 +181,20 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	}
 
 	// プロジェクトの存在チェック
-	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
+	err := repo.h.
+		Where(&model.Project{ID: projectID}).
+		First(&model.Project{}).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
 	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
-	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
+	err = repo.h.
+		Where(&model.ProjectMember{ProjectID: projectID}).
+		Find(&_mmbs).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
@@ -233,14 +242,17 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 	}
 
 	// プロジェクトの存在チェック
-	err := repo.h.First(&model.Project{}, &model.Project{ID: projectID}).Error()
+	err := repo.h.
+		Where(&model.Project{ID: projectID}).
+		First(&model.Project{}).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
 
 	err = repo.h.
 		Where(&model.ProjectMember{ProjectID: projectID}).
-		Where("user_id IN ?", members).
+		Where("`project_members`.`user_id` IN (?)", members).
 		Delete(&model.ProjectMember{}).
 		Error()
 	if err != nil {
