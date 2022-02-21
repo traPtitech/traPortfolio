@@ -41,7 +41,10 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 
 func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
 	project := new(model.Project)
-	if err := repo.h.Where(&model.Project{ID: id}).First(project).Error(); err != nil {
+	if err := repo.h.
+		Where(&model.Project{ID: id}).
+		First(project).
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -178,14 +181,20 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	}
 
 	// プロジェクトの存在チェック
-	err := repo.h.Where(&model.Project{ID: projectID}).First(&model.Project{}).Error()
+	err := repo.h.
+		Where(&model.Project{ID: projectID}).
+		First(&model.Project{}).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
 	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
-	err = repo.h.Where(&model.ProjectMember{ProjectID: projectID}).Find(&_mmbs).Error()
+	err = repo.h.
+		Where(&model.ProjectMember{ProjectID: projectID}).
+		Find(&_mmbs).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
@@ -233,7 +242,10 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 	}
 
 	// プロジェクトの存在チェック
-	err := repo.h.Where(&model.Project{ID: projectID}).First(&model.Project{}).Error()
+	err := repo.h.
+		Where(&model.Project{ID: projectID}).
+		First(&model.Project{}).
+		Error()
 	if err != nil {
 		return convertError(err)
 	}
