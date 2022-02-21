@@ -117,7 +117,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 					hAccounts = append(hAccounts, haccount)
 				}
 
-				ruser := domain.UserDetail{
+				repoUser := domain.UserDetail{
 
 					User: domain.User{
 						ID:       random.UUID(),
@@ -129,23 +129,20 @@ func TestUserHandler_GetByID(t *testing.T) {
 					Accounts: rAccounts,
 				}
 
-				huser := handler.UserDetail{
+				hresUser := handler.UserDetail{
 					User: handler.User{
-						Id:       ruser.User.ID,
-						Name:     ruser.User.Name,
-						RealName: ruser.User.RealName,
+						Id:       repoUser.User.ID,
+						Name:     repoUser.User.Name,
+						RealName: repoUser.User.RealName,
 					},
 					Accounts: hAccounts,
-					Bio:      ruser.Bio,
-					State:    handler.UserAccountState(ruser.State),
+					Bio:      repoUser.Bio,
+					State:    handler.UserAccountState(repoUser.State),
 				}
 
-				repoUser := &ruser
-				hresUser := &huser
-
-				th.Service.MockUserService.EXPECT().GetUser(gomock.Any(), ruser.User.ID).Return(repoUser, nil)
-				path := fmt.Sprintf("/api/v1/users/%s", ruser.User.ID)
-				return hresUser, path
+				th.Service.MockUserService.EXPECT().GetUser(gomock.Any(), repoUser.User.ID).Return(&repoUser, nil)
+				path := fmt.Sprintf("/api/v1/users/%s", hresUser.User.Id)
+				return &hresUser, path
 			},
 			statusCode: http.StatusOK,
 		},
