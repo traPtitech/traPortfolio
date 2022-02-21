@@ -252,7 +252,7 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 
 	err = repo.h.
 		Where(&model.ProjectMember{ProjectID: projectID}).
-		Where(map[string]interface{}{"user_id": members}).
+		Where("`project_members`.`user_id` IN (?)", members).
 		Delete(&model.ProjectMember{}).
 		Error()
 	if err != nil {
