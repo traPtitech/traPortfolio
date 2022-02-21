@@ -26,7 +26,7 @@ func makeYearWithSemester(s int) domain.YearWithSemester {
 	}
 }
 
-func TestProjecttHandler_GetAll(t *testing.T) {
+func TestProjectHandler_GetAll(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -126,7 +126,7 @@ func TestProjecttHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestProjecttHandler_GetByID(t *testing.T) {
+func TestProjectHandler_GetByID(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
