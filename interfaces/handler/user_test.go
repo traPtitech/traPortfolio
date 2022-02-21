@@ -271,56 +271,10 @@ func TestUserHandler_Update(t *testing.T) {
 			statusCode: http.StatusNotFound,
 		},
 		{
-			name: "Bad Request: bind error",
-			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
-
-				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
-				userCheck := false
-				if rand.Intn(2) == 1 {
-					userCheck = true
-				}
-
-				reqBody := &handler.EditUser{
-					Bio:   &userBio,
-					Check: &userCheck,
-				}
-
-				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
-				}
-
-				path := fmt.Sprintf("/api/v1/users/%s", userID)
-				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrBind)
-				return reqBody, path
-			},
-			statusCode: http.StatusBadRequest,
-		},
-		{
 			name: "Bad Request: validate error",
 			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
-
-				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
-				userCheck := false
-				if rand.Intn(2) == 1 {
-					userCheck = true
-				}
-
-				reqBody := &handler.EditUser{
-					Bio:   &userBio,
-					Check: &userCheck,
-				}
-
-				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
-				}
-
-				path := fmt.Sprintf("/api/v1/users/%s", userID)
-				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrValidate)
-				return reqBody, path
+				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
+				return nil, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
