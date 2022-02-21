@@ -213,11 +213,14 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 }
 
 func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
+	if err := repo.
+		Where(&model.Account{ID: accountID, UserID: userID}).
+		Delete(&domain.Account{}).
+		Error(); err != nil {
+		return convertError(err)
+	}
 
-	err := repo.Delete(&domain.Account{}, &model.Account{ID: accountID, UserID: userID}).Error()
-
-	return convertError(err)
-
+	return nil
 }
 
 func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
