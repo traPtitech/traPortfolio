@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -178,34 +180,119 @@ func TestUserHandler_GetByID(t *testing.T) {
 	}
 }
 
-/*
-
 func TestUserHandler_Update(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(th *handler.TestHandlers) (reqBody *handler.EditUser, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(nil)
+				return reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Conflict",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrAlreadyExists)
+				return reqBody, path
+			},
+			statusCode: http.StatusConflict,
+		},
+		{
+			name: "Not Found",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+
+				userID := random.UUID()
+				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &handler.EditUser{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				th.Service.MockUserService.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrNotFound)
+				return reqBody, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(th *handler.TestHandlers) (*handler.EditUser, string) {
+				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := handler.Update(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.Update() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
+
+			reqBody, path := tt.setup(&handlers)
+
+			statusCode, _ := doRequest(t, handlers.API, http.MethodPatch, path, reqBody, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
 		})
 	}
 }
+
+/*
 
 func TestUserHandler_GetAccounts(t *testing.T) {
 	type fields struct {
