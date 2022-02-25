@@ -22,7 +22,7 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, handler.API) {
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockUserService(ctrl)
-	api := handler.API{User: handler.NewUserHandler(s)}
+	api := handler.NewAPI(nil, handler.NewUserHandler(s), nil, nil, nil)
 
 	return s, api
 }

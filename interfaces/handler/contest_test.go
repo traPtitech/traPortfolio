@@ -28,7 +28,7 @@ func setupContestMock(t *testing.T) (*mock_service.MockContestService, handler.A
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockContestService(ctrl)
-	api := handler.API{Contest: handler.NewContestHandler(s)}
+	api := handler.NewAPI(nil, nil, nil, nil, handler.NewContestHandler(s))
 
 	return s, api
 }
