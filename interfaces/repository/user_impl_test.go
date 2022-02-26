@@ -461,7 +461,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Check, args.args.Description, anyTime{}, args.id).
+					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -511,7 +511,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Check, args.args.Description, anyTime{}, args.id).
+					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectRollback()
@@ -683,7 +683,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted, args.args.Name, args.args.Type, args.args.URL, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.Bool, args.args.Name.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -734,7 +734,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted, args.args.Name, args.args.Type, args.args.URL, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.Bool, args.args.Name.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectRollback()

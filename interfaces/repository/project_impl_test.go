@@ -495,7 +495,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				h.Mock.ExpectBegin()
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.SinceSemester, args.args.SinceYear, args.args.UntilSemester, args.args.UntilYear, anyTime{}, args.id).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.ExpectCommit()
 			},
@@ -520,7 +520,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				h.Mock.ExpectBegin()
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.SinceSemester, args.args.SinceYear, args.args.UntilSemester, args.args.UntilYear, anyTime{}, args.id).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},

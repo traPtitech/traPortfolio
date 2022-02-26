@@ -292,14 +292,14 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.Since, args.args.Until, anyTime{}, args.id).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-							AddRow(args.id, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, time.Time{}, time.Time{}),
+							AddRow(args.id, args.args.Name.String, args.args.Description.String, args.args.Link.String, args.args.Since.Time, args.args.Until.Time, time.Time{}, time.Time{}),
 					)
 				h.Mock.ExpectCommit()
 			},
@@ -352,7 +352,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.Since, args.args.Until, anyTime{}, args.id).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
@@ -744,7 +744,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.Result, anyTime{}, args.teamID).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Result.String, anyTime{}, args.teamID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
@@ -802,7 +802,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.Result, anyTime{}, args.teamID).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Result.String, anyTime{}, args.teamID).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
