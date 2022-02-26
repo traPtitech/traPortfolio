@@ -122,25 +122,10 @@ func (s *contestService) CreateContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
-	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.String
+	if err := s.repo.UpdateContestTeam(teamID, args); err != nil {
+		return err
 	}
-	if args.Description.Valid {
-		changes["description"] = args.Description.String
-	}
-	if args.Link.Valid {
-		changes["link"] = args.Link.String
-	}
-	if args.Result.Valid {
-		changes["result"] = args.Result.String
-	}
-	if len(changes) > 0 {
-		err := s.repo.UpdateContestTeam(teamID, changes)
-		if err != nil {
-			return err
-		}
-	}
+
 	return nil
 }
 

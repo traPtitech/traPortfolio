@@ -744,14 +744,8 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				},
 			},
 			setup: func(f fields, args args) {
-				changes := map[string]interface{}{
-					"name":        args.args.Name.String,
-					"result":      args.args.Result.String,
-					"link":        args.args.Link.String,
-					"description": args.args.Description.String,
-				}
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().UpdateContestTeam(args.teamID, changes).Return(nil)
+				repo.EXPECT().UpdateContestTeam(args.teamID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -762,7 +756,10 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				teamID: random.UUID(),
 				args:   &repository.UpdateContestTeamArgs{},
 			},
-			setup:     func(f fields, args args) {},
+			setup: func(f fields, args args) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().UpdateContestTeam(args.teamID, args.args).Return(nil)
+			},
 			assertion: assert.NoError,
 		},
 		{
@@ -778,14 +775,8 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				},
 			},
 			setup: func(f fields, args args) {
-				changes := map[string]interface{}{
-					"name":        args.args.Name.String,
-					"result":      args.args.Result.String,
-					"link":        args.args.Link.String,
-					"description": args.args.Description.String,
-				}
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().UpdateContestTeam(args.teamID, changes).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateContestTeam(args.teamID, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},

@@ -234,7 +234,25 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 	return result, nil
 }
 
-func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, changes map[string]interface{}) error {
+func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
+	}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Link.Valid {
+		changes["link"] = args.Link.String
+	}
+	if args.Result.Valid {
+		changes["result"] = args.Result.String
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	var (
 		old model.ContestTeam
 		new model.ContestTeam
