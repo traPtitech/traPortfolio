@@ -318,15 +318,8 @@ func TestContestService_UpdateContest(t *testing.T) {
 				},
 			},
 			setup: func(f fields, args args) {
-				changes := map[string]interface{}{
-					"name":        args.args.Name.String,
-					"description": args.args.Description.String,
-					"link":        args.args.Link.String,
-					"since":       args.args.Since.Time,
-					"until":       args.args.Until.Time,
-				}
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().UpdateContest(args.id, changes).Return(nil)
+				repo.EXPECT().UpdateContest(args.id, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -344,15 +337,8 @@ func TestContestService_UpdateContest(t *testing.T) {
 				},
 			},
 			setup: func(f fields, args args) {
-				changes := map[string]interface{}{
-					"name":        args.args.Name.String,
-					"description": args.args.Description.String,
-					"link":        args.args.Link.String,
-					"since":       args.args.Since.Time,
-					"until":       args.args.Until.Time,
-				}
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().UpdateContest(args.id, changes).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateContest(args.id, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},

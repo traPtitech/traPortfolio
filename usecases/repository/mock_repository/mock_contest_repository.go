@@ -198,17 +198,17 @@ func (mr *MockContestRepositoryMockRecorder) GetContests() *gomock.Call {
 }
 
 // UpdateContest mocks base method.
-func (m *MockContestRepository) UpdateContest(id uuid.UUID, changes map[string]interface{}) error {
+func (m *MockContestRepository) UpdateContest(id uuid.UUID, args *repository.UpdateContestArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateContest", id, changes)
+	ret := m.ctrl.Call(m, "UpdateContest", id, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateContest indicates an expected call of UpdateContest.
-func (mr *MockContestRepositoryMockRecorder) UpdateContest(id, changes interface{}) *gomock.Call {
+func (mr *MockContestRepositoryMockRecorder) UpdateContest(id, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContest", reflect.TypeOf((*MockContestRepository)(nil).UpdateContest), id, changes)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContest", reflect.TypeOf((*MockContestRepository)(nil).UpdateContest), id, args)
 }
 
 // UpdateContestTeam mocks base method.

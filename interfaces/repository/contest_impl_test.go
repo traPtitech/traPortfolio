@@ -259,8 +259,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 func TestContestRepository_UpdateContest(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		id      uuid.UUID
-		changes map[string]interface{}
+		id   uuid.UUID
+		args *repository.UpdateContestArgs
 	}
 	tests := []struct {
 		name      string
@@ -272,12 +272,12 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"link":        random.AlphaNumeric(rand.Intn(30) + 1),
-					"since":       sampleTime,
-					"until":       sampleTime,
+				args: &repository.UpdateContestArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       optional.NewTime(sampleTime, true),
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -292,14 +292,14 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
+					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.Since, args.args.Until, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-							AddRow(args.id, args.changes["name"], args.changes["description"], args.changes["link"], args.changes["since"], args.changes["until"], time.Time{}, time.Time{}),
+							AddRow(args.id, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, time.Time{}, time.Time{}),
 					)
 				h.Mock.ExpectCommit()
 			},
@@ -309,12 +309,12 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"link":        random.AlphaNumeric(rand.Intn(30) + 1),
-					"since":       sampleTime,
-					"until":       sampleTime,
+				args: &repository.UpdateContestArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       optional.NewTime(sampleTime, true),
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -332,12 +332,12 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"link":        random.AlphaNumeric(rand.Intn(30) + 1),
-					"since":       sampleTime,
-					"until":       sampleTime,
+				args: &repository.UpdateContestArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       optional.NewTime(sampleTime, true),
+					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -352,7 +352,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
+					WithArgs(args.args.Description, args.args.Link, args.args.Name, args.args.Since, args.args.Until, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
@@ -369,7 +369,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := impl.NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.changes))
+			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.args))
 		})
 	}
 }
