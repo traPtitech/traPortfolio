@@ -137,7 +137,19 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUserArgs) error {
+	changes := map[string]interface{}{}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Check.Valid {
+		changes["check"] = args.Check.Bool
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
 		err := repo.

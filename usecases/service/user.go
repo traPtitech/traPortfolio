@@ -51,19 +51,10 @@ func (s *userService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 }
 
 func (s *userService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
-	changes := map[string]interface{}{}
-	if args.Description.Valid {
-		changes["description"] = args.Description.String
+	if err := s.repo.UpdateUser(id, args); err != nil {
+		return err
 	}
-	if args.Check.Valid {
-		changes["check"] = args.Check.Bool
-	}
-	if len(changes) > 0 {
-		err := s.repo.UpdateUser(id, changes)
-		if err != nil {
-			return err
-		}
-	}
+
 	return nil
 }
 

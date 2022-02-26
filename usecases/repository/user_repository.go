@@ -30,7 +30,7 @@ type UpdateAccountArgs struct {
 type UserRepository interface {
 	GetUsers() ([]*domain.User, error)
 	GetUser(id uuid.UUID) (*domain.UserDetail, error)
-	UpdateUser(id uuid.UUID, changes map[string]interface{}) error
+	UpdateUser(id uuid.UUID, args *UpdateUserArgs) error
 	GetAccounts(id uuid.UUID) ([]*domain.Account, error)
 	GetAccount(id uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
 	CreateAccount(id uuid.UUID, args *CreateAccountArgs) (*domain.Account, error)

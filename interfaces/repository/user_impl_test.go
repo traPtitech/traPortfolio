@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
 
@@ -429,8 +430,8 @@ func TestUserRepository_GetAccount(t *testing.T) {
 func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		id      uuid.UUID
-		changes map[string]interface{}
+		id   uuid.UUID
+		args *repository.UpdateUserArgs
 	}
 	tests := []struct {
 		name      string
@@ -442,9 +443,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"check":       true,
+				args: &repository.UpdateUserArgs{
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -460,7 +461,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
+					WithArgs(args.args.Check, args.args.Description, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -471,9 +472,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"check":       true,
+				args: &repository.UpdateUserArgs{
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -492,9 +493,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			name: "UnexpectedError_Update",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"check":       true,
+				args: &repository.UpdateUserArgs{
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -510,7 +511,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
+					WithArgs(args.args.Check, args.args.Description, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectRollback()
@@ -528,7 +529,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.changes))
+			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.args))
 		})
 	}
 }
