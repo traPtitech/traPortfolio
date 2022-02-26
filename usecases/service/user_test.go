@@ -429,13 +429,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				changes := map[string]interface{}{
-					"name":  args.args.Name.String,
-					"url":   args.args.URL.String,
-					"check": args.args.PrPermitted.Bool,
-					"type":  args.args.Type.Int64,
-				}
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, changes).Return(nil)
+				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -453,13 +447,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				changes := map[string]interface{}{
-					"name":  args.args.Name.String,
-					"url":   args.args.URL.String,
-					"check": args.args.PrPermitted.Bool,
-					"type":  args.args.Type.Int64,
-				}
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, changes).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},

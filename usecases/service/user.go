@@ -87,25 +87,10 @@ func (s *userService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 }
 
 func (s *userService) EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
-	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.String
+	if err := s.repo.UpdateAccount(userID, accountID, args); err != nil {
+		return err
 	}
-	if args.URL.Valid {
-		changes["url"] = args.URL.String
-	}
-	if args.PrPermitted.Valid {
-		changes["check"] = args.PrPermitted.Bool
-	}
-	if args.Type.Valid {
-		changes["type"] = args.Type.Int64
-	}
-	if len(changes) > 0 {
-		err := s.repo.UpdateAccount(userID, accountID, changes)
-		if err != nil {
-			return err
-		}
-	}
+
 	return nil
 }
 

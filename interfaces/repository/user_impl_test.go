@@ -654,7 +654,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	type args struct {
 		userID    uuid.UUID
 		accountID uuid.UUID
-		changes   map[string]interface{}
+		args      *repository.UpdateAccountArgs
 	}
 	tests := []struct {
 		name      string
@@ -667,11 +667,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			args: args{
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
-					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
-					"check": true,
-					"type":  domain.HOMEPAGE,
+				args: &repository.UpdateAccountArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					URL:         optional.NewString(random.RandURLString(), true),
+					PrPermitted: optional.NewBool(true, true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -683,7 +683,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted, args.args.Name, args.args.Type, args.args.URL, anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -695,11 +695,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			args: args{
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
-					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
-					"check": true,
-					"type":  domain.HOMEPAGE,
+				args: &repository.UpdateAccountArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					URL:         optional.NewString(random.RandURLString(), true),
+					PrPermitted: optional.NewBool(true, true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -718,11 +718,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			args: args{
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
-					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
-					"check": true,
-					"type":  domain.HOMEPAGE,
+				args: &repository.UpdateAccountArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					URL:         optional.NewString(random.RandURLString(), true),
+					PrPermitted: optional.NewBool(true, true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -734,7 +734,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted, args.args.Name, args.args.Type, args.args.URL, anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectRollback()
@@ -752,7 +752,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.changes))
+			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.args))
 		})
 	}
 }
