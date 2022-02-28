@@ -308,7 +308,8 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 				userID := random.UUID()
 				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
 				//AccountLimit種類のうち、テストに使うものだけbitが立っている
-				//bitがすべて立っていないものは除外
+				//例えば0(HOMEPAGE)と2(TWITTER)と7(ATCODER)なら10000101=133
+				//0(bitがすべて立っていない)は除外
 
 				rAccounts := []*domain.Account{}
 				hAccounts := []*handler.Account{}
@@ -349,6 +350,17 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 				return hAccounts, path
 			},
 			statusCode: http.StatusOK,
+		},
+		{
+			name: "internal error",
+			setup: func(th *handler.TestHandlers) (hres []*handler.Account, path string) {
+
+				userID := random.UUID()
+				th.Service.MockUserService.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, path
+			},
+			statusCode: http.StatusInternalServerError,
 		},
 	}
 	for _, tt := range tests {
