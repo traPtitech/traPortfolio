@@ -1,4 +1,4 @@
-package service
+package service_test
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
+	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"gorm.io/gorm"
 )
@@ -75,7 +76,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 			got, err := s.GetProjects(tt.args.ctx)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -146,7 +147,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 			got, err := s.GetProject(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -254,7 +255,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 			got, err := s.CreateProject(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -390,7 +391,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 
 			tt.assertion(t, s.UpdateProject(tt.args.ctx, tt.args.id, tt.args.args))
 		})
@@ -452,7 +453,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 			got, err := s.GetProjectMembers(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -546,7 +547,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 
 			tt.assertion(t, s.AddProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.args))
 		})
@@ -602,7 +603,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := NewProjectService(repo)
+			s := service.NewProjectService(repo)
 
 			tt.assertion(t, s.DeleteProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.memberIDs))
 		})

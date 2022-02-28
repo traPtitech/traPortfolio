@@ -1,4 +1,4 @@
-package repository
+package repository_test
 
 import (
 	"math/rand"
@@ -18,6 +18,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
+	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -120,7 +121,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUsers()
 			tt.assertion(t, err)
@@ -278,7 +279,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUser(tt.args.id)
 			tt.assertion(t, err)
@@ -316,7 +317,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE user_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnRows(rows)
 			},
@@ -344,7 +345,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccounts(tt.args.userID)
 			tt.assertion(t, err)
@@ -416,7 +417,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccount(tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
@@ -525,7 +526,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.changes))
 		})
@@ -638,7 +639,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.CreateAccount(tt.args.id, tt.args.args)
 			tt.assertion(t, err)
@@ -748,7 +749,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.changes))
 		})
@@ -808,7 +809,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
 		})
@@ -883,7 +884,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetProjects(tt.args.userID)
 			tt.assertion(t, err)
@@ -968,7 +969,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetContests(tt.args.userID)
 			tt.assertion(t, err)

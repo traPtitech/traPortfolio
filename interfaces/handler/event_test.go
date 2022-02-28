@@ -12,19 +12,30 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
+
+func setupEventMock(t *testing.T) (*mock_service.MockEventService, handler.API) {
+	t.Helper()
+
+	ctrl := gomock.NewController(t)
+	s := mock_service.NewMockEventService(ctrl)
+	api := handler.NewAPI(nil, nil, nil, handler.NewEventHandler(s), nil)
+
+	return s, api
+}
 
 func TestEventHandler_GetAll(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers) (hres []*handler.Event, path string)
+		setup      func(s *mock_service.MockEventService) (hres []*handler.Event, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(th *handler.TestHandlers) (hres []*handler.Event, path string) {
+			setup: func(s *mock_service.MockEventService) (hres []*handler.Event, path string) {
 
 				casenum := 2
 				repoEvents := []*domain.Event{}
@@ -51,15 +62,15 @@ func TestEventHandler_GetAll(t *testing.T) {
 
 				}
 
-				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(repoEvents, nil)
+				s.EXPECT().GetEvents(gomock.Any()).Return(repoEvents, nil)
 				return hresEvents, "/api/v1/events"
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers) (hres []*handler.Event, path string) {
-				th.Service.MockEventService.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+			setup: func(s *mock_service.MockEventService) (hres []*handler.Event, path string) {
+				s.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
 			statusCode: http.StatusInternalServerError,
@@ -68,13 +79,12 @@ func TestEventHandler_GetAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
-			ctrl := gomock.NewController(t)
-			handlers := SetupTestHandlers(t, ctrl)
+			s, api := setupEventMock(t)
 
-			hresEvents, path := tt.setup(&handlers)
+			hresEvents, path := tt.setup(s)
 
 			var resBody []*handler.Event
-			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
@@ -86,12 +96,12 @@ func TestEventHandler_GetAll(t *testing.T) {
 func TestEventHandler_GetByID(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetail, eventpath string)
+		setup      func(s *mock_service.MockEventService, hostnum int) (hres *handler.EventDetail, eventpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *handler.EventDetail, eventpath string) {
 
 				rHost := []*domain.User{}
 				hHost := []handler.User{}
@@ -149,7 +159,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 				repoEvent := &revent
 				hresEvent := &hevent
 
-				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
+				s.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
 				path := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
 				return hresEvent, path
 			},
@@ -158,9 +168,9 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers, hostnum int) (hres *handler.EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *handler.EventDetail, eventpath string) {
 				id := random.UUID()
-				th.Service.MockEventService.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
 				return nil, path
 			},
@@ -170,16 +180,15 @@ func TestEventHandler_GetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
-			ctrl := gomock.NewController(t)
-			handlers := SetupTestHandlers(t, ctrl)
+			s, api := setupEventMock(t)
 
 			casenum := []int{1, 2, 32}
 			var resBody *handler.EventDetail
 
 			for _, testcase := range casenum {
-				hresEvent, eventpath := tt.setup(&handlers, testcase)
+				hresEvent, eventpath := tt.setup(s, testcase)
 
-				statusCode, _ := doRequest(t, handlers.API, http.MethodGet, eventpath, nil, &resBody)
+				statusCode, _ := doRequest(t, api, http.MethodGet, eventpath, nil, &resBody)
 
 				// Assertion
 				assert.Equal(t, tt.statusCode, statusCode)
@@ -192,12 +201,12 @@ func TestEventHandler_GetByID(t *testing.T) {
 func TestEventHandler_PatchEvent(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers) (reqBody *handler.EditEvent, path string)
+		setup      func(s *mock_service.MockEventService) (reqBody *handler.EditEvent, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
@@ -213,14 +222,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
+				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
 		},
 		{
 			name: "Conflict",
-			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
@@ -236,14 +245,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrAlreadyExists)
+				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrAlreadyExists)
 				return reqBody, path
 			},
 			statusCode: http.StatusConflict,
 		},
 		{
 			name: "Not Found",
-			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
@@ -259,14 +268,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrNotFound)
+				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrNotFound)
 				return reqBody, path
 			},
 			statusCode: http.StatusNotFound,
 		},
 		{
 			name: "Bad Request: bind error",
-			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
@@ -282,14 +291,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrBind)
+				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrBind)
 				return reqBody, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(th *handler.TestHandlers) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
@@ -305,7 +314,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				th.Service.MockEventService.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrValidate)
+				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrValidate)
 				return reqBody, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -314,12 +323,11 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
-			ctrl := gomock.NewController(t)
-			handlers := SetupTestHandlers(t, ctrl)
+			s, api := setupEventMock(t)
 
-			reqBody, path := tt.setup(&handlers)
+			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, handlers.API, http.MethodPatch, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPatch, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
