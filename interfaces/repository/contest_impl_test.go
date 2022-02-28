@@ -181,7 +181,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 		name      string
 		args      args
 		want      *domain.Contest
-		setup     func(f mockContestRepositoryFields, args args, want *domain.Contest)
+		setup     func(f mockContestRepositoryFields, args args)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -201,7 +201,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				TimeStart: sampleTime,
 				TimeEnd:   sampleTime,
 			},
-			setup: func(f mockContestRepositoryFields, args args, want *domain.Contest) {
+			setup: func(f mockContestRepositoryFields, args args) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -224,7 +224,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f mockContestRepositoryFields, args args, want *domain.Contest) {
+			setup: func(f mockContestRepositoryFields, args args) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -243,7 +243,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
-			tt.setup(f, tt.args, tt.want)
+			tt.setup(f, tt.args)
 			repo := impl.NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
