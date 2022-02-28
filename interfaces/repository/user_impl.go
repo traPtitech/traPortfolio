@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -97,8 +99,19 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	return &result, nil
 }
 
-// returned use does not contain portal info
 func (repo *UserRepository) CreateUser(arg repository.CreateUserArgs) (*domain.UserDetail, error) {
+	portalUsers, err := repo.portal.GetAll()
+	if err != nil {
+		log.Println(err)
+	}
+
+	var portalUser external.PortalUserResponse
+	for _, u := range portalUsers {
+		if u.TraQID == arg.Name {
+			portalUser = *u
+		}
+	}
+
 	user := model.User{
 		ID:          uuid.Must(uuid.NewV4()),
 		Description: arg.Description,
@@ -106,7 +119,7 @@ func (repo *UserRepository) CreateUser(arg repository.CreateUserArgs) (*domain.U
 		Name:        arg.Name,
 	}
 
-	err := repo.Create(&user).Error()
+	err = repo.Create(&user).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -115,7 +128,7 @@ func (repo *UserRepository) CreateUser(arg repository.CreateUserArgs) (*domain.U
 		User: domain.User{
 			ID:       user.ID,
 			Name:     user.Name,
-			RealName: "",
+			RealName: portalUser.RealName,
 		},
 		State:    0,
 		Bio:      user.Description,
