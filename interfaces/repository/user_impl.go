@@ -97,6 +97,33 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	return &result, nil
 }
 
+// returned use does not contain portal info
+func (repo *UserRepository) CreateUser(arg repository.CreateUserArgs) (*domain.UserDetail, error) {
+	user := model.User{
+		ID:          uuid.Must(uuid.NewV4()),
+		Description: arg.Description,
+		Check:       arg.Check,
+		Name:        arg.Name,
+	}
+
+	err := repo.Create(&user).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	result := &domain.UserDetail{
+		User: domain.User{
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: "",
+		},
+		State:    0,
+		Bio:      user.Description,
+		Accounts: []*domain.Account{},
+	}
+	return result, nil
+}
+
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
 	err := repo.
