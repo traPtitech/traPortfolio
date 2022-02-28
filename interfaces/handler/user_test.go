@@ -303,12 +303,12 @@ func TestUserHandler_Update(t *testing.T) {
 func TestUserHandler_GetAccounts(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(th *handler.TestHandlers) (hres []*handler.Account, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*handler.Account, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(th *handler.TestHandlers) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
 
 				userID := random.UUID()
 				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
@@ -350,7 +350,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 
 				}
 
-				th.Service.MockUserService.EXPECT().GetAccounts(gomock.Any()).Return(rAccounts, nil)
+				s.EXPECT().GetAccounts(gomock.Any()).Return(rAccounts, nil)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return hAccounts, path
 			},
@@ -358,10 +358,10 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(th *handler.TestHandlers) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
 
 				userID := random.UUID()
-				th.Service.MockUserService.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -371,13 +371,12 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
-			ctrl := gomock.NewController(t)
-			handlers := SetupTestHandlers(t, ctrl)
+			s, api := setupUserMock(t)
 
-			hresUsers, path := tt.setup(&handlers)
+			hresUsers, path := tt.setup(s)
 
 			var resBody []*handler.Account
-			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &resBody)
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
