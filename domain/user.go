@@ -69,5 +69,4 @@ const (
 	TraqStateActive
 	// ユーザーアカウント状態: 一時停止
 	TraqStateSuspended
-	TraqStateLimit
 )

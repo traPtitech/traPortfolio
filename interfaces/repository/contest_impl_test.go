@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
@@ -16,7 +16,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -85,7 +84,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContests()
 			tt.assertion(t, err)
@@ -161,7 +160,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContest(tt.args.id)
 			tt.assertion(t, err)
@@ -244,7 +243,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
 			if tt.want != nil && got != nil {
@@ -367,7 +366,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.changes))
 		})
@@ -456,7 +455,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteContest(tt.args.id))
 		})
@@ -497,7 +496,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				}
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
 					WithArgs(args.contestID).
 					WillReturnRows(rows)
 			},
@@ -527,7 +526,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeams(tt.args.contestID)
 			tt.assertion(t, err)
@@ -606,7 +605,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeam(tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -696,7 +695,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContestTeam(tt.args.contestID, tt.args._contestTeam)
 			if tt.want != nil && got != nil {
@@ -817,7 +816,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateContestTeam(tt.args.teamID, tt.args.changes))
 		})
@@ -973,7 +972,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeamMembers(tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -1122,7 +1121,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddContestTeamMembers(tt.args.teamID, tt.args.members))
 		})
@@ -1253,7 +1252,7 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteContestTeamMembers(tt.args.teamID, tt.args.members))
 		})
