@@ -288,6 +288,122 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}
 }
 
+func TestUserRepository_CreateUser(t *testing.T) {
+	t.Parallel()
+	name := random.AlphaNumeric(rand.Intn(30) + 1)
+	realName := random.AlphaNumeric(rand.Intn(30) + 1)
+	check := random.Bool()
+	description := random.AlphaNumeric(rand.Intn(30) + 1)
+
+	type args struct {
+		args repository.CreateUserArgs
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      *domain.UserDetail
+		setup     func(f mockUserRepositoryFields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: &domain.UserDetail{
+				User: domain.User{
+					Name:     name,
+					RealName: realName,
+				},
+				Bio:      description,
+				Accounts: []*domain.Account{},
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+					TraQID:   args.args.Name,
+					RealName: realName,
+				}, nil)
+
+				h := f.sqlhandler.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "PortalError",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+					TraQID:   args.args.Name,
+					RealName: realName,
+				}, nil)
+
+				h := f.sqlhandler.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.Error,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
+			tt.setup(f, tt.args)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			// Assertion
+			got, err := repo.CreateUser(tt.args.args)
+			if tt.want != nil && got != nil {
+				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
+			}
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
 	type args struct {
