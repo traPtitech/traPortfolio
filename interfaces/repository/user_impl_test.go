@@ -291,6 +291,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 func TestUserRepository_CreateUser(t *testing.T) {
 	t.Parallel()
 	name := random.AlphaNumeric(rand.Intn(30) + 1)
+	realName := random.AlphaNumeric(rand.Intn(30) + 1)
 	check := random.Bool()
 	description := random.AlphaNumeric(rand.Intn(30) + 1)
 
@@ -315,12 +316,19 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			},
 			want: &domain.UserDetail{
 				User: domain.User{
-					Name: name,
+					Name:     name,
+					RealName: realName,
 				},
 				Bio:      description,
 				Accounts: []*domain.Account{},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+					TraQID:   args.args.Name,
+					RealName: realName,
+				}, nil)
+
 				h := f.sqlhandler.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -330,6 +338,22 @@ func TestUserRepository_CreateUser(t *testing.T) {
 				h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
+		},
+		{
+			name: "PortalError",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
 		},
 		{
 			name: "UnexpectedError",
@@ -342,6 +366,12 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+					TraQID:   args.args.Name,
+					RealName: realName,
+				}, nil)
+
 				h := f.sqlhandler.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
