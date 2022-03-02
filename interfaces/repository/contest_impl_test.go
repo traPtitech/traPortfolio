@@ -497,6 +497,10 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				}
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(args.contestID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
+				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
 					WithArgs(args.contestID).
 					WillReturnRows(rows)
@@ -504,13 +508,32 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "UnexpectedError",
+			name: "ContestNotFound",
 			args: args{
 				contestID: random.UUID(),
 			},
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
 				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(args.contestID).
+					WillReturnError(gorm.ErrRecordNotFound)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindContestTeam",
+			args: args{
+				contestID: random.UUID(),
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(args.contestID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
 					WithArgs(args.contestID).
