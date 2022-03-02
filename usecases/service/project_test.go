@@ -298,16 +298,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					ID:       args.id,
 					Duration: duration,
 				}, nil)
-				changes := map[string]interface{}{
-					"name":           args.args.Name.String,
-					"description":    args.args.Description.String,
-					"link":           args.args.Link.String,
-					"since_year":     args.args.SinceYear.Int64,
-					"since_semester": args.args.SinceSemester.Int64,
-					"until_year":     args.args.UntilYear.Int64,
-					"until_semester": args.args.UntilSemester.Int64,
-				}
-				repo.EXPECT().UpdateProject(args.id, changes).Return(nil)
+				repo.EXPECT().UpdateProject(args.id, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -366,16 +357,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					ID:       args.id,
 					Duration: duration,
 				}, nil)
-				changes := map[string]interface{}{
-					"name":           args.args.Name.String,
-					"description":    args.args.Description.String,
-					"link":           args.args.Link.String,
-					"since_year":     args.args.SinceYear.Int64,
-					"since_semester": args.args.SinceSemester.Int64,
-					"until_year":     args.args.UntilYear.Int64,
-					"until_semester": args.args.UntilSemester.Int64,
-				}
-				repo.EXPECT().UpdateProject(args.id, changes).Return(gorm.ErrInvalidDB)
+				repo.EXPECT().UpdateProject(args.id, args.args).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},

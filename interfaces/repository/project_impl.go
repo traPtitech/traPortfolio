@@ -124,7 +124,30 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 	return res, nil
 }
 
-func (repo *ProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *ProjectRepository) UpdateProject(id uuid.UUID, args *repository.UpdateProjectArgs) error {
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
+	}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Link.Valid {
+		changes["link"] = args.Link.String
+	}
+	if args.SinceYear.Valid && args.SinceSemester.Valid {
+		changes["since_year"] = args.SinceYear.Int64
+		changes["since_semester"] = args.SinceSemester.Int64
+	}
+	if args.UntilYear.Valid && args.UntilSemester.Valid {
+		changes["until_year"] = args.UntilYear.Int64
+		changes["until_semester"] = args.UntilSemester.Int64
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	err := repo.h.
 		Model(&model.Project{}).
 		Where(&model.Project{ID: id}).

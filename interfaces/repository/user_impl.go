@@ -170,7 +170,19 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUserArgs) error {
+	changes := map[string]interface{}{}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Check.Valid {
+		changes["check"] = args.Check.Bool
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
 		err := repo.
@@ -225,7 +237,25 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 	}, nil
 }
 
-func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
+	}
+	if args.URL.Valid {
+		changes["url"] = args.URL.String
+	}
+	if args.PrPermitted.Valid {
+		changes["check"] = args.PrPermitted.Bool
+	}
+	if args.Type.Valid {
+		changes["type"] = args.Type.Int64
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
 		err := repo.
