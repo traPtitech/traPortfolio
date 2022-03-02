@@ -99,24 +99,17 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	return &result, nil
 }
 
-func (repo *UserRepository) CreateUser(arg repository.CreateUserArgs) (*domain.UserDetail, error) {
-	portalUsers, err := repo.portal.GetAll()
+func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
+	portalUser, err := repo.portal.GetByID(args.Name)
 	if err != nil {
 		log.Println(err)
 	}
 
-	var portalUser external.PortalUserResponse
-	for _, u := range portalUsers {
-		if u.TraQID == arg.Name {
-			portalUser = *u
-		}
-	}
-
 	user := model.User{
 		ID:          uuid.Must(uuid.NewV4()),
-		Description: arg.Description,
-		Check:       arg.Check,
-		Name:        arg.Name,
+		Description: args.Description,
+		Check:       args.Check,
+		Name:        args.Name,
 	}
 
 	err = repo.Create(&user).Error()
