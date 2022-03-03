@@ -52,10 +52,10 @@ func (mr *MockContestServiceMockRecorder) AddContestTeamMembers(ctx, teamID, mem
 }
 
 // CreateContest mocks base method.
-func (m *MockContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (m *MockContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateContest", ctx, args)
-	ret0, _ := ret[0].(*domain.Contest)
+	ret0, _ := ret[0].(*domain.ContestDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
