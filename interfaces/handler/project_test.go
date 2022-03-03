@@ -11,23 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 var (
 	errInternal = errors.New("internal error")
 )
-
-func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, handler.API) {
-	t.Helper()
-
-	ctrl := gomock.NewController(t)
-	s := mock_service.NewMockProjectService(ctrl)
-	api := handler.NewAPI(nil, nil, handler.NewProjectHandler(s), nil, nil)
-
-	return s, api
-}
 
 // 0 first semester, 1 second semester
 func makeYearWithSemester(s int) domain.YearWithSemester {
@@ -37,17 +26,17 @@ func makeYearWithSemester(s int) domain.YearWithSemester {
 	}
 }
 
-func TestProjectHandler_GetAll(t *testing.T) {
+func TestProjecttHandler_GetAll(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) ([]*handler.Project, string)
+		setup      func(th *handler.TestHandlers) ([]*handler.Project, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) ([]*handler.Project, string) {
+			setup: func(th *handler.TestHandlers) ([]*handler.Project, string) {
 				sinceSem := rand.Intn(2)
 				untilSem := rand.Intn(2)
 				duration := domain.YearWithSemesterDuration{
@@ -105,15 +94,15 @@ func TestProjectHandler_GetAll(t *testing.T) {
 					})
 				}
 
-				s.EXPECT().GetProjects(gomock.Any()).Return(repo, nil)
+				th.Service.MockProjectService.EXPECT().GetProjects(gomock.Any()).Return(repo, nil)
 				return reqBody, "/api/v1/projects"
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) ([]*handler.Project, string) {
-				s.EXPECT().GetProjects(gomock.Any()).Return(nil, errInternal)
+			setup: func(th *handler.TestHandlers) ([]*handler.Project, string) {
+				th.Service.MockProjectService.EXPECT().GetProjects(gomock.Any()).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
 			statusCode: http.StatusInternalServerError,
@@ -122,12 +111,13 @@ func TestProjectHandler_GetAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
-			s, api := setupProjectMock(t)
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
 
-			expectedHres, path := tt.setup(s)
+			expectedHres, path := tt.setup(&handlers)
 
 			hres := []*handler.Project(nil)
-			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &hres)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
@@ -136,17 +126,17 @@ func TestProjectHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestProjectHandler_GetByID(t *testing.T) {
+func TestProjecttHandler_GetByID(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (handler.ProjectDetail, string)
+		setup      func(th *handler.TestHandlers) (handler.ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (handler.ProjectDetail, string) {
+			setup: func(th *handler.TestHandlers) (handler.ProjectDetail, string) {
 				sinceSem := rand.Intn(2)
 				untilSem := rand.Intn(2)
 				duration := domain.YearWithSemesterDuration{
@@ -210,16 +200,16 @@ func TestProjectHandler_GetByID(t *testing.T) {
 					Members:     members,
 				}
 
-				s.EXPECT().GetProject(gomock.Any(), projectID).Return(&repo, nil)
+				th.Service.MockProjectService.EXPECT().GetProject(gomock.Any(), projectID).Return(&repo, nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (handler.ProjectDetail, string) {
+			setup: func(th *handler.TestHandlers) (handler.ProjectDetail, string) {
 				projectID := random.UUID()
-				s.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, errInternal)
+				th.Service.MockProjectService.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, errInternal)
 				return handler.ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
@@ -228,12 +218,13 @@ func TestProjectHandler_GetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
-			s, api := setupProjectMock(t)
+			ctrl := gomock.NewController(t)
+			handlers := SetupTestHandlers(t, ctrl)
 
-			expectedHres, path := tt.setup(s)
+			expectedHres, path := tt.setup(&handlers)
 
 			hres := handler.ProjectDetail{}
-			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
+			statusCode, _ := doRequest(t, handlers.API, http.MethodGet, path, nil, &hres)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)

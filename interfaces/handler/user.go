@@ -97,7 +97,7 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	return c.NoContent(http.StatusNoContent)
+	return c.NoContent(http.StatusOK)
 }
 
 // GetAccounts GET /users/:userID/accounts

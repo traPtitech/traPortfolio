@@ -8,11 +8,19 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
+
+func SetupTestHandlers(t *testing.T, ctrl *gomock.Controller) handler.TestHandlers {
+	t.Helper()
+	testHandlers := handler.SetupTestApi(ctrl)
+
+	return testHandlers
+}
 
 func doRequest(t *testing.T, api handler.API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()

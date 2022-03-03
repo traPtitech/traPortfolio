@@ -1,4 +1,4 @@
-package service_test
+package service
 
 import (
 	"context"
@@ -12,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -75,7 +74,7 @@ func TestContestService_GetContests(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.GetContests(tt.args.ctx)
 			tt.assertion(t, err)
@@ -196,7 +195,7 @@ func TestContestService_GetContest(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.GetContest(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
@@ -278,7 +277,7 @@ func TestContestService_CreateContest(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.CreateContest(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
@@ -367,7 +366,7 @@ func TestContestService_UpdateContest(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			tt.assertion(t, s.UpdateContest(tt.args.ctx, tt.args.id, tt.args.args))
 		})
@@ -425,7 +424,7 @@ func TestContestService_DeleteContest(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			tt.assertion(t, s.DeleteContest(tt.args.ctx, tt.args.id))
 		})
@@ -495,7 +494,7 @@ func TestContestService_GetContestTeams(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.GetContestTeams(tt.args.ctx, tt.args.contestID)
 			tt.assertion(t, err)
@@ -614,7 +613,7 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.GetContestTeam(tt.args.ctx, tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -719,7 +718,7 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.CreateContestTeam(tt.args.ctx, tt.args.contestID, tt.args.args)
 			tt.assertion(t, err)
@@ -814,7 +813,7 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			tt.assertion(t, s.UpdateContestTeam(tt.args.ctx, tt.args.teamID, tt.args.args))
 		})
@@ -875,7 +874,7 @@ func Test_contestService_DeleteContestTeam(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			tt.assertion(t, s.DeleteContestTeam(tt.args.ctx, tt.args.contestID, tt.args.teamID))
 		})
@@ -945,7 +944,7 @@ func TestContestService_GetContestTeamMembers(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			got, err := s.GetContestTeamMembers(tt.args.ctx, tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -1008,7 +1007,7 @@ func TestContestService_AddContestTeamMembers(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			tt.assertion(t, s.AddContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
 		})
@@ -1069,7 +1068,7 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 				repo: mock_repository.NewMockContestRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewContestService(tt.fields.repo)
+			s := NewContestService(tt.fields.repo)
 			// Assertion
 			tt.assertion(t, s.DeleteContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
 		})
