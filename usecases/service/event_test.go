@@ -1,4 +1,4 @@
-package service
+package service_test
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
+	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
 func TestEventService_GetEvents(t *testing.T) {
@@ -64,7 +65,7 @@ func TestEventService_GetEvents(t *testing.T) {
 				user:  mock_repository.NewMockUserRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := NewEventService(tt.fields.event, tt.fields.user)
+			s := service.NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
 			got, err := s.GetEvents(tt.args.ctx)
 			tt.assertion(t, err)
@@ -192,7 +193,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 				user:  mock_repository.NewMockUserRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := NewEventService(tt.fields.event, tt.fields.user)
+			s := service.NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
 			got, err := s.GetEventByID(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
@@ -246,7 +247,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 				user:  mock_repository.NewMockUserRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := NewEventService(tt.fields.event, tt.fields.user)
+			s := service.NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
 			tt.assertion(t, s.UpdateEventLevel(tt.args.ctx, tt.args.id, tt.args.arg))
 		})

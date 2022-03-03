@@ -12,3 +12,4 @@ linters:
     - typecheck
     - gofmt
     - revive
+    - testpackage
