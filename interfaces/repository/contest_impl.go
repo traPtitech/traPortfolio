@@ -162,6 +162,13 @@ func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
 }
 
 func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	if err := repo.h.
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error(); err != nil {
+		return nil, convertError(err)
+	}
+
 	teams := make([]*model.ContestTeam, 10)
 	err := repo.h.
 		Where(&model.ContestTeam{ContestID: contestID}).
