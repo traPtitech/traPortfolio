@@ -25,7 +25,10 @@ func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, tr
 	}
 }
 
-func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
+func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
+	// TODO:
+	// - traQからアカウントの凍結情報を取得する
+	// - args.IncludeSuspendedがfalseの時アクティブユーザーのみ返すようにフィルターを掛ける
 	users := make([]*model.User, 0)
 	err := repo.Find(&users).Error()
 	if err != nil {

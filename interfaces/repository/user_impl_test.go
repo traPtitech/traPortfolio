@@ -39,14 +39,21 @@ func newMockUserRepositoryFields(ctrl *gomock.Controller) mockUserRepositoryFiel
 
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
+	type args struct {
+		args *repository.GetUsersArgs
+	}
 	tests := []struct {
 		name      string
+		args      args
 		want      []*domain.User
 		setup     func(f mockUserRepositoryFields, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
+			name: "Success_NoOpts",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
@@ -78,6 +85,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
+		// TODO: オプションありのテストを追加する
 		{
 			name: "UnexpectedError_Find",
 			want: nil,
@@ -124,7 +132,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			tt.setup(f, tt.want)
 			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetUsers()
+			got, err := repo.GetUsers(tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

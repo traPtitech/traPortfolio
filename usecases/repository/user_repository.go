@@ -8,6 +8,11 @@ import (
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
+type GetUsersArgs struct {
+	IncludeSuspended optional.Bool
+	Name             optional.String
+}
+
 type CreateUserArgs struct {
 	Description string
 	Check       bool
@@ -34,7 +39,7 @@ type UpdateAccountArgs struct {
 }
 
 type UserRepository interface {
-	GetUsers() ([]*domain.User, error)
+	GetUsers(args *GetUsersArgs) ([]*domain.User, error)
 	GetUser(id uuid.UUID) (*domain.UserDetail, error)
 	CreateUser(args CreateUserArgs) (*domain.UserDetail, error)
 	UpdateUser(id uuid.UUID, args *UpdateUserArgs) error

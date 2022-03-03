@@ -36,7 +36,7 @@ func (s *eventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 	}
 
 	// hostnameの詳細を取得
-	users, err := s.user.GetUsers()
+	users, err := s.user.GetUsers(&repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
 	if err != nil {
 		return nil, err
 	}

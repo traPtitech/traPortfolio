@@ -39,10 +39,15 @@ func (handler *UserHandler) GetAll(_c echo.Context) error {
 	req := GetUsersParams{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
-	} // TODO: handler.srv.GetUsersにqueryを渡す
+	}
 
 	ctx := c.Request().Context()
-	users, err := handler.srv.GetUsers(ctx)
+	args := repository.GetUsersArgs{
+		IncludeSuspended: optional.BoolFrom((*bool)(req.IncludeSuspended)),
+		Name:             optional.StringFrom((*string)(req.Name)),
+	}
+
+	users, err := handler.srv.GetUsers(ctx, &args)
 	if err != nil {
 		return convertError(err)
 	}

@@ -136,7 +136,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 					GroupID:     want.GroupID,
 					RoomID:      want.RoomID,
 				}, nil)
-				u.EXPECT().GetUsers().Return(want.HostName, nil)
+				u.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return(want.HostName, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -177,7 +177,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}, nil)
-				u.EXPECT().GetUsers().Return(nil, repository.ErrForbidden)
+				u.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return(nil, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
