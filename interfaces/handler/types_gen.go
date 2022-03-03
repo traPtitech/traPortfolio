@@ -505,6 +505,12 @@ type EventIdInPath uuid.UUID
 // GroupIdInPath defines model for groupIdInPath.
 type GroupIdInPath uuid.UUID
 
+// IncludeSuspendedInQuery defines model for includeSuspendedInQuery.
+type IncludeSuspendedInQuery bool
+
+// NameInQuery defines model for nameInQuery.
+type NameInQuery string
+
 // ProjectIdInPath defines model for projectIdInPath.
 type ProjectIdInPath uuid.UUID
 
@@ -550,10 +556,10 @@ type AddProjectMembersJSONBody AddProjectMembers
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// アカウントがアクティブでないユーザーを含めるかどうか
-	IncludeSuspended *bool `json:"include-suspended,omitempty"`
+	IncludeSuspended *IncludeSuspendedInQuery `json:"includeSuspended,omitempty"`
 
 	// 指定した文字列がtraP IDに含まれているかどうか
-	Name *string `json:"name,omitempty"`
+	Name *NameInQuery `json:"name,omitempty"`
 }
 
 // EditUserJSONBody defines parameters for EditUser.

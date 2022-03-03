@@ -34,7 +34,13 @@ func NewUserHandler(s service.UserService) *UserHandler {
 }
 
 // GetAll GET /users
-func (handler *UserHandler) GetAll(c echo.Context) error {
+func (handler *UserHandler) GetAll(_c echo.Context) error {
+	c := Context{_c}
+	req := GetUsersParams{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	} // TODO: handler.srv.GetUsersにqueryを渡す
+
 	ctx := c.Request().Context()
 	users, err := handler.srv.GetUsers(ctx)
 	if err != nil {
