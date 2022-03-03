@@ -1,4 +1,4 @@
-package repository
+package repository_test
 
 import (
 	"math/rand"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
+	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
@@ -120,7 +122,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUsers()
 			tt.assertion(t, err)
@@ -278,9 +280,125 @@ func TestUserRepository_GetUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUser(tt.args.id)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestUserRepository_CreateUser(t *testing.T) {
+	t.Parallel()
+	name := random.AlphaNumeric(rand.Intn(30) + 1)
+	realName := random.AlphaNumeric(rand.Intn(30) + 1)
+	check := random.Bool()
+	description := random.AlphaNumeric(rand.Intn(30) + 1)
+
+	type args struct {
+		args repository.CreateUserArgs
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      *domain.UserDetail
+		setup     func(f mockUserRepositoryFields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: &domain.UserDetail{
+				User: domain.User{
+					Name:     name,
+					RealName: realName,
+				},
+				Bio:      description,
+				Accounts: []*domain.Account{},
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+					TraQID:   args.args.Name,
+					RealName: realName,
+				}, nil)
+
+				h := f.sqlhandler.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "PortalError",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				args: repository.CreateUserArgs{
+					Description: description,
+					Check:       check,
+					Name:        name,
+				},
+			},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args) {
+				p := f.portal.(*mock_external.MockPortalAPI)
+				p.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+					TraQID:   args.args.Name,
+					RealName: realName,
+				}, nil)
+
+				h := f.sqlhandler.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				h.Mock.ExpectCommit()
+			},
+			assertion: assert.Error,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
+			tt.setup(f, tt.args)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			// Assertion
+			got, err := repo.CreateUser(tt.args.args)
+			if tt.want != nil && got != nil {
+				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
+			}
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -316,7 +434,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 				}
 				sqlhandler := f.sqlhandler.(*mock_database.MockSQLHandler)
 				sqlhandler.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE user_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnRows(rows)
 			},
@@ -344,7 +462,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccounts(tt.args.userID)
 			tt.assertion(t, err)
@@ -416,7 +534,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccount(tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
@@ -428,8 +546,8 @@ func TestUserRepository_GetAccount(t *testing.T) {
 func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		id      uuid.UUID
-		changes map[string]interface{}
+		id   uuid.UUID
+		args *repository.UpdateUserArgs
 	}
 	tests := []struct {
 		name      string
@@ -441,9 +559,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"check":       true,
+				args: &repository.UpdateUserArgs{
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -459,7 +577,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
+					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -470,9 +588,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"check":       true,
+				args: &repository.UpdateUserArgs{
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -491,9 +609,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			name: "UnexpectedError_Update",
 			args: args{
 				id: random.UUID(),
-				changes: map[string]interface{}{
-					"description": random.AlphaNumeric(rand.Intn(30) + 1),
-					"check":       true,
+				args: &repository.UpdateUserArgs{
+					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Check:       optional.NewBool(true, true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -509,7 +627,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["description"], anyTime{}, args.id).
+					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectRollback()
@@ -525,9 +643,9 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.changes))
+			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.args))
 		})
 	}
 }
@@ -638,7 +756,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.CreateAccount(tt.args.id, tt.args.args)
 			tt.assertion(t, err)
@@ -652,7 +770,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	type args struct {
 		userID    uuid.UUID
 		accountID uuid.UUID
-		changes   map[string]interface{}
+		args      *repository.UpdateAccountArgs
 	}
 	tests := []struct {
 		name      string
@@ -665,11 +783,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			args: args{
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
-					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
-					"check": true,
-					"type":  domain.HOMEPAGE,
+				args: &repository.UpdateAccountArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					URL:         optional.NewString(random.RandURLString(), true),
+					PrPermitted: optional.NewBool(true, true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -681,7 +799,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.Bool, args.args.Name.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				sqlhandler.Mock.ExpectCommit()
 				sqlhandler.Mock.ExpectCommit()
@@ -693,11 +811,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			args: args{
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
-					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
-					"check": true,
-					"type":  domain.HOMEPAGE,
+				args: &repository.UpdateAccountArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					URL:         optional.NewString(random.RandURLString(), true),
+					PrPermitted: optional.NewBool(true, true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -716,11 +834,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			args: args{
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				changes: map[string]interface{}{
-					"name":  random.AlphaNumeric(rand.Intn(30) + 1),
-					"url":   random.AlphaNumeric(rand.Intn(30) + 1),
-					"check": true,
-					"type":  domain.HOMEPAGE,
+				args: &repository.UpdateAccountArgs{
+					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					URL:         optional.NewString(random.RandURLString(), true),
+					PrPermitted: optional.NewBool(true, true),
+					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -732,7 +850,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				sqlhandler.Mock.ExpectBegin()
 				sqlhandler.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.changes["check"], args.changes["name"], args.changes["type"], args.changes["url"], anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.Bool, args.args.Name.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
 				sqlhandler.Mock.ExpectRollback()
 				sqlhandler.Mock.ExpectRollback()
@@ -748,9 +866,9 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.changes))
+			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.args))
 		})
 	}
 }
@@ -808,7 +926,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
 		})
@@ -883,7 +1001,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetProjects(tt.args.userID)
 			tt.assertion(t, err)
@@ -968,7 +1086,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.sqlhandler, f.portal, f.traq)
+			repo := impl.NewUserRepository(f.sqlhandler, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetContests(tt.args.userID)
 			tt.assertion(t, err)
