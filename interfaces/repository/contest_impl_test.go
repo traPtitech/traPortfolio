@@ -171,7 +171,9 @@ func TestContestRepository_GetContest(t *testing.T) {
 }
 
 func TestContestRepository_CreateContest(t *testing.T) {
-	cname := random.AlphaNumeric(rand.Intn(30) + 1) // Successで使用するContest.Name
+	cname := random.AlphaNumeric(rand.Intn(30) + 1)       // Successで使用するContest.Name
+	link := random.AlphaNumeric(rand.Intn(30) + 1)        // Successで使用するContestDetail.Link
+	description := random.AlphaNumeric(rand.Intn(30) + 1) // Successで使用するContestDetail.Description
 
 	t.Parallel()
 	type args struct {
@@ -180,8 +182,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      *domain.Contest
-		setup     func(f mockContestRepositoryFields, args args)
+		want      *domain.ContestDetail
+		setup     func(f mockContestRepositoryFields, args args, want *domain.ContestDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -195,13 +197,16 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					Until:       optional.NewTime(sampleTime, true),
 				},
 			},
-			want: &domain.Contest{
-				// ID: Assertion時にgot.IDと合わせる
-				Name:      cname,
-				TimeStart: sampleTime,
-				TimeEnd:   sampleTime,
+			want: &domain.ContestDetail{
+				Contest: domain.Contest{
+					Name:      cname,
+					TimeStart: sampleTime,
+					TimeEnd:   sampleTime,
+				},
+				Link:        link,
+				Description: description,
 			},
-			setup: func(f mockContestRepositoryFields, args args) {
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -209,6 +214,15 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.ExpectCommit()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(anyUUID{}).
+					WillReturnRows(
+						sqlmock.NewRows(
+							[]string{"id", "name", "since", "until", "link", "description"}).
+							// do not compare id
+							AddRow(random.UUID(), want.Contest.Name, want.Contest.TimeStart, want.Contest.TimeEnd, want.Link, want.Description),
+					)
 			},
 			assertion: assert.NoError,
 		},
@@ -224,7 +238,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f mockContestRepositoryFields, args args) {
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -243,7 +257,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
-			tt.setup(f, tt.args)
+			tt.setup(f, tt.args, tt.want)
 			repo := impl.NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
@@ -251,6 +265,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
 			}
 			tt.assertion(t, err)
+
 			assert.Equal(t, tt.want, got)
 		})
 	}

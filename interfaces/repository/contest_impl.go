@@ -63,7 +63,7 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 	return res, nil
 }
 
-func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	contest := &model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
@@ -78,11 +78,9 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		return nil, convertError(err)
 	}
 
-	result := &domain.Contest{
-		ID:        contest.ID,
-		Name:      contest.Name,
-		TimeStart: contest.Since,
-		TimeEnd:   contest.Until,
+	result, err := repo.GetContest(contest.ID)
+	if err != nil {
+		return nil, convertError(err)
 	}
 
 	return result, nil
