@@ -497,7 +497,11 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				}
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(args.contestID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
 					WithArgs(args.contestID).
 					WillReturnRows(rows)
 			},
