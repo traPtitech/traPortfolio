@@ -8,12 +8,6 @@ import (
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
-type CreateUserArgs struct {
-	Description string
-	Check       bool
-	Name        string
-}
-
 type UpdateUserArgs struct {
 	Description optional.String
 	Check       optional.Bool
@@ -36,12 +30,11 @@ type UpdateAccountArgs struct {
 type UserRepository interface {
 	GetUsers() ([]*domain.User, error)
 	GetUser(id uuid.UUID) (*domain.UserDetail, error)
-	CreateUser(args CreateUserArgs) (*domain.UserDetail, error)
-	UpdateUser(id uuid.UUID, args *UpdateUserArgs) error
+	UpdateUser(id uuid.UUID, changes map[string]interface{}) error
 	GetAccounts(id uuid.UUID) ([]*domain.Account, error)
 	GetAccount(id uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
 	CreateAccount(id uuid.UUID, args *CreateAccountArgs) (*domain.Account, error)
-	UpdateAccount(id uuid.UUID, accountID uuid.UUID, args *UpdateAccountArgs) error
+	UpdateAccount(id uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error
 	DeleteAccount(id uuid.UUID, accountID uuid.UUID) error
 	GetProjects(id uuid.UUID) ([]*domain.UserProject, error)
 	GetContests(id uuid.UUID) ([]*domain.UserContest, error)

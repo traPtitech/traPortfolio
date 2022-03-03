@@ -92,7 +92,3 @@ func Duration() domain.YearWithSemesterDuration {
 		Until: ys2,
 	}
 }
-
-func Bool() bool {
-	return rand.Int()%2 == 0
-}

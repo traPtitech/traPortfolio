@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
@@ -16,7 +16,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -85,7 +84,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContests()
 			tt.assertion(t, err)
@@ -161,7 +160,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContest(tt.args.id)
 			tt.assertion(t, err)
@@ -181,7 +180,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 		name      string
 		args      args
 		want      *domain.Contest
-		setup     func(f mockContestRepositoryFields, args args)
+		setup     func(f mockContestRepositoryFields, args args, want *domain.Contest)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -201,7 +200,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				TimeStart: sampleTime,
 				TimeEnd:   sampleTime,
 			},
-			setup: func(f mockContestRepositoryFields, args args) {
+			setup: func(f mockContestRepositoryFields, args args, want *domain.Contest) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -224,7 +223,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f mockContestRepositoryFields, args args) {
+			setup: func(f mockContestRepositoryFields, args args, want *domain.Contest) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
@@ -243,8 +242,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
-			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			tt.setup(f, tt.args, tt.want)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
 			if tt.want != nil && got != nil {
@@ -259,8 +258,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 func TestContestRepository_UpdateContest(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		id   uuid.UUID
-		args *repository.UpdateContestArgs
+		id      uuid.UUID
+		changes map[string]interface{}
 	}
 	tests := []struct {
 		name      string
@@ -272,12 +271,12 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: random.UUID(),
-				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       optional.NewTime(sampleTime, true),
-					Until:       optional.NewTime(sampleTime, true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"since":       sampleTime,
+					"until":       sampleTime,
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -292,14 +291,14 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-							AddRow(args.id, args.args.Name.String, args.args.Description.String, args.args.Link.String, args.args.Since.Time, args.args.Until.Time, time.Time{}, time.Time{}),
+							AddRow(args.id, args.changes["name"], args.changes["description"], args.changes["link"], args.changes["since"], args.changes["until"], time.Time{}, time.Time{}),
 					)
 				h.Mock.ExpectCommit()
 			},
@@ -309,12 +308,12 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				id: random.UUID(),
-				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       optional.NewTime(sampleTime, true),
-					Until:       optional.NewTime(sampleTime, true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"since":       sampleTime,
+					"until":       sampleTime,
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -332,12 +331,12 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				id: random.UUID(),
-				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       optional.NewTime(sampleTime, true),
-					Until:       optional.NewTime(sampleTime, true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"since":       sampleTime,
+					"until":       sampleTime,
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -352,7 +351,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
@@ -367,9 +366,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.args))
+			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.changes))
 		})
 	}
 }
@@ -456,7 +455,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteContest(tt.args.id))
 		})
@@ -497,11 +496,15 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				}
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.
+<<<<<<< HEAD
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.contestID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
+=======
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
+>>>>>>> parent of 86685dd... Merge remote-tracking branch 'origin' into feat/get-groups
 					WithArgs(args.contestID).
 					WillReturnRows(rows)
 			},
@@ -550,7 +553,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeams(tt.args.contestID)
 			tt.assertion(t, err)
@@ -629,7 +632,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeam(tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -719,7 +722,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContestTeam(tt.args.contestID, tt.args._contestTeam)
 			if tt.want != nil && got != nil {
@@ -734,8 +737,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		teamID uuid.UUID
-		args   *repository.UpdateContestTeamArgs
+		teamID  uuid.UUID
+		changes map[string]interface{}
 	}
 	tests := []struct {
 		name      string
@@ -747,11 +750,11 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			name: "Success",
 			args: args{
 				teamID: random.UUID(),
-				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"result":      random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -767,14 +770,14 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Result.String, anyTime{}, args.teamID).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["result"], anyTime{}, args.teamID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
-							AddRow(args.teamID, cid, args.args.Name, args.args.Description, args.args.Result, args.args.Link, time.Time{}, time.Time{}),
+							AddRow(args.teamID, cid, args.changes["name"], args.changes["description"], args.changes["result"], args.changes["link"], time.Time{}, time.Time{}),
 					)
 				h.Mock.ExpectCommit()
 			},
@@ -784,11 +787,11 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			name: "NotFound",
 			args: args{
 				teamID: random.UUID(),
-				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"result":      random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -806,11 +809,11 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				teamID: random.UUID(),
-				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"result":      random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -825,7 +828,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					)
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Result.String, anyTime{}, args.teamID).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["result"], anyTime{}, args.teamID).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
@@ -840,9 +843,9 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateContestTeam(tt.args.teamID, tt.args.args))
+			tt.assertion(t, repo.UpdateContestTeam(tt.args.teamID, tt.args.changes))
 		})
 	}
 }
@@ -996,7 +999,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeamMembers(tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -1145,7 +1148,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddContestTeamMembers(tt.args.teamID, tt.args.members))
 		})
@@ -1276,7 +1279,7 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteContestTeamMembers(tt.args.teamID, tt.args.members))
 		})

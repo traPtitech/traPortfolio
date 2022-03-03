@@ -125,15 +125,15 @@ func (mr *MockProjectRepositoryMockRecorder) GetProjects() *gomock.Call {
 }
 
 // UpdateProject mocks base method.
-func (m *MockProjectRepository) UpdateProject(id uuid.UUID, args *repository.UpdateProjectArgs) error {
+func (m *MockProjectRepository) UpdateProject(id uuid.UUID, changes map[string]interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateProject", id, args)
+	ret := m.ctrl.Call(m, "UpdateProject", id, changes)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateProject indicates an expected call of UpdateProject.
-func (mr *MockProjectRepositoryMockRecorder) UpdateProject(id, args interface{}) *gomock.Call {
+func (mr *MockProjectRepositoryMockRecorder) UpdateProject(id, changes interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectRepository)(nil).UpdateProject), id, args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectRepository)(nil).UpdateProject), id, changes)
 }

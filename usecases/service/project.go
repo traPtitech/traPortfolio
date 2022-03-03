@@ -68,12 +68,25 @@ func (s *projectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 	}
 
 	d := old.Duration
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
+	}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Link.Valid {
+		changes["link"] = args.Link.String
+	}
 	if args.SinceYear.Valid && args.SinceSemester.Valid {
+		changes["since_year"] = args.SinceYear.Int64
+		changes["since_semester"] = args.SinceSemester.Int64
 		d.Since.Year = int(args.SinceYear.Int64)
 		d.Since.Semester = int(args.SinceSemester.Int64)
 	}
-
 	if args.UntilYear.Valid && args.UntilSemester.Valid {
+		changes["until_year"] = args.UntilYear.Int64
+		changes["until_semester"] = args.UntilSemester.Int64
 		d.Until.Year = int(args.UntilYear.Int64)
 		d.Until.Semester = int(args.UntilSemester.Int64)
 	}
@@ -82,10 +95,12 @@ func (s *projectService) UpdateProject(ctx context.Context, id uuid.UUID, args *
 		return repository.ErrInvalidArg
 	}
 
-	if err := s.repo.UpdateProject(id, args); err != nil {
-		return err
+	if len(changes) > 0 {
+		err := s.repo.UpdateProject(id, changes)
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 

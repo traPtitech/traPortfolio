@@ -172,7 +172,11 @@ func TestUserService_Update(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateUser(args.id, args.args).Return(nil)
+				changes := map[string]interface{}{
+					"description": args.args.Description.String,
+					"check":       args.args.Check.Bool,
+				}
+				repo.EXPECT().UpdateUser(args.id, changes).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -187,7 +191,11 @@ func TestUserService_Update(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateUser(args.id, args.args).Return(repository.ErrNotFound)
+				changes := map[string]interface{}{
+					"description": args.args.Description.String,
+					"check":       args.args.Check.Bool,
+				}
+				repo.EXPECT().UpdateUser(args.id, changes).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -428,7 +436,13 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(nil)
+				changes := map[string]interface{}{
+					"name":  args.args.Name.String,
+					"url":   args.args.URL.String,
+					"check": args.args.PrPermitted.Bool,
+					"type":  args.args.Type.Int64,
+				}
+				repo.EXPECT().UpdateAccount(args.accountID, args.userID, changes).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -446,7 +460,13 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(repository.ErrNotFound)
+				changes := map[string]interface{}{
+					"name":  args.args.Name.String,
+					"url":   args.args.URL.String,
+					"check": args.args.PrPermitted.Bool,
+					"type":  args.args.Type.Int64,
+				}
+				repo.EXPECT().UpdateAccount(args.accountID, args.userID, changes).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},

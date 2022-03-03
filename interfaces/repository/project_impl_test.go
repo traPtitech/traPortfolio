@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
@@ -466,8 +467,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		id   uuid.UUID
-		args *repository.UpdateProjectArgs
+		id      uuid.UUID
+		changes map[string]interface{}
 	}
 	tests := []struct {
 		name      string
@@ -479,14 +480,14 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			name: "Success_AllParameterWillBeChanged",
 			args: args{
 				id: random.UUID(),
-				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
-					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+				changes: map[string]interface{}{
+					"name":           random.AlphaNumeric(rand.Intn(30) + 1),
+					"description":    random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":           random.RandURLString(),
+					"since_year":     random.Time().Year(),
+					"since_semester": rand.Intn(2),
+					"until_year":     random.Time().Year(),
+					"until_semester": rand.Intn(2),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
@@ -494,7 +495,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				h.Mock.ExpectBegin()
 				h.Mock.
 					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since_semester"], args.changes["since_year"], args.changes["until_semester"], args.changes["until_year"], anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				h.Mock.ExpectCommit()
 			},
@@ -504,22 +505,20 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			name: "ErrorUpdate",
 			args: args{
 				id: random.UUID(),
-				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
-					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+				changes: map[string]interface{}{
+					"name":        random.AlphaNumeric(rand.Intn(30) + 1),
+					"description": random.AlphaNumeric(rand.Intn(30) + 1),
+					"link":        random.RandURLString(),
+					"since":       time.Now(),
+					"until":       time.Now(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				h := f.h.(*mock_database.MockSQLHandler)
 				h.Mock.ExpectBegin()
 				h.Mock.
-					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
+					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(args.changes["description"], args.changes["link"], args.changes["name"], args.changes["since"], args.changes["until"], anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
 			},
@@ -536,7 +535,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
+			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.changes))
 		})
 	}
 }

@@ -51,10 +51,19 @@ func (s *userService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDe
 }
 
 func (s *userService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
-	if err := s.repo.UpdateUser(id, args); err != nil {
-		return err
+	changes := map[string]interface{}{}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
 	}
-
+	if args.Check.Valid {
+		changes["check"] = args.Check.Bool
+	}
+	if len(changes) > 0 {
+		err := s.repo.UpdateUser(id, changes)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -87,10 +96,25 @@ func (s *userService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 }
 
 func (s *userService) EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
-	if err := s.repo.UpdateAccount(userID, accountID, args); err != nil {
-		return err
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
 	}
-
+	if args.URL.Valid {
+		changes["url"] = args.URL.String
+	}
+	if args.PrPermitted.Valid {
+		changes["check"] = args.PrPermitted.Bool
+	}
+	if args.Type.Valid {
+		changes["type"] = args.Type.Int64
+	}
+	if len(changes) > 0 {
+		err := s.repo.UpdateAccount(userID, accountID, changes)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
