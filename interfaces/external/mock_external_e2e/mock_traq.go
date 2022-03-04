@@ -11,22 +11,16 @@ import (
 var (
 	traQUserMap = map[uuid.UUID]*external.TraQUserResponse{
 		uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"): {
-			State:       domain.TraqStateActive,
-			Bot:         false,
-			DisplayName: "user1",
-			Name:        "user1",
+			ID:    uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
+			State: domain.TraqStateActive,
 		},
 		uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"): {
-			State:       domain.TraqStateDeactivated,
-			Bot:         false,
-			DisplayName: "凍結ユーザー",
-			Name:        "user2",
+			ID:    uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
+			State: domain.TraqStateDeactivated,
 		},
 		uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"): {
-			State:       domain.TraqStateActive,
-			Bot:         true,
-			DisplayName: "Noriko Azuma",
-			Name:        "lolico",
+			ID:    uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
+			State: domain.TraqStateActive,
 		},
 	}
 )
