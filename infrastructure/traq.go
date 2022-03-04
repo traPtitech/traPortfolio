@@ -56,6 +56,26 @@ func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 	return &TraQAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
 }
 
+func (traQ *TraQAPI) GetAll(includeSuspended bool, name string) ([]*external.TraQUserResponse, error) {
+	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users?include-suspended=%t&name=%s", includeSuspended, name))
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("status code: %d", res.StatusCode)
+	}
+
+	var users []*external.TraQUserResponse
+	if err := json.NewDecoder(res.Body).Decode(&users); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", id))
 	if err != nil {

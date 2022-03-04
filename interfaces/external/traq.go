@@ -8,12 +8,14 @@ import (
 )
 
 type TraQUserResponse struct {
-	State       domain.TraQState `json:"state"`
-	Bot         bool             `json:"bot"`
-	DisplayName string           `json:"displayName"`
+	ID          uuid.UUID        `json:"id"`
 	Name        string           `json:"name"`
+	DisplayName string           `json:"displayName"`
+	Bot         bool             `json:"bot"`
+	State       domain.TraQState `json:"state"`
 }
 
 type TraQAPI interface {
+	GetAll(includeSuspended bool, name string) ([]*TraQUserResponse, error)
 	GetByID(id uuid.UUID) (*TraQUserResponse, error)
 }
