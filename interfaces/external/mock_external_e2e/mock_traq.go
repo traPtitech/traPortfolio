@@ -37,17 +37,6 @@ func NewMockTraQAPI() *MockTraQAPI {
 	return &MockTraQAPI{}
 }
 
-func (traQ *MockTraQAPI) GetAll(includeSuspended bool, name string) ([]*external.TraQUserResponse, error) {
-	res := make([]*external.TraQUserResponse, 0, len(traQUserMap))
-	for _, user := range traQUserMap {
-		if includeSuspended || user.State == domain.TraqStateActive {
-			res = append(res, user)
-		}
-	}
-
-	return res, nil
-}
-
 func (m *MockTraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	if res, ok := traQUserMap[id]; ok {
 		return res, nil
