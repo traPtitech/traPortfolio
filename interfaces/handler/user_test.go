@@ -367,6 +367,27 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 			},
 			statusCode: http.StatusInternalServerError,
 		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+
+				userID := random.UUID()
+				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, repository.ErrValidate)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+
+				userID := random.AlphaNumeric(36)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
