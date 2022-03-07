@@ -26,36 +26,65 @@ func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, tr
 }
 
 func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
-	// TODO:
-	// - traQからアカウントの凍結情報を取得する
-	// - args.IncludeSuspendedがfalseの時アクティブユーザーのみ返すようにフィルターを掛ける
+	traqReq := new(external.TraQGetAllArgs)
+	if args.IncludeSuspended.Valid {
+		traqReq.IncludeSuspended = args.IncludeSuspended.Bool
+	} else if args.Name.Valid {
+		traqReq.Name = args.Name.String
+	}
+
+	traqUsers, err := repo.traQ.GetAll(traqReq)
+	if err != nil {
+		return nil, convertError(err)
+	}
+
 	users := make([]*model.User, 0)
-	err := repo.Find(&users).Error()
-	if err != nil {
+	if err := repo.
+		Where("`users`.`id` IN (?)", traqUsers).
+		Find(&users).
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
-	idMap := make(map[string]uuid.UUID, len(users))
-	for _, v := range users {
-		idMap[v.Name] = v.ID
-	}
-
-	portalUsers, err := repo.portal.GetAll()
-	if err != nil {
-		return nil, convertError(err)
-	}
-
-	result := make([]*domain.User, 0, len(users))
-	for _, v := range portalUsers {
-		if id, ok := idMap[v.TraQID]; ok {
-			result = append(result, &domain.User{
-				ID:       id,
-				Name:     v.TraQID,
-				RealName: v.RealName,
-			})
+	if l := len(users); l == 0 {
+		return []*domain.User{}, nil
+	} else if l == 1 {
+		portalUser, err := repo.portal.GetByID(users[0].Name)
+		if err != nil {
+			return nil, convertError(err)
 		}
+
+		return []*domain.User{
+			{
+				ID:       users[0].ID,
+				Name:     users[0].Name,
+				RealName: portalUser.RealName,
+			},
+		}, nil
+	} else {
+		idMap := make(map[string]uuid.UUID, l(users))
+		for _, v := range users {
+			idMap[v.Name] = v.ID
+		}
+
+		portalUsers, err := repo.portal.GetAll()
+		if err != nil {
+			return nil, convertError(err)
+		}
+
+		result := make([]*domain.User, 0, l(users))
+		for _, v := range portalUsers {
+			if id, ok := idMap[v.TraQID]; ok {
+				result = append(result, &domain.User{
+					ID:       id,
+					Name:     v.TraQID,
+					RealName: v.RealName,
+				})
+			}
+		}
+
+		return result, nil
 	}
-	return result, nil
 }
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
