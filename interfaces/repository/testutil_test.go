@@ -90,8 +90,8 @@ func makePortalUser(user *domain.User) *external.PortalUserResponse {
 
 func makeTraqUser(user *domain.UserDetail) *external.TraQUserResponse {
 	return &external.TraQUserResponse{
-		ID:          user.ID,
-		State:       user.State,
+		ID:    user.ID,
+		State: user.State,
 	}
 }
 
