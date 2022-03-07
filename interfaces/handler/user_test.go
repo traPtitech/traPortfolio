@@ -424,35 +424,63 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 	}
 }
 
-/*
-
 func TestUserHandler_GetAccount(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService) (hres *handler.Account, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+
+				userID := random.UUID()
+				prRandom := false
+				if rand.Intn(2) == 1 {
+					prRandom = true
+				}
+
+				rAccount := domain.Account{
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Type:        uint(rand.Intn(int(domain.AccountLimit))),
+					PrPermitted: prRandom,
+					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+				}
+				hAccount := handler.Account{
+					Id:          rAccount.ID,
+					Name:        rAccount.Name,
+					PrPermitted: handler.PrPermitted(prRandom),
+					Type:        handler.AccountType(rAccount.Type),
+					Url:         rAccount.URL,
+				}
+
+				s.EXPECT().GetAccount(gomock.Any(), rAccount.ID).Return(&rAccount, nil)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, rAccount.ID)
+				return &hAccount, path
+
+			},
+			statusCode: http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := handler.GetAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetAccount() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			hresUsers, path := tt.setup(s)
+
+			var resBody *handler.Account
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
 		})
 	}
 }
 
+/*
 func TestUserHandler_AddAccount(t *testing.T) {
 	type fields struct {
 		srv service.UserService
