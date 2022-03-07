@@ -73,28 +73,11 @@ func (s *contestService) CreateContest(ctx context.Context, args *repository.Cre
 }
 
 func (s *contestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
-	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.String
+	err := s.repo.UpdateContest(id, args)
+	if err != nil {
+		return err
 	}
-	if args.Description.Valid {
-		changes["description"] = args.Description.String
-	}
-	if args.Link.Valid {
-		changes["link"] = args.Link.String
-	}
-	if args.Since.Valid {
-		changes["since"] = args.Since.Time
-	}
-	if args.Until.Valid {
-		changes["until"] = args.Until.Time
-	}
-	if len(changes) > 0 {
-		err := s.repo.UpdateContest(id, changes)
-		if err != nil {
-			return err
-		}
-	}
+
 	return nil
 }
 
@@ -139,25 +122,10 @@ func (s *contestService) CreateContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
-	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.String
+	if err := s.repo.UpdateContestTeam(teamID, args); err != nil {
+		return err
 	}
-	if args.Description.Valid {
-		changes["description"] = args.Description.String
-	}
-	if args.Link.Valid {
-		changes["link"] = args.Link.String
-	}
-	if args.Result.Valid {
-		changes["result"] = args.Result.String
-	}
-	if len(changes) > 0 {
-		err := s.repo.UpdateContestTeam(teamID, changes)
-		if err != nil {
-			return err
-		}
-	}
+
 	return nil
 }
 

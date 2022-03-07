@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -97,6 +99,37 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	return &result, nil
 }
 
+func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
+	portalUser, err := repo.portal.GetByID(args.Name)
+	if err != nil {
+		log.Println(err)
+	}
+
+	user := model.User{
+		ID:          uuid.Must(uuid.NewV4()),
+		Description: args.Description,
+		Check:       args.Check,
+		Name:        args.Name,
+	}
+
+	err = repo.Create(&user).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	result := &domain.UserDetail{
+		User: domain.User{
+			ID:       user.ID,
+			Name:     user.Name,
+			RealName: portalUser.RealName,
+		},
+		State:    0,
+		Bio:      user.Description,
+		Accounts: []*domain.Account{},
+	}
+	return result, nil
+}
+
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
 	err := repo.
@@ -137,7 +170,19 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) UpdateUser(id uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUserArgs) error {
+	changes := map[string]interface{}{}
+	if args.Description.Valid {
+		changes["description"] = args.Description.String
+	}
+	if args.Check.Valid {
+		changes["check"] = args.Check.Bool
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
 		err := repo.
@@ -192,7 +237,25 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 	}, nil
 }
 
-func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, changes map[string]interface{}) error {
+func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
+	changes := map[string]interface{}{}
+	if args.Name.Valid {
+		changes["name"] = args.Name.String
+	}
+	if args.URL.Valid {
+		changes["url"] = args.URL.String
+	}
+	if args.PrPermitted.Valid {
+		changes["check"] = args.PrPermitted.Bool
+	}
+	if args.Type.Valid {
+		changes["type"] = args.Type.Int64
+	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
 	err := repo.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
 		err := repo.
