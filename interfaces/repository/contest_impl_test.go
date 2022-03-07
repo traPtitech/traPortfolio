@@ -227,7 +227,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "UnexpectedError",
+			name: "UnexpectedError Create",
 			args: args{
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
@@ -246,6 +246,33 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError Get",
+			args: args{
+				args: &repository.CreateContestArgs{
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Link:        optional.NewString(random.RandURLString(), true),
+					Since:       sampleTime,
+					Until:       optional.NewTime(sampleTime, true),
+				},
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
+				h := f.h.(*mock_database.MockSQLHandler)
+				h.Mock.ExpectBegin()
+				h.Mock.
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				h.Mock.ExpectCommit()
+				h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(anyUUID{}).
+					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
 		},
