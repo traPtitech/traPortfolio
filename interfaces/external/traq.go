@@ -12,6 +12,12 @@ type TraQUserResponse struct {
 	State domain.TraQState `json:"state"`
 }
 
+type TraQGetAllArgs struct {
+	IncludeSuspended bool
+	Name             string
+}
+
 type TraQAPI interface {
+	GetAll(args *TraQGetAllArgs) ([]uuid.UUID, error)
 	GetByID(id uuid.UUID) (*TraQUserResponse, error)
 }

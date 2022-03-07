@@ -35,6 +35,21 @@ func (m *MockTraQAPI) EXPECT() *MockTraQAPIMockRecorder {
 	return m.recorder
 }
 
+// GetAll mocks base method.
+func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]uuid.UUID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", args)
+	ret0, _ := ret[0].([]uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockTraQAPIMockRecorder) GetAll(args interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockTraQAPI)(nil).GetAll), args)
+}
+
 // GetByID mocks base method.
 func (m *MockTraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	m.ctrl.T.Helper()
