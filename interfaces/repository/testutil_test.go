@@ -90,10 +90,8 @@ func makePortalUser(user *domain.User) *external.PortalUserResponse {
 
 func makeTraqUser(user *domain.UserDetail) *external.TraQUserResponse {
 	return &external.TraQUserResponse{
-		State:       user.State,
-		Bot:         false,
-		DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
-		Name:        user.Name,
+		ID:    user.ID,
+		State: user.State,
 	}
 }
 
