@@ -158,7 +158,6 @@ func TestUserHandler_GetByID(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
-
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
@@ -168,6 +167,25 @@ func TestUserHandler_GetByID(t *testing.T) {
 				return nil, path
 			},
 			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+				id := random.UUID()
+				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, repository.ErrValidate)
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+				id := random.AlphaNumeric(36)
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
