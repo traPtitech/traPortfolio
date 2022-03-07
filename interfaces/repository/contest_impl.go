@@ -38,8 +38,12 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 	return result, nil
 }
 
-// Teamsは別途GetContestTeamsで取得するためここではnilのまま返す
 func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, error) {
+	return repo.getContest(id)
+}
+
+// Teamsは別途GetContestTeamsで取得するためここではnilのまま返す
+func (repo *ContestRepository) getContest(id uuid.UUID) (*domain.ContestDetail, error) {
 	contest := new(model.Contest)
 	if err := repo.h.
 		Where(&model.Contest{ID: id}).
@@ -78,7 +82,7 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		return nil, convertError(err)
 	}
 
-	result, err := repo.GetContest(contest.ID)
+	result, err := repo.getContest(contest.ID)
 	if err != nil {
 		return nil, convertError(err)
 	}
