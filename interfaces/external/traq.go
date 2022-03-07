@@ -8,10 +8,8 @@ import (
 )
 
 type TraQUserResponse struct {
-	State       domain.TraQState `json:"state"`
-	Bot         bool             `json:"bot"`
-	DisplayName string           `json:"displayName"`
-	Name        string           `json:"name"`
+	ID    uuid.UUID        `json:"id"`
+	State domain.TraQState `json:"state"`
 }
 
 type TraQAPI interface {
