@@ -211,7 +211,31 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "PortalError",
+			name: "PortalError_Single",
+			args: args{
+				&repository.GetUsersArgs{
+					Name: optional.NewString(name, true),
+				},
+			},
+			want: nil,
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				id := random.UUID()
+
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return([]uuid.UUID{id}, nil)
+
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
+					WithArgs(id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
+					)
+
+				f.portal.EXPECT().GetByID(name).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "PortalError_Multiple",
 			args: args{
 				&repository.GetUsersArgs{},
 			},
