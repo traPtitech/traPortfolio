@@ -37,6 +37,8 @@ func newMockUserRepositoryFields(ctrl *gomock.Controller) mockUserRepositoryFiel
 }
 
 func TestUserRepository_GetUsers(t *testing.T) {
+	name := random.AlphaNumeric(rand.Intn(30) + 1)
+
 	t.Parallel()
 	type args struct {
 		args *repository.GetUsersArgs
@@ -129,21 +131,18 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_WithOpts_Name",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name: optional.NewString(name, true),
 				},
 			},
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     name,
 					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				var (
-					id   = want[0].ID
-					name = want[0].Name
-				)
+				id := want[0].ID
 
 				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
 
