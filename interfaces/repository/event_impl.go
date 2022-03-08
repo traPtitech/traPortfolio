@@ -12,16 +12,16 @@ import (
 )
 
 type EventRepository struct {
-	h   database.SQLHandler
-	api external.KnoqAPI
+	h    database.SQLHandler
+	knoq external.KnoqAPI
 }
 
 func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) repository.EventRepository {
-	return &EventRepository{h: sql, api: knoq}
+	return &EventRepository{h: sql, knoq: knoq}
 }
 
 func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
-	events, err := repo.api.GetAll()
+	events, err := repo.knoq.GetAll()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -41,7 +41,7 @@ func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
 }
 
 func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error) {
-	er, err := repo.api.GetByID(id)
+	er, err := repo.knoq.GetByID(id)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -101,7 +101,7 @@ func (repo *EventRepository) UpdateEventLevel(id uuid.UUID, arg *repository.Upda
 }
 
 func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
-	events, err := repo.api.GetByUserID(userID)
+	events, err := repo.knoq.GetByUserID(userID)
 	if err != nil {
 		return nil, convertError(err)
 	}

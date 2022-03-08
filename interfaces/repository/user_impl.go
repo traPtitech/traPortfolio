@@ -12,16 +12,16 @@ import (
 )
 
 type UserRepository struct {
-	database.SQLHandler
+	h      database.SQLHandler
 	portal external.PortalAPI
 	traQ   external.TraQAPI
 }
 
-func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, traQAPI external.TraQAPI) repository.UserRepository {
+func NewUserRepository(h database.SQLHandler, portalAPI external.PortalAPI, traQAPI external.TraQAPI) repository.UserRepository {
 	return &UserRepository{
-		SQLHandler: sql,
-		portal:     portalAPI,
-		traQ:       traQAPI,
+		h:      h,
+		portal: portalAPI,
+		traQ:   traQAPI,
 	}
 }
 
@@ -51,7 +51,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	}
 
 	users := make([]*model.User, 0)
-	if err := repo.
+	if err := repo.h.
 		Where("`users`.`id` IN (?)", traqUserIDs).
 		Find(&users).
 		Error(); err != nil {
@@ -101,7 +101,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 	user := new(model.User)
-	err := repo.
+	err := repo.h.
 		Preload("Accounts").
 		Where(&model.User{ID: id}).
 		First(user).
@@ -156,7 +156,7 @@ func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.
 		Name:        args.Name,
 	}
 
-	err = repo.Create(&user).Error()
+	err = repo.h.Create(&user).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -176,7 +176,7 @@ func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.
 
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	accounts := make([]*model.Account, 0)
-	err := repo.
+	err := repo.h.
 		Where(&model.Account{UserID: userID}).
 		Find(&accounts).
 		Error()
@@ -197,7 +197,7 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 
 func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
 	account := &model.Account{}
-	err := repo.
+	err := repo.h.
 		Where(&model.Account{ID: accountID, UserID: userID}).
 		First(account).
 		Error()
@@ -227,9 +227,9 @@ func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUser
 		return nil
 	}
 
-	err := repo.Transaction(func(tx database.SQLHandler) error {
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
-		err := repo.
+		err := repo.h.
 			Where(&model.User{ID: id}).
 			First(user).
 			Error()
@@ -237,7 +237,7 @@ func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUser
 			return convertError(err)
 		}
 
-		err = repo.Model(user).Updates(changes).Error()
+		err = repo.h.Model(user).Updates(changes).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -259,13 +259,13 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 		UserID: id,
 		Check:  args.PrPermitted,
 	}
-	err := repo.Create(&account).Error()
+	err := repo.h.Create(&account).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	ver := new(model.Account)
-	if err := repo.
+	if err := repo.h.
 		Where(&model.Account{ID: account.ID}).
 		First(ver).
 		Error(); err != nil {
@@ -300,9 +300,9 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 		return nil
 	}
 
-	err := repo.Transaction(func(tx database.SQLHandler) error {
+	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
-		err := repo.
+		err := repo.h.
 			Where(&model.Account{ID: accountID, UserID: userID}).
 			First(account).
 			Error()
@@ -310,7 +310,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 			return convertError(err)
 		}
 
-		err = repo.Model(account).Updates(changes).Error()
+		err = repo.h.Model(account).Updates(changes).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -320,7 +320,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 }
 
 func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
-	if err := repo.
+	if err := repo.h.
 		Where(&model.Account{ID: accountID, UserID: userID}).
 		Delete(&domain.Account{}).
 		Error(); err != nil {
@@ -332,7 +332,7 @@ func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID)
 
 func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
 	projects := make([]*model.ProjectMember, 0)
-	err := repo.
+	err := repo.h.
 		Preload("Project").
 		Where(&model.ProjectMember{UserID: userID}).
 		Find(&projects).
@@ -356,7 +356,7 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 
 func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
 	groups := make([]*model.GroupUserBelonging, 0)
-	err := repo.
+	err := repo.h.
 		Preload("Group").
 		Where(&model.GroupUserBelonging{UserID: userID}).
 		Find(&groups).
@@ -388,7 +388,7 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.Group
 
 func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
 	contests := make([]*model.ContestTeamUserBelonging, 0)
-	err := repo.
+	err := repo.h.
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
 		Find(&contests).
