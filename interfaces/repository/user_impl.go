@@ -33,14 +33,14 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 		traqReq.Name = args.Name.String
 	}
 
-	traqUsers, err := repo.traQ.GetAll(traqReq)
+	traqUserIDs, err := repo.traQ.GetAll(traqReq)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	users := make([]*model.User, 0)
 	if err := repo.
-		Where("`users`.`id` IN (?)", traqUsers).
+		Where("`users`.`id` IN (?)", traqUserIDs).
 		Find(&users).
 		Error(); err != nil {
 		return nil, convertError(err)
