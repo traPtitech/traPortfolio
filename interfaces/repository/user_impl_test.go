@@ -171,6 +171,17 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
+			name: "TraqError",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
+			want: nil,
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
 			name: "UnexpectedError_Find",
 			args: args{
 				&repository.GetUsersArgs{},
