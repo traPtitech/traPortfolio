@@ -87,6 +87,45 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		},
 		// TODO: オプションありのテストを追加する
 		{
+			name: "Success_WithOpts_IncludeSuspended",
+			args: args{
+				&repository.GetUsersArgs{
+					IncludeSuspended: optional.NewBool(true, true),
+				},
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+
+				rows := sqlmock.NewRows([]string{"id", "name"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.Name)
+				}
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
+					WillReturnRows(rows)
+
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
 			name: "UnexpectedError_Find",
 			args: args{
 				&repository.GetUsersArgs{},
