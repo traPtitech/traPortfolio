@@ -49,7 +49,6 @@ func TestUserService_GetUsers(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		// TODO: オプションありのテストを追加する
 		{
 			name: "Forbidden",
 			args: args{
