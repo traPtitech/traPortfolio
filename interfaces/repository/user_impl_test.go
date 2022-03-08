@@ -159,6 +159,18 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
+			name: "Error_WithMultipleOpts",
+			args: args{
+				&repository.GetUsersArgs{
+					IncludeSuspended: optional.NewBool(true, true),
+					Name:             optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+				},
+			},
+			want:      nil,
+			setup:     func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {},
+			assertion: assert.Error,
+		},
+		{
 			name: "UnexpectedError_Find",
 			args: args{
 				&repository.GetUsersArgs{},
