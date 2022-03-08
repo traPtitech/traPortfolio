@@ -25,15 +25,27 @@ func NewUserRepository(sql database.SQLHandler, portalAPI external.PortalAPI, tr
 	}
 }
 
-func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
-	traqReq := new(external.TraQGetAllArgs)
-	if args.IncludeSuspended.Valid {
-		traqReq.IncludeSuspended = args.IncludeSuspended.Bool
-	} else if args.Name.Valid {
-		traqReq.Name = args.Name.String
+func MakeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
+	eargs := new(external.TraQGetAllArgs)
+	if iv, nv := rargs.IncludeSuspended.Valid, rargs.Name.Valid; iv && nv {
+		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
+		return nil, repository.ErrInvalidArg
+	} else if iv {
+		eargs.IncludeSuspended = rargs.IncludeSuspended.Bool
+	} else if nv {
+		eargs.Name = rargs.Name.String
 	}
 
-	traqUserIDs, err := repo.traQ.GetAll(traqReq)
+	return eargs, nil
+}
+
+func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
+	eargs, err := MakeTraqGetAllArgs(args)
+	if err != nil {
+		return nil, err
+	}
+
+	traqUserIDs, err := repo.traQ.GetAll(eargs)
 	if err != nil {
 		return nil, convertError(err)
 	}

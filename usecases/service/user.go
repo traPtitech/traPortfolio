@@ -35,11 +35,6 @@ func NewUserService(userRepository repository.UserRepository, eventRepository re
 }
 
 func (s *userService) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
-	// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
-	if args.IncludeSuspended.Valid && args.Name.Valid {
-		return nil, repository.ErrInvalidArg
-	}
-
 	users, err := s.repo.GetUsers(args)
 	if err != nil {
 		return nil, err
