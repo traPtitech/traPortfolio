@@ -159,6 +159,21 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
+			name: "Success_zero_result",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
+			want: []*domain.User{},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name"}))
+			},
+			assertion: assert.NoError,
+		},
+		{
 			name: "Error_WithMultipleOpts",
 			args: args{
 				&repository.GetUsersArgs{
