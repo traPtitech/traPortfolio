@@ -185,8 +185,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			args: args{
 				args: &repository.CreateContestArgs{
 					Name:        cname,
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Description: description,
+					Link:        optional.NewString(link, true),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -207,6 +207,13 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(anyUUID{}).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
+							AddRow(uuid.Nil, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until),
+					)
 			},
 			assertion: assert.NoError,
 		},
