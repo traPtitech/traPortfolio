@@ -85,12 +85,14 @@ func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *exter
 	return eargs
 }
 
-func makeTraqUserIDs(t *testing.T, users []*domain.User) []uuid.UUID {
+func makeTraqUsers(t *testing.T, users []*domain.User) []*external.TraQUserResponse {
 	t.Helper()
 
-	res := make([]uuid.UUID, len(users))
+	res := make([]*external.TraQUserResponse, len(users))
 	for i, u := range users {
-		res[i] = u.ID
+		res[i] = &external.TraQUserResponse{
+			ID: u.ID,
+		}
 	}
 
 	return res

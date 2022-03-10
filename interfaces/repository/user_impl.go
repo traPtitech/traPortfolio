@@ -45,9 +45,14 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 		return nil, err
 	}
 
-	traqUserIDs, err := repo.traQ.GetAll(eargs)
+	traqUsers, err := repo.traQ.GetAll(eargs)
 	if err != nil {
 		return nil, convertError(err)
+	}
+
+	traqUserIDs := make([]uuid.UUID, len(traqUsers))
+	for i, v := range traqUsers {
+		traqUserIDs[i] = v.ID
 	}
 
 	users := make([]*model.User, 0)

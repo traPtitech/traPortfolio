@@ -36,10 +36,10 @@ func (m *MockTraQAPI) EXPECT() *MockTraQAPIMockRecorder {
 }
 
 // GetAll mocks base method.
-func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]uuid.UUID, error) {
+func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", args)
-	ret0, _ := ret[0].([]uuid.UUID)
+	ret0, _ := ret[0].([]*external.TraQUserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

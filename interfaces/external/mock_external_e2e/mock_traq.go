@@ -31,15 +31,8 @@ func NewMockTraQAPI() *MockTraQAPI {
 	return &MockTraQAPI{}
 }
 
-func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
-	for _, u := range mockTraQUsers {
-		if args.IncludeSuspended || u.State == domain.TraqStateActive {
-			ids = append(ids, u.ID)
-		}
-	}
-
-	return ids, nil
+func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
+	return mockTraQUsers, nil
 }
 
 func (m *MockTraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {

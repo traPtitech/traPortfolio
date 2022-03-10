@@ -56,7 +56,7 @@ func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 	return &TraQAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
 }
 
-func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]uuid.UUID, error) {
+func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
 	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]uuid.UUID, error) 
 		return nil, fmt.Errorf("GET /users failed: %v", res.Status)
 	}
 
-	var usersResponse []uuid.UUID
+	var usersResponse []*external.TraQUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&usersResponse); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}

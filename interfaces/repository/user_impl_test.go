@@ -73,7 +73,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range want {
@@ -113,7 +113,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range want {
@@ -144,7 +144,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
 				id := want[0].ID
 
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
@@ -164,7 +164,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			want: []*domain.User{},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
@@ -202,7 +202,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
@@ -221,7 +221,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
 				id := random.UUID()
 
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return([]uuid.UUID{id}, nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return([]*external.TraQUserResponse{{ID: id}}, nil)
 
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
@@ -241,7 +241,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUserIDs(t, want), nil)
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				users := []*domain.User{
 					{
