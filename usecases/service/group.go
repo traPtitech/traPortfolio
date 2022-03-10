@@ -37,7 +37,7 @@ func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain
 	}
 
 	// pick all users info
-	users, err := s.user.GetUsers()
+	users, err := s.user.GetUsers(&repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
 	if err != nil {
 		return nil, err
 	}
