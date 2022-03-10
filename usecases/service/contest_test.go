@@ -219,8 +219,8 @@ func TestContestService_CreateContest(t *testing.T) {
 		name      string
 		fields    fields
 		args      args
-		want      *domain.Contest
-		setup     func(f fields, args args, want *domain.Contest)
+		want      *domain.ContestDetail
+		setup     func(f fields, args args, want *domain.ContestDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -235,13 +235,18 @@ func TestContestService_CreateContest(t *testing.T) {
 					Until:       optional.NewTime(time.Now(), true),
 				},
 			},
-			want: &domain.Contest{
-				ID:        random.UUID(),
-				Name:      cname,
-				TimeStart: time.Now(),
-				TimeEnd:   time.Now(),
+			want: &domain.ContestDetail{
+				Contest: domain.Contest{
+					ID:        random.UUID(),
+					Name:      cname,
+					TimeStart: time.Now(),
+					TimeEnd:   time.Now(),
+				},
+				Link:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Teams:       []*domain.ContestTeam{},
 			},
-			setup: func(f fields, args args, want *domain.Contest) {
+			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().CreateContest(args.args).Return(want, nil)
 			},
@@ -260,7 +265,7 @@ func TestContestService_CreateContest(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f fields, args args, want *domain.Contest) {
+			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().CreateContest(args.args).Return(nil, repository.ErrInvalidArg)
 			},

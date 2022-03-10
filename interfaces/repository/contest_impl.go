@@ -38,11 +38,17 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 	return result, nil
 }
 
-// Teamsは別途GetContestTeamsで取得するためここではnilのまま返す
 func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, error) {
-	contest := &model.Contest{ID: id}
-	err := repo.h.First(contest).Error()
-	if err != nil {
+	return repo.getContest(id)
+}
+
+// Teamsは別途GetContestTeamsで取得するためここではnilのまま返す
+func (repo *ContestRepository) getContest(id uuid.UUID) (*domain.ContestDetail, error) {
+	contest := new(model.Contest)
+	if err := repo.h.
+		Where(&model.Contest{ID: id}).
+		First(contest).
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -61,7 +67,7 @@ func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, 
 	return res, nil
 }
 
-func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	contest := &model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
@@ -76,11 +82,9 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		return nil, convertError(err)
 	}
 
-	result := &domain.Contest{
-		ID:        contest.ID,
-		Name:      contest.Name,
-		TimeStart: contest.Since,
-		TimeEnd:   contest.Until,
+	result, err := repo.getContest(contest.ID)
+	if err != nil {
+		return nil, convertError(err)
 	}
 
 	return result, nil
@@ -150,6 +154,13 @@ func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
 }
 
 func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	if err := repo.h.
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error(); err != nil {
+		return nil, convertError(err)
+	}
+
 	teams := make([]*model.ContestTeam, 10)
 	err := repo.h.Model(&model.ContestTeam{}).Where("contest_id = ?", contestID).Find(&teams).Error()
 	if err != nil {
