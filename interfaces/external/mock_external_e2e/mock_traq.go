@@ -31,6 +31,10 @@ func NewMockTraQAPI() *MockTraQAPI {
 	return &MockTraQAPI{}
 }
 
+func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
+	return mockTraQUsers, nil
+}
+
 func (m *MockTraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
 	for _, u := range mockTraQUsers {
 		if u.ID == id {

@@ -186,18 +186,18 @@ func (mr *MockUserServiceMockRecorder) GetUserProjects(ctx, userID interface{}) 
 }
 
 // GetUsers mocks base method.
-func (m *MockUserService) GetUsers(ctx context.Context) ([]*domain.User, error) {
+func (m *MockUserService) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUsers", ctx)
+	ret := m.ctrl.Call(m, "GetUsers", ctx, args)
 	ret0, _ := ret[0].([]*domain.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUsers indicates an expected call of GetUsers.
-func (mr *MockUserServiceMockRecorder) GetUsers(ctx interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) GetUsers(ctx, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockUserService)(nil).GetUsers), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockUserService)(nil).GetUsers), ctx, args)
 }
 
 // Update mocks base method.

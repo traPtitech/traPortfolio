@@ -171,18 +171,18 @@ func (mr *MockUserRepositoryMockRecorder) GetUser(id interface{}) *gomock.Call {
 }
 
 // GetUsers mocks base method.
-func (m *MockUserRepository) GetUsers() ([]*domain.User, error) {
+func (m *MockUserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUsers")
+	ret := m.ctrl.Call(m, "GetUsers", args)
 	ret0, _ := ret[0].([]*domain.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUsers indicates an expected call of GetUsers.
-func (mr *MockUserRepositoryMockRecorder) GetUsers() *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) GetUsers(args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockUserRepository)(nil).GetUsers))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockUserRepository)(nil).GetUsers), args)
 }
 
 // UpdateAccount mocks base method.

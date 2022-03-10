@@ -11,7 +11,7 @@ import (
 )
 
 type UserService interface {
-	GetUsers(ctx context.Context) ([]*domain.User, error)
+	GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error)
 	GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error)
 	Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error
 	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
@@ -34,8 +34,8 @@ func NewUserService(userRepository repository.UserRepository, eventRepository re
 	return &userService{repo: userRepository, event: eventRepository}
 }
 
-func (s *userService) GetUsers(ctx context.Context) ([]*domain.User, error) {
-	users, err := s.repo.GetUsers()
+func (s *userService) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
+	users, err := s.repo.GetUsers(args)
 	if err != nil {
 		return nil, err
 	}

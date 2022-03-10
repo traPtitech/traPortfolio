@@ -34,7 +34,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name: "success",
+			name: "Success_NoOpts",
 			setup: func(s *mock_service.MockUserService) (hres []*handler.User, path string) {
 
 				casenum := 2
@@ -58,15 +58,21 @@ func TestUserHandler_GetAll(t *testing.T) {
 
 				}
 
-				s.EXPECT().GetUsers(gomock.Any()).Return(repoUsers, nil)
+				args := repository.GetUsersArgs{}
+
+				s.EXPECT().GetUsers(gomock.Any(), &args).Return(repoUsers, nil)
 				return hresUsers, "/api/v1/users"
 			},
 			statusCode: http.StatusOK,
 		},
+		// TODO: オプションありのテストを追加する
+		// TODO: Validationのテストを追加する
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres []*handler.User, path string) {
-				s.EXPECT().GetUsers(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				args := repository.GetUsersArgs{}
+
+				s.EXPECT().GetUsers(gomock.Any(), &args).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/users"
 			},
 			statusCode: http.StatusInternalServerError,
