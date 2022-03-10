@@ -1,4 +1,4 @@
-output: types_gen.go
+output: oapi_types_gen.go
 generate:
   - types
 package: handler
