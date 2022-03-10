@@ -1,0 +1,4 @@
+output: oapi_client_gen.go
+generate:
+  - client
+package: handler
