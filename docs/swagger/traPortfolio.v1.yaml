@@ -389,7 +389,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Contest'
+                $ref: '#/components/schemas/ContestDetail'
         '400':
           description: Bad Request
       requestBody:

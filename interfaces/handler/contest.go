@@ -99,7 +99,11 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd)
+	contestTeams := make([]ContestTeam, 0, len(contest.Teams))
+	for _, team := range contest.Teams {
+		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
+	}
+	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
 
 	return c.JSON(http.StatusCreated, res)
 }
