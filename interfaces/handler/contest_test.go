@@ -254,11 +254,16 @@ func TestContestHandler_PostContest(t *testing.T) {
 					Since:       reqBody.Duration.Since,
 					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
-				want := domain.Contest{
-					ID:        random.UUID(),
-					Name:      args.Name,
-					TimeStart: args.Since,
-					TimeEnd:   args.Until.Time,
+				want := domain.ContestDetail{
+					Contest: domain.Contest{
+						ID:        random.UUID(),
+						Name:      args.Name,
+						TimeStart: args.Since,
+						TimeEnd:   args.Until.Time,
+					},
+					Link:        args.Link.String,
+					Description: args.Description,
+					Teams:       []*domain.ContestTeam{},
 				}
 				expectedResBody = &handler.Contest{
 					Id:   want.ID,

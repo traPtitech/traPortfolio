@@ -16,7 +16,7 @@ import (
 type ContestService interface {
 	GetContests(ctx context.Context) ([]*domain.Contest, error)
 	GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error)
-	CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error)
+	CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error)
 	UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error
 	DeleteContest(ctx context.Context, id uuid.UUID) error
 	GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error)
@@ -64,7 +64,7 @@ func (s *contestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.
 	return contest, nil
 }
 
-func (s *contestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (s *contestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	contest, err := s.repo.CreateContest(args)
 	if err != nil {
 		return nil, err
