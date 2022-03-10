@@ -25,34 +25,83 @@ func NewUserRepository(h database.SQLHandler, portalAPI external.PortalAPI, traQ
 	}
 }
 
-func (repo *UserRepository) GetUsers() ([]*domain.User, error) {
+func MakeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
+	eargs := new(external.TraQGetAllArgs)
+	if iv, nv := rargs.IncludeSuspended.Valid, rargs.Name.Valid; iv && nv {
+		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
+		return nil, repository.ErrInvalidArg
+	} else if iv {
+		eargs.IncludeSuspended = rargs.IncludeSuspended.Bool
+	} else if nv {
+		eargs.Name = rargs.Name.String
+	}
+
+	return eargs, nil
+}
+
+func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
+	eargs, err := MakeTraqGetAllArgs(args)
+	if err != nil {
+		return nil, err
+	}
+
+	traqUsers, err := repo.traQ.GetAll(eargs)
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	traqUserIDs := make([]uuid.UUID, len(traqUsers))
+	for i, v := range traqUsers {
+		traqUserIDs[i] = v.ID
+	}
+
 	users := make([]*model.User, 0)
-	err := repo.h.Find(&users).Error()
-	if err != nil {
+	if err := repo.h.
+		Where("`users`.`id` IN (?)", traqUserIDs).
+		Find(&users).
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
-	idMap := make(map[string]uuid.UUID, len(users))
-	for _, v := range users {
-		idMap[v.Name] = v.ID
-	}
-
-	portalUsers, err := repo.portal.GetAll()
-	if err != nil {
-		return nil, convertError(err)
-	}
-
-	result := make([]*domain.User, 0, len(users))
-	for _, v := range portalUsers {
-		if id, ok := idMap[v.TraQID]; ok {
-			result = append(result, &domain.User{
-				ID:       id,
-				Name:     v.TraQID,
-				RealName: v.RealName,
-			})
+	if l := len(users); l == 0 {
+		return []*domain.User{}, nil
+	} else if l == 1 {
+		portalUser, err := repo.portal.GetByID(users[0].Name)
+		if err != nil {
+			return nil, convertError(err)
 		}
+
+		return []*domain.User{
+			{
+				ID:       users[0].ID,
+				Name:     users[0].Name,
+				RealName: portalUser.RealName,
+			},
+		}, nil
+	} else {
+		idMap := make(map[string]uuid.UUID, l)
+		for _, v := range users {
+			idMap[v.Name] = v.ID
+		}
+
+		portalUsers, err := repo.portal.GetAll()
+		if err != nil {
+			return nil, convertError(err)
+		}
+
+		result := make([]*domain.User, 0, l)
+		for _, v := range portalUsers {
+			if id, ok := idMap[v.TraQID]; ok {
+				result = append(result, &domain.User{
+					ID:       id,
+					Name:     v.TraQID,
+					RealName: v.RealName,
+				})
+			}
+		}
+
+		return result, nil
 	}
-	return result, nil
 }
 
 func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {

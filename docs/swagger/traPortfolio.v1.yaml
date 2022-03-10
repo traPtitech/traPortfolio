@@ -25,19 +25,10 @@ paths:
       operationId: getUsers
       description: |-
         ユーザー情報を取得します
-        `include-suspended`を指定しない場合、レスポンスに非アクティブユーザーは含まれません。
+        `includeSuspended`を指定しない場合、レスポンスに非アクティブユーザーは含まれません。
       parameters:
-        - schema:
-            type: boolean
-            default: false
-          in: query
-          name: include-suspended
-          description: アカウントがアクティブでないユーザーを含めるかどうか
-        - schema:
-            type: string
-          in: query
-          name: name
-          description: 指定した文字列がtraP IDに含まれているかどうか
+        - $ref: '#/components/parameters/includeSuspendedInQuery'
+        - $ref: '#/components/parameters/nameInQuery'
       tags:
         - user
   '/users/{userId}':
@@ -1533,6 +1524,20 @@ components:
         x-go-type: uuid.UUID
       description: アカウントUUID
       required: true
+    includeSuspendedInQuery:
+      name: includeSuspended
+      in: query
+      schema:
+        type: boolean
+        default: false
+      description: アカウントがアクティブでないユーザーを含めるかどうか
+    nameInQuery:
+      name: name
+      in: query
+      schema:
+        type: string
+        default: ""
+      description: 指定した文字列がtraP IDに含まれているかどうか
 tags:
   - name: user
     description: ユーザーAPI

@@ -21,7 +21,8 @@ import (
 func TestUserService_GetUsers(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		ctx context.Context
+		ctx  context.Context
+		args *repository.GetUsersArgs
 	}
 	tests := []struct {
 		name      string
@@ -31,8 +32,11 @@ func TestUserService_GetUsers(t *testing.T) {
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
-			args: args{ctx: context.Background()},
+			name: "Success_NoOpts",
+			args: args{
+				ctx:  context.Background(),
+				args: &repository.GetUsersArgs{},
+			},
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
@@ -41,16 +45,19 @@ func TestUserService_GetUsers(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
-				repo.EXPECT().GetUsers().Return(want, nil)
+				repo.EXPECT().GetUsers(args.args).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
 		{
 			name: "Forbidden",
-			args: args{ctx: context.Background()},
+			args: args{
+				ctx:  context.Background(),
+				args: &repository.GetUsersArgs{},
+			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
-				repo.EXPECT().GetUsers().Return(want, repository.ErrForbidden)
+				repo.EXPECT().GetUsers(args.args).Return(want, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
@@ -68,7 +75,7 @@ func TestUserService_GetUsers(t *testing.T) {
 			tt.setup(repo, event, tt.args, tt.want)
 
 			s := service.NewUserService(repo, event)
-			got, err := s.GetUsers(tt.args.ctx)
+			got, err := s.GetUsers(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

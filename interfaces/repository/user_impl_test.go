@@ -37,15 +37,24 @@ func newMockUserRepositoryFields(ctrl *gomock.Controller) mockUserRepositoryFiel
 }
 
 func TestUserRepository_GetUsers(t *testing.T) {
+	name := random.AlphaNumeric(rand.Intn(30) + 1)
+
 	t.Parallel()
+	type args struct {
+		args *repository.GetUsersArgs
+	}
 	tests := []struct {
 		name      string
+		args      args
 		want      []*domain.User
-		setup     func(f mockUserRepositoryFields, want []*domain.User)
+		setup     func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
+			name: "Success_NoOpts",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
@@ -63,7 +72,9 @@ func TestUserRepository_GetUsers(t *testing.T) {
 					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 				},
 			},
-			setup: func(f mockUserRepositoryFields, want []*domain.User) {
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range want {
 					rows.AddRow(v.ID, v.Name)
@@ -71,14 +82,128 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
 					WillReturnRows(rows)
+
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
+			},
+			assertion: assert.NoError,
+		},
+		// TODO: オプションありのテストを追加する
+		{
+			name: "Success_WithOpts_IncludeSuspended",
+			args: args{
+				&repository.GetUsersArgs{
+					IncludeSuspended: optional.NewBool(true, true),
+				},
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
+				rows := sqlmock.NewRows([]string{"id", "name"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.Name)
+				}
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
+					WillReturnRows(rows)
+
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
 			},
 			assertion: assert.NoError,
 		},
 		{
-			name: "UnexpectedError_Find",
+			name: "Success_WithOpts_Name",
+			args: args{
+				&repository.GetUsersArgs{
+					Name: optional.NewString(name, true),
+				},
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     name,
+					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+				},
+			},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				id := want[0].ID
+
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
+					WithArgs(id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
+					)
+
+				f.portal.EXPECT().GetByID(name).Return(makePortalUser(want[0]), nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success_zero_result",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
+			want: []*domain.User{},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name"}))
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Error_WithMultipleOpts",
+			args: args{
+				&repository.GetUsersArgs{
+					IncludeSuspended: optional.NewBool(true, true),
+					Name:             optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+				},
+			},
+			want:      nil,
+			setup:     func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "TraqError",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
 			want: nil,
-			setup: func(f mockUserRepositoryFields, want []*domain.User) {
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_Find",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
+			want: nil,
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
 					WillReturnError(errUnexpected)
@@ -86,10 +211,44 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "PortalError",
+			name: "PortalError_Single",
+			args: args{
+				&repository.GetUsersArgs{
+					Name: optional.NewString(name, true),
+				},
+			},
 			want: nil,
-			setup: func(f mockUserRepositoryFields, want []*domain.User) {
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				id := random.UUID()
+
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return([]*external.TraQUserResponse{{ID: id}}, nil)
+
+				f.h.Mock.
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
+					WithArgs(id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
+					)
+
+				f.portal.EXPECT().GetByID(name).Return(nil, errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "PortalError_Multiple",
+			args: args{
+				&repository.GetUsersArgs{},
+			},
+			want: nil,
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
 				users := []*domain.User{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
+						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					},
 					{
 						ID:       random.UUID(),
 						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
@@ -103,6 +262,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users`")).
 					WillReturnRows(rows)
+
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
@@ -115,10 +275,10 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			// Setup mock
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
-			tt.setup(f, tt.want)
+			tt.setup(t, f, tt.args, tt.want)
 			repo := impl.NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetUsers()
+			got, err := repo.GetUsers(tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
