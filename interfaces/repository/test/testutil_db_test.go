@@ -45,7 +45,7 @@ func TestMain(m *testing.M) {
 
 	// DBとの接続が確立できるまで待つ
 	for i := 0; ; i++ {
-		log.Println("hh")
+		log.Println(i)
 		if i > 10 {
 			panic(fmt.Errorf("faild to connect to DB"))
 		}
@@ -65,7 +65,9 @@ func setup(t *testing.T, dbName string) database.SQLHandler {
 
 	db := establishTestDBConnection(t, dbPrefix+dbName)
 	dropAll(t, db)
-	_, err := migration.Migrate(db, migration.AllTables())
+	init, err := migration.Migrate(db, migration.AllTables())
+	assert.True(t, init)
+
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +102,11 @@ func establishTestDBConnection(t *testing.T, dbName string) *gorm.DB {
 
 func dropAll(t *testing.T, db *gorm.DB) {
 	t.Helper()
-	err := db.Migrator().DropTable(AllTables()...)
+
+	allTables := []interface{}{"migrations"}
+	allTables = append(allTables, AllTables()...)
+
+	err := db.Migrator().DropTable(allTables...)
 	require.NoError(t, err)
 }
 
@@ -119,7 +125,7 @@ func AllTables() []interface{} {
 	}
 }
 
-func MustMakeContest(t *testing.T, repo repository.ContestRepository, args *repository.CreateContestArgs) *domain.Contest {
+func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repository.CreateContestArgs) *domain.ContestDetail {
 	t.Helper()
 
 	if args == nil {
@@ -172,7 +178,7 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	var err error
 	var contestTeamDetail *domain.ContestTeamDetail
 	if contestID == uuid.Nil {
-		contest := MustMakeContest(t, nil, nil)
+		contest := mustMakeContest(t, nil, nil)
 		contestTeamDetail, err = repo.CreateContestTeam(contest.ID, args)
 	} else {
 		contestTeamDetail, err = repo.CreateContestTeam(contestID, args)
@@ -181,6 +187,23 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	require.NoError(t, err)
 
 	return contestTeamDetail
+}
+
+func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
+	t.Helper()
+
+	if args == nil {
+		args = &repository.CreateUserArgs{
+			Description: random.AlphaNumeric(rand.Intn(30) + 1),
+			Check:       random.Bool(),
+			Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+		}
+	}
+
+	user, err := repo.CreateUser(*args)
+	require.NoError(t, err)
+
+	return user
 }
 
 func getEnvOrDefault(env string, def string) string {
