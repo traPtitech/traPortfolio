@@ -1,4 +1,4 @@
-package repository
+package repository_test
 
 import (
 	"math/rand"
@@ -14,6 +14,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
+	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
@@ -79,7 +80,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := NewEventRepository(f.h, f.api)
+			repo := impl.NewEventRepository(f.h, f.api)
 			// Assertion
 			got, err := repo.GetEvents()
 			tt.assertion(t, err)
@@ -212,7 +213,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewEventRepository(f.h, f.api)
+			repo := impl.NewEventRepository(f.h, f.api)
 			// Assertion
 			got, err := repo.GetEvent(tt.args.id)
 			tt.assertion(t, err)
@@ -329,7 +330,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewEventRepository(f.h, f.api)
+			repo := impl.NewEventRepository(f.h, f.api)
 			// Assertion
 			tt.assertion(t, repo.UpdateEventLevel(tt.args.id, tt.args.arg))
 		})
@@ -394,7 +395,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewEventRepository(f.h, f.api)
+			repo := impl.NewEventRepository(f.h, f.api)
 			// Assertion
 			got, err := repo.GetUserEvents(tt.args.userID)
 			tt.assertion(t, err)
