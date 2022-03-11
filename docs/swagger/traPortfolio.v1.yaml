@@ -1541,6 +1541,8 @@ components:
         type: boolean
         default: false
       description: アカウントがアクティブでないユーザーを含めるかどうか
+      x-oapi-codegen-extra-tags:
+        query: includeSuspended
     nameInQuery:
       name: name
       in: query
@@ -1548,6 +1550,8 @@ components:
         type: string
         default: ''
       description: 指定した文字列がtraP IDに含まれているかどうか
+      x-oapi-codegen-extra-tags:
+        query: name
 tags:
   - name: user
     description: ユーザーAPI
