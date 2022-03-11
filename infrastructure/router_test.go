@@ -1,4 +1,4 @@
-//TODO: 書き終わったら外す//go:build integration && router
+//go:build integration && router
 
 package infrastructure_test
 
