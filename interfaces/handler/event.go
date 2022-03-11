@@ -32,7 +32,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	ctx := c.Request().Context()
 	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]Event, len(events))
@@ -48,13 +48,13 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
 	req := EventIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	event, err := h.srv.GetEventByID(ctx, req.EventID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	hostname := make([]User, len(event.HostName))
@@ -79,7 +79,7 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 		EditEventJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
@@ -88,7 +88,7 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	}
 
 	if err := h.srv.UpdateEventLevel(ctx, req.EventID, &patchReq); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }

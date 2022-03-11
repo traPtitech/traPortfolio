@@ -37,7 +37,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetContests(ctx)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]Contest, len(contests))
@@ -53,12 +53,12 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	contest, err := h.srv.GetContest(ctx, req.ContestID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	teams := make([]ContestTeam, len(contest.Teams))
@@ -96,7 +96,7 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 
 	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	contestTeams := make([]ContestTeam, 0, len(contest.Teams))
@@ -133,7 +133,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 
 	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -144,11 +144,11 @@ func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	err := h.srv.DeleteContest(ctx, req.ContestID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -159,12 +159,12 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	contestTeams, err := h.srv.GetContestTeams(ctx, req.ContestID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]ContestTeam, len(contestTeams))
@@ -184,11 +184,11 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		TeamIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	contestTeam, err := h.srv.GetContestTeam(ctx, req.ContestID, req.TeamID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	members := make([]User, len(contestTeam.Members))
@@ -228,7 +228,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 
 	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result)
@@ -259,7 +259,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 
 	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -279,7 +279,7 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 
 	err = h.srv.DeleteContestTeam(ctx, req.ContestID, req.TeamID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -293,12 +293,12 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 		TeamIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	users, err := h.srv.GetContestTeamMembers(ctx, req.ContestID, req.TeamID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]*User, 0, len(users))
@@ -329,7 +329,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 
 	err = h.srv.AddContestTeamMembers(ctx, req.TeamID, req.Members)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -351,7 +351,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 
 	err = h.srv.DeleteContestTeamMembers(ctx, req.TeamID, req.Members)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }

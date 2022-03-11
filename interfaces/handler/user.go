@@ -38,7 +38,7 @@ func (handler *UserHandler) GetAll(_c echo.Context) error {
 	c := Context{_c}
 	req := GetUsersParams{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
@@ -49,7 +49,7 @@ func (handler *UserHandler) GetAll(_c echo.Context) error {
 
 	users, err := handler.srv.GetUsers(ctx, &args)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]User, len(users))
@@ -65,13 +65,13 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 	c := Context{_c}
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	user, err := handler.srv.GetUser(ctx, req.UserID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	accounts := make([]Account, len(user.Accounts))
@@ -95,7 +95,7 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 		EditUserJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
@@ -106,7 +106,7 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 
 	err := handler.srv.Update(ctx, req.UserID, &u)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -116,12 +116,12 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 	c := Context{_c}
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	accounts, err := handler.srv.GetAccounts(req.UserID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]Account, len(accounts))
@@ -140,12 +140,12 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 		AccountIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	account, err := handler.srv.GetAccount(req.UserID, req.AccountID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
@@ -159,7 +159,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 		AddAccountJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
@@ -171,7 +171,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 	}
 	account, err := handler.srv.CreateAccount(ctx, req.UserID, &args)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
@@ -187,7 +187,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
@@ -200,7 +200,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 
 	err = handler.srv.EditAccount(ctx, req.UserID, req.AccountID, &args)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -214,13 +214,13 @@ func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 		AccountIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	err := handler.srv.DeleteAccount(ctx, req.UserID, req.AccountID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	return c.NoContent(http.StatusOK)
 }
@@ -230,13 +230,13 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	c := Context{_c}
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	projects, err := handler.srv.GetUserProjects(ctx, req.UserID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 	res := make([]UserProject, len(projects))
 	for i, v := range projects {
@@ -256,13 +256,13 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 	c := Context{_c}
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	contests, err := handler.srv.GetUserContests(ctx, req.UserID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]ContestTeamWithContestName, len(contests))
@@ -281,13 +281,13 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	c := Context{_c}
 	req := GroupIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	groups, err := handler.srv.GetGroupsByUserID(ctx, req.GroupID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]UserGroup, len(groups))
@@ -305,13 +305,13 @@ func (handler *UserHandler) GetEvents(_c echo.Context) error {
 	c := Context{_c}
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	ctx := c.Request().Context()
 	events, err := handler.srv.GetUserEvents(ctx, req.UserID)
 	if err != nil {
-		return convertError(err)
+		return ConvertError(err)
 	}
 
 	res := make([]Event, len(events))
