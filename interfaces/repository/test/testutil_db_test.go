@@ -7,35 +7,23 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/infrastructure"
-	"github.com/traPtitech/traPortfolio/infrastructure/migration"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/testutils"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-)
-
-const (
-	dbPrefix = "portfolio_test_repo_"
 )
 
 func TestMain(m *testing.M) {
-	dbUser := getEnvOrDefault("MYSQL_USERNAME", "root")
-	dbPass := getEnvOrDefault("MYSQL_PASSWORD", "password")
-	dbHost := getEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
-	dbPort := getEnvOrDefault("MYSQL_PORT", "3306")
+	dbUser := testutils.GetEnvOrDefault("MYSQL_USERNAME", "root")
+	dbPass := testutils.GetEnvOrDefault("MYSQL_PASSWORD", "password")
+	dbHost := testutils.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
+	dbPort := testutils.GetEnvOrDefault("MYSQL_PORT", "3306")
 
 	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort)
 	log.Println(dbDsn)
@@ -60,71 +48,6 @@ func TestMain(m *testing.M) {
 	}
 
 	m.Run()
-}
-
-func setup(t *testing.T, dbName string) database.SQLHandler {
-	t.Helper()
-
-	db := establishTestDBConnection(t, dbPrefix+dbName)
-	dropAll(t, db)
-	init, err := migration.Migrate(db, migration.AllTables())
-	assert.True(t, init)
-
-	if err != nil {
-		panic(err)
-	}
-	require.NoError(t, err)
-	h := infrastructure.FromDB(db)
-	return h
-}
-
-func establishTestDBConnection(t *testing.T, dbName string) *gorm.DB {
-	t.Helper()
-	dbUser := getEnvOrDefault("MYSQL_USERNAME", "root")
-	dbPass := getEnvOrDefault("MYSQL_PASSWORD", "password")
-	dbHost := getEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
-	dbPort := getEnvOrDefault("MYSQL_PORT", "3306")
-
-	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort)
-	conn, err := sql.Open("mysql", dbDsn)
-	require.NoError(t, err)
-	defer conn.Close()
-	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", dbName))
-	assert.NoError(t, err)
-
-	config := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	}
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
-	db, err := gorm.Open(mysql.Open(dsn), config)
-	require.NoError(t, err)
-
-	return db
-}
-
-func dropAll(t *testing.T, db *gorm.DB) {
-	t.Helper()
-
-	allTables := []interface{}{"migrations"}
-	allTables = append(allTables, AllTables()...)
-
-	err := db.Migrator().DropTable(allTables...)
-	require.NoError(t, err)
-}
-
-func AllTables() []interface{} {
-	return []interface{}{
-		model.User{},
-		model.Account{},
-		model.Project{},
-		model.ProjectMember{},
-		model.EventLevelRelation{},
-		model.Contest{},
-		model.ContestTeam{},
-		model.ContestTeamUserBelonging{},
-		model.Group{},
-		model.GroupUserBelonging{},
-	}
 }
 
 func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repository.CreateContestArgs) *domain.ContestDetail {
@@ -206,12 +129,4 @@ func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository
 	require.NoError(t, err)
 
 	return user
-}
-
-func getEnvOrDefault(env string, def string) string {
-	s := os.Getenv(env)
-	if len(s) == 0 {
-		return def
-	}
-	return s
 }

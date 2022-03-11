@@ -10,14 +10,19 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/testutils"
 
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
+)
+
+const (
+	dbPrefix = "portfolio_test_repo_"
 )
 
 func TestContestRepositoryDB_GetContests(t *testing.T) {
 	t.Parallel()
 
-	h := setup(t, "contest")
+	h := testutils.Setup(t, dbPrefix, "contest")
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
