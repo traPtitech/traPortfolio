@@ -732,6 +732,20 @@ paths:
       tags:
         - project
         - user
+  /ping:
+    get:
+      summary: サーバー疎通確認
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+      description: サーバーの疎通確認を行います
+      tags:
+        - ping
 components:
   schemas:
     User:
@@ -957,7 +971,6 @@ components:
           example: 第n回進捗会
           description: イベント名
         duration:
-          # description: イベントの開催期間
           $ref: '#/components/schemas/Duration'
       required:
         - id
@@ -1003,7 +1016,6 @@ components:
           type: string
           description: コンテスト名
         duration:
-          # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
       required:
         - id
@@ -1221,7 +1233,6 @@ components:
           type: string
           description: コンテスト説明
         duration:
-          # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
       required:
         - name
@@ -1245,7 +1256,6 @@ components:
           type: string
           description: コンテスト説明
         duration:
-          # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
     AddContestTeam:
       title: AddContestTeam
@@ -1536,7 +1546,7 @@ components:
       in: query
       schema:
         type: string
-        default: ""
+        default: ''
       description: 指定した文字列がtraP IDに含まれているかどうか
 tags:
   - name: user
@@ -1549,3 +1559,5 @@ tags:
     description: 班API
   - name: contest
     description: コンテストAPI
+  - name: ping
+    description: 疎通確認API

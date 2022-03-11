@@ -158,6 +158,9 @@ type ClientInterface interface {
 	// GetGroup request
 	GetGroup(ctx context.Context, groupId GroupIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// Ping request
+	Ping(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetProjects request
 	GetProjects(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -520,6 +523,18 @@ func (c *Client) GetGroups(ctx context.Context, reqEditors ...RequestEditorFn) (
 
 func (c *Client) GetGroup(ctx context.Context, groupId GroupIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetGroupRequest(c.Server, groupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) Ping(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPingRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1559,6 +1574,33 @@ func NewGetGroupRequest(server string, groupId GroupIdInPath) (*http.Request, er
 	return req, nil
 }
 
+// NewPingRequest generates requests for Ping
+func NewPingRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/ping")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetProjectsRequest generates requests for GetProjects
 func NewGetProjectsRequest(server string) (*http.Request, error) {
 	var err error
@@ -2443,6 +2485,9 @@ type ClientWithResponsesInterface interface {
 	// GetGroup request
 	GetGroupWithResponse(ctx context.Context, groupId GroupIdInPath, reqEditors ...RequestEditorFn) (*GetGroupResponse, error)
 
+	// Ping request
+	PingWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PingResponse, error)
+
 	// GetProjects request
 	GetProjectsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetProjectsResponse, error)
 
@@ -2898,6 +2943,28 @@ func (r GetGroupResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetGroupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PingResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *string
+}
+
+// Status returns HTTPResponse.Status
+func (r PingResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PingResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3534,6 +3601,15 @@ func (c *ClientWithResponses) GetGroupWithResponse(ctx context.Context, groupId 
 	return ParseGetGroupResponse(rsp)
 }
 
+// PingWithResponse request returning *PingResponse
+func (c *ClientWithResponses) PingWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PingResponse, error) {
+	rsp, err := c.Ping(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePingResponse(rsp)
+}
+
 // GetProjectsWithResponse request returning *GetProjectsResponse
 func (c *ClientWithResponses) GetProjectsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetProjectsResponse, error) {
 	rsp, err := c.GetProjects(ctx, reqEditors...)
@@ -4149,6 +4225,32 @@ func ParseGetGroupResponse(rsp *http.Response) (*GetGroupResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest GroupDetail
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePingResponse parses an HTTP response from a PingWithResponse call
+func ParsePingResponse(rsp *http.Response) (*PingResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PingResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest string
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

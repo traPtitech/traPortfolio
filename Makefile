@@ -12,6 +12,10 @@ all: clean build
 test: $(GOFILES)
 	go test -v -cover -race ./...
 
+.PHONY: test-integration-router
+test-integration-router: $(GOFILES)
+	go test -v -cover -race -tags="integration router" ./...
+
 .PHONY: build
 build: $(GOFILES)
 	go build -o $(BINARY)
@@ -20,7 +24,6 @@ build: $(GOFILES)
 clean: ## Cleanup working directory
 	@$(RM) $(BINARY)
 	@go clean
-
 
 .PHONY: golangci-lint
 golangci-lint:
