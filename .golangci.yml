@@ -13,3 +13,8 @@ linters:
     - gofmt
     - revive
     - testpackage
+
+run:
+  build-tags:
+    - integration
+    - db
