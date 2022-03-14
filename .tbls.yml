@@ -108,6 +108,7 @@ comments:
       name: グループ名
       link: グループのリンク
       leader: グループリーダーのユーザーUUID
+      description: グループの説明文
       created_at: グループ作成日時
       updated_at: グループ更新日時
   - table: group_user_belongings
