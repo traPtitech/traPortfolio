@@ -21,6 +21,7 @@ func (*Group) TableName() string {
 }
 
 type GroupUserBelonging struct {
+	// Relation      int       `gorm:"type:smallint(4);not null"`
 	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	GroupID       uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	SinceYear     int       `gorm:"type:smallint(4);not null"`
