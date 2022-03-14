@@ -18,6 +18,7 @@ run:
   build-tags:
     - integration
     - db
+    - repository
 
 linters-settings:
   staticcheck:
