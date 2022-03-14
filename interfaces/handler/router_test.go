@@ -77,7 +77,7 @@ func TestMain(m *testing.M) {
 
 	time.Sleep(time.Second)
 
-	os.Exit(m.Run())
+	m.Run()
 }
 
 // GET /ping
