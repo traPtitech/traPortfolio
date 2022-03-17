@@ -57,30 +57,30 @@ func TestProjectHandler_GetAll(t *testing.T) {
 				repo := []*domain.Project{
 					{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:        random.AlphaNumericn(rand.Intn(30) + 1),
 						Duration:    duration,
-						Description: random.AlphaNumeric(rand.Intn(30) + 1),
+						Description: random.AlphaNumericn(rand.Intn(30) + 1),
 						Link:        random.RandURLString(),
 						Members: []*domain.ProjectMember{
 							{
 								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-								RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+								Name:     random.AlphaNumericn(rand.Intn(30) + 1),
+								RealName: random.AlphaNumericn(rand.Intn(30) + 1),
 								Duration: random.Duration(),
 							},
 						},
 					},
 					{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:        random.AlphaNumericn(rand.Intn(30) + 1),
 						Duration:    duration,
-						Description: random.AlphaNumeric(rand.Intn(30) + 1),
+						Description: random.AlphaNumericn(rand.Intn(30) + 1),
 						Link:        random.RandURLString(),
 						Members: []*domain.ProjectMember{
 							{
 								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-								RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+								Name:     random.AlphaNumericn(rand.Intn(30) + 1),
+								RealName: random.AlphaNumericn(rand.Intn(30) + 1),
 								Duration: random.Duration(),
 							},
 						},
@@ -156,15 +156,15 @@ func TestProjectHandler_GetByID(t *testing.T) {
 				projectID := random.UUID()
 				repo := domain.Project{
 					ID:          projectID,
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
 					Duration:    duration,
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumericn(rand.Intn(30) + 1),
 					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
 						{
 							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+							Name:     random.AlphaNumericn(rand.Intn(30) + 1),
+							RealName: random.AlphaNumericn(rand.Intn(30) + 1),
 							Duration: random.Duration(),
 						},
 					},
