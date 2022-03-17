@@ -44,8 +44,8 @@ func TestUserHandler_GetAll(t *testing.T) {
 				for i := 0; i < casenum; i++ {
 					ruser := domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumericn(rand.Intn(30) + 1),
+						RealName: random.AlphaNumericn(rand.Intn(30) + 1),
 					}
 					huser := handler.User{
 						Id:       ruser.ID,
@@ -117,10 +117,10 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:        random.AlphaNumericn(rand.Intn(30) + 1),
 						Type:        uint(rand.Intn(int(domain.AccountLimit))),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+						URL:         random.AlphaNumericn(rand.Intn(30) + 1),
 					}
 
 					haccount := handler.Account{
@@ -139,11 +139,11 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					User: domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumericn(rand.Intn(30) + 1),
+						RealName: random.AlphaNumericn(rand.Intn(30) + 1),
 					},
 					State:    domain.TraQState(uint8(rand.Intn(int(domain.TraqStateLimit)))),
-					Bio:      random.AlphaNumeric(rand.Intn(256) + 1),
+					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
 					Accounts: rAccounts,
 				}
 
@@ -187,7 +187,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
-				id := random.AlphaNumeric(36)
+				id := random.AlphaNumericn(36)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
 			},
@@ -224,7 +224,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumericn(rand.Intn(30) + 1)
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -251,7 +251,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumericn(rand.Intn(30) + 1)
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -278,7 +278,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumericn(rand.Intn(30) + 1)
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -355,10 +355,10 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:        random.AlphaNumericn(rand.Intn(30) + 1),
 						Type:        uint(i),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+						URL:         random.AlphaNumericn(rand.Intn(30) + 1),
 					}
 
 					haccount := handler.Account{
@@ -406,7 +406,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 			name: "Bad Request: validate error nonUUID",
 			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
 
-				userID := random.AlphaNumeric(36)
+				userID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -448,10 +448,10 @@ func TestUserHandler_GetAccount(t *testing.T) {
 
 				rAccount := domain.Account{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
 					Type:        uint(rand.Intn(int(domain.AccountLimit))),
 					PrPermitted: prRandom,
-					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+					URL:         random.AlphaNumericn(rand.Intn(30) + 1),
 				}
 				hAccount := handler.Account{
 					Id:          rAccount.ID,
@@ -500,7 +500,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 			name: "Bad Request: validate error nonUUID",
 			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
 
-				userID := random.AlphaNumeric(36)
+				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
