@@ -15,14 +15,10 @@ import (
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 )
 
-const (
-	dbPrefix = "portfolio_test_repo_"
-)
-
 func TestContestRepositoryDB_GetContests(t *testing.T) {
 	t.Parallel()
 
-	h := testutils.Setup(t, dbPrefix, "contest")
+	h := testutils.Setup(t, "get_contests")
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)

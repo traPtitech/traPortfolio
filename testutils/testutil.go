@@ -17,8 +17,11 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func Setup(t *testing.T, dbPrefix, dbName string) database.SQLHandler {
+func Setup(t *testing.T, dbName string) database.SQLHandler {
 	t.Helper()
+	const (
+		dbPrefix = "portfolio_test_repo_"
+	)
 
 	db := establishTestDBConnection(t, dbPrefix+dbName)
 	dropAll(t, db)
