@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/testutils"
@@ -77,50 +78,50 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	return contest
 }
 
-// func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contestID uuid.UUID, args *repository.CreateContestTeamArgs) *domain.ContestTeamDetail {
-// 	t.Helper()
+func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contestID uuid.UUID, args *repository.CreateContestTeamArgs) *domain.ContestTeamDetail {
+	t.Helper()
 
-// 	if args == nil {
-// 		var result optional.String
-// 		if rand.Intn(2) == 0 {
-// 			result = optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true)
-// 		}
+	if args == nil {
+		var result optional.String
+		if rand.Intn(2) == 0 {
+			result = optional.NewString(random.AlphaNumeric(), true)
+		}
 
-// 		var link optional.String
-// 		if rand.Intn(2) == 0 {
-// 			link = optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true)
-// 		}
+		var link optional.String
+		if rand.Intn(2) == 0 {
+			link = optional.NewString(random.AlphaNumeric(), true)
+		}
 
-// 		args = &repository.CreateContestTeamArgs{
-// 			Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-// 			Result:      result,
-// 			Link:        link,
-// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
-// 		}
-// 	}
+		args = &repository.CreateContestTeamArgs{
+			Name:        random.AlphaNumeric(),
+			Result:      result,
+			Link:        link,
+			Description: random.AlphaNumeric(),
+		}
+	}
 
-// 	var err error
-// 	var contestTeamDetail *domain.ContestTeamDetail
-// 	if contestID == uuid.Nil {
-// 		contest := mustMakeContest(t, nil, nil)
-// 		contestTeamDetail, err = repo.CreateContestTeam(contest.ID, args)
-// 	} else {
-// 		contestTeamDetail, err = repo.CreateContestTeam(contestID, args)
-// 	}
+	var err error
+	var contestTeamDetail *domain.ContestTeamDetail
+	if contestID == uuid.Nil {
+		contest := mustMakeContest(t, nil, nil)
+		contestTeamDetail, err = repo.CreateContestTeam(contest.ID, args)
+	} else {
+		contestTeamDetail, err = repo.CreateContestTeam(contestID, args)
+	}
 
-// 	require.NoError(t, err)
+	require.NoError(t, err)
 
-// 	return contestTeamDetail
-// }
+	return contestTeamDetail
+}
 
 // func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
 // 	t.Helper()
 
 // 	if args == nil {
 // 		args = &repository.CreateUserArgs{
-// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
+// 			Description: random.AlphaNumeric(),
 // 			Check:       random.Bool(),
-// 			Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+// 			Name:        random.AlphaNumeric(),
 // 		}
 // 	}
 

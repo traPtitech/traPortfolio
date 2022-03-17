@@ -143,3 +143,48 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, contest2, gotContest2)
 }
+
+func TestContestRepository_GetContestTeams(t *testing.T) {
+	t.Parallel()
+
+	h := testutils.Setup(t, "get_contest_teams")
+	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
+
+	contest1 := mustMakeContest(t, repo, nil)
+	contest2 := mustMakeContest(t, repo, nil)
+	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
+		Name:        random.AlphaNumeric(),
+		Result:      random.OptAlphaNumeric(),
+		Link:        random.OptURLString(),
+		Description: random.AlphaNumeric(),
+	})
+	team2 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
+		Name:        random.AlphaNumeric(),
+		Result:      random.OptAlphaNumeric(),
+		Link:        random.OptURLString(),
+		Description: random.AlphaNumeric(),
+	})
+
+	gotTeams1, err := repo.GetContestTeams(contest1.ID)
+	require.NoError(t, err)
+
+	gotTeams2, err := repo.GetContestTeams(contest2.ID)
+	require.NoError(t, err)
+
+	expected := [][]*domain.ContestTeam{gotTeams1, {}}
+	gots := [][]*domain.ContestTeam{{&team1.ContestTeam, &team2.ContestTeam}, gotTeams2}
+
+	for i := range expected {
+		expectedTeams := expected[i]
+		sort.SliceStable(expectedTeams, func(i, j int) bool {
+			return expectedTeams[i].ID.String() > expectedTeams[j].ID.String()
+		})
+
+		gotsTeams := gots[i]
+		sort.SliceStable(gotsTeams, func(i, j int) bool {
+			return gotsTeams[i].ID.String() > gotsTeams[j].ID.String()
+		})
+
+		assert.Equal(t, expectedTeams, gotsTeams)
+	}
+}
