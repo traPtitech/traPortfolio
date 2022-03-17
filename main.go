@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 		}
 
 		e := echo.New()
-		infrastructure.Setup(e, api)
+		handler.Setup(e, api)
 
 		port := os.Getenv("PORT")
 		if port == "" {
