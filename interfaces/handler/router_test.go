@@ -154,7 +154,7 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			mustMarshal(handler.ConvertError(repository.ErrInvalidArg)),
+			mustMarshal(handler.ConvertError(t, repository.ErrInvalidArg)),
 		},
 	}
 	for name, tt := range tests {
