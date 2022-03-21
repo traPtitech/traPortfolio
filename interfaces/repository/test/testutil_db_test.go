@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 	for i := 0; ; i++ {
 		log.Println(i)
 		if i > 10 {
-			panic(fmt.Errorf("faild to connect to DB"))
+			panic(fmt.Errorf("failed to connect to DB"))
 		}
 		err = conn.Ping()
 		log.Println(err)
