@@ -30,7 +30,7 @@ var (
 
 		return 1323
 	}()
-	baseURL = fmt.Sprintf("http://localhost:%d/api/v1/", port)
+	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
 
 	sampleUser1 = handler.User{
 		Id:       uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
@@ -75,7 +75,19 @@ func TestMain(m *testing.M) {
 		log.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 	}(api)
 
-	time.Sleep(time.Second)
+	for i := 0; ; i++ {
+		log.Printf("waiting for server to start... (%ds)", i)
+
+		if i > 10 {
+			log.Fatal("failed to connect to server")
+		}
+
+		if _, err := http.Get(baseURL + "/ping"); err == nil {
+			break
+		}
+
+		time.Sleep(time.Second)
+	}
 
 	m.Run()
 }
