@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
-	"github.com/traPtitech/traPortfolio/testutils"
 
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 )
