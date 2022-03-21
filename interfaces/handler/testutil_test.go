@@ -10,7 +10,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
-	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
@@ -23,7 +22,7 @@ func doRequest(t *testing.T, api handler.API, method, path string, reqBody inter
 
 	e := echo.New()
 
-	infrastructure.Setup(e, api)
+	handler.Setup(e, api)
 	e.ServeHTTP(rec, req)
 
 	// ここ決め打ちじゃないほうが良いかもしれない
