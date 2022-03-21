@@ -1,6 +1,6 @@
 //go:build integration && router
 
-package infrastructure_test
+package handler_test
 
 import (
 	"context"
@@ -70,7 +70,7 @@ func TestMain(m *testing.M) {
 
 	go func(api handler.API) {
 		e := echo.New()
-		infrastructure.Setup(e, api)
+		handler.Setup(e, api)
 
 		log.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 	}(api)
