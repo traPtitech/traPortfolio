@@ -9,7 +9,7 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-func ConvertError(err error) error {
+func convertError(err error) error {
 	switch {
 	case errors.Is(err, repository.ErrNilID):
 		fallthrough
