@@ -3,13 +3,14 @@ package handler
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type Validator struct {
 	validator *validator.Validate
 }
 
-func newValidator() (*Validator, error) {
+func newValidator() (echo.Validator, error) {
 	v := validator.New()
 	if err := v.RegisterValidation("is-uuid", isValidUUID); err != nil {
 		return nil, err
