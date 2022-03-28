@@ -32,17 +32,17 @@ var (
 	}()
 	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
 
-	sampleUser1 = handler.User{
+	sampleUser1 = User{
 		Id:       uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
 		Name:     "user1",
 		RealName: "ユーザー1 ユーザー1",
 	}
-	sampleUser2 = handler.User{
+	sampleUser2 = User{
 		Id:       uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
 		Name:     "user2",
 		RealName: "ユーザー2 ユーザー2",
 	}
-	sampleUser3 = handler.User{
+	sampleUser3 = User{
 		Id:       uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
 		Name:     "lolico",
 		RealName: "東 工子",
@@ -105,7 +105,7 @@ func TestPing(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			cli, err := handler.NewClientWithResponses(baseURL)
+			cli, err := NewClientWithResponses(baseURL)
 			assert.NoError(t, err)
 
 			res, err := cli.PingWithResponse(context.Background())
@@ -122,30 +122,30 @@ func TestPing(t *testing.T) {
 // GET /users
 func TestGetUsers(t *testing.T) {
 	var (
-		includeSuspended handler.IncludeSuspendedInQuery = true
-		name             handler.NameInQuery             = "user1"
+		includeSuspended IncludeSuspendedInQuery = true
+		name             NameInQuery             = "user1"
 	)
 
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		params     *handler.GetUsersParams
+		params     *GetUsersParams
 		want       []byte
 	}{
 		"200": {
 			http.StatusOK,
-			new(handler.GetUsersParams),
-			mustMarshal(&[]handler.User{
+			new(GetUsersParams),
+			mustMarshal(&[]User{
 				sampleUser1,
 				sampleUser3,
 			}),
 		},
 		"200 with includeSuspended": {
 			http.StatusOK,
-			&handler.GetUsersParams{
+			&GetUsersParams{
 				IncludeSuspended: &includeSuspended,
 			},
-			mustMarshal(&[]handler.User{
+			mustMarshal(&[]User{
 				sampleUser1,
 				sampleUser2,
 				sampleUser3,
@@ -153,16 +153,16 @@ func TestGetUsers(t *testing.T) {
 		},
 		"200 with name": {
 			http.StatusOK,
-			&handler.GetUsersParams{
+			&GetUsersParams{
 				Name: &name,
 			},
-			mustMarshal(&[]handler.User{
+			mustMarshal(&[]User{
 				sampleUser1,
 			}),
 		},
 		"400 multiple params": {
 			http.StatusBadRequest,
-			&handler.GetUsersParams{
+			&GetUsersParams{
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
@@ -173,7 +173,7 @@ func TestGetUsers(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			cli, err := handler.NewClientWithResponses(baseURL)
+			cli, err := NewClientWithResponses(baseURL)
 			assert.NoError(t, err)
 
 			res, err := cli.GetUsersWithResponse(context.Background(), tt.params)

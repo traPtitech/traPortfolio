@@ -1,3 +1,5 @@
+//go:build integration && router
+
 package handler
 
 import "testing"
