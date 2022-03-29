@@ -1,4 +1,4 @@
-//go:build integration && router
+//go:build integration && db
 
 package handler_test
 

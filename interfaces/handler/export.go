@@ -1,5 +1,6 @@
-//go:build integration && router
+//go:build integration && db
 
+// NOTE: パッケージを跨ぐためbuild tagsを使ってexportしている
 package handler
 
 import "testing"
