@@ -971,6 +971,7 @@ components:
           example: 第n回進捗会
           description: イベント名
         duration:
+          # description: イベントの開催期間
           $ref: '#/components/schemas/Duration'
       required:
         - id
@@ -1016,6 +1017,7 @@ components:
           type: string
           description: コンテスト名
         duration:
+          # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
       required:
         - id
@@ -1233,6 +1235,7 @@ components:
           type: string
           description: コンテスト説明
         duration:
+          # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
       required:
         - name
@@ -1256,6 +1259,7 @@ components:
           type: string
           description: コンテスト説明
         duration:
+          # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
     AddContestTeam:
       title: AddContestTeam
