@@ -75,15 +75,15 @@ func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 	return er, nil
 }
 
-func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/events/%v", id))
+func (knoq *KnoqAPI) GetByID(eventID uuid.UUID) (*external.EventResponse, error) {
+	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/events/%v", eventID))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /events/%v failed", id)
+		return nil, fmt.Errorf("GET /events/%v failed", eventID)
 	}
 
 	var er external.EventResponse
@@ -93,15 +93,15 @@ func (knoq *KnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
 	return &er, nil
 }
 
-func (knoq *KnoqAPI) GetByUserID(id uuid.UUID) ([]*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/users/%v/events", id))
+func (knoq *KnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
+	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/users/%v/events", userID))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users/%v/events failed", id)
+		return nil, fmt.Errorf("GET /users/%v/events failed", userID)
 	}
 
 	var er []*external.EventResponse

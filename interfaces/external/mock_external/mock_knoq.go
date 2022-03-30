@@ -51,18 +51,18 @@ func (mr *MockKnoqAPIMockRecorder) GetAll() *gomock.Call {
 }
 
 // GetByID mocks base method.
-func (m *MockKnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetByID(eventID uuid.UUID) (*external.EventResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", id)
+	ret := m.ctrl.Call(m, "GetByID", eventID)
 	ret0, _ := ret[0].(*external.EventResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockKnoqAPIMockRecorder) GetByID(id interface{}) *gomock.Call {
+func (mr *MockKnoqAPIMockRecorder) GetByID(eventID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockKnoqAPI)(nil).GetByID), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockKnoqAPI)(nil).GetByID), eventID)
 }
 
 // GetByUserID mocks base method.

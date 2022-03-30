@@ -40,8 +40,8 @@ func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
 	return result, nil
 }
 
-func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error) {
-	er, err := repo.knoq.GetByID(id)
+func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
+	er, err := repo.knoq.GetByID(eventID)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -67,7 +67,7 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 		RoomID:   er.RoomID,
 	}
 
-	elv, err := repo.getEventLevelByID(id)
+	elv, err := repo.getEventLevelByID(eventID)
 	if err == nil {
 		result.Level = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
@@ -79,15 +79,15 @@ func (repo *EventRepository) GetEvent(id uuid.UUID) (*domain.EventDetail, error)
 	return result, nil
 }
 
-func (repo *EventRepository) UpdateEventLevel(id uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if elv, err := repo.getEventLevelByID(id); err != nil {
+		if elv, err := repo.getEventLevelByID(eventID); err != nil {
 			return convertError(err)
 		} else if elv.Level == arg.Level {
 			return nil // updateする必要がないのでここでcommitする
 		}
 
-		if err := tx.Model(&model.EventLevelRelation{ID: id}).Update("level", arg.Level).Error(); err != nil {
+		if err := tx.Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
 			return convertError(err)
 		}
 
@@ -119,10 +119,10 @@ func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, e
 	return result, nil
 }
 
-func (repo *EventRepository) getEventLevelByID(id uuid.UUID) (*model.EventLevelRelation, error) {
+func (repo *EventRepository) getEventLevelByID(eventID uuid.UUID) (*model.EventLevelRelation, error) {
 	elv := &model.EventLevelRelation{}
 	err := repo.h.
-		Where(&model.EventLevelRelation{ID: id}).
+		Where(&model.EventLevelRelation{ID: eventID}).
 		First(elv).
 		Error()
 	if err != nil {
