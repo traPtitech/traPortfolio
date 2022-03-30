@@ -22,6 +22,12 @@ const (
 	envKnoqAPIEndpoint   = "KNOQ_API_ENDPOINT"
 	envPortalCookie      = "PORTAL_COOKIE"
 	envPortalAPIEndpoint = "PORTAL_API_ENDPOINT"
+	defaultPort          = 1323
+	defaultDBUser        = "root"
+	defaultDBPass        = "password"
+	defaultDBHost        = "mysql"
+	defaultDBName        = "portfolio"
+	defaultDBPort        = 3306
 )
 
 func IsDevelopment() bool {
@@ -29,15 +35,15 @@ func IsDevelopment() bool {
 }
 
 func Port() string {
-	return fmt.Sprintf(":%d", getNumEnvOrDefault(envPort, 1323))
+	return fmt.Sprintf(":%d", getNumEnvOrDefault(envPort, defaultPort))
 }
 
 func SQLConf() infrastructure.SQLConfig {
-	user := getEnvOrDefault(envDBUser, "root")
-	pass := getEnvOrDefault(envDBPass, "password")
-	host := getEnvOrDefault(envDBHost, "mysql")
-	dbname := getEnvOrDefault(envDBName, "portfolio")
-	port := getNumEnvOrDefault(envDBPort, 3306)
+	user := getEnvOrDefault(envDBUser, defaultDBUser)
+	pass := getEnvOrDefault(envDBPass, defaultDBPass)
+	host := getEnvOrDefault(envDBHost, defaultDBHost)
+	dbname := getEnvOrDefault(envDBName, defaultDBName)
+	port := getNumEnvOrDefault(envDBPort, defaultDBPort)
 
 	return infrastructure.NewSQLConfig(user, pass, host, dbname, port)
 }
