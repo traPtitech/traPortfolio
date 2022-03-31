@@ -24,7 +24,7 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, handler.A
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockProjectService(ctrl)
-	api := handler.NewAPI(nil, nil, handler.NewProjectHandler(s), nil, nil)
+	api := handler.NewAPI(nil, nil, handler.NewProjectHandler(s), nil, nil, nil)
 
 	return s, api
 }

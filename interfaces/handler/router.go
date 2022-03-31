@@ -1,9 +1,7 @@
-package infrastructure
+package handler
 
 import (
 	"log"
-
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 
 	"github.com/go-playground/validator/v10"
 
@@ -11,10 +9,10 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Setup(e *echo.Echo, api handler.API) {
+func Setup(e *echo.Echo, api API) {
 
 	v := validator.New()
-	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
+	if err := v.RegisterValidation("is-uuid", IsValidUUID); err != nil {
 		log.Fatal(err)
 	}
 	e.Validator = &Validator{
@@ -26,7 +24,7 @@ func Setup(e *echo.Echo, api handler.API) {
 	e.Use(middleware.Recover())
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return h(&handler.Context{Context: c})
+			return h(&Context{Context: c})
 		}
 	})
 
@@ -105,6 +103,12 @@ func Setup(e *echo.Echo, api handler.API) {
 			apiEventsEID.PATCH("", api.Event.PatchEvent)
 		}
 
+		{
+			apiGroups := v1.Group("/groups")
+
+			apiGroups.GET("", api.Group.GetAllGroups)
+			apiGroups.GET("/:groupID", api.Group.GetGroup)
+		}
 		{
 			apiContests := v1.Group("/contests")
 

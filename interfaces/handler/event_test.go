@@ -21,7 +21,7 @@ func setupEventMock(t *testing.T) (*mock_service.MockEventService, handler.API) 
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockEventService(ctrl)
-	api := handler.NewAPI(nil, nil, nil, handler.NewEventHandler(s), nil)
+	api := handler.NewAPI(nil, nil, nil, handler.NewEventHandler(s), nil, nil)
 
 	return s, api
 }

@@ -22,7 +22,7 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, handler.API) {
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockUserService(ctrl)
-	api := handler.NewAPI(nil, handler.NewUserHandler(s), nil, nil, nil)
+	api := handler.NewAPI(nil, handler.NewUserHandler(s), nil, nil, nil, nil)
 
 	return s, api
 }
@@ -164,6 +164,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
+
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
@@ -324,11 +325,20 @@ func TestUserHandler_Update(t *testing.T) {
 	}
 }
 
+/*
+
 func TestUserHandler_GetAccounts(t *testing.T) {
+	type fields struct {
+		srv service.UserService
+	}
+	type args struct {
+		_c echo.Context
+	}
 	tests := []struct {
-		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*handler.Account, path string)
-		statusCode int
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "success",
@@ -415,26 +425,28 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Setup mock
-			s, api := setupUserMock(t)
-
-			hresUsers, path := tt.setup(s)
-
-			var resBody []*handler.Account
-			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
-
-			// Assertion
-			assert.Equal(t, tt.statusCode, statusCode)
-			assert.Equal(t, hresUsers, resBody)
+			handler := &UserHandler{
+				srv: tt.fields.srv,
+			}
+			if err := handler.GetAccounts(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserHandler.GetAccounts() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }
 
 func TestUserHandler_GetAccount(t *testing.T) {
+	type fields struct {
+		srv service.UserService
+	}
+	type args struct {
+		_c echo.Context
+	}
 	tests := []struct {
-		name       string
-		setup      func(s *mock_service.MockUserService) (hres *handler.Account, path string)
-		statusCode int
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "success",
@@ -512,22 +524,16 @@ func TestUserHandler_GetAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Setup mock
-			s, api := setupUserMock(t)
-
-			hresUsers, path := tt.setup(s)
-
-			var resBody *handler.Account
-			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
-
-			// Assertion
-			assert.Equal(t, tt.statusCode, statusCode)
-			assert.Equal(t, hresUsers, resBody)
+			handler := &UserHandler{
+				srv: tt.fields.srv,
+			}
+			if err := handler.GetAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserHandler.GetAccount() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }
 
-/*
 func TestUserHandler_AddAccount(t *testing.T) {
 	type fields struct {
 		srv service.UserService
