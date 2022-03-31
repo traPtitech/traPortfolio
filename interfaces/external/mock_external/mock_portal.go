@@ -49,17 +49,17 @@ func (mr *MockPortalAPIMockRecorder) GetAll() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPortalAPI)(nil).GetAll))
 }
 
-// GetByID mocks base method.
-func (m *MockPortalAPI) GetByID(traQID string) (*external.PortalUserResponse, error) {
+// GetByTraqID mocks base method.
+func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", traQID)
+	ret := m.ctrl.Call(m, "GetByTraqID", traQID)
 	ret0, _ := ret[0].(*external.PortalUserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetByID indicates an expected call of GetByID.
-func (mr *MockPortalAPIMockRecorder) GetByID(traQID interface{}) *gomock.Call {
+// GetByTraqID indicates an expected call of GetByTraqID.
+func (mr *MockPortalAPIMockRecorder) GetByTraqID(traQID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockPortalAPI)(nil).GetByID), traQID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTraqID", reflect.TypeOf((*MockPortalAPI)(nil).GetByTraqID), traQID)
 }

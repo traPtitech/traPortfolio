@@ -75,7 +75,7 @@ func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 	return er, nil
 }
 
-func (knoq *KnoqAPI) GetByID(eventID uuid.UUID) (*external.EventResponse, error) {
+func (knoq *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
 	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/events/%v", eventID))
 	if err != nil {
 		return nil, err

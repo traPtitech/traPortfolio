@@ -50,7 +50,7 @@ func (m *MockKnoqAPI) GetAll() ([]*external.EventResponse, error) {
 	return mockKnoqEvents, nil
 }
 
-func (m *MockKnoqAPI) GetByID(eventID uuid.UUID) (*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
 	for _, v := range mockKnoqEvents {
 		if v.ID == eventID {
 			return v, nil

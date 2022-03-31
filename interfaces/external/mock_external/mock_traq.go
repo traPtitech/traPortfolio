@@ -50,17 +50,17 @@ func (mr *MockTraQAPIMockRecorder) GetAll(args interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockTraQAPI)(nil).GetAll), args)
 }
 
-// GetByID mocks base method.
-func (m *MockTraQAPI) GetByID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+// GetByUserID mocks base method.
+func (m *MockTraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", userID)
+	ret := m.ctrl.Call(m, "GetByUserID", userID)
 	ret0, _ := ret[0].(*external.TraQUserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetByID indicates an expected call of GetByID.
-func (mr *MockTraQAPIMockRecorder) GetByID(userID interface{}) *gomock.Call {
+// GetByUserID indicates an expected call of GetByUserID.
+func (mr *MockTraQAPIMockRecorder) GetByUserID(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockTraQAPI)(nil).GetByID), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUserID", reflect.TypeOf((*MockTraQAPI)(nil).GetByUserID), userID)
 }

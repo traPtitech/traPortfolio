@@ -41,7 +41,7 @@ func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
 }
 
 func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
-	er, err := repo.knoq.GetByID(eventID)
+	er, err := repo.knoq.GetByEventID(eventID)
 	if err != nil {
 		return nil, convertError(err)
 	}

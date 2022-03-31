@@ -153,7 +153,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
 					)
 
-				f.portal.EXPECT().GetByID(name).Return(makePortalUser(want[0]), nil)
+				f.portal.EXPECT().GetByTraqID(name).Return(makePortalUser(want[0]), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -230,7 +230,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
 					)
 
-				f.portal.EXPECT().GetByID(name).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(name).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -335,8 +335,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(rows)
-				f.portal.EXPECT().GetByID(want.User.Name).Return(makePortalUser(&want.User), nil)
-				f.traq.EXPECT().GetByID(args.id).Return(makeTraqUser(want), nil)
+				f.portal.EXPECT().GetByTraqID(want.User.Name).Return(makePortalUser(&want.User), nil)
+				f.traq.EXPECT().GetByUserID(args.id).Return(makeTraqUser(want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -385,7 +385,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
 							AddRow(random.UUID(), args.id, 0, 0),
 					)
-				f.portal.EXPECT().GetByID(name).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(name).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -410,8 +410,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
 							AddRow(random.UUID(), args.id, 0, 0),
 					)
-				f.portal.EXPECT().GetByID(name).Return(makePortalUser(&domain.User{Name: name}), nil)
-				f.traq.EXPECT().GetByID(args.id).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(name).Return(makePortalUser(&domain.User{Name: name}), nil)
+				f.traq.EXPECT().GetByUserID(args.id).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -468,7 +468,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 				Accounts: []*domain.Account{},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
-				f.portal.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+				f.portal.EXPECT().GetByTraqID(args.args.Name).Return(&external.PortalUserResponse{
 					TraQID:   args.args.Name,
 					RealName: realName,
 				}, nil)
@@ -493,7 +493,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args) {
-				f.portal.EXPECT().GetByID(args.args.Name).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(args.args.Name).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -508,7 +508,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args) {
-				f.portal.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+				f.portal.EXPECT().GetByTraqID(args.args.Name).Return(&external.PortalUserResponse{
 					TraQID:   args.args.Name,
 					RealName: realName,
 				}, nil)

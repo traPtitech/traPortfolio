@@ -23,6 +23,6 @@ type EventResponse struct {
 
 type KnoqAPI interface {
 	GetAll() ([]*EventResponse, error)
-	GetByID(eventID uuid.UUID) (*EventResponse, error)
+	GetByEventID(eventID uuid.UUID) (*EventResponse, error)
 	GetByUserID(userID uuid.UUID) ([]*EventResponse, error)
 }

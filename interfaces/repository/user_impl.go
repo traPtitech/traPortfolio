@@ -66,7 +66,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	if l := len(users); l == 0 {
 		return []*domain.User{}, nil
 	} else if l == 1 {
-		portalUser, err := repo.portal.GetByID(users[0].Name)
+		portalUser, err := repo.portal.GetByTraqID(users[0].Name)
 		if err != nil {
 			return nil, convertError(err)
 		}
@@ -124,12 +124,12 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 		})
 	}
 
-	portalUser, err := repo.portal.GetByID(user.Name)
+	portalUser, err := repo.portal.GetByTraqID(user.Name)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	traQUser, err := repo.traQ.GetByID(userID)
+	traQUser, err := repo.traQ.GetByUserID(userID)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -149,7 +149,7 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 }
 
 func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
-	portalUser, err := repo.portal.GetByID(args.Name)
+	portalUser, err := repo.portal.GetByTraqID(args.Name)
 	if err != nil {
 		log.Println(err)
 	}

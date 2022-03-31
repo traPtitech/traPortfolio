@@ -74,7 +74,7 @@ func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUser
 	return usersResponse, nil
 }
 
-func (traQ *TraQAPI) GetByID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+func (traQ *TraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", userID))
 	if err != nil {
 		return nil, err
