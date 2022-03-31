@@ -524,12 +524,12 @@ func TestUserHandler_GetAccount(t *testing.T) {
 func TestUserHandler_AddAccount(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *handler.AddAccountJSONBody, expectedResBody handler.AddAccount, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *handler.AddAccountJSONBody, expectedResBody handler.Account, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.AddAccount, string) {
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
 
 				userID := random.UUID()
 
@@ -555,20 +555,13 @@ func TestUserHandler_AddAccount(t *testing.T) {
 					URL:         args.URL,
 				}
 
-				expectedResBody := handler.AddAccount{
-					Id:          reqBody.Id,
+				expectedResBody := handler.Account{
+					Id:          userID,
+					Name:        reqBody.Id,
 					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
 					Url:         reqBody.Url,
 				}
-				/*
-					expectedResBody := handler.Account{
-						Id:          userID,
-						Name:        reqBody.Id,
-						PrPermitted: reqBody.PrPermitted,
-						Type:        reqBody.Type,
-						Url:         reqBody.Url,
-					}*/
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(&want, nil)
@@ -610,7 +603,7 @@ func TestUserHandler_AddAccount(t *testing.T) {
 
 			reqBody, res, path := tt.setup(s)
 
-			var resBody handler.AddAccount
+			var resBody handler.Account
 			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, &resBody)
 
 			// Assertion
