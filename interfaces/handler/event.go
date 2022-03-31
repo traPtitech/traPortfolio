@@ -45,7 +45,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 
 // GetByID GET /events/:eventID
 func (h *EventHandler) GetByID(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := EventIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -73,7 +73,7 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 
 // PatchEvent PATCH /events/:eventID
 func (h *EventHandler) PatchEvent(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := struct {
 		EventIDInPath
 		EditEventJSONRequestBody
