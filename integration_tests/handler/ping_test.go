@@ -5,7 +5,6 @@ package handler_test
 import (
 	"context"
 	"net/http"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,9 +30,7 @@ func TestPing(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, tt.statusCode, res.StatusCode())
-
-			actual := reflect.ValueOf(*res).FieldByName("Body").Interface().([]byte)
-			assert.Equal(t, tt.want, actual)
+			assert.Equal(t, tt.want, res.Body)
 		})
 	}
 }

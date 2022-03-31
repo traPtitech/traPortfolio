@@ -41,44 +41,44 @@ func TestGetUsers(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		params     *GetUsersParams
-		want       []byte
+		params     GetUsersParams
+		want       interface{}
 	}{
 		"200": {
 			http.StatusOK,
-			new(GetUsersParams),
-			mustMarshal(&[]User{
+			GetUsersParams{},
+			[]User{
 				sampleUser1,
 				sampleUser3,
-			}),
+			},
 		},
 		"200 with includeSuspended": {
 			http.StatusOK,
-			&GetUsersParams{
+			GetUsersParams{
 				IncludeSuspended: &includeSuspended,
 			},
-			mustMarshal(&[]User{
+			[]User{
 				sampleUser1,
 				sampleUser2,
 				sampleUser3,
-			}),
+			},
 		},
 		"200 with name": {
 			http.StatusOK,
-			&GetUsersParams{
+			GetUsersParams{
 				Name: &name,
 			},
-			mustMarshal(&[]User{
+			[]User{
 				sampleUser1,
-			}),
+			},
 		},
 		"400 multiple params": {
 			http.StatusBadRequest,
-			&GetUsersParams{
+			GetUsersParams{
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			mustMarshal(handler.ConvertError(t, repository.ErrInvalidArg)),
+			handler.ConvertError(t, repository.ErrInvalidArg),
 		},
 	}
 	for name, tt := range tests {
@@ -88,11 +88,11 @@ func TestGetUsers(t *testing.T) {
 			cli, err := NewClientWithResponses(baseURL)
 			assert.NoError(t, err)
 
-			res, err := cli.GetUsersWithResponse(context.Background(), tt.params)
+			res, err := cli.GetUsersWithResponse(context.Background(), &tt.params)
 			assert.NoError(t, err)
 
 			assert.Equal(t, tt.statusCode, res.StatusCode())
-			assert.JSONEq(t, string(tt.want), string(res.Body))
+			assert.JSONEq(t, string(mustMarshal(tt.want)), string(res.Body))
 		})
 	}
 }
