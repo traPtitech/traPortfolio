@@ -33,7 +33,9 @@ func main() {
 		}
 
 		e := echo.New()
-		handler.Setup(e, api)
+		if err := handler.Setup(e, api); err != nil {
+			log.Fatal(err)
+		}
 
 		// Start server
 		e.Logger.Fatal(e.Start(config.Port()))
