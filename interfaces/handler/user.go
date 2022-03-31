@@ -163,7 +163,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
+	return c.JSON(http.StatusCreated, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
 }
 
 // PatchAccount PATCH /users/:userID/accounts/:accountID

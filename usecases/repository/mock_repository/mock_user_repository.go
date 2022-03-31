@@ -52,18 +52,18 @@ func (mr *MockUserRepositoryMockRecorder) CreateAccount(id, args interface{}) *g
 }
 
 // CreateUser mocks base method.
-func (m *MockUserRepository) CreateUser(arg repository.CreateUserArgs) (*domain.UserDetail, error) {
+func (m *MockUserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", arg)
+	ret := m.ctrl.Call(m, "CreateUser", args)
 	ret0, _ := ret[0].(*domain.UserDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateUser indicates an expected call of CreateUser.
-func (mr *MockUserRepositoryMockRecorder) CreateUser(arg interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) CreateUser(args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), args)
 }
 
 // DeleteAccount mocks base method.

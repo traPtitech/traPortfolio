@@ -521,34 +521,106 @@ func TestUserHandler_GetAccount(t *testing.T) {
 	}
 }
 
-/*
 func TestUserHandler_AddAccount(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService) (reqBody *handler.AddAccountJSONBody, expectedResBody handler.AddAccount, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.AddAccount, string) {
+
+				userID := random.UUID()
+
+				reqBody := handler.AddAccountJSONBody{
+					Id:          random.AlphaNumeric(rand.Intn(30) + 1),
+					PrPermitted: handler.PrPermitted(random.Bool()),
+					Type:        handler.AccountType((rand.Intn(int(domain.AccountLimit)))),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.CreateAccountArgs{
+					ID:          reqBody.Id,
+					Type:        uint(reqBody.Type),
+					URL:         reqBody.Url,
+					PrPermitted: bool(reqBody.PrPermitted),
+				}
+
+				want := domain.Account{
+					ID:          userID,
+					Name:        args.ID,
+					Type:        args.Type,
+					PrPermitted: args.PrPermitted,
+					URL:         args.URL,
+				}
+
+				expectedResBody := handler.AddAccount{
+					Id:          reqBody.Id,
+					PrPermitted: reqBody.PrPermitted,
+					Type:        reqBody.Type,
+					Url:         reqBody.Url,
+				}
+				/*
+					expectedResBody := handler.Account{
+						Id:          userID,
+						Name:        reqBody.Id,
+						PrPermitted: reqBody.PrPermitted,
+						Type:        reqBody.Type,
+						Url:         reqBody.Url,
+					}*/
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(&want, nil)
+				return &reqBody, expectedResBody, path
+			},
+			statusCode: http.StatusCreated,
+		},
+		/*{
+			name: "internal error",
+			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				s.EXPECT().GetAccount(gomock.Any(), accountID).Return(nil, errors.New("Internal Server Error"))
+				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.AddAccount, string) {
+
+				userID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(gomock.Any(), userID, &repository.CreateAccountArgs{}).Return(nil, errors.New("Internal Server Error"))
+				return &reqBody, expectedResBody, path
+			},
+			statusCode: http.StatusInternalServerError,
+		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := handler.AddAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.AddAccount() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			reqBody, res, path := tt.setup(s)
+
+			var resBody handler.AddAccount
+			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, res, resBody)
 		})
 	}
 }
 
+/*
 func TestUserHandler_PatchAccount(t *testing.T) {
 	type fields struct {
 		srv service.UserService
