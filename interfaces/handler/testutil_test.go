@@ -22,7 +22,9 @@ func doRequest(t *testing.T, api handler.API, method, path string, reqBody inter
 
 	e := echo.New()
 
-	handler.Setup(e, api)
+	if err := handler.Setup(e, api); err != nil {
+		t.Fatal(err)
+	}
 	e.ServeHTTP(rec, req)
 
 	// ここ決め打ちじゃないほうが良いかもしれない

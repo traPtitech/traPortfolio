@@ -1,17 +1,15 @@
 package handler
 
 import (
-	"log"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Setup(e *echo.Echo, api API) {
+func Setup(e *echo.Echo, api API) error {
 	// Setup validator
 	v, err := newValidator()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	e.Validator = v
 
@@ -146,4 +144,5 @@ func Setup(e *echo.Echo, api API) {
 		}
 	}
 
+	return nil
 }
