@@ -3,14 +3,10 @@
 package repository_test
 
 import (
-	"database/sql"
-	"fmt"
-	"log"
 	"math/rand"
 	"testing"
-	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -19,32 +15,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	dbUser := testutils.GetEnvOrDefault("MYSQL_USERNAME", "root")
-	dbPass := testutils.GetEnvOrDefault("MYSQL_PASSWORD", "password")
-	dbHost := testutils.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
-	dbPort := testutils.GetEnvOrDefault("MYSQL_PORT", "3306")
-
-	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort)
-	log.Println(dbDsn)
-	conn, err := sql.Open("mysql", dbDsn)
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-
-	// DBとの接続が確立できるまで待つ
-	for i := 0; ; i++ {
-		log.Println(i)
-		if i > 10 {
-			panic(fmt.Errorf("failed to connect to DB"))
-		}
-		err = conn.Ping()
-		log.Println(err)
-		if err == nil {
-			break
-		}
-		time.Sleep(time.Second * 10)
-	}
+	<-testutils.WaitTestDBConnection()
 
 	m.Run()
 }
@@ -73,7 +44,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	}
 
 	contest, err := repo.CreateContest(args)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	return contest
 }
 

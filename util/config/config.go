@@ -39,10 +39,10 @@ func Port() string {
 }
 
 func SQLConf() infrastructure.SQLConfig {
-	user := getEnvOrDefault(envDBUser, defaultDBUser)
-	pass := getEnvOrDefault(envDBPass, defaultDBPass)
-	host := getEnvOrDefault(envDBHost, defaultDBHost)
-	dbname := getEnvOrDefault(envDBName, defaultDBName)
+	user := GetEnvOrDefault(envDBUser, defaultDBUser)
+	pass := GetEnvOrDefault(envDBPass, defaultDBPass)
+	host := GetEnvOrDefault(envDBHost, defaultDBHost)
+	dbname := GetEnvOrDefault(envDBName, defaultDBName)
 	port := getNumEnvOrDefault(envDBPort, defaultDBPort)
 
 	return infrastructure.NewSQLConfig(user, pass, host, dbname, port)
@@ -69,7 +69,7 @@ func PortalConf(isDevelopment bool) infrastructure.PortalConfig {
 	return infrastructure.NewPortalConfig(portalCookie, portalAPIEndpoint, isDevelopment)
 }
 
-func getEnvOrDefault(env string, def string) string {
+func GetEnvOrDefault(env string, def string) string {
 	s := os.Getenv(env)
 	if len(s) == 0 {
 		return def

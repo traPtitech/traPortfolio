@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
@@ -39,7 +39,7 @@ func requestEncode(t *testing.T, body interface{}) *strings.Reader {
 	t.Helper()
 
 	b, err := json.Marshal(body)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	return strings.NewReader(string(b))
 }
@@ -48,7 +48,7 @@ func responseDecode(t *testing.T, rec *httptest.ResponseRecorder, i interface{})
 	t.Helper()
 
 	err := json.Unmarshal(rec.Body.Bytes(), i)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 // FIXME: 暫定対処
