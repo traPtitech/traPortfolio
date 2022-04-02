@@ -800,7 +800,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -833,7 +833,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -855,7 +855,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
