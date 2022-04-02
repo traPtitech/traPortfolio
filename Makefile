@@ -2,6 +2,7 @@ TEST_DB_PORT := 3307
 TBLS_VERSION := 1.49.6
 
 GOFILES=$(wildcard *.go **/*.go)
+INTEGRATION_HANDLER_GOFILES=$(wildcard *.go integration_tests/handler/*.go)
 
 BINARY=./bin/traPortfolio
 
@@ -12,8 +13,8 @@ all: clean build
 test: $(GOFILES)
 	go test -v -cover -race ./...
 
-.PHONY: test-integration-router
-test-integration-router: $(GOFILES)
+.PHONY: test-integration-handler
+test-integration-handler: $(INTEGRATION_HANDLER_GOFILES)
 	go test -v -cover -race -tags="integration db" ./integration_tests/...
 
 .PHONY: build
