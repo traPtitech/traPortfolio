@@ -7,25 +7,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
 	"testing"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
 var (
-	port = func() int {
-		if p, err := strconv.Atoi(os.Getenv("PORT")); err == nil {
-			return p
-		}
-
-		return 1323
-	}()
-	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
+	port    = config.Port()
+	baseURL = fmt.Sprintf("http://localhost%s/api/v1", port)
 )
 
 func mustMarshal(t *testing.T, v interface{}) []byte {
