@@ -24,7 +24,7 @@ func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 
 // GetAll GET /projects
 func (h *ProjectHandler) GetAll(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 
 // GetByID GET /projects/:projectID
 func (h *ProjectHandler) GetByID(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -71,7 +71,7 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 
 // PostProject POST /projects
 func (h *ProjectHandler) PostProject(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := PostProjectJSONRequestBody{}
 	err := c.BindAndValidate(&req)
@@ -105,7 +105,7 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 }
 
 func (h *ProjectHandler) PatchProject(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ProjectIDInPath
@@ -145,7 +145,7 @@ func (h *ProjectHandler) PatchProject(_c echo.Context) error {
 
 // GetProjectMembers GET /projects/:projectID/members
 func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -170,7 +170,7 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 
 // AddProjectMembers POST /projects/:projectID/members
 func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ProjectIDInPath
@@ -205,7 +205,7 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 
 // DeleteProjectMembers DELETE /projects/:projectID/members
 func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ProjectIDInPath
