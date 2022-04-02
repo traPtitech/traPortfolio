@@ -28,10 +28,12 @@ var (
 	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
 )
 
-func mustMarshal(v interface{}) []byte {
+func mustMarshal(t *testing.T, v interface{}) []byte {
+	t.Helper()
+
 	b, err := json.Marshal(v)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return b

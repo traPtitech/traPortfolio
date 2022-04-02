@@ -92,7 +92,7 @@ func TestGetUsers(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, tt.statusCode, res.StatusCode())
-			assert.JSONEq(t, string(mustMarshal(tt.want)), string(res.Body))
+			assert.JSONEq(t, string(mustMarshal(t, tt.want)), string(res.Body))
 		})
 	}
 }
