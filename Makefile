@@ -12,9 +12,9 @@ all: clean build
 test: $(GOFILES)
 	go test -v -cover -race ./...
 
-.PHONY: test-integration-router
-test-integration-router: $(GOFILES)
-	go test -v -cover -race -tags="integration db" ./integration_tests/...
+.PHONY: test-integration-handler
+test-integration-handler: $(GOFILES)
+	go test -v -cover -race -tags="integration db" ./integration_tests/handler/...
 
 .PHONY: build
 build: $(GOFILES)
