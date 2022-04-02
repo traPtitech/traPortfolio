@@ -1,4 +1,4 @@
-//go:build integration && db && repository
+//go:build integration && db
 
 package repository_test
 
@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
-	"github.com/traPtitech/traPortfolio/testutils"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )

@@ -107,7 +107,7 @@ jobs:
             ${{ runner.os }}-go-build-
       - name: Run tests
         run: |
-          go test ./... -coverprofile=coverage.txt -race -vet=off -tags="integration db repository"
+          go test ./... -coverprofile=coverage.txt -race -vet=off -tags="integration db"
       - name: Upload coverage data
         uses: codecov/codecov-action@v2
         with:
