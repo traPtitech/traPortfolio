@@ -53,6 +53,9 @@ func TestMain(m *testing.M) {
 		e := echo.New()
 		handler.Setup(e, api)
 
+		// TODO: DBのセットアップを行う
+		// Ref: https://github.com/traPtitech/traPortfolio/pull/228
+
 		log.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 	}(api)
 
