@@ -68,7 +68,7 @@ type AccountType int64
 // 新規アカウントリクエスト
 type AddAccount struct {
 	// アカウントID
-	Id string `json:"id"`
+	Name string `json:"name"`
 
 	// 広報での利用が許可されているかどうか
 	PrPermitted PrPermitted `json:"prPermitted"`

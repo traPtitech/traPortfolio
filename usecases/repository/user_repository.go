@@ -25,7 +25,7 @@ type UpdateUserArgs struct {
 }
 
 type CreateAccountArgs struct {
-	ID          string // traqID
+	Name        string // Twitter等のアカウントID
 	Type        uint
 	URL         string
 	PrPermitted bool

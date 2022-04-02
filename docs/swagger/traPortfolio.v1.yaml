@@ -1444,14 +1444,14 @@ components:
           format: uri
           x-oapi-codegen-extra-tags:
             validate: url
-        id:
+        name:
           type: string
           description: アカウントID
       required:
         - type
         - prPermitted
         - url
-        - id
+        - name
     EditAccount:
       title: EditAccount
       type: object

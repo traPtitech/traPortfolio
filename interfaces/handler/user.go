@@ -164,7 +164,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
-		ID:          req.Id,
+		Name:          req.Name,
 		Type:        uint(req.Type),
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,

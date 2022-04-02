@@ -70,7 +70,7 @@ func (s *userService) CreateAccount(ctx context.Context, userID uuid.UUID, accou
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
-	if len(account.ID) == 0 {
+	if len(account.Name) == 0 {
 		return nil, repository.ErrInvalidArg
 	}
 

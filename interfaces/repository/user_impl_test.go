@@ -800,7 +800,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -815,7 +815,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.Name, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
@@ -833,7 +833,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -844,7 +844,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.Name, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -855,7 +855,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -866,7 +866,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.Name, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.

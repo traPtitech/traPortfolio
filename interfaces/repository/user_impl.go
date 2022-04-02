@@ -259,7 +259,7 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
-		Name:   args.ID,
+		Name:   args.Name,
 		URL:    args.URL,
 		UserID: userID,
 		Check:  args.PrPermitted,
