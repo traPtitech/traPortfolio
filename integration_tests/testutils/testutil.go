@@ -21,9 +21,7 @@ import (
 
 func Setup(t *testing.T, dbName string) database.SQLHandler {
 	t.Helper()
-	const (
-		dbPrefix = "portfolio_test_repo_"
-	)
+	const dbPrefix = "portfolio_test_repo_"
 
 	db := establishTestDBConnection(t, dbPrefix+dbName)
 	dropAll(t, db)
