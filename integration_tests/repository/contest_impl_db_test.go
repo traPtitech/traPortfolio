@@ -1,4 +1,4 @@
-//go:build integration && db && repository
+//go:build integration && db
 
 package repository_test
 

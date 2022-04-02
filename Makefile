@@ -12,9 +12,9 @@ all: clean build
 test: $(GOFILES)
 	go test -v -cover -race ./...
 
-.PHONY: test-integration-db-repository
+.PHONY: test-integration-db
 test-integration-db: $(GOFILES)
-	go test -v -cover -race -tags="integration db repository" ./...
+	go test -v -cover -race -tags="integration db" ./...
 
 .PHONY: build
 build: $(GOFILES)
