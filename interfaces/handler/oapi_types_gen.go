@@ -556,10 +556,10 @@ type AddProjectMembersJSONBody AddProjectMembers
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// アカウントがアクティブでないユーザーを含めるかどうか
-	IncludeSuspended *IncludeSuspendedInQuery `json:"includeSuspended,omitempty"`
+	IncludeSuspended *IncludeSuspendedInQuery `json:"includeSuspended,omitempty" query:"includeSuspended"`
 
 	// 指定した文字列がtraP IDに含まれているかどうか
-	Name *NameInQuery `json:"name,omitempty"`
+	Name *NameInQuery `json:"name,omitempty" query:"name"`
 }
 
 // EditUserJSONBody defines parameters for EditUser.

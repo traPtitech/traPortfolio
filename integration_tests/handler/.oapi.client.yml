@@ -1,0 +1,5 @@
+output: oapi_client_gen_test.go
+generate:
+  - client
+  - types
+package: handler_test
