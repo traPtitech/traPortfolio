@@ -1,32 +1,24 @@
-package infrastructure
+package handler
 
 import (
-	"log"
-
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
-
-	"github.com/go-playground/validator/v10"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Setup(e *echo.Echo, api handler.API) {
-
-	v := validator.New()
-	if err := v.RegisterValidation("is-uuid", handler.IsValidUUID); err != nil {
-		log.Fatal(err)
+func Setup(e *echo.Echo, api API) error {
+	// Setup validator
+	v, err := newValidator()
+	if err != nil {
+		return err
 	}
-	e.Validator = &Validator{
-		validator: v,
-	}
+	e.Validator = v
 
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return h(&handler.Context{Context: c})
+			return h(&Context{Context: c})
 		}
 	})
 
@@ -106,6 +98,12 @@ func Setup(e *echo.Echo, api handler.API) {
 		}
 
 		{
+			apiGroups := v1.Group("/groups")
+
+			apiGroups.GET("", api.Group.GetAllGroups)
+			apiGroups.GET("/:groupID", api.Group.GetGroup)
+		}
+		{
 			apiContests := v1.Group("/contests")
 
 			apiContests.GET("", api.Contest.GetContests)
@@ -146,12 +144,5 @@ func Setup(e *echo.Echo, api handler.API) {
 		}
 	}
 
-}
-
-type Validator struct {
-	validator *validator.Validate
-}
-
-func (v *Validator) Validate(i interface{}) error {
-	return v.validator.Struct(i)
+	return nil
 }
