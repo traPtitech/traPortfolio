@@ -43,7 +43,7 @@ func SetupRoutes(t *testing.T, e *echo.Echo, dbName string, f initDBFunc) (*hand
 	return &api, nil
 }
 
-func DoRequest(t *testing.T, e *echo.Echo, method string, fh echo.HandlerFunc, body interface{}) *httptest.ResponseRecorder {
+func DoRequest(t *testing.T, e *echo.Echo, method string, path string, body interface{}) *httptest.ResponseRecorder {
 	t.Helper()
 
 	var bodyReader io.Reader
@@ -54,7 +54,7 @@ func DoRequest(t *testing.T, e *echo.Echo, method string, fh echo.HandlerFunc, b
 		bodyReader = bytes.NewReader(b)
 	}
 
-	req := httptest.NewRequest(method, e.URL(fh), bodyReader)
+	req := httptest.NewRequest(method, path, bodyReader)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 

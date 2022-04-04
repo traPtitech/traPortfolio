@@ -118,7 +118,7 @@ func TestGetUsers(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			res := testutils.DoRequest(t, e, http.MethodGet, api.User.GetAll, &tt.params)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetAll), &tt.params)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
