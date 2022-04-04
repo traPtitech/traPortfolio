@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/deepmap/oapi-codegen/pkg/testutil"
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -116,13 +115,11 @@ func TestGetUsers(t *testing.T) {
 	e := echo.New()
 	api, err := testutils.SetupRoutes(t, e, "get_users", initUser)
 	assert.NoError(t, err)
-	req := testutil.NewRequest().Get(e.URL(api.User.GetAll))
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			res := req.WithJsonBody(tt.params).Go(t, e)
-			assert.Equal(t, tt.statusCode, res.Code())
-			testutils.AssertResBody(t, tt.want, res)
+			res := testutils.DoRequest(t, e, http.MethodGet, api.User.GetAll, &tt.params)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }

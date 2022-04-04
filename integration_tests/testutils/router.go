@@ -1,9 +1,14 @@
 package testutils
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
@@ -36,4 +41,24 @@ func SetupRoutes(t *testing.T, e *echo.Echo, dbName string, f initDBFunc) (*hand
 	}
 
 	return &api, nil
+}
+
+func DoRequest(t *testing.T, e *echo.Echo, method string, fh echo.HandlerFunc, body interface{}) *httptest.ResponseRecorder {
+	t.Helper()
+
+	var bodyReader io.Reader
+	if body != nil {
+		b, err := json.Marshal(body)
+		assert.NoError(t, err)
+
+		bodyReader = bytes.NewReader(b)
+	}
+
+	req := httptest.NewRequest(method, e.URL(fh), bodyReader)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+
+	e.ServeHTTP(rec, req)
+
+	return rec
 }

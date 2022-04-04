@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/deepmap/oapi-codegen/pkg/testutil"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
@@ -25,13 +24,11 @@ func TestPing(t *testing.T) {
 	e := echo.New()
 	api, err := testutils.SetupRoutes(t, e, "get_ping", nil)
 	assert.NoError(t, err)
-	req := testutil.NewRequest().Get(e.URL(api.Ping.Ping))
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			res := req.Go(t, e)
-			assert.Equal(t, tt.statusCode, res.Code())
-			assert.Equal(t, tt.want, res.Recorder.Body.Bytes())
+			res := testutils.DoRequest(t, e, http.MethodGet, api.Ping.Ping, nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
