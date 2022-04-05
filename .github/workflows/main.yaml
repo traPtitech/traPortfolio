@@ -68,6 +68,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           go_version: ${{ env.GO_VERSION }}
+          filter_mode: nofilter
   test:
     name: Test
     runs-on: ubuntu-latest
