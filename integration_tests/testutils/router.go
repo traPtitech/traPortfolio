@@ -10,20 +10,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/infrastructure"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
-type initDBFunc func(database.SQLHandler) error
-
-func SetupRoutes(t *testing.T, e *echo.Echo, dbName string, f initDBFunc) (*handler.API, error) {
+func SetupRoutes(t *testing.T, e *echo.Echo, dbName string) (*handler.API, error) {
 	t.Helper()
 
 	db := SetupDB(t, dbName)
-	if f != nil {
-		if err := f(db); err != nil {
-			return nil, err
-		}
+	if err := mockdata.InsertSampleDataToDB(db); err != nil {
+		return nil, err
 	}
 
 	s := infrastructure.NewSQLConfig("root", "password", "localhost", testDBName(dbName), 3307)
