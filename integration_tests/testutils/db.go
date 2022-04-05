@@ -19,6 +19,13 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+var (
+	dbUser = config.GetEnvOrDefault("MYSQL_USERNAME", "root")
+	dbPass = config.GetEnvOrDefault("MYSQL_PASSWORD", "password")
+	dbHost = config.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
+	dbPort = config.GetNumEnvOrDefault("MYSQL_PORT", 3307)
+)
+
 func SetupDB(t *testing.T, dbName string) database.SQLHandler {
 	t.Helper()
 
@@ -37,12 +44,9 @@ func SetupDB(t *testing.T, dbName string) database.SQLHandler {
 
 func establishTestDBConnection(t *testing.T, dbName string) *gorm.DB {
 	t.Helper()
-	dbUser := config.GetEnvOrDefault("MYSQL_USERNAME", "root")
-	dbPass := config.GetEnvOrDefault("MYSQL_PASSWORD", "password")
-	dbHost := config.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
-	dbPort := config.GetEnvOrDefault("MYSQL_PORT", "3307")
 
-	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort)
+	conf := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, "", dbPort)
+	dbDsn := conf.Dsn()
 	conn, err := sql.Open("mysql", dbDsn)
 	assert.NoError(t, err)
 	defer conn.Close()
@@ -52,31 +56,27 @@ func establishTestDBConnection(t *testing.T, dbName string) *gorm.DB {
 	config := &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	}
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
+
+	newConf := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, dbName, dbPort)
+	dsn := newConf.Dsn()
 	db, err := gorm.Open(mysql.Open(dsn), config)
 	assert.NoError(t, err)
 
 	return db
 }
 
-func WaitTestDBConnection() <-chan struct{} {
+func WaitTestDBConnection(conf *infrastructure.SQLConfig) <-chan struct{} {
 	ch := make(chan struct{})
 	go func() {
-		waitTestDBConnection()
+		waitTestDBConnection(conf)
 		close(ch)
 	}()
 
 	return ch
 }
 
-func waitTestDBConnection() {
-	dbUser := config.GetEnvOrDefault("MYSQL_USERNAME", "root")
-	dbPass := config.GetEnvOrDefault("MYSQL_PASSWORD", "password")
-	dbHost := config.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
-	dbPort := config.GetEnvOrDefault("MYSQL_PORT", "3307")
-
-	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort)
-	log.Println(dbDsn)
+func waitTestDBConnection(conf *infrastructure.SQLConfig) {
+	dbDsn := conf.Dsn()
 	conn, err := sql.Open("mysql", dbDsn)
 	if err != nil {
 		panic(err)

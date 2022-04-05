@@ -35,7 +35,7 @@ func IsDevelopment() bool {
 }
 
 func Port() string {
-	return fmt.Sprintf(":%d", getNumEnvOrDefault(envPort, defaultPort))
+	return fmt.Sprintf(":%d", GetNumEnvOrDefault(envPort, defaultPort))
 }
 
 func SQLConf() infrastructure.SQLConfig {
@@ -43,7 +43,7 @@ func SQLConf() infrastructure.SQLConfig {
 	pass := GetEnvOrDefault(envDBPass, defaultDBPass)
 	host := GetEnvOrDefault(envDBHost, defaultDBHost)
 	dbname := GetEnvOrDefault(envDBName, defaultDBName)
-	port := getNumEnvOrDefault(envDBPort, defaultDBPort)
+	port := GetNumEnvOrDefault(envDBPort, defaultDBPort)
 
 	return infrastructure.NewSQLConfig(user, pass, host, dbname, port)
 }
@@ -78,7 +78,7 @@ func GetEnvOrDefault(env string, def string) string {
 	return s
 }
 
-func getNumEnvOrDefault(env string, def int) int {
+func GetNumEnvOrDefault(env string, def int) int {
 	i, err := strconv.Atoi(os.Getenv(env))
 	if err != nil {
 		return def
