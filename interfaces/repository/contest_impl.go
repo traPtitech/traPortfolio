@@ -38,15 +38,15 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 	return result, nil
 }
 
-func (repo *ContestRepository) GetContest(id uuid.UUID) (*domain.ContestDetail, error) {
-	return repo.getContest(id)
+func (repo *ContestRepository) GetContest(contestID uuid.UUID) (*domain.ContestDetail, error) {
+	return repo.getContest(contestID)
 }
 
 // Teamsは別途GetContestTeamsで取得するためここではnilのまま返す
-func (repo *ContestRepository) getContest(id uuid.UUID) (*domain.ContestDetail, error) {
+func (repo *ContestRepository) getContest(contestID uuid.UUID) (*domain.ContestDetail, error) {
 	contest := new(model.Contest)
 	if err := repo.h.
-		Where(&model.Contest{ID: id}).
+		Where(&model.Contest{ID: contestID}).
 		First(contest).
 		Error(); err != nil {
 		return nil, convertError(err)
@@ -90,7 +90,7 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 	return result, nil
 }
 
-func (repo *ContestRepository) UpdateContest(id uuid.UUID, args *repository.UpdateContestArgs) error {
+func (repo *ContestRepository) UpdateContest(contestID uuid.UUID, args *repository.UpdateContestArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -119,7 +119,7 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, args *repository.Upda
 
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
-			Where(&model.Contest{ID: id}).
+			Where(&model.Contest{ID: contestID}).
 			First(&old).
 			Error(); err != nil {
 			return convertError(err)
@@ -128,7 +128,7 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, args *repository.Upda
 			return convertError(err)
 		}
 		err := tx.
-			Where(&model.Contest{ID: id}).
+			Where(&model.Contest{ID: contestID}).
 			First(&new).
 			Error()
 
@@ -140,17 +140,17 @@ func (repo *ContestRepository) UpdateContest(id uuid.UUID, args *repository.Upda
 	return nil
 }
 
-func (repo *ContestRepository) DeleteContest(id uuid.UUID) error {
+func (repo *ContestRepository) DeleteContest(contestID uuid.UUID) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if err := repo.h.
-			Where(&model.Contest{ID: id}).
+			Where(&model.Contest{ID: contestID}).
 			First(&model.Contest{}).
 			Error(); err != nil {
 			return convertError(err)
 		}
 
 		if err := tx.
-			Where(&model.Contest{ID: id}).
+			Where(&model.Contest{ID: contestID}).
 			Delete(&model.Contest{}).
 			Error(); err != nil {
 			return convertError(err)

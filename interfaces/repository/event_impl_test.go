@@ -117,7 +117,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByID(args.id).Return(makeKnoqEvent(want), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
 				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
@@ -134,7 +134,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByID(args.id).Return(nil, repository.ErrNotFound)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(nil, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -158,7 +158,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByID(args.id).Return(makeKnoqEvent(want), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
 				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(gorm.ErrRecordNotFound)
@@ -186,7 +186,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}
-				f.knoq.EXPECT().GetByID(args.id).Return(makeKnoqEvent(&ed), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(&ed), nil)
 				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(errUnexpected)

@@ -38,10 +38,10 @@ type CreateProjectMemberArgs struct {
 
 type ProjectRepository interface {
 	GetProjects() ([]*domain.Project, error)
-	GetProject(id uuid.UUID) (*domain.Project, error)
-	CreateProject(project *CreateProjectArgs) (*domain.Project, error)
-	UpdateProject(id uuid.UUID, args *UpdateProjectArgs) error
-	GetProjectMembers(id uuid.UUID) ([]*domain.User, error)
-	AddProjectMembers(id uuid.UUID, args []*CreateProjectMemberArgs) error
-	DeleteProjectMembers(id uuid.UUID, memberIDs []uuid.UUID) error
+	GetProject(projectID uuid.UUID) (*domain.Project, error)
+	CreateProject(args *CreateProjectArgs) (*domain.Project, error)
+	UpdateProject(projectID uuid.UUID, args *UpdateProjectArgs) error
+	GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error)
+	AddProjectMembers(projectID uuid.UUID, args []*CreateProjectMemberArgs) error
+	DeleteProjectMembers(projectID uuid.UUID, memberIDs []uuid.UUID) error
 }

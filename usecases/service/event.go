@@ -12,8 +12,8 @@ import (
 
 type EventService interface {
 	GetEvents(ctx context.Context) ([]*domain.Event, error)
-	GetEventByID(ctx context.Context, id uuid.UUID) (*domain.EventDetail, error)
-	UpdateEventLevel(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventLevelArg) error
+	GetEventByID(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error)
+	UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error
 }
 
 type eventService struct {
@@ -29,8 +29,8 @@ func (s *eventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 	return s.event.GetEvents()
 }
 
-func (s *eventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.EventDetail, error) {
-	event, err := s.event.GetEvent(id)
+func (s *eventService) GetEventByID(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error) {
+	event, err := s.event.GetEvent(eventID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +55,8 @@ func (s *eventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.
 	return event, nil
 }
 
-func (s *eventService) UpdateEventLevel(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventLevelArg) error {
-	return s.event.UpdateEventLevel(id, arg)
+func (s *eventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+	return s.event.UpdateEventLevel(eventID, arg)
 }
 
 // Interface guards

@@ -74,15 +74,15 @@ func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUser
 	return usersResponse, nil
 }
 
-func (traQ *TraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
-	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", id))
+func (traQ *TraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", userID))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users/%v failed: %v", id, res.Status)
+		return nil, fmt.Errorf("GET /users/%v failed: %v", userID, res.Status)
 	}
 
 	var userResponse external.TraQUserResponse

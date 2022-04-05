@@ -22,7 +22,7 @@ func SetupRoutes(t *testing.T, e *echo.Echo, dbName string) (*handler.API, error
 		return nil, err
 	}
 
-	s := infrastructure.NewSQLConfig("root", "password", "localhost", testDBName(dbName), 3307)
+	s := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, testDBName(dbName), dbPort)
 	tr := infrastructure.NewTraQConfig("", "", true)
 	p := infrastructure.NewPortalConfig("", "", true)
 	k := infrastructure.NewKnoqConfig("", "", true)

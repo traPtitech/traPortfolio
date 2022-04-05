@@ -18,14 +18,14 @@ func (m *MockKnoqAPI) GetAll() ([]*external.EventResponse, error) {
 	return mockdata.MockKnoqEvents, nil
 }
 
-func (m *MockKnoqAPI) GetByID(id uuid.UUID) (*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
 	for _, v := range mockdata.MockKnoqEvents {
-		if v.ID == id {
+		if v.ID == eventID {
 			return v, nil
 		}
 	}
 
-	return nil, fmt.Errorf("GET /events/%v failed: 404", id)
+	return nil, fmt.Errorf("GET /events/%v failed: 404", eventID)
 }
 
 func (m *MockKnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {

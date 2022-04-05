@@ -38,18 +38,18 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 }
 
 // CreateAccount mocks base method.
-func (m *MockUserService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
+func (m *MockUserService) CreateAccount(ctx context.Context, userID uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAccount", ctx, id, account)
+	ret := m.ctrl.Call(m, "CreateAccount", ctx, userID, account)
 	ret0, _ := ret[0].(*domain.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateAccount indicates an expected call of CreateAccount.
-func (mr *MockUserServiceMockRecorder) CreateAccount(ctx, id, account interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) CreateAccount(ctx, userID, account interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUserService)(nil).CreateAccount), ctx, id, account)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUserService)(nil).CreateAccount), ctx, userID, account)
 }
 
 // DeleteAccount mocks base method.
@@ -126,18 +126,18 @@ func (mr *MockUserServiceMockRecorder) GetGroupsByUserID(ctx, userID interface{}
 }
 
 // GetUser mocks base method.
-func (m *MockUserService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error) {
+func (m *MockUserService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", ctx, id)
+	ret := m.ctrl.Call(m, "GetUser", ctx, userID)
 	ret0, _ := ret[0].(*domain.UserDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUser indicates an expected call of GetUser.
-func (mr *MockUserServiceMockRecorder) GetUser(ctx, id interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) GetUser(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockUserService)(nil).GetUser), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockUserService)(nil).GetUser), ctx, userID)
 }
 
 // GetUserContests mocks base method.
@@ -201,15 +201,15 @@ func (mr *MockUserServiceMockRecorder) GetUsers(ctx, args interface{}) *gomock.C
 }
 
 // Update mocks base method.
-func (m *MockUserService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
+func (m *MockUserService) Update(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, id, args)
+	ret := m.ctrl.Call(m, "Update", ctx, userID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockUserServiceMockRecorder) Update(ctx, id, args interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) Update(ctx, userID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserService)(nil).Update), ctx, id, args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserService)(nil).Update), ctx, userID, args)
 }

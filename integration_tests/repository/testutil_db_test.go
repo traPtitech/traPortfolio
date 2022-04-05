@@ -8,14 +8,24 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
+var (
+	dbUser = config.GetEnvOrDefault("MYSQL_USERNAME", "root")
+	dbPass = config.GetEnvOrDefault("MYSQL_PASSWORD", "password")
+	dbHost = config.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
+	dbPort = config.GetNumEnvOrDefault("MYSQL_PORT", 3307)
+)
+
 func TestMain(m *testing.M) {
-	<-testutils.WaitTestDBConnection()
+	conf := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, "", dbPort)
+	<-testutils.WaitTestDBConnection(&conf)
 
 	m.Run()
 }
