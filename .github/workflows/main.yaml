@@ -128,9 +128,11 @@ jobs:
         run: |
           source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio/traPortfolio
-          DB_HOST=localhost KNOQ_COOKIE=test KNOQ_API_ENDPOINT=test TRAQ_COOKIE=test TRAQ_API_ENDPOINT=test PORTAL_COOKIE=test PORTAL_API_ENDPOINT=test DB_PORT=3307 ./traPortfolio/traPortfolio -migrate true
+          ./traPortfolio/traPortfolio -migrate
           tbls lint
         env:
+          DB_HOST: localhost
+          DB_PORT: 3307
           TBLS_DSN: mariadb://root:password@127.0.0.1:3307/portfolio
   spectral:
     name: Spectral
