@@ -14,6 +14,7 @@ type SQLHandler interface {
 	Preload(query string, args ...interface{}) SQLHandler
 	Rollback() SQLHandler
 	Transaction(fc func(handler SQLHandler) error) error
+	Ping() error
 
 	Error() error
 }

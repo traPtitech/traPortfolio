@@ -3,11 +3,12 @@
 package handler_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 )
 
 // GET /ping
@@ -19,18 +20,15 @@ func TestPing(t *testing.T) {
 	}{
 		"200": {http.StatusOK, []byte("pong")},
 	}
+
+	e := echo.New()
+	api, err := testutils.SetupRoutes(t, e, "get_ping", nil)
+	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			cli, err := NewClientWithResponses(baseURL)
-			assert.NoError(t, err)
-
-			res, err := cli.PingWithResponse(context.Background())
-			assert.NoError(t, err)
-
-			assert.Equal(t, tt.statusCode, res.StatusCode())
-			assert.Equal(t, tt.want, res.Body)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Ping.Ping), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
