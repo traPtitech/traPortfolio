@@ -8,7 +8,6 @@ on:
 
 env:
   GO_VERSION: 1.17
-  MYSQL_VERSION: 10.6.4
 
 jobs:
   mod:
@@ -71,7 +70,7 @@ jobs:
       GOCACHE: /tmp/go/cache
     services:
       mysql:
-        image: mariadb:${{ env.MYSQL_VERSION }}
+        image: mariadb:10.6.4
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
         env:
           MYSQL_ROOT_PASSWORD: password
@@ -115,7 +114,7 @@ jobs:
     needs: [build]
     services:
       mysql:
-        image: mariadb:${{ env.MYSQL_VERSION }}
+        image: mariadb:10.6.4
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
         env:
           MYSQL_ROOT_PASSWORD: password
