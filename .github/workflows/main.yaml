@@ -71,7 +71,7 @@ jobs:
       GOCACHE: /tmp/go/cache
     services:
       mysql:
-        image: "mariadb:${{ env.MYSQL_VERSION }}"
+        image: mariadb:${{ env.MYSQL_VERSION }}
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
         env:
           MYSQL_ROOT_PASSWORD: password
@@ -115,7 +115,7 @@ jobs:
     needs: [build]
     services:
       mysql:
-        image: "mariadb:${{ env.MYSQL_VERSION }}"
+        image: mariadb:${{ env.MYSQL_VERSION }}
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
         env:
           MYSQL_ROOT_PASSWORD: password
