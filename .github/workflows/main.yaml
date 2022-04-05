@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-go-build-${{ github.ref }}-
             ${{ runner.os }}-go-build-
       - run: go build -o traPortfolio .
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         with:
           name: traPortfolio
           path: traPortfolio
@@ -115,7 +115,7 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           file: ./coverage.txt
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         with:
           name: coverage.txt
           path: coverage.txt
