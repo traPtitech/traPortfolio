@@ -62,12 +62,12 @@ func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUse
 	return users, nil
 }
 
-func (m *MockTraQAPI) GetByID(id uuid.UUID) (*external.TraQUserResponse, error) {
+func (m *MockTraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	for _, u := range mockTraQUsers {
-		if u.u.ID == id {
+		if u.u.ID == userID {
 			return u.u, nil
 		}
 	}
 
-	return nil, fmt.Errorf("GET /users/%v failed: 404", id)
+	return nil, fmt.Errorf("GET /users/%v failed: 404", userID)
 }

@@ -36,7 +36,7 @@ func (m *MockPortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	return mockPortalUsers, nil
 }
 
-func (m *MockPortalAPI) GetByID(traQID string) (*external.PortalUserResponse, error) {
+func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	for _, v := range mockPortalUsers {
 		if v.TraQID == traQID {
 			return v, nil

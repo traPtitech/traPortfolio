@@ -153,7 +153,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
 					)
 
-				f.portal.EXPECT().GetByID(name).Return(makePortalUser(want[0]), nil)
+				f.portal.EXPECT().GetByTraqID(name).Return(makePortalUser(want[0]), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -230,7 +230,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
 					)
 
-				f.portal.EXPECT().GetByID(name).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(name).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -335,8 +335,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(rows)
-				f.portal.EXPECT().GetByID(want.User.Name).Return(makePortalUser(&want.User), nil)
-				f.traq.EXPECT().GetByID(args.id).Return(makeTraqUser(want), nil)
+				f.portal.EXPECT().GetByTraqID(want.User.Name).Return(makePortalUser(&want.User), nil)
+				f.traq.EXPECT().GetByUserID(args.id).Return(makeTraqUser(want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -385,7 +385,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
 							AddRow(random.UUID(), args.id, 0, 0),
 					)
-				f.portal.EXPECT().GetByID(name).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(name).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -410,8 +410,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
 							AddRow(random.UUID(), args.id, 0, 0),
 					)
-				f.portal.EXPECT().GetByID(name).Return(makePortalUser(&domain.User{Name: name}), nil)
-				f.traq.EXPECT().GetByID(args.id).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(name).Return(makePortalUser(&domain.User{Name: name}), nil)
+				f.traq.EXPECT().GetByUserID(args.id).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -468,7 +468,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 				Accounts: []*domain.Account{},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
-				f.portal.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+				f.portal.EXPECT().GetByTraqID(args.args.Name).Return(&external.PortalUserResponse{
 					TraQID:   args.args.Name,
 					RealName: realName,
 				}, nil)
@@ -493,7 +493,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args) {
-				f.portal.EXPECT().GetByID(args.args.Name).Return(nil, errUnexpected)
+				f.portal.EXPECT().GetByTraqID(args.args.Name).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -508,7 +508,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args) {
-				f.portal.EXPECT().GetByID(args.args.Name).Return(&external.PortalUserResponse{
+				f.portal.EXPECT().GetByTraqID(args.args.Name).Return(&external.PortalUserResponse{
 					TraQID:   args.args.Name,
 					RealName: realName,
 				}, nil)
@@ -800,7 +800,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -815,7 +815,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.DisplayName, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
@@ -833,7 +833,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -844,7 +844,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.DisplayName, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -855,7 +855,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					PrPermitted: true,
@@ -866,7 +866,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `accounts` (`id`,`type`,`name`,`url`,`user_id`,`check`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Type, args.args.ID, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Type, args.args.DisplayName, args.args.URL, args.id, args.args.PrPermitted, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
@@ -913,7 +913,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -927,7 +927,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted.Bool, args.args.Name.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.ExpectCommit()
@@ -940,7 +940,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -962,7 +962,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -976,7 +976,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted.Bool, args.args.Name.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 				f.h.Mock.ExpectRollback()

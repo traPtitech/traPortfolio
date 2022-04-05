@@ -39,10 +39,10 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	return res, nil
 }
 
-func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error) {
+func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.Project, error) {
 	project := new(model.Project)
 	if err := repo.h.
-		Where(&model.Project{ID: id}).
+		Where(&model.Project{ID: projectID}).
 		First(project).
 		Error(); err != nil {
 		return nil, convertError(err)
@@ -51,7 +51,7 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
-		Where(model.ProjectMember{ProjectID: id}).
+		Where(model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
 		Error()
 	if err != nil {
@@ -84,7 +84,7 @@ func (repo *ProjectRepository) GetProject(id uuid.UUID) (*domain.Project, error)
 	}
 
 	res := &domain.Project{
-		ID:          id,
+		ID:          projectID,
 		Name:        project.Name,
 		Duration:    domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
 		Description: project.Description,
@@ -124,7 +124,7 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 	return res, nil
 }
 
-func (repo *ProjectRepository) UpdateProject(id uuid.UUID, args *repository.UpdateProjectArgs) error {
+func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -150,7 +150,7 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, args *repository.Upda
 
 	err := repo.h.
 		Model(&model.Project{}).
-		Where(&model.Project{ID: id}).
+		Where(&model.Project{ID: projectID}).
 		Updates(changes).
 		Error()
 	if err != nil {
@@ -160,11 +160,11 @@ func (repo *ProjectRepository) UpdateProject(id uuid.UUID, args *repository.Upda
 	return nil
 }
 
-func (repo *ProjectRepository) GetProjectMembers(id uuid.UUID) ([]*domain.User, error) {
+func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error) {
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
-		Where(&model.ProjectMember{ProjectID: id}).
+		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
 		Error()
 	if err != nil {
