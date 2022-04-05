@@ -105,7 +105,7 @@ jobs:
             ${{ runner.os }}-go-build-
       - name: Run tests
         run: |
-          go test ./... -coverprofile=coverage.txt -race -vet=off # -tags="integration db"
+          go test ./... -coverprofile=coverage.txt -race -vet=off -tags="integration db"
         env:
           APP_ENV: development
       - name: Upload coverage data

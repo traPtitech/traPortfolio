@@ -103,6 +103,14 @@ func (handler *MockSQLHandler) Transaction(fc func(database.SQLHandler) error) e
 	return handler.Conn.Transaction(ffc)
 }
 
+func (handler *MockSQLHandler) Ping() error {
+	db, err := handler.Conn.DB()
+	if err != nil {
+		return err
+	}
+	return db.Ping()
+}
+
 func (handler *MockSQLHandler) Error() error {
 	return handler.Conn.Error
 }
