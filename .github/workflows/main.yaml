@@ -95,6 +95,8 @@ jobs:
       - name: Run tests
         run: |
           go test ./... -coverprofile=coverage.txt -race -vet=off
+        env:
+          APP_ENV: development
       - name: Upload coverage data
         uses: codecov/codecov-action@v2
         with:
