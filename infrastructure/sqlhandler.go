@@ -61,6 +61,10 @@ func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
 	return sqlHandler, nil
 }
 
+func FromDB(db *gorm.DB) database.SQLHandler {
+	return &SQLHandler{conn: db}
+}
+
 // initDB データベースのスキーマを更新
 func initDB(db *gorm.DB) error {
 	// db.Logger = db.Logger.LogMode(logger.Info)
@@ -137,6 +141,14 @@ func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error
 		return fc(driver)
 	}
 	return handler.conn.Transaction(ffc)
+}
+
+func (handler *SQLHandler) Ping() error {
+	db, err := handler.conn.DB()
+	if err != nil {
+		return err
+	}
+	return db.Ping()
 }
 
 func (handler *SQLHandler) Error() error {
