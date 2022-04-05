@@ -97,7 +97,7 @@ jobs:
             ${{ runner.os }}-go-build-
       - name: Run tests
         run: |
-          go test ./... -coverprofile=coverage.txt -race -vet=off -tags="integration db"
+          go test ./... -coverprofile=coverage.txt -race -vet=off # -tags="integration db"
         env:
           APP_ENV: development
       - name: Upload coverage data
@@ -129,8 +129,8 @@ jobs:
       - name: Lint
         run: |
           source <(curl -sL https://git.io/use-tbls)
-          chmod +x ./traPortfolio/traPortfolio
-          ./traPortfolio/traPortfolio -migrate
+          chmod +x ./traPortfolio
+          ./traPortfolio -migrate
           tbls lint
         env:
           DB_HOST: localhost
