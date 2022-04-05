@@ -19,11 +19,10 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func Setup(t *testing.T, dbName string) database.SQLHandler {
+func SetupDB(t *testing.T, dbName string) database.SQLHandler {
 	t.Helper()
-	const dbPrefix = "portfolio_test_repo_"
 
-	db := establishTestDBConnection(t, dbPrefix+dbName)
+	db := establishTestDBConnection(t, testDBName(dbName))
 	dropAll(t, db)
 	init, err := migration.Migrate(db, migration.AllTables())
 	assert.True(t, init)
@@ -107,4 +106,10 @@ func dropAll(t *testing.T, db *gorm.DB) {
 
 	err := db.Migrator().DropTable(tables...)
 	assert.NoError(t, err)
+}
+
+func testDBName(dbName string) string {
+	const dbPrefix = "portfolio_test_repo_"
+
+	return dbPrefix + dbName
 }
