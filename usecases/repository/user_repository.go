@@ -25,14 +25,14 @@ type UpdateUserArgs struct {
 }
 
 type CreateAccountArgs struct {
-	Name        string // Twitter等のアカウントID
+	DisplayName string // 外部アカウントの表示名
 	Type        uint
 	URL         string
 	PrPermitted bool
 }
 
 type UpdateAccountArgs struct {
-	Name        optional.String // Twitter等のアカウントID
+	DisplayName optional.String // 外部アカウントの表示名
 	Type        optional.Int64
 	URL         optional.String
 	PrPermitted optional.Bool

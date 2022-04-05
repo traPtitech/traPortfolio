@@ -259,7 +259,7 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
-		Name:   args.Name,
+		Name:   args.DisplayName,
 		URL:    args.URL,
 		UserID: userID,
 		Check:  args.PrPermitted,
@@ -279,7 +279,7 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 
 	return &domain.Account{
 		ID:          ver.ID,
-		Name:        ver.Name,
+		DisplayName: ver.Name,
 		Type:        ver.Type,
 		PrPermitted: ver.Check,
 		URL:         ver.URL,
@@ -288,8 +288,8 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.String
+	if args.DisplayName.Valid {
+		changes["name"] = args.DisplayName.String
 	}
 	if args.URL.Valid {
 		changes["url"] = args.URL.String

@@ -117,7 +117,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
 						Type:        uint(rand.Intn(int(domain.AccountLimit))),
 						PrPermitted: prRandom,
 						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
@@ -125,7 +125,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					haccount := handler.Account{
 						Id:          raccount.ID,
-						Name:        raccount.Name,
+						DisplayName: raccount.DisplayName,
 						PrPermitted: handler.PrPermitted(prRandom),
 						Type:        handler.AccountType(raccount.Type),
 						Url:         raccount.URL,

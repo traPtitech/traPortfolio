@@ -838,9 +838,9 @@ components:
           description: アカウントUUID
           format: uuid
           x-go-type: uuid.UUID
-        name:
+        displayName:
           type: string
-          description: アカウントID
+          description: 外部アカウントの表示名
         type:
           $ref: '#/components/schemas/AccountType'
         prPermitted:
@@ -850,7 +850,7 @@ components:
           description: アカウントurl
       required:
         - id
-        - name
+        - displayName
         - type
         - prPermitted
         - url
@@ -1444,14 +1444,14 @@ components:
           format: uri
           x-oapi-codegen-extra-tags:
             validate: url
-        name:
+        displayName:
           type: string
-          description: アカウントID
+          description: 外部アカウントの表示名
       required:
         - type
         - prPermitted
         - url
-        - name
+        - displayName
     EditAccount:
       title: EditAccount
       type: object
@@ -1467,9 +1467,9 @@ components:
           format: uri
           x-oapi-codegen-extra-tags:
             validate: url
-        id:
+        displayName:
           type: string
-          description: アカウントID
+          description: 外部アカウントの表示名
     PrPermitted:
       title: PrPermitted
       type: boolean
