@@ -107,8 +107,6 @@ jobs:
       - name: Run tests
         run: |
           go test ./... -coverprofile=coverage.txt -race -vet=off -tags="integration db"
-        env:
-          APP_ENV: development
       - name: Upload coverage data
         uses: codecov/codecov-action@v2
         with:
@@ -139,11 +137,9 @@ jobs:
         run: |
           source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio
-          ./traPortfolio -migrate
+          ./traPortfolio --migrate --db-user=root --db-pass=password --db-name=portfolio --db-port=3307
           tbls lint
         env:
-          DB_HOST: localhost
-          DB_PORT: 3307
           TBLS_DSN: mariadb://root:password@127.0.0.1:3307/portfolio
   spectral:
     name: Spectral
