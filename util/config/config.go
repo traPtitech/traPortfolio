@@ -37,25 +37,39 @@ func isParsed() bool {
 
 // ReadOnly outside this package
 type Config struct {
-	isProduction      bool   `mapstructure:"isProduction"`
-	Port              int    `mapstructure:"port"`
-	DBUser            string `mapstructure:"dbUser"`
-	DBPass            string `mapstructure:"dbPass"`
-	DBHost            string `mapstructure:"dbHost"`
-	DBName            string `mapstructure:"dbName"`
-	DBPort            int    `mapstructure:"dbPort"`
-	TraqCookie        string `mapstructure:"traqCookie"` // r_session
-	TraqAPIEndpoint   string `mapstructure:"traqAPIEndpoint"`
-	KnoqCookie        string `mapstructure:"knoqCookie"` // session
-	KnoqAPIEndpoint   string `mapstructure:"knoqAPIEndpoint"`
-	PortalCookie      string `mapstructure:"portalCookie"`
-	PortalAPIEndpoint string `mapstructure:"portalAPIEndpoint"`
-	Migrate           bool   `mapstructure:"migrate"`
+	IsProduction bool `mapstructure:"production"`
+	Port         int  `mapstructure:"port"`
+	Migrate      bool `mapstructure:"migrate"`
+
+	DB struct {
+		User string `mapstructure:"user"`
+		Pass string `mapstructure:"pass"`
+		Host string `mapstructure:"host"`
+		Name string `mapstructure:"name"`
+		Port int    `mapstructure:"port"`
+	} `mapstructure:"db"`
+
+	Traq struct {
+		Cookie      string `mapstructure:"cookie"` // r_session
+		APIEndpoint string `mapstructure:"apiEndpoint"`
+	} `mapstructure:"traq"`
+
+	Knoq struct {
+		Cookie      string `mapstructure:"cookie"` // session
+		APIEndpoint string `mapstructure:"apiEndpoint"`
+	} `mapstructure:"knoq"`
+
+	Portal struct {
+		Cookie      string `mapstructure:"cookie"` // access_token
+		APIEndpoint string `mapstructure:"apiEndpoint"`
+	} `mapstructure:"portal"`
 }
 
 func init() {
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", defaultAppPort, "api port")
+	pflag.Bool("migrate", false, "run with migrate mode")
+
 	pflag.String("db-user", "", "db user name")
 	pflag.String("db-pass", "", "db password")
 	pflag.String("db-host", defaultDBHost, "db host")
@@ -68,7 +82,6 @@ func init() {
 	pflag.String("portal-cookie", "", "portal cookie")
 	pflag.String("portal-api-endpoint", "", "portal api endpoint")
 	pflag.StringP("config-path", "c", "", "config file path")
-	pflag.Bool("migrate", false, "run with migrate mode")
 	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 }
 
@@ -78,17 +91,19 @@ func Parse() {
 
 	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
 	_ = viper.BindPFlag("port", pflag.Lookup("port"))
-	_ = viper.BindPFlag("dbUser", pflag.Lookup("db-user"))
-	_ = viper.BindPFlag("dbPass", pflag.Lookup("db-pass"))
-	_ = viper.BindPFlag("dbHost", pflag.Lookup("db-host"))
-	_ = viper.BindPFlag("dbName", pflag.Lookup("db-name"))
-	_ = viper.BindPFlag("dbPort", pflag.Lookup("db-port"))
-	_ = viper.BindPFlag("traqCookie", pflag.Lookup("traq-cookie"))
-	_ = viper.BindPFlag("traqAPIEndpoint", pflag.Lookup("traq-api-endpoint"))
-	_ = viper.BindPFlag("knoqCookie", pflag.Lookup("knoq-cookie"))
-	_ = viper.BindPFlag("knoqAPIEndpoint", pflag.Lookup("knoq-api-endpoint"))
-	_ = viper.BindPFlag("portalCookie", pflag.Lookup("portal-cookie"))
-	_ = viper.BindPFlag("portalAPIEndpoint", pflag.Lookup("portal-api-endpoint"))
+	_ = viper.BindPFlag("migration", pflag.Lookup("migration"))
+
+	_ = viper.BindPFlag("db.user", pflag.Lookup("db-user"))
+	_ = viper.BindPFlag("db.pass", pflag.Lookup("db-pass"))
+	_ = viper.BindPFlag("db.host", pflag.Lookup("db-host"))
+	_ = viper.BindPFlag("db.name", pflag.Lookup("db-name"))
+	_ = viper.BindPFlag("db.port", pflag.Lookup("db-port"))
+	_ = viper.BindPFlag("traq.cookie", pflag.Lookup("traq-cookie"))
+	_ = viper.BindPFlag("traq.apiEndpoint", pflag.Lookup("traq-api-endpoint"))
+	_ = viper.BindPFlag("knoq.cookie", pflag.Lookup("knoq-cookie"))
+	_ = viper.BindPFlag("knoq.apiEndpoint", pflag.Lookup("knoq-api-endpoint"))
+	_ = viper.BindPFlag("portal.cookie", pflag.Lookup("portal-cookie"))
+	_ = viper.BindPFlag("portal.apiEndpoint", pflag.Lookup("portal-api-endpoint"))
 
 	_ = viper.BindPFlags(pflag.CommandLine)
 	viper.SetConfigName("config") // name of config file (without extension)
@@ -135,7 +150,7 @@ func GetConfig() *Config {
 
 func (c *Config) SetDBName(name string) *Config {
 	cloned := c.Clone()
-	cloned.DBName = name
+	cloned.DB.Name = name
 	return &cloned
 }
 
@@ -144,23 +159,23 @@ func (c *Config) Clone() Config {
 }
 
 func (c *Config) IsDevelopment() bool {
-	return !c.isProduction
+	return !c.IsProduction
 }
 
 func (c *Config) SQLConf() infrastructure.SQLConfig {
-	return infrastructure.NewSQLConfig(c.DBUser, c.DBPass, c.DBHost, c.DBName, c.DBPort)
+	return infrastructure.NewSQLConfig(c.DB.User, c.DB.Pass, c.DB.Host, c.DB.Name, c.DB.Port)
 }
 
 func (c *Config) TraqConf() infrastructure.TraQConfig {
-	return infrastructure.NewTraQConfig(c.TraqCookie, c.TraqAPIEndpoint, c.IsDevelopment())
+	return infrastructure.NewTraQConfig(c.Traq.Cookie, c.Traq.APIEndpoint, c.IsDevelopment())
 }
 
 func (c *Config) KnoqConf() infrastructure.KnoQConfig {
-	return infrastructure.NewKnoqConfig(c.KnoqCookie, c.KnoqAPIEndpoint, c.IsDevelopment())
+	return infrastructure.NewKnoqConfig(c.Knoq.Cookie, c.Knoq.APIEndpoint, c.IsDevelopment())
 }
 
 func (c *Config) PortalConf() infrastructure.PortalConfig {
-	return infrastructure.NewPortalConfig(c.PortalCookie, c.PortalAPIEndpoint, c.IsDevelopment())
+	return infrastructure.NewPortalConfig(c.Portal.Cookie, c.Portal.APIEndpoint, c.IsDevelopment())
 }
 
 func (c *Config) IsMigrate() bool { return c.Migrate }

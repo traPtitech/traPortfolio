@@ -1,6 +1,6 @@
-appEnv: 'development'
 port: 1323
-dbUser: 'root'
-dbPass: 'password'
-dbHost: 'localhost'
-dbPort: 3307
+db:
+  user: 'root'
+  pass: 'password'
+  host: 'localhost'
+  port: 3307
