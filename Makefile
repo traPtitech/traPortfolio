@@ -23,10 +23,6 @@ test-all: $(GOFILES)
 test-integration-db: $(GOFILES)
 	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/...
 
-.PHONY: test-integration-handler
-test-integration-handler: $(GOFILES)
-	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/handler/...
-
 .PHONY: build
 build: $(GOFILES)
 	go build -o $(BINARY)

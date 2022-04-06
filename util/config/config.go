@@ -55,7 +55,7 @@ type Config struct {
 }
 
 func init() {
-	pflag.String("app-env", defaultAppEnv, "whether production of development")
+	pflag.String("app-env", defaultAppEnv, "whether production or development")
 	pflag.Int("port", defaultAppPort, "api port")
 	pflag.String("db-user", "", "db user name")
 	pflag.String("db-pass", "", "db password")
@@ -68,7 +68,7 @@ func init() {
 	pflag.String("knoq-api-endpoint", "", "knoq api endpoint")
 	pflag.String("portal-cookie", "", "portal cookie")
 	pflag.String("portal-api-endpoint", "", "portal api endpoint")
-	pflag.String("config-dir-path", "", "config directory path")
+	pflag.StringP("config-path", "c", "", "config file path")
 	pflag.Bool("migrate", false, "run with migrate mode")
 	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 }
@@ -96,17 +96,23 @@ func Parse() {
 	viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
 	viper.AddConfigPath(".")
 
-	configPath, err := pflag.CommandLine.GetString("config-dir-path")
+	configPath, err := pflag.CommandLine.GetString("config-path")
 	if err != nil {
 		panic(err)
 	}
 	if configPath != "" {
-		viper.AddConfigPath(configPath)
+		viper.SetConfigFile(configPath)
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if err, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error if desired
+
+			// exit if configPath is explicitly specified and fails to load.
+			if configPath != "" {
+				log.Fatal("cannot load config from ", configPath)
+			}
+
 			log.Printf("config file does not found %s", err.Error())
 		} else {
 			// Config file was found but another error was produced
