@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -19,17 +20,10 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var (
-	dbUser = config.GetEnvOrDefault("MYSQL_USERNAME", "root")
-	dbPass = config.GetEnvOrDefault("MYSQL_PASSWORD", "password")
-	dbHost = config.GetEnvOrDefault("MYSQL_HOSTNAME", "127.0.0.1")
-	dbPort = config.GetNumEnvOrDefault("MYSQL_PORT", 3307)
-)
-
-func SetupDB(t *testing.T, dbName string) database.SQLHandler {
+func SetupDB(t *testing.T, sqlConf *infrastructure.SQLConfig) database.SQLHandler {
 	t.Helper()
 
-	db := establishTestDBConnection(t, testDBName(dbName))
+	db := establishTestDBConnection(t, sqlConf)
 	dropAll(t, db)
 	init, err := migration.Migrate(db, migration.AllTables())
 	assert.True(t, init)
@@ -42,23 +36,21 @@ func SetupDB(t *testing.T, dbName string) database.SQLHandler {
 	return h
 }
 
-func establishTestDBConnection(t *testing.T, dbName string) *gorm.DB {
+func establishTestDBConnection(t *testing.T, sqlConf *infrastructure.SQLConfig) *gorm.DB {
 	t.Helper()
 
-	conf := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, "", dbPort)
-	dbDsn := conf.Dsn()
+	dbDsn := sqlConf.DsnWithoutName()
 	conn, err := sql.Open("mysql", dbDsn)
 	assert.NoError(t, err)
 	defer conn.Close()
-	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", dbName))
+	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name()))
 	assert.NoError(t, err)
 
 	config := &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	}
 
-	newConf := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, dbName, dbPort)
-	dsn := newConf.Dsn()
+	dsn := sqlConf.Dsn()
 	db, err := gorm.Open(mysql.Open(dsn), config)
 	assert.NoError(t, err)
 
@@ -112,4 +104,18 @@ func testDBName(dbName string) string {
 	const dbPrefix = "portfolio_test_repo_"
 
 	return dbPrefix + dbName
+}
+
+var once sync.Once
+
+func GetConfig() *config.Config {
+	once.Do(func() {
+		config.Parse()
+	})
+
+	return config.GetConfig()
+}
+
+func SetDBSuffix(config *config.Config, suffix string) *config.Config {
+	return config.SetDBName(testDBName(suffix))
 }
