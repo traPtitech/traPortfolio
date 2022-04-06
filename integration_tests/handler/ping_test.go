@@ -23,8 +23,7 @@ func TestPing(t *testing.T) {
 
 	e := echo.New()
 
-	appConf := testutils.GetConfig()
-	conf := testutils.SetDBSuffix(appConf, "get_ping")
+	conf := testutils.GetConfigWithDBName("get_ping")
 
 	api, err := testutils.SetupRoutes(t, e, conf, nil)
 	assert.NoError(t, err)

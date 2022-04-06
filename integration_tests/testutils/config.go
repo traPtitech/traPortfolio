@@ -15,3 +15,13 @@ func ParseConfig(path string) {
 func GetConfig() *config.Config {
 	return config.GetConfig()
 }
+
+func GetModified(f config.EditFunc) *config.Config {
+	return config.GetModified(f)
+}
+
+func GetConfigWithDBName(dbName string) *config.Config {
+	return GetModified(func(c *config.Config) {
+		c.DB.Name = dbName
+	})
+}

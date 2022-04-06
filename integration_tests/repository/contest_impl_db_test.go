@@ -16,9 +16,7 @@ import (
 func TestContestRepositoryDB_GetContests(t *testing.T) {
 	t.Parallel()
 
-	appConf := testutils.GetConfig()
-
-	conf := testutils.SetDBSuffix(appConf, "get_contests")
+	conf := testutils.GetConfigWithDBName("get_contests")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupDB(t, &sqlConf)

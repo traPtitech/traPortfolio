@@ -87,7 +87,6 @@ func init() {
 
 func Parse() {
 	pflag.Parse()
-	setParsed(true)
 
 	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
 	_ = viper.BindPFlag("port", pflag.Lookup("port"))
@@ -139,6 +138,8 @@ func Parse() {
 	if err := viper.Unmarshal(&config); err != nil {
 		panic(err)
 	}
+
+	setParsed(true)
 }
 
 func GetConfig() *Config {
@@ -148,14 +149,17 @@ func GetConfig() *Config {
 	return &config
 }
 
-func (c *Config) SetDBName(name string) *Config {
-	cloned := c.Clone()
-	cloned.DB.Name = name
-	return &cloned
+type EditFunc func(*Config)
+
+func GetModified(editFunc EditFunc) *Config {
+	cloned := config.clone()
+	editFunc(cloned)
+	return cloned
 }
 
-func (c *Config) Clone() Config {
-	return *c
+func (c *Config) clone() *Config {
+	cloned := *c
+	return &cloned
 }
 
 func (c *Config) IsDevelopment() bool {

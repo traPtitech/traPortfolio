@@ -13,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -103,8 +102,4 @@ func testDBName(dbName string) string {
 	const dbPrefix = "portfolio_test_repo_"
 
 	return dbPrefix + dbName
-}
-
-func SetDBSuffix(config *config.Config, suffix string) *config.Config {
-	return config.SetDBName(testDBName(suffix))
 }
