@@ -14,7 +14,6 @@ import (
 const (
 	defaultAppPort = 1323
 	defaultDBPort  = 3306
-	defaultAppEnv  = "development"
 	defaultDBHost  = "127.0.0.1"
 )
 
@@ -38,7 +37,7 @@ func isParsed() bool {
 
 // ReadOnly outside this package
 type Config struct {
-	AppEnv            string `mapstructure:"appEnv"`
+	isProduction      bool   `mapstructure:"isProduction"`
 	Port              int    `mapstructure:"port"`
 	DBUser            string `mapstructure:"dbUser"`
 	DBPass            string `mapstructure:"dbPass"`
@@ -55,7 +54,7 @@ type Config struct {
 }
 
 func init() {
-	pflag.String("app-env", defaultAppEnv, "whether production or development")
+	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", defaultAppPort, "api port")
 	pflag.String("db-user", "", "db user name")
 	pflag.String("db-pass", "", "db password")
@@ -77,7 +76,7 @@ func Parse() {
 	pflag.Parse()
 	setParsed(true)
 
-	_ = viper.BindPFlag("appEnv", pflag.Lookup("app-env"))
+	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
 	_ = viper.BindPFlag("port", pflag.Lookup("port"))
 	_ = viper.BindPFlag("dbUser", pflag.Lookup("db-user"))
 	_ = viper.BindPFlag("dbPass", pflag.Lookup("db-pass"))
@@ -145,7 +144,7 @@ func (c *Config) Clone() Config {
 }
 
 func (c *Config) IsDevelopment() bool {
-	return c.AppEnv == "development"
+	return !c.isProduction
 }
 
 func (c *Config) SQLConf() infrastructure.SQLConfig {
