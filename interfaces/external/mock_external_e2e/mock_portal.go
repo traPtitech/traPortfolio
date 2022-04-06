@@ -4,26 +4,7 @@ import (
 	"fmt"
 
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-)
-
-var (
-	mockPortalUsers = []*external.PortalUserResponse{
-		{
-			TraQID:         "user1",
-			RealName:       "ユーザー1 ユーザー1",
-			AlphabeticName: "user1 user1",
-		},
-		{
-			TraQID:         "user2",
-			RealName:       "ユーザー2 ユーザー2",
-			AlphabeticName: "user2 user2",
-		},
-		{
-			TraQID:         "lolico",
-			RealName:       "東 工子",
-			AlphabeticName: "Noriko Azuma",
-		},
-	}
+	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
 type MockPortalAPI struct{}
@@ -33,11 +14,11 @@ func NewMockPortalAPI() *MockPortalAPI {
 }
 
 func (m *MockPortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
-	return mockPortalUsers, nil
+	return mockdata.MockPortalUsers, nil
 }
 
 func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
-	for _, v := range mockPortalUsers {
+	for _, v := range mockdata.MockPortalUsers {
 		if v.TraQID == traQID {
 			return v, nil
 		}

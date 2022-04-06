@@ -6,66 +6,37 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
 var (
 	sampleUser1 = handler.User{
-		Id:       uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"), // TODO: 変数で管理する 以下も同様
-		Name:     "user1",
-		RealName: "ユーザー1 ユーザー1",
+		Id:       mockdata.MockUsers[0].ID,
+		Name:     mockdata.MockUsers[0].Name,
+		RealName: mockdata.MockPortalUsers[0].RealName,
 	}
 	sampleUser2 = handler.User{
-		Id:       uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
-		Name:     "user2",
-		RealName: "ユーザー2 ユーザー2",
+		Id:       mockdata.MockUsers[1].ID,
+		Name:     mockdata.MockUsers[1].Name,
+		RealName: mockdata.MockPortalUsers[1].RealName,
 	}
 	sampleUser3 = handler.User{
-		Id:       uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
-		Name:     "lolico",
-		RealName: "東 工子",
+		Id:       mockdata.MockUsers[2].ID,
+		Name:     mockdata.MockUsers[2].Name,
+		RealName: mockdata.MockPortalUsers[2].RealName,
 	}
 )
-
-func initUser(h database.SQLHandler) error {
-	if err := h.Create([]*model.User{
-		{
-			ID:          sampleUser1.Id,
-			Description: "I am user1",
-			Check:       true,
-			Name:        sampleUser1.Name,
-		},
-		{
-			ID:          sampleUser2.Id,
-			Description: "I am user2",
-			Check:       true,
-			Name:        sampleUser2.Name,
-		},
-		{
-			ID:          sampleUser3.Id,
-			Description: "I am lolico",
-			Check:       false,
-			Name:        sampleUser3.Name,
-		},
-	}).Error(); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 // GET /users
 func TestGetUsers(t *testing.T) {
 	var (
 		includeSuspended handler.IncludeSuspendedInQuery = true
-		name             handler.NameInQuery             = "user1"
+		name             handler.NameInQuery             = handler.NameInQuery(mockdata.MockUsers[0].Name)
 	)
 
 	t.Parallel()
@@ -115,8 +86,7 @@ func TestGetUsers(t *testing.T) {
 	e := echo.New()
 
 	conf := testutils.GetConfigWithDBName("get_users")
-
-	api, err := testutils.SetupRoutes(t, e, conf, initUser)
+	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt

@@ -8,6 +8,7 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/config"
+	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
 func main() {
@@ -16,28 +17,37 @@ func main() {
 
 	if appConf.IsMigrate() {
 		s := appConf.SQLConf()
-		_, err := infrastructure.NewSQLHandler(&s)
+		h, err := infrastructure.NewSQLHandler(&s)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		if appConf.IsDevelopment() {
+			if err := mockdata.InsertSampleDataToDB(h); err != nil {
+				log.Fatal(err)
+			}
+		}
+
 		log.Println("finished")
-	} else {
-		s := appConf.SQLConf()
-		t := appConf.TraqConf()
-		p := appConf.PortalConf()
-		k := appConf.KnoqConf()
 
-		api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		e := echo.New()
-		if err := handler.Setup(e, api); err != nil {
-			log.Fatal(err)
-		}
-
-		// Start server
-		e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", appConf.Port)))
+		return
 	}
+
+	s := appConf.SQLConf()
+	t := appConf.TraqConf()
+	p := appConf.PortalConf()
+	k := appConf.KnoqConf()
+
+	api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	e := echo.New()
+	if err := handler.Setup(e, api); err != nil {
+		log.Fatal(err)
+	}
+
+	// Start server
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", appConf.Port)))
 }
