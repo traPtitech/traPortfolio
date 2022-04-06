@@ -113,7 +113,11 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := testutils.SetupRoutes(t, e, "get_users", initUser)
+
+	appConf := testutils.GetConfig()
+	conf := testutils.SetDBSuffix(appConf, "get_users")
+
+	api, err := testutils.SetupRoutes(t, e, conf, initUser)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt

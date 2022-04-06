@@ -22,7 +22,11 @@ func TestPing(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := testutils.SetupRoutes(t, e, "get_ping", nil)
+
+	appConf := testutils.GetConfig()
+	conf := testutils.SetDBSuffix(appConf, "get_ping")
+
+	api, err := testutils.SetupRoutes(t, e, conf, nil)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
