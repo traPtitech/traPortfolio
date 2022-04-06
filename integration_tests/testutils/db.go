@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"sync"
 	"testing"
 	"time"
 
@@ -104,16 +103,6 @@ func testDBName(dbName string) string {
 	const dbPrefix = "portfolio_test_repo_"
 
 	return dbPrefix + dbName
-}
-
-var once sync.Once
-
-func GetConfig() *config.Config {
-	once.Do(func() {
-		config.Parse()
-	})
-
-	return config.GetConfig()
 }
 
 func SetDBSuffix(config *config.Config, suffix string) *config.Config {
