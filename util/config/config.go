@@ -81,7 +81,7 @@ func init() {
 	pflag.String("knoq-api-endpoint", "", "knoq api endpoint")
 	pflag.String("portal-cookie", "", "portal cookie")
 	pflag.String("portal-api-endpoint", "", "portal api endpoint")
-	pflag.StringP("config-path", "c", "", "config file path")
+	pflag.StringP("config", "c", "", "config file path")
 	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 }
 
@@ -110,7 +110,7 @@ func Parse() {
 	viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
 	viper.AddConfigPath(".")
 
-	configPath, err := pflag.CommandLine.GetString("config-path")
+	configPath, err := pflag.CommandLine.GetString("config")
 	if err != nil {
 		panic(err)
 	}
