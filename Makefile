@@ -1,9 +1,12 @@
 TEST_DB_PORT := 3307
+
 TBLS_VERSION := 1.49.6
 
 GOFILES=$(wildcard *.go **/*.go)
 
 BINARY=./bin/traPortfolio
+
+TEST_INTEGRATION_TAGS := "integration db"
 
 .PHONY: all
 all: clean build
@@ -12,13 +15,17 @@ all: clean build
 test: $(GOFILES)
 	go test -v -cover -race ./...
 
+.PHONY: test-all
+test-all: $(GOFILES)
+	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./...
+
 .PHONY: test-integration-db
 test-integration-db: $(GOFILES)
-	go test -v -cover -race -tags="integration db" ./integration_tests/...
+	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/...
 
 .PHONY: test-integration-handler
 test-integration-handler: $(GOFILES)
-	go test -v -cover -race -tags="integration db" ./integration_tests/handler/...
+	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/handler/...
 
 .PHONY: build
 build: $(GOFILES)
