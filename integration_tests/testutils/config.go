@@ -22,6 +22,6 @@ func GetModified(f config.EditFunc) *config.Config {
 
 func GetConfigWithDBName(dbName string) *config.Config {
 	return GetModified(func(c *config.Config) {
-		c.DB.Name = dbName
+		c.DB.Name = testDBName(dbName)
 	})
 }

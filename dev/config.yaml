@@ -1,13 +1,7 @@
-appEnv: 'development'
 port: 1323
-dbUser: 'root'
-dbPass: 'password'
-dbHost: 'mysql'
-dbName: 'portfolio'
-dbPort: 3306
-traqCookie: ''
-traqAPIEndpoint: ''
-knoqCookie: ''
-knoqAPIEndpoint: ''
-portalCookie: ''
-portalAPIEndpoint: ''
+db:
+  user: 'root'
+  pass: 'password'
+  host: 'mysql'
+  name: 'portfolio'
+  port: 3306
