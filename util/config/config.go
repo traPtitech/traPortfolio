@@ -105,16 +105,17 @@ func Parse() {
 	_ = viper.BindPFlag("portal.apiEndpoint", pflag.Lookup("portal-api-endpoint"))
 
 	_ = viper.BindPFlags(pflag.CommandLine)
-	viper.SetConfigName("config") // name of config file (without extension)
-	viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath(".")
 
 	configPath, err := pflag.CommandLine.GetString("config")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	if configPath != "" {
+	if len(configPath) > 0 {
 		viper.SetConfigFile(configPath)
+	} else {
+		viper.SetConfigName("config") // name of config file (without extension)
+		viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
+		viper.AddConfigPath(".")
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -122,7 +123,7 @@ func Parse() {
 			// Config file not found; ignore error if desired
 
 			// exit if configPath is explicitly specified and fails to load.
-			if configPath != "" {
+			if len(configPath) > 0 {
 				log.Fatal("cannot load config from ", configPath)
 			}
 
@@ -132,7 +133,7 @@ func Parse() {
 			log.Fatal("cannot load config", err)
 		}
 	} else {
-		log.Printf("successfully loaded config")
+		log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {

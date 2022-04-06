@@ -5,7 +5,7 @@ services:
     build: ./
     restart: always
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
-    command: ./traPortfolio -c /opt/portfolio
+    command: ./traPortfolio -c /opt/portfolio/config.yaml
     expose:
       - "80"
       - "6060"
