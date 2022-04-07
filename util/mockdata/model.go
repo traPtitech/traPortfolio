@@ -59,8 +59,8 @@ var (
 	}
 
 	MockContestTeamUserBelonging = model.ContestTeamUserBelonging{
-		TeamID: MockContestTeam.ID,
-		UserID: MockUsers[0].ID,
+		ContestTeamID: MockContestTeam.ID,
+		UserID:        MockUsers[0].ID,
 	}
 
 	MockEventLevelRelation = model.EventLevelRelation{

@@ -118,7 +118,7 @@ func TestContestService_GetContest(t *testing.T) {
 				},
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(rand.Intn(30) + 1),
-				Teams: []*domain.ContestTeam{
+				ContestTeams: []*domain.ContestTeam{
 					{
 						ID:        random.UUID(),
 						ContestID: cid,
@@ -130,7 +130,7 @@ func TestContestService_GetContest(t *testing.T) {
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().GetContest(args.id).Return(want, nil)
-				repo.EXPECT().GetContestTeams(args.id).Return(want.Teams, nil)
+				repo.EXPECT().GetContestTeams(args.id).Return(want.ContestTeams, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -147,9 +147,9 @@ func TestContestService_GetContest(t *testing.T) {
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Link:        random.RandURLString(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
-				Teams:       nil,
+				Link:         random.RandURLString(),
+				Description:  random.AlphaNumeric(rand.Intn(30) + 1),
+				ContestTeams: nil,
 			},
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -245,7 +245,7 @@ func TestContestService_CreateContest(t *testing.T) {
 				},
 				Link:         random.AlphaNumeric(rand.Intn(30) + 1),
 				Description:  random.AlphaNumeric(rand.Intn(30) + 1),
-				contestTeams: []*domain.ContestTeam{},
+				ContestTeams: []*domain.ContestTeam{},
 			},
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
