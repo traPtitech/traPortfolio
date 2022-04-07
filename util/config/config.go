@@ -23,60 +23,40 @@ var (
 	rmu    sync.RWMutex
 )
 
-func setParsed(b bool) {
-	rmu.Lock()
-	defer rmu.Unlock()
-	parsed = b
-}
+type (
+	// Immutable except within this package or EditFunc
+	Config struct {
+		IsProduction bool `mapstructure:"production"`
+		Port         int  `mapstructure:"port"`
+		Migrate      bool `mapstructure:"migrate"`
 
-func isParsed() bool {
-	rmu.RLock()
-	defer rmu.RUnlock()
-	return parsed
-}
+		DB     SQLConfig    `mapstructure:"db"`
+		Traq   TraqConfig   `mapstructure:"traq"`
+		Knoq   KnoqConfig   `mapstructure:"knoq"`
+		Portal PortalConfig `mapstructure:"portal"`
+	}
 
-// Immutable except within this package or EditFunc
-type Config struct {
-	IsProduction bool `mapstructure:"production"`
-	Port         int  `mapstructure:"port"`
-	Migrate      bool `mapstructure:"migrate"`
+	SQLConfig struct {
+		User string `mapstructure:"user"`
+		Pass string `mapstructure:"pass"`
+		Host string `mapstructure:"host"`
+		Name string `mapstructure:"name"`
+		Port int    `mapstructure:"port"`
+	}
 
-	DB     SQLConfig    `mapstructure:"db"`
-	Traq   TraqConfig   `mapstructure:"traq"`
-	Knoq   KnoqConfig   `mapstructure:"knoq"`
-	Portal PortalConfig `mapstructure:"portal"`
-}
+	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
+	// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
+	TraqConfig   APIConfig
+	KnoqConfig   APIConfig
+	PortalConfig APIConfig
 
-type SQLConfig struct {
-	User string `mapstructure:"user"`
-	Pass string `mapstructure:"pass"`
-	Host string `mapstructure:"host"`
-	Name string `mapstructure:"name"`
-	Port int    `mapstructure:"port"`
-}
+	APIConfig struct {
+		Cookie      string `mapstructure:"cookie"`
+		APIEndpoint string `mapstructure:"apiEndpoint"`
+	}
 
-// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
-// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
-type TraqConfig APIConfig
-type KnoqConfig APIConfig
-type PortalConfig APIConfig
-
-func (c *TraqConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-func (c *KnoqConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-func (c *PortalConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-type APIConfig struct {
-	Cookie      string `mapstructure:"cookie"`
-	APIEndpoint string `mapstructure:"apiEndpoint"`
-}
+	EditFunc func(*Config)
+)
 
 func init() {
 	pflag.Bool("production", false, "whether production or development")
@@ -156,6 +136,12 @@ func Parse() {
 	setParsed(true)
 }
 
+func setParsed(b bool) {
+	rmu.Lock()
+	defer rmu.Unlock()
+	parsed = b
+}
+
 func GetConfig() *Config {
 	if !isParsed() {
 		panic("config does not parsed")
@@ -163,7 +149,11 @@ func GetConfig() *Config {
 	return &config
 }
 
-type EditFunc func(*Config)
+func isParsed() bool {
+	rmu.RLock()
+	defer rmu.RUnlock()
+	return parsed
+}
 
 func GetModified(editFunc EditFunc) *Config {
 	cloned := config.clone()
@@ -198,6 +188,18 @@ func (c *Config) KnoqConf() *KnoqConfig {
 
 func (c *Config) PortalConf() *PortalConfig {
 	return &c.Portal
+}
+
+func (c *TraqConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *KnoqConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *PortalConfig) API() *APIConfig {
+	return (*APIConfig)(c)
 }
 
 func (c *SQLConfig) Dsn() string {
