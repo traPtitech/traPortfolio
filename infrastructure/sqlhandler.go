@@ -33,6 +33,14 @@ func (c *SQLConfig) Dsn() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.user, c.password, c.host, c.port, c.dbname)
 }
 
+func (c *SQLConfig) DsnWithoutName() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.user, c.password, c.host, c.port)
+}
+
+func (c *SQLConfig) Name() string {
+	return c.dbname
+}
+
 type SQLHandler struct {
 	conn *gorm.DB
 }

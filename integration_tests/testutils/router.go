@@ -1,3 +1,5 @@
+//go:build integration && db
+
 package testutils
 
 import (
@@ -11,21 +13,23 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
-func SetupRoutes(t *testing.T, e *echo.Echo, dbName string) (*handler.API, error) {
+func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API, error) {
 	t.Helper()
 
-	db := SetupDB(t, dbName)
+	s := conf.SQLConf()
+	tr := conf.TraqConf()
+	p := conf.PortalConf()
+	k := conf.KnoqConf()
+
+	db := SetupDB(t, &s)
+
 	if err := mockdata.InsertSampleDataToDB(db); err != nil {
 		return nil, err
 	}
-
-	s := infrastructure.NewSQLConfig(dbUser, dbPass, dbHost, testDBName(dbName), dbPort)
-	tr := infrastructure.NewTraQConfig("", "", true)
-	p := infrastructure.NewPortalConfig("", "", true)
-	k := infrastructure.NewKnoqConfig("", "", true)
 
 	api, err := infrastructure.InjectAPIServer(&s, &tr, &p, &k)
 	if err != nil {

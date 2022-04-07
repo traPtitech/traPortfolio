@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -12,16 +12,17 @@ import (
 )
 
 func main() {
-	migrate := flag.Bool("migrate", false, "migration mode or not")
-	flag.Parse()
-	if *migrate {
-		s := config.SQLConf()
+	config.Parse()
+	appConf := config.GetConfig()
+
+	if appConf.IsMigrate() {
+		s := appConf.SQLConf()
 		h, err := infrastructure.NewSQLHandler(&s)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if config.IsDevelopment() {
+		if appConf.IsDevelopment() {
 			if err := mockdata.InsertSampleDataToDB(h); err != nil {
 				log.Fatal(err)
 			}
@@ -32,11 +33,10 @@ func main() {
 		return
 	}
 
-	isDevelopment := config.IsDevelopment()
-	s := config.SQLConf()
-	t := config.TraqConf(isDevelopment)
-	p := config.PortalConf(isDevelopment)
-	k := config.KnoqConf(isDevelopment)
+	s := appConf.SQLConf()
+	t := appConf.TraqConf()
+	p := appConf.PortalConf()
+	k := appConf.KnoqConf()
 
 	api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
 	if err != nil {
@@ -49,5 +49,5 @@ func main() {
 	}
 
 	// Start server
-	e.Logger.Fatal(e.Start(config.Port()))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", appConf.Port)))
 }
