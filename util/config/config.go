@@ -35,7 +35,7 @@ func isParsed() bool {
 	return parsed
 }
 
-// ReadOnly outside this package
+// Immutable except within this package or EditFunc
 type Config struct {
 	IsProduction bool `mapstructure:"production"`
 	Port         int  `mapstructure:"port"`
