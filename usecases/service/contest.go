@@ -59,7 +59,7 @@ func (s *contestService) GetContest(ctx context.Context, contestID uuid.UUID) (*
 		return nil, err
 	}
 
-	contest.Teams = teams // TODO: repositoryで行うべきな気がする
+	contest.contestTeams = teams // TODO: repositoryで行うべきな気がする
 
 	return contest, nil
 }

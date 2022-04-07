@@ -243,9 +243,9 @@ func TestContestService_CreateContest(t *testing.T) {
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Link:        random.AlphaNumeric(rand.Intn(30) + 1),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
-				Teams:       []*domain.ContestTeam{},
+				Link:         random.AlphaNumeric(rand.Intn(30) + 1),
+				Description:  random.AlphaNumeric(rand.Intn(30) + 1),
+				contestTeams: []*domain.ContestTeam{},
 			},
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)

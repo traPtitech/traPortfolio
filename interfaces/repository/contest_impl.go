@@ -323,7 +323,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 	var belongings []*model.ContestTeamUserBelonging
 	err := repo.h.
 		Preload("User").
-		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+		Where(&model.ContestTeamUserBelonging{ContestTeamID: teamID}).
 		Find(&belongings).
 		Error()
 	if err != nil {
@@ -370,7 +370,7 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 	belongingsMap := make(map[uuid.UUID]struct{}, len(members))
 	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
 	err = repo.h.
-		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+		Where(&model.ContestTeamUserBelonging{ContestTeamID: teamID}).
 		Find(&_belongings).
 		Error()
 	if err != nil {
@@ -385,7 +385,7 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 			if _, ok := belongingsMap[memberID]; ok {
 				continue
 			}
-			err = tx.Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
+			err = tx.Create(&model.ContestTeamUserBelonging{ContestTeamID: teamID, UserID: memberID}).Error()
 			if err != nil {
 				return convertError(err)
 			}
@@ -412,7 +412,7 @@ func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, member
 	belongings := make(map[uuid.UUID]struct{}, len(members))
 	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
 	err = repo.h.
-		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+		Where(&model.ContestTeamUserBelonging{ContestTeamID: teamID}).
 		Find(&_belongings).
 		Error()
 	if err != nil {
@@ -426,7 +426,7 @@ func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, member
 		for _, memberID := range members {
 			if _, ok := belongings[memberID]; ok {
 				err = tx.
-					Where(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).
+					Where(&model.ContestTeamUserBelonging{ContestTeamID: teamID, UserID: memberID}).
 					Delete(&model.ContestTeamUserBelonging{}).
 					Error()
 				if err != nil {

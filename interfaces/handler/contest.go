@@ -18,8 +18,8 @@ type ContestIDInPath struct {
 	ContestID uuid.UUID `param:"contestID" validate:"is-uuid"`
 }
 
-type TeamIDInPath struct {
-	TeamID uuid.UUID `param:"teamID" validate:"is-uuid"`
+type ContestTeamIDInPath struct {
+	ContestTeamID uuid.UUID `param:"teamID" validate:"is-uuid"`
 }
 
 type ContestHandler struct {
@@ -61,8 +61,8 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	teams := make([]ContestTeam, len(contest.Teams))
-	for i, v := range contest.Teams {
+	teams := make([]ContestTeam, len(contest.ContestTeams))
+	for i, v := range contest.ContestTeams {
 		teams[i] = newContestTeam(v.ID, v.Name, v.Result)
 	}
 
@@ -99,8 +99,8 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	contestTeams := make([]ContestTeam, 0, len(contest.Teams))
-	for _, team := range contest.Teams {
+	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
+	for _, team := range contest.ContestTeams {
 		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
 	}
 	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
@@ -181,12 +181,12 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
-		TeamIDInPath
+		ContestTeamIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
-	contestTeam, err := h.srv.GetContestTeam(ctx, req.ContestID, req.TeamID)
+	contestTeam, err := h.srv.GetContestTeam(ctx, req.ContestID, req.ContestTeamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -243,7 +243,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 	// todo contestIDが必要ない
 	req := struct {
 		ContestIDInPath
-		TeamIDInPath
+		ContestTeamIDInPath
 		EditContestTeamJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
@@ -257,7 +257,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 		Description: optional.StringFrom(req.Description),
 	}
 
-	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)
+	err = h.srv.UpdateContestTeam(ctx, req.ContestTeamID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -270,14 +270,14 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
-		TeamIDInPath
+		ContestTeamIDInPath
 	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeam(ctx, req.ContestID, req.TeamID)
+	err = h.srv.DeleteContestTeam(ctx, req.ContestID, req.ContestTeamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -290,13 +290,13 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
-		TeamIDInPath
+		ContestTeamIDInPath
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
-	users, err := h.srv.GetContestTeamMembers(ctx, req.ContestID, req.TeamID)
+	users, err := h.srv.GetContestTeamMembers(ctx, req.ContestID, req.ContestTeamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -319,7 +319,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 	// todo contestIDが必要ない
 	req := struct {
 		ContestIDInPath
-		TeamIDInPath
+		ContestTeamIDInPath
 		MemberIDs
 	}{}
 	err := c.BindAndValidate(&req)
@@ -327,7 +327,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.AddContestTeamMembers(ctx, req.TeamID, req.Members)
+	err = h.srv.AddContestTeamMembers(ctx, req.ContestTeamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
@@ -341,7 +341,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	// todo contestIDが必要ない
 	req := struct {
 		ContestIDInPath
-		TeamIDInPath
+		ContestTeamIDInPath
 		MemberIDs
 	}{}
 	err := c.BindAndValidate(&req)
@@ -349,7 +349,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeamMembers(ctx, req.TeamID, req.Members)
+	err = h.srv.DeleteContestTeamMembers(ctx, req.ContestTeamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
@@ -369,10 +369,10 @@ func newContest(id uuid.UUID, name string, since time.Time, until time.Time) Con
 
 func newContestDetail(contest Contest, link string, description string, teams []ContestTeam) ContestDetail {
 	return ContestDetail{
-		Contest:     contest,
-		Link:        link,
-		Description: description,
-		Teams:       teams,
+		Contest:      contest,
+		Link:         link,
+		Description:  description,
+		ContestTeams: teams,
 	}
 }
 

@@ -146,7 +146,7 @@ type ContestDetail struct {
 	Link string `json:"link"`
 
 	// コンテストチーム
-	Teams []ContestTeam `json:"teams"`
+	ContestTeams []ContestTeam `json:"teams"`
 }
 
 // コンテストチーム情報

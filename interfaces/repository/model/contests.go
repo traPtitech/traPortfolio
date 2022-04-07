@@ -39,10 +39,10 @@ func (*ContestTeam) TableName() string {
 }
 
 type ContestTeamUserBelonging struct {
-	TeamID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	UserID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	CreatedAt time.Time `gorm:"precision:6"`
-	UpdatedAt time.Time `gorm:"precision:6"`
+	ContestTeamID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	CreatedAt     time.Time `gorm:"precision:6"`
+	UpdatedAt     time.Time `gorm:"precision:6"`
 
 	ContestTeam ContestTeam `gorm:"foreignKey:TeamID"`
 	User        User        `gorm:"foreignKey:UserID"`
