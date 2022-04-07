@@ -3,10 +3,7 @@ package infrastructure
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"net/http/cookiejar"
-	"net/url"
 	"time"
 
 	"github.com/patrickmn/go-cache"
@@ -20,9 +17,8 @@ const (
 )
 
 type PortalAPI struct {
-	Client *http.Client
-	Cache  *cache.Cache
-	conf   *config.PortalConfig
+	apiClient
+	Cache *cache.Cache
 }
 
 func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.PortalAPI, error) {
@@ -30,27 +26,14 @@ func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.Porta
 		return mock_external_e2e.NewMockPortalAPI(), nil
 	}
 
-	jar, err := cookiejar.New(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cookies := []*http.Cookie{
-		{
-			Name:  "access_token",
-			Value: conf.Cookie,
-			Path:  "/",
-		},
-	}
-	u, err := url.Parse(conf.APIEndpoint)
+	jar, err := newCookieJar(conf.API(), "access_token")
 	if err != nil {
 		return nil, err
 	}
-	jar.SetCookies(u, cookies)
-	c := cache.New(1*time.Hour, 2*time.Hour)
+
 	return &PortalAPI{
-		Client: &http.Client{Jar: jar},
-		Cache:  c,
-		conf:   conf,
+		apiClient: newAPIClient(jar, conf.API()),
+		Cache:     cache.New(1*time.Hour, 2*time.Hour),
 	}, nil
 }
 
@@ -60,7 +43,7 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
 
-	res, err := apiGet(portal.Client, portal.conf.APIEndpoint, "/user")
+	res, err := portal.apiGet("/user")
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +65,7 @@ func (portal *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserRespons
 		return nil, fmt.Errorf("invalid traQID")
 	}
 
-	res, err := apiGet(portal.Client, portal.conf.APIEndpoint, fmt.Sprintf("/user/%v", traQID))
+	res, err := portal.apiGet(fmt.Sprintf("/user/%v", traQID))
 	if err != nil {
 		return nil, err
 	}

@@ -55,9 +55,23 @@ type SQLConfig struct {
 	Port int    `mapstructure:"port"`
 }
 
+// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
+// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
 type TraqConfig APIConfig
 type KnoqConfig APIConfig
 type PortalConfig APIConfig
+
+func (c *TraqConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *KnoqConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *PortalConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
 
 type APIConfig struct {
 	Cookie      string `mapstructure:"cookie"`
