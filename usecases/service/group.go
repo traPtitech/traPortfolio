@@ -56,9 +56,11 @@ func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain
 	}
 
 	// fill leader info
-	if u, ok := umap[groups.Leader.ID]; ok {
-		groups.Leader.Name = u.Name
-		groups.Leader.RealName = u.RealName
+	for i, v := range groups.Admin {
+		if u, ok := umap[v.ID]; ok {
+			groups.Admin[i].Name = u.Name
+			groups.Admin[i].RealName = u.RealName
+		}
 	}
 
 	return groups, nil
