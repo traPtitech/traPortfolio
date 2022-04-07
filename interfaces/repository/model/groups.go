@@ -10,7 +10,6 @@ type Group struct {
 	GroupID     uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Name        string    `gorm:"type:varchar(32)"`
 	Link        string    `gorm:"type:text"`
-	Leader      uuid.UUID `gorm:"type:char(36);not null"`
 	Description string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
@@ -24,6 +23,7 @@ type GroupUserBelonging struct {
 	// Relation      int       `gorm:"type:smallint(4);not null"`
 	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	GroupID       uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Relation      int       `gorm:"type:smallint(4);not null"`
 	SinceYear     int       `gorm:"type:smallint(4);not null"`
 	SinceSemester int       `gorm:"type:tinyint(1);not null"`
 	UntilYear     int       `gorm:"type:smallint(4);not null"`

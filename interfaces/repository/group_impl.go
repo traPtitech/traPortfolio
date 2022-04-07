@@ -40,24 +40,36 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		return nil, convertError(err)
 	}
 
+	// Name, RealNameはusercaseでPortalから取得する
 	erMembers := make([]*domain.UserGroup, 0, len(users))
+	erAdmin := make([]*domain.User, 0, len(users))
 	for _, v := range users {
-		// Name,RealNameはusercaseでPortalから取得する
-		erMembers = append(erMembers, &domain.UserGroup{
-			ID: v.UserID,
-			// Name:     v.Name,
-			// RealName: v.RealName,
-			Duration: domain.YearWithSemesterDuration{
-				Since: domain.YearWithSemester{
-					Year:     v.SinceYear,
-					Semester: v.SinceSemester,
+		// グループ外管理者除外
+		if v.Relation != 2 {
+			erMembers = append(erMembers, &domain.UserGroup{
+				ID: v.UserID,
+				// Name:     v.Name,
+				// RealName: v.RealName,
+				Duration: domain.YearWithSemesterDuration{
+					Since: domain.YearWithSemester{
+						Year:     v.SinceYear,
+						Semester: v.SinceSemester,
+					},
+					Until: domain.YearWithSemester{
+						Year:     v.UntilYear,
+						Semester: v.UntilSemester,
+					},
 				},
-				Until: domain.YearWithSemester{
-					Year:     v.UntilYear,
-					Semester: v.UntilSemester,
-				},
-			},
-		})
+			})
+		}
+		// リーダー抽出
+		if v.Relation == 1 || v.Relation == 2 {
+			erAdmin = append(erAdmin, &domain.User{
+				ID: v.UserID,
+				// Name:     v.Name,
+				// RealName: v.RealName,
+			})
+		}
 	}
 
 	var group model.Group
@@ -67,14 +79,10 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 
 	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
-		ID:   groupID,
-		Name: group.Name,
-		Link: group.Link,
-		Leader: &domain.User{
-			ID: group.Leader,
-			// Name: later,
-			// RealName: later,
-		},
+		ID:          groupID,
+		Name:        group.Name,
+		Link:        group.Link,
+		Admin:       erAdmin,
 		Members:     erMembers,
 		Description: group.Description,
 	}
