@@ -12,34 +12,21 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
 const (
 	cacheKey = "portalUsers"
 )
 
-type PortalConfig struct {
-	cookie        string
-	endpoint      string
-	isDevelopment bool
-}
-
-func NewPortalConfig(cookie, endpoint string, isDevelopment bool) PortalConfig {
-	return PortalConfig{
-		cookie,
-		endpoint,
-		isDevelopment,
-	}
-}
-
 type PortalAPI struct {
 	Client *http.Client
 	Cache  *cache.Cache
-	conf   *PortalConfig
+	conf   *config.PortalConfig
 }
 
-func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
-	if conf.isDevelopment {
+func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.PortalAPI, error) {
+	if isDevelopment {
 		return mock_external_e2e.NewMockPortalAPI(), nil
 	}
 
@@ -50,11 +37,11 @@ func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
 	cookies := []*http.Cookie{
 		{
 			Name:  "access_token",
-			Value: conf.cookie,
+			Value: conf.Cookie,
 			Path:  "/",
 		},
 	}
-	u, err := url.Parse(conf.endpoint)
+	u, err := url.Parse(conf.APIEndpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +60,7 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
 
-	res, err := apiGet(portal.Client, portal.conf.endpoint, "/user")
+	res, err := apiGet(portal.Client, portal.conf.APIEndpoint, "/user")
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +82,7 @@ func (portal *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserRespons
 		return nil, fmt.Errorf("invalid traQID")
 	}
 
-	res, err := apiGet(portal.Client, portal.conf.endpoint, fmt.Sprintf("/user/%v", traQID))
+	res, err := apiGet(portal.Client, portal.conf.APIEndpoint, fmt.Sprintf("/user/%v", traQID))
 	if err != nil {
 		return nil, err
 	}

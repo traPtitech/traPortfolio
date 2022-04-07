@@ -13,12 +13,13 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func SetupDB(t *testing.T, sqlConf *infrastructure.SQLConfig) database.SQLHandler {
+func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
 	t.Helper()
 
 	db := establishTestDBConnection(t, sqlConf)
@@ -34,14 +35,14 @@ func SetupDB(t *testing.T, sqlConf *infrastructure.SQLConfig) database.SQLHandle
 	return h
 }
 
-func establishTestDBConnection(t *testing.T, sqlConf *infrastructure.SQLConfig) *gorm.DB {
+func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	t.Helper()
 
 	dbDsn := sqlConf.DsnWithoutName()
 	conn, err := sql.Open("mysql", dbDsn)
 	assert.NoError(t, err)
 	defer conn.Close()
-	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name()))
+	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.DBName()))
 	assert.NoError(t, err)
 
 	config := &gorm.Config{
@@ -55,7 +56,7 @@ func establishTestDBConnection(t *testing.T, sqlConf *infrastructure.SQLConfig) 
 	return db
 }
 
-func WaitTestDBConnection(conf *infrastructure.SQLConfig) <-chan struct{} {
+func WaitTestDBConnection(conf *config.SQLConfig) <-chan struct{} {
 	ch := make(chan struct{})
 	go func() {
 		waitTestDBConnection(conf)
@@ -65,7 +66,7 @@ func WaitTestDBConnection(conf *infrastructure.SQLConfig) <-chan struct{} {
 	return ch
 }
 
-func waitTestDBConnection(conf *infrastructure.SQLConfig) {
+func waitTestDBConnection(conf *config.SQLConfig) {
 	dbDsn := conf.Dsn()
 	conn, err := sql.Open("mysql", dbDsn)
 	if err != nil {

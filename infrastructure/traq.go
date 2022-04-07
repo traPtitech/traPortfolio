@@ -11,29 +11,16 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
-
-type TraQConfig struct {
-	cookie        string
-	endpoint      string
-	isDevelopment bool
-}
-
-func NewTraQConfig(cookie, endpoint string, isDevelopment bool) TraQConfig {
-	return TraQConfig{
-		cookie,
-		endpoint,
-		isDevelopment,
-	}
-}
 
 type TraQAPI struct {
 	Client *http.Client
-	conf   *TraQConfig
+	conf   *config.TraqConfig
 }
 
-func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
-	if conf.isDevelopment {
+func NewTraQAPI(conf *config.TraqConfig, isDevelopment bool) (external.TraQAPI, error) {
+	if isDevelopment {
 		return mock_external_e2e.NewMockTraQAPI(), nil
 	}
 
@@ -44,11 +31,11 @@ func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 	cookies := []*http.Cookie{
 		{
 			Name:  "r_session",
-			Value: conf.cookie,
+			Value: conf.Cookie,
 			Path:  "/",
 		},
 	}
-	u, err := url.Parse(conf.endpoint)
+	u, err := url.Parse(conf.APIEndpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +44,7 @@ func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
 }
 
 func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
-	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
+	res, err := apiGet(traQ.Client, traQ.conf.APIEndpoint, fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +62,7 @@ func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUser
 }
 
 func (traQ *TraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
-	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", userID))
+	res, err := apiGet(traQ.Client, traQ.conf.APIEndpoint, fmt.Sprintf("/users/%v", userID))
 	if err != nil {
 		return nil, err
 	}

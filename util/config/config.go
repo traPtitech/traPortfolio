@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"sync"
 
@@ -8,7 +9,6 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"github.com/traPtitech/traPortfolio/infrastructure"
 )
 
 const (
@@ -41,28 +41,27 @@ type Config struct {
 	Port         int  `mapstructure:"port"`
 	Migrate      bool `mapstructure:"migrate"`
 
-	DB struct {
-		User string `mapstructure:"user"`
-		Pass string `mapstructure:"pass"`
-		Host string `mapstructure:"host"`
-		Name string `mapstructure:"name"`
-		Port int    `mapstructure:"port"`
-	} `mapstructure:"db"`
+	DB     SQLConfig    `mapstructure:"db"`
+	Traq   TraqConfig   `mapstructure:"traq"`
+	Knoq   KnoqConfig   `mapstructure:"knoq"`
+	Portal PortalConfig `mapstructure:"portal"`
+}
 
-	Traq struct {
-		Cookie      string `mapstructure:"cookie"` // r_session
-		APIEndpoint string `mapstructure:"apiEndpoint"`
-	} `mapstructure:"traq"`
+type SQLConfig struct {
+	User string `mapstructure:"user"`
+	Pass string `mapstructure:"pass"`
+	Host string `mapstructure:"host"`
+	Name string `mapstructure:"name"`
+	Port int    `mapstructure:"port"`
+}
 
-	Knoq struct {
-		Cookie      string `mapstructure:"cookie"` // session
-		APIEndpoint string `mapstructure:"apiEndpoint"`
-	} `mapstructure:"knoq"`
+type TraqConfig APIConfig
+type KnoqConfig APIConfig
+type PortalConfig APIConfig
 
-	Portal struct {
-		Cookie      string `mapstructure:"cookie"` // access_token
-		APIEndpoint string `mapstructure:"apiEndpoint"`
-	} `mapstructure:"portal"`
+type APIConfig struct {
+	Cookie      string `mapstructure:"cookie"`
+	APIEndpoint string `mapstructure:"apiEndpoint"`
 }
 
 func init() {
@@ -167,20 +166,34 @@ func (c *Config) IsDevelopment() bool {
 	return !c.IsProduction
 }
 
-func (c *Config) SQLConf() infrastructure.SQLConfig {
-	return infrastructure.NewSQLConfig(c.DB.User, c.DB.Pass, c.DB.Host, c.DB.Name, c.DB.Port)
+func (c *Config) IsMigrate() bool {
+	return c.Migrate
 }
 
-func (c *Config) TraqConf() infrastructure.TraQConfig {
-	return infrastructure.NewTraQConfig(c.Traq.Cookie, c.Traq.APIEndpoint, c.IsDevelopment())
+func (c *Config) SQLConf() *SQLConfig {
+	return &c.DB
 }
 
-func (c *Config) KnoqConf() infrastructure.KnoQConfig {
-	return infrastructure.NewKnoqConfig(c.Knoq.Cookie, c.Knoq.APIEndpoint, c.IsDevelopment())
+func (c *Config) TraqConf() *TraqConfig {
+	return &c.Traq
 }
 
-func (c *Config) PortalConf() infrastructure.PortalConfig {
-	return infrastructure.NewPortalConfig(c.Portal.Cookie, c.Portal.APIEndpoint, c.IsDevelopment())
+func (c *Config) KnoqConf() *KnoqConfig {
+	return &c.Knoq
 }
 
-func (c *Config) IsMigrate() bool { return c.Migrate }
+func (c *Config) PortalConf() *PortalConfig {
+	return &c.Portal
+}
+
+func (c *SQLConfig) Dsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port, c.Name)
+}
+
+func (c *SQLConfig) DsnWithoutName() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port)
+}
+
+func (c *SQLConfig) DBName() string {
+	return c.Name
+}

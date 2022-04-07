@@ -11,26 +11,31 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
 // Injectors from wire.go:
 
-func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) (handler.API, error) {
+func InjectAPIServer(c *config.Config, isDevelopment bool) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
-	sqlHandler, err := NewSQLHandler(s)
+	sqlConfig := provideSQLConf(c)
+	sqlHandler, err := NewSQLHandler(sqlConfig)
 	if err != nil {
 		return handler.API{}, err
 	}
-	portalAPI, err := NewPortalAPI(p)
+	portalConfig := providePortalConf(c)
+	portalAPI, err := NewPortalAPI(portalConfig, isDevelopment)
 	if err != nil {
 		return handler.API{}, err
 	}
-	traQAPI, err := NewTraQAPI(t)
+	traqConfig := provideTraqConf(c)
+	traQAPI, err := NewTraQAPI(traqConfig, isDevelopment)
 	if err != nil {
 		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler, portalAPI, traQAPI)
-	knoqAPI, err := NewKnoqAPI(k)
+	knoqConfig := provideKnoqConf(c)
+	knoqAPI, err := NewKnoqAPI(knoqConfig, isDevelopment)
 	if err != nil {
 		return handler.API{}, err
 	}
@@ -77,3 +82,18 @@ var externalSet = wire.NewSet(
 )
 
 var apiSet = wire.NewSet(handler.NewAPI)
+
+var confSet = wire.NewSet(
+	provideSQLConf,
+	provideTraqConf,
+	provideKnoqConf,
+	providePortalConf,
+)
+
+func provideSQLConf(c *config.Config) *config.SQLConfig { return c.SQLConf() }
+
+func provideTraqConf(c *config.Config) *config.TraqConfig { return c.TraqConf() }
+
+func provideKnoqConf(c *config.Config) *config.KnoqConfig { return c.KnoqConf() }
+
+func providePortalConf(c *config.Config) *config.PortalConfig { return c.PortalConf() }
