@@ -18,7 +18,7 @@ const (
 
 type PortalAPI struct {
 	apiClient
-	Cache *cache.Cache
+	cache *cache.Cache
 }
 
 func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.PortalAPI, error) {
@@ -33,12 +33,12 @@ func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.Porta
 
 	return &PortalAPI{
 		apiClient: newAPIClient(jar, conf.API()),
-		Cache:     cache.New(1*time.Hour, 2*time.Hour),
+		cache:     cache.New(1*time.Hour, 2*time.Hour),
 	}, nil
 }
 
 func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
-	portalUsers, found := portal.Cache.Get(cacheKey)
+	portalUsers, found := portal.cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
@@ -56,7 +56,7 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	if err := json.NewDecoder(res.Body).Decode(&userResponses); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
-	portal.Cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
+	portal.cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
 }
 
