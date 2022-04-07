@@ -170,6 +170,10 @@ func (c *Config) IsDevelopment() bool {
 	return !c.IsProduction
 }
 
+func (c *Config) Addr() string {
+	return fmt.Sprintf(":%d", c.Port)
+}
+
 func (c *Config) IsMigrate() bool {
 	return c.Migrate
 }
