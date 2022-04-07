@@ -16,37 +16,22 @@ func TestParse(t *testing.T) {
 		IsProduction: true,
 		Port:         3000,
 		Migrate:      true,
-		DB: struct {
-			User string `mapstructure:"user"`
-			Pass string `mapstructure:"pass"`
-			Host string `mapstructure:"host"`
-			Name string `mapstructure:"name"`
-			Port int    `mapstructure:"port"`
-		}{
+		DB: config.SQLConfig{
 			User: "root",
 			Pass: "password",
 			Host: "mysql",
 			Name: "portfolio",
 			Port: 3001,
 		},
-		Traq: struct {
-			Cookie      string `mapstructure:"cookie"`
-			APIEndpoint string `mapstructure:"apiEndpoint"`
-		}{
+		Traq: config.TraqConfig{
 			Cookie:      "traq cookie",
 			APIEndpoint: "traq endpoint",
 		},
-		Knoq: struct {
-			Cookie      string `mapstructure:"cookie"`
-			APIEndpoint string `mapstructure:"apiEndpoint"`
-		}{
+		Knoq: config.KnoqConfig{
 			Cookie:      "knoq cookie",
 			APIEndpoint: "knoq endpoint",
 		},
-		Portal: struct {
-			Cookie      string `mapstructure:"cookie"`
-			APIEndpoint string `mapstructure:"apiEndpoint"`
-		}{
+		Portal: config.PortalConfig{
 			Cookie:      "portal cookie",
 			APIEndpoint: "portal endpoint",
 		},
