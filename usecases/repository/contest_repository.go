@@ -44,10 +44,10 @@ type UpdateContestTeamArgs struct {
 
 type ContestRepository interface {
 	GetContests() ([]*domain.Contest, error)
-	GetContest(id uuid.UUID) (*domain.ContestDetail, error)
-	CreateContest(args *CreateContestArgs) (*domain.Contest, error)
-	UpdateContest(id uuid.UUID, args *UpdateContestArgs) error
-	DeleteContest(id uuid.UUID) error
+	GetContest(contestID uuid.UUID) (*domain.ContestDetail, error)
+	CreateContest(args *CreateContestArgs) (*domain.ContestDetail, error)
+	UpdateContest(contestID uuid.UUID, args *UpdateContestArgs) error
+	DeleteContest(contestID uuid.UUID) error
 	GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error)
 	GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error)
 	CreateContestTeam(contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)

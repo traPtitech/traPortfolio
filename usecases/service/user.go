@@ -11,12 +11,12 @@ import (
 )
 
 type UserService interface {
-	GetUsers(ctx context.Context) ([]*domain.User, error)
-	GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error)
-	Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error
+	GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error)
+	GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error)
+	Update(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error
 	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
 	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
-	CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error)
+	CreateAccount(ctx context.Context, userID uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error)
 	EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error
 	DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error
 	GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
@@ -34,24 +34,24 @@ func NewUserService(userRepository repository.UserRepository, eventRepository re
 	return &userService{repo: userRepository, event: eventRepository}
 }
 
-func (s *userService) GetUsers(ctx context.Context) ([]*domain.User, error) {
-	users, err := s.repo.GetUsers()
+func (s *userService) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
+	users, err := s.repo.GetUsers(args)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
 
-func (s *userService) GetUser(ctx context.Context, id uuid.UUID) (*domain.UserDetail, error) {
-	user, err := s.repo.GetUser(id)
+func (s *userService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
+	user, err := s.repo.GetUser(userID)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (s *userService) Update(ctx context.Context, id uuid.UUID, args *repository.UpdateUserArgs) error {
-	if err := s.repo.UpdateUser(id, args); err != nil {
+func (s *userService) Update(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error {
+	if err := s.repo.UpdateUser(userID, args); err != nil {
 		return err
 	}
 
@@ -66,11 +66,11 @@ func (s *userService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 	return s.repo.GetAccounts(userID)
 }
 
-func (s *userService) CreateAccount(ctx context.Context, id uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
+func (s *userService) CreateAccount(ctx context.Context, userID uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
 
 	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
 
-	if len(account.ID) == 0 {
+	if len(account.DisplayName) == 0 {
 		return nil, repository.ErrInvalidArg
 	}
 
@@ -82,7 +82,7 @@ func (s *userService) CreateAccount(ctx context.Context, id uuid.UUID, account *
 	//accountの構造体たりないので補う
 	//ここらへんのコメントアウトはリファクタのときにでも消す
 
-	return s.repo.CreateAccount(id, account)
+	return s.repo.CreateAccount(userID, account)
 
 }
 

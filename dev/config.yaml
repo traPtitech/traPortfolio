@@ -1,0 +1,7 @@
+port: 1323
+db:
+  user: 'root'
+  pass: 'password'
+  host: 'mysql'
+  name: 'portfolio'
+  port: 3306

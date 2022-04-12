@@ -32,6 +32,12 @@ var eventSet = wire.NewSet(
 	handler.NewEventHandler,
 )
 
+var groupSet = wire.NewSet(
+	impl.NewGroupRepository,
+	service.NewGroupService,
+	handler.NewGroupHandler,
+)
+
 var contestSet = wire.NewSet(
 	impl.NewContestRepository,
 	service.NewContestService,
@@ -56,6 +62,7 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 		userSet,
 		projectSet,
 		eventSet,
+		groupSet,
 		contestSet,
 		sqlSet,
 		externalSet,

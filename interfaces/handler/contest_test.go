@@ -28,7 +28,7 @@ func setupContestMock(t *testing.T) (*mock_service.MockContestService, handler.A
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockContestService(ctrl)
-	api := handler.NewAPI(nil, nil, nil, nil, handler.NewContestHandler(s))
+	api := handler.NewAPI(nil, nil, nil, nil, handler.NewContestHandler(s), nil)
 
 	return s, api
 }
@@ -254,11 +254,16 @@ func TestContestHandler_PostContest(t *testing.T) {
 					Since:       reqBody.Duration.Since,
 					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
-				want := domain.Contest{
-					ID:        random.UUID(),
-					Name:      args.Name,
-					TimeStart: args.Since,
-					TimeEnd:   args.Until.Time,
+				want := domain.ContestDetail{
+					Contest: domain.Contest{
+						ID:        random.UUID(),
+						Name:      args.Name,
+						TimeStart: args.Since,
+						TimeEnd:   args.Until.Time,
+					},
+					Link:        args.Link.String,
+					Description: args.Description,
+					Teams:       []*domain.ContestTeam{},
 				}
 				expectedResBody = &handler.Contest{
 					Id:   want.ID,

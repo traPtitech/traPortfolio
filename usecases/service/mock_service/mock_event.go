@@ -38,18 +38,18 @@ func (m *MockEventService) EXPECT() *MockEventServiceMockRecorder {
 }
 
 // GetEventByID mocks base method.
-func (m *MockEventService) GetEventByID(ctx context.Context, id uuid.UUID) (*domain.EventDetail, error) {
+func (m *MockEventService) GetEventByID(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEventByID", ctx, id)
+	ret := m.ctrl.Call(m, "GetEventByID", ctx, eventID)
 	ret0, _ := ret[0].(*domain.EventDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetEventByID indicates an expected call of GetEventByID.
-func (mr *MockEventServiceMockRecorder) GetEventByID(ctx, id interface{}) *gomock.Call {
+func (mr *MockEventServiceMockRecorder) GetEventByID(ctx, eventID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventByID", reflect.TypeOf((*MockEventService)(nil).GetEventByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventByID", reflect.TypeOf((*MockEventService)(nil).GetEventByID), ctx, eventID)
 }
 
 // GetEvents mocks base method.
@@ -68,15 +68,15 @@ func (mr *MockEventServiceMockRecorder) GetEvents(ctx interface{}) *gomock.Call 
 }
 
 // UpdateEventLevel mocks base method.
-func (m *MockEventService) UpdateEventLevel(ctx context.Context, id uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+func (m *MockEventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateEventLevel", ctx, id, arg)
+	ret := m.ctrl.Call(m, "UpdateEventLevel", ctx, eventID, arg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateEventLevel indicates an expected call of UpdateEventLevel.
-func (mr *MockEventServiceMockRecorder) UpdateEventLevel(ctx, id, arg interface{}) *gomock.Call {
+func (mr *MockEventServiceMockRecorder) UpdateEventLevel(ctx, eventID, arg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventLevel", reflect.TypeOf((*MockEventService)(nil).UpdateEventLevel), ctx, id, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventLevel", reflect.TypeOf((*MockEventService)(nil).UpdateEventLevel), ctx, eventID, arg)
 }

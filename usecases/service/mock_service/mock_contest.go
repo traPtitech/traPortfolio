@@ -52,10 +52,10 @@ func (mr *MockContestServiceMockRecorder) AddContestTeamMembers(ctx, teamID, mem
 }
 
 // CreateContest mocks base method.
-func (m *MockContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.Contest, error) {
+func (m *MockContestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateContest", ctx, args)
-	ret0, _ := ret[0].(*domain.Contest)
+	ret0, _ := ret[0].(*domain.ContestDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -82,17 +82,17 @@ func (mr *MockContestServiceMockRecorder) CreateContestTeam(ctx, contestID, args
 }
 
 // DeleteContest mocks base method.
-func (m *MockContestService) DeleteContest(ctx context.Context, id uuid.UUID) error {
+func (m *MockContestService) DeleteContest(ctx context.Context, contestID uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteContest", ctx, id)
+	ret := m.ctrl.Call(m, "DeleteContest", ctx, contestID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteContest indicates an expected call of DeleteContest.
-func (mr *MockContestServiceMockRecorder) DeleteContest(ctx, id interface{}) *gomock.Call {
+func (mr *MockContestServiceMockRecorder) DeleteContest(ctx, contestID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContest", reflect.TypeOf((*MockContestService)(nil).DeleteContest), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContest", reflect.TypeOf((*MockContestService)(nil).DeleteContest), ctx, contestID)
 }
 
 // DeleteContestTeam mocks base method.
@@ -124,18 +124,18 @@ func (mr *MockContestServiceMockRecorder) DeleteContestTeamMembers(ctx, teamID, 
 }
 
 // GetContest mocks base method.
-func (m *MockContestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error) {
+func (m *MockContestService) GetContest(ctx context.Context, contestID uuid.UUID) (*domain.ContestDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetContest", ctx, id)
+	ret := m.ctrl.Call(m, "GetContest", ctx, contestID)
 	ret0, _ := ret[0].(*domain.ContestDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetContest indicates an expected call of GetContest.
-func (mr *MockContestServiceMockRecorder) GetContest(ctx, id interface{}) *gomock.Call {
+func (mr *MockContestServiceMockRecorder) GetContest(ctx, contestID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContest", reflect.TypeOf((*MockContestService)(nil).GetContest), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContest", reflect.TypeOf((*MockContestService)(nil).GetContest), ctx, contestID)
 }
 
 // GetContestTeam mocks base method.
@@ -199,17 +199,17 @@ func (mr *MockContestServiceMockRecorder) GetContests(ctx interface{}) *gomock.C
 }
 
 // UpdateContest mocks base method.
-func (m *MockContestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
+func (m *MockContestService) UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateContest", ctx, id, args)
+	ret := m.ctrl.Call(m, "UpdateContest", ctx, contestID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateContest indicates an expected call of UpdateContest.
-func (mr *MockContestServiceMockRecorder) UpdateContest(ctx, id, args interface{}) *gomock.Call {
+func (mr *MockContestServiceMockRecorder) UpdateContest(ctx, contestID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContest", reflect.TypeOf((*MockContestService)(nil).UpdateContest), ctx, id, args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContest", reflect.TypeOf((*MockContestService)(nil).UpdateContest), ctx, contestID, args)
 }
 
 // UpdateContestTeam mocks base method.

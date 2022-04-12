@@ -13,7 +13,7 @@ type UpdateEventLevelArg struct {
 
 type EventRepository interface {
 	GetEvents() ([]*domain.Event, error)
-	GetEvent(id uuid.UUID) (*domain.EventDetail, error)
-	UpdateEventLevel(id uuid.UUID, arg *UpdateEventLevelArg) error
+	GetEvent(eventID uuid.UUID) (*domain.EventDetail, error)
+	UpdateEventLevel(eventID uuid.UUID, arg *UpdateEventLevelArg) error
 	GetUserEvents(userID uuid.UUID) ([]*domain.Event, error)
 }

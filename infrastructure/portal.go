@@ -90,7 +90,7 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	return userResponses, nil
 }
 
-func (portal *PortalAPI) GetByID(traQID string) (*external.PortalUserResponse, error) {
+func (portal *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	if traQID == "" {
 		return nil, fmt.Errorf("invalid traQID")
 	}

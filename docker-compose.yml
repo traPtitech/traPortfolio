@@ -5,15 +5,7 @@ services:
     build: ./
     restart: always
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
-    command: ./traPortfolio
-    environment:
-      APP_ENV: ${APP_ENV}
-      KNOQ_COOKIE: ${KNOQ_COOKIE}
-      KNOQ_API_ENDPOINT: ${KNOQ_API_ENDPOINT}
-      TRAQ_COOKIE: ${TRAQ_COOKIE}
-      TRAQ_API_ENDPOINT: ${TRAQ_API_ENDPOINT}
-      PORTAL_COOKIE: ${PORTAL_COOKIE}
-      PORTAL_API_ENDPOINT: ${PORTAL_API_ENDPOINT}
+    command: ./traPortfolio -c /opt/portfolio/config.yaml
     expose:
       - "80"
       - "6060"
@@ -21,6 +13,8 @@ services:
       - "1323:1323"
     depends_on:
       - mysql
+    volumes:
+      - ./dev/config.yaml:/opt/portfolio/config.yaml
 
   mysql:
     image: mariadb:10.6.4
@@ -32,6 +26,8 @@ services:
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     expose:
       - "3306"
+    ports:
+      - "3306:3306"
 
   adminer:
     image: adminer

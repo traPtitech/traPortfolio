@@ -12,7 +12,7 @@ type User struct {
 
 type Account struct {
 	ID          uuid.UUID
-	Name        string
+	DisplayName string
 	Type        uint
 	PrPermitted bool
 	URL         string
@@ -37,6 +37,14 @@ type UserContest struct {
 	Name        string // チーム名
 	Result      string
 	ContestName string
+}
+
+// UserGroup indicates User who belongs to Group
+type UserGroup struct {
+	ID       uuid.UUID // User ID
+	Name     string    // User Name
+	RealName string
+	Duration YearWithSemesterDuration
 }
 
 const (

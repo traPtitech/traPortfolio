@@ -33,7 +33,7 @@ func NewContestHandler(service service.ContestService) *ContestHandler {
 
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetContests(ctx)
 	if err != nil {
@@ -49,7 +49,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 }
 
 func (h *ContestHandler) GetContest(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -78,7 +78,7 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 
 // PostContest POST /contests
 func (h *ContestHandler) PostContest(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := PostContestJSONRequestBody{}
 	err := c.BindAndValidate(&req)
@@ -99,14 +99,18 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd)
+	contestTeams := make([]ContestTeam, 0, len(contest.Teams))
+	for _, team := range contest.Teams {
+		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
+	}
+	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
 
 	return c.JSON(http.StatusCreated, res)
 }
 
 // PatchContest PATCH /contests/:contestID
 func (h *ContestHandler) PatchContest(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
@@ -136,7 +140,7 @@ func (h *ContestHandler) PatchContest(_c echo.Context) error {
 
 // DeleteContest DELETE /contests/:contestID
 func (h *ContestHandler) DeleteContest(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -151,7 +155,7 @@ func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 
 // GetContestTeams GET /contests/:contestID/teams
 func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := ContestIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -173,7 +177,7 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 
 // GetContestTeams GET /contests/:contestID/teams/:teamID
 func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
@@ -204,7 +208,7 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 
 // PostContestTeam POST /contests/:contestID/teams
 func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
@@ -234,7 +238,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 
 // PatchContestTeam PATCH /contests/:contestID
 func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	req := struct {
@@ -262,7 +266,7 @@ func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
 
 // DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
 func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
@@ -282,7 +286,7 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 
 // GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
 func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
@@ -310,7 +314,7 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 
 // PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	req := struct {
@@ -332,7 +336,7 @@ func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
 
 // DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
 	req := struct {

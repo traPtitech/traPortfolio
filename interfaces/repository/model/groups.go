@@ -7,12 +7,13 @@ import (
 )
 
 type Group struct {
-	GroupID   uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Name      string    `gorm:"type:varchar(32)"`
-	Link      string    `gorm:"type:text"`
-	Leader    uuid.UUID `gorm:"type:char(36);not null"`
-	CreatedAt time.Time `gorm:"precision:6"`
-	UpdatedAt time.Time `gorm:"precision:6"`
+	GroupID     uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Name        string    `gorm:"type:varchar(32)"`
+	Link        string    `gorm:"type:text"`
+	Leader      uuid.UUID `gorm:"type:char(36);not null"`
+	Description string    `gorm:"type:text"`
+	CreatedAt   time.Time `gorm:"precision:6"`
+	UpdatedAt   time.Time `gorm:"precision:6"`
 }
 
 func (*Group) TableName() string {

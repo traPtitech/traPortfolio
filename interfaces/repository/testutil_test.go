@@ -4,12 +4,15 @@ import (
 	"database/sql/driver"
 	"errors"
 	"math/rand"
+	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -71,6 +74,30 @@ func makeKnoqEvent(event *domain.EventDetail) *external.EventResponse {
 	}
 }
 
+func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *external.TraQGetAllArgs {
+	t.Helper()
+
+	eargs, err := impl.MakeTraqGetAllArgs(rargs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return eargs
+}
+
+func makeTraqUsers(t *testing.T, users []*domain.User) []*external.TraQUserResponse {
+	t.Helper()
+
+	res := make([]*external.TraQUserResponse, len(users))
+	for i, u := range users {
+		res[i] = &external.TraQUserResponse{
+			ID: u.ID,
+		}
+	}
+
+	return res
+}
+
 func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
 	res := make([]*external.PortalUserResponse, len(users))
 	for i, u := range users {
@@ -90,10 +117,8 @@ func makePortalUser(user *domain.User) *external.PortalUserResponse {
 
 func makeTraqUser(user *domain.UserDetail) *external.TraQUserResponse {
 	return &external.TraQUserResponse{
-		State:       user.State,
-		Bot:         false,
-		DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
-		Name:        user.Name,
+		ID:    user.ID,
+		State: user.State,
 	}
 }
 

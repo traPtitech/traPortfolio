@@ -45,7 +45,10 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 	contestRepository := repository.NewContestRepository(sqlHandler, portalAPI)
 	contestService := service.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestService)
-	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler)
+	groupRepository := repository.NewGroupRepository(sqlHandler)
+	groupService := service.NewGroupService(groupRepository, userRepository)
+	groupHandler := handler.NewGroupHandler(groupService)
+	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
 	return api, nil
 }
 
@@ -58,6 +61,8 @@ var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, 
 var projectSet = wire.NewSet(repository.NewProjectRepository, service.NewProjectService, handler.NewProjectHandler)
 
 var eventSet = wire.NewSet(repository.NewEventRepository, service.NewEventService, handler.NewEventHandler)
+
+var groupSet = wire.NewSet(repository.NewGroupRepository, service.NewGroupService, handler.NewGroupHandler)
 
 var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
 

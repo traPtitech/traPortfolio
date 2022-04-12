@@ -9,8 +9,7 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/require"
-	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
@@ -23,7 +22,9 @@ func doRequest(t *testing.T, api handler.API, method, path string, reqBody inter
 
 	e := echo.New()
 
-	infrastructure.Setup(e, api)
+	if err := handler.Setup(e, api); err != nil {
+		t.Fatal(err)
+	}
 	e.ServeHTTP(rec, req)
 
 	// ここ決め打ちじゃないほうが良いかもしれない
@@ -38,7 +39,7 @@ func requestEncode(t *testing.T, body interface{}) *strings.Reader {
 	t.Helper()
 
 	b, err := json.Marshal(body)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	return strings.NewReader(string(b))
 }
@@ -47,7 +48,7 @@ func responseDecode(t *testing.T, rec *httptest.ResponseRecorder, i interface{})
 	t.Helper()
 
 	err := json.Unmarshal(rec.Body.Bytes(), i)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 // FIXME: 暫定対処
