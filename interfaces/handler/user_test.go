@@ -576,7 +576,6 @@ func TestUserHandler_AddAccount(t *testing.T) {
 				userID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				s.EXPECT().CreateAccount(gomock.Any(), userID, &repository.CreateAccountArgs{}).Return(nil, repository.ErrValidate)
 				return nil, handler.Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
