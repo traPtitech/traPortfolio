@@ -2,7 +2,6 @@ package handler_test
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
 	"testing"
 	"time"
@@ -115,24 +114,24 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *handler.ContestDetail) {
 	d := domain.ContestDetail{
 		Contest: domain.Contest{
 			ID:        getContestID[0],
-			Name:      random.AlphaNumericn(rand.Intn(30) + 1),
+			Name:      random.AlphaNumeric(),
 			TimeStart: random.Time(),
 			TimeEnd:   random.Time(),
 		},
 		Link:        random.RandURLString(),
-		Description: random.AlphaNumericn(rand.Intn(30) + 1),
+		Description: random.AlphaNumeric(),
 		Teams: []*domain.ContestTeam{
 			{
 				ID:        getContestID[1],
 				ContestID: getContestID[0],
-				Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-				Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+				Name:      random.AlphaNumeric(),
+				Result:    random.AlphaNumeric(),
 			},
 			{
 				ID:        getContestID[2],
 				ContestID: getContestID[0],
-				Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-				Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+				Name:      random.AlphaNumeric(),
+				Result:    random.AlphaNumeric(),
 			},
 		},
 	}
@@ -241,10 +240,10 @@ func TestContestHandler_PostContest(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockContestService) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
 				reqBody = makePostContestRequest(
-					random.AlphaNumericn(rand.Intn(30)+1),
+					random.AlphaNumeric(),
 					random.Time(),
 					random.Time(),
-					random.AlphaNumericn(rand.Intn(30)+1),
+					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
 				args := repository.CreateContestArgs{
@@ -283,11 +282,11 @@ func TestContestHandler_PostContest(t *testing.T) {
 			name: "Bad Request: invalid url",
 			setup: func(s *mock_service.MockContestService) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
 				reqBody = makePostContestRequest(
-					random.AlphaNumericn(rand.Intn(30)+1),
+					random.AlphaNumeric(),
 					random.Time(),
 					random.Time(),
-					random.AlphaNumericn(rand.Intn(30)+1),
-					random.AlphaNumericn(rand.Intn(30)+1),
+					random.AlphaNumeric(),
+					random.AlphaNumeric(),
 				)
 				path = "/api/v1/contests"
 				return reqBody, nil, nil, path
@@ -298,10 +297,10 @@ func TestContestHandler_PostContest(t *testing.T) {
 			name: "Conflict",
 			setup: func(s *mock_service.MockContestService) (reqBody *handler.PostContestJSONRequestBody, expectedResBody *handler.Contest, resBody *handler.Contest, path string) {
 				reqBody = makePostContestRequest(
-					random.AlphaNumericn(rand.Intn(30)+1),
+					random.AlphaNumeric(),
 					random.Time(),
 					random.Time(),
-					random.AlphaNumericn(rand.Intn(30)+1),
+					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
 				args := repository.CreateContestArgs{
@@ -345,9 +344,9 @@ func TestContestHandler_PatchContest(t *testing.T) {
 			name: "Success 1",
 			setup: func(s *mock_service.MockContestService) (*handler.EditContestJSONRequestBody, string) {
 				contestID := random.UUID()
-				name := random.AlphaNumericn(rand.Intn(30) + 1)
+				name := random.AlphaNumeric()
 				link := random.RandURLString()
-				description := random.AlphaNumericn(rand.Intn(30) + 1)
+				description := random.AlphaNumeric()
 				since := random.Time()
 				until := random.Time()
 				reqBody := &handler.EditContestJSONRequestBody{
@@ -481,14 +480,14 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 					{
 						ID:        random.UUID(),
 						ContestID: contestID,
-						Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-						Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
 					},
 					{
 						ID:        random.UUID(),
 						ContestID: contestID,
-						Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-						Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
 					},
 				}
 				hres = []*handler.ContestTeam{
@@ -550,21 +549,21 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 					ContestTeam: domain.ContestTeam{
 						ID:        teamID,
 						ContestID: contestID,
-						Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-						Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
 					},
-					Link:        random.AlphaNumericn(rand.Intn(30) + 1),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
+					Link:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
 					Members: []*domain.User{
 						{
 							ID:       random.UUID(),
-							Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-							RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
 						},
 						{
 							ID:       random.UUID(),
-							Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-							RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
 						},
 					},
 				}
@@ -649,10 +648,10 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &handler.PostContestTeamJSONRequestBody{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
@@ -685,10 +684,10 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 			name: "BadRequest: Invalid contest ID",
 			setup: func(s *mock_service.MockContestService) (*handler.PostContestTeamJSONRequestBody, handler.ContestTeam, string) {
 				reqBody := &handler.PostContestTeamJSONRequestBody{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				return reqBody, handler.ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", invalidID)
 			},
@@ -699,10 +698,10 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 			setup: func(s *mock_service.MockContestService) (*handler.PostContestTeamJSONRequestBody, handler.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &handler.PostContestTeamJSONRequestBody{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
@@ -720,10 +719,10 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 			setup: func(s *mock_service.MockContestService) (*handler.PostContestTeamJSONRequestBody, handler.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &handler.PostContestTeamJSONRequestBody{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
@@ -768,10 +767,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &handler.EditContestTeamJSONRequestBody{
-					Name:        ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
-					Description: ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Result:      ptr(t, random.AlphaNumeric()),
+					Description: ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.UpdateContestTeamArgs{
 					Name:        optional.StringFrom(reqBody.Name),
@@ -788,10 +787,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 			name: "BadRequest: Invalid contest ID",
 			setup: func(s *mock_service.MockContestService) (*handler.EditContestTeamJSONRequestBody, string) {
 				reqBody := &handler.EditContestTeamJSONRequestBody{
-					Name:        ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
-					Description: ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Result:      ptr(t, random.AlphaNumeric()),
+					Description: ptr(t, random.AlphaNumeric()),
 				}
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", invalidID, random.UUID())
 			},
@@ -801,10 +800,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 			name: "BadRequest: Invalid team ID",
 			setup: func(s *mock_service.MockContestService) (*handler.EditContestTeamJSONRequestBody, string) {
 				reqBody := &handler.EditContestTeamJSONRequestBody{
-					Name:        ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
-					Description: ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Result:      ptr(t, random.AlphaNumeric()),
+					Description: ptr(t, random.AlphaNumeric()),
 				}
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), invalidID)
 			},
@@ -816,10 +815,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &handler.EditContestTeamJSONRequestBody{
-					Name:        ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
-					Result:      ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
-					Description: ptr(t, random.AlphaNumericn(rand.Intn(30)+1)),
+					Result:      ptr(t, random.AlphaNumeric()),
+					Description: ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.UpdateContestTeamArgs{
 					Name:        optional.StringFrom(reqBody.Name),
@@ -864,8 +863,8 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 				users := []*domain.User{
 					{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-						RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					},
 				}
 				hres := make([]*handler.User, len(users))

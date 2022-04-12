@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"database/sql/driver"
-	"math/rand"
 	"regexp"
 	"testing"
 	"time"
@@ -46,7 +45,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			want: []*domain.Contest{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: sampleTime,
 					TimeEnd:   sampleTime,
 				},
@@ -112,12 +111,12 @@ func TestContestRepository_GetContest(t *testing.T) {
 			want: &domain.ContestDetail{
 				Contest: domain.Contest{
 					ID:        cid,
-					Name:      random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: sampleTime,
 					TimeEnd:   sampleTime,
 				},
 				Link:        random.RandURLString(),
-				Description: random.AlphaNumericn(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				// Teams:
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
@@ -165,9 +164,9 @@ func TestContestRepository_GetContest(t *testing.T) {
 }
 
 func TestContestRepository_CreateContest(t *testing.T) {
-	cname := random.AlphaNumericn(rand.Intn(30) + 1)       // Successで使用するContest.Name
-	link := random.AlphaNumericn(rand.Intn(30) + 1)        // Successで使用するContestDetail.Link
-	description := random.AlphaNumericn(rand.Intn(30) + 1) // Successで使用するContestDetail.Description
+	cname := random.AlphaNumeric()       // Successで使用するContest.Name
+	link := random.AlphaNumeric()        // Successで使用するContestDetail.Link
+	description := random.AlphaNumeric() // Successで使用するContestDetail.Description
 
 	t.Parallel()
 	type args struct {
@@ -221,8 +220,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			name: "UnexpectedError Create",
 			args: args{
 				args: &repository.CreateContestArgs{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
@@ -243,8 +242,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			name: "UnexpectedError Get",
 			args: args{
 				args: &repository.CreateContestArgs{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
@@ -304,8 +303,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -340,8 +339,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -362,8 +361,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -511,8 +510,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					ContestID: cid,
-					Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
@@ -607,11 +606,11 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 				ContestTeam: domain.ContestTeam{
 					ID:        tid,
 					ContestID: cid,
-					Name:      random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:    random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
 				},
 				Link:        random.RandURLString(),
-				Description: random.AlphaNumericn(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				// Members
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
@@ -661,10 +660,10 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
-		Name:        random.AlphaNumericn(rand.Intn(30) + 1),
-		Result:      optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+		Name:        random.AlphaNumeric(),
+		Result:      optional.NewString(random.AlphaNumeric(), true),
 		Link:        optional.NewString(random.RandURLString(), true),
-		Description: random.AlphaNumericn(rand.Intn(30) + 1),
+		Description: random.AlphaNumeric(),
 	}
 
 	t.Parallel()
@@ -711,10 +710,10 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			args: args{
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:      optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        random.AlphaNumeric(),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 				},
 			},
 			want: nil,
@@ -766,10 +765,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -802,10 +801,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -823,10 +822,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -884,8 +883,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-					RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
@@ -917,13 +916,13 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-					RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-					RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
@@ -974,8 +973,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				u := &domain.User{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-					RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				}
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).

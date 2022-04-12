@@ -44,8 +44,8 @@ func TestUserHandler_GetAll(t *testing.T) {
 				for i := 0; i < casenum; i++ {
 					ruser := domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-						RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					}
 					huser := handler.User{
 						Id:       ruser.ID,
@@ -117,10 +117,10 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						DisplayName: random.AlphaNumericn(rand.Intn(30) + 1),
+						DisplayName: random.AlphaNumeric(),
 						Type:        uint(rand.Intn(int(domain.AccountLimit))),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumericn(rand.Intn(30) + 1),
+						URL:         random.AlphaNumeric(),
 					}
 
 					haccount := handler.Account{
@@ -139,8 +139,8 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					User: domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-						RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					},
 					State:    domain.TraQState(uint8(rand.Intn(int(domain.TraqStateLimit)))),
 					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
@@ -225,7 +225,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumericn(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -252,7 +252,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumericn(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -279,7 +279,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumericn(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -365,10 +365,10 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:        random.AlphaNumeric(),
 						Type:        uint(i),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumericn(rand.Intn(30) + 1),
+						URL:         random.AlphaNumeric(),
 					}
 
 					haccount := handler.Account{
@@ -460,10 +460,10 @@ func TestUserHandler_GetAccount(t *testing.T) {
 
 				rAccount := domain.Account{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Type:        uint(rand.Intn(int(domain.AccountLimit))),
 					PrPermitted: prRandom,
-					URL:         random.AlphaNumericn(rand.Intn(30) + 1),
+					URL:         random.AlphaNumeric(),
 				}
 				hAccount := handler.Account{
 					Id:          rAccount.ID,

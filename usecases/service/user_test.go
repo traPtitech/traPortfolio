@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
@@ -40,8 +39,8 @@ func TestUserService_GetUsers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-					RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
@@ -104,11 +103,11 @@ func TestUserService_GetUser(t *testing.T) {
 			want: &domain.UserDetail{
 				User: domain.User{
 					ID:       uuid.Nil, // setupで変更する
-					Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-					RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 				State: domain.TraqStateActive,
-				Bio:   random.AlphaNumericn(rand.Intn(30) + 1),
+				Bio:   random.AlphaNumeric(),
 				Accounts: []*domain.Account{
 					{
 						ID:          random.UUID(),
@@ -175,7 +174,7 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -190,7 +189,7 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -337,9 +336,9 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					DisplayName: random.AlphaNumericn(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(),
 					Type:        domain.HOMEPAGE,
-					URL:         "https://" + random.AlphaNumericn(rand.Intn(30)+1),
+					URL:         "https://" + random.AlphaNumeric(),
 					PrPermitted: true,
 				},
 			},
@@ -361,7 +360,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				account: &repository.CreateAccountArgs{
 					DisplayName: "",
 					Type:        domain.HOMEPAGE,
-					URL:         "https://" + random.AlphaNumericn(rand.Intn(30)+1),
+					URL:         "https://" + random.AlphaNumeric(),
 					PrPermitted: true,
 				},
 			},
@@ -376,9 +375,9 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					DisplayName: random.AlphaNumericn(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(),
 					Type:        10000,
-					URL:         "https://" + random.AlphaNumericn(rand.Intn(30)+1),
+					URL:         "https://" + random.AlphaNumeric(),
 					PrPermitted: true,
 				},
 			},
@@ -429,7 +428,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
@@ -447,7 +446,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
@@ -543,7 +542,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			want: []*domain.UserProject{
 				{
 					ID:           random.UUID(),
-					Name:         random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:         random.AlphaNumeric(),
 					Duration:     random.Duration(),
 					UserDuration: random.Duration(),
 				},
@@ -608,9 +607,9 @@ func TestUserService_GetUserContests(t *testing.T) {
 			want: []*domain.UserContest{
 				{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumericn(rand.Intn(30) + 1),
-					Result:      random.AlphaNumericn(rand.Intn(30) + 1),
-					ContestName: random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
+					Result:      random.AlphaNumeric(),
+					ContestName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
@@ -673,7 +672,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumericn(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
