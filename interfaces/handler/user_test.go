@@ -569,6 +569,72 @@ func TestUserHandler_AddAccount(t *testing.T) {
 			},
 			statusCode: http.StatusCreated,
 		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+
+				userID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(gomock.Any(), userID, &repository.CreateAccountArgs{}).Return(nil, repository.ErrValidate)
+				return nil, handler.Account{}, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+
+				userID := random.AlphaNumeric(36)
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, handler.Account{}, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		/*
+			{
+				name: "Bad Request",
+				setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+
+					userID := random.UUID()
+
+					reqBody := handler.AddAccountJSONBody{
+						Id:          random.AlphaNumeric(rand.Intn(30) + 1),
+						PrPermitted: handler.PrPermitted(random.Bool()),
+						Type:        handler.AccountType((rand.Intn(int(domain.AccountLimit)))),
+						Url:         random.RandURLString(),
+					}
+
+					args := repository.CreateAccountArgs{
+						ID:          reqBody.Id,
+						Type:        uint(reqBody.Type),
+						URL:         reqBody.Url,
+						PrPermitted: bool(reqBody.PrPermitted),
+					}
+
+					want := domain.Account{
+						ID:          userID,
+						Name:        args.ID,
+						Type:        args.Type,
+						PrPermitted: args.PrPermitted,
+						URL:         args.URL,
+					}
+
+					expectedResBody := handler.Account{
+						Id:          userID,
+						Name:        reqBody.Id,
+						PrPermitted: reqBody.PrPermitted,
+						Type:        reqBody.Type,
+						Url:         reqBody.Url,
+					}
+
+					path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+					s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(&want, nil)
+					return &reqBody, expectedResBody, path
+				},
+				statusCode: http.StatusBadRequest,
+			},*/
 		/*{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
