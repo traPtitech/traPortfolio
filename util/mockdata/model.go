@@ -72,7 +72,6 @@ var (
 		GroupID:     uuid.FromStringOrNil("455938b1-635f-4b43-ae74-66550b04c5d4"),
 		Name:        "sample_group_name",
 		Link:        "https://sample.groups.com",
-		Leader:      uuid.FromStringOrNil("3a3cb018-76df-49e2-ad1b-85ee3a48c7e2"),
 		Description: "sample_group_description",
 	}
 

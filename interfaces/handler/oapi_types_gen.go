@@ -330,11 +330,10 @@ type GroupDetail struct {
 	// Embedded struct due to allOf(#/components/schemas/Group)
 	Group `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
+	Admin []User `json:"admin"`
+
 	// 班説明
 	Description string `json:"description"`
-
-	// ユーザー情報
-	Leader User `json:"leader"`
 
 	// 班の詳細が載っているページへのリンク
 	Link string `json:"link"`
