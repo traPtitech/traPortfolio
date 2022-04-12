@@ -1146,7 +1146,7 @@ components:
               description: 班の詳細が載っているページへのリンク
             admin:
               type: array
-              discription: 班管理者
+              description: 班管理者
               items:
                 $ref: '#/components/schemas/User'
             members:
