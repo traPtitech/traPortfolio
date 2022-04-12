@@ -31,7 +31,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	if args == nil {
 		var link optional.String
 		if rand.Intn(2) == 1 {
-			link = optional.NewString(random.AlphaNumericn(rand.Intn(30)+1), true)
+			link = optional.NewString(random.AlphaNumeric(), true)
 		}
 
 		var t optional.Time
@@ -40,8 +40,8 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 		}
 
 		args = &repository.CreateContestArgs{
-			Name:        random.AlphaNumericn(rand.Intn(30) + 1),
-			Description: random.AlphaNumericn(rand.Intn(30) + 1),
+			Name:        random.AlphaNumeric(),
+			Description: random.AlphaNumeric(),
 			Link:        link,
 			Since:       random.Time(),
 			Until:       t,

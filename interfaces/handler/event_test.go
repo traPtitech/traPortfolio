@@ -44,7 +44,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 				for i := 0; i < casenum; i++ {
 					revent := domain.Event{
 						ID:        random.UUID(),
-						Name:      random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
 						TimeStart: random.Time(),
 						TimeEnd:   random.Time(),
 					}
@@ -109,8 +109,8 @@ func TestEventHandler_GetByID(t *testing.T) {
 				for i := 0; i < hostnum; i++ {
 					rhost := domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumericn(rand.Intn(30) + 1),
-						RealName: random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					}
 					hhost := handler.User{
 						Id:       rhost.ID,
@@ -127,13 +127,13 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 					Event: domain.Event{
 						ID:        random.UUID(),
-						Name:      random.AlphaNumericn(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
 						TimeStart: random.Time(),
 						TimeEnd:   random.Time(),
 					},
 
-					Description: random.AlphaNumericn(rand.Intn(30) + 1),
-					Place:       random.AlphaNumericn(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
+					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
 					HostName:    rHost,
 					GroupID:     random.UUID(),
