@@ -3,7 +3,6 @@
 package repository_test
 
 import (
-	"sort"
 	"testing"
 	"time"
 
@@ -184,16 +183,6 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 	gots := [][]*domain.ContestTeam{{&team1.ContestTeam, &team2.ContestTeam}, gotTeams2}
 
 	for i := range expected {
-		expectedTeams := expected[i]
-		sort.SliceStable(expectedTeams, func(i, j int) bool {
-			return expectedTeams[i].ID.String() > expectedTeams[j].ID.String()
-		})
-
-		gotsTeams := gots[i]
-		sort.SliceStable(gotsTeams, func(i, j int) bool {
-			return gotsTeams[i].ID.String() > gotsTeams[j].ID.String()
-		})
-
-		assert.Equal(t, expectedTeams, gotsTeams)
+		assert.ElementsMatch(t, expected[i], gots[i])
 	}
 }
