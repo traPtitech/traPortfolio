@@ -35,7 +35,7 @@ func NewUserHandler(s service.UserService) *UserHandler {
 
 // GetAll GET /users
 func (handler *UserHandler) GetAll(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := GetUsersParams{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -62,7 +62,7 @@ func (handler *UserHandler) GetAll(_c echo.Context) error {
 
 // GetByID GET /users/:userID
 func (handler *UserHandler) GetByID(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -76,7 +76,7 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 
 	accounts := make([]Account, len(user.Accounts))
 	for i, v := range user.Accounts {
-		accounts[i] = newAccount(v.ID, v.Name, v.Type, v.URL, v.PrPermitted)
+		accounts[i] = newAccount(v.ID, v.DisplayName, v.Type, v.URL, v.PrPermitted)
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
@@ -89,7 +89,7 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 
 // Update PATCH /users/:userID
 func (handler *UserHandler) Update(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
 		EditUserJSONRequestBody
@@ -113,7 +113,7 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 
 // GetAccounts GET /users/:userID/accounts
 func (handler *UserHandler) GetAccounts(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -126,7 +126,7 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 
 	res := make([]Account, len(accounts))
 	for i, v := range accounts {
-		res[i] = newAccount(v.ID, v.Name, v.Type, v.URL, v.PrPermitted)
+		res[i] = newAccount(v.ID, v.DisplayName, v.Type, v.URL, v.PrPermitted)
 	}
 
 	return c.JSON(http.StatusOK, accounts)
@@ -134,7 +134,7 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 
 // GetAccount GET /users/:userID/accounts/:accountID
 func (handler *UserHandler) GetAccount(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
 		AccountIDInPath
@@ -148,12 +148,12 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, account.Type, account.URL, account.PrPermitted))
 }
 
 // AddAccount POST /users/:userID/accounts
 func (handler *UserHandler) AddAccount(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
 		AddAccountJSONRequestBody
@@ -164,7 +164,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
-		ID:          req.Id,
+		DisplayName: req.DisplayName,
 		Type:        uint(req.Type),
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
@@ -174,12 +174,12 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, newAccount(account.ID, account.Name, account.Type, account.URL, account.PrPermitted))
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, account.Type, account.URL, account.PrPermitted))
 }
 
 // PatchAccount PATCH /users/:userID/accounts/:accountID
 func (handler *UserHandler) PatchAccount(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
 		AccountIDInPath
@@ -192,7 +192,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.UpdateAccountArgs{
-		Name:        optional.StringFrom(req.Id),
+		DisplayName: optional.StringFrom(req.DisplayName),
 		Type:        optional.Int64From(((*int64)(req.Type))),
 		URL:         optional.StringFrom(req.Url),
 		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
@@ -208,7 +208,7 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 
 // DeleteAccount DELETE /users/:userID/accounts/:accountID
 func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
 		AccountIDInPath
@@ -227,7 +227,7 @@ func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 
 // GetProjects GET /users/:userID/projects
 func (handler *UserHandler) GetProjects(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -253,7 +253,7 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 
 // GetContests GET /users/:userID/contests
 func (handler *UserHandler) GetContests(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -278,7 +278,7 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 
 // GetGroups by UserID GET /users/:userID/groups
 func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := GroupIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -302,7 +302,7 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 
 // GetEvents GET /users/:userID/events
 func (handler *UserHandler) GetEvents(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -339,10 +339,10 @@ func newUserDetail(user User, accounts []Account, bio string, state domain.TraQS
 	}
 }
 
-func newAccount(id uuid.UUID, name string, atype uint, url string, prPermitted bool) Account {
+func newAccount(id uuid.UUID, displayName string, atype uint, url string, prPermitted bool) Account {
 	return Account{
 		Id:          id,
-		Name:        name,
+		DisplayName: displayName,
 		Type:        AccountType(atype),
 		Url:         url,
 		PrPermitted: PrPermitted(prPermitted),

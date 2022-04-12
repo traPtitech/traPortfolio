@@ -81,33 +81,33 @@ func (mr *MockProjectServiceMockRecorder) DeleteProjectMembers(ctx, projectID, m
 }
 
 // GetProject mocks base method.
-func (m *MockProjectService) GetProject(ctx context.Context, id uuid.UUID) (*domain.Project, error) {
+func (m *MockProjectService) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProject", ctx, id)
+	ret := m.ctrl.Call(m, "GetProject", ctx, projectID)
 	ret0, _ := ret[0].(*domain.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProject indicates an expected call of GetProject.
-func (mr *MockProjectServiceMockRecorder) GetProject(ctx, id interface{}) *gomock.Call {
+func (mr *MockProjectServiceMockRecorder) GetProject(ctx, projectID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectService)(nil).GetProject), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectService)(nil).GetProject), ctx, projectID)
 }
 
 // GetProjectMembers mocks base method.
-func (m *MockProjectService) GetProjectMembers(ctx context.Context, id uuid.UUID) ([]*domain.User, error) {
+func (m *MockProjectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectMembers", ctx, id)
+	ret := m.ctrl.Call(m, "GetProjectMembers", ctx, projectID)
 	ret0, _ := ret[0].([]*domain.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProjectMembers indicates an expected call of GetProjectMembers.
-func (mr *MockProjectServiceMockRecorder) GetProjectMembers(ctx, id interface{}) *gomock.Call {
+func (mr *MockProjectServiceMockRecorder) GetProjectMembers(ctx, projectID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectMembers", reflect.TypeOf((*MockProjectService)(nil).GetProjectMembers), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectMembers", reflect.TypeOf((*MockProjectService)(nil).GetProjectMembers), ctx, projectID)
 }
 
 // GetProjects mocks base method.
@@ -126,15 +126,15 @@ func (mr *MockProjectServiceMockRecorder) GetProjects(ctx interface{}) *gomock.C
 }
 
 // UpdateProject mocks base method.
-func (m *MockProjectService) UpdateProject(ctx context.Context, id uuid.UUID, args *repository.UpdateProjectArgs) error {
+func (m *MockProjectService) UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateProject", ctx, id, args)
+	ret := m.ctrl.Call(m, "UpdateProject", ctx, projectID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateProject indicates an expected call of UpdateProject.
-func (mr *MockProjectServiceMockRecorder) UpdateProject(ctx, id, args interface{}) *gomock.Call {
+func (mr *MockProjectServiceMockRecorder) UpdateProject(ctx, projectID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectService)(nil).UpdateProject), ctx, id, args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectService)(nil).UpdateProject), ctx, projectID, args)
 }

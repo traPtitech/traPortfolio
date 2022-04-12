@@ -36,11 +36,11 @@ const (
 
 // アカウントへのリンク
 type Account struct {
+	// 外部アカウントの表示名
+	DisplayName string `json:"displayName"`
+
 	// アカウントUUID
 	Id uuid.UUID `json:"id"`
-
-	// アカウントID
-	Name string `json:"name"`
 
 	// 広報での利用が許可されているかどうか
 	PrPermitted PrPermitted `json:"prPermitted"`
@@ -57,8 +57,8 @@ type AccountType int64
 
 // 新規アカウントリクエスト
 type AddAccount struct {
-	// アカウントID
-	Id string `json:"id"`
+	// 外部アカウントの表示名
+	DisplayName string `json:"displayName"`
 
 	// 広報での利用が許可されているかどうか
 	PrPermitted PrPermitted `json:"prPermitted"`
@@ -197,8 +197,8 @@ type Duration struct {
 
 // アカウント変更リクエスト
 type EditAccount struct {
-	// アカウントID
-	Id *string `json:"id,omitempty"`
+	// 外部アカウントの表示名
+	DisplayName *string `json:"displayName,omitempty"`
 
 	// 広報での利用が許可されているかどうか
 	PrPermitted *PrPermitted `json:"prPermitted,omitempty"`
@@ -556,10 +556,10 @@ type AddProjectMembersJSONBody AddProjectMembers
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// アカウントがアクティブでないユーザーを含めるかどうか
-	IncludeSuspended *IncludeSuspendedInQuery `json:"includeSuspended,omitempty"`
+	IncludeSuspended *IncludeSuspendedInQuery `json:"includeSuspended,omitempty" query:"includeSuspended"`
 
 	// 指定した文字列がtraP IDに含まれているかどうか
-	Name *NameInQuery `json:"name,omitempty"`
+	Name *NameInQuery `json:"name,omitempty" query:"name"`
 }
 
 // EditUserJSONBody defines parameters for EditUser.

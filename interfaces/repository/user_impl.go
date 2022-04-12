@@ -66,7 +66,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	if l := len(users); l == 0 {
 		return []*domain.User{}, nil
 	} else if l == 1 {
-		portalUser, err := repo.portal.GetByID(users[0].Name)
+		portalUser, err := repo.portal.GetByTraqID(users[0].Name)
 		if err != nil {
 			return nil, convertError(err)
 		}
@@ -104,11 +104,11 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	}
 }
 
-func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
+func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error) {
 	user := new(model.User)
 	err := repo.h.
 		Preload("Accounts").
-		Where(&model.User{ID: id}).
+		Where(&model.User{ID: userID}).
 		First(user).
 		Error()
 	if err != nil {
@@ -124,12 +124,12 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 		})
 	}
 
-	portalUser, err := repo.portal.GetByID(user.Name)
+	portalUser, err := repo.portal.GetByTraqID(user.Name)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	traQUser, err := repo.traQ.GetByID(id)
+	traQUser, err := repo.traQ.GetByUserID(userID)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -149,7 +149,7 @@ func (repo *UserRepository) GetUser(id uuid.UUID) (*domain.UserDetail, error) {
 }
 
 func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
-	portalUser, err := repo.portal.GetByID(args.Name)
+	portalUser, err := repo.portal.GetByTraqID(args.Name)
 	if err != nil {
 		log.Println(err)
 	}
@@ -219,7 +219,7 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUserArgs) error {
+func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.UpdateUserArgs) error {
 	changes := map[string]interface{}{}
 	if args.Description.Valid {
 		changes["description"] = args.Description.String
@@ -235,7 +235,7 @@ func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUser
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
 		err := repo.h.
-			Where(&model.User{ID: id}).
+			Where(&model.User{ID: userID}).
 			First(user).
 			Error()
 		if err != nil {
@@ -255,13 +255,13 @@ func (repo *UserRepository) UpdateUser(id uuid.UUID, args *repository.UpdateUser
 	return nil
 }
 
-func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
+func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
-		Name:   args.ID,
+		Name:   args.DisplayName,
 		URL:    args.URL,
-		UserID: id,
+		UserID: userID,
 		Check:  args.PrPermitted,
 	}
 	err := repo.h.Create(&account).Error()
@@ -279,7 +279,7 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 	return &domain.Account{
 		ID:          ver.ID,
-		Name:        ver.Name,
+		DisplayName: ver.Name,
 		Type:        ver.Type,
 		PrPermitted: ver.Check,
 		URL:         ver.URL,
@@ -288,8 +288,8 @@ func (repo *UserRepository) CreateAccount(id uuid.UUID, args *repository.CreateA
 
 func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.String
+	if args.DisplayName.Valid {
+		changes["name"] = args.DisplayName.String
 	}
 	if args.URL.Valid {
 		changes["url"] = args.URL.String

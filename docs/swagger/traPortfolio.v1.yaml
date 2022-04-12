@@ -732,6 +732,20 @@ paths:
       tags:
         - project
         - user
+  /ping:
+    get:
+      summary: サーバー疎通確認
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+      description: サーバーの疎通確認を行います
+      tags:
+        - ping
 components:
   schemas:
     User:
@@ -824,9 +838,9 @@ components:
           description: アカウントUUID
           format: uuid
           x-go-type: uuid.UUID
-        name:
+        displayName:
           type: string
-          description: アカウントID
+          description: 外部アカウントの表示名
         type:
           $ref: '#/components/schemas/AccountType'
         prPermitted:
@@ -836,7 +850,7 @@ components:
           description: アカウントurl
       required:
         - id
-        - name
+        - displayName
         - type
         - prPermitted
         - url
@@ -1430,14 +1444,14 @@ components:
           format: uri
           x-oapi-codegen-extra-tags:
             validate: url
-        id:
+        displayName:
           type: string
-          description: アカウントID
+          description: 外部アカウントの表示名
       required:
         - type
         - prPermitted
         - url
-        - id
+        - displayName
     EditAccount:
       title: EditAccount
       type: object
@@ -1453,9 +1467,9 @@ components:
           format: uri
           x-oapi-codegen-extra-tags:
             validate: url
-        id:
+        displayName:
           type: string
-          description: アカウントID
+          description: 外部アカウントの表示名
     PrPermitted:
       title: PrPermitted
       type: boolean
@@ -1531,13 +1545,17 @@ components:
         type: boolean
         default: false
       description: アカウントがアクティブでないユーザーを含めるかどうか
+      x-oapi-codegen-extra-tags:
+        query: includeSuspended
     nameInQuery:
       name: name
       in: query
       schema:
         type: string
-        default: ""
+        default: ''
       description: 指定した文字列がtraP IDに含まれているかどうか
+      x-oapi-codegen-extra-tags:
+        query: name
 tags:
   - name: user
     description: ユーザーAPI
@@ -1549,3 +1567,5 @@ tags:
     description: 班API
   - name: contest
     description: コンテストAPI
+  - name: ping
+    description: 疎通確認API

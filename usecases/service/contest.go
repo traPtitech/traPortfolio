@@ -15,10 +15,10 @@ import (
 
 type ContestService interface {
 	GetContests(ctx context.Context) ([]*domain.Contest, error)
-	GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error)
+	GetContest(ctx context.Context, contestID uuid.UUID) (*domain.ContestDetail, error)
 	CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error)
-	UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error
-	DeleteContest(ctx context.Context, id uuid.UUID) error
+	UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error
+	DeleteContest(ctx context.Context, contestID uuid.UUID) error
 	GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error)
 	GetContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error)
 	CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
@@ -48,13 +48,13 @@ func (s *contestService) GetContests(ctx context.Context) ([]*domain.Contest, er
 	return contest, nil
 }
 
-func (s *contestService) GetContest(ctx context.Context, id uuid.UUID) (*domain.ContestDetail, error) {
-	contest, err := s.repo.GetContest(id)
+func (s *contestService) GetContest(ctx context.Context, contestID uuid.UUID) (*domain.ContestDetail, error) {
+	contest, err := s.repo.GetContest(contestID)
 	if err != nil {
 		return nil, err
 	}
 
-	teams, err := s.repo.GetContestTeams(id)
+	teams, err := s.repo.GetContestTeams(contestID)
 	if err != nil && !errors.Is(err, repository.ErrNotFound) {
 		return nil, err
 	}
@@ -72,8 +72,8 @@ func (s *contestService) CreateContest(ctx context.Context, args *repository.Cre
 	return contest, nil
 }
 
-func (s *contestService) UpdateContest(ctx context.Context, id uuid.UUID, args *repository.UpdateContestArgs) error {
-	err := s.repo.UpdateContest(id, args)
+func (s *contestService) UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error {
+	err := s.repo.UpdateContest(contestID, args)
 	if err != nil {
 		return err
 	}
@@ -81,8 +81,8 @@ func (s *contestService) UpdateContest(ctx context.Context, id uuid.UUID, args *
 	return nil
 }
 
-func (s *contestService) DeleteContest(ctx context.Context, id uuid.UUID) error {
-	if err := s.repo.DeleteContest(id); err != nil {
+func (s *contestService) DeleteContest(ctx context.Context, contestID uuid.UUID) error {
+	if err := s.repo.DeleteContest(contestID); err != nil {
 		return err
 	}
 

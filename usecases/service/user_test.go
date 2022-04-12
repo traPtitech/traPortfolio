@@ -337,7 +337,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        domain.HOMEPAGE,
 					URL:         "https://" + random.AlphaNumeric(rand.Intn(30)+1),
 					PrPermitted: true,
@@ -359,7 +359,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					ID:          "",
+					DisplayName: "",
 					Type:        domain.HOMEPAGE,
 					URL:         "https://" + random.AlphaNumeric(rand.Intn(30)+1),
 					PrPermitted: true,
@@ -376,7 +376,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					ID:          random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
 					Type:        10000,
 					URL:         "https://" + random.AlphaNumeric(rand.Intn(30)+1),
 					PrPermitted: true,
@@ -429,7 +429,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
@@ -447,7 +447,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),

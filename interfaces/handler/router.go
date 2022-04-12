@@ -1,23 +1,17 @@
 package handler
 
 import (
-	"log"
-
-	"github.com/go-playground/validator/v10"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Setup(e *echo.Echo, api API) {
-
-	v := validator.New()
-	if err := v.RegisterValidation("is-uuid", IsValidUUID); err != nil {
-		log.Fatal(err)
+func Setup(e *echo.Echo, api API) error {
+	// Setup validator
+	v, err := newValidator()
+	if err != nil {
+		return err
 	}
-	e.Validator = &Validator{
-		validator: v,
-	}
+	e.Validator = v
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -150,12 +144,5 @@ func Setup(e *echo.Echo, api API) {
 		}
 	}
 
-}
-
-type Validator struct {
-	validator *validator.Validate
-}
-
-func (v *Validator) Validate(i interface{}) error {
-	return v.validator.Struct(i)
+	return nil
 }

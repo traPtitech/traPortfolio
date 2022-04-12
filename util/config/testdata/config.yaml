@@ -1,0 +1,18 @@
+production: true
+port: 3000
+migrate: true
+db:
+  user: 'root'
+  pass: 'password'
+  host: 'mysql'
+  name: 'portfolio'
+  port: 3001
+traq:
+  cookie: 'traq cookie'
+  apiEndpoint: 'traq endpoint'
+knoq:
+  cookie: 'knoq cookie'
+  apiEndpoint: 'knoq endpoint'
+portal:
+  cookie: 'portal cookie'
+  apiEndpoint: 'portal endpoint'

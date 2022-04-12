@@ -26,7 +26,7 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 }
 
 func (h *GroupHandler) GetAllGroups(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
 	if err != nil {
@@ -42,7 +42,7 @@ func (h *GroupHandler) GetAllGroups(_c echo.Context) error {
 }
 
 func (h *GroupHandler) GetGroup(_c echo.Context) error {
-	c := Context{_c}
+	c := _c.(*Context)
 	req := groupParam{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)

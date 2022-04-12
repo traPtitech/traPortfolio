@@ -12,7 +12,7 @@ type User struct {
 
 type Account struct {
 	ID          uuid.UUID
-	Name        string
+	DisplayName string
 	Type        uint
 	PrPermitted bool
 	URL         string
