@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
@@ -176,10 +175,10 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 	})
 
 	gotTeams1, err := repo.GetContestTeams(contest1.ID)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	gotTeams2, err := repo.GetContestTeams(contest2.ID)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	expected := [][]*domain.ContestTeam{gotTeams1, {}}
 	gots := [][]*domain.ContestTeam{{&team1.ContestTeam, &team2.ContestTeam}, gotTeams2}
