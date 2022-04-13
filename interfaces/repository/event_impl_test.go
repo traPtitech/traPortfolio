@@ -214,7 +214,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		id  uuid.UUID
-		arg *repository.UpdateEventLevelArg
+		arg *repository.UpdateEventLevelArgs
 	}
 	tests := []struct {
 		name      string
@@ -226,7 +226,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -249,7 +249,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "LevelNotFound",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -266,7 +266,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "DoNotUpdate",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -286,7 +286,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "UpdateError",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},

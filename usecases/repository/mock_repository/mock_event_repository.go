@@ -82,15 +82,15 @@ func (mr *MockEventRepositoryMockRecorder) GetUserEvents(userID interface{}) *go
 }
 
 // UpdateEventLevel mocks base method.
-func (m *MockEventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+func (m *MockEventRepository) UpdateEventLevel(eventID uuid.UUID, args *repository.UpdateEventLevelArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateEventLevel", eventID, arg)
+	ret := m.ctrl.Call(m, "UpdateEventLevel", eventID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateEventLevel indicates an expected call of UpdateEventLevel.
-func (mr *MockEventRepositoryMockRecorder) UpdateEventLevel(eventID, arg interface{}) *gomock.Call {
+func (mr *MockEventRepositoryMockRecorder) UpdateEventLevel(eventID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).UpdateEventLevel), eventID, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).UpdateEventLevel), eventID, args)
 }
