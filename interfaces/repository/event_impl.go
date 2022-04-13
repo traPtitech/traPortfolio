@@ -79,6 +79,25 @@ func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, e
 	return result, nil
 }
 
+func (repo *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelArgs) error {
+	_, err := repo.knoq.GetByEventID(arg.EventID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	relation := model.EventLevelRelation{
+		ID:    arg.EventID,
+		Level: arg.Level,
+	}
+
+	err = repo.h.Create(&relation).Error()
+	if err != nil {
+		return convertError(err)
+	}
+
+	return nil
+}
+
 func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := repo.getEventLevelByID(eventID); err != nil {
