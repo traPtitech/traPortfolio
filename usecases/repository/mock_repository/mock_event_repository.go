@@ -36,6 +36,20 @@ func (m *MockEventRepository) EXPECT() *MockEventRepositoryMockRecorder {
 	return m.recorder
 }
 
+// CreateEventLevel mocks base method.
+func (m *MockEventRepository) CreateEventLevel(args *repository.CreateEventLevelArgs) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateEventLevel", args)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateEventLevel indicates an expected call of CreateEventLevel.
+func (mr *MockEventRepositoryMockRecorder) CreateEventLevel(args interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).CreateEventLevel), args)
+}
+
 // GetEvent mocks base method.
 func (m *MockEventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
 	m.ctrl.T.Helper()
