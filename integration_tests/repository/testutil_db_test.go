@@ -57,20 +57,10 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	t.Helper()
 
 	if args == nil {
-		var result optional.String
-		if rand.Intn(2) == 0 {
-			result = optional.NewString(random.AlphaNumeric(), true)
-		}
-
-		var link optional.String
-		if rand.Intn(2) == 0 {
-			link = optional.NewString(random.AlphaNumeric(), true)
-		}
-
 		args = &repository.CreateContestTeamArgs{
 			Name:        random.AlphaNumeric(),
-			Result:      result,
-			Link:        link,
+			Result:      random.OptAlphaNumeric(),
+			Link:        random.OptURLString(),
 			Description: random.AlphaNumeric(),
 		}
 	}
