@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"sync"
 
@@ -8,7 +9,6 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"github.com/traPtitech/traPortfolio/infrastructure"
 )
 
 const (
@@ -23,47 +23,40 @@ var (
 	rmu    sync.RWMutex
 )
 
-func setParsed(b bool) {
-	rmu.Lock()
-	defer rmu.Unlock()
-	parsed = b
-}
+type (
+	// Immutable except within this package or EditFunc
+	Config struct {
+		IsProduction bool `mapstructure:"production"`
+		Port         int  `mapstructure:"port"`
+		Migrate      bool `mapstructure:"migrate"`
 
-func isParsed() bool {
-	rmu.RLock()
-	defer rmu.RUnlock()
-	return parsed
-}
+		DB     SQLConfig    `mapstructure:"db"`
+		Traq   TraqConfig   `mapstructure:"traq"`
+		Knoq   KnoqConfig   `mapstructure:"knoq"`
+		Portal PortalConfig `mapstructure:"portal"`
+	}
 
-// Immutable except within this package or EditFunc
-type Config struct {
-	IsProduction bool `mapstructure:"production"`
-	Port         int  `mapstructure:"port"`
-	Migrate      bool `mapstructure:"migrate"`
-
-	DB struct {
+	SQLConfig struct {
 		User string `mapstructure:"user"`
 		Pass string `mapstructure:"pass"`
 		Host string `mapstructure:"host"`
 		Name string `mapstructure:"name"`
 		Port int    `mapstructure:"port"`
-	} `mapstructure:"db"`
+	}
 
-	Traq struct {
-		Cookie      string `mapstructure:"cookie"` // r_session
-		APIEndpoint string `mapstructure:"apiEndpoint"`
-	} `mapstructure:"traq"`
+	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
+	// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
+	TraqConfig   APIConfig
+	KnoqConfig   APIConfig
+	PortalConfig APIConfig
 
-	Knoq struct {
-		Cookie      string `mapstructure:"cookie"` // session
+	APIConfig struct {
+		Cookie      string `mapstructure:"cookie"`
 		APIEndpoint string `mapstructure:"apiEndpoint"`
-	} `mapstructure:"knoq"`
+	}
 
-	Portal struct {
-		Cookie      string `mapstructure:"cookie"` // access_token
-		APIEndpoint string `mapstructure:"apiEndpoint"`
-	} `mapstructure:"portal"`
-}
+	EditFunc func(*Config)
+)
 
 func init() {
 	pflag.Bool("production", false, "whether production or development")
@@ -143,6 +136,12 @@ func Parse() {
 	setParsed(true)
 }
 
+func setParsed(b bool) {
+	rmu.Lock()
+	defer rmu.Unlock()
+	parsed = b
+}
+
 func GetConfig() *Config {
 	if !isParsed() {
 		panic("config does not parsed")
@@ -150,7 +149,11 @@ func GetConfig() *Config {
 	return &config
 }
 
-type EditFunc func(*Config)
+func isParsed() bool {
+	rmu.RLock()
+	defer rmu.RUnlock()
+	return parsed
+}
 
 func GetModified(editFunc EditFunc) *Config {
 	cloned := config.clone()
@@ -167,20 +170,50 @@ func (c *Config) IsDevelopment() bool {
 	return !c.IsProduction
 }
 
-func (c *Config) SQLConf() infrastructure.SQLConfig {
-	return infrastructure.NewSQLConfig(c.DB.User, c.DB.Pass, c.DB.Host, c.DB.Name, c.DB.Port)
+func (c *Config) Addr() string {
+	return fmt.Sprintf(":%d", c.Port)
 }
 
-func (c *Config) TraqConf() infrastructure.TraQConfig {
-	return infrastructure.NewTraQConfig(c.Traq.Cookie, c.Traq.APIEndpoint, c.IsDevelopment())
+func (c *Config) IsMigrate() bool {
+	return c.Migrate
 }
 
-func (c *Config) KnoqConf() infrastructure.KnoQConfig {
-	return infrastructure.NewKnoqConfig(c.Knoq.Cookie, c.Knoq.APIEndpoint, c.IsDevelopment())
+func (c *Config) SQLConf() *SQLConfig {
+	return &c.DB
 }
 
-func (c *Config) PortalConf() infrastructure.PortalConfig {
-	return infrastructure.NewPortalConfig(c.Portal.Cookie, c.Portal.APIEndpoint, c.IsDevelopment())
+func (c *Config) TraqConf() *TraqConfig {
+	return &c.Traq
 }
 
-func (c *Config) IsMigrate() bool { return c.Migrate }
+func (c *Config) KnoqConf() *KnoqConfig {
+	return &c.Knoq
+}
+
+func (c *Config) PortalConf() *PortalConfig {
+	return &c.Portal
+}
+
+func (c *TraqConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *KnoqConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *PortalConfig) API() *APIConfig {
+	return (*APIConfig)(c)
+}
+
+func (c *SQLConfig) Dsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port, c.Name)
+}
+
+func (c *SQLConfig) DsnWithoutName() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port)
+}
+
+func (c *SQLConfig) DBName() string {
+	return c.Name
+}

@@ -3,61 +3,33 @@ package infrastructure
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"net/http/cookiejar"
-	"net/url"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
-type TraQConfig struct {
-	cookie        string
-	endpoint      string
-	isDevelopment bool
-}
-
-func NewTraQConfig(cookie, endpoint string, isDevelopment bool) TraQConfig {
-	return TraQConfig{
-		cookie,
-		endpoint,
-		isDevelopment,
-	}
-}
-
 type TraQAPI struct {
-	Client *http.Client
-	conf   *TraQConfig
+	apiClient
 }
 
-func NewTraQAPI(conf *TraQConfig) (external.TraQAPI, error) {
-	if conf.isDevelopment {
+func NewTraQAPI(conf *config.TraqConfig, isDevelopment bool) (external.TraQAPI, error) {
+	if isDevelopment {
 		return mock_external_e2e.NewMockTraQAPI(), nil
 	}
 
-	jar, err := cookiejar.New(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cookies := []*http.Cookie{
-		{
-			Name:  "r_session",
-			Value: conf.cookie,
-			Path:  "/",
-		},
-	}
-	u, err := url.Parse(conf.endpoint)
+	jar, err := newCookieJar(conf.API(), "r_session")
 	if err != nil {
 		return nil, err
 	}
-	jar.SetCookies(u, cookies)
-	return &TraQAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
+
+	return &TraQAPI{newAPIClient(jar, conf.API())}, nil
 }
 
 func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
-	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
+	res, err := traQ.apiGet(fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +47,7 @@ func (traQ *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUser
 }
 
 func (traQ *TraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
-	res, err := apiGet(traQ.Client, traQ.conf.endpoint, fmt.Sprintf("/users/%v", userID))
+	res, err := traQ.apiGet(fmt.Sprintf("/users/%v", userID))
 	if err != nil {
 		return nil, err
 	}
