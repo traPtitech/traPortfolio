@@ -7,13 +7,13 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 )
 
-type UpdateEventLevelArg struct {
+type UpdateEventLevelArgs struct {
 	Level domain.EventLevel
 }
 
 type EventRepository interface {
 	GetEvents() ([]*domain.Event, error)
 	GetEvent(eventID uuid.UUID) (*domain.EventDetail, error)
-	UpdateEventLevel(eventID uuid.UUID, arg *UpdateEventLevelArg) error
+	UpdateEventLevel(eventID uuid.UUID, args *UpdateEventLevelArgs) error
 	GetUserEvents(userID uuid.UUID) ([]*domain.Event, error)
 }

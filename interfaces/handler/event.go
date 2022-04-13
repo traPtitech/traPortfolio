@@ -83,7 +83,7 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	patchReq := repository.UpdateEventLevelArg{
+	patchReq := repository.UpdateEventLevelArgs{
 		Level: domain.EventLevel(*req.EventLevel),
 	}
 

@@ -79,7 +79,7 @@ func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, e
 	return result, nil
 }
 
-func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := repo.getEventLevelByID(eventID); err != nil {
 			return convertError(err)

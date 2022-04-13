@@ -13,7 +13,7 @@ import (
 type EventService interface {
 	GetEvents(ctx context.Context) ([]*domain.Event, error)
 	GetEventByID(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error)
-	UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error
+	UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error
 }
 
 type eventService struct {
@@ -55,7 +55,7 @@ func (s *eventService) GetEventByID(ctx context.Context, eventID uuid.UUID) (*do
 	return event, nil
 }
 
-func (s *eventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+func (s *eventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
 	return s.event.UpdateEventLevel(eventID, arg)
 }
 

@@ -217,7 +217,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -240,7 +240,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -263,7 +263,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -286,7 +286,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -309,7 +309,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
