@@ -100,7 +100,6 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	e := echo.New()
-
 	conf := testutils.GetConfigWithDBName("get_users")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
