@@ -119,8 +119,10 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 	for _, v := range user.Accounts {
 		accounts = append(accounts, &domain.Account{
 			ID:          v.ID,
+			DisplayName: v.Name,
 			Type:        v.Type,
 			PrPermitted: v.Check,
+			URL:         v.URL,
 		})
 	}
 
