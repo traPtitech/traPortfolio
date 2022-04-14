@@ -1,4 +1,4 @@
-package handler_test
+package handler
 
 import (
 	"errors"
@@ -10,7 +10,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -19,12 +18,12 @@ var (
 	errInternal = errors.New("internal error")
 )
 
-func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, handler.API) {
+func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockProjectService(ctrl)
-	api := handler.NewAPI(nil, nil, handler.NewProjectHandler(s), nil, nil, nil)
+	api := NewAPI(nil, nil, NewProjectHandler(s), nil, nil, nil)
 
 	return s, api
 }
@@ -42,12 +41,12 @@ func TestProjectHandler_GetAll(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) ([]*handler.Project, string)
+		setup      func(s *mock_service.MockProjectService) ([]*Project, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) ([]*handler.Project, string) {
+			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
 				sinceSem := rand.Intn(2)
 				untilSem := rand.Intn(2)
 				duration := domain.YearWithSemesterDuration{
@@ -87,16 +86,16 @@ func TestProjectHandler_GetAll(t *testing.T) {
 					},
 				}
 
-				var reqBody []*handler.Project
+				var reqBody []*Project
 				for _, v := range repo {
-					reqBody = append(reqBody, &handler.Project{
-						Duration: handler.YearWithSemesterDuration{
-							Since: handler.YearWithSemester{
-								Semester: handler.Semester(sinceSem),
+					reqBody = append(reqBody, &Project{
+						Duration: YearWithSemesterDuration{
+							Since: YearWithSemester{
+								Semester: Semester(sinceSem),
 								Year:     v.Duration.Since.Year,
 							},
-							Until: &handler.YearWithSemester{
-								Semester: handler.Semester(untilSem),
+							Until: &YearWithSemester{
+								Semester: Semester(untilSem),
 								Year:     v.Duration.Until.Year,
 							},
 						},
@@ -112,7 +111,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) ([]*handler.Project, string) {
+			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
 				s.EXPECT().GetProjects(gomock.Any()).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
@@ -126,7 +125,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := []*handler.Project(nil)
+			hres := []*Project(nil)
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
@@ -141,12 +140,12 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (handler.ProjectDetail, string)
+		setup      func(s *mock_service.MockProjectService) (ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (handler.ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
 				sinceSem := rand.Intn(2)
 				untilSem := rand.Intn(2)
 				duration := domain.YearWithSemesterDuration{
@@ -170,35 +169,35 @@ func TestProjectHandler_GetByID(t *testing.T) {
 					},
 				}
 
-				var members []handler.ProjectMember
+				var members []ProjectMember
 				for _, v := range repo.Members {
-					members = append(members, handler.ProjectMember{
-						User: handler.User{
+					members = append(members, ProjectMember{
+						User: User{
 							Id:       v.UserID,
 							Name:     v.Name,
 							RealName: v.RealName,
 						},
-						Duration: handler.YearWithSemesterDuration{
-							Since: handler.YearWithSemester{
+						Duration: YearWithSemesterDuration{
+							Since: YearWithSemester{
 								Year:     v.Duration.Since.Year,
-								Semester: handler.Semester(v.Duration.Since.Semester),
+								Semester: Semester(v.Duration.Since.Semester),
 							},
-							Until: &handler.YearWithSemester{
+							Until: &YearWithSemester{
 								Year:     v.Duration.Until.Year,
-								Semester: handler.Semester(v.Duration.Until.Semester),
+								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
 					})
 				}
-				reqBody := handler.ProjectDetail{
-					Project: handler.Project{
-						Duration: handler.YearWithSemesterDuration{
-							Since: handler.YearWithSemester{
-								Semester: handler.Semester(sinceSem),
+				reqBody := ProjectDetail{
+					Project: Project{
+						Duration: YearWithSemesterDuration{
+							Since: YearWithSemester{
+								Semester: Semester(sinceSem),
 								Year:     repo.Duration.Since.Year,
 							},
-							Until: &handler.YearWithSemester{
-								Semester: handler.Semester(untilSem),
+							Until: &YearWithSemester{
+								Semester: Semester(untilSem),
 								Year:     repo.Duration.Until.Year,
 							},
 						},
@@ -217,10 +216,10 @@ func TestProjectHandler_GetByID(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (handler.ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, errInternal)
-				return handler.ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
 		},
@@ -232,7 +231,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := handler.ProjectDetail{}
+			hres := ProjectDetail{}
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion

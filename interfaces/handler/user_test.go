@@ -1,4 +1,4 @@
-package handler_test
+package handler
 
 import (
 	"errors"
@@ -10,19 +10,18 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupUserMock(t *testing.T) (*mock_service.MockUserService, handler.API) {
+func setupUserMock(t *testing.T) (*mock_service.MockUserService, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockUserService(ctrl)
-	api := handler.NewAPI(nil, handler.NewUserHandler(s), nil, nil, nil, nil)
+	api := NewAPI(nil, NewUserHandler(s), nil, nil, nil, nil)
 
 	return s, api
 }
@@ -30,16 +29,16 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, handler.API) {
 func TestUserHandler_GetAll(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*handler.User, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*User, path string)
 		statusCode int
 	}{
 		{
 			name: "Success_NoOpts",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.User, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 
 				casenum := 2
 				repoUsers := []*domain.User{}
-				hresUsers := []*handler.User{}
+				hresUsers := []*User{}
 
 				for i := 0; i < casenum; i++ {
 					ruser := domain.User{
@@ -47,7 +46,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
 						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
 					}
-					huser := handler.User{
+					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
 						RealName: ruser.RealName,
@@ -69,7 +68,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 		// TODO: Validationのテストを追加する
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.User, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 				args := repository.GetUsersArgs{}
 
 				s.EXPECT().GetUsers(gomock.Any(), &args).Return(nil, errors.New("Internal Server Error"))
@@ -85,7 +84,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 
 			hresUsers, path := tt.setup(s)
 
-			var resBody []*handler.User
+			var resBody []*User
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -98,16 +97,16 @@ func TestUserHandler_GetAll(t *testing.T) {
 func TestUserHandler_GetByID(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string)
+		setup      func(s *mock_service.MockUserService) (hres *UserDetail, userpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 
 				const accountNum int = 9
 				rAccounts := []*domain.Account{}
-				hAccounts := []handler.Account{}
+				hAccounts := []Account{}
 
 				for i := 0; i < accountNum; i++ {
 					prRandom := false
@@ -123,11 +122,11 @@ func TestUserHandler_GetByID(t *testing.T) {
 						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
 					}
 
-					haccount := handler.Account{
+					haccount := Account{
 						Id:          raccount.ID,
 						DisplayName: raccount.DisplayName,
-						PrPermitted: handler.PrPermitted(prRandom),
-						Type:        handler.AccountType(raccount.Type),
+						PrPermitted: PrPermitted(prRandom),
+						Type:        AccountType(raccount.Type),
 						Url:         raccount.URL,
 					}
 
@@ -147,15 +146,15 @@ func TestUserHandler_GetByID(t *testing.T) {
 					Accounts: rAccounts,
 				}
 
-				hresUser := handler.UserDetail{
-					User: handler.User{
+				hresUser := UserDetail{
+					User: User{
 						Id:       repoUser.User.ID,
 						Name:     repoUser.User.Name,
 						RealName: repoUser.User.RealName,
 					},
 					Accounts: hAccounts,
 					Bio:      repoUser.Bio,
-					State:    handler.UserAccountState(repoUser.State),
+					State:    UserAccountState(repoUser.State),
 				}
 
 				s.EXPECT().GetUser(gomock.Any(), repoUser.User.ID).Return(&repoUser, nil)
@@ -167,7 +166,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.UUID()
 				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/users/%s", id)
@@ -181,7 +180,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			var resBody *handler.UserDetail
+			var resBody *UserDetail
 
 			hresUsers, userpath := tt.setup(s)
 
@@ -198,12 +197,12 @@ func TestUserHandler_GetByID(t *testing.T) {
 func TestUserHandler_Update(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *handler.EditUser, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUser, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
@@ -212,7 +211,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &handler.EditUser{
+				reqBody := &EditUser{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -230,7 +229,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
@@ -239,7 +238,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &handler.EditUser{
+				reqBody := &EditUser{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -257,7 +256,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
@@ -266,7 +265,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &handler.EditUser{
+				reqBody := &EditUser{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -284,7 +283,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -328,8 +327,8 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetAccounts(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetAccounts() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetAccounts(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetAccounts() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -355,8 +354,8 @@ func TestUserHandler_GetAccount(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetAccount() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetAccount() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -382,8 +381,8 @@ func TestUserHandler_AddAccount(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.AddAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.AddAccount() error = %v, wantErr %v", err, tt.wantErr)
+			if err := AddAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserAddAccount() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -409,8 +408,8 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.PatchAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.PatchAccount() error = %v, wantErr %v", err, tt.wantErr)
+			if err := PatchAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserPatchAccount() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -436,8 +435,8 @@ func TestUserHandler_DeleteAccount(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.DeleteAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.DeleteAccount() error = %v, wantErr %v", err, tt.wantErr)
+			if err := DeleteAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserDeleteAccount() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -463,8 +462,8 @@ func TestUserHandler_GetProjects(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetProjects(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetProjects() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetProjects(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetProjects() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -490,8 +489,8 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetUsers(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetUsers() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetUsers(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetUsers() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -517,8 +516,8 @@ func TestUserHandler_GetGroupsByUserID(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetGroupsByUserID(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetGroupsByUserID() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetGroupsByUserID(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetGroupsByUserID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -544,8 +543,8 @@ func TestUserHandler_GetEvents(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetEvents(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetEvents() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetEvents(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetEvents() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
