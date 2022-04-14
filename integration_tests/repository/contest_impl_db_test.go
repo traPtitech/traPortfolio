@@ -1,6 +1,6 @@
 //go:build integration && db
 
-package repository_test
+package repository
 
 import (
 	"testing"
