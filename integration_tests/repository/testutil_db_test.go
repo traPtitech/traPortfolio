@@ -79,6 +79,22 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	return contestTeamDetail
 }
 
+func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *repository.CreateEventLevelArgs) *repository.CreateEventLevelArgs {
+	t.Helper()
+
+	if args == nil {
+		args = &repository.CreateEventLevelArgs{
+			EventID: random.UUID(),
+			Level:   domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+		}
+	}
+
+	err := repo.CreateEventLevel(args)
+	assert.NoError(t, err)
+
+	return args
+}
+
 // func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
 // 	t.Helper()
 
