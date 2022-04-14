@@ -40,7 +40,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("get_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, &sqlConf)
+	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -64,7 +64,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("update_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, &sqlConf)
+	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -120,7 +120,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("delete_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, &sqlConf)
+	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -155,7 +155,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("delete_contest_teams")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, &sqlConf)
+	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
