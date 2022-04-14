@@ -25,7 +25,7 @@ func NewUserRepository(h database.SQLHandler, portalAPI external.PortalAPI, traQ
 	}
 }
 
-func MakeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
+func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
 	eargs := new(external.TraQGetAllArgs)
 	if iv, nv := rargs.IncludeSuspended.Valid, rargs.Name.Valid; iv && nv {
 		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
@@ -40,7 +40,7 @@ func MakeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 }
 
 func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
-	eargs, err := MakeTraqGetAllArgs(args)
+	eargs, err := makeTraqGetAllArgs(args)
 	if err != nil {
 		return nil, err
 	}

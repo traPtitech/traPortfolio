@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
@@ -11,7 +11,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -77,7 +76,7 @@ func makeKnoqEvent(event *domain.EventDetail) *external.EventResponse {
 func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *external.TraQGetAllArgs {
 	t.Helper()
 
-	eargs, err := impl.MakeTraqGetAllArgs(rargs)
+	eargs, err := makeTraqGetAllArgs(rargs)
 	if err != nil {
 		t.Fatal(err)
 	}

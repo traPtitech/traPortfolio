@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
@@ -14,7 +14,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -94,7 +93,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjects()
 			tt.assertion(t, err)
@@ -341,7 +340,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProject(tt.args.id)
 			tt.assertion(t, err)
@@ -439,7 +438,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateProject(tt.args.project)
 			if tt.want != nil && got != nil {
@@ -520,7 +519,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
 		})
@@ -673,7 +672,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjectMembers(tt.args.id)
 			tt.assertion(t, err)
@@ -891,7 +890,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddProjectMembers(tt.args.projectID, tt.args.projectMembers))
 		})
@@ -997,7 +996,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteProjectMembers(tt.args.projectID, tt.args.members))
 		})
