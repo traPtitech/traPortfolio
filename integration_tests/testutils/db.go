@@ -16,7 +16,6 @@ import (
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
@@ -45,12 +44,8 @@ func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB
 	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.DBName()))
 	assert.NoError(t, err)
 
-	config := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	}
-
 	dsn := sqlConf.Dsn()
-	db, err := gorm.Open(mysql.Open(dsn), config)
+	db, err := gorm.Open(mysql.Open(dsn), infrastructure.GormConfig)
 	assert.NoError(t, err)
 
 	return db
