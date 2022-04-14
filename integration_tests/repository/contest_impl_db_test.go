@@ -22,7 +22,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("get_contests")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, &sqlConf)
+	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)

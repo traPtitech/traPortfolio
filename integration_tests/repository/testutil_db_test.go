@@ -20,7 +20,7 @@ func TestMain(m *testing.M) {
 
 	appConf := testutils.GetConfig()
 	sqlConf := appConf.SQLConf()
-	<-testutils.WaitTestDBConnection(&sqlConf)
+	<-testutils.WaitTestDBConnection(sqlConf)
 
 	m.Run()
 }

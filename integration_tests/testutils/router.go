@@ -20,18 +20,12 @@ import (
 func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API, error) {
 	t.Helper()
 
-	s := conf.SQLConf()
-	tr := conf.TraqConf()
-	p := conf.PortalConf()
-	k := conf.KnoqConf()
-
-	db := SetupDB(t, &s)
-
+	db := SetupDB(t, conf.SQLConf())
 	if err := mockdata.InsertSampleDataToDB(db); err != nil {
 		return nil, err
 	}
 
-	api, err := infrastructure.InjectAPIServer(&s, &tr, &p, &k)
+	api, err := infrastructure.InjectAPIServer(conf, true)
 	if err != nil {
 		return nil, err
 	}

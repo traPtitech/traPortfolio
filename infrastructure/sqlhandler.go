@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"fmt"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -9,43 +8,14 @@ import (
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
-
-type SQLConfig struct {
-	user     string
-	password string
-	host     string
-	port     int
-	dbname   string
-}
-
-func NewSQLConfig(user, password, host, dbname string, port int) SQLConfig {
-	return SQLConfig{
-		user,
-		password,
-		host,
-		port,
-		dbname,
-	}
-}
-
-func (c *SQLConfig) Dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.user, c.password, c.host, c.port, c.dbname)
-}
-
-func (c *SQLConfig) DsnWithoutName() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.user, c.password, c.host, c.port)
-}
-
-func (c *SQLConfig) Name() string {
-	return c.dbname
-}
 
 type SQLHandler struct {
 	conn *gorm.DB
 }
 
-func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
+func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
 	engine, err := gorm.Open(mysql.New(mysql.Config{
 		DSN: conf.Dsn(),
 	}), &gorm.Config{
