@@ -1,28 +1,43 @@
 package infrastructure
 
 import (
+	"log"
+	"os"
 	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
+var GormConfig = &gorm.Config{
+	Logger: logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             200 * time.Millisecond,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	),
+	NowFunc: func() time.Time {
+		return time.Now().Truncate(time.Microsecond)
+	},
+}
+
 type SQLHandler struct {
 	conn *gorm.DB
 }
 
 func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
-	engine, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: conf.Dsn(),
-	}), &gorm.Config{
-		NowFunc: func() time.Time {
-			return time.Now().Truncate(time.Microsecond)
-		},
-	})
+	engine, err := gorm.Open(
+		mysql.New(mysql.Config{DSN: conf.Dsn()}),
+		GormConfig,
+	)
 	if err != nil {
 		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
@@ -49,7 +64,6 @@ func FromDB(db *gorm.DB) database.SQLHandler {
 
 // initDB データベースのスキーマを更新
 func initDB(db *gorm.DB) error {
-	// db.Logger = db.Logger.LogMode(logger.Info)
 	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err
