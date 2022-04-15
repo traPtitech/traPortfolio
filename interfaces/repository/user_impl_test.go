@@ -439,7 +439,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 	description := random.AlphaNumeric()
 
 	type args struct {
-		args repository.CreateUserArgs
+		args *repository.CreateUserArgs
 	}
 	tests := []struct {
 		name      string
@@ -451,7 +451,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				args: repository.CreateUserArgs{
+				args: &repository.CreateUserArgs{
 					Description: description,
 					Check:       check,
 					Name:        name,
@@ -483,7 +483,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		{
 			name: "PortalError",
 			args: args{
-				args: repository.CreateUserArgs{
+				args: &repository.CreateUserArgs{
 					Description: description,
 					Check:       check,
 					Name:        name,
@@ -498,7 +498,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				args: repository.CreateUserArgs{
+				args: &repository.CreateUserArgs{
 					Description: description,
 					Check:       check,
 					Name:        name,
