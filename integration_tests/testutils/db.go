@@ -46,7 +46,7 @@ func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB
 	assert.NoError(t, err)
 
 	config := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: logger.Default.LogMode(logger.Warn),
 	}
 
 	dsn := sqlConf.Dsn()
