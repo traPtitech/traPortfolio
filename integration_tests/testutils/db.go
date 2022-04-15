@@ -45,7 +45,7 @@ func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB
 	assert.NoError(t, err)
 
 	dsn := sqlConf.Dsn()
-	db, err := gorm.Open(mysql.Open(dsn), infrastructure.GormConfig)
+	db, err := gorm.Open(mysql.Open(dsn), sqlConf.GormConfig())
 	assert.NoError(t, err)
 
 	return db
