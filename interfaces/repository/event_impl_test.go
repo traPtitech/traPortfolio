@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"math/rand"
@@ -13,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
@@ -77,7 +76,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			got, err := repo.GetEvents()
 			tt.assertion(t, err)
@@ -203,7 +202,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			got, err := repo.GetEvent(tt.args.id)
 			tt.assertion(t, err)
@@ -304,7 +303,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			err := repo.CreateEventLevel(tt.args.args)
 			tt.assertion(t, err)
@@ -416,7 +415,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			tt.assertion(t, repo.UpdateEventLevel(tt.args.id, tt.args.arg))
 		})
@@ -479,7 +478,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			got, err := repo.GetUserEvents(tt.args.userID)
 			tt.assertion(t, err)
