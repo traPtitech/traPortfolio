@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"math/rand"
 	"regexp"
 	"testing"
 
@@ -42,13 +41,13 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
@@ -104,14 +103,14 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
-				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelPrivate,
 				HostName:    []*domain.User{{ID: random.UUID()}},
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
 			},
@@ -145,14 +144,14 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
-				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
 				HostName:    []*domain.User{{ID: random.UUID()}},
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
 			},
@@ -174,14 +173,14 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				ed := domain.EventDetail{
 					Event: domain.Event{
 						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
 						TimeStart: random.Time(),
 						TimeEnd:   random.Time(),
 					},
-					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevelPrivate,
 					HostName:    []*domain.User{{ID: random.UUID()}},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}
@@ -341,13 +340,13 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},

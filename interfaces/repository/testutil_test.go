@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql/driver"
 	"errors"
-	"math/rand"
 	"testing"
 	"time"
 
@@ -110,7 +109,7 @@ func makePortalUser(user *domain.User) *external.PortalUserResponse {
 	return &external.PortalUserResponse{
 		TraQID:         user.Name,
 		RealName:       user.RealName,
-		AlphabeticName: random.AlphaNumeric(rand.Intn(30) + 1),
+		AlphabeticName: random.AlphaNumeric(),
 	}
 }
 

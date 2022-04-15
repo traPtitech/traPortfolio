@@ -43,8 +43,8 @@ func TestUserHandler_GetAll(t *testing.T) {
 				for i := 0; i < casenum; i++ {
 					ruser := domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					}
 					huser := User{
 						Id:       ruser.ID,
@@ -116,10 +116,10 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+						DisplayName: random.AlphaNumeric(),
 						Type:        uint(rand.Intn(int(domain.AccountLimit))),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+						URL:         random.AlphaNumeric(),
 					}
 
 					haccount := Account{
@@ -138,11 +138,11 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					User: domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					},
 					State:    domain.TraQState(uint8(rand.Intn(int(domain.TraqStateLimit)))),
-					Bio:      random.AlphaNumeric(rand.Intn(256) + 1),
+					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
 					Accounts: rAccounts,
 				}
 
@@ -173,6 +173,25 @@ func TestUserHandler_GetByID(t *testing.T) {
 				return nil, path
 			},
 			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+				id := random.UUID()
+				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, repository.ErrValidate)
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+				id := random.AlphaNumericn(36)
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
@@ -205,7 +224,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -232,7 +251,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -259,7 +278,7 @@ func TestUserHandler_Update(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
@@ -320,7 +339,88 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+
+				userID := random.UUID()
+				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
+				//AccountLimit種類のうち、テストに使うものだけbitが立っている
+				//例えば0(HOMEPAGE)と2(TWITTER)と7(ATCODER)なら10000101=133
+				//0(bitがすべて立っていない)は除外
+
+				rAccounts := []*domain.Account{}
+				hAccounts := []*handler.Account{}
+
+				for i := 0; i < int(domain.AccountLimit); i++ {
+					if (accountKinds>>i)%2 == 0 {
+						continue
+					}
+
+					prRandom := false
+					if rand.Intn(2) == 1 {
+						prRandom = true
+					}
+
+					raccount := domain.Account{
+						ID:          random.UUID(),
+						Name:        random.AlphaNumeric(),
+						Type:        uint(i),
+						PrPermitted: prRandom,
+						URL:         random.AlphaNumeric(),
+					}
+
+					haccount := handler.Account{
+						Id:          raccount.ID,
+						Name:        raccount.Name,
+						PrPermitted: handler.PrPermitted(prRandom),
+						Type:        handler.AccountType(raccount.Type),
+						Url:         raccount.URL,
+					}
+
+					rAccounts = append(rAccounts, &raccount)
+					hAccounts = append(hAccounts, &haccount)
+
+				}
+
+				s.EXPECT().GetAccounts(gomock.Any()).Return(rAccounts, nil)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return hAccounts, path
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+
+				userID := random.UUID()
+				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, path
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+
+				userID := random.UUID()
+				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, repository.ErrValidate)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+
+				userID := random.AlphaNumericn(36)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -347,7 +447,79 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+
+				userID := random.UUID()
+				prRandom := false
+				if rand.Intn(2) == 1 {
+					prRandom = true
+				}
+
+				rAccount := domain.Account{
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(),
+					Type:        uint(rand.Intn(int(domain.AccountLimit))),
+					PrPermitted: prRandom,
+					URL:         random.AlphaNumeric(),
+				}
+				hAccount := handler.Account{
+					Id:          rAccount.ID,
+					Name:        rAccount.Name,
+					PrPermitted: handler.PrPermitted(prRandom),
+					Type:        handler.AccountType(rAccount.Type),
+					Url:         rAccount.URL,
+				}
+
+				s.EXPECT().GetAccount(gomock.Any(), rAccount.ID).Return(&rAccount, nil)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, rAccount.ID)
+				return &hAccount, path
+
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				s.EXPECT().GetAccount(gomock.Any(), accountID).Return(nil, errors.New("Internal Server Error"))
+				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				s.EXPECT().GetAccount(gomock.Any(), accountID).Return(nil, repository.ErrValidate)
+				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+
+				userID := random.AlphaNumericn(36)
+				accountID := random.UUID()
+
+				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

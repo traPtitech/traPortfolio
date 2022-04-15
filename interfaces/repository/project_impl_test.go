@@ -52,12 +52,12 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			want: []*domain.Project{
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 					Duration: domain.YearWithSemesterDuration{
 						Since: makeYearWithSemester(rand.Intn(2)),
 						Until: makeYearWithSemester(rand.Intn(2)),
 					},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members:     nil,
 				},
@@ -123,15 +123,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          pid,
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -177,21 +177,21 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          pid,
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -263,8 +263,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								args.id,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
+								random.AlphaNumeric(),
 								random.RandURLString(),
 								random.Time().Year(),
 								rand.Intn(2),
@@ -293,8 +293,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								args.id,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
+								random.AlphaNumeric(),
 								random.RandURLString(),
 								random.Time().Year(),
 								rand.Intn(2),
@@ -310,7 +310,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 								random.Time().Year(),
 								rand.Intn(2),
 								random.Time().Year(),
@@ -324,7 +324,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 							),
 					)
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
@@ -352,8 +352,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_CreateProject(t *testing.T) {
 	duration := random.Duration()
 	successProject := &repository.CreateProjectArgs{
-		Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-		Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+		Name:          random.AlphaNumeric(),
+		Description:   random.AlphaNumeric(),
 		Link:          optional.NewString(random.RandURLString(), true),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
@@ -408,8 +408,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				project: &repository.CreateProjectArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(),
+					Description:   random.AlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
@@ -467,8 +467,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
 					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
@@ -491,8 +491,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
 					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
@@ -546,8 +546,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -583,12 +583,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 					// RealName:
 				},
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -655,7 +655,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 							),
 					)
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)

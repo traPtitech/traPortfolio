@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
@@ -41,7 +40,7 @@ func TestEventService_GetEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
@@ -100,18 +99,18 @@ func TestEventService_GetEventByID(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					// ID:
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
-				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
+				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
 				HostName: []*domain.User{
 					{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					},
 				},
 				GroupID: random.UUID(),
@@ -165,12 +164,12 @@ func TestEventService_GetEventByID(t *testing.T) {
 				e.EXPECT().GetEvent(args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
 						ID:        args.id,
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
 						TimeStart: time.Now(),
 						TimeEnd:   time.Now(),
 					},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
+					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevelAnonymous,
 					HostName:    []*domain.User{{ID: random.UUID()}},
 					GroupID:     random.UUID(),
