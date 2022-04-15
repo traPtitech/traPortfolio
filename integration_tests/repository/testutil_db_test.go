@@ -79,19 +79,118 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	return contestTeamDetail
 }
 
-// func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
-// 	t.Helper()
+func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
+	t.Helper()
 
-// 	if args == nil {
-// 		args = &repository.CreateUserArgs{
-// 			Description: random.AlphaNumeric(),
-// 			Check:       random.Bool(),
-// 			Name:        random.AlphaNumeric(),
-// 		}
-// 	}
+	if args == nil {
+		args = &repository.CreateUserArgs{
+			Description: random.AlphaNumeric(),
+			Check:       random.Bool(),
+			Name:        random.AlphaNumeric(),
+		}
+	}
 
-// 	user, err := repo.CreateUser(*args)
-// 	assert.NoError(t, err)
+	user, err := repo.CreateUser(args)
+	assert.NoError(t, err)
 
-// 	return user
-// }
+	return user
+}
+
+func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.UUID, args *repository.CreateAccountArgs) *domain.Account {
+	t.Helper()
+
+	if args == nil {
+		args = &repository.CreateAccountArgs{
+			DisplayName: random.AlphaNumeric(),
+			Type:        uint(rand.Intn(int(domain.AccountLimit))),
+			URL:         random.RandURLString(),
+			PrPermitted: random.Bool(),
+		}
+	}
+
+	if userID == uuid.Nil {
+		user := mustMakeUser(t, repo, nil)
+		userID = user.ID
+	}
+	account, err := repo.CreateAccount(userID, args)
+	assert.NoError(t, err)
+
+	return account
+}
+
+func mustMakeProject(t *testing.T, repo repository.ProjectRepository, args *repository.CreateProjectArgs) *domain.Project {
+	t.Helper()
+
+	if args == nil {
+		args = &repository.CreateProjectArgs{
+			Name:          random.AlphaNumeric(),
+			Description:   random.AlphaNumeric(),
+			Link:          random.OptURLString(),
+			SinceYear:     rand.Intn(2100),
+			SinceSemester: rand.Intn(2),
+			UntilYear:     rand.Intn(2100),
+			UntilSemester: rand.Intn(2),
+		}
+	}
+
+	project, err := repo.CreateProject(args)
+	assert.NoError(t, err)
+
+	return project
+}
+
+func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
+	t.Helper()
+
+	if projectID == uuid.Nil || userID == uuid.Nil {
+		t.Fatal("projectID and userID must not be empty")
+	}
+
+	if args == nil {
+		args = &repository.CreateProjectMemberArgs{
+			UserID:        userID,
+			SinceYear:     rand.Intn(2100),
+			SinceSemester: rand.Intn(2),
+			UntilYear:     rand.Intn(2100),
+			UntilSemester: rand.Intn(2),
+		}
+	}
+
+	err := repo.AddProjectMembers(projectID, []*repository.CreateProjectMemberArgs{args})
+	assert.NoError(t, err)
+
+	return args
+}
+
+func mustAddContestTeam(t *testing.T, repo repository.ContestRepository, contestID uuid.UUID, args *repository.CreateContestTeamArgs) *domain.ContestTeamDetail {
+	t.Helper()
+
+	if contestID == uuid.Nil {
+		contest := mustMakeContest(t, repo, nil)
+		contestID = contest.ID
+	}
+
+	if args == nil {
+		args = &repository.CreateContestTeamArgs{
+			Name:        random.AlphaNumeric(),
+			Result:      random.OptAlphaNumeric(),
+			Link:        random.OptAlphaNumeric(),
+			Description: random.AlphaNumeric(),
+		}
+	}
+
+	team, err := repo.CreateContestTeam(contestID, args)
+	assert.NoError(t, err)
+	return team
+}
+
+func mustAddContestTeamMember(t *testing.T, repo repository.ContestRepository, teamID, userID uuid.UUID) {
+	t.Helper()
+
+	if teamID == uuid.Nil || userID == uuid.Nil {
+		t.Fatal("projectID and userID must not be empty")
+	}
+
+	err := repo.AddContestTeamMembers(teamID, []uuid.UUID{userID})
+	assert.NoError(t, err)
+}
