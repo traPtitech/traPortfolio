@@ -176,7 +176,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.UUID()
 				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, repository.ErrValidate)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
@@ -186,7 +186,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.AlphaNumericn(36)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
@@ -341,7 +341,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
 				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
@@ -350,7 +350,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 				//0(bitがすべて立っていない)は除外
 
 				rAccounts := []*domain.Account{}
-				hAccounts := []*handler.Account{}
+				hAccounts := []*Account{}
 
 				for i := 0; i < int(domain.AccountLimit); i++ {
 					if (accountKinds>>i)%2 == 0 {
@@ -370,11 +370,11 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 						URL:         random.AlphaNumeric(),
 					}
 
-					haccount := handler.Account{
+					haccount := Account{
 						Id:          raccount.ID,
 						Name:        raccount.Name,
-						PrPermitted: handler.PrPermitted(prRandom),
-						Type:        handler.AccountType(raccount.Type),
+						PrPermitted: PrPermitted(prRandom),
+						Type:        AccountType(raccount.Type),
 						Url:         raccount.URL,
 					}
 
@@ -391,7 +391,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
 				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
@@ -402,7 +402,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
 				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, repository.ErrValidate)
@@ -413,7 +413,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -449,7 +449,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				prRandom := false
@@ -464,11 +464,11 @@ func TestUserHandler_GetAccount(t *testing.T) {
 					PrPermitted: prRandom,
 					URL:         random.AlphaNumeric(),
 				}
-				hAccount := handler.Account{
+				hAccount := Account{
 					Id:          rAccount.ID,
 					Name:        rAccount.Name,
-					PrPermitted: handler.PrPermitted(prRandom),
-					Type:        handler.AccountType(rAccount.Type),
+					PrPermitted: PrPermitted(prRandom),
+					Type:        AccountType(rAccount.Type),
 					Url:         rAccount.URL,
 				}
 
@@ -481,7 +481,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
@@ -495,7 +495,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
@@ -509,7 +509,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
