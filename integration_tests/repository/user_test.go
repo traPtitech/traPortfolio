@@ -395,10 +395,10 @@ func TestDeleteAccount(t *testing.T) {
 	assert.ElementsMatch(t, expected, got)
 }
 
-func TestGetProjects(t *testing.T) {
+func TestGetUserProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_projects")
+	conf := testutils.GetConfigWithDBName("repository_get_user_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
