@@ -13,6 +13,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 var (
@@ -124,6 +125,16 @@ func TestGetUser(t *testing.T) {
 			http.StatusOK,
 			sampleUserDetail1.Id,
 			sampleUserDetail1,
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
