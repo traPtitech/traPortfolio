@@ -1,6 +1,6 @@
 //go:build integration && db
 
-package handler_test
+package handler
 
 import (
 	"net/http"

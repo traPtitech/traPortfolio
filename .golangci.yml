@@ -12,7 +12,6 @@ linters:
     - typecheck
     - gofmt
     - revive
-    - testpackage
 
 run:
   build-tags:
