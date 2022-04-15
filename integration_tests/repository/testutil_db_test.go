@@ -162,28 +162,6 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 	return args
 }
 
-func mustAddContestTeam(t *testing.T, repo repository.ContestRepository, contestID uuid.UUID, args *repository.CreateContestTeamArgs) *domain.ContestTeamDetail {
-	t.Helper()
-
-	if contestID == uuid.Nil {
-		contest := mustMakeContest(t, repo, nil)
-		contestID = contest.ID
-	}
-
-	if args == nil {
-		args = &repository.CreateContestTeamArgs{
-			Name:        random.AlphaNumeric(),
-			Result:      random.OptAlphaNumeric(),
-			Link:        random.OptAlphaNumeric(),
-			Description: random.AlphaNumeric(),
-		}
-	}
-
-	team, err := repo.CreateContestTeam(contestID, args)
-	assert.NoError(t, err)
-	return team
-}
-
 func mustAddContestTeamMember(t *testing.T, repo repository.ContestRepository, teamID, userID uuid.UUID) {
 	t.Helper()
 

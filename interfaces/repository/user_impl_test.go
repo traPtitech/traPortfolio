@@ -1018,7 +1018,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
-					WithArgs(args.accountID, args.userID).
+					WithArgs(args.userID, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -1033,7 +1033,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
-					WithArgs(args.accountID, args.userID).
+					WithArgs(args.userID, args.accountID).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

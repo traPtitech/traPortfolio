@@ -1,6 +1,6 @@
 //go:build integration && db
 
-package repository_test
+package repository
 
 import (
 	"math/rand"
@@ -25,7 +25,8 @@ func TestGetUsers(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_get_users")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
@@ -118,7 +119,8 @@ func TestGetUser(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_get_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
@@ -242,7 +244,8 @@ func TestUpdateUser(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_update_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	idx := 1
@@ -254,7 +257,7 @@ func TestUpdateUser(t *testing.T) {
 		Check:       random.OptBool(),
 	}
 
-	err := repo.UpdateUser(user.ID, args)
+	err = repo.UpdateUser(user.ID, args)
 	assert.NoError(t, err)
 
 	var bio string
@@ -286,7 +289,8 @@ func TestGetAccounts(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_get_accounts")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	idx := 1
@@ -307,7 +311,8 @@ func TestGetAccount(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_get_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	idx := 1
@@ -329,7 +334,8 @@ func TestUpdateAccount(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_update_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	idx := 1
@@ -355,7 +361,7 @@ func TestUpdateAccount(t *testing.T) {
 	if args.PrPermitted.Valid {
 		account1.PrPermitted = args.PrPermitted.Bool
 	}
-	err := repo.UpdateAccount(user.ID, account1.ID, args)
+	err = repo.UpdateAccount(user.ID, account1.ID, args)
 	assert.NoError(t, err)
 
 	got, err := repo.GetAccount(user.ID, account1.ID)
@@ -369,7 +375,8 @@ func TestDeleteAccount(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_delete_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	idx := 1
@@ -377,7 +384,7 @@ func TestDeleteAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	account2 := mustMakeAccount(t, repo, user.ID, nil)
 
-	err := repo.DeleteAccount(user.ID, account1.ID)
+	err = repo.DeleteAccount(user.ID, account1.ID)
 	assert.NoError(t, err)
 
 	expected := []*domain.Account{account2}
@@ -394,7 +401,8 @@ func TestGetProjects(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_get_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 	projectRepo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
@@ -424,7 +432,8 @@ func TestGetContests(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("repository_get_contests")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
-	mockdata.InsertSampleDataToDB(h)
+	err := mockdata.InsertSampleDataToDB(h)
+	assert.NoError(t, err)
 	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 	contestRepo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
