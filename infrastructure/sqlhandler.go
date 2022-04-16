@@ -1,8 +1,6 @@
 package infrastructure
 
 import (
-	"time"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -16,13 +14,10 @@ type SQLHandler struct {
 }
 
 func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
-	engine, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: conf.Dsn(),
-	}), &gorm.Config{
-		NowFunc: func() time.Time {
-			return time.Now().Truncate(time.Microsecond)
-		},
-	})
+	engine, err := gorm.Open(
+		mysql.New(mysql.Config{DSN: conf.Dsn()}),
+		conf.GormConfig(),
+	)
 	if err != nil {
 		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
@@ -49,7 +44,6 @@ func FromDB(db *gorm.DB) database.SQLHandler {
 
 // initDB データベースのスキーマを更新
 func initDB(db *gorm.DB) error {
-	// db.Logger = db.Logger.LogMode(logger.Info)
 	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err

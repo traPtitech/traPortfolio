@@ -16,11 +16,12 @@ func TestParse(t *testing.T) {
 		Port:         3000,
 		Migrate:      true,
 		DB: SQLConfig{
-			User: "root",
-			Pass: "password",
-			Host: "mysql",
-			Name: "portfolio",
-			Port: 3001,
+			User:    "root",
+			Pass:    "password",
+			Host:    "mysql",
+			Name:    "portfolio",
+			Port:    3001,
+			Verbose: true,
 		},
 		Traq: TraqConfig{
 			Cookie:      "traq cookie",
