@@ -18,10 +18,10 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func TestGetProjects(t *testing.T) {
+func TestProjectRepository_GetProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_projects")
+	conf := testutils.GetConfigWithDBName("project_repository_get_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -39,10 +39,10 @@ func TestGetProjects(t *testing.T) {
 
 }
 
-func TestGetProject(t *testing.T) {
+func TestProjectRepository_GetProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_project")
+	conf := testutils.GetConfigWithDBName("project_repository_get_project")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -64,13 +64,13 @@ func TestGetProject(t *testing.T) {
 	}
 }
 
-// func TestCreateProject(t *testing.T) {
+// func TestProjectRepository_CreateProject(t *testing.T) {
 // }
 
-func TestUpdateProject(t *testing.T) {
+func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_update_project")
+	conf := testutils.GetConfigWithDBName("project_repository_update_project")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -119,10 +119,10 @@ func TestUpdateProject(t *testing.T) {
 
 }
 
-func TestGetProjectMembers(t *testing.T) {
+func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_project_members")
+	conf := testutils.GetConfigWithDBName("project_repository_get_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -158,13 +158,13 @@ func TestGetProjectMembers(t *testing.T) {
 }
 
 // TestGetProjectMembers と似たような内容になるから省略
-// func TestAddProjectMembers(t *testing.T) {
+// func TestProjectRepository_AddProjectMembers(t *testing.T) {
 // }
 
-func TestDeleteProjectMembers(t *testing.T) {
+func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_")
+	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
