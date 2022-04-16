@@ -95,7 +95,7 @@ func dropAll(t *testing.T, db *gorm.DB) {
 }
 
 func testDBName(dbName string) string {
-	const dbPrefix = "portfolio_test_repo_"
+	const dbPrefix = "portfolio_test_"
 
 	return dbPrefix + dbName
 }
