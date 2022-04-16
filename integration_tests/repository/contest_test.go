@@ -261,7 +261,6 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	got, err := repo.GetContestTeam(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, team1, got)
-
 }
 
 func TestContestRepository_DeleteContestTeam(t *testing.T) {
