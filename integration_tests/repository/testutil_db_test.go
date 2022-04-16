@@ -95,23 +95,6 @@ func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *rep
 	return args
 }
 
-func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
-	t.Helper()
-
-	if args == nil {
-		args = &repository.CreateUserArgs{
-			Description: random.AlphaNumeric(),
-			Check:       random.Bool(),
-			Name:        random.AlphaNumeric(),
-		}
-	}
-
-	user, err := repo.CreateUser(args)
-	assert.NoError(t, err)
-
-	return user
-}
-
 func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.UUID, args *repository.CreateAccountArgs) *domain.Account {
 	t.Helper()
 
