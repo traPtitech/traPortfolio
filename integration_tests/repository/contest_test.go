@@ -49,15 +49,11 @@ func TestContestRepository_GetContest(t *testing.T) {
 
 	gotContest1, err := repo.GetContest(contest1.ID)
 	assert.NoError(t, err)
+	assert.Equal(t, contest1, gotContest1)
+
 	gotContest2, err := repo.GetContest(contest2.ID)
 	assert.NoError(t, err)
-
-	expected := []*domain.ContestDetail{contest1, contest2}
-	gots := []*domain.ContestDetail{gotContest1, gotContest2}
-
-	for i := range expected {
-		assert.Equal(t, expected[i], gots[i])
-	}
+	assert.Equal(t, contest2, gotContest2)
 }
 
 func TestContestRepository_UpdateContest(t *testing.T) {
@@ -129,15 +125,11 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 
 	gotContest1, err := repo.GetContest(contest1.ID)
 	assert.NoError(t, err)
+	assert.Equal(t, contest1, gotContest1)
+
 	gotContest2, err := repo.GetContest(contest2.ID)
 	assert.NoError(t, err)
-
-	expected := []*domain.ContestDetail{contest1, contest2}
-	gots := []*domain.ContestDetail{gotContest1, gotContest2}
-
-	for i := range expected {
-		assert.Equal(t, expected[i], gots[i])
-	}
+	assert.Equal(t, contest2, gotContest2)
 
 	err = repo.DeleteContest(contest1.ID)
 	assert.NoError(t, err)
@@ -216,8 +208,9 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, team1, gotTeams1)
 
-	_, err = repo.GetContestTeam(contest2.ID, team2.ID)
+	gotTeams2, err := repo.GetContestTeam(contest2.ID, team2.ID)
 	assert.Error(t, err)
+	assert.Nil(t, gotTeams2)
 }
 
 // func TestCreateContestTeam(t *testing.T) {
@@ -298,18 +291,15 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 		Description: random.AlphaNumeric(),
 	})
 
+	expected1 := []*domain.ContestTeam{&team1.ContestTeam, &team2.ContestTeam}
 	gotTeams1, err := repo.GetContestTeams(contest1.ID)
 	assert.NoError(t, err)
+	assert.ElementsMatch(t, expected1, gotTeams1)
 
+	expected2 := []*domain.ContestTeam{}
 	gotTeams2, err := repo.GetContestTeams(contest2.ID)
 	assert.NoError(t, err)
-
-	expected := [][]*domain.ContestTeam{{&team1.ContestTeam, &team2.ContestTeam}, {}}
-	gots := [][]*domain.ContestTeam{gotTeams1, gotTeams2}
-
-	for i := range expected {
-		assert.ElementsMatch(t, expected[i], gots[i])
-	}
+	assert.ElementsMatch(t, expected2, gotTeams2)
 
 	err = repo.DeleteContestTeam(contest1.ID, team1.ID)
 	assert.NoError(t, err)
