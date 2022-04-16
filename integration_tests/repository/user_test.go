@@ -99,6 +99,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				Name:             optional.NewString(mockdata.MockTraQUsers[0].Name, true),
 				IncludeSuspended: optional.NewBool(true, true),
 			}},
+			expected:  nil,
 			assertion: assert.Error,
 		},
 	}
@@ -462,8 +463,8 @@ func TestUserRepository_GetContests(t *testing.T) {
 	user1 := mockdata.MockUsers[1]
 	user2 := mockdata.MockUsers[2]
 
-	mustAddContestTeamMember(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
-	mustAddContestTeamMember(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
+	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
+	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
 	expected1 := []*domain.UserContest{makeUserContest(&contest1.Contest, &team1.ContestTeam), makeUserContest(&contest2.Contest, &team2.ContestTeam)}
 	projects1, err := userRepo.GetContests(user1.ID)

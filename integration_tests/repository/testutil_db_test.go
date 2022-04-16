@@ -160,7 +160,7 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 	return args
 }
 
-func mustAddContestTeamMember(t *testing.T, repo repository.ContestRepository, teamID uuid.UUID, userIDs []uuid.UUID) {
+func mustAddContestTeamMembers(t *testing.T, repo repository.ContestRepository, teamID uuid.UUID, userIDs []uuid.UUID) {
 	t.Helper()
 
 	for _, id := range userIDs {
