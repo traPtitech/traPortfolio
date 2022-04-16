@@ -4,16 +4,20 @@ traPortfolio backend
 
 ## Develop environment
 
-### Set up local develop environment with docker
+### Requirements
 
-#### Requirements
-
+- bash
+- make
 - docker
 - docker-compose
-- make
-- bash
+- go 1.17
+- mysql
 
-1. Run the following command in the project root
+### Set up with docker-compose
+
+#### Start docker container
+
+Run the following command in the project root
 
 ```bash
 docker-compose up
@@ -26,58 +30,78 @@ Now you can access to
   - username: `root`
   - password: `password`
   - database: `portfolio`
+  - port: `3306`
 
-### Set up local develop environment without docker
-
-#### Requirements
-
-- go 1.17
-- mysql
-
-1. Make sure MySQL is running
-2. Run the following command in the project root
+(Optional) Then, the following command will insert sample data into the database
 
 ```bash
-DB_HOST=localhost go run main.go
+go run main.go --migrate --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
 ```
 
-if you want to change DB port, set the `DB_PORT` environment variable.
+#### Rebuild docker container
 
-### Rebuild
+Run the following command in the project root
 
 ```bash
 docker-compose up --build
 ```
 
-### Up test DB
+### Set up without docker-compose
+
+#### Set Up test DB (with port 3307)
+
+Run the following command in the project root
 
 ```bash
 make up-test-db
 ```
 
-### Remove test DB
+(Optional) Then, the following command will insert sample data into the database
+
+```bash
+go run main.go --migrate --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
+```
+
+#### Remove test DB
+
+Run the following command in the project root
 
 ```bash
 make rm-test-db
 ```
 
+#### Run locally
+
+Make sure test MySQL container is running,
+and run the following command in the project root
+
+```bash
+go run main.go --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
+```
+
 ### Generate DB docs
 
-Make sure test MySQL container is running
+Make sure test MySQL container is running,
+and run the following command in the project root
 
 ```bash
 make db-gen-docs
 ```
 
-### Lint
+### Run linters
 
-DB Lint(you need docker)
+#### DB linter (tbls)
+
+Make sure test MySQL container is running,
+and run the following command in the project root
 
 ```bash
 make db-lint
 ```
 
-golangci-lint(you need docker)
+#### Go linter (golangci-lint)
+
+Run the following command in the project root
 
 ```bash
 make golangci-lint
