@@ -50,8 +50,6 @@ go run main.go --migrate --db-user root --db-pass password --db-port 3306 --db-h
 
 ### Rebuild docker container (with docker-compose)
 
-Run the following command in the project root
-
 ```bash
 docker-compose up --build
 ```
@@ -72,16 +70,13 @@ go run main.go --migrate --db-user root --db-pass password --db-port 3307 --db-h
 
 ### Remove test DB
 
-Run the following command in the project root
-
 ```bash
 make rm-test-db
 ```
 
 ### Run locally
 
-Make sure test MySQL container is running,
-and run the following command in the project root
+Make sure test MySQL container is running
 
 ```bash
 go run main.go --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
@@ -89,8 +84,7 @@ go run main.go --db-user root --db-pass password --db-port 3307 --db-host localh
 
 ### Generate DB docs
 
-Make sure test MySQL container is running,
-and run the following command in the project root
+Make sure test MySQL container is running
 
 ```bash
 make db-gen-docs
@@ -100,16 +94,13 @@ make db-gen-docs
 
 #### DB linter (tbls)
 
-Make sure test MySQL container is running,
-and run the following command in the project root
+Make sure test MySQL container is running
 
 ```bash
 make db-lint
 ```
 
 #### Go linter (golangci-lint)
-
-Run the following command in the project root
 
 ```bash
 make golangci-lint
