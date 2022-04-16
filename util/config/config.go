@@ -3,12 +3,16 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 	"sync"
+	"time"
 
 	goflag "flag"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const (
@@ -37,11 +41,12 @@ type (
 	}
 
 	SQLConfig struct {
-		User string `mapstructure:"user"`
-		Pass string `mapstructure:"pass"`
-		Host string `mapstructure:"host"`
-		Name string `mapstructure:"name"`
-		Port int    `mapstructure:"port"`
+		User    string `mapstructure:"user"`
+		Pass    string `mapstructure:"pass"`
+		Host    string `mapstructure:"host"`
+		Name    string `mapstructure:"name"`
+		Port    int    `mapstructure:"port"`
+		Verbose bool   `mapstructure:"verbose"`
 	}
 
 	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
@@ -68,6 +73,7 @@ func init() {
 	pflag.String("db-host", defaultDBHost, "db host")
 	pflag.String("db-name", "", "db name")
 	pflag.Int("db-port", defaultDBPort, "db port")
+	pflag.Bool("db-verbose", false, "db verbose mode")
 	pflag.String("traq-cookie", "", "traq cookie")
 	pflag.String("traq-api-endpoint", "", "traq api endpoint")
 	pflag.String("knoq-cookie", "", "knoq cookie")
@@ -90,6 +96,7 @@ func Parse() {
 	_ = viper.BindPFlag("db.host", pflag.Lookup("db-host"))
 	_ = viper.BindPFlag("db.name", pflag.Lookup("db-name"))
 	_ = viper.BindPFlag("db.port", pflag.Lookup("db-port"))
+	_ = viper.BindPFlag("db.verbose", pflag.Lookup("db-verbose"))
 	_ = viper.BindPFlag("traq.cookie", pflag.Lookup("traq-cookie"))
 	_ = viper.BindPFlag("traq.apiEndpoint", pflag.Lookup("traq-api-endpoint"))
 	_ = viper.BindPFlag("knoq.cookie", pflag.Lookup("knoq-cookie"))
@@ -216,4 +223,31 @@ func (c *SQLConfig) DsnWithoutName() string {
 
 func (c *SQLConfig) DBName() string {
 	return c.Name
+}
+
+func (c *SQLConfig) GormConfig() *gorm.Config {
+	var (
+		logLevel  = logger.Warn
+		ignoreRNF = true
+	)
+
+	if c.Verbose {
+		logLevel = logger.Info
+		ignoreRNF = false
+	}
+
+	return &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				SlowThreshold:             200 * time.Millisecond,
+				LogLevel:                  logLevel,
+				IgnoreRecordNotFoundError: ignoreRNF,
+				Colorful:                  true,
+			},
+		),
+		NowFunc: func() time.Time {
+			return time.Now().Truncate(time.Microsecond)
+		},
+	}
 }
