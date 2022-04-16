@@ -17,10 +17,10 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func TestGetEvents(t *testing.T) {
+func TestEventRepository_GetEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("get_events")
+	conf := testutils.GetConfigWithDBName("event_repository_get_events")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
@@ -41,10 +41,10 @@ func TestGetEvents(t *testing.T) {
 	assert.ElementsMatch(t, expected, got)
 }
 
-func TestGetEvent(t *testing.T) {
+func TestEventRepository_GetEvent(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("get_event")
+	conf := testutils.GetConfigWithDBName("event_repository_get_event")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
@@ -87,10 +87,10 @@ func TestGetEvent(t *testing.T) {
 // func TestCreateEventLevel(t *testing.T) {
 // }
 
-func TestUpdateEventLevel(t *testing.T) {
+func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("update_event_level")
+	conf := testutils.GetConfigWithDBName("event_repository_update_event_level")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
@@ -119,10 +119,10 @@ func TestUpdateEventLevel(t *testing.T) {
 	assert.Equal(t, updatedLevel, got.Level)
 }
 
-func TestGetUserEvents(t *testing.T) {
+func TestEventRepository_GetUserEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("get_user_events")
+	conf := testutils.GetConfigWithDBName("event_repository_get_user_events")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
