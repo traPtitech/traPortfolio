@@ -49,7 +49,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
 
-	levels := createRandomEventLevel(t, repo)
+	levels := createRandomEventLevels(t, repo)
 	selected := mockdata.MockKnoqEvents[rand.Intn(len(mockdata.MockKnoqEvents)-1)]
 	hostName := make([]*domain.User, 0, len(selected.Admins))
 	for _, aid := range selected.Admins {
@@ -95,7 +95,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
 
-	levels := createRandomEventLevel(t, repo)
+	levels := createRandomEventLevels(t, repo)
 
 	// choose randomly
 	var selected *urepository.CreateEventLevelArgs
@@ -141,11 +141,10 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, expected, got)
-
 }
 
 // Create at least 1 event level.
-func createRandomEventLevel(t *testing.T, repo urepository.EventRepository) map[uuid.UUID]*urepository.CreateEventLevelArgs {
+func createRandomEventLevels(t *testing.T, repo urepository.EventRepository) map[uuid.UUID]*urepository.CreateEventLevelArgs {
 	created := make(map[uuid.UUID]*urepository.CreateEventLevelArgs)
 
 	for idx, e := range mockdata.MockKnoqEvents {
