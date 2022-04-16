@@ -10,6 +10,12 @@
 
 ## Develop environment
 
+If you want know this repository, then, follow these pages.
+
+- [Architecture memo (in Japanese)](./docs/architecture.md)
+- [API schema](./docs/swagger/traPortfolio.v1.yaml)
+- [DB schema](./docs/dbschema)
+
 ### Requirements
 
 - bash
