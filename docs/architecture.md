@@ -1,40 +1,42 @@
 # パッケージ構成
 
-クリーンアーキテクチャ っぽくしてるけど一部そうなってないところもある(interactor とか controller がなくて直接 usecase の handler になってたりする)
+クリーンアーキテクチャを参考に構成
 
-```
+```bash
 .
-├── dev/    開発用のなにかのつもり
-│  └── bin/
-├── docs    ドキュメント. swaggerとかtblsのやつとか
-│  ├── architecture.md
-│  ├── dbschema/
-│  └── swagger/
-├── domain/     ドメインオブジェクト. tagとかgorm依存になるかもしれない
-├── infrastructure/     dbとかフレームワークに関するもの
-│  ├── migration/       gomigrateをつかったdbのマイグレーション.
-│  │  ├── current.go
-│  │  ├── migrate.go
-│  │  └── v1.go
-│  ├── router.go    echo routerの定義
-│  ├── sqlhandler.go    dbの初期化とinterface/database/sqlhandlerの実装
-│  ├── wire.go
-│  └── wire_gen.go
-├── interfaces/     interface層
-│  ├── database/    databaseについてのinterface
-│  │  └── sqlhandler.go
-│  └── repository/      usecases/repositoryの実装
-│     └── user_impl.go
-├── main.go
-└── usecases/       ユースケース層
-   ├── handler/     echo ハンドラー
-   │  └── api.go
-   ├── repository/      レポジトリインターフェス
-   │  └── error.go
-   ├── service/     ビジネスロジックとかを書くつもり
-   │  └── user_service/
-   │     └── user.go
-   └── usecase/     ユースケースのインターフェース
-      ├── ping.go
-      └── user.go
+├── bin # makeでコンパイルしたバイナリが入る
+├── dev # 開発用の設定ファイル、スクリプト
+│  └── bin # makeで使うシェルスクリプト
+├── docs # ドキュメント
+│  ├── dbschema # DBスキーマ(tblsで自動生成)
+│  └── swagger # APIスキーマ
+├── domain # domain層。他層に依存しないドメインオブジェクトを格納する
+├── infrastructure # infrastructure層。他3層に依存する。
+│  └── migration # DBのマイグレーション(go-gormigrate/gormigrateを使用)
+├── integration_tests # 結合テスト。build tagsをつけて管理
+│  ├── handler
+│  ├── repository
+│  ├── testdata
+│  └── testutils
+├── interfaces # interface層。usecase層、domain層に依存する
+│  ├── database # DB操作に関するインターフェイスを定義
+│  │  └── mock_database # 単体テスト用モック(mockgenで自動生成)
+│  ├── external # 外部サービス(traQ等)に関するインターフェイスを定義
+│  │  ├── mock_external # 単体テスト用モック(mockgenで自動生成)
+│  │  └── mock_external_e2e # E2Eテスト用モック
+│  ├── handler # echoハンドラーの実装、組み立て
+│  └── repository # usecases/repositoryの実装
+│     └── model # DBのモデル
+├── usecases # usecase層。domain層に依存する
+│  ├── repository # リポジトリ操作に関するインターフェイスを定義
+│  │  └── mock_repository # 単体テスト用モック(mockgenで自動生成)
+│  └── service # ビジネスロジックに関するインターフェイスの定義、実装
+│     └── mock_service # 単体テスト用モック(mockgenで自動生成)
+├── util # 汎用パッケージ
+│  ├── config # config.yamlから設定を読み込む
+│  │  └── testdata
+│  ├── mockdata # E2Eテスト、結合テストで用いるサンプルデータを格納
+│  ├── optional # sql.NullXXXをラップ
+│  └── random # テストで用いる乱数生成パッケージ
+└── main.go
 ```
