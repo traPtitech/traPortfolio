@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
@@ -14,7 +14,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -53,12 +52,12 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			want: []*domain.Project{
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 					Duration: domain.YearWithSemesterDuration{
 						Since: makeYearWithSemester(rand.Intn(2)),
 						Until: makeYearWithSemester(rand.Intn(2)),
 					},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members:     nil,
 				},
@@ -94,7 +93,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjects()
 			tt.assertion(t, err)
@@ -124,15 +123,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          pid,
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -178,21 +177,21 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          pid,
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -264,8 +263,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								args.id,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
+								random.AlphaNumeric(),
 								random.RandURLString(),
 								random.Time().Year(),
 								rand.Intn(2),
@@ -294,8 +293,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								args.id,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
+								random.AlphaNumeric(),
 								random.RandURLString(),
 								random.Time().Year(),
 								rand.Intn(2),
@@ -311,7 +310,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 								random.Time().Year(),
 								rand.Intn(2),
 								random.Time().Year(),
@@ -325,7 +324,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 							),
 					)
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
@@ -341,7 +340,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProject(tt.args.id)
 			tt.assertion(t, err)
@@ -353,8 +352,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_CreateProject(t *testing.T) {
 	duration := random.Duration()
 	successProject := &repository.CreateProjectArgs{
-		Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-		Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+		Name:          random.AlphaNumeric(),
+		Description:   random.AlphaNumeric(),
 		Link:          optional.NewString(random.RandURLString(), true),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
@@ -409,8 +408,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				project: &repository.CreateProjectArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(),
+					Description:   random.AlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
@@ -439,7 +438,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateProject(tt.args.project)
 			if tt.want != nil && got != nil {
@@ -468,8 +467,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
 					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
@@ -492,8 +491,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
 					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
@@ -520,7 +519,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
 		})
@@ -547,8 +546,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -584,12 +583,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 					// RealName:
 				},
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -656,7 +655,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 							),
 					)
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
@@ -673,7 +672,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjectMembers(tt.args.id)
 			tt.assertion(t, err)
@@ -891,7 +890,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddProjectMembers(tt.args.projectID, tt.args.projectMembers))
 		})
@@ -997,7 +996,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteProjectMembers(tt.args.projectID, tt.args.members))
 		})

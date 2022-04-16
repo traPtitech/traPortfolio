@@ -1,11 +1,12 @@
 //go:build integration && db
 
-package repository_test
+package repository
 
 import (
 	"math/rand"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
@@ -30,7 +31,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	if args == nil {
 		var link optional.String
 		if rand.Intn(2) == 1 {
-			link = optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true)
+			link = optional.NewString(random.AlphaNumeric(), true)
 		}
 
 		var t optional.Time
@@ -39,8 +40,8 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 		}
 
 		args = &repository.CreateContestArgs{
-			Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-			Description: random.AlphaNumeric(rand.Intn(30) + 1),
+			Name:        random.AlphaNumeric(),
+			Description: random.AlphaNumeric(),
 			Link:        link,
 			Since:       random.Time(),
 			Until:       t,
@@ -52,55 +53,61 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	return contest
 }
 
-// func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contestID uuid.UUID, args *repository.CreateContestTeamArgs) *domain.ContestTeamDetail {
-// 	t.Helper()
+func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contestID uuid.UUID, args *repository.CreateContestTeamArgs) *domain.ContestTeamDetail {
+	t.Helper()
 
-// 	if args == nil {
-// 		var result optional.String
-// 		if rand.Intn(2) == 0 {
-// 			result = optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true)
-// 		}
+	if args == nil {
+		args = &repository.CreateContestTeamArgs{
+			Name:        random.AlphaNumeric(),
+			Result:      random.OptAlphaNumeric(),
+			Link:        random.OptURLString(),
+			Description: random.AlphaNumeric(),
+		}
+	}
 
-// 		var link optional.String
-// 		if rand.Intn(2) == 0 {
-// 			link = optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true)
-// 		}
+	var err error
+	var contestTeamDetail *domain.ContestTeamDetail
+	if contestID == uuid.Nil {
+		contest := mustMakeContest(t, nil, nil)
+		contestTeamDetail, err = repo.CreateContestTeam(contest.ID, args)
+	} else {
+		contestTeamDetail, err = repo.CreateContestTeam(contestID, args)
+	}
 
-// 		args = &repository.CreateContestTeamArgs{
-// 			Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-// 			Result:      result,
-// 			Link:        link,
-// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
-// 		}
-// 	}
+	assert.NoError(t, err)
 
-// 	var err error
-// 	var contestTeamDetail *domain.ContestTeamDetail
-// 	if contestID == uuid.Nil {
-// 		contest := mustMakeContest(t, nil, nil)
-// 		contestTeamDetail, err = repo.CreateContestTeam(contest.ID, args)
-// 	} else {
-// 		contestTeamDetail, err = repo.CreateContestTeam(contestID, args)
-// 	}
+	return contestTeamDetail
+}
 
-// 	require.NoError(t, err)
+func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *repository.CreateEventLevelArgs) *repository.CreateEventLevelArgs {
+	t.Helper()
 
-// 	return contestTeamDetail
-// }
+	if args == nil {
+		args = &repository.CreateEventLevelArgs{
+			EventID: random.UUID(),
+			Level:   domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+		}
+	}
+
+	err := repo.CreateEventLevel(args)
+	assert.NoError(t, err)
+
+	return args
+}
 
 // func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
 // 	t.Helper()
 
 // 	if args == nil {
 // 		args = &repository.CreateUserArgs{
-// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
+// 			Description: random.AlphaNumeric(),
 // 			Check:       random.Bool(),
-// 			Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+// 			Name:        random.AlphaNumeric(),
 // 		}
 // 	}
 
 // 	user, err := repo.CreateUser(*args)
-// 	require.NoError(t, err)
+// 	assert.NoError(t, err)
 
 // 	return user
 // }

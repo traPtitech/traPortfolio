@@ -68,7 +68,7 @@ func (mr *MockEventServiceMockRecorder) GetEvents(ctx interface{}) *gomock.Call 
 }
 
 // UpdateEventLevel mocks base method.
-func (m *MockEventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArg) error {
+func (m *MockEventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateEventLevel", ctx, eventID, arg)
 	ret0, _ := ret[0].(error)

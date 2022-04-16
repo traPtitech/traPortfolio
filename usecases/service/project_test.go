@@ -1,8 +1,7 @@
-package service_test
+package service
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -13,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"gorm.io/gorm"
 )
@@ -36,15 +34,15 @@ func TestProjectService_GetProjects(t *testing.T) {
 			want: []*domain.Project{
 				{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Duration:    random.Duration(),
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
 						{
 							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
 							Duration: random.Duration(),
 						},
 					},
@@ -76,7 +74,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 			got, err := s.GetProjects(tt.args.ctx)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -105,15 +103,15 @@ func TestProjectService_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          random.UUID(),
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -147,7 +145,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 			got, err := s.GetProject(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -157,8 +155,8 @@ func TestProjectService_GetProject(t *testing.T) {
 
 func TestProjectService_CreateProject(t *testing.T) {
 	var (
-		name        = random.AlphaNumeric(rand.Intn(30) + 1)
-		description = random.AlphaNumeric(rand.Intn(30) + 1)
+		name        = random.AlphaNumeric()
+		description = random.AlphaNumeric()
 		link        = random.RandURLString()
 		duration    = random.Duration()
 	)
@@ -209,8 +207,8 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(),
+					Description:   random.AlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     duration.Until.Year,
 					SinceSemester: duration.Until.Semester,
@@ -228,8 +226,8 @@ func TestProjectService_CreateProject(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				args: &repository.CreateProjectArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(),
+					Description:   random.AlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
@@ -255,7 +253,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 			got, err := s.CreateProject(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -284,9 +282,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
+					Link:          optional.NewString(random.AlphaNumeric(), true),
 					SinceYear:     optional.NewInt64(int64(duration.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(duration.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(duration.Until.Year), true),
@@ -320,9 +318,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
+					Link:          optional.NewString(random.AlphaNumeric(), true),
 					SinceYear:     optional.NewInt64(int64(duration.Until.Year), true),
 					SinceSemester: optional.NewInt64(int64(duration.Until.Semester), true),
 					UntilYear:     optional.NewInt64(int64(duration.Since.Year), true),
@@ -343,9 +341,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Link:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
+					Link:          optional.NewString(random.AlphaNumeric(), true),
 					SinceYear:     optional.NewInt64(int64(duration.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(duration.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(duration.Until.Year), true),
@@ -373,7 +371,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 
 			tt.assertion(t, s.UpdateProject(tt.args.ctx, tt.args.id, tt.args.args))
 		})
@@ -402,8 +400,8 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
@@ -435,7 +433,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 			got, err := s.GetProjectMembers(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -529,7 +527,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 
 			tt.assertion(t, s.AddProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.args))
 		})
@@ -585,7 +583,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
 
-			s := service.NewProjectService(repo)
+			s := NewProjectService(repo)
 
 			tt.assertion(t, s.DeleteProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.memberIDs))
 		})

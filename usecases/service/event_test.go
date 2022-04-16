@@ -1,8 +1,7 @@
-package service_test
+package service
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
@@ -14,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 )
 
 func TestEventService_GetEvents(t *testing.T) {
@@ -42,7 +40,7 @@ func TestEventService_GetEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
@@ -65,7 +63,7 @@ func TestEventService_GetEvents(t *testing.T) {
 				user:  mock_repository.NewMockUserRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewEventService(tt.fields.event, tt.fields.user)
+			s := NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
 			got, err := s.GetEvents(tt.args.ctx)
 			tt.assertion(t, err)
@@ -101,18 +99,18 @@ func TestEventService_GetEventByID(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					// ID:
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
-				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
+				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
 				HostName: []*domain.User{
 					{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					},
 				},
 				GroupID: random.UUID(),
@@ -166,12 +164,12 @@ func TestEventService_GetEventByID(t *testing.T) {
 				e.EXPECT().GetEvent(args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
 						ID:        args.id,
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
 						TimeStart: time.Now(),
 						TimeEnd:   time.Now(),
 					},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
+					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevelAnonymous,
 					HostName:    []*domain.User{{ID: random.UUID()}},
 					GroupID:     random.UUID(),
@@ -193,7 +191,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 				user:  mock_repository.NewMockUserRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args, tt.want)
-			s := service.NewEventService(tt.fields.event, tt.fields.user)
+			s := NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
 			got, err := s.GetEventByID(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
@@ -211,7 +209,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		id  uuid.UUID
-		arg *repository.UpdateEventLevelArg
+		arg *repository.UpdateEventLevelArgs
 	}
 	tests := []struct {
 		name      string
@@ -225,7 +223,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				id:  random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelAnonymous,
 				},
 			},
@@ -247,7 +245,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 				user:  mock_repository.NewMockUserRepository(ctrl),
 			}
 			tt.setup(tt.fields, tt.args)
-			s := service.NewEventService(tt.fields.event, tt.fields.user)
+			s := NewEventService(tt.fields.event, tt.fields.user)
 			// Assertion
 			tt.assertion(t, s.UpdateEventLevel(tt.args.ctx, tt.args.id, tt.args.arg))
 		})
