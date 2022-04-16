@@ -19,10 +19,10 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func TestGetUsers(t *testing.T) {
+func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_users")
+	conf := testutils.GetConfigWithDBName("user_repository_get_users")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -113,10 +113,10 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
-func TestGetUser(t *testing.T) {
+func TestUserRepository_GetUser(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_user")
+	conf := testutils.GetConfigWithDBName("user_repository_get_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -186,10 +186,10 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
-func TestCreateUser(t *testing.T) {
+func TestUserRepository_CreateUser(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_create_user")
+	conf := testutils.GetConfigWithDBName("user_repository_create_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -238,10 +238,10 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-func TestUpdateUser(t *testing.T) {
+func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_update_user")
+	conf := testutils.GetConfigWithDBName("user_repository_update_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -283,10 +283,10 @@ func TestUpdateUser(t *testing.T) {
 	assert.Equal(t, expected, got)
 }
 
-func TestGetAccounts(t *testing.T) {
+func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_accounts")
+	conf := testutils.GetConfigWithDBName("user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -305,10 +305,10 @@ func TestGetAccounts(t *testing.T) {
 	assert.ElementsMatch(t, expected, got)
 }
 
-func TestGetAccount(t *testing.T) {
+func TestUserRepository_GetAccount(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_account")
+	conf := testutils.GetConfigWithDBName("user_repository_get_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -325,13 +325,13 @@ func TestGetAccount(t *testing.T) {
 	assert.Equal(t, account1, got)
 }
 
-// func TestCreateAccount(t *testing.T) {
+// func TestUserRepository_CreateAccount(t *testing.T) {
 // }
 
-func TestUpdateAccount(t *testing.T) {
+func TestUserRepository_UpdateAccount(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_update_account")
+	conf := testutils.GetConfigWithDBName("user_repository_update_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -369,10 +369,10 @@ func TestUpdateAccount(t *testing.T) {
 	assert.Equal(t, account1, got)
 }
 
-func TestDeleteAccount(t *testing.T) {
+func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_delete_account")
+	conf := testutils.GetConfigWithDBName("user_repository_delete_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -395,10 +395,10 @@ func TestDeleteAccount(t *testing.T) {
 	assert.ElementsMatch(t, expected, got)
 }
 
-func TestGetUserProjects(t *testing.T) {
+func TestUserRepository_GetUserProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_user_projects")
+	conf := testutils.GetConfigWithDBName("user_repository_get_user_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -426,10 +426,10 @@ func TestGetUserProjects(t *testing.T) {
 	assert.ElementsMatch(t, expected2, projects2)
 }
 
-func TestGetContests(t *testing.T) {
+func TestUserRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("repository_get_contests")
+	conf := testutils.GetConfigWithDBName("user_repository_get_contests")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -471,7 +471,7 @@ func TestGetContests(t *testing.T) {
 	assert.ElementsMatch(t, expected2, projects2)
 }
 
-// func TestGetGroupsByUserID(t *testing.T) {
+// func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 // }
 
 func makeUserProject(args *urepository.CreateProjectMemberArgs, project *domain.Project) *domain.UserProject {
