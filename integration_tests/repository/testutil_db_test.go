@@ -125,8 +125,7 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	}
 
 	if userID == uuid.Nil {
-		user := mustMakeUser(t, repo, nil)
-		userID = user.ID
+		t.Fatal("userID must not be empty")
 	}
 	account, err := repo.CreateAccount(userID, args)
 	assert.NoError(t, err)
@@ -178,13 +177,19 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 	return args
 }
 
-func mustAddContestTeamMember(t *testing.T, repo repository.ContestRepository, teamID, userID uuid.UUID) {
+func mustAddContestTeamMember(t *testing.T, repo repository.ContestRepository, teamID uuid.UUID, userIDs []uuid.UUID) {
 	t.Helper()
 
-	if teamID == uuid.Nil || userID == uuid.Nil {
-		t.Fatal("projectID and userID must not be empty")
+	for _, id := range userIDs {
+		if id == uuid.Nil {
+			t.Fatal("userID must not be empty")
+		}
 	}
 
-	err := repo.AddContestTeamMembers(teamID, []uuid.UUID{userID})
+	if teamID == uuid.Nil {
+		t.Fatal("projectID must not be empty")
+	}
+
+	err := repo.AddContestTeamMembers(teamID, userIDs)
 	assert.NoError(t, err)
 }
