@@ -1,7 +1,6 @@
 # traPortfolio
 
-[![GitHub release](https://img.shields.io/github/release/traPtitech/traPortfolio.svg)](https://GitHub.com/traPtitech/traPortfolio/releases/) [![CI](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml) [![Build image](https://github.com/traPtitech/traPortfolio/actions/workflows/release.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/release.yaml)  [![codecov](https://codecov.io/gh/traPtitech/traPortfolio/branch/main/graph/badge.svg?token=2HB6P7RUX8)](https://codecov.io/gh/traPtitech/traPortfolio) [![swagger](https://img.shields.io/badge/swagger-docs-brightgreen)](https://apis.trap.jp/?urls.primaryName=traPortfolio)
-
+[![GitHub release](https://img.shields.io/github/release/traPtitech/traPortfolio.svg)](https://GitHub.com/traPtitech/traPortfolio/releases/) [![CI](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml) [![Build image](https://github.com/traPtitech/traPortfolio/actions/workflows/release.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/release.yaml) [![codecov](https://codecov.io/gh/traPtitech/traPortfolio/branch/main/graph/badge.svg?token=2HB6P7RUX8)](https://codecov.io/gh/traPtitech/traPortfolio) [![swagger](https://img.shields.io/badge/swagger-docs-brightgreen)](https://apis.trap.jp/?urls.primaryName=traPortfolio)
 
 - Backend
   - [traPtitech/traPortfolio](https://github.com/traPtitech/traPortfolio) (this repository)
@@ -39,7 +38,7 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-(Optional) Then, the following command will insert sample data into the database
+(Optional) After running the following command, sample data will be inserted into the database
 
 ```bash
 go run main.go --migrate --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
@@ -63,7 +62,7 @@ Run the following command in the project root
 make up-test-db
 ```
 
-(Optional) Then, the following command will insert sample data into the database
+(Optional) After running the following command, sample data will be inserted into the database
 
 ```bash
 go run main.go --migrate --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
