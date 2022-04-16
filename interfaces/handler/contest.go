@@ -48,6 +48,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// GetContest GET /contests/:contestID
 func (h *ContestHandler) GetContest(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
@@ -236,7 +237,7 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
-// EditContestTeam PATCH /contests/:contestID
+// EditContestTeam PATCH /contests/:contestID/teams/:teamID
 func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
@@ -284,7 +285,7 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// GetContestTeamMembers GET /contests/{contestId}/teams/{teamId}/members
+// GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()

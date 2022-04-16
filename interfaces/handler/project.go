@@ -104,6 +104,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	))
 }
 
+// EditProject PATCH /projects/:projectID
 func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
