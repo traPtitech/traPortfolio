@@ -216,8 +216,8 @@ func TestContestHandler_GetContest(t *testing.T) {
 	}
 }
 
-func makePostContestRequest(description string, since time.Time, until time.Time, name string, link string) *PostContestJSONRequestBody {
-	return &PostContestJSONRequestBody{
+func makeCreateContestRequest(description string, since time.Time, until time.Time, name string, link string) *CreateContestJSONRequestBody {
+	return &CreateContestJSONRequestBody{
 		Description: description,
 		Duration: Duration{
 			Since: since,
@@ -232,13 +232,13 @@ func TestContestHandler_PostContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockContestService) (reqBody *PostContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string)
+		setup      func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockContestService) (reqBody *PostContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
-				reqBody = makePostContestRequest(
+			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
 					random.Time(),
 					random.Time(),
@@ -279,8 +279,8 @@ func TestContestHandler_PostContest(t *testing.T) {
 		},
 		{
 			name: "Bad Request: invalid url",
-			setup: func(s *mock_service.MockContestService) (reqBody *PostContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
-				reqBody = makePostContestRequest(
+			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
 					random.Time(),
 					random.Time(),
@@ -294,8 +294,8 @@ func TestContestHandler_PostContest(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockContestService) (reqBody *PostContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
-				reqBody = makePostContestRequest(
+			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
 					random.Time(),
 					random.Time(),
@@ -638,15 +638,15 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockContestService) (reqBody *PostContestTeamJSONRequestBody, expectedResBody ContestTeam, path string)
+		setup      func(s *mock_service.MockContestService) (reqBody *AddContestTeamJSONRequestBody, expectedResBody ContestTeam, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockContestService) (*PostContestTeamJSONRequestBody, ContestTeam, string) {
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
-				reqBody := &PostContestTeamJSONRequestBody{
+				reqBody := &AddContestTeamJSONRequestBody{
 					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
 					Description: random.AlphaNumeric(),
@@ -681,8 +681,8 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(s *mock_service.MockContestService) (*PostContestTeamJSONRequestBody, ContestTeam, string) {
-				reqBody := &PostContestTeamJSONRequestBody{
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+				reqBody := &AddContestTeamJSONRequestBody{
 					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
 					Description: random.AlphaNumeric(),
@@ -694,9 +694,9 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 		},
 		{
 			name: "Contest not exist",
-			setup: func(s *mock_service.MockContestService) (*PostContestTeamJSONRequestBody, ContestTeam, string) {
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
 				contestID := random.UUID()
-				reqBody := &PostContestTeamJSONRequestBody{
+				reqBody := &AddContestTeamJSONRequestBody{
 					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
 					Description: random.AlphaNumeric(),
@@ -715,9 +715,9 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 		},
 		{
 			name: "conflict contest",
-			setup: func(s *mock_service.MockContestService) (*PostContestTeamJSONRequestBody, ContestTeam, string) {
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
 				contestID := random.UUID()
-				reqBody := &PostContestTeamJSONRequestBody{
+				reqBody := &AddContestTeamJSONRequestBody{
 					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
 					Description: random.AlphaNumeric(),

@@ -73,7 +73,7 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
-	req := PostProjectJSONRequestBody{}
+	req := CreateProjectJSONRequestBody{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)

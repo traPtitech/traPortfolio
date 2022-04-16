@@ -156,7 +156,7 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
-		AddAccountJSONRequestBody
+		AddUserAccountJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)

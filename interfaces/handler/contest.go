@@ -80,7 +80,7 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 func (h *ContestHandler) PostContest(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
-	req := PostContestJSONRequestBody{}
+	req := CreateContestJSONRequestBody{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -212,7 +212,7 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
-		PostContestTeamJSONRequestBody
+		AddContestTeamJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
