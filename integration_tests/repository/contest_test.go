@@ -167,18 +167,15 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 		Description: random.AlphaNumeric(),
 	})
 
+	expected1 := []*domain.ContestTeam{&team1.ContestTeam, &team2.ContestTeam}
 	gotTeams1, err := repo.GetContestTeams(contest1.ID)
 	assert.NoError(t, err)
+	assert.ElementsMatch(t, expected1, gotTeams1)
 
+	expected2 := []*domain.ContestTeam{}
 	gotTeams2, err := repo.GetContestTeams(contest2.ID)
 	assert.NoError(t, err)
-
-	expected := [][]*domain.ContestTeam{{&team1.ContestTeam, &team2.ContestTeam}, {}}
-	gots := [][]*domain.ContestTeam{gotTeams1, gotTeams2}
-
-	for i := range expected {
-		assert.ElementsMatch(t, expected[i], gots[i])
-	}
+	assert.ElementsMatch(t, expected2, gotTeams2)
 }
 
 func TestContestRepository_GetContestTeam(t *testing.T) {
