@@ -19,9 +19,7 @@
 - go 1.17
 - mysql
 
-### Set up with docker-compose
-
-#### Start docker container
+### Start docker container (with docker-compose)
 
 Run the following command in the project root
 
@@ -44,7 +42,7 @@ Now you can access to
 go run main.go --migrate --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
 ```
 
-#### Rebuild docker container
+### Rebuild docker container (with docker-compose)
 
 Run the following command in the project root
 
@@ -52,9 +50,7 @@ Run the following command in the project root
 docker-compose up --build
 ```
 
-### Set up without docker-compose
-
-#### Set Up test DB (with port 3307)
+### Set Up test DB (with docker, port:3307)
 
 Run the following command in the project root
 
@@ -68,7 +64,7 @@ make up-test-db
 go run main.go --migrate --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
 ```
 
-#### Remove test DB
+### Remove test DB
 
 Run the following command in the project root
 
@@ -76,7 +72,7 @@ Run the following command in the project root
 make rm-test-db
 ```
 
-#### Run locally
+### Run locally
 
 Make sure test MySQL container is running,
 and run the following command in the project root
