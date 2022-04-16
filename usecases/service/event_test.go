@@ -209,7 +209,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		id  uuid.UUID
-		arg *repository.UpdateEventLevelArg
+		arg *repository.UpdateEventLevelArgs
 	}
 	tests := []struct {
 		name      string
@@ -223,7 +223,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				id:  random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelAnonymous,
 				},
 			},
