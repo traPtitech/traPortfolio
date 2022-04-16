@@ -36,7 +36,6 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, projects, got)
-
 }
 
 func TestProjectRepository_GetProject(t *testing.T) {
@@ -116,7 +115,6 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	if diff := cmp.Diff(project1, got, opt); diff != "" {
 		t.Error(diff)
 	}
-
 }
 
 func TestProjectRepository_GetProjectMembers(t *testing.T) {
