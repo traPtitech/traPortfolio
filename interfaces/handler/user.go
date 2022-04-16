@@ -276,7 +276,7 @@ func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetGroups by UserID GET /users/:userID/groups
+// GetUserGroups GET /users/:userID/groups
 func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	c := _c.(*Context)
 	req := GroupIDInPath{}
