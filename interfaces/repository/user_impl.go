@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -151,7 +149,7 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
 	portalUser, err := repo.portal.GetByTraqID(args.Name)
 	if err != nil {
-		log.Println(err)
+		return nil, convertError(err)
 	}
 
 	user := model.User{
