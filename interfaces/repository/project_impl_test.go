@@ -873,9 +873,10 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 							AddRow(args.projectID),
 					)
 				f.h.Mock.ExpectBegin()
+				pm := args.projectMembers[0]
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.projectID, anyUUID{}, anyTime{}, anyTime{}, anyTime{}, anyTime{}).
+					ExpectExec(regexp.QuoteMeta("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.projectID, pm.UserID, pm.SinceYear, pm.SinceSemester, pm.UntilYear, pm.UntilSemester, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

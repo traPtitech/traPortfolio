@@ -516,7 +516,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 					ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
 					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
-				f.h.Mock.ExpectCommit()
+				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
 		},
@@ -582,7 +582,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			want: nil,
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.Account) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE user_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnError(errUnexpected)
 			},

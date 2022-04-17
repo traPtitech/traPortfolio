@@ -555,7 +555,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 					WithArgs(args.contestID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
 					WithArgs(args.contestID).
 					WillReturnError(errUnexpected)
 			},
