@@ -95,19 +95,84 @@ func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *rep
 	return args
 }
 
-// func mustMakeUser(t *testing.T, repo repository.UserRepository, args *repository.CreateUserArgs) *domain.UserDetail {
-// 	t.Helper()
+func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.UUID, args *repository.CreateAccountArgs) *domain.Account {
+	t.Helper()
 
-// 	if args == nil {
-// 		args = &repository.CreateUserArgs{
-// 			Description: random.AlphaNumeric(),
-// 			Check:       random.Bool(),
-// 			Name:        random.AlphaNumeric(),
-// 		}
-// 	}
+	if args == nil {
+		args = &repository.CreateAccountArgs{
+			DisplayName: random.AlphaNumeric(),
+			Type:        uint(rand.Intn(int(domain.AccountLimit))),
+			URL:         random.RandURLString(),
+			PrPermitted: random.Bool(),
+		}
+	}
 
-// 	user, err := repo.CreateUser(*args)
-// 	assert.NoError(t, err)
+	if userID == uuid.Nil {
+		t.Fatal("userID must not be empty")
+	}
+	account, err := repo.CreateAccount(userID, args)
+	assert.NoError(t, err)
 
-// 	return user
-// }
+	return account
+}
+
+func mustMakeProject(t *testing.T, repo repository.ProjectRepository, args *repository.CreateProjectArgs) *domain.Project {
+	t.Helper()
+
+	if args == nil {
+		args = &repository.CreateProjectArgs{
+			Name:          random.AlphaNumeric(),
+			Description:   random.AlphaNumeric(),
+			Link:          random.OptURLString(),
+			SinceYear:     rand.Intn(2100),
+			SinceSemester: rand.Intn(2),
+			UntilYear:     rand.Intn(2100),
+			UntilSemester: rand.Intn(2),
+		}
+	}
+
+	project, err := repo.CreateProject(args)
+	assert.NoError(t, err)
+
+	return project
+}
+
+func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
+	t.Helper()
+
+	if projectID == uuid.Nil || userID == uuid.Nil {
+		t.Fatal("projectID and userID must not be empty")
+	}
+
+	if args == nil {
+		args = &repository.CreateProjectMemberArgs{
+			UserID:        userID,
+			SinceYear:     rand.Intn(2100),
+			SinceSemester: rand.Intn(2),
+			UntilYear:     rand.Intn(2100),
+			UntilSemester: rand.Intn(2),
+		}
+	}
+
+	err := repo.AddProjectMembers(projectID, []*repository.CreateProjectMemberArgs{args})
+	assert.NoError(t, err)
+
+	return args
+}
+
+func mustAddContestTeamMembers(t *testing.T, repo repository.ContestRepository, teamID uuid.UUID, userIDs []uuid.UUID) {
+	t.Helper()
+
+	for _, id := range userIDs {
+		if id == uuid.Nil {
+			t.Fatal("userID must not be empty")
+		}
+	}
+
+	if teamID == uuid.Nil {
+		t.Fatal("projectID must not be empty")
+	}
+
+	err := repo.AddContestTeamMembers(teamID, userIDs)
+	assert.NoError(t, err)
+}

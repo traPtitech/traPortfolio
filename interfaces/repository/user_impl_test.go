@@ -439,7 +439,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 	description := random.AlphaNumeric()
 
 	type args struct {
-		args repository.CreateUserArgs
+		args *repository.CreateUserArgs
 	}
 	tests := []struct {
 		name      string
@@ -451,7 +451,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				args: repository.CreateUserArgs{
+				args: &repository.CreateUserArgs{
 					Description: description,
 					Check:       check,
 					Name:        name,
@@ -483,7 +483,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		{
 			name: "PortalError",
 			args: args{
-				args: repository.CreateUserArgs{
+				args: &repository.CreateUserArgs{
 					Description: description,
 					Check:       check,
 					Name:        name,
@@ -498,7 +498,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		{
 			name: "UnexpectedError",
 			args: args{
-				args: repository.CreateUserArgs{
+				args: &repository.CreateUserArgs{
 					Description: description,
 					Check:       check,
 					Name:        name,
@@ -1018,7 +1018,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
-					WithArgs(args.accountID, args.userID).
+					WithArgs(args.userID, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -1033,7 +1033,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(regexp.QuoteMeta("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
-					WithArgs(args.accountID, args.userID).
+					WithArgs(args.userID, args.accountID).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
