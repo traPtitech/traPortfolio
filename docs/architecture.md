@@ -20,10 +20,10 @@
 │  └── testutils
 ├── interfaces # interface層。usecase層、domain層に依存する
 │  ├── database # DB操作に関するインターフェイスを定義
-│  │  └── mock_database # 単体テスト用モック(mockgenで自動生成)
+│  │  └── mock_database # 単体テスト用モック(手書き)
 │  ├── external # 外部サービス(traQ等)に関するインターフェイスを定義
 │  │  ├── mock_external # 単体テスト用モック(mockgenで自動生成)
-│  │  └── mock_external_e2e # E2Eテスト用モック
+│  │  └── mock_external_e2e # E2Eテスト用モック(手書き)
 │  ├── handler # echoハンドラーの実装、組み立て
 │  └── repository # usecases/repositoryの実装
 │     └── model # DBのモデル
@@ -36,7 +36,7 @@
 │  ├── config # config.yamlから設定を読み込む
 │  │  └── testdata
 │  ├── mockdata # E2Eテスト、結合テストで用いるサンプルデータを格納
-│  ├── optional # sql.NullXXXをラップ
+│  ├── optional # null値を扱うためのパッケージ
 │  └── random # テストで用いる乱数生成パッケージ
 └── main.go
 ```
