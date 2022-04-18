@@ -16,40 +16,7 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-var (
-	sampleUser1 = handler.User{
-		Id:       mockdata.MockUsers[0].ID,
-		Name:     mockdata.MockUsers[0].Name,
-		RealName: mockdata.MockPortalUsers[0].RealName,
-	}
-	sampleUser2 = handler.User{
-		Id:       mockdata.MockUsers[1].ID,
-		Name:     mockdata.MockUsers[1].Name,
-		RealName: mockdata.MockPortalUsers[1].RealName,
-	}
-	sampleUser3 = handler.User{
-		Id:       mockdata.MockUsers[2].ID,
-		Name:     mockdata.MockUsers[2].Name,
-		RealName: mockdata.MockPortalUsers[2].RealName,
-	}
-
-	sampleAccount = handler.Account{
-		DisplayName: mockdata.MockAccount.Name,
-		Id:          mockdata.MockAccount.ID,
-		PrPermitted: handler.PrPermitted(mockdata.MockAccount.Check),
-		Type:        handler.AccountType(mockdata.MockAccount.Type),
-		Url:         mockdata.MockAccount.URL,
-	}
-
-	sampleUserDetail1 = handler.UserDetail{
-		User:     sampleUser1,
-		Accounts: []handler.Account{sampleAccount},
-		Bio:      mockdata.MockUsers[0].Description,
-		State:    handler.UserAccountState(mockdata.MockTraQUsers[0].User.State),
-	}
-)
-
-// GetUsers GET /users
+// GET /users
 func TestGetUsers(t *testing.T) {
 	var (
 		includeSuspended handler.IncludeSuspendedInQuery = true
@@ -66,8 +33,8 @@ func TestGetUsers(t *testing.T) {
 			http.StatusOK,
 			handler.GetUsersParams{},
 			[]handler.User{
-				sampleUser1,
-				sampleUser3,
+				mockdata.HMockUser1,
+				mockdata.HMockUser3,
 			},
 		},
 		"200 with includeSuspended": {
@@ -76,9 +43,9 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 			},
 			[]handler.User{
-				sampleUser1,
-				sampleUser2,
-				sampleUser3,
+				mockdata.HMockUser1,
+				mockdata.HMockUser2,
+				mockdata.HMockUser3,
 			},
 		},
 		"200 with name": {
@@ -87,7 +54,7 @@ func TestGetUsers(t *testing.T) {
 				Name: &name,
 			},
 			[]handler.User{
-				sampleUser1,
+				mockdata.HMockUser1,
 			},
 		},
 		"400 multiple params": {
@@ -123,8 +90,8 @@ func TestGetUser(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			sampleUserDetail1.Id,
-			sampleUserDetail1,
+			mockdata.HMockUserDetail1.Id,
+			mockdata.HMockUserDetail1,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -145,7 +112,7 @@ func TestGetUser(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetByID, tt.userID.String()), nil)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID.String()), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
