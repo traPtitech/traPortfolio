@@ -70,21 +70,6 @@ type AddAccount struct {
 	Url string `json:"url" validate:"url"`
 }
 
-// 新規コンテストリクエスト
-type AddContest struct {
-	// コンテスト説明
-	Description string `json:"description"`
-
-	// イベントやコンテストなどの存続期間
-	Duration Duration `json:"duration"`
-
-	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
-
-	// コンテスト名
-	Name string `json:"name"`
-}
-
 // 新規コンテストチームリクエスト
 type AddContestTeam struct {
 	// チーム情報
@@ -98,23 +83,6 @@ type AddContestTeam struct {
 
 	// 順位などの結果
 	Result *string `json:"result,omitempty"`
-}
-
-// 新規プロジェクトリクエスト
-type AddProject struct {
-	// プロジェクト説明
-	Description string `json:"description"`
-
-	// 班やプロジェクトの期間
-	// 年と前期/後期がある
-	// untilがなかった場合存続中
-	Duration YearWithSemesterDuration `json:"duration"`
-
-	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
-
-	// プロジェクト名
-	Name string `json:"name"`
 }
 
 // プロジェクトメンバー追加リクエスト
@@ -183,6 +151,38 @@ type ContestTeamWithContestName struct {
 	// Embedded fields due to inline allOf schema
 	// コンテスト名
 	ContestName string `json:"contestName"`
+}
+
+// 新規コンテストリクエスト
+type CreateContest struct {
+	// コンテスト説明
+	Description string `json:"description"`
+
+	// イベントやコンテストなどの存続期間
+	Duration Duration `json:"duration"`
+
+	// コンテストの詳細が載っているページへのリンク
+	Link *string `json:"link,omitempty" validate:"url"`
+
+	// コンテスト名
+	Name string `json:"name"`
+}
+
+// 新規プロジェクトリクエスト
+type CreateProject struct {
+	// プロジェクト説明
+	Description string `json:"description"`
+
+	// 班やプロジェクトの期間
+	// 年と前期/後期がある
+	// untilがなかった場合存続中
+	Duration YearWithSemesterDuration `json:"duration"`
+
+	// プロジェクトの詳細が載っているページへのリンク
+	Link *string `json:"link,omitempty" validate:"url"`
+
+	// プロジェクト名
+	Name string `json:"name"`
 }
 
 // イベントやコンテストなどの存続期間
@@ -520,14 +520,14 @@ type TeamIdInPath uuid.UUID
 // UserIdInPath defines model for userIdInPath.
 type UserIdInPath uuid.UUID
 
-// PostContestJSONBody defines parameters for PostContest.
-type PostContestJSONBody AddContest
+// CreateContestJSONBody defines parameters for CreateContest.
+type CreateContestJSONBody CreateContest
 
 // EditContestJSONBody defines parameters for EditContest.
 type EditContestJSONBody EditContest
 
-// PostContestTeamJSONBody defines parameters for PostContestTeam.
-type PostContestTeamJSONBody AddContestTeam
+// AddContestTeamJSONBody defines parameters for AddContestTeam.
+type AddContestTeamJSONBody AddContestTeam
 
 // EditContestTeamJSONBody defines parameters for EditContestTeam.
 type EditContestTeamJSONBody EditContestTeam
@@ -535,14 +535,14 @@ type EditContestTeamJSONBody EditContestTeam
 // DeleteContestTeamMembersJSONBody defines parameters for DeleteContestTeamMembers.
 type DeleteContestTeamMembersJSONBody MemberIDs
 
-// PostContestTeamMembersJSONBody defines parameters for PostContestTeamMembers.
-type PostContestTeamMembersJSONBody MemberIDs
+// AddContestTeamMembersJSONBody defines parameters for AddContestTeamMembers.
+type AddContestTeamMembersJSONBody MemberIDs
 
 // EditEventJSONBody defines parameters for EditEvent.
 type EditEventJSONBody EditEvent
 
-// PostProjectJSONBody defines parameters for PostProject.
-type PostProjectJSONBody AddProject
+// CreateProjectJSONBody defines parameters for CreateProject.
+type CreateProjectJSONBody CreateProject
 
 // EditProjectJSONBody defines parameters for EditProject.
 type EditProjectJSONBody EditProject
@@ -565,20 +565,20 @@ type GetUsersParams struct {
 // EditUserJSONBody defines parameters for EditUser.
 type EditUserJSONBody EditUser
 
-// AddAccountJSONBody defines parameters for AddAccount.
-type AddAccountJSONBody AddAccount
+// AddUserAccountJSONBody defines parameters for AddUserAccount.
+type AddUserAccountJSONBody AddAccount
 
 // EditUserAccountJSONBody defines parameters for EditUserAccount.
 type EditUserAccountJSONBody EditAccount
 
-// PostContestJSONRequestBody defines body for PostContest for application/json ContentType.
-type PostContestJSONRequestBody PostContestJSONBody
+// CreateContestJSONRequestBody defines body for CreateContest for application/json ContentType.
+type CreateContestJSONRequestBody CreateContestJSONBody
 
 // EditContestJSONRequestBody defines body for EditContest for application/json ContentType.
 type EditContestJSONRequestBody EditContestJSONBody
 
-// PostContestTeamJSONRequestBody defines body for PostContestTeam for application/json ContentType.
-type PostContestTeamJSONRequestBody PostContestTeamJSONBody
+// AddContestTeamJSONRequestBody defines body for AddContestTeam for application/json ContentType.
+type AddContestTeamJSONRequestBody AddContestTeamJSONBody
 
 // EditContestTeamJSONRequestBody defines body for EditContestTeam for application/json ContentType.
 type EditContestTeamJSONRequestBody EditContestTeamJSONBody
@@ -586,14 +586,14 @@ type EditContestTeamJSONRequestBody EditContestTeamJSONBody
 // DeleteContestTeamMembersJSONRequestBody defines body for DeleteContestTeamMembers for application/json ContentType.
 type DeleteContestTeamMembersJSONRequestBody DeleteContestTeamMembersJSONBody
 
-// PostContestTeamMembersJSONRequestBody defines body for PostContestTeamMembers for application/json ContentType.
-type PostContestTeamMembersJSONRequestBody PostContestTeamMembersJSONBody
+// AddContestTeamMembersJSONRequestBody defines body for AddContestTeamMembers for application/json ContentType.
+type AddContestTeamMembersJSONRequestBody AddContestTeamMembersJSONBody
 
 // EditEventJSONRequestBody defines body for EditEvent for application/json ContentType.
 type EditEventJSONRequestBody EditEventJSONBody
 
-// PostProjectJSONRequestBody defines body for PostProject for application/json ContentType.
-type PostProjectJSONRequestBody PostProjectJSONBody
+// CreateProjectJSONRequestBody defines body for CreateProject for application/json ContentType.
+type CreateProjectJSONRequestBody CreateProjectJSONBody
 
 // EditProjectJSONRequestBody defines body for EditProject for application/json ContentType.
 type EditProjectJSONRequestBody EditProjectJSONBody
@@ -607,8 +607,8 @@ type AddProjectMembersJSONRequestBody AddProjectMembersJSONBody
 // EditUserJSONRequestBody defines body for EditUser for application/json ContentType.
 type EditUserJSONRequestBody EditUserJSONBody
 
-// AddAccountJSONRequestBody defines body for AddAccount for application/json ContentType.
-type AddAccountJSONRequestBody AddAccountJSONBody
+// AddUserAccountJSONRequestBody defines body for AddUserAccount for application/json ContentType.
+type AddUserAccountJSONRequestBody AddUserAccountJSONBody
 
 // EditUserAccountJSONRequestBody defines body for EditUserAccount for application/json ContentType.
 type EditUserAccountJSONRequestBody EditUserAccountJSONBody

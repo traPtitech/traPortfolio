@@ -33,8 +33,8 @@ func NewUserHandler(s service.UserService) *UserHandler {
 	return &UserHandler{srv: s}
 }
 
-// GetAll GET /users
-func (handler *UserHandler) GetAll(_c echo.Context) error {
+// GetUsers GET /users
+func (handler *UserHandler) GetUsers(_c echo.Context) error {
 	c := _c.(*Context)
 	req := GetUsersParams{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -60,8 +60,8 @@ func (handler *UserHandler) GetAll(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetByID GET /users/:userID
-func (handler *UserHandler) GetByID(_c echo.Context) error {
+// GetUser GET /users/:userID
+func (handler *UserHandler) GetUser(_c echo.Context) error {
 	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -87,8 +87,8 @@ func (handler *UserHandler) GetByID(_c echo.Context) error {
 	))
 }
 
-// Update PATCH /users/:userID
-func (handler *UserHandler) Update(_c echo.Context) error {
+// UpdateUser PATCH /users/:userID
+func (handler *UserHandler) UpdateUser(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
@@ -111,8 +111,8 @@ func (handler *UserHandler) Update(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// GetAccounts GET /users/:userID/accounts
-func (handler *UserHandler) GetAccounts(_c echo.Context) error {
+// GetUserAccounts GET /users/:userID/accounts
+func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -132,8 +132,8 @@ func (handler *UserHandler) GetAccounts(_c echo.Context) error {
 	return c.JSON(http.StatusOK, accounts)
 }
 
-// GetAccount GET /users/:userID/accounts/:accountID
-func (handler *UserHandler) GetAccount(_c echo.Context) error {
+// GetUserAccount GET /users/:userID/accounts/:accountID
+func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
@@ -151,12 +151,12 @@ func (handler *UserHandler) GetAccount(_c echo.Context) error {
 	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, account.Type, account.URL, account.PrPermitted))
 }
 
-// AddAccount POST /users/:userID/accounts
-func (handler *UserHandler) AddAccount(_c echo.Context) error {
+// AddUserAccount POST /users/:userID/accounts
+func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
-		AddAccountJSONRequestBody
+		AddUserAccountJSONRequestBody
 	}{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
@@ -177,8 +177,8 @@ func (handler *UserHandler) AddAccount(_c echo.Context) error {
 	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, account.Type, account.URL, account.PrPermitted))
 }
 
-// PatchAccount PATCH /users/:userID/accounts/:accountID
-func (handler *UserHandler) PatchAccount(_c echo.Context) error {
+// EditUserAccount PATCH /users/:userID/accounts/:accountID
+func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
@@ -206,8 +206,8 @@ func (handler *UserHandler) PatchAccount(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// DeleteAccount DELETE /users/:userID/accounts/:accountID
-func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
+// DeleteUserAccount DELETE /users/:userID/accounts/:accountID
+func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		UserIDInPath
@@ -225,8 +225,8 @@ func (handler *UserHandler) DeleteAccount(_c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-// GetProjects GET /users/:userID/projects
-func (handler *UserHandler) GetProjects(_c echo.Context) error {
+// GetUserProjects GET /users/:userID/projects
+func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -251,8 +251,8 @@ func (handler *UserHandler) GetProjects(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetContests GET /users/:userID/contests
-func (handler *UserHandler) GetContests(_c echo.Context) error {
+// GetUserContests GET /users/:userID/contests
+func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -276,8 +276,8 @@ func (handler *UserHandler) GetContests(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetGroups by UserID GET /users/:userID/groups
-func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
+// GetUserGroups GET /users/:userID/groups
+func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	c := _c.(*Context)
 	req := GroupIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -300,8 +300,8 @@ func (handler *UserHandler) GetGroupsByUserID(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetEvents GET /users/:userID/events
-func (handler *UserHandler) GetEvents(_c echo.Context) error {
+// GetUserEvents GET /users/:userID/events
+func (handler *UserHandler) GetUserEvents(_c echo.Context) error {
 	c := _c.(*Context)
 	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
