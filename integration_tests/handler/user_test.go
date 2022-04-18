@@ -16,7 +16,7 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-// GET /users
+// GetUsers GET /users
 func TestGetUsers(t *testing.T) {
 	var (
 		includeSuspended handler.IncludeSuspendedInQuery = true
@@ -68,7 +68,7 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("get_users")
+	conf := testutils.GetConfigWithDBName("user_handler_get_users")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -80,7 +80,7 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
-// GET /users/:userID
+// GetUser GET /users/:userID
 func TestGetUser(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
@@ -106,7 +106,7 @@ func TestGetUser(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("get_user")
+	conf := testutils.GetConfigWithDBName("user_handler_get_user")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
