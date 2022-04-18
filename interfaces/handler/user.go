@@ -279,13 +279,13 @@ func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 // GetUserGroups GET /users/:userID/groups
 func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	c := _c.(*Context)
-	req := GroupIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	groups, err := handler.srv.GetGroupsByUserID(ctx, req.GroupID)
+	groups, err := handler.srv.GetGroupsByUserID(ctx, req.UserID)
 	if err != nil {
 		return convertError(err)
 	}
