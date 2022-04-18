@@ -347,9 +347,9 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	portalUser1 := mockdata.MockPortalUsers[1]
 	portalUser2 := mockdata.MockPortalUsers[2]
 
-	mustAddContestTeamMember(t, repo, team1.ID, user1.ID)
-	mustAddContestTeamMember(t, repo, team1.ID, user2.ID)
-	mustAddContestTeamMember(t, repo, team2.ID, user2.ID)
+	mustAddContestTeamMembers(t, repo, team1.ID, []uuid.UUID{user1.ID})
+	mustAddContestTeamMembers(t, repo, team1.ID, []uuid.UUID{user2.ID})
+	mustAddContestTeamMembers(t, repo, team2.ID, []uuid.UUID{user2.ID})
 
 	expected1 := []*domain.User{
 		{
@@ -422,9 +422,9 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 	portalUser1 := mockdata.MockPortalUsers[1]
 	portalUser2 := mockdata.MockPortalUsers[2]
 
-	mustAddContestTeamMember(t, repo, team1.ID, user1.ID)
-	mustAddContestTeamMember(t, repo, team1.ID, user2.ID)
-	mustAddContestTeamMember(t, repo, team2.ID, user2.ID)
+	mustAddContestTeamMembers(t, repo, team1.ID, []uuid.UUID{user1.ID})
+	mustAddContestTeamMembers(t, repo, team1.ID, []uuid.UUID{user2.ID})
+	mustAddContestTeamMembers(t, repo, team2.ID, []uuid.UUID{user2.ID})
 
 	expected1 := []*domain.User{
 		{
