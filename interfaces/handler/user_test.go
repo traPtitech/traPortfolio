@@ -667,6 +667,57 @@ func TestUserHandler_AddAccount(t *testing.T) {
 	}
 }
 
+func TestUserHandler_PatchAccount(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockUserService) (reqBody *AddUserAccountJSONBody, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+				accountType := int64(rand.Intn(int(domain.AccountLimit)))
+				accountPermit := random.Bool()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(accountPermit),
+					Type:        AccountType(accountType),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.UpdateAccountArgs{
+					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					Type:        optional.Int64From(&accountType),
+					URL:         optional.StringFrom(&reqBody.Url),
+					PrPermitted: optional.BoolFrom(&accountPermit),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(nil)
+				return &reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			reqBody, path := tt.setup(s)
+
+			statusCode, _ := doRequest(t, api, http.MethodPatch, path, reqBody, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+		})
+	}
+}
+
 /*
 func TestUserHandler_PatchAccount(t *testing.T) {
 	type fields struct {
