@@ -558,6 +558,58 @@ func TestUserHandler_AddAccount(t *testing.T) {
 			statusCode: http.StatusCreated,
 		},
 		{
+			name: "Bad Request: DisplayName is empty",
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+
+				userID := random.UUID()
+
+				reqBody := handler.AddAccountJSONBody{
+					DisplayName: "",
+					PrPermitted: handler.PrPermitted(random.Bool()),
+					Type:        handler.AccountType((rand.Intn(int(domain.AccountLimit)))),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.CreateAccountArgs{
+					DisplayName: reqBody.DisplayName,
+					Type:        uint(reqBody.Type),
+					URL:         reqBody.Url,
+					PrPermitted: bool(reqBody.PrPermitted),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(nil, repository.ErrInvalidArg)
+				return &reqBody, handler.Account{}, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: Account Type is invalid",
+			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+
+				userID := random.UUID()
+
+				reqBody := handler.AddAccountJSONBody{
+					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+					PrPermitted: handler.PrPermitted(random.Bool()),
+					Type:        handler.AccountType(domain.AccountLimit),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.CreateAccountArgs{
+					DisplayName: reqBody.DisplayName,
+					Type:        uint(reqBody.Type),
+					URL:         reqBody.Url,
+					PrPermitted: bool(reqBody.PrPermitted),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(nil, repository.ErrInvalidArg)
+				return &reqBody, handler.Account{}, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Bad Request: validate error: UUID",
 			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
 
