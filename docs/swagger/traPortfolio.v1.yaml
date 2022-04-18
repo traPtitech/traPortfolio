@@ -575,7 +575,7 @@ paths:
       description: コンテストチームメンバーを取得します
     post:
       summary: コンテストチームメンバーの追加
-      operationId: AddContestTeamMembers
+      operationId: addContestTeamMembers
       responses:
         '204':
           description: No Content
