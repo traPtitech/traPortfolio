@@ -21,6 +21,8 @@ func AssertResponse(t *testing.T, expectedStatusCode int, expectedBody interface
 		assert.Equal(t, expected, actual.String())
 	case []byte:
 		assert.Equal(t, expected, actual.Bytes())
+	case nil:
+		assert.Empty(t, actual.Bytes())
 	default:
 		b, err := json.Marshal(expected)
 		assert.NoError(t, err)

@@ -26,7 +26,7 @@ func TestGetUsers(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		params     handler.GetUsersParams
+		reqBody    handler.GetUsersParams
 		want       interface{} // []handler.User | echo.HTTPError
 	}{
 		"200": {
@@ -74,7 +74,7 @@ func TestGetUsers(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.params)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
@@ -117,3 +117,274 @@ func TestGetUser(t *testing.T) {
 		})
 	}
 }
+
+// UpdateUser PATCH /users/:userID
+func TestUpdateUser(t *testing.T) {
+	var (
+		bio   = random.AlphaNumeric()
+		check = random.Bool()
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		reqBody    handler.EditUser
+		want       interface{} // nil or error
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.HMockUser1.Id,
+			handler.EditUser{
+				Bio:   &bio,
+				Check: &check,
+			},
+			nil,
+		},
+		"204 without changes": {
+			http.StatusNoContent,
+			mockdata.HMockUser1.Id,
+			handler.EditUser{},
+			nil,
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.EditUser{},
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_update_user")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID.String()), &tt.reqBody)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
+
+// // GetUserAccounts GET /users/:userID/accounts
+// func TestGetUserAccounts(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_accounts")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccounts, tt.userID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // GetUserAccount GET /users/:userID/accounts/:accountID
+// func TestGetUserAccount(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		accountID  uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_account")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // AddUserAccount POST /users/:userID/accounts
+// func TestAddUserAccount(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		reqBody    handler.AddUserAccountJSONRequestBody
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_add_user_account")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // EditUserAccount PATCH /users/:userID/accounts/:accountID
+// func TestEditUserAccount(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		accountID  uuid.UUID
+// 		reqBody    handler.EditUserAccountJSONRequestBody
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_edit_user_account")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
+// func TestDeleteUserAccount(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		accountID  uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_delete_user_account")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, tt.accountID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // GetUserProjects GET /users/:userID/projects
+// func TestGetUserProjects(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_projects")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // GetUserContests GET /users/:userID/contests
+// func TestGetUserContests(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_contests")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // GetUserGroups GET /users/:userID/groups
+// func TestGetUserGroups(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_groups")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
+
+// // GetUserEvents GET /users/:userID/events
+// func TestGetUserEvents(t *testing.T) {
+// 	t.Parallel()
+// 	tests := map[string]struct {
+// 		statusCode int
+// 		userID     uuid.UUID
+// 		want       interface{}
+// 	}{
+// 		// TODO: Add cases
+// 	}
+
+// 	e := echo.New()
+// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_events")
+// 	api, err := testutils.SetupRoutes(t, e, conf)
+// 	assert.NoError(t, err)
+// 	for name, tt := range tests {
+// 		tt := tt
+// 		t.Run(name, func(t *testing.T) {
+// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
+// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+// 		})
+// 	}
+// }
