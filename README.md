@@ -31,6 +31,8 @@ If you want to contribute to traPortfolio, then follow these pages.
 docker-compose up
 ```
 
+Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
+
 Now you can access to
 
 - `http://localhost:1323` for backend server.
@@ -61,8 +63,13 @@ make rm-test-db
 Make sure test MySQL container is running.
 
 ```bash
-go run main.go --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
+go run main.go --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
 ```
+
+(Optional) You can change the configuration by
+
+- Specifying it with flags (Run `go run main.go --help`)
+- Creating a configuration file (ex: [config.yaml](./util/config/testdata/config.yaml))
 
 ### Generate DB docs
 
