@@ -42,17 +42,7 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-(Optional) After running the following command, sample data will be inserted into the database
-
-```bash
-go run main.go --migrate --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
-```
-
-### Rebuild docker container (with docker-compose)
-
-```bash
-docker-compose up --build
-```
+(Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
 
 ### Set Up test DB (with docker, port:3307)
 
@@ -62,11 +52,7 @@ Run the following command in the project root
 make up-test-db
 ```
 
-(Optional) After running the following command, sample data will be inserted into the database
-
-```bash
-go run main.go --migrate --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
-```
+(Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
 
 ### Remove test DB
 
