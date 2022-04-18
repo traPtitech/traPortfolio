@@ -8,6 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.6.0
+	github.com/google/go-cmp v0.5.7
 	github.com/google/wire v0.5.0
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo/v4 v4.6.3
@@ -26,7 +27,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/subcommands v1.2.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
