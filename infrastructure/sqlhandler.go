@@ -1,58 +1,23 @@
 package infrastructure
 
 import (
-	"fmt"
-	"time"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
-
-type SQLConfig struct {
-	user     string
-	password string
-	host     string
-	port     int
-	dbname   string
-}
-
-func NewSQLConfig(user, password, host, dbname string, port int) SQLConfig {
-	return SQLConfig{
-		user,
-		password,
-		host,
-		port,
-		dbname,
-	}
-}
-
-func (c *SQLConfig) Dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.user, c.password, c.host, c.port, c.dbname)
-}
-
-func (c *SQLConfig) DsnWithoutName() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.user, c.password, c.host, c.port)
-}
-
-func (c *SQLConfig) Name() string {
-	return c.dbname
-}
 
 type SQLHandler struct {
 	conn *gorm.DB
 }
 
-func NewSQLHandler(conf *SQLConfig) (database.SQLHandler, error) {
-	engine, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: conf.Dsn(),
-	}), &gorm.Config{
-		NowFunc: func() time.Time {
-			return time.Now().Truncate(time.Microsecond)
-		},
-	})
+func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
+	engine, err := gorm.Open(
+		mysql.New(mysql.Config{DSN: conf.Dsn()}),
+		conf.GormConfig(),
+	)
 	if err != nil {
 		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
@@ -79,7 +44,6 @@ func FromDB(db *gorm.DB) database.SQLHandler {
 
 // initDB データベースのスキーマを更新
 func initDB(db *gorm.DB) error {
-	// db.Logger = db.Logger.LogMode(logger.Info)
 	_, err := migration.Migrate(db, migration.AllTables())
 	if err != nil {
 		return err

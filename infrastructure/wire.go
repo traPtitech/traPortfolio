@@ -8,6 +8,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
 var pingSet = wire.NewSet(
@@ -56,7 +57,19 @@ var externalSet = wire.NewSet(
 
 var apiSet = wire.NewSet(handler.NewAPI)
 
-func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig) (handler.API, error) {
+var confSet = wire.NewSet(
+	provideSQLConf,
+	provideTraqConf,
+	provideKnoqConf,
+	providePortalConf,
+)
+
+func provideSQLConf(c *config.Config) *config.SQLConfig       { return c.SQLConf() }
+func provideTraqConf(c *config.Config) *config.TraqConfig     { return c.TraqConf() }
+func provideKnoqConf(c *config.Config) *config.KnoqConfig     { return c.KnoqConf() }
+func providePortalConf(c *config.Config) *config.PortalConfig { return c.PortalConf() }
+
+func InjectAPIServer(c *config.Config, isDevelopment bool) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,
@@ -67,6 +80,7 @@ func InjectAPIServer(s *SQLConfig, t *TraQConfig, p *PortalConfig, k *KnoQConfig
 		sqlSet,
 		externalSet,
 		apiSet,
+		confSet,
 	)
 	return handler.API{}, nil
 }

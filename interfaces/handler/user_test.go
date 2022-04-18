@@ -1,4 +1,4 @@
-package handler_test
+package handler
 
 import (
 	"errors"
@@ -10,19 +10,18 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupUserMock(t *testing.T) (*mock_service.MockUserService, handler.API) {
+func setupUserMock(t *testing.T) (*mock_service.MockUserService, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockUserService(ctrl)
-	api := handler.NewAPI(nil, handler.NewUserHandler(s), nil, nil, nil, nil)
+	api := NewAPI(nil, NewUserHandler(s), nil, nil, nil, nil)
 
 	return s, api
 }
@@ -30,24 +29,24 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, handler.API) {
 func TestUserHandler_GetAll(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*handler.User, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*User, path string)
 		statusCode int
 	}{
 		{
 			name: "Success_NoOpts",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.User, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 
 				casenum := 2
 				repoUsers := []*domain.User{}
-				hresUsers := []*handler.User{}
+				hresUsers := []*User{}
 
 				for i := 0; i < casenum; i++ {
 					ruser := domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					}
-					huser := handler.User{
+					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
 						RealName: ruser.RealName,
@@ -69,7 +68,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 		// TODO: Validationのテストを追加する
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.User, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 				args := repository.GetUsersArgs{}
 
 				s.EXPECT().GetUsers(gomock.Any(), &args).Return(nil, errors.New("Internal Server Error"))
@@ -85,7 +84,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 
 			hresUsers, path := tt.setup(s)
 
-			var resBody []*handler.User
+			var resBody []*User
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -98,16 +97,16 @@ func TestUserHandler_GetAll(t *testing.T) {
 func TestUserHandler_GetByID(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string)
+		setup      func(s *mock_service.MockUserService) (hres *UserDetail, userpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 
 				const accountNum int = 9
 				rAccounts := []*domain.Account{}
-				hAccounts := []handler.Account{}
+				hAccounts := []Account{}
 
 				for i := 0; i < accountNum; i++ {
 					prRandom := false
@@ -117,17 +116,17 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+						DisplayName: random.AlphaNumeric(),
 						Type:        uint(rand.Intn(int(domain.AccountLimit))),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumeric(rand.Intn(30) + 1),
+						URL:         random.AlphaNumeric(),
 					}
 
-					haccount := handler.Account{
+					haccount := Account{
 						Id:          raccount.ID,
 						DisplayName: raccount.DisplayName,
-						PrPermitted: handler.PrPermitted(prRandom),
-						Type:        handler.AccountType(raccount.Type),
+						PrPermitted: PrPermitted(prRandom),
+						Type:        AccountType(raccount.Type),
 						Url:         raccount.URL,
 					}
 
@@ -139,23 +138,23 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 					User: domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					},
 					State:    domain.TraQState(uint8(rand.Intn(int(domain.TraqStateLimit)))),
-					Bio:      random.AlphaNumeric(rand.Intn(256) + 1),
+					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
 					Accounts: rAccounts,
 				}
 
-				hresUser := handler.UserDetail{
-					User: handler.User{
+				hresUser := UserDetail{
+					User: User{
 						Id:       repoUser.User.ID,
 						Name:     repoUser.User.Name,
 						RealName: repoUser.User.RealName,
 					},
 					Accounts: hAccounts,
 					Bio:      repoUser.Bio,
-					State:    handler.UserAccountState(repoUser.State),
+					State:    UserAccountState(repoUser.State),
 				}
 
 				s.EXPECT().GetUser(gomock.Any(), repoUser.User.ID).Return(&repoUser, nil)
@@ -167,7 +166,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres *handler.UserDetail, userpath string) {
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.UUID()
 				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/users/%s", id)
@@ -175,13 +174,32 @@ func TestUserHandler_GetByID(t *testing.T) {
 			},
 			statusCode: http.StatusInternalServerError,
 		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
+				id := random.UUID()
+				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, repository.ErrValidate)
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
+				id := random.AlphaNumericn(36)
+				path := fmt.Sprintf("/api/v1/users/%s", id)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			var resBody *handler.UserDetail
+			var resBody *UserDetail
 
 			hresUsers, userpath := tt.setup(s)
 
@@ -198,21 +216,21 @@ func TestUserHandler_GetByID(t *testing.T) {
 func TestUserHandler_Update(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *handler.EditUser, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUser, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
 				}
 
-				reqBody := &handler.EditUser{
+				reqBody := &EditUser{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -230,16 +248,16 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
 				}
 
-				reqBody := &handler.EditUser{
+				reqBody := &EditUser{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -257,16 +275,16 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 
 				userID := random.UUID()
-				userBio := random.AlphaNumeric(rand.Intn(30) + 1)
+				userBio := random.AlphaNumeric()
 				userCheck := false
 				if rand.Intn(2) == 1 {
 					userCheck = true
 				}
 
-				reqBody := &handler.EditUser{
+				reqBody := &EditUser{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -284,7 +302,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (*handler.EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -309,12 +327,12 @@ func TestUserHandler_Update(t *testing.T) {
 func TestUserHandler_GetAccounts(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*handler.Account, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*Account, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
 				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
@@ -323,7 +341,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 				//0(bitがすべて立っていない)は除外
 
 				rAccounts := []*domain.Account{}
-				hAccounts := []*handler.Account{}
+				hAccounts := []*Account{}
 
 				for i := 0; i < int(domain.AccountLimit); i++ {
 					if (accountKinds>>i)%2 == 0 {
@@ -337,17 +355,17 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
-						DisplayName: random.AlphaNumeric(30),
+						DisplayName: random.AlphaNumeric(),
 						Type:        uint(i),
 						PrPermitted: prRandom,
-						URL:         random.AlphaNumeric(30),
+						URL:         random.AlphaNumeric(),
 					}
 
-					haccount := handler.Account{
+					haccount := Account{
 						Id:          raccount.ID,
 						DisplayName: raccount.DisplayName,
-						PrPermitted: handler.PrPermitted(prRandom),
-						Type:        handler.AccountType(raccount.Type),
+						PrPermitted: PrPermitted(prRandom),
+						Type:        AccountType(raccount.Type),
 						Url:         raccount.URL,
 					}
 
@@ -364,7 +382,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
 				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
@@ -375,7 +393,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
 				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, repository.ErrValidate)
@@ -386,9 +404,9 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres []*handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
-				userID := random.AlphaNumeric(36)
+				userID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -402,7 +420,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 
 			hresUsers, path := tt.setup(s)
 
-			var resBody []*handler.Account
+			var resBody []*Account
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -415,12 +433,12 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 func TestUserHandler_GetAccount(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres *handler.Account, path string)
+		setup      func(s *mock_service.MockUserService) (hres *Account, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				prRandom := false
@@ -430,16 +448,16 @@ func TestUserHandler_GetAccount(t *testing.T) {
 
 				rAccount := domain.Account{
 					ID:          random.UUID(),
-					DisplayName: random.AlphaNumeric(30),
+					DisplayName: random.AlphaNumeric(),
 					Type:        uint(rand.Intn(int(domain.AccountLimit))),
 					PrPermitted: prRandom,
-					URL:         random.AlphaNumeric(30),
+					URL:         random.AlphaNumeric(),
 				}
-				hAccount := handler.Account{
+				hAccount := Account{
 					Id:          rAccount.ID,
 					DisplayName: rAccount.DisplayName,
-					PrPermitted: handler.PrPermitted(prRandom),
-					Type:        handler.AccountType(rAccount.Type),
+					PrPermitted: PrPermitted(prRandom),
+					Type:        AccountType(rAccount.Type),
 					Url:         rAccount.URL,
 				}
 
@@ -452,7 +470,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
@@ -466,7 +484,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
@@ -480,9 +498,9 @@ func TestUserHandler_GetAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
+			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
-				userID := random.AlphaNumeric(36)
+				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -499,7 +517,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 
 			hresUsers, path := tt.setup(s)
 
-			var resBody *handler.Account
+			var resBody *Account
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -512,19 +530,19 @@ func TestUserHandler_GetAccount(t *testing.T) {
 func TestUserHandler_AddAccount(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *handler.AddAccountJSONBody, expectedResBody handler.Account, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *AddUserAccountJSONBody, expectedResBody Account, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
-				reqBody := handler.AddAccountJSONBody{
-					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType((rand.Intn(int(domain.AccountLimit)))),
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(random.Bool()),
+					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
 					Url:         random.RandURLString(),
 				}
 
@@ -543,7 +561,7 @@ func TestUserHandler_AddAccount(t *testing.T) {
 					URL:         args.URL,
 				}
 
-				expectedResBody := handler.Account{
+				expectedResBody := Account{
 					Id:          userID,
 					DisplayName: reqBody.DisplayName,
 					PrPermitted: reqBody.PrPermitted,
@@ -559,14 +577,14 @@ func TestUserHandler_AddAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: DisplayName is empty",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
-				reqBody := handler.AddAccountJSONBody{
+				reqBody := AddUserAccountJSONBody{
 					DisplayName: "",
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType((rand.Intn(int(domain.AccountLimit)))),
+					PrPermitted: PrPermitted(random.Bool()),
+					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
 					Url:         random.RandURLString(),
 				}
 
@@ -579,20 +597,20 @@ func TestUserHandler_AddAccount(t *testing.T) {
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(nil, repository.ErrInvalidArg)
-				return &reqBody, handler.Account{}, path
+				return &reqBody, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Bad Request: Account Type is invalid",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
-				reqBody := handler.AddAccountJSONBody{
-					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(domain.AccountLimit),
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(random.Bool()),
+					Type:        AccountType(domain.AccountLimit),
 					Url:         random.RandURLString(),
 				}
 
@@ -605,101 +623,32 @@ func TestUserHandler_AddAccount(t *testing.T) {
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(nil, repository.ErrInvalidArg)
-				return &reqBody, handler.Account{}, path
+				return &reqBody, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				return nil, handler.Account{}, path
+				return nil, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
-				userID := random.AlphaNumeric(36)
+				userID := random.AlphaNumericn(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				return nil, handler.Account{}, path
+				return nil, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
-		/*
-			{
-				name: "Bad Request",
-				setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.Account, string) {
-
-					userID := random.UUID()
-
-					reqBody := handler.AddAccountJSONBody{
-						Id:          random.AlphaNumeric(rand.Intn(30) + 1),
-						PrPermitted: handler.PrPermitted(random.Bool()),
-						Type:        handler.AccountType((rand.Intn(int(domain.AccountLimit)))),
-						Url:         random.RandURLString(),
-					}
-
-					args := repository.CreateAccountArgs{
-						ID:          reqBody.Id,
-						Type:        uint(reqBody.Type),
-						URL:         reqBody.Url,
-						PrPermitted: bool(reqBody.PrPermitted),
-					}
-
-					want := domain.Account{
-						ID:          userID,
-						Name:        args.ID,
-						Type:        args.Type,
-						PrPermitted: args.PrPermitted,
-						URL:         args.URL,
-					}
-
-					expectedResBody := handler.Account{
-						Id:          userID,
-						Name:        reqBody.Id,
-						PrPermitted: reqBody.PrPermitted,
-						Type:        reqBody.Type,
-						Url:         reqBody.Url,
-					}
-
-					path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-					s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(&want, nil)
-					return &reqBody, expectedResBody, path
-				},
-				statusCode: http.StatusBadRequest,
-			},*/
-		/*{
-			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (hres *handler.Account, path string) {
-
-				userID := random.UUID()
-				accountID := random.UUID()
-
-				s.EXPECT().GetAccount(gomock.Any(), accountID).Return(nil, errors.New("Internal Server Error"))
-				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				return nil, path
-
-			},
-			statusCode: http.StatusInternalServerError,
-		},
-		{
-			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (*handler.AddAccountJSONBody, handler.AddAccount, string) {
-
-				userID := random.UUID()
-
-				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				s.EXPECT().CreateAccount(gomock.Any(), userID, &repository.CreateAccountArgs{}).Return(nil, errors.New("Internal Server Error"))
-				return &reqBody, expectedResBody, path
-			},
-			statusCode: http.StatusInternalServerError,
-		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -708,7 +657,7 @@ func TestUserHandler_AddAccount(t *testing.T) {
 
 			reqBody, res, path := tt.setup(s)
 
-			var resBody handler.Account
+			var resBody Account
 			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, &resBody)
 
 			// Assertion
@@ -739,8 +688,8 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.PatchAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.PatchAccount() error = %v, wantErr %v", err, tt.wantErr)
+			if err := PatchAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserPatchAccount() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -766,8 +715,8 @@ func TestUserHandler_DeleteAccount(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.DeleteAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.DeleteAccount() error = %v, wantErr %v", err, tt.wantErr)
+			if err := DeleteAccount(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserDeleteAccount() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -793,8 +742,8 @@ func TestUserHandler_GetProjects(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetProjects(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetProjects() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetProjects(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetProjects() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -820,8 +769,8 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetUsers(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetUsers() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetUsers(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetUsers() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -847,8 +796,8 @@ func TestUserHandler_GetGroupsByUserID(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetGroupsByUserID(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetGroupsByUserID() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetGroupsByUserID(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetGroupsByUserID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -874,8 +823,8 @@ func TestUserHandler_GetEvents(t *testing.T) {
 			handler := &UserHandler{
 				srv: tt.fields.srv,
 			}
-			if err := handler.GetEvents(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserHandler.GetEvents() error = %v, wantErr %v", err, tt.wantErr)
+			if err := GetEvents(tt.args._c); (err != nil) != tt.wantErr {
+				t.Errorf("UserGetEvents() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

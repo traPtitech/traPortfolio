@@ -1,8 +1,7 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
-	"math/rand"
 	"regexp"
 	"testing"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -46,7 +44,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			want: []*domain.Contest{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: sampleTime,
 					TimeEnd:   sampleTime,
 				},
@@ -81,7 +79,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContests()
 			tt.assertion(t, err)
@@ -112,12 +110,12 @@ func TestContestRepository_GetContest(t *testing.T) {
 			want: &domain.ContestDetail{
 				Contest: domain.Contest{
 					ID:        cid,
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: sampleTime,
 					TimeEnd:   sampleTime,
 				},
 				Link:        random.RandURLString(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				// Teams:
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
@@ -155,7 +153,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContest(tt.args.id)
 			tt.assertion(t, err)
@@ -165,9 +163,9 @@ func TestContestRepository_GetContest(t *testing.T) {
 }
 
 func TestContestRepository_CreateContest(t *testing.T) {
-	cname := random.AlphaNumeric(rand.Intn(30) + 1)       // Successで使用するContest.Name
-	link := random.AlphaNumeric(rand.Intn(30) + 1)        // Successで使用するContestDetail.Link
-	description := random.AlphaNumeric(rand.Intn(30) + 1) // Successで使用するContestDetail.Description
+	cname := random.AlphaNumeric()       // Successで使用するContest.Name
+	link := random.AlphaNumeric()        // Successで使用するContestDetail.Link
+	description := random.AlphaNumeric() // Successで使用するContestDetail.Description
 
 	t.Parallel()
 	type args struct {
@@ -221,8 +219,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			name: "UnexpectedError Create",
 			args: args{
 				args: &repository.CreateContestArgs{
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
@@ -243,8 +241,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			name: "UnexpectedError Get",
 			args: args{
 				args: &repository.CreateContestArgs{
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
@@ -274,7 +272,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContest(tt.args.args)
 			if tt.want != nil && got != nil {
@@ -304,8 +302,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -340,8 +338,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -362,8 +360,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -395,7 +393,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.args))
 		})
@@ -481,7 +479,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteContest(tt.args.id))
 		})
@@ -511,8 +509,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					ContestID: cid,
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:    random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
@@ -557,7 +555,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 					WithArgs(args.contestID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE contest_id = ?")).
+					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
 					WithArgs(args.contestID).
 					WillReturnError(errUnexpected)
 			},
@@ -572,7 +570,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeams(tt.args.contestID)
 			tt.assertion(t, err)
@@ -607,11 +605,11 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 				ContestTeam: domain.ContestTeam{
 					ID:        tid,
 					ContestID: cid,
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:    random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
 				},
 				Link:        random.RandURLString(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				// Members
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
@@ -649,7 +647,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeam(tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -661,10 +659,10 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
-		Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-		Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+		Name:        random.AlphaNumeric(),
+		Result:      optional.NewString(random.AlphaNumeric(), true),
 		Link:        optional.NewString(random.RandURLString(), true),
-		Description: random.AlphaNumeric(rand.Intn(30) + 1),
+		Description: random.AlphaNumeric(),
 	}
 
 	t.Parallel()
@@ -711,10 +709,10 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			args: args{
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        random.AlphaNumeric(),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 				},
 			},
 			want: nil,
@@ -737,7 +735,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateContestTeam(tt.args.contestID, tt.args._contestTeam)
 			if tt.want != nil && got != nil {
@@ -766,10 +764,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -802,10 +800,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -823,10 +821,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:        optional.NewString(random.AlphaNumeric(), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Result:      optional.NewString(random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -855,7 +853,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateContestTeam(tt.args.teamID, tt.args.args))
 		})
@@ -884,8 +882,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
@@ -917,13 +915,13 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
@@ -974,8 +972,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				u := &domain.User{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				}
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
@@ -1004,7 +1002,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetContestTeamMembers(tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
@@ -1149,7 +1147,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddContestTeamMembers(tt.args.teamID, tt.args.members))
 		})
@@ -1276,7 +1274,7 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockContestRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewContestRepository(f.h, f.portal)
+			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteContestTeamMembers(tt.args.teamID, tt.args.members))
 		})

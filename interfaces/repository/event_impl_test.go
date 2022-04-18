@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"math/rand"
@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
+	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
@@ -43,13 +43,13 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
@@ -76,7 +76,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			got, err := repo.GetEvents()
 			tt.assertion(t, err)
@@ -105,14 +105,14 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
-				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelPrivate,
 				HostName:    []*domain.User{{ID: random.UUID()}},
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
 			},
@@ -146,14 +146,14 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
-				Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
 				HostName:    []*domain.User{{ID: random.UUID()}},
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
 			},
@@ -175,14 +175,14 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				ed := domain.EventDetail{
 					Event: domain.Event{
 						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:      random.AlphaNumeric(),
 						TimeStart: random.Time(),
 						TimeEnd:   random.Time(),
 					},
-					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevelPrivate,
 					HostName:    []*domain.User{{ID: random.UUID()}},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}
@@ -202,7 +202,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			got, err := repo.GetEvent(tt.args.id)
 			tt.assertion(t, err)
@@ -211,11 +211,111 @@ func TestEventRepository_GetEvent(t *testing.T) {
 	}
 }
 
+func TestEventRepository_CreateEventLevel(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		args *repository.CreateEventLevelArgs
+	}
+	tests := []struct {
+		name      string
+		args      args
+		setup     func(f mockEventRepositoryFields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				args: &repository.CreateEventLevelArgs{
+					EventID: random.UUID(),
+					Level:   domain.EventLevel(rand.Intn(int(domain.EventLevelLimit))),
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				event := external.EventResponse{
+					ID:          args.args.EventID,
+					Name:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
+					Place:       random.AlphaNumeric(),
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+					TimeStart:   random.Time(),
+					TimeEnd:     random.Time(),
+					SharedRoom:  random.Bool(),
+				}
+				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(&event, nil)
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `event_level_relations` (`id`,`level`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
+					WithArgs(args.args.EventID, args.args.Level, anyTime{}, anyTime{}).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				f.h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "KnoqNotFound",
+			args: args{
+				args: &repository.CreateEventLevelArgs{
+					EventID: random.UUID(),
+					Level:   domain.EventLevel(rand.Intn(int(domain.EventLevelLimit))),
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(nil, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "LevelAlreadyExist",
+			args: args{
+				args: &repository.CreateEventLevelArgs{
+					EventID: random.UUID(),
+					Level:   domain.EventLevel(rand.Intn(int(domain.EventLevelLimit))),
+				},
+			},
+			setup: func(f mockEventRepositoryFields, args args) {
+				event := external.EventResponse{
+					ID:          args.args.EventID,
+					Name:        random.AlphaNumeric(),
+					Description: random.AlphaNumeric(),
+					Place:       random.AlphaNumeric(),
+					GroupID:     random.UUID(),
+					RoomID:      random.UUID(),
+					TimeStart:   random.Time(),
+					TimeEnd:     random.Time(),
+					SharedRoom:  random.Bool(),
+				}
+				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(&event, nil)
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `event_level_relations` (`id`,`level`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
+					WithArgs(args.args.EventID, args.args.Level, anyTime{}, anyTime{}).
+					WillReturnError(gorm.ErrRegistered)
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockEventRepositoryFields(ctrl)
+			tt.setup(f, tt.args)
+			repo := NewEventRepository(f.h, f.knoq)
+			// Assertion
+			err := repo.CreateEventLevel(tt.args.args)
+			tt.assertion(t, err)
+		})
+	}
+}
+
 func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		id  uuid.UUID
-		arg *repository.UpdateEventLevelArg
+		arg *repository.UpdateEventLevelArgs
 	}
 	tests := []struct {
 		name      string
@@ -227,7 +327,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "Success",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -250,7 +350,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "LevelNotFound",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -267,7 +367,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "DoNotUpdate",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -287,7 +387,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			name: "UpdateError",
 			args: args{
 				id: random.UUID(),
-				arg: &repository.UpdateEventLevelArg{
+				arg: &repository.UpdateEventLevelArgs{
 					Level: domain.EventLevelPublic,
 				},
 			},
@@ -315,7 +415,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			tt.assertion(t, repo.UpdateEventLevel(tt.args.id, tt.args.arg))
 		})
@@ -342,13 +442,13 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 				},
@@ -378,7 +478,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
 			got, err := repo.GetUserEvents(tt.args.userID)
 			tt.assertion(t, err)

@@ -10,141 +10,181 @@ import (
 )
 
 var (
-	MockUsers = []*model.User{
-		{
-			ID:          uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
-			Description: "I am user1",
-			Check:       true,
-			Name:        "user1",
-		},
-		{
-			ID:          uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
-			Description: "I am user2",
-			Check:       true,
-			Name:        "user2",
-		},
-		{
-			ID:          uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
-			Description: "I am lolico",
-			Check:       false,
-			Name:        "lolico",
-		},
+	MockUsers      = CloneMockUsers()
+	CloneMockUsers = func() []*model.User {
+		return []*model.User{
+			{
+				ID:          uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
+				Description: "I am user1",
+				Check:       true,
+				Name:        "user1",
+			},
+			{
+				ID:          uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
+				Description: "I am user2",
+				Check:       true,
+				Name:        "user2",
+			},
+			{
+				ID:          uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
+				Description: "I am lolico",
+				Check:       false,
+				Name:        "lolico",
+			},
+		}
 	}
 
-	MockAccount = model.Account{
-		ID:     uuid.FromStringOrNil("d834e180-2af9-4cfe-838a-8a3930666490"),
-		Type:   0,
-		Name:   "sample_account_display_name",
-		URL:    "https://sample.accounts.com",
-		UserID: MockUsers[0].ID,
-		Check:  true,
+	MockAccount      = CloneMockAccount()
+	CloneMockAccount = func() model.Account {
+		return model.Account{
+			ID:     uuid.FromStringOrNil("d834e180-2af9-4cfe-838a-8a3930666490"),
+			Type:   0,
+			Name:   "sample_account_display_name",
+			URL:    "https://sample.accounts.com",
+			UserID: MockUsers[0].ID,
+			Check:  true,
+		}
 	}
 
-	MockContest = model.Contest{
-		ID:          uuid.FromStringOrNil("08eec963-0f29-48d1-929f-004cb67d8ce6"),
-		Name:        "sample_contest_name",
-		Description: "sample_contest_description",
-		Link:        "https://sample.contests.com",
-		Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
-		Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+	MockContest      = CloneMockContest()
+	CloneMockContest = func() model.Contest {
+		return model.Contest{
+			ID:          uuid.FromStringOrNil("08eec963-0f29-48d1-929f-004cb67d8ce6"),
+			Name:        "sample_contest_name",
+			Description: "sample_contest_description",
+			Link:        "https://sample.contests.com",
+			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+		}
 	}
 
-	MockContestTeam = model.ContestTeam{
-		ID:          uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750d"),
-		ContestID:   MockContest.ID,
-		Name:        "sample_contest_team_name",
-		Description: "sample_contest_team_description",
-		Result:      "sample_contest_team_result",
-		Link:        "https://sample.contest_teams.com",
+	MockContestTeam      = CloneMockContestTeam()
+	CloneMockContestTeam = func() model.ContestTeam {
+		return model.ContestTeam{
+			ID:          uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750d"),
+			ContestID:   MockContest.ID,
+			Name:        "sample_contest_team_name",
+			Description: "sample_contest_team_description",
+			Result:      "sample_contest_team_result",
+			Link:        "https://sample.contest_teams.com",
+		}
 	}
 
-	MockContestTeamUserBelonging = model.ContestTeamUserBelonging{
-		TeamID: MockContestTeam.ID,
-		UserID: MockUsers[0].ID,
+	MockContestTeamUserBelonging      = CloneMockContestTeam()
+	CloneMockContestTeamUserBelonging = func() model.ContestTeamUserBelonging {
+		return model.ContestTeamUserBelonging{
+			TeamID: MockContestTeam.ID,
+			UserID: MockUsers[0].ID,
+		}
 	}
 
-	MockEventLevelRelation = model.EventLevelRelation{
-		ID:    uuid.FromStringOrNil("e32a0431-aa0e-4825-98e6-479912275bbd"),
-		Level: domain.EventLevelPublic,
+	MockEventLevelRelation      = CloneMockEventLevelRelation()
+	CloneMockEventLevelRelation = func() model.EventLevelRelation {
+		return model.EventLevelRelation{
+			ID:    uuid.FromStringOrNil("e32a0431-aa0e-4825-98e6-479912275bbd"),
+			Level: domain.EventLevelPublic,
+		}
 	}
 
-	MockGroup = model.Group{
-		GroupID:     uuid.FromStringOrNil("455938b1-635f-4b43-ae74-66550b04c5d4"),
-		Name:        "sample_group_name",
-		Link:        "https://sample.groups.com",
-		Leader:      uuid.FromStringOrNil("3a3cb018-76df-49e2-ad1b-85ee3a48c7e2"),
-		Description: "sample_group_description",
+	MockGroup      = CloneMockGroup()
+	CloneMockGroup = func() model.Group {
+		return model.Group{
+			GroupID:     uuid.FromStringOrNil("455938b1-635f-4b43-ae74-66550b04c5d4"),
+			Name:        "sample_group_name",
+			Link:        "https://sample.groups.com",
+			Leader:      uuid.FromStringOrNil("3a3cb018-76df-49e2-ad1b-85ee3a48c7e2"),
+			Description: "sample_group_description",
+		}
 	}
 
-	MockGroupUserBelonging = model.GroupUserBelonging{
-		UserID:        MockUsers[0].ID,
-		GroupID:       MockGroup.GroupID,
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
+	MockGroupUserBelonging      = CloneMockGroupUserBelonging()
+	CloneMockGroupUserBelonging = func() model.GroupUserBelonging {
+		return model.GroupUserBelonging{
+			UserID:        MockUsers[0].ID,
+			GroupID:       MockGroup.GroupID,
+			SinceYear:     2022,
+			SinceSemester: 1,
+			UntilYear:     2022,
+			UntilSemester: 2,
+		}
 	}
 
-	MockProject = model.Project{
-		ID:            uuid.FromStringOrNil("bf9c1aec-7e3a-4587-8adc-651895aa6ec0"),
-		Name:          "sample_project_name",
-		Description:   "sample_project_description",
-		Link:          "https://sample.projects.com",
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
+	MockProject      = CloneMockProject()
+	CloneMockProject = func() model.Project {
+		return model.Project{
+			ID:            uuid.FromStringOrNil("bf9c1aec-7e3a-4587-8adc-651895aa6ec0"),
+			Name:          "sample_project_name",
+			Description:   "sample_project_description",
+			Link:          "https://sample.projects.com",
+			SinceYear:     2022,
+			SinceSemester: 1,
+			UntilYear:     2022,
+			UntilSemester: 2,
+		}
 	}
 
-	MockProjectMember = model.ProjectMember{
-		ID:            uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c7"),
-		ProjectID:     MockProject.ID,
-		UserID:        MockUsers[0].ID,
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
+	MockProjectMember      = CloneMockProjectMember()
+	CloneMockProjectMember = func() model.ProjectMember {
+		return model.ProjectMember{
+			ID:            uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c7"),
+			ProjectID:     MockProject.ID,
+			UserID:        MockUsers[0].ID,
+			SinceYear:     2022,
+			SinceSemester: 1,
+			UntilYear:     2022,
+			UntilSemester: 2,
+		}
 	}
 )
 
 func InsertSampleDataToDB(h database.SQLHandler) error {
-	if err := h.Create(&MockUsers).Error(); err != nil {
+	mockUsers := CloneMockUsers()
+	if err := h.Create(&mockUsers).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockAccount).Error(); err != nil {
+	mockAccount := CloneMockAccount()
+	if err := h.Create(&mockAccount).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockContest).Error(); err != nil {
+	mockContest := CloneMockContest()
+	if err := h.Create(&mockContest).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockContestTeam).Error(); err != nil {
+	mockContestTeam := CloneMockContestTeam()
+	if err := h.Create(&mockContestTeam).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockContestTeamUserBelonging).Error(); err != nil {
+	mockContestTeamUserBelonging := CloneMockContestTeamUserBelonging()
+	if err := h.Create(&mockContestTeamUserBelonging).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockEventLevelRelation).Error(); err != nil {
+	mockEventLevelRelation := CloneMockEventLevelRelation()
+	if err := h.Create(&mockEventLevelRelation).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockGroup).Error(); err != nil {
+	mockGroup := CloneMockGroup()
+	if err := h.Create(&mockGroup).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockGroupUserBelonging).Error(); err != nil {
+	mockGroupUserBelonging := CloneMockGroupUserBelonging()
+	if err := h.Create(&mockGroupUserBelonging).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockProject).Error(); err != nil {
+	mockProject := CloneMockProject()
+	if err := h.Create(&mockProject).Error(); err != nil {
 		return err
 	}
 
-	if err := h.Create(&MockProjectMember).Error(); err != nil {
+	mockProjectMember := CloneMockProjectMember()
+	if err := h.Create(&mockProjectMember).Error(); err != nil {
 		return err
 	}
 

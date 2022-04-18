@@ -1,6 +1,6 @@
 //go:build integration && db
 
-package handler_test
+package handler
 
 import (
 	"net/http"
@@ -32,7 +32,7 @@ var (
 	}
 )
 
-// GET /users
+// GetUsers GET /users
 func TestGetUsers(t *testing.T) {
 	var (
 		includeSuspended handler.IncludeSuspendedInQuery = true
@@ -91,7 +91,7 @@ func TestGetUsers(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetAll), &tt.params)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.params)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}

@@ -25,7 +25,8 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 	return &GroupHandler{service}
 }
 
-func (h *GroupHandler) GetAllGroups(_c echo.Context) error {
+// GetGroups GET /groups
+func (h *GroupHandler) GetGroups(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
@@ -41,6 +42,7 @@ func (h *GroupHandler) GetAllGroups(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// GetGroup GET /groups/:groupID
 func (h *GroupHandler) GetGroup(_c echo.Context) error {
 	c := _c.(*Context)
 	req := groupParam{}

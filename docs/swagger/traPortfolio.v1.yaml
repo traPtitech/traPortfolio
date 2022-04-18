@@ -74,7 +74,7 @@ paths:
       - $ref: '#/components/parameters/userIdInPath'
     post:
       summary: アカウント情報の追加
-      operationId: addAccount
+      operationId: addUserAccount
       responses:
         '201':
           description: Created
@@ -217,7 +217,7 @@ paths:
         - project
     post:
       summary: プロジェクトの作成
-      operationId: postProject
+      operationId: createProject
       responses:
         '201':
           description: Created
@@ -235,7 +235,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddProject'
+              $ref: '#/components/schemas/CreateProject'
   '/projects/{projectId}':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
@@ -382,7 +382,7 @@ paths:
     parameters: []
     post:
       summary: コンテストの作成
-      operationId: postContest
+      operationId: createContest
       responses:
         '201':
           description: Created
@@ -397,7 +397,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddContest'
+              $ref: '#/components/schemas/CreateContest'
       tags:
         - contest
       description: コンテストを作成します
@@ -474,8 +474,8 @@ paths:
       operationId: getContestTeams
       description: コンテストのチーム情報を取得します
     post:
-      summary: コンテストチームの作成
-      operationId: postContestTeam
+      summary: コンテストチームの追加
+      operationId: addContestTeam
       responses:
         '201':
           description: Created
@@ -489,7 +489,7 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
-      description: コンテストチームを作成します
+      description: コンテストのチーム情報を追加します
       requestBody:
         content:
           application/json:
@@ -575,7 +575,7 @@ paths:
       description: コンテストチームメンバーを取得します
     post:
       summary: コンテストチームメンバーの追加
-      operationId: postContestTeamMembers
+      operationId: addContestTeamMembers
       responses:
         '204':
           description: No Content
@@ -657,7 +657,7 @@ paths:
         - user
     delete:
       summary: ユーザーアカウントの削除
-      operationId: deleteAccount
+      operationId: deleteUserAccount
       responses:
         '204':
           description: No Content
@@ -1171,8 +1171,8 @@ components:
               $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
-    AddProject:
-      title: AddProject
+    CreateProject:
+      title: CreateProject
       type: object
       description: 新規プロジェクトリクエスト
       properties:
@@ -1217,8 +1217,8 @@ components:
           description: プロジェクト説明
         duration:
           $ref: '#/components/schemas/YearWithSemesterDuration'
-    AddContest:
-      title: AddContest
+    CreateContest:
+      title: CreateContest
       type: object
       description: 新規コンテストリクエスト
       properties:

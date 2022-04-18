@@ -52,7 +52,7 @@ func (mr *MockUserRepositoryMockRecorder) CreateAccount(userID, args interface{}
 }
 
 // CreateUser mocks base method.
-func (m *MockUserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
+func (m *MockUserRepository) CreateUser(args *repository.CreateUserArgs) (*domain.UserDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", args)
 	ret0, _ := ret[0].(*domain.UserDetail)

@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -25,7 +23,7 @@ func NewUserRepository(h database.SQLHandler, portalAPI external.PortalAPI, traQ
 	}
 }
 
-func MakeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
+func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
 	eargs := new(external.TraQGetAllArgs)
 	if iv, nv := rargs.IncludeSuspended.Valid, rargs.Name.Valid; iv && nv {
 		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
@@ -40,7 +38,7 @@ func MakeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 }
 
 func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
-	eargs, err := MakeTraqGetAllArgs(args)
+	eargs, err := makeTraqGetAllArgs(args)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +117,10 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 	for _, v := range user.Accounts {
 		accounts = append(accounts, &domain.Account{
 			ID:          v.ID,
+			DisplayName: v.Name,
 			Type:        v.Type,
 			PrPermitted: v.Check,
+			URL:         v.URL,
 		})
 	}
 
@@ -148,10 +148,10 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 	return &result, nil
 }
 
-func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.UserDetail, error) {
+func (repo *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain.UserDetail, error) {
 	portalUser, err := repo.portal.GetByTraqID(args.Name)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
 	user := model.User{
@@ -176,46 +176,6 @@ func (repo *UserRepository) CreateUser(args repository.CreateUserArgs) (*domain.
 		Bio:      user.Description,
 		Accounts: []*domain.Account{},
 	}
-	return result, nil
-}
-
-func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
-	accounts := make([]*model.Account, 0)
-	err := repo.h.
-		Where(&model.Account{UserID: userID}).
-		Find(&accounts).
-		Error()
-	if err != nil {
-		return nil, convertError(err)
-	}
-
-	result := make([]*domain.Account, 0, len(accounts))
-	for _, v := range accounts {
-		result = append(result, &domain.Account{
-			ID:          v.ID,
-			Type:        v.Type,
-			PrPermitted: v.Check,
-		})
-	}
-	return result, nil
-}
-
-func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
-	account := &model.Account{}
-	err := repo.h.
-		Where(&model.Account{ID: accountID, UserID: userID}).
-		First(account).
-		Error()
-	if err != nil {
-		return nil, convertError(err)
-	}
-
-	result := &domain.Account{
-		ID:          account.ID,
-		Type:        account.Type,
-		PrPermitted: account.Check,
-	}
-
 	return result, nil
 }
 
@@ -253,6 +213,50 @@ func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.Update
 	}
 
 	return nil
+}
+
+func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
+	accounts := make([]*model.Account, 0)
+	err := repo.h.
+		Where(&model.Account{UserID: userID}).
+		Find(&accounts).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	result := make([]*domain.Account, 0, len(accounts))
+	for _, v := range accounts {
+		result = append(result, &domain.Account{
+			ID:          v.ID,
+			Type:        v.Type,
+			PrPermitted: v.Check,
+			DisplayName: v.Name,
+			URL:         v.URL,
+		})
+	}
+	return result, nil
+}
+
+func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
+	account := &model.Account{}
+	err := repo.h.
+		Where(&model.Account{ID: accountID, UserID: userID}).
+		First(account).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	result := &domain.Account{
+		ID:          account.ID,
+		Type:        account.Type,
+		PrPermitted: account.Check,
+		DisplayName: account.Name,
+		URL:         account.URL,
+	}
+
+	return result, nil
 }
 
 func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
@@ -324,7 +328,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 	return convertError(err)
 }
 
-func (repo *UserRepository) DeleteAccount(accountID uuid.UUID, userID uuid.UUID) error {
+func (repo *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID) error {
 	if err := repo.h.
 		Where(&model.Account{ID: accountID, UserID: userID}).
 		Delete(&domain.Account{}).

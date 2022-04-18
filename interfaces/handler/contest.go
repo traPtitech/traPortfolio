@@ -48,6 +48,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// GetContest GET /contests/:contestID
 func (h *ContestHandler) GetContest(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
@@ -76,11 +77,11 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// PostContest POST /contests
-func (h *ContestHandler) PostContest(_c echo.Context) error {
+// CreateContest POST /contests
+func (h *ContestHandler) CreateContest(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
-	req := PostContestJSONRequestBody{}
+	req := CreateContestJSONRequestBody{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -108,8 +109,8 @@ func (h *ContestHandler) PostContest(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
-// PatchContest PATCH /contests/:contestID
-func (h *ContestHandler) PatchContest(_c echo.Context) error {
+// EditContest PATCH /contests/:contestID
+func (h *ContestHandler) EditContest(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
@@ -206,13 +207,13 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// PostContestTeam POST /contests/:contestID/teams
-func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
+// AddContestTeam POST /contests/:contestID/teams
+func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ContestIDInPath
-		PostContestTeamJSONRequestBody
+		AddContestTeamJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
@@ -236,8 +237,8 @@ func (h *ContestHandler) PostContestTeam(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
-// PatchContestTeam PATCH /contests/:contestID
-func (h *ContestHandler) PatchContestTeam(_c echo.Context) error {
+// EditContestTeam PATCH /contests/:contestID/teams/:teamID
+func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
@@ -284,8 +285,8 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// GetContestTeamMember GET /contests/{contestId}/teams/{teamId}/members
-func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
+// GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
@@ -312,8 +313,8 @@ func (h *ContestHandler) GetContestTeamMember(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// PostContestTeamMember POST /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) PostContestTeamMember(_c echo.Context) error {
+// AddContestTeamMember POST /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない

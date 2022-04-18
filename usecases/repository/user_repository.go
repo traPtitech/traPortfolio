@@ -41,7 +41,7 @@ type UpdateAccountArgs struct {
 type UserRepository interface {
 	GetUsers(args *GetUsersArgs) ([]*domain.User, error)
 	GetUser(userID uuid.UUID) (*domain.UserDetail, error)
-	CreateUser(args CreateUserArgs) (*domain.UserDetail, error)
+	CreateUser(args *CreateUserArgs) (*domain.UserDetail, error)
 	UpdateUser(userID uuid.UUID, args *UpdateUserArgs) error
 	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
 	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
