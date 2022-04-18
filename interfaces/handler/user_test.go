@@ -702,6 +702,42 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 			},
 			statusCode: http.StatusNoContent,
 		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID1",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.AlphaNumericn(36)
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID2",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.AlphaNumericn(36)
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
