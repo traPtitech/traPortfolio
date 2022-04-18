@@ -10,7 +10,7 @@
 
 ## Develop environment
 
-If you want know this repository, then, follow these pages.
+If you want to contribute to traPortfolio, then follow these pages.
 
 - [Architecture memo (in Japanese)](./docs/architecture.md)
 - [API schema](./docs/swagger/traPortfolio.v1.yaml)
@@ -26,8 +26,6 @@ If you want know this repository, then, follow these pages.
 - mysql
 
 ### Start docker container (with docker-compose)
-
-Run the following command in the project root
 
 ```bash
 docker-compose up
@@ -46,8 +44,6 @@ Now you can access to
 
 ### Set Up test DB (with docker, port:3307)
 
-Run the following command in the project root
-
 ```bash
 make up-test-db
 ```
@@ -62,7 +58,7 @@ make rm-test-db
 
 ### Run locally
 
-Make sure test MySQL container is running
+Make sure test MySQL container is running.
 
 ```bash
 go run main.go --db-user root --db-pass password --db-port 3307 --db-host localhost --db-name portfolio
@@ -70,7 +66,7 @@ go run main.go --db-user root --db-pass password --db-port 3307 --db-host localh
 
 ### Generate DB docs
 
-Make sure test MySQL container is running
+Make sure test MySQL container is running.
 
 ```bash
 make db-gen-docs
@@ -80,7 +76,7 @@ make db-gen-docs
 
 #### DB linter (tbls)
 
-Make sure test MySQL container is running
+Make sure test MySQL container is running.
 
 ```bash
 make db-lint
