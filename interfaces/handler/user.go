@@ -129,7 +129,7 @@ func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 		res[i] = newAccount(v.ID, v.DisplayName, v.Type, v.URL, v.PrPermitted)
 	}
 
-	return c.JSON(http.StatusOK, accounts)
+	return c.JSON(http.StatusOK, res)
 }
 
 // GetUserAccount GET /users/:userID/accounts/:accountID
