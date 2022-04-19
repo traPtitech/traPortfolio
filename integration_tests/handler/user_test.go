@@ -208,30 +208,53 @@ func TestGetUserAccounts(t *testing.T) {
 	}
 }
 
-// // GetUserAccount GET /users/:userID/accounts/:accountID
-// func TestGetUserAccount(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		accountID  uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserAccount GET /users/:userID/accounts/:accountID
+func TestGetUserAccount(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		accountID  uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUser1.Id,
+			mockdata.HMockAccount.Id,
+			mockdata.HMockAccount,
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.HMockAccount.Id,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"400 invalid accountID": {
+			http.StatusBadRequest,
+			mockdata.HMockUser1.Id,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_account")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_account")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
 // // AddUserAccount POST /users/:userID/accounts
 // func TestAddUserAccount(t *testing.T) {
