@@ -3,12 +3,14 @@
 package handler
 
 import (
+	"math/rand"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -256,30 +258,86 @@ func TestGetUserAccount(t *testing.T) {
 	}
 }
 
-// // AddUserAccount POST /users/:userID/accounts
-// func TestAddUserAccount(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		reqBody    handler.AddUserAccountJSONRequestBody
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// AddUserAccount POST /users/:userID/accounts
+func TestAddUserAccount(t *testing.T) {
+	var (
+		displayName = random.AlphaNumeric()
+		prPermitted = random.Bool()
+		atype       = rand.Intn(int(domain.AccountLimit)) // TODO: openapiでenumを定義する
+		url         = random.RandURLString()
+	)
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_add_user_account")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-// 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		reqBody    handler.AddUserAccountJSONRequestBody
+		want       interface{}
+	}{
+		"201": {
+			http.StatusCreated,
+			mockdata.HMockUser1.Id,
+			handler.AddUserAccountJSONRequestBody{
+				DisplayName: displayName,
+				PrPermitted: handler.PrPermitted(prPermitted),
+				Type:        handler.AccountType(atype),
+				Url:         url,
+			},
+			handler.Account{
+				Id:          uuid.Nil,
+				DisplayName: displayName,
+				PrPermitted: handler.PrPermitted(prPermitted),
+				Type:        handler.AccountType(atype),
+				Url:         url,
+			},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.AddUserAccountJSONRequestBody{},
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"400 invalid URL": {
+			http.StatusBadRequest,
+			mockdata.HMockUser1.Id,
+			handler.AddUserAccountJSONRequestBody{
+				DisplayName: displayName,
+				PrPermitted: handler.PrPermitted(prPermitted),
+				Type:        handler.AccountType(atype),
+				Url:         "invalid url",
+			},
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"400 invalid account type": {
+			http.StatusBadRequest,
+			mockdata.HMockUser1.Id,
+			handler.AddUserAccountJSONRequestBody{
+				DisplayName: displayName,
+				PrPermitted: handler.PrPermitted(prPermitted),
+				Type:        handler.AccountType(domain.AccountLimit),
+				Url:         url,
+			},
+			handler.ConvertError(t, repository.ErrInvalidArg),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_add_user_account")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
+			switch tt.want.(type) {
+			case handler.Account:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID)
+			case error:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
+		})
+	}
+}
 
 // // EditUserAccount PATCH /users/:userID/accounts/:accountID
 // func TestEditUserAccount(t *testing.T) {
