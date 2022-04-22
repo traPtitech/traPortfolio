@@ -66,7 +66,7 @@ Make sure test MySQL container is running.
 go run main.go --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
 ```
 
-(Optional) You can change the configuration by
+Tips: You can change the configuration by
 
 - Specifying it with flags (Run `go run main.go --help`)
 - Creating a configuration file (ex: [config.yaml](./util/config/testdata/config.yaml))
