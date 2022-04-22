@@ -31,6 +31,11 @@ func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFi
 }
 
 func TestEventRepository_GetEvents(t *testing.T) {
+	var (
+		since1, until1 = random.SinceAndUntil()
+		since2, until2 = random.SinceAndUntil()
+	)
+
 	t.Parallel()
 	tests := []struct {
 		name      string
@@ -44,14 +49,14 @@ func TestEventRepository_GetEvents(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since1,
+					TimeEnd:   until1,
 				},
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since2,
+					TimeEnd:   until2,
 				},
 			},
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
@@ -86,6 +91,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 }
 
 func TestEventRepository_GetEvent(t *testing.T) {
+	since, until := random.SinceAndUntil()
+
 	t.Parallel()
 	type args struct {
 		id uuid.UUID
@@ -106,8 +113,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				Event: domain.Event{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since,
+					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelPrivate,
@@ -147,8 +154,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				Event: domain.Event{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since,
+					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
@@ -176,8 +183,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					Event: domain.Event{
 						ID:        random.UUID(),
 						Name:      random.AlphaNumeric(),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
+						TimeStart: since,
+						TimeEnd:   until,
 					},
 					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevelPrivate,
@@ -232,6 +239,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
+				since, until := random.SinceAndUntil()
 				event := external.EventResponse{
 					ID:          args.args.EventID,
 					Name:        random.AlphaNumeric(),
@@ -239,8 +247,8 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 					Place:       random.AlphaNumeric(),
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
-					TimeStart:   random.Time(),
-					TimeEnd:     random.Time(),
+					TimeStart:   since,
+					TimeEnd:     until,
 					SharedRoom:  random.Bool(),
 				}
 				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(&event, nil)
@@ -274,6 +282,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
+				since, until := random.SinceAndUntil()
 				event := external.EventResponse{
 					ID:          args.args.EventID,
 					Name:        random.AlphaNumeric(),
@@ -281,8 +290,8 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 					Place:       random.AlphaNumeric(),
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
-					TimeStart:   random.Time(),
-					TimeEnd:     random.Time(),
+					TimeStart:   since,
+					TimeEnd:     until,
 					SharedRoom:  random.Bool(),
 				}
 				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(&event, nil)
@@ -423,6 +432,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 }
 
 func TestEventRepository_GetUserEvents(t *testing.T) {
+	since1, until1 := random.SinceAndUntil()
+	since2, until2 := random.SinceAndUntil()
 	t.Parallel()
 	type args struct {
 		userID uuid.UUID
@@ -443,14 +454,14 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since1,
+					TimeEnd:   until1,
 				},
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since2,
+					TimeEnd:   until2,
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
