@@ -47,6 +47,17 @@ func UUID() uuid.UUID {
 	return uuid.Must(uuid.NewV4())
 }
 
+func SinceAndUntil() (time.Time, time.Time) {
+	since := Time()
+	until := Time()
+
+	if since.After(until) {
+		since, until = until, since
+	}
+
+	return since, until
+}
+
 func Time() time.Time {
 	min := time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
 	max := time.Date(2070, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()

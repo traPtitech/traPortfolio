@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql/driver"
-	"math/rand"
 	"regexp"
 	"testing"
 
@@ -18,14 +17,6 @@ import (
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
-
-// 0 first semester, 1 second semester
-func makeYearWithSemester(s int) domain.YearWithSemester {
-	return domain.YearWithSemester{
-		Year:     random.Time().Year(),
-		Semester: s,
-	}
-}
 
 type mockProjectRepositoryFields struct {
 	h      *mock_database.MockSQLHandler
@@ -51,12 +42,9 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			name: "Success",
 			want: []*domain.Project{
 				{
-					ID:   random.UUID(),
-					Name: random.AlphaNumeric(),
-					Duration: domain.YearWithSemesterDuration{
-						Since: makeYearWithSemester(rand.Intn(2)),
-						Until: makeYearWithSemester(rand.Intn(2)),
-					},
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(),
+					Duration:    random.Duration(),
 					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members:     nil,
@@ -256,6 +244,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				d := random.Duration()
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
@@ -266,10 +255,10 @@ func TestProjectRepository_GetProject(t *testing.T) {
 								random.AlphaNumeric(),
 								random.AlphaNumeric(),
 								random.RandURLString(),
-								random.Time().Year(),
-								rand.Intn(2),
-								random.Time().Year(),
-								rand.Intn(2),
+								d.Since.Year,
+								d.Since.Semester,
+								d.Until.Year,
+								d.Until.Semester,
 							),
 					)
 				f.h.Mock.
@@ -286,6 +275,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				d := random.Duration()
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
@@ -296,13 +286,14 @@ func TestProjectRepository_GetProject(t *testing.T) {
 								random.AlphaNumeric(),
 								random.AlphaNumeric(),
 								random.RandURLString(),
-								random.Time().Year(),
-								rand.Intn(2),
-								random.Time().Year(),
-								rand.Intn(2),
+								d.Since.Year,
+								d.Since.Semester,
+								d.Until.Year,
+								d.Until.Semester,
 							),
 					)
 				uid := random.UUID()
+				md := random.Duration()
 				f.h.Mock.
 					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
@@ -311,10 +302,10 @@ func TestProjectRepository_GetProject(t *testing.T) {
 							AddRow(
 								uid,
 								random.AlphaNumeric(),
-								random.Time().Year(),
-								rand.Intn(2),
-								random.Time().Year(),
-								rand.Intn(2),
+								md.Since.Year,
+								md.Since.Semester,
+								md.Until.Year,
+								md.Until.Semester,
 							),
 					)
 				f.h.Mock.
@@ -451,6 +442,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 }
 
 func TestProjectRepository_UpdateProject(t *testing.T) {
+	d := random.Duration()
+
 	t.Parallel()
 	type args struct {
 		id   uuid.UUID
@@ -470,10 +463,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          optional.NewString(random.AlphaNumeric(), true),
 					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
-					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
+					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
+					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
+					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
@@ -494,10 +487,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          optional.NewString(random.AlphaNumeric(), true),
 					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
-					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
+					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
+					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
+					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
