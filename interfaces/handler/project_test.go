@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"testing"
 
@@ -133,8 +132,6 @@ func TestProjectHandler_GetByID(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
-				sinceSem := rand.Intn(2)
-				untilSem := rand.Intn(2)
 				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.Project{
@@ -177,11 +174,11 @@ func TestProjectHandler_GetByID(t *testing.T) {
 					Project: Project{
 						Duration: YearWithSemesterDuration{
 							Since: YearWithSemester{
-								Semester: Semester(sinceSem),
+								Semester: Semester(repo.Duration.Since.Semester),
 								Year:     repo.Duration.Since.Year,
 							},
 							Until: &YearWithSemester{
-								Semester: Semester(untilSem),
+								Semester: Semester(repo.Duration.Until.Semester),
 								Year:     repo.Duration.Until.Year,
 							},
 						},
