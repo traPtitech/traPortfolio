@@ -69,7 +69,7 @@ go run main.go
 Tips: You can change the configuration by
 
 - Specifying it with flags (Run `go run main.go --help`)
-- Creating a configuration file (ex: [config.yaml](./util/config/testdata/config.yaml)) and specifing it with  a `--config` flag.
+- Creating a configuration file (ex: [config.yaml](./util/config/testdata/config.yaml)) and specifing it with a `--config` flag.
 
 ### Generate DB docs
 
@@ -93,4 +93,26 @@ make db-lint
 
 ```bash
 make golangci-lint
+```
+
+### Run tests
+
+#### Unit tests
+
+```bash
+make test
+```
+
+#### Integration tests
+
+Make sure MySQL is running.
+
+```bash
+make test-integration-db
+```
+
+If you want to test both of them, run the following command.
+
+```bash
+make test-all
 ```
