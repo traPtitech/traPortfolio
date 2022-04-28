@@ -1,82 +1,118 @@
 # traPortfolio
 
-traPortfolio backend
+[![GitHub release](https://img.shields.io/github/release/traPtitech/traPortfolio.svg)](https://GitHub.com/traPtitech/traPortfolio/releases/) [![CI](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml) [![Build image](https://github.com/traPtitech/traPortfolio/actions/workflows/release.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/release.yaml) [![codecov](https://codecov.io/gh/traPtitech/traPortfolio/branch/main/graph/badge.svg?token=2HB6P7RUX8)](https://codecov.io/gh/traPtitech/traPortfolio) [![swagger](https://img.shields.io/badge/swagger-docs-brightgreen)](https://apis.trap.jp/?urls.primaryName=traPortfolio)
+
+- Backend
+  - [traPtitech/traPortfolio](https://github.com/traPtitech/traPortfolio) (this repository)
+- Frontend
+  - [traPtitech/traPortfolio-UI](https://github.com/traPtitech/traPortfolio-UI)
+  - [traPtitech/traPortfolio-Dashboard](https://github.com/traPtitech/traPortfolio-Dashboard)
 
 ## Develop environment
 
-### Set up local develop environment with docker
+If you want to contribute to traPortfolio, then follow these pages.
 
-#### Requirements
+- [Architecture memo (in Japanese)](./docs/architecture.md)
+- [API schema](./docs/swagger/traPortfolio.v1.yaml)
+- [DB schema](./docs/dbschema)
 
-- docker
-- docker-compose
+### Requirements
+
+- Bash
 - make
-- bash
+- Docker
+- Docker Compose
+- Go 1.17
+- MySQL
 
-1. Run the following command in the project root
+### Start docker container (with Docker Compose)
 
+```bash
+docker compose up
 ```
-$ docker-compose up
-```
 
-Now you can access to 
+Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
+
+Now you can access to
 
 - `http://localhost:1323` for backend server.
-- `http://localhost:3001` for Adminer
+- `http://localhost:3001` for adminer
   - username: `root`
   - password: `password`
   - database: `portfolio`
+  - port: `3306`
 
-### Set up local develop environment without docker
+(Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
 
-#### Requirements
+### Set Up test DB (with Docker, port:3307)
 
-- go 1.15
-- mysql
-
-1. Make sure MySQL is running
-2. Run the following command in the project root
-
-```
-$ DB_HOST=localhost go run main.go
+```bash
+make up-test-db
 ```
 
-if you want to change DB port, set the `DB_PORT` environment variable.
-
-### Rebuild
-
-```
-$ docker-compose up --build
-```
-
-### Up test DB
-
-```
-$ make up-test-db
-```
+(Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
 
 ### Remove test DB
 
+```bash
+make rm-test-db
 ```
-$ make rm-test-db
+
+### Run locally
+
+Make sure MySQL is running.
+
+```bash
+go run main.go
 ```
+
+Tips: You can change the configuration by
+
+- Specifying it with flags (Run `go run main.go --help`)
+- Creating a configuration file (ex: [config.yaml](./util/config/testdata/config.yaml)) and specifing it with a `--config` flag.
 
 ### Generate DB docs
 
-1. Make sure test MySQL container is running
-2. `make db-gen-docs`
+Make sure MySQL is running.
 
-### Lint
-
-DB Lint(you need docker)
-
-```
-$ make db-lint
+```bash
+make db-gen-docs
 ```
 
-golangci-lint(you need docker)
+### Run linters
 
-```
-$ make golangci-lint
+#### DB linter (tbls)
+
+Make sure MySQL is running.
+
+```bash
+make db-lint
 ```
 
+#### Go linter (golangci-lint)
+
+```bash
+make golangci-lint
+```
+
+### Run tests
+
+#### Unit tests
+
+```bash
+make test
+```
+
+#### Integration tests
+
+Make sure MySQL is running.
+
+```bash
+make test-integration-db
+```
+
+If you want to test both of them, run the following command.
+
+```bash
+make test-all
+```
