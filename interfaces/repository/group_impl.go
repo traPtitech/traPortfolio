@@ -42,39 +42,32 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 
 	// Name, RealNameはusercaseでPortalから取得する
 	erMembers := make([]*domain.UserGroup, 0, len(users))
-	erAdmin := make([]*domain.User, 0, len(users))
 	for _, v := range users {
-		// グループ外管理者除外
-		if v.Relation != 2 {
-			erMembers = append(erMembers, &domain.UserGroup{
-				ID: v.UserID,
-				// Name:     v.Name,
-				// RealName: v.RealName,
-				Duration: domain.YearWithSemesterDuration{
-					Since: domain.YearWithSemester{
-						Year:     v.SinceYear,
-						Semester: v.SinceSemester,
-					},
-					Until: domain.YearWithSemester{
-						Year:     v.UntilYear,
-						Semester: v.UntilSemester,
-					},
+		erMembers = append(erMembers, &domain.UserGroup{
+			ID: v.UserID,
+			// Name:     v.Name,
+			// RealName: v.RealName,
+			Duration: domain.YearWithSemesterDuration{
+				Since: domain.YearWithSemester{
+					Year:     v.SinceYear,
+					Semester: v.SinceSemester,
 				},
-			})
-		}
-		// リーダー抽出
-		if v.Relation == 1 || v.Relation == 2 {
-			erAdmin = append(erAdmin, &domain.User{
-				ID: v.UserID,
-				// Name:     v.Name,
-				// RealName: v.RealName,
-			})
-		}
+				Until: domain.YearWithSemester{
+					Year:     v.UntilYear,
+					Semester: v.UntilSemester,
+				},
+			},
+		})
 	}
 
 	var group model.Group
-	if err := repo.h.Where(&model.Group{GroupID: groupID}).First(&group).Error(); err != nil {
+	if err := repo.h.Preload("UserGroupAdmin").Where(&model.Group{GroupID: groupID}).First(&group).Error(); err != nil {
 		return nil, convertError(err)
+	}
+
+	erAdmin := make([]*domain.User, 0, len(group.Admin))
+	for _, v := range group.Admin {
+		erAdmin = append(erAdmin, &domain.User{ID: v.UserID})
 	}
 
 	// Name,RealNameはPortalから取得する

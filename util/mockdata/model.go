@@ -78,11 +78,15 @@ var (
 	MockGroupUserBelonging = model.GroupUserBelonging{
 		UserID:        MockUsers[0].ID,
 		GroupID:       MockGroup.GroupID,
-		Relation:      1,
 		SinceYear:     2022,
 		SinceSemester: 1,
 		UntilYear:     2022,
 		UntilSemester: 2,
+	}
+
+	MockGroupUserAdmin = model.GroupUserAdmin{
+		UserID:  MockUsers[0].ID,
+		GroupID: MockGroup.GroupID,
 	}
 
 	MockProject = model.Project{

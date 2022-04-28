@@ -13,6 +13,8 @@ type Group struct {
 	Description string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
+
+	Admin []*GroupUserAdmin `gorm:"foreignKey:UserID"`
 }
 
 func (*Group) TableName() string {
@@ -20,10 +22,8 @@ func (*Group) TableName() string {
 }
 
 type GroupUserBelonging struct {
-	// Relation      int       `gorm:"type:smallint(4);not null"`
 	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	GroupID       uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Relation      int       `gorm:"type:smallint(4);not null"`
 	SinceYear     int       `gorm:"type:smallint(4);not null"`
 	SinceSemester int       `gorm:"type:tinyint(1);not null"`
 	UntilYear     int       `gorm:"type:smallint(4);not null"`
@@ -37,4 +37,13 @@ type GroupUserBelonging struct {
 
 func (*GroupUserBelonging) TableName() string {
 	return "group_user_belongings"
+}
+
+type GroupUserAdmin struct {
+	UserID  uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	GroupID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+}
+
+func (*GroupUserAdmin) TableName() string {
+	return "group_user_admins"
 }
