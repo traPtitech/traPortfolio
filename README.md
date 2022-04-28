@@ -18,17 +18,17 @@ If you want to contribute to traPortfolio, then follow these pages.
 
 ### Requirements
 
-- bash
+- Bash
 - make
-- docker
-- docker-compose
-- go 1.17
-- mysql
+- Docker
+- Docker Compose
+- Go 1.17
+- MySQL
 
-### Start docker container (with docker-compose)
+### Start docker container (with Docker Compose)
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
@@ -36,7 +36,7 @@ Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/co
 Now you can access to
 
 - `http://localhost:1323` for backend server.
-- `http://localhost:3001` for Adminer
+- `http://localhost:3001` for adminer
   - username: `root`
   - password: `password`
   - database: `portfolio`
@@ -44,7 +44,7 @@ Now you can access to
 
 (Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
 
-### Set Up test DB (with docker, port:3307)
+### Set Up test DB (with Docker, port:3307)
 
 ```bash
 make up-test-db
