@@ -60,7 +60,7 @@ make rm-test-db
 
 ### Run locally
 
-Make sure test MySQL container is running.
+Make sure MySQL is running.
 
 ```bash
 go run main.go --db-user root --db-pass password --db-port 3306 --db-host localhost --db-name portfolio
@@ -73,7 +73,7 @@ Tips: You can change the configuration by
 
 ### Generate DB docs
 
-Make sure test MySQL container is running.
+Make sure MySQL is running.
 
 ```bash
 make db-gen-docs
@@ -83,7 +83,7 @@ make db-gen-docs
 
 #### DB linter (tbls)
 
-Make sure test MySQL container is running.
+Make sure MySQL is running.
 
 ```bash
 make db-lint
