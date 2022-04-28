@@ -29,54 +29,54 @@ func Setup(e *echo.Echo, api API) error {
 		{
 			apiUsers := v1.Group("/users")
 
-			apiUsers.GET("", api.User.GetAll)
+			apiUsers.GET("", api.User.GetUsers)
 			{
 				apiUsersUID := apiUsers.Group("/:userID")
 
-				apiUsersUID.GET("", api.User.GetByID)
-				apiUsersUID.PATCH("", api.User.Update)
+				apiUsersUID.GET("", api.User.GetUser)
+				apiUsersUID.PATCH("", api.User.UpdateUser)
 				{
 					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
 
-					apiUsersUIDAccounts.GET("", api.User.GetAccounts)
-					apiUsersUIDAccounts.POST("", api.User.AddAccount)
+					apiUsersUIDAccounts.GET("", api.User.GetUserAccounts)
+					apiUsersUIDAccounts.POST("", api.User.AddUserAccount)
 					{
 						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
 
-						apiUsersUIDAccountsAID.GET("", api.User.GetAccount)
-						apiUsersUIDAccountsAID.PATCH("", api.User.PatchAccount)
-						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteAccount)
+						apiUsersUIDAccountsAID.GET("", api.User.GetUserAccount)
+						apiUsersUIDAccountsAID.PATCH("", api.User.EditUserAccount)
+						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteUserAccount)
 					}
 
 					apiUsersUIDProjects := apiUsersUID.Group("/projects")
 
-					apiUsersUIDProjects.GET("", api.User.GetProjects)
+					apiUsersUIDProjects.GET("", api.User.GetUserProjects)
 
 					apiUsersUIDContests := apiUsersUID.Group("/contests")
 
-					apiUsersUIDContests.GET("", api.User.GetContests)
+					apiUsersUIDContests.GET("", api.User.GetUserContests)
 
 					apiUsersUIDGroups := apiUsersUID.Group("/groups")
 
-					apiUsersUIDGroups.GET("", api.User.GetGroupsByUserID)
+					apiUsersUIDGroups.GET("", api.User.GetUserGroups)
 
 					apiUsersUIDEvents := apiUsersUID.Group("/events")
 
-					apiUsersUIDEvents.GET("", api.User.GetEvents)
+					apiUsersUIDEvents.GET("", api.User.GetUserEvents)
 				}
 			}
 		}
 		{
 			apiProjects := v1.Group("/projects")
 
-			apiProjects.GET("", api.Project.GetAll)
-			apiProjects.POST("", api.Project.PostProject)
+			apiProjects.GET("", api.Project.GetProjects)
+			apiProjects.POST("", api.Project.CreateProject)
 
 			{
 				apiProjectsPID := apiProjects.Group("/:projectID")
 
-				apiProjectsPID.GET("", api.Project.GetByID)
-				apiProjectsPID.PATCH("", api.Project.PatchProject)
+				apiProjectsPID.GET("", api.Project.GetProject)
+				apiProjectsPID.PATCH("", api.Project.EditProject)
 
 				apiProjectsPIDMembers := apiProjectsPID.Group("/members")
 
@@ -89,47 +89,47 @@ func Setup(e *echo.Echo, api API) error {
 		{
 			apiEvents := v1.Group("/events")
 
-			apiEvents.GET("", api.Event.GetAll)
+			apiEvents.GET("", api.Event.GetEvents)
 
 			apiEventsEID := apiEvents.Group("/:eventID")
 
-			apiEventsEID.GET("", api.Event.GetByID)
-			apiEventsEID.PATCH("", api.Event.PatchEvent)
+			apiEventsEID.GET("", api.Event.GetEvent)
+			apiEventsEID.PATCH("", api.Event.EditEvent)
 		}
 
 		{
 			apiGroups := v1.Group("/groups")
 
-			apiGroups.GET("", api.Group.GetAllGroups)
+			apiGroups.GET("", api.Group.GetGroups)
 			apiGroups.GET("/:groupID", api.Group.GetGroup)
 		}
 		{
 			apiContests := v1.Group("/contests")
 
 			apiContests.GET("", api.Contest.GetContests)
-			apiContests.POST("", api.Contest.PostContest)
+			apiContests.POST("", api.Contest.CreateContest)
 			{
 				apiContestsCID := apiContests.Group("/:contestID")
 
 				apiContestsCID.GET("", api.Contest.GetContest)
-				apiContestsCID.PATCH("", api.Contest.PatchContest)
+				apiContestsCID.PATCH("", api.Contest.EditContest)
 				apiContestsCID.DELETE("", api.Contest.DeleteContest)
 				{
 					apiContestsCIDTeams := apiContestsCID.Group("/teams")
 
 					apiContestsCIDTeams.GET("", api.Contest.GetContestTeams)
-					apiContestsCIDTeams.POST("", api.Contest.PostContestTeam)
+					apiContestsCIDTeams.POST("", api.Contest.AddContestTeam)
 					{
 						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")
 
 						apiContestsCIDTeamsTID.GET("", api.Contest.GetContestTeam)
-						apiContestsCIDTeamsTID.PATCH("", api.Contest.PatchContestTeam)
+						apiContestsCIDTeamsTID.PATCH("", api.Contest.EditContestTeam)
 						apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
 						{
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
-							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMember)
-							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.PostContestTeamMember)
+							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMembers)
+							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMember)
 							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
 						}
 					}

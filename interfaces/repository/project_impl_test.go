@@ -1,9 +1,7 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
-	"math/rand"
-	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -14,19 +12,10 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
-
-// 0 first semester, 1 second semester
-func makeYearWithSemester(s int) domain.YearWithSemester {
-	return domain.YearWithSemester{
-		Year:     random.Time().Year(),
-		Semester: s,
-	}
-}
 
 type mockProjectRepositoryFields struct {
 	h      *mock_database.MockSQLHandler
@@ -52,13 +41,10 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			name: "Success",
 			want: []*domain.Project{
 				{
-					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
-					Duration: domain.YearWithSemesterDuration{
-						Since: makeYearWithSemester(rand.Intn(2)),
-						Until: makeYearWithSemester(rand.Intn(2)),
-					},
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(),
+					Duration:    random.Duration(),
+					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members:     nil,
 				},
@@ -70,7 +56,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 					rows.AddRow(v.ID, v.Name, v.Description, v.Link, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects`")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects`")).
 					WillReturnRows(rows)
 			},
 			assertion: assert.NoError,
@@ -80,7 +66,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, want []*domain.Project) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects`")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects`")).
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
@@ -94,7 +80,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjects()
 			tt.assertion(t, err)
@@ -124,15 +110,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          pid,
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -140,7 +126,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
 				wd := want.Duration
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
@@ -149,14 +135,14 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				wm := want.Members[0]
 				wmd := wm.Duration
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(wm.UserID, wm.Name, wmd.Since.Year, wmd.Since.Semester, wmd.Until.Year, wmd.Until.Semester),
 					)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
 					WithArgs(wm.UserID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
@@ -178,21 +164,21 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: &domain.Project{
 				ID:          pid,
-				Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+				Name:        random.AlphaNumeric(),
 				Duration:    random.Duration(),
-				Description: random.AlphaNumeric(rand.Intn(30) + 1),
+				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 					{
 						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
@@ -200,7 +186,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
 				wd := want.Duration
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
@@ -212,7 +198,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					memberRows.AddRow(v.UserID, v.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(memberRows)
 				userIDs := make([]driver.Value, len(want.Members))
@@ -222,7 +208,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					userRows.AddRow(v.UserID, v.Name)
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
 				wp := make([]*external.PortalUserResponse, len(want.Members))
@@ -244,7 +230,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}))
 			},
@@ -257,24 +243,25 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				d := random.Duration()
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								args.id,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
+								random.AlphaNumeric(),
 								random.RandURLString(),
-								random.Time().Year(),
-								rand.Intn(2),
-								random.Time().Year(),
-								rand.Intn(2),
+								d.Since.Year,
+								d.Since.Semester,
+								d.Until.Year,
+								d.Until.Semester,
 							),
 					)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnError(errUnexpected)
 			},
@@ -287,45 +274,47 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+				d := random.Duration()
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								args.id,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
+								random.AlphaNumeric(),
 								random.RandURLString(),
-								random.Time().Year(),
-								rand.Intn(2),
-								random.Time().Year(),
-								rand.Intn(2),
+								d.Since.Year,
+								d.Since.Semester,
+								d.Until.Year,
+								d.Until.Semester,
 							),
 					)
 				uid := random.UUID()
+				md := random.Duration()
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
-								random.Time().Year(),
-								rand.Intn(2),
-								random.Time().Year(),
-								rand.Intn(2),
+								random.AlphaNumeric(),
+								md.Since.Year,
+								md.Since.Semester,
+								md.Until.Year,
+								md.Until.Semester,
 							),
 					)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
 					WithArgs(uid).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 							),
 					)
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
@@ -341,7 +330,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProject(tt.args.id)
 			tt.assertion(t, err)
@@ -353,8 +342,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_CreateProject(t *testing.T) {
 	duration := random.Duration()
 	successProject := &repository.CreateProjectArgs{
-		Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-		Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+		Name:          random.AlphaNumeric(),
+		Description:   random.AlphaNumeric(),
 		Link:          optional.NewString(random.RandURLString(), true),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
@@ -398,7 +387,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				p := args.project
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?)")).
+					ExpectExec(makeSQLQueryRegexp("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?)")).
 					WithArgs(anyUUID{}, p.Name, p.Description, p.Link, p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
@@ -409,8 +398,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{
 				project: &repository.CreateProjectArgs{
-					Name:          random.AlphaNumeric(rand.Intn(30) + 1),
-					Description:   random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:          random.AlphaNumeric(),
+					Description:   random.AlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
@@ -423,7 +412,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				p := args.project
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?)")).
+					ExpectExec(makeSQLQueryRegexp("INSERT INTO `projects` (`id`,`name`,`description`,`link`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?,?)")).
 					WithArgs(anyUUID{}, p.Name, p.Description, p.Link, p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
@@ -439,7 +428,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.CreateProject(tt.args.project)
 			if tt.want != nil && got != nil {
@@ -452,6 +441,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 }
 
 func TestProjectRepository_UpdateProject(t *testing.T) {
+	d := random.Duration()
+
 	t.Parallel()
 	type args struct {
 		id   uuid.UUID
@@ -468,19 +459,19 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
-					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
+					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
+					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
+					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
+					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
 					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
@@ -492,19 +483,19 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
-					Description:   optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Name:          optional.NewString(random.AlphaNumeric(), true),
+					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					SinceSemester: optional.NewInt64(int64(rand.Intn(2)), true),
-					UntilYear:     optional.NewInt64(int64(random.Time().Year()), true),
-					UntilSemester: optional.NewInt64(int64(rand.Intn(2)), true),
+					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
+					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
+					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
+					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
+					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
 					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
@@ -520,7 +511,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
 		})
@@ -547,8 +538,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -557,11 +548,11 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					rows.AddRow(u.ID)
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(rows)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
 					WithArgs(want[0].ID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
@@ -584,12 +575,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 					// RealName:
 				},
 				{
 					ID:   random.UUID(),
-					Name: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name: random.AlphaNumeric(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
@@ -598,7 +589,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					rows.AddRow(u.ID)
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(rows)
 				userIDs := make([]driver.Value, len(want))
@@ -608,7 +599,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					userRows.AddRow(v.ID, v.Name)
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
 				wp := make([]*external.PortalUserResponse, len(want))
@@ -630,7 +621,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
@@ -646,17 +637,17 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
 				uid := random.UUID()
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(sqlmock.NewRows([]string{"user_id"}).AddRow(uid))
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
 					WithArgs(uid).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(
 								uid,
-								random.AlphaNumeric(rand.Intn(30)+1),
+								random.AlphaNumeric(),
 							),
 					)
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
@@ -673,7 +664,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			got, err := repo.GetProjectMembers(tt.args.id)
 			tt.assertion(t, err)
@@ -742,20 +733,20 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 					}
 				}
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
 					)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.projectID).
 					WillReturnRows(rows)
 				f.h.Mock.ExpectBegin()
 				for _, u := range newUsers {
 					f.h.Mock.
-						ExpectExec(regexp.QuoteMeta("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?)")).
+						ExpectExec(makeSQLQueryRegexp("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?)")).
 						WithArgs(anyUUID{}, args.projectID, u.UserID, u.SinceYear, u.SinceSemester, u.UntilYear, u.UntilSemester, anyTime{}, anyTime{}).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 				}
@@ -795,7 +786,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnError(errUnexpected)
 			},
@@ -824,14 +815,14 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
 					)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.projectID).
 					WillReturnError(errUnexpected)
 			},
@@ -860,23 +851,24 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
 					)
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.projectID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
 					)
 				f.h.Mock.ExpectBegin()
+				pm := args.projectMembers[0]
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.projectID, anyUUID{}, anyTime{}, anyTime{}, anyTime{}, anyTime{}).
+					ExpectExec(makeSQLQueryRegexp("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.projectID, pm.UserID, pm.SinceYear, pm.SinceSemester, pm.UntilYear, pm.UntilSemester, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -891,7 +883,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.AddProjectMembers(tt.args.projectID, tt.args.projectMembers))
 		})
@@ -921,7 +913,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
@@ -929,7 +921,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 					)
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` IN (?,?)")).
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` IN (?,?)")).
 					WithArgs(args.projectID, args.members[0], args.members[1]).
 					WillReturnResult(sqlmock.NewResult(0, int64(len(args.members)+1)/2))
 				f.h.Mock.ExpectCommit()
@@ -956,7 +948,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnError(errUnexpected)
 			},
@@ -973,7 +965,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(regexp.QuoteMeta("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
@@ -981,7 +973,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 					)
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectExec(regexp.QuoteMeta("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` IN (?,?)")).
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` IN (?,?)")).
 					WithArgs(args.projectID, args.members[0], args.members[1]).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
@@ -997,7 +989,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := impl.NewProjectRepository(f.h, f.portal)
+			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.DeleteProjectMembers(tt.args.projectID, tt.args.members))
 		})

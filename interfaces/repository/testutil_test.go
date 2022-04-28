@@ -1,9 +1,10 @@
-package repository_test
+package repository
 
 import (
 	"database/sql/driver"
 	"errors"
-	"math/rand"
+	"fmt"
+	"regexp"
 	"testing"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -39,6 +39,10 @@ func (a anyUUID) Match(v driver.Value) bool {
 func validUUIDStr(s string) bool {
 	_, err := uuid.FromString(s)
 	return err == nil
+}
+
+func makeSQLQueryRegexp(query string) string {
+	return fmt.Sprintf("^%s$", regexp.QuoteMeta(query))
 }
 
 func makeKnoqEvents(events []*domain.Event) []*external.EventResponse {
@@ -77,7 +81,7 @@ func makeKnoqEvent(event *domain.EventDetail) *external.EventResponse {
 func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *external.TraQGetAllArgs {
 	t.Helper()
 
-	eargs, err := impl.MakeTraqGetAllArgs(rargs)
+	eargs, err := makeTraqGetAllArgs(rargs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +115,7 @@ func makePortalUser(user *domain.User) *external.PortalUserResponse {
 	return &external.PortalUserResponse{
 		TraQID:         user.Name,
 		RealName:       user.RealName,
-		AlphabeticName: random.AlphaNumeric(rand.Intn(30) + 1),
+		AlphabeticName: random.AlphaNumeric(),
 	}
 }
 

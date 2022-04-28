@@ -4,61 +4,33 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
-	"net/http/cookiejar"
-	"net/url"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
-type KnoQConfig struct {
-	cookie        string
-	endpoint      string
-	isDevelopment bool
-}
-
-func NewKnoqConfig(cookie, endpoint string, isDevelopment bool) KnoQConfig {
-	return KnoQConfig{
-		cookie,
-		endpoint,
-		isDevelopment,
-	}
-}
-
 type KnoqAPI struct {
-	Client *http.Client
-	conf   *KnoQConfig
+	apiClient
 }
 
-func NewKnoqAPI(conf *KnoQConfig) (external.KnoqAPI, error) {
-	if conf.isDevelopment {
+func NewKnoqAPI(conf *config.KnoqConfig, isDevelopment bool) (external.KnoqAPI, error) {
+	if isDevelopment {
 		return &mock_external_e2e.MockKnoqAPI{}, nil
 	}
 
-	jar, err := cookiejar.New(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cookies := []*http.Cookie{
-		{
-			Name:  "session",
-			Value: conf.cookie,
-			Path:  "/",
-		},
-	}
-	u, err := url.Parse(conf.endpoint)
+	jar, err := newCookieJar(conf.API(), "session")
 	if err != nil {
 		return nil, err
 	}
-	jar.SetCookies(u, cookies)
-	return &KnoqAPI{Client: &http.Client{Jar: jar}, conf: conf}, nil
+
+	return &KnoqAPI{newAPIClient(jar, conf.API())}, nil
 }
 
 func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, knoq.conf.endpoint, "/events")
+	res, err := knoq.apiGet("/events")
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +48,7 @@ func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 }
 
 func (knoq *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/events/%v", eventID))
+	res, err := knoq.apiGet(fmt.Sprintf("/events/%v", eventID))
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +66,7 @@ func (knoq *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, e
 }
 
 func (knoq *KnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
-	res, err := apiGet(knoq.Client, knoq.conf.endpoint, fmt.Sprintf("/users/%v/events", userID))
+	res, err := knoq.apiGet(fmt.Sprintf("/users/%v/events", userID))
 	if err != nil {
 		return nil, err
 	}

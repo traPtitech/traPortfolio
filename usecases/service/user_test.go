@@ -1,8 +1,7 @@
-package service_test
+package service
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
@@ -14,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
@@ -40,8 +38,8 @@ func TestUserService_GetUsers(t *testing.T) {
 			want: []*domain.User{
 				{
 					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
@@ -74,7 +72,7 @@ func TestUserService_GetUsers(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetUsers(tt.args.ctx, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -104,11 +102,11 @@ func TestUserService_GetUser(t *testing.T) {
 			want: &domain.UserDetail{
 				User: domain.User{
 					ID:       uuid.Nil, // setupで変更する
-					Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-					RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
 				},
 				State: domain.TraqStateActive,
-				Bio:   random.AlphaNumeric(rand.Intn(30) + 1),
+				Bio:   random.AlphaNumeric(),
 				Accounts: []*domain.Account{
 					{
 						ID:          random.UUID(),
@@ -148,7 +146,7 @@ func TestUserService_GetUser(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetUser(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -175,7 +173,7 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -190,7 +188,7 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					Description: optional.NewString(random.AlphaNumeric(), true),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -212,7 +210,7 @@ func TestUserService_Update(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			tt.assertion(t, s.Update(tt.args.ctx, tt.args.id, tt.args.args))
 		})
 	}
@@ -261,7 +259,7 @@ func TestUserService_GetAccount(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetAccount(tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -309,7 +307,7 @@ func TestUserService_GetAccounts(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetAccounts(tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -337,9 +335,9 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(),
 					Type:        domain.HOMEPAGE,
-					URL:         "https://" + random.AlphaNumeric(rand.Intn(30)+1),
+					URL:         "https://" + random.AlphaNumeric(),
 					PrPermitted: true,
 				},
 			},
@@ -361,7 +359,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				account: &repository.CreateAccountArgs{
 					DisplayName: "",
 					Type:        domain.HOMEPAGE,
-					URL:         "https://" + random.AlphaNumeric(rand.Intn(30)+1),
+					URL:         "https://" + random.AlphaNumeric(),
 					PrPermitted: true,
 				},
 			},
@@ -376,9 +374,9 @@ func TestUserService_CreateAccount(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				account: &repository.CreateAccountArgs{
-					DisplayName: random.AlphaNumeric(rand.Intn(30) + 1),
+					DisplayName: random.AlphaNumeric(),
 					Type:        10000,
-					URL:         "https://" + random.AlphaNumeric(rand.Intn(30)+1),
+					URL:         "https://" + random.AlphaNumeric(),
 					PrPermitted: true,
 				},
 			},
@@ -400,7 +398,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.CreateAccount(tt.args.ctx, tt.args.id, tt.args.account)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -429,7 +427,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
@@ -447,7 +445,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				userID:    random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(rand.Intn(30)+1), true),
+					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
@@ -471,7 +469,7 @@ func TestUserService_EditAccount(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			tt.assertion(t, s.EditAccount(tt.args.ctx, tt.args.accountID, tt.args.userID, tt.args.args))
 		})
 	}
@@ -515,7 +513,7 @@ func TestUserService_DeleteAccount(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			tt.assertion(t, s.DeleteAccount(tt.args.ctx, tt.args.accountid, tt.args.userid))
 		})
 	}
@@ -543,7 +541,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			want: []*domain.UserProject{
 				{
 					ID:           random.UUID(),
-					Name:         random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:         random.AlphaNumeric(),
 					Duration:     random.Duration(),
 					UserDuration: random.Duration(),
 				},
@@ -578,7 +576,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetUserProjects(tt.args.ctx, tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -608,9 +606,9 @@ func TestUserService_GetUserContests(t *testing.T) {
 			want: []*domain.UserContest{
 				{
 					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
-					Result:      random.AlphaNumeric(rand.Intn(30) + 1),
-					ContestName: random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
+					Result:      random.AlphaNumeric(),
+					ContestName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
@@ -643,7 +641,7 @@ func TestUserService_GetUserContests(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetUserContests(tt.args.ctx, tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -673,7 +671,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			want: []*domain.Event{
 				{
 					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:      random.AlphaNumeric(),
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
@@ -708,7 +706,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
 
-			s := service.NewUserService(repo, event)
+			s := NewUserService(repo, event)
 			got, err := s.GetUserEvents(tt.args.ctx, tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)

@@ -27,8 +27,8 @@ func NewEventHandler(service service.EventService) *EventHandler {
 	return &EventHandler{service}
 }
 
-// GetAll GET /events
-func (h *EventHandler) GetAll(c echo.Context) error {
+// GetEvents GET /events
+func (h *EventHandler) GetEvents(c echo.Context) error {
 	ctx := c.Request().Context()
 	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
@@ -43,8 +43,8 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetByID GET /events/:eventID
-func (h *EventHandler) GetByID(_c echo.Context) error {
+// GetEvent GET /events/:eventID
+func (h *EventHandler) GetEvent(_c echo.Context) error {
 	c := _c.(*Context)
 	req := EventIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -71,8 +71,8 @@ func (h *EventHandler) GetByID(_c echo.Context) error {
 	))
 }
 
-// PatchEvent PATCH /events/:eventID
-func (h *EventHandler) PatchEvent(_c echo.Context) error {
+// EditEvent PATCH /events/:eventID
+func (h *EventHandler) EditEvent(_c echo.Context) error {
 	c := _c.(*Context)
 	req := struct {
 		EventIDInPath
@@ -83,7 +83,7 @@ func (h *EventHandler) PatchEvent(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	patchReq := repository.UpdateEventLevelArg{
+	patchReq := repository.UpdateEventLevelArgs{
 		Level: domain.EventLevel(*req.EventLevel),
 	}
 

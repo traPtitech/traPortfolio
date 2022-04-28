@@ -1,4 +1,4 @@
-package handler_test
+package handler
 
 import (
 	"encoding/json"
@@ -10,10 +10,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
-func doRequest(t *testing.T, api handler.API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
+func doRequest(t *testing.T, api API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()
 
 	req := httptest.NewRequest(method, path, requestEncode(t, reqBody))
@@ -22,7 +21,7 @@ func doRequest(t *testing.T, api handler.API, method, path string, reqBody inter
 
 	e := echo.New()
 
-	if err := handler.Setup(e, api); err != nil {
+	if err := Setup(e, api); err != nil {
 		t.Fatal(err)
 	}
 	e.ServeHTTP(rec, req)

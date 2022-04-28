@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -17,7 +16,7 @@ func main() {
 
 	if appConf.IsMigrate() {
 		s := appConf.SQLConf()
-		h, err := infrastructure.NewSQLHandler(&s)
+		h, err := infrastructure.NewSQLHandler(s)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -33,12 +32,7 @@ func main() {
 		return
 	}
 
-	s := appConf.SQLConf()
-	t := appConf.TraqConf()
-	p := appConf.PortalConf()
-	k := appConf.KnoqConf()
-
-	api, err := infrastructure.InjectAPIServer(&s, &t, &p, &k)
+	api, err := infrastructure.InjectAPIServer(appConf, appConf.IsDevelopment())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,5 +43,5 @@ func main() {
 	}
 
 	// Start server
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", appConf.Port)))
+	e.Logger.Fatal(e.Start(appConf.Addr()))
 }

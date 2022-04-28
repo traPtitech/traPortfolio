@@ -3,77 +3,47 @@ package infrastructure
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"net/http/cookiejar"
-	"net/url"
 	"time"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/util/config"
 )
 
 const (
 	cacheKey = "portalUsers"
 )
 
-type PortalConfig struct {
-	cookie        string
-	endpoint      string
-	isDevelopment bool
-}
-
-func NewPortalConfig(cookie, endpoint string, isDevelopment bool) PortalConfig {
-	return PortalConfig{
-		cookie,
-		endpoint,
-		isDevelopment,
-	}
-}
-
 type PortalAPI struct {
-	Client *http.Client
-	Cache  *cache.Cache
-	conf   *PortalConfig
+	apiClient
+	cache *cache.Cache
 }
 
-func NewPortalAPI(conf *PortalConfig) (external.PortalAPI, error) {
-	if conf.isDevelopment {
+func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.PortalAPI, error) {
+	if isDevelopment {
 		return mock_external_e2e.NewMockPortalAPI(), nil
 	}
 
-	jar, err := cookiejar.New(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cookies := []*http.Cookie{
-		{
-			Name:  "access_token",
-			Value: conf.cookie,
-			Path:  "/",
-		},
-	}
-	u, err := url.Parse(conf.endpoint)
+	jar, err := newCookieJar(conf.API(), "access_token")
 	if err != nil {
 		return nil, err
 	}
-	jar.SetCookies(u, cookies)
-	c := cache.New(1*time.Hour, 2*time.Hour)
+
 	return &PortalAPI{
-		Client: &http.Client{Jar: jar},
-		Cache:  c,
-		conf:   conf,
+		apiClient: newAPIClient(jar, conf.API()),
+		cache:     cache.New(1*time.Hour, 2*time.Hour),
 	}, nil
 }
 
 func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
-	portalUsers, found := portal.Cache.Get(cacheKey)
+	portalUsers, found := portal.cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
 
-	res, err := apiGet(portal.Client, portal.conf.endpoint, "/user")
+	res, err := portal.apiGet("/user")
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +56,7 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	if err := json.NewDecoder(res.Body).Decode(&userResponses); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
-	portal.Cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
+	portal.cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
 }
 
@@ -95,7 +65,7 @@ func (portal *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserRespons
 		return nil, fmt.Errorf("invalid traQID")
 	}
 
-	res, err := apiGet(portal.Client, portal.conf.endpoint, fmt.Sprintf("/user/%v", traQID))
+	res, err := portal.apiGet(fmt.Sprintf("/user/%v", traQID))
 	if err != nil {
 		return nil, err
 	}

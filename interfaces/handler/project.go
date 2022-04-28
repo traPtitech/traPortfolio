@@ -22,8 +22,8 @@ func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 	return &ProjectHandler{service: s}
 }
 
-// GetAll GET /projects
-func (h *ProjectHandler) GetAll(_c echo.Context) error {
+// GetProjects GET /projects
+func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
@@ -39,8 +39,8 @@ func (h *ProjectHandler) GetAll(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GetByID GET /projects/:projectID
-func (h *ProjectHandler) GetByID(_c echo.Context) error {
+// GetProject GET /projects/:projectID
+func (h *ProjectHandler) GetProject(_c echo.Context) error {
 	c := _c.(*Context)
 	req := ProjectIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -69,11 +69,11 @@ func (h *ProjectHandler) GetByID(_c echo.Context) error {
 	))
 }
 
-// PostProject POST /projects
-func (h *ProjectHandler) PostProject(_c echo.Context) error {
+// CreateProject POST /projects
+func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
-	req := PostProjectJSONRequestBody{}
+	req := CreateProjectJSONRequestBody{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
@@ -104,7 +104,8 @@ func (h *ProjectHandler) PostProject(_c echo.Context) error {
 	))
 }
 
-func (h *ProjectHandler) PatchProject(_c echo.Context) error {
+// EditProject PATCH /projects/:projectID
+func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {

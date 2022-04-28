@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 const (
@@ -17,9 +18,9 @@ const (
 	rs6LetterIdxMax  = 63 / rs6LetterIdxBits
 )
 
-// AlphaNumeric 指定した文字数のランダム英数字文字列を生成します
+// AlphaNumericn 指定した文字数のランダム英数字文字列を生成します
 // この関数はmath/randが生成する擬似乱数を使用します
-func AlphaNumeric(n int) string {
+func AlphaNumericn(n int) string {
 	b := make([]byte, n)
 	cache, remain := rand.Int63(), rs6LetterIdxMax
 	for i := n - 1; i >= 0; {
@@ -37,9 +38,24 @@ func AlphaNumeric(n int) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
+func AlphaNumeric() string {
+	return AlphaNumericn(rand.Intn(30) + 1)
+}
+
 // UUID ランダムなUUIDを生成します
 func UUID() uuid.UUID {
 	return uuid.Must(uuid.NewV4())
+}
+
+func SinceAndUntil() (time.Time, time.Time) {
+	since := Time()
+	until := Time()
+
+	if since.After(until) {
+		since, until = until, since
+	}
+
+	return since, until
 }
 
 func Time() time.Time {
@@ -58,7 +74,7 @@ func URL(useHTTPS bool, domainLength uint16) *url.URL {
 	}
 	scheme += "://"
 
-	scheme += AlphaNumeric(int(domainLength))
+	scheme += AlphaNumericn(int(domainLength))
 	url, err := url.Parse(scheme)
 	if err != nil {
 		panic(err)
@@ -95,4 +111,28 @@ func Duration() domain.YearWithSemesterDuration {
 
 func Bool() bool {
 	return rand.Int()%2 == 0
+}
+
+func OptBool() optional.Bool {
+	return optional.NewBool(Bool(), Bool())
+}
+
+func OptInt64() optional.Int64 {
+	return optional.NewInt64(rand.Int63(), Bool())
+}
+
+func OptAlphaNumericn(n int) optional.String {
+	return optional.NewString(AlphaNumericn(n), Bool())
+}
+
+func OptAlphaNumeric() optional.String {
+	return optional.NewString(AlphaNumeric(), Bool())
+}
+
+func OptTime() optional.Time {
+	return optional.NewTime(Time(), Bool())
+}
+
+func OptURLString() optional.String {
+	return optional.NewString(RandURLString(), Bool())
 }

@@ -1,16 +1,14 @@
-package handler_test
+package handler
 
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -19,22 +17,14 @@ var (
 	errInternal = errors.New("internal error")
 )
 
-func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, handler.API) {
+func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockProjectService(ctrl)
-	api := handler.NewAPI(nil, nil, handler.NewProjectHandler(s), nil, nil, nil)
+	api := NewAPI(nil, nil, NewProjectHandler(s), nil, nil, nil)
 
 	return s, api
-}
-
-// 0 first semester, 1 second semester
-func makeYearWithSemester(s int) domain.YearWithSemester {
-	return domain.YearWithSemester{
-		Year:     random.Time().Year(),
-		Semester: s,
-	}
 }
 
 func TestProjectHandler_GetAll(t *testing.T) {
@@ -42,62 +32,57 @@ func TestProjectHandler_GetAll(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) ([]*handler.Project, string)
+		setup      func(s *mock_service.MockProjectService) ([]*Project, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) ([]*handler.Project, string) {
-				sinceSem := rand.Intn(2)
-				untilSem := rand.Intn(2)
-				duration := domain.YearWithSemesterDuration{
-					Since: makeYearWithSemester(sinceSem),
-					Until: makeYearWithSemester(untilSem),
-				}
+			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
+				duration := random.Duration()
 				repo := []*domain.Project{
 					{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:        random.AlphaNumeric(),
 						Duration:    duration,
-						Description: random.AlphaNumeric(rand.Intn(30) + 1),
+						Description: random.AlphaNumeric(),
 						Link:        random.RandURLString(),
 						Members: []*domain.ProjectMember{
 							{
 								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-								RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+								Name:     random.AlphaNumeric(),
+								RealName: random.AlphaNumeric(),
 								Duration: random.Duration(),
 							},
 						},
 					},
 					{
 						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:        random.AlphaNumeric(),
 						Duration:    duration,
-						Description: random.AlphaNumeric(rand.Intn(30) + 1),
+						Description: random.AlphaNumeric(),
 						Link:        random.RandURLString(),
 						Members: []*domain.ProjectMember{
 							{
 								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-								RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+								Name:     random.AlphaNumeric(),
+								RealName: random.AlphaNumeric(),
 								Duration: random.Duration(),
 							},
 						},
 					},
 				}
 
-				var reqBody []*handler.Project
+				var reqBody []*Project
 				for _, v := range repo {
-					reqBody = append(reqBody, &handler.Project{
-						Duration: handler.YearWithSemesterDuration{
-							Since: handler.YearWithSemester{
-								Semester: handler.Semester(sinceSem),
+					reqBody = append(reqBody, &Project{
+						Duration: YearWithSemesterDuration{
+							Since: YearWithSemester{
 								Year:     v.Duration.Since.Year,
+								Semester: Semester(v.Duration.Since.Semester),
 							},
-							Until: &handler.YearWithSemester{
-								Semester: handler.Semester(untilSem),
+							Until: &YearWithSemester{
 								Year:     v.Duration.Until.Year,
+								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
 						Id:   v.ID,
@@ -112,7 +97,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) ([]*handler.Project, string) {
+			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
 				s.EXPECT().GetProjects(gomock.Any()).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
@@ -126,7 +111,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := []*handler.Project(nil)
+			hres := []*Project(nil)
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
@@ -141,64 +126,59 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (handler.ProjectDetail, string)
+		setup      func(s *mock_service.MockProjectService) (ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (handler.ProjectDetail, string) {
-				sinceSem := rand.Intn(2)
-				untilSem := rand.Intn(2)
-				duration := domain.YearWithSemesterDuration{
-					Since: makeYearWithSemester(sinceSem),
-					Until: makeYearWithSemester(untilSem),
-				}
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.Project{
 					ID:          projectID,
-					Name:        random.AlphaNumeric(rand.Intn(30) + 1),
+					Name:        random.AlphaNumeric(),
 					Duration:    duration,
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
 						{
 							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-							RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
 							Duration: random.Duration(),
 						},
 					},
 				}
 
-				var members []handler.ProjectMember
+				var members []ProjectMember
 				for _, v := range repo.Members {
-					members = append(members, handler.ProjectMember{
-						User: handler.User{
+					members = append(members, ProjectMember{
+						User: User{
 							Id:       v.UserID,
 							Name:     v.Name,
 							RealName: v.RealName,
 						},
-						Duration: handler.YearWithSemesterDuration{
-							Since: handler.YearWithSemester{
+						Duration: YearWithSemesterDuration{
+							Since: YearWithSemester{
 								Year:     v.Duration.Since.Year,
-								Semester: handler.Semester(v.Duration.Since.Semester),
+								Semester: Semester(v.Duration.Since.Semester),
 							},
-							Until: &handler.YearWithSemester{
+							Until: &YearWithSemester{
 								Year:     v.Duration.Until.Year,
-								Semester: handler.Semester(v.Duration.Until.Semester),
+								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
 					})
 				}
-				reqBody := handler.ProjectDetail{
-					Project: handler.Project{
-						Duration: handler.YearWithSemesterDuration{
-							Since: handler.YearWithSemester{
-								Semester: handler.Semester(sinceSem),
+				reqBody := ProjectDetail{
+					Project: Project{
+						Duration: YearWithSemesterDuration{
+							Since: YearWithSemester{
+								Semester: Semester(repo.Duration.Since.Semester),
 								Year:     repo.Duration.Since.Year,
 							},
-							Until: &handler.YearWithSemester{
-								Semester: handler.Semester(untilSem),
+							Until: &YearWithSemester{
+								Semester: Semester(repo.Duration.Until.Semester),
 								Year:     repo.Duration.Until.Year,
 							},
 						},
@@ -217,10 +197,10 @@ func TestProjectHandler_GetByID(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (handler.ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, errInternal)
-				return handler.ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
 		},
@@ -232,7 +212,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := handler.ProjectDetail{}
+			hres := ProjectDetail{}
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion

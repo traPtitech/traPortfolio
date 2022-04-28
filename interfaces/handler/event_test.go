@@ -1,4 +1,4 @@
-package handler_test
+package handler
 
 import (
 	"errors"
@@ -10,18 +10,17 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupEventMock(t *testing.T) (*mock_service.MockEventService, handler.API) {
+func setupEventMock(t *testing.T) (*mock_service.MockEventService, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	s := mock_service.NewMockEventService(ctrl)
-	api := handler.NewAPI(nil, nil, nil, handler.NewEventHandler(s), nil, nil)
+	api := NewAPI(nil, nil, nil, NewEventHandler(s), nil, nil)
 
 	return s, api
 }
@@ -30,28 +29,29 @@ func TestEventHandler_GetAll(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService) (hres []*handler.Event, path string)
+		setup      func(s *mock_service.MockEventService) (hres []*Event, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockEventService) (hres []*handler.Event, path string) {
+			setup: func(s *mock_service.MockEventService) (hres []*Event, path string) {
 
 				casenum := 2
 				repoEvents := []*domain.Event{}
-				hresEvents := []*handler.Event{}
+				hresEvents := []*Event{}
 
 				for i := 0; i < casenum; i++ {
+					since, until := random.SinceAndUntil()
 					revent := domain.Event{
 						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
+						Name:      random.AlphaNumeric(),
+						TimeStart: since,
+						TimeEnd:   until,
 					}
-					hevent := handler.Event{
+					hevent := Event{
 						Id:   revent.ID,
 						Name: revent.Name,
-						Duration: handler.Duration{
+						Duration: Duration{
 							Since: revent.TimeStart,
 							Until: &revent.TimeEnd,
 						},
@@ -69,7 +69,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockEventService) (hres []*handler.Event, path string) {
+			setup: func(s *mock_service.MockEventService) (hres []*Event, path string) {
 				s.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
@@ -83,7 +83,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 
 			hresEvents, path := tt.setup(s)
 
-			var resBody []*handler.Event
+			var resBody []*Event
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -96,23 +96,23 @@ func TestEventHandler_GetAll(t *testing.T) {
 func TestEventHandler_GetByID(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService, hostnum int) (hres *handler.EventDetail, eventpath string)
+		setup      func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(s *mock_service.MockEventService, hostnum int) (hres *handler.EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
 
 				rHost := []*domain.User{}
-				hHost := []handler.User{}
+				hHost := []User{}
 
 				for i := 0; i < hostnum; i++ {
 					rhost := domain.User{
 						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(rand.Intn(30) + 1),
-						RealName: random.AlphaNumeric(rand.Intn(30) + 1),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
 					}
-					hhost := handler.User{
+					hhost := User{
 						Id:       rhost.ID,
 						Name:     rhost.Name,
 						RealName: rhost.RealName,
@@ -123,28 +123,28 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 				}
 
+				since, until := random.SinceAndUntil()
 				revent := domain.EventDetail{
-
 					Event: domain.Event{
 						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(rand.Intn(30) + 1),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
+						Name:      random.AlphaNumeric(),
+						TimeStart: since,
+						TimeEnd:   until,
 					},
 
-					Description: random.AlphaNumeric(rand.Intn(30) + 1),
-					Place:       random.AlphaNumeric(rand.Intn(30) + 1),
+					Description: random.AlphaNumeric(),
+					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
 					HostName:    rHost,
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}
 
-				hevent := handler.EventDetail{
-					Event: handler.Event{
+				hevent := EventDetail{
+					Event: Event{
 						Id:   revent.Event.ID,
 						Name: revent.Event.Name,
-						Duration: handler.Duration{
+						Duration: Duration{
 							Since: revent.Event.TimeStart,
 							Until: &revent.Event.TimeEnd,
 						},
@@ -153,7 +153,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 					Description: revent.Description,
 					Place:       revent.Place,
 					Hostname:    hHost,
-					EventLevel:  handler.EventLevel(revent.Level),
+					EventLevel:  EventLevel(revent.Level),
 				}
 
 				repoEvent := &revent
@@ -168,7 +168,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockEventService, hostnum int) (hres *handler.EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
 				id := random.UUID()
 				s.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
@@ -183,7 +183,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 			s, api := setupEventMock(t)
 
 			casenum := []int{1, 2, 32}
-			var resBody *handler.EventDetail
+			var resBody *EventDetail
 
 			for _, testcase := range casenum {
 				hresEvent, eventpath := tt.setup(s, testcase)
@@ -201,23 +201,23 @@ func TestEventHandler_GetByID(t *testing.T) {
 func TestEventHandler_PatchEvent(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService) (reqBody *handler.EditEvent, path string)
+		setup      func(s *mock_service.MockEventService) (reqBody *EditEvent, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &handler.EditEvent{
+				reqBody := &EditEvent{
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -229,18 +229,18 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &handler.EditEvent{
+				reqBody := &EditEvent{
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -252,18 +252,18 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &handler.EditEvent{
+				reqBody := &EditEvent{
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -275,18 +275,18 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: bind error",
-			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &handler.EditEvent{
+				reqBody := &EditEvent{
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
@@ -298,18 +298,18 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockEventService) (*handler.EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := handler.EventLevel(eventLevelUint)
+				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &handler.EditEvent{
+				reqBody := &EditEvent{
 					EventLevel: &eventLevelHandler,
 				}
 
-				args := repository.UpdateEventLevelArg{
+				args := repository.UpdateEventLevelArgs{
 					Level: eventLevelDomain,
 				}
 
