@@ -339,31 +339,88 @@ func TestAddUserAccount(t *testing.T) {
 	}
 }
 
-// // EditUserAccount PATCH /users/:userID/accounts/:accountID
-// func TestEditUserAccount(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		accountID  uuid.UUID
-// 		reqBody    handler.EditUserAccountJSONRequestBody
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// EditUserAccount PATCH /users/:userID/accounts/:accountID
+func TestEditUserAccount(t *testing.T) {
+	var (
+		displayName = random.AlphaNumeric()
+		prPermitted = random.Bool()
+		atype       = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		url         = random.RandURLString()
+	)
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_edit_user_account")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-// 			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		accountID  uuid.UUID
+		reqBody    handler.EditUserAccountJSONRequestBody
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.HMockUser1.Id,
+			mockdata.HMockAccount.Id,
+			handler.EditUserAccountJSONRequestBody{
+				DisplayName: &displayName,
+				PrPermitted: (*handler.PrPermitted)(&prPermitted),
+				Type:        (*handler.AccountType)(&atype),
+				Url:         &url,
+			},
+			nil,
+		},
+		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
+			http.StatusNoContent,
+			mockdata.HMockUser1.Id,
+			mockdata.HMockAccount.Id,
+			handler.EditUserAccountJSONRequestBody{},
+			nil,
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.HMockAccount.Id,
+			handler.EditUserAccountJSONRequestBody{},
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"400 invalid accountID": {
+			http.StatusBadRequest,
+			mockdata.HMockUser1.Id,
+			uuid.Nil,
+			handler.EditUserAccountJSONRequestBody{},
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 user not found": {
+			http.StatusNotFound,
+			random.UUID(),
+			random.UUID(),
+			handler.EditUserAccountJSONRequestBody{
+				DisplayName: &displayName,
+			},
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+		"404 account not found": {
+			http.StatusNotFound,
+			mockdata.HMockUser1.Id,
+			random.UUID(),
+			handler.EditUserAccountJSONRequestBody{
+				DisplayName: &displayName,
+			},
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_edit_user_account")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
 // // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
 // func TestDeleteUserAccount(t *testing.T) {
