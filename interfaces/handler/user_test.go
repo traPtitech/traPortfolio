@@ -897,61 +897,93 @@ func TestUserHandler_DeleteAccount(t *testing.T) {
 	}
 }
 
-/*
-func TestUserHandler_DeleteAccount(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := DeleteAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserDeleteAccount() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestUserHandler_GetProjects(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
+
+				userID := random.UUID()
+
+				repoProjects := []*domain.UserProject{}
+				hresProjects := []*UserProject{}
+
+				for i := 0; i < casenum; i++ {
+
+					//TODO: DurationはUserDurationを包含しているべき
+					rproject := domain.UserProject{
+						ID:           random.UUID(),
+						Name:         random.AlphaNumeric(),
+						Duration:     random.Duration(),
+						UserDuration: random.Duration(),
+					}
+
+					hproject := UserProject{
+						Project: Project{
+							Duration: YearWithSemesterDuration{
+								Since: YearWithSemester{
+									Semester: Semester(rproject.Duration.Since.Semester),
+									Year:     rproject.Duration.Since.Year,
+								},
+								Until: &YearWithSemester{
+									Semester: Semester(rproject.Duration.Until.Semester),
+									Year:     rproject.Duration.Until.Year,
+								},
+							},
+							Id:   rproject.ID,
+							Name: rproject.Name,
+						},
+						UserDuration: YearWithSemesterDuration{
+							Since: YearWithSemester{
+								Semester: Semester(rproject.UserDuration.Since.Semester),
+								Year:     rproject.UserDuration.Since.Year,
+							},
+							Until: &YearWithSemester{
+								Semester: Semester(rproject.UserDuration.Until.Semester),
+								Year:     rproject.UserDuration.Until.Year,
+							},
+						},
+					}
+
+					repoProjects = append(repoProjects, &rproject)
+					hresProjects = append(hresProjects, &hproject)
+
+				}
+
+				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(repoProjects, nil)
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return hresProjects, path
+
+			},
+			statusCode: http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := GetProjects(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserGetProjects() error = %v, wantErr %v", err, tt.wantErr)
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			casenum := []int{1, 2, 32}
+
+			for _, testcase := range casenum {
+
+				hresUsers, path := tt.setup(s, testcase)
+				var resBody []*UserProject
+				statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+				// Assertion
+				assert.Equal(t, tt.statusCode, statusCode)
+				assert.Equal(t, hresUsers, resBody)
 			}
 		})
 	}
 }
 
+/*
 func TestUserHandler_GetUsers(t *testing.T) {
 	type fields struct {
 		srv service.UserService
