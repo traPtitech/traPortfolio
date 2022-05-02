@@ -667,34 +667,152 @@ func TestUserHandler_AddAccount(t *testing.T) {
 	}
 }
 
-/*
 func TestUserHandler_PatchAccount(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService) (reqBody *AddUserAccountJSONBody, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+				accountType := int64(rand.Intn(int(domain.AccountLimit)))
+				accountPermit := random.Bool()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(accountPermit),
+					Type:        AccountType(accountType),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.UpdateAccountArgs{
+					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					Type:        optional.Int64From(&accountType),
+					URL:         optional.StringFrom(&reqBody.Url),
+					PrPermitted: optional.BoolFrom(&accountPermit),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(nil)
+				return &reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Forbidden",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+				accountType := int64(domain.AccountLimit)
+				accountPermit := random.Bool()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(accountPermit),
+					Type:        AccountType(accountType),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.UpdateAccountArgs{
+					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					Type:        optional.Int64From(&accountType),
+					URL:         optional.StringFrom(&reqBody.Url),
+					PrPermitted: optional.BoolFrom(&accountPermit),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(repository.ErrForbidden)
+				return &reqBody, path
+			},
+			statusCode: http.StatusForbidden,
+		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+				accountType := int64(domain.AccountLimit)
+				accountPermit := random.Bool()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(accountPermit),
+					Type:        AccountType(accountType),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.UpdateAccountArgs{
+					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					Type:        optional.Int64From(&accountType),
+					URL:         optional.StringFrom(&reqBody.Url),
+					PrPermitted: optional.BoolFrom(&accountPermit),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(repository.ErrNotFound)
+				return &reqBody, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID1",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.AlphaNumericn(36)
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID2",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+
+				userID := random.UUID()
+				accountID := random.AlphaNumericn(36)
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := PatchAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserPatchAccount() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			reqBody, path := tt.setup(s)
+
+			statusCode, _ := doRequest(t, api, http.MethodPatch, path, reqBody, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
 		})
 	}
 }
 
+/*
 func TestUserHandler_DeleteAccount(t *testing.T) {
 	type fields struct {
 		srv service.UserService
