@@ -41,11 +41,12 @@ func TestEventHandler_GetAll(t *testing.T) {
 				hresEvents := []*Event{}
 
 				for i := 0; i < casenum; i++ {
+					since, until := random.SinceAndUntil()
 					revent := domain.Event{
 						ID:        random.UUID(),
 						Name:      random.AlphaNumeric(),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
+						TimeStart: since,
+						TimeEnd:   until,
 					}
 					hevent := Event{
 						Id:   revent.ID,
@@ -122,13 +123,13 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 				}
 
+				since, until := random.SinceAndUntil()
 				revent := domain.EventDetail{
-
 					Event: domain.Event{
 						ID:        random.UUID(),
 						Name:      random.AlphaNumeric(),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
+						TimeStart: since,
+						TimeEnd:   until,
 					},
 
 					Description: random.AlphaNumeric(),

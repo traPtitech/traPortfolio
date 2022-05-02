@@ -110,12 +110,13 @@ var (
 func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 	t.Helper()
 
+	since, until := random.SinceAndUntil()
 	d := domain.ContestDetail{
 		Contest: domain.Contest{
 			ID:        getContestID[0],
 			Name:      random.AlphaNumeric(),
-			TimeStart: random.Time(),
-			TimeEnd:   random.Time(),
+			TimeStart: since,
+			TimeEnd:   until,
 		},
 		Link:        random.RandURLString(),
 		Description: random.AlphaNumeric(),
@@ -238,10 +239,11 @@ func TestContestHandler_PostContest(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
-					random.Time(),
-					random.Time(),
+					since,
+					until,
 					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
@@ -280,10 +282,11 @@ func TestContestHandler_PostContest(t *testing.T) {
 		{
 			name: "Bad Request: invalid url",
 			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
-					random.Time(),
-					random.Time(),
+					since,
+					until,
 					random.AlphaNumeric(),
 					random.AlphaNumeric(),
 				)
@@ -295,10 +298,11 @@ func TestContestHandler_PostContest(t *testing.T) {
 		{
 			name: "Conflict",
 			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
-					random.Time(),
-					random.Time(),
+					since,
+					until,
 					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
@@ -346,8 +350,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 				name := random.AlphaNumeric()
 				link := random.RandURLString()
 				description := random.AlphaNumeric()
-				since := random.Time()
-				until := random.Time()
+				since, until := random.SinceAndUntil()
 				reqBody := &EditContestJSONRequestBody{
 					Name:        &name,
 					Link:        &link,
@@ -384,14 +387,15 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		// 	name: "BadRequest: Invalid URL",
 		// 	setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
 		// 		contestID := random.UUID()
+		//    since, until := random.SinceAndUntil()
 		// 		reqBody := &EditContestJSONRequestBody{
 		// 			ContestID:   contestID,
 		// 			Name:        ptr(t,random.AlphaNumeric(rand.Intn(30) + 1)),
 		// 			Link:        random.AlphaNumeric(rand.Intn(30) + 1),
 		// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
 		// 			Duration: OptionalDuration{
-		// 				Since: optional.TimeFrom(random.Time()),
-		// 				Until: optional.TimeFrom(random.Time()),
+		// 				Since: optional.TimeFrom(since),
+		// 				Until: optional.TimeFrom(until),
 		// 			},
 		// 		}
 		// 		args := repository.UpdateContestArgs{

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"math/rand"
-	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -31,6 +30,11 @@ func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFi
 }
 
 func TestEventRepository_GetEvents(t *testing.T) {
+	var (
+		since1, until1 = random.SinceAndUntil()
+		since2, until2 = random.SinceAndUntil()
+	)
+
 	t.Parallel()
 	tests := []struct {
 		name      string
@@ -44,14 +48,14 @@ func TestEventRepository_GetEvents(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since1,
+					TimeEnd:   until1,
 				},
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since2,
+					TimeEnd:   until2,
 				},
 			},
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
@@ -86,6 +90,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 }
 
 func TestEventRepository_GetEvent(t *testing.T) {
+	since, until := random.SinceAndUntil()
+
 	t.Parallel()
 	type args struct {
 		id uuid.UUID
@@ -106,8 +112,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				Event: domain.Event{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since,
+					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelPrivate,
@@ -118,7 +124,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
 				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "level"}).
@@ -147,8 +153,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				Event: domain.Event{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since,
+					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
@@ -159,7 +165,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
 				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(gorm.ErrRecordNotFound)
 			},
@@ -176,8 +182,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					Event: domain.Event{
 						ID:        random.UUID(),
 						Name:      random.AlphaNumeric(),
-						TimeStart: random.Time(),
-						TimeEnd:   random.Time(),
+						TimeStart: since,
+						TimeEnd:   until,
 					},
 					Place:       random.AlphaNumeric(),
 					Level:       domain.EventLevelPrivate,
@@ -187,7 +193,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					RoomID:      random.UUID(),
 				}
 				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(&ed), nil)
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(errUnexpected)
 			},
@@ -232,6 +238,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
+				since, until := random.SinceAndUntil()
 				event := external.EventResponse{
 					ID:          args.args.EventID,
 					Name:        random.AlphaNumeric(),
@@ -239,13 +246,13 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 					Place:       random.AlphaNumeric(),
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
-					TimeStart:   random.Time(),
-					TimeEnd:     random.Time(),
+					TimeStart:   since,
+					TimeEnd:     until,
 					SharedRoom:  random.Bool(),
 				}
 				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(&event, nil)
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `event_level_relations` (`id`,`level`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
+				f.h.Mock.ExpectExec(makeSQLQueryRegexp("INSERT INTO `event_level_relations` (`id`,`level`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
 					WithArgs(args.args.EventID, args.args.Level, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
@@ -274,6 +281,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
+				since, until := random.SinceAndUntil()
 				event := external.EventResponse{
 					ID:          args.args.EventID,
 					Name:        random.AlphaNumeric(),
@@ -281,13 +289,13 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 					Place:       random.AlphaNumeric(),
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
-					TimeStart:   random.Time(),
-					TimeEnd:     random.Time(),
+					TimeStart:   since,
+					TimeEnd:     until,
 					SharedRoom:  random.Bool(),
 				}
 				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(&event, nil)
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `event_level_relations` (`id`,`level`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
+				f.h.Mock.ExpectExec(makeSQLQueryRegexp("INSERT INTO `event_level_relations` (`id`,`level`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
 					WithArgs(args.args.EventID, args.args.Level, anyTime{}, anyTime{}).
 					WillReturnError(gorm.ErrRegistered)
 				f.h.Mock.ExpectRollback()
@@ -333,13 +341,13 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "level"}).
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
-				f.h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
+				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.arg.Level, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
@@ -356,7 +364,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(gorm.ErrRecordNotFound)
 				f.h.Mock.ExpectRollback()
@@ -373,7 +381,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "level"}).
@@ -393,13 +401,13 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "level"}).
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
-				f.h.Mock.ExpectExec(regexp.QuoteMeta("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
+				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.arg.Level, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
@@ -423,6 +431,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 }
 
 func TestEventRepository_GetUserEvents(t *testing.T) {
+	since1, until1 := random.SinceAndUntil()
+	since2, until2 := random.SinceAndUntil()
 	t.Parallel()
 	type args struct {
 		userID uuid.UUID
@@ -443,14 +453,14 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since1,
+					TimeEnd:   until1,
 				},
 				{
 					ID:        random.UUID(),
 					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
+					TimeStart: since2,
+					TimeEnd:   until2,
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {

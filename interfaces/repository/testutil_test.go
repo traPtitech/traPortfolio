@@ -3,6 +3,8 @@ package repository
 import (
 	"database/sql/driver"
 	"errors"
+	"fmt"
+	"regexp"
 	"testing"
 	"time"
 
@@ -37,6 +39,10 @@ func (a anyUUID) Match(v driver.Value) bool {
 func validUUIDStr(s string) bool {
 	_, err := uuid.FromString(s)
 	return err == nil
+}
+
+func makeSQLQueryRegexp(query string) string {
+	return fmt.Sprintf("^%s$", regexp.QuoteMeta(query))
 }
 
 func makeKnoqEvents(events []*domain.Event) []*external.EventResponse {

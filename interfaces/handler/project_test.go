@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"testing"
 
@@ -28,14 +27,6 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-// 0 first semester, 1 second semester
-func makeYearWithSemester(s int) domain.YearWithSemester {
-	return domain.YearWithSemester{
-		Year:     random.Time().Year(),
-		Semester: s,
-	}
-}
-
 func TestProjectHandler_GetAll(t *testing.T) {
 	t.Parallel()
 
@@ -47,12 +38,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
-				sinceSem := rand.Intn(2)
-				untilSem := rand.Intn(2)
-				duration := domain.YearWithSemesterDuration{
-					Since: makeYearWithSemester(sinceSem),
-					Until: makeYearWithSemester(untilSem),
-				}
+				duration := random.Duration()
 				repo := []*domain.Project{
 					{
 						ID:          random.UUID(),
@@ -91,12 +77,12 @@ func TestProjectHandler_GetAll(t *testing.T) {
 					reqBody = append(reqBody, &Project{
 						Duration: YearWithSemesterDuration{
 							Since: YearWithSemester{
-								Semester: Semester(sinceSem),
 								Year:     v.Duration.Since.Year,
+								Semester: Semester(v.Duration.Since.Semester),
 							},
 							Until: &YearWithSemester{
-								Semester: Semester(untilSem),
 								Year:     v.Duration.Until.Year,
+								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
 						Id:   v.ID,
@@ -146,12 +132,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
-				sinceSem := rand.Intn(2)
-				untilSem := rand.Intn(2)
-				duration := domain.YearWithSemesterDuration{
-					Since: makeYearWithSemester(sinceSem),
-					Until: makeYearWithSemester(untilSem),
-				}
+				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.Project{
 					ID:          projectID,
@@ -193,11 +174,11 @@ func TestProjectHandler_GetByID(t *testing.T) {
 					Project: Project{
 						Duration: YearWithSemesterDuration{
 							Since: YearWithSemester{
-								Semester: Semester(sinceSem),
+								Semester: Semester(repo.Duration.Since.Semester),
 								Year:     repo.Duration.Since.Year,
 							},
 							Until: &YearWithSemester{
-								Semester: Semester(untilSem),
+								Semester: Semester(repo.Duration.Until.Semester),
 								Year:     repo.Duration.Until.Year,
 							},
 						},
