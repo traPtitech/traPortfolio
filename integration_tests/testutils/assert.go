@@ -28,7 +28,7 @@ func AssertResponse(t *testing.T, expectedStatusCode int, expectedBody interface
 	case []byte:
 		assert.Equal(t, expected, actual.Bytes())
 	case nil:
-		assert.Empty(t, actual.Bytes())
+		assert.Empty(t, actual.String())
 	default:
 		b, err := json.Marshal(expected)
 		assert.NoError(t, err)
@@ -58,4 +58,22 @@ func OptSyncID(t *testing.T, expectedBodyPtr interface{}, res *httptest.Response
 	v.Set(tmp)
 
 	return nil
+}
+
+func OptRetrieveID(idPtr *uuid.UUID) Option {
+	return func(t *testing.T, expectedBodyPtr interface{}, res *httptest.ResponseRecorder) error {
+		t.Helper()
+
+		m := struct {
+			ID uuid.UUID `json:"id"`
+		}{}
+
+		if err := json.Unmarshal(res.Body.Bytes(), &m); err != nil {
+			return err
+		}
+
+		*idPtr = m.ID
+
+		return nil
+	}
 }

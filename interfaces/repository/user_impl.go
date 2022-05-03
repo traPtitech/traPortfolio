@@ -329,10 +329,23 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 }
 
 func (repo *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID) error {
-	if err := repo.h.
-		Where(&model.Account{ID: accountID, UserID: userID}).
-		Delete(&domain.Account{}).
-		Error(); err != nil {
+	if err := repo.h.Transaction(func(tx database.SQLHandler) error {
+		if err := tx.
+			Where(&model.Account{ID: accountID, UserID: userID}).
+			First(&model.Account{}).
+			Error(); err != nil {
+			return convertError(err)
+		}
+
+		if err := tx.
+			Where(&model.Account{ID: accountID, UserID: userID}).
+			Delete(&domain.Account{}).
+			Error(); err != nil {
+			return convertError(err)
+		}
+
+		return nil
+	}); err != nil {
 		return convertError(err)
 	}
 
