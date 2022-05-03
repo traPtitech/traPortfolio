@@ -324,7 +324,7 @@ func TestUserHandler_Update(t *testing.T) {
 	}
 }
 
-func TestUserHandler_GetAccounts(t *testing.T) {
+func TestUserHandler_GetUserAccounts(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*Account, path string)
@@ -430,7 +430,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 	}
 }
 
-func TestUserHandler_GetAccount(t *testing.T) {
+func TestUserHandler_GetUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *Account, path string)
@@ -527,7 +527,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_AddAccount(t *testing.T) {
+func TestUserHandler_AddUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *AddUserAccountJSONBody, expectedResBody Account, path string)
@@ -667,7 +667,7 @@ func TestUserHandler_AddAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_PatchAccount(t *testing.T) {
+func TestUserHandler_PatchUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *EditUserAccountJSONBody, path string)
