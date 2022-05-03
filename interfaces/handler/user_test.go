@@ -667,7 +667,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_PatchUserAccount(t *testing.T) {
+func TestUserHandler_EditUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *EditUserAccountJSONBody, path string)
