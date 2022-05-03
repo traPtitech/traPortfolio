@@ -707,7 +707,7 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 			},
 			statusCode: http.StatusNoContent,
 		},
-		{
+		/*{
 			name: "Forbidden",
 			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
@@ -717,30 +717,30 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
-				//argsPermit := PrPermitted(accountPermit)
-				//argsType := AccountType(accountType)
+				argsPermit := PrPermitted(accountPermit)
+				argsType := AccountType(accountType)
+				argsUrl := random.RandURLString()
 
-				/*
-					reqBody := EditUserAccountJSONBody{
-						DisplayName: &argsName,
-						PrPermitted: &argsPermit,
-						Type:        &argsType,
-						Url:         &argsUrl,
-					}
-				*/
+				reqBody := EditUserAccountJSONBody{
+					DisplayName: &argsName,
+					PrPermitted: &argsPermit,
+					Type:        &argsType,
+					Url:         &argsUrl,
+				}
+
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         random.OptURLString(),
+					URL:         optional.StringFrom(&argsUrl),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(repository.ErrForbidden)
-				return nil, path
+				return &reqBody, path
 			},
 			statusCode: http.StatusForbidden,
-		},
+		},*/
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
@@ -751,27 +751,27 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
-				//argsPermit := PrPermitted(accountPermit)
-				//argsType := AccountType(accountType)
+				argsPermit := PrPermitted(accountPermit)
+				argsType := AccountType(accountType)
+				argsUrl := random.RandURLString()
 
-				/*
-					reqBody := EditUserAccountJSONBody{
-						DisplayName: &argsName,
-						PrPermitted: &argsPermit,
-						Type:        &argsType,
-						Url:         &argsUrl,
-					}*/
+				reqBody := EditUserAccountJSONBody{
+					DisplayName: &argsName,
+					PrPermitted: &argsPermit,
+					Type:        &argsType,
+					Url:         &argsUrl,
+				}
 
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         random.OptURLString(),
+					URL:         optional.StringFrom(&argsUrl),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(repository.ErrNotFound)
-				return nil, path
+				return &reqBody, path
 			},
 			statusCode: http.StatusNotFound,
 		},
