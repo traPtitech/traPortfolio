@@ -21,8 +21,7 @@ func main() {
 	}
 
 	if appConf.IsMigrate() {
-		log.Println("finished")
-
+		log.Println("migration finished")
 		return
 	}
 
