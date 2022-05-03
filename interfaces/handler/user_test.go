@@ -812,7 +812,7 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_DeleteAccount(t *testing.T) {
+func TestUserHandler_DeleteUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (path string)
