@@ -685,19 +685,19 @@ func TestUserHandler_PatchUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsUrl := random.RandURLString()
+				argsURL := random.RandURLString()
 
 				reqBody := EditUserAccountJSONBody{
 					DisplayName: &argsName,
 					PrPermitted: &argsPermit,
 					Type:        &argsType,
-					Url:         &argsUrl,
+					Url:         &argsURL,
 				}
 
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&argsUrl),
+					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
@@ -719,19 +719,19 @@ func TestUserHandler_PatchUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsUrl := random.RandURLString()
+				argsURL := random.RandURLString()
 
 				reqBody := EditUserAccountJSONBody{
 					DisplayName: &argsName,
 					PrPermitted: &argsPermit,
 					Type:        &argsType,
-					Url:         &argsUrl,
+					Url:         &argsURL,
 				}
 
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&argsUrl),
+					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
@@ -753,19 +753,19 @@ func TestUserHandler_PatchUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsUrl := random.RandURLString()
+				argsURL := random.RandURLString()
 
 				reqBody := EditUserAccountJSONBody{
 					DisplayName: &argsName,
 					PrPermitted: &argsPermit,
 					Type:        &argsType,
-					Url:         &argsUrl,
+					Url:         &argsURL,
 				}
 
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&argsUrl),
+					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
