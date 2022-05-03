@@ -1,4 +1,5 @@
 port: 1323
+production: false
 db:
   user: 'root'
   pass: 'password'
