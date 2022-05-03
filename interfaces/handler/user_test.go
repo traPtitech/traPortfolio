@@ -324,7 +324,7 @@ func TestUserHandler_Update(t *testing.T) {
 	}
 }
 
-func TestUserHandler_GetAccounts(t *testing.T) {
+func TestUserHandler_GetUserAccounts(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*Account, path string)
@@ -430,7 +430,7 @@ func TestUserHandler_GetAccounts(t *testing.T) {
 	}
 }
 
-func TestUserHandler_GetAccount(t *testing.T) {
+func TestUserHandler_GetUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *Account, path string)
@@ -527,7 +527,7 @@ func TestUserHandler_GetAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_AddAccount(t *testing.T) {
+func TestUserHandler_AddUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *AddUserAccountJSONBody, expectedResBody Account, path string)
@@ -667,32 +667,37 @@ func TestUserHandler_AddAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_PatchAccount(t *testing.T) {
+func TestUserHandler_EditUserAccount(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *AddUserAccountJSONBody, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUserAccountJSONBody, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := int64(rand.Intn(int(domain.AccountLimit)))
 				accountPermit := random.Bool()
 
-				reqBody := AddUserAccountJSONBody{
-					DisplayName: random.AlphaNumeric(),
-					PrPermitted: PrPermitted(accountPermit),
-					Type:        AccountType(accountType),
-					Url:         random.RandURLString(),
+				argsName := random.AlphaNumeric()
+				argsPermit := PrPermitted(accountPermit)
+				argsType := AccountType(accountType)
+				argsURL := random.RandURLString()
+
+				reqBody := EditUserAccountJSONBody{
+					DisplayName: &argsName,
+					PrPermitted: &argsPermit,
+					Type:        &argsType,
+					Url:         &argsURL,
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&reqBody.Url),
+					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
@@ -702,26 +707,31 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 			},
 			statusCode: http.StatusNoContent,
 		},
-		{
+		/*{
 			name: "Forbidden",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := int64(domain.AccountLimit)
 				accountPermit := random.Bool()
 
-				reqBody := AddUserAccountJSONBody{
-					DisplayName: random.AlphaNumeric(),
-					PrPermitted: PrPermitted(accountPermit),
-					Type:        AccountType(accountType),
-					Url:         random.RandURLString(),
+				argsName := random.AlphaNumeric()
+				argsPermit := PrPermitted(accountPermit)
+				argsType := AccountType(accountType)
+				argsURL := random.RandURLString()
+
+				reqBody := EditUserAccountJSONBody{
+					DisplayName: &argsName,
+					PrPermitted: &argsPermit,
+					Type:        &argsType,
+					Url:         &argsURL,
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&reqBody.Url),
+					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
@@ -730,27 +740,32 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 				return &reqBody, path
 			},
 			statusCode: http.StatusForbidden,
-		},
+		},*/
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := int64(domain.AccountLimit)
 				accountPermit := random.Bool()
 
-				reqBody := AddUserAccountJSONBody{
-					DisplayName: random.AlphaNumeric(),
-					PrPermitted: PrPermitted(accountPermit),
-					Type:        AccountType(accountType),
-					Url:         random.RandURLString(),
+				argsName := random.AlphaNumeric()
+				argsPermit := PrPermitted(accountPermit)
+				argsType := AccountType(accountType)
+				argsURL := random.RandURLString()
+
+				reqBody := EditUserAccountJSONBody{
+					DisplayName: &argsName,
+					PrPermitted: &argsPermit,
+					Type:        &argsType,
+					Url:         &argsURL,
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&reqBody.DisplayName),
+					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&reqBody.Url),
+					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.BoolFrom(&accountPermit),
 				}
 
@@ -762,7 +777,7 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
@@ -774,7 +789,7 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
@@ -786,7 +801,7 @@ func TestUserHandler_PatchAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID2",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
