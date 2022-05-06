@@ -1003,8 +1003,8 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		accountID uuid.UUID
 		userID    uuid.UUID
+		accountID uuid.UUID
 	}
 	tests := []struct {
 		name      string
@@ -1015,8 +1015,8 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				accountID: random.UUID(),
 				userID:    random.UUID(),
+				accountID: random.UUID(),
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
@@ -1033,6 +1033,22 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
+			name: "NotFound",
+			args: args{
+				userID:    random.UUID(),
+				accountID: random.UUID(),
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnError(gorm.ErrRecordNotFound)
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
 			name: "UnexpectedError",
 			args: args{
 				accountID: random.UUID(),
@@ -1040,6 +1056,10 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
 					WithArgs(args.userID, args.accountID).
 					WillReturnError(errUnexpected)
