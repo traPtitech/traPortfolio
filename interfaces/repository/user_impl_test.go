@@ -1020,8 +1020,13 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectExec(makeSQLQueryRegexp("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
-					WithArgs(args.userID, args.accountID).
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				f.h.Mock.
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
+					WithArgs(args.accountID, args.userID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -1053,7 +1058,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
+			tt.assertion(t, repo.DeleteAccount(tt.args.userID, tt.args.accountID))
 		})
 	}
 }
