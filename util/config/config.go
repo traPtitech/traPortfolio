@@ -86,7 +86,10 @@ func init() {
 
 func Parse() {
 	pflag.Parse()
+	ReadFromFile()
+}
 
+func ReadFromFile() {
 	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
 	_ = viper.BindPFlag("port", pflag.Lookup("port"))
 	_ = viper.BindPFlag("migration", pflag.Lookup("migration"))
