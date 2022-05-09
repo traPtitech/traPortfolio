@@ -443,6 +443,12 @@ func TestDeleteUserAccount(t *testing.T) {
 			handler.ConvertError(t, repository.ErrValidate),
 			false,
 		},
+		"404 user not found": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+			false,
+		},
 		"404 account not found": {
 			http.StatusNotFound,
 			mockdata.HMockUser1.Id,
