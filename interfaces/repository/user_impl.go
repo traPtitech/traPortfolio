@@ -339,7 +339,7 @@ func (repo *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID)
 
 		if err := tx.
 			Where(&model.Account{ID: accountID, UserID: userID}).
-			Delete(&domain.Account{}).
+			Delete(&model.Account{}).
 			Error(); err != nil {
 			return convertError(err)
 		}
