@@ -130,7 +130,7 @@ func Parse() {
 				log.Fatal("cannot load config from ", configPath)
 			}
 
-			log.Printf("config file does not found %s", err)
+			log.Printf("config file does not found %s", err.Error())
 		} else {
 			// Config file was found but another error was produced
 			log.Fatal("cannot load config", err)
