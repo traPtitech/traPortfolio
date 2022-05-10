@@ -119,7 +119,7 @@ func Parse() {
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		if err, ok := err.(viper.ConfigFileNotFoundError); ok {
+		if notFoundErr, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error if desired
 
 			// exit if configPath is explicitly specified and fails to load.
@@ -127,7 +127,7 @@ func Parse() {
 				log.Fatal("cannot load config from ", configPath)
 			}
 
-			log.Printf("config file does not found %s", err.Error())
+			log.Printf("config file does not found %s", notFoundErr.Error())
 		} else {
 			// Config file was found but another error was produced
 			log.Fatal("cannot load config", err)
