@@ -26,6 +26,10 @@ func main() {
 	}
 
 	if appConf.InsertMock() {
+		if !appConf.IsDevelopment() {
+			log.Fatal("cannot specify both `production` and `insert-mock-data`")
+		}
+
 		if err := mockdata.InsertSampleDataToDB(h); err != nil {
 			log.Fatal(err)
 		}
