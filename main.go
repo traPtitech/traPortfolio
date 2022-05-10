@@ -13,23 +13,22 @@ import (
 func main() {
 	config.Parse()
 	appConf := config.GetConfig()
+	s := appConf.SQLConf()
+	// migration
+	h, err := infrastructure.NewSQLHandler(s)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if appConf.IsMigrate() {
-		s := appConf.SQLConf()
-		h, err := infrastructure.NewSQLHandler(s)
-		if err != nil {
+		log.Println("migration finished")
+		return
+	}
+
+	if appConf.IsDevelopment() {
+		if err := mockdata.InsertSampleDataToDB(h); err != nil {
 			log.Fatal(err)
 		}
-
-		if appConf.IsDevelopment() {
-			if err := mockdata.InsertSampleDataToDB(h); err != nil {
-				log.Fatal(err)
-			}
-		}
-
-		log.Println("finished")
-
-		return
 	}
 
 	api, err := infrastructure.InjectAPIServer(appConf, appConf.IsDevelopment())
