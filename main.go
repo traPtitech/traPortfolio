@@ -25,7 +25,7 @@ func main() {
 		return
 	}
 
-	if appConf.IsDevelopment() {
+	if appConf.InsertMock() {
 		if err := mockdata.InsertSampleDataToDB(h); err != nil {
 			log.Fatal(err)
 		}
