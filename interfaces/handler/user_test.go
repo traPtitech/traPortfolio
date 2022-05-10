@@ -827,6 +827,91 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 	}
 }
 
+func TestUserHandler_DeleteUserAccount(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockUserService) (path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockUserService) string {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().DeleteAccount(gomock.Any(), userID, accountID).Return(nil)
+				return path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Forbidden",
+			setup: func(s *mock_service.MockUserService) string {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().DeleteAccount(gomock.Any(), userID, accountID).Return(repository.ErrForbidden)
+				return path
+			},
+			statusCode: http.StatusForbidden,
+		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService) string {
+
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				s.EXPECT().DeleteAccount(gomock.Any(), userID, accountID).Return(repository.ErrNotFound)
+				return path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID1",
+			setup: func(s *mock_service.MockUserService) string {
+
+				userID := random.AlphaNumericn(36)
+				accountID := random.UUID()
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID2",
+			setup: func(s *mock_service.MockUserService) string {
+
+				userID := random.UUID()
+				accountID := random.AlphaNumericn(36)
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+				return path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			path := tt.setup(s)
+
+			statusCode, _ := doRequest(t, api, http.MethodDelete, path, nil, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+		})
+	}
+}
+
 /*
 func TestUserHandler_DeleteAccount(t *testing.T) {
 	type fields struct {
