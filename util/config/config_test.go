@@ -12,9 +12,10 @@ func TestParse(t *testing.T) {
 	Parse()
 
 	expected := Config{
-		IsProduction: true,
-		Port:         3000,
-		Migrate:      true,
+		IsProduction:   true,
+		Port:           3000,
+		Migrate:        true,
+		InsertMockData: true,
 		DB: SQLConfig{
 			User:    "root",
 			Pass:    "password",

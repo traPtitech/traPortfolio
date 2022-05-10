@@ -30,9 +30,10 @@ var (
 type (
 	// Immutable except within this package or EditFunc
 	Config struct {
-		IsProduction bool `mapstructure:"production"`
-		Port         int  `mapstructure:"port"`
-		Migrate      bool `mapstructure:"migrate"`
+		IsProduction   bool `mapstructure:"production"`
+		Port           int  `mapstructure:"port"`
+		Migrate        bool `mapstructure:"migrate"`
+		InsertMockData bool `mapstructure:"insertMockData"`
 
 		DB     SQLConfig    `mapstructure:"db"`
 		Traq   TraqConfig   `mapstructure:"traq"`
@@ -67,6 +68,7 @@ func init() {
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", defaultAppPort, "api port")
 	pflag.Bool("migrate", false, "run with migrate mode")
+	pflag.Bool("insert-mock-data", false, "insert sample mock data(for dev)")
 
 	pflag.String("db-user", "", "db user name")
 	pflag.String("db-pass", "", "db password")
@@ -86,10 +88,14 @@ func init() {
 
 func Parse() {
 	pflag.Parse()
+	ReadFromFile()
+}
 
+func ReadFromFile() {
 	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
 	_ = viper.BindPFlag("port", pflag.Lookup("port"))
 	_ = viper.BindPFlag("migration", pflag.Lookup("migration"))
+	_ = viper.BindPFlag("insertMockData", pflag.Lookup("insert-mock-data"))
 
 	_ = viper.BindPFlag("db.user", pflag.Lookup("db-user"))
 	_ = viper.BindPFlag("db.pass", pflag.Lookup("db-pass"))
@@ -119,7 +125,7 @@ func Parse() {
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		if err, ok := err.(viper.ConfigFileNotFoundError); ok {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error if desired
 
 			// exit if configPath is explicitly specified and fails to load.
@@ -127,10 +133,10 @@ func Parse() {
 				log.Fatal("cannot load config from ", configPath)
 			}
 
-			log.Printf("config file does not found %s", err.Error())
+			log.Printf("config file does not found: %v", err)
 		} else {
 			// Config file was found but another error was produced
-			log.Fatal("cannot load config", err)
+			log.Fatalf("cannot load config: %v", err)
 		}
 	} else {
 		log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
@@ -183,6 +189,10 @@ func (c *Config) Addr() string {
 
 func (c *Config) IsMigrate() bool {
 	return c.Migrate
+}
+
+func (c *Config) InsertMock() bool {
+	return c.InsertMockData
 }
 
 func (c *Config) SQLConf() *SQLConfig {
