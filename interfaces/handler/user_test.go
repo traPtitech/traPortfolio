@@ -776,18 +776,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			statusCode: http.StatusNotFound,
 		},
 		{
-			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
-
-				userID := random.UUID()
-				accountID := random.UUID()
-
-				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				return nil, path
-			},
-			statusCode: http.StatusBadRequest,
-		},
-		{
 			name: "Bad Request: validate error: nonUUID1",
 			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
