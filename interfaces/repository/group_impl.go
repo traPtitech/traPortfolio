@@ -60,24 +60,24 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		})
 	}
 
-	var group model.Group
-	if err := repo.h.Preload("UserGroupAdmin").Where(&model.Group{GroupID: groupID}).First(&group).Error(); err != nil {
+	admins := make([]*model.GroupUserAdmin, 0)
+	if err := repo.h.Preload("Group").Where(&model.GroupUserAdmin{GroupID: groupID}).First(&admins).Error(); err != nil {
 		return nil, convertError(err)
 	}
 
-	erAdmin := make([]*domain.User, 0, len(group.Admin))
-	for _, v := range group.Admin {
+	erAdmin := make([]*domain.User, 0, len(admins))
+	for _, v := range admins {
 		erAdmin = append(erAdmin, &domain.User{ID: v.UserID})
 	}
 
 	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
 		ID:          groupID,
-		Name:        group.Name,
-		Link:        group.Link,
+		Name:        "kari name",
+		Link:        "kari link",
 		Admin:       erAdmin,
 		Members:     erMembers,
-		Description: group.Description,
+		Description: "kari description",
 	}
 	return result, nil
 }

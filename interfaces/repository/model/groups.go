@@ -42,6 +42,8 @@ func (*GroupUserBelonging) TableName() string {
 type GroupUserAdmin struct {
 	UserID  uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	GroupID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+
+	Group Group `gorm:"foreignKey:GroupID"`
 }
 
 func (*GroupUserAdmin) TableName() string {

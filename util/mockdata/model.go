@@ -190,6 +190,11 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
+	mockGroupUserAdmin := CloneMockGroupUserAdmin()
+	if err := h.Create(&mockGroupUserAdmin).Error(); err != nil {
+		return err
+	}
+
 	mockProjectMember := CloneMockProjectMember()
 	if err := h.Create(&mockProjectMember).Error(); err != nil {
 		return err
