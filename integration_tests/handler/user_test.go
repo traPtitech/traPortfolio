@@ -422,30 +422,69 @@ func TestEditUserAccount(t *testing.T) {
 	}
 }
 
-// // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
-// func TestDeleteUserAccount(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		accountID  uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// DeleteUserAccount DELETE /users/:userID/accounts/:accountID
+func TestDeleteUserAccount(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode    int
+		userID        uuid.UUID
+		want          interface{}
+		needInsertion bool
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.HMockUser1.Id,
+			nil,
+			true,
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+			false,
+		},
+		"404 user not found": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+			false,
+		},
+		"404 account not found": {
+			http.StatusNotFound,
+			mockdata.HMockUser1.Id,
+			handler.ConvertError(t, repository.ErrNotFound),
+			false,
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_delete_user_account")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-// 			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, tt.accountID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_delete_user_account")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			accountID := random.UUID()
+			if tt.needInsertion {
+				reqBody := handler.AddUserAccountJSONRequestBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: handler.PrPermitted(random.Bool()),
+					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
+					Url:         random.RandURLString(),
+				}
+				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
+				testutils.AssertResponse(t, http.StatusCreated, handler.Account{
+					DisplayName: reqBody.DisplayName,
+					PrPermitted: reqBody.PrPermitted,
+					Type:        reqBody.Type,
+					Url:         reqBody.Url,
+				}, res, testutils.OptSyncID, testutils.OptRetrieveID(&accountID))
+			}
+			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, accountID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
 // // GetUserProjects GET /users/:userID/projects
 // func TestGetUserProjects(t *testing.T) {

@@ -222,7 +222,8 @@ func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
-	return c.NoContent(http.StatusOK)
+
+	return c.NoContent(http.StatusNoContent)
 }
 
 // GetUserProjects GET /users/:userID/projects
