@@ -1,6 +1,7 @@
 production: true
 port: 3000
 migrate: true
+insertMockData: true
 db:
   user: 'root'
   pass: 'password'
