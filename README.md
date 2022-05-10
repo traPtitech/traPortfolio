@@ -42,15 +42,11 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-If you do not specify `--production` flag(by default), sample data will be inserted into the database and mock service is used.
-
 ### Set Up test DB (with Docker, port:3307)
 
 ```bash
 make up-test-db
 ```
-
-If you do not specify `--production` flag(by default), sample data will be inserted into the database and mock service is used.
 
 ### Remove test DB
 
