@@ -699,8 +699,6 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args, tt.want)
