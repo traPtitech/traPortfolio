@@ -1133,6 +1133,79 @@ func TestUserRepository_GetProjects(t *testing.T) {
 	}
 }
 
+func TestUserRepository_GetGroupsByUserID(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      []*domain.GroupUser
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.GroupUser)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{userID: random.UUID()},
+			want: []*domain.GroupUser{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					Duration: random.Duration(),
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+				rows := sqlmock.NewRows([]string{"id", "group_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"})
+				for _, v := range want {
+					d := v.Duration
+					rows.AddRow(random.UUID(), v.ID, args.userID, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+				for _, v := range want {
+					f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ?")).
+						WithArgs(v.ID).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"group_id", "name"}).
+								AddRow(v.ID, v.Name),
+						)
+				}
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{userID: random.UUID()},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.h, f.portal, f.traq)
+			// Assertion
+			got, err := repo.GetGroupsByUserID(tt.args.userID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestUserRepository_GetContests(t *testing.T) {
 	t.Parallel()
 	type args struct {
