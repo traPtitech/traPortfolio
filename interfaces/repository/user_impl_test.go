@@ -1156,7 +1156,6 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
-				// TODO
 				rows := sqlmock.NewRows([]string{"id", "group_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, v := range want {
 					d := v.Duration
@@ -1167,12 +1166,11 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 					WithArgs(args.userID).
 					WillReturnRows(rows)
 				for _, v := range want {
-					d := v.Duration
 					f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ?")).
 						WithArgs(v.ID).
 						WillReturnRows(
-							sqlmock.NewRows([]string{"group_id", "name", "since_year", "since_semester", "until_year", "until_semester", "created_at", "updated_at"}).
-								AddRow(v.ID, v.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester, time.Now(), time.Now()),
+							sqlmock.NewRows([]string{"group_id", "name"}).
+								AddRow(v.ID, v.Name),
 						)
 				}
 			},
