@@ -649,6 +649,68 @@ func TestUserService_GetUserContests(t *testing.T) {
 	}
 }
 
+func TestUserService_GetGroupsByUserID(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		ctx    context.Context
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      []*domain.GroupUser
+		setup     func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				ctx:    context.Background(),
+				userID: random.UUID(),
+			},
+			want: []*domain.GroupUser{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					Duration: random.Duration(),
+				},
+			},
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser) {
+				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Notfound",
+			args: args{
+				ctx:    context.Background(),
+				userID: random.UUID(),
+			},
+			want: nil,
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser) {
+				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, repository.ErrNotFound)
+			},
+			assertion: assert.Error,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			repo := mock_repository.NewMockUserRepository(ctrl)
+			event := mock_repository.NewMockEventRepository(ctrl)
+			tt.setup(repo, event, tt.args, tt.want)
+
+			s := NewUserService(repo, event)
+			got, err := s.GetGroupsByUserID(tt.args.ctx, tt.args.userID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestUserService_GetUserEvents(t *testing.T) {
 	t.Parallel()
 	type args struct {
