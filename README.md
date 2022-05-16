@@ -42,15 +42,11 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-(Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
-
 ### Set Up test DB (with Docker, port:3307)
 
 ```bash
 make up-test-db
 ```
-
-(Optional) By running the server with a `--migrate` flag, sample data will be inserted into the database.
 
 ### Remove test DB
 

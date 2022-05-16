@@ -9,7 +9,7 @@ import (
 
 func ParseConfig(path string) {
 	viper.AddConfigPath(path)
-	config.Parse()
+	config.ReadFromFile()
 }
 
 func GetConfig() *config.Config {
