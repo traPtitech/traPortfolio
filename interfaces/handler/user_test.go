@@ -1021,34 +1021,75 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 	}
 }
 
-/*
-func TestUserHandler_GetUsers(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
+func TestUserHandler_GetUserContests(t *testing.T) {
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string) {
+
+				userID := random.UUID()
+
+				repoContests := []*domain.UserContest{}
+				hresContests := []*ContestTeamWithContestName{}
+
+				for i := 0; i < casenum; i++ {
+
+					//TODO: DurationはUserDurationを包含しているべき
+					rcontest := domain.UserContest{
+						ID:          random.UUID(),
+						Name:        random.AlphaNumeric(),
+						Result:      random.AlphaNumeric(),
+						ContestName: random.AlphaNumeric(),
+					}
+
+					hcontest := ContestTeamWithContestName{
+						ContestTeam: ContestTeam{
+							Id:     rcontest.ID,
+							Name:   rcontest.Name,
+							Result: rcontest.Result,
+						},
+						ContestName: rcontest.ContestName,
+					}
+
+					repoContests = append(repoContests, &rcontest)
+					hresContests = append(hresContests, &hcontest)
+
+				}
+
+				s.EXPECT().GetUserContests(gomock.Any(), userID).Return(repoContests, nil)
+				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
+				return hresContests, path
+
+			},
+			statusCode: http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := GetUsers(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserGetUsers() error = %v, wantErr %v", err, tt.wantErr)
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			casenum := []int{1, 2, 32}
+
+			for _, testcase := range casenum {
+
+				hresUsers, path := tt.setup(s, testcase)
+				var resBody []*ContestTeamWithContestName
+				statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+				// Assertion
+				assert.Equal(t, tt.statusCode, statusCode)
+				assert.Equal(t, hresUsers, resBody)
 			}
 		})
 	}
 }
 
+/*
 func TestUserHandler_GetGroupsByUserID(t *testing.T) {
 	type fields struct {
 		srv service.UserService
