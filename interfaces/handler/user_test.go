@@ -900,7 +900,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 	}
 }
 
-func TestUserHandler_GetProjects(t *testing.T) {
+func TestUserHandler_GetUserProjects(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string)
