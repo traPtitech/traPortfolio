@@ -13,8 +13,6 @@ type Group struct {
 	Description string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
-
-	Admin []*GroupUserAdmin `gorm:"foreignKey:UserID"`
 }
 
 func (*Group) TableName() string {
