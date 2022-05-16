@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http/httptest"
-	"sync"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -18,18 +17,13 @@ import (
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
-var mu sync.Mutex
-
 func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API, error) {
 	t.Helper()
 
 	db := SetupDB(t, conf.SQLConf())
-
-	mu.Lock()
 	if err := mockdata.InsertSampleDataToDB(db); err != nil {
 		return nil, err
 	}
-	mu.Unlock()
 
 	api, err := infrastructure.InjectAPIServer(conf, true)
 	if err != nil {
