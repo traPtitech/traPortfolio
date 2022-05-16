@@ -1067,6 +1067,29 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string) {
+
+				userID := random.UUID()
+
+				s.EXPECT().GetUserContests(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
+				return nil, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string) {
+
+				userID := random.AlphaNumericn(36)
+
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
