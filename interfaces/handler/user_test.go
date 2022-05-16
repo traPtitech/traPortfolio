@@ -976,6 +976,29 @@ func TestUserHandler_GetProjects(t *testing.T) {
 			},
 			statusCode: http.StatusNotFound,
 		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
+
+				userID := random.UUID()
+
+				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(nil, repository.ErrValidate)
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: nonUUID",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
+
+				userID := random.AlphaNumericn(36)
+
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
