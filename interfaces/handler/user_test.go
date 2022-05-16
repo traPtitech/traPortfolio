@@ -964,6 +964,18 @@ func TestUserHandler_GetProjects(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
+
+				userID := random.UUID()
+
+				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return nil, path
+			},
+			statusCode: http.StatusNotFound,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
