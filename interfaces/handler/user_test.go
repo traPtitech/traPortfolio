@@ -997,6 +997,10 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 			for _, testcase := range casenum {
 
+				if tt.name != "success" && testcase != 1 {
+					continue
+				}
+
 				hresUsers, path := tt.setup(s, testcase)
 				var resBody []*UserProject
 				statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
