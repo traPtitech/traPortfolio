@@ -376,12 +376,12 @@ func TestEditUserAccount(t *testing.T) {
 		userID     uuid.UUID
 		accountID  uuid.UUID
 		reqBody    handler.EditUserAccountJSONRequestBody
-		want       interface{}
+		want       interface{} // nil | error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
-			mockdata.HMockAccount.Id,
+			testutils.MutableUUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 				PrPermitted: (*handler.PrPermitted)(&prPermitted),
@@ -393,7 +393,7 @@ func TestEditUserAccount(t *testing.T) {
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
-			mockdata.HMockAccount.Id,
+			testutils.MutableUUID(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
 		},
@@ -439,8 +439,44 @@ func TestEditUserAccount(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			if tt.statusCode == http.StatusNoContent {
+				// Insert & Assert
+				account := handler.Account{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: handler.PrPermitted(random.Bool()),
+					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
+					Url:         random.RandURLString(),
+				}
+				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
+					DisplayName: account.DisplayName,
+					PrPermitted: account.PrPermitted,
+					Type:        account.Type,
+					Url:         account.Url,
+				})
+				testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
+				account.Id = tt.accountID
+				// Update & Assert
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				// Get updated response & Assert
+				if tt.reqBody.DisplayName != nil {
+					account.DisplayName = *tt.reqBody.DisplayName
+				}
+				if tt.reqBody.PrPermitted != nil {
+					account.PrPermitted = *tt.reqBody.PrPermitted
+				}
+				if tt.reqBody.Type != nil {
+					account.Type = *tt.reqBody.Type
+				}
+				if tt.reqBody.Url != nil {
+					account.Url = *tt.reqBody.Url
+				}
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+				testutils.AssertResponse(t, http.StatusOK, account, res)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
 		})
 	}
 }
