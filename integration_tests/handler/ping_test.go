@@ -28,6 +28,7 @@ func TestPing(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Ping.Ping), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})

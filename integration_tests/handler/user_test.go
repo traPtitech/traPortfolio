@@ -76,6 +76,7 @@ func TestGetUsers(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -114,6 +115,7 @@ func TestGetUser(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID.String()), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -164,6 +166,7 @@ func TestUpdateUser(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID.String()), &tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -204,6 +207,7 @@ func TestGetUserAccounts(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccounts, tt.userID), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -264,6 +268,7 @@ func TestGetUserAccount(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -340,6 +345,7 @@ func TestAddUserAccount(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
 			switch tt.want.(type) {
 			case handler.Account:
@@ -428,6 +434,7 @@ func TestEditUserAccount(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -476,6 +483,7 @@ func TestDeleteUserAccount(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			accountID := random.UUID()
 			if tt.needInsertion {
 				reqBody := handler.AddUserAccountJSONRequestBody{
@@ -516,6 +524,7 @@ func TestDeleteUserAccount(t *testing.T) {
 // 	for name, tt := range tests {
 // 		tt := tt
 // 		t.Run(name, func(t *testing.T) {
+// 			t.Parallel()
 // 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
 // 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 // 		})
@@ -540,6 +549,7 @@ func TestDeleteUserAccount(t *testing.T) {
 // 	for name, tt := range tests {
 // 		tt := tt
 // 		t.Run(name, func(t *testing.T) {
+//    	t.Parallel()
 // 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
 // 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 // 		})
@@ -564,6 +574,7 @@ func TestDeleteUserAccount(t *testing.T) {
 // 	for name, tt := range tests {
 // 		tt := tt
 // 		t.Run(name, func(t *testing.T) {
+//			t.Parallel()
 // 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
 // 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 // 		})
@@ -588,6 +599,7 @@ func TestDeleteUserAccount(t *testing.T) {
 // 	for name, tt := range tests {
 // 		tt := tt
 // 		t.Run(name, func(t *testing.T) {
+//			t.Parallel()
 // 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
 // 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 // 		})
