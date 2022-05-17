@@ -237,7 +237,19 @@ func TestGetUserAccount(t *testing.T) {
 			uuid.Nil,
 			handler.ConvertError(t, repository.ErrValidate),
 		},
-		"404": {
+		"404 userID not found": {
+			http.StatusNotFound,
+			random.UUID(),
+			mockdata.HMockAccount.Id,
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+		"404 accountID not found": {
+			http.StatusNotFound,
+			mockdata.HMockUser1.Id,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+		"404 both userID and accountID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
