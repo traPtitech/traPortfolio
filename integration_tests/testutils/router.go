@@ -9,12 +9,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API, error) {
@@ -55,4 +57,9 @@ func DoRequest(t *testing.T, e *echo.Echo, method string, path string, body inte
 	e.ServeHTTP(rec, req)
 
 	return rec
+}
+
+// OptRetrieveIDなどですぐに変更される可能性があるUUIDを生成する
+func MutableUUID() uuid.UUID {
+	return random.UUID()
 }

@@ -451,23 +451,27 @@ func TestDeleteUserAccount(t *testing.T) {
 	tests := map[string]struct {
 		statusCode    int
 		userID        uuid.UUID
+		accountID     uuid.UUID
 		want          interface{}
 		needInsertion bool
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
+			testutils.MutableUUID(),
 			nil,
 			true,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
+			random.UUID(),
 			handler.ConvertError(t, repository.ErrValidate),
 			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
+			random.UUID(),
 			random.UUID(),
 			handler.ConvertError(t, repository.ErrNotFound),
 			false,
@@ -475,6 +479,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		"404 account not found": {
 			http.StatusNotFound,
 			mockdata.HMockUser1.Id,
+			random.UUID(),
 			handler.ConvertError(t, repository.ErrNotFound),
 			false,
 		},
@@ -488,7 +493,6 @@ func TestDeleteUserAccount(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			accountID := random.UUID()
 			if tt.needInsertion {
 				reqBody := handler.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
@@ -502,9 +506,9 @@ func TestDeleteUserAccount(t *testing.T) {
 					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
 					Url:         reqBody.Url,
-				}, res, testutils.OptSyncID, testutils.OptRetrieveID(&accountID))
+				}, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
 			}
-			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, accountID), nil)
+			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, tt.accountID), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
