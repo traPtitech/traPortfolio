@@ -347,9 +347,13 @@ func TestAddUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
-			switch tt.want.(type) {
+			switch want := tt.want.(type) {
 			case handler.Account:
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
+				if tt.statusCode == http.StatusCreated {
+					res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, want.Id), nil)
+					testutils.AssertResponse(t, http.StatusOK, want, res)
+				}
 			case error:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
