@@ -3,6 +3,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -116,7 +117,7 @@ func TestGetUser(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID.String()), nil)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
@@ -147,7 +148,7 @@ func TestUpdateUser(t *testing.T) {
 		},
 		"204 without changes": {
 			http.StatusNoContent,
-			mockdata.HMockUser1.Id,
+			mockdata.HMockUser2.Id,
 			handler.EditUser{},
 			nil,
 		},
@@ -167,8 +168,26 @@ func TestUpdateUser(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID.String()), &tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			if tt.statusCode == http.StatusNoContent {
+				// Get response before update
+				var user handler.UserDetail
+				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
+				assert.Equal(t, http.StatusOK, res.Code)
+				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &user)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
+				// Update & Assert
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				// Get updated response & Assert
+				if tt.reqBody.Bio != nil {
+					user.Bio = *tt.reqBody.Bio
+				}
+				// if tt.reqBody.Check != nil {} // TODO: Checkに応じて処理を書く
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
+				testutils.AssertResponse(t, http.StatusOK, user, res)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
 		})
 	}
 }
