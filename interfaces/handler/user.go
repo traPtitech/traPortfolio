@@ -129,7 +129,7 @@ func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 		res[i] = newAccount(v.ID, v.DisplayName, v.Type, v.URL, v.PrPermitted)
 	}
 
-	return c.JSON(http.StatusOK, accounts)
+	return c.JSON(http.StatusOK, res)
 }
 
 // GetUserAccount GET /users/:userID/accounts/:accountID
@@ -222,6 +222,7 @@ func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 	if err != nil {
 		return convertError(err)
 	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
@@ -279,13 +280,13 @@ func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 // GetUserGroups GET /users/:userID/groups
 func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	c := _c.(*Context)
-	req := GroupIDInPath{}
+	req := UserIDInPath{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	groups, err := handler.srv.GetGroupsByUserID(ctx, req.GroupID)
+	groups, err := handler.srv.GetGroupsByUserID(ctx, req.UserID)
 	if err != nil {
 		return convertError(err)
 	}

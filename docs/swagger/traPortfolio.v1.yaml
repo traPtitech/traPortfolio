@@ -651,7 +651,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditAccount'
+              $ref: '#/components/schemas/EditUserAccount'
         description: ''
       tags:
         - user
@@ -1452,8 +1452,8 @@ components:
         - prPermitted
         - url
         - displayName
-    EditAccount:
-      title: EditAccount
+    EditUserAccount:
+      title: EditUserAccount
       type: object
       description: アカウント変更リクエスト
       properties:
@@ -1466,7 +1466,7 @@ components:
           description: アカウントurl
           format: uri
           x-oapi-codegen-extra-tags:
-            validate: url
+            validate: omitempty,url # TODO: requiredになるので暫定的にomitemptyタグで対処
         displayName:
           type: string
           description: 外部アカウントの表示名
