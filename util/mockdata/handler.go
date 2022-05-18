@@ -4,18 +4,18 @@ import "github.com/traPtitech/traPortfolio/interfaces/handler"
 
 var (
 	HMockUser1 = handler.User{
-		Id:       MockUsers[0].ID,
-		Name:     MockUsers[0].Name,
+		Id:       userID1,
+		Name:     userName1,
 		RealName: MockPortalUsers[0].RealName,
 	}
 	HMockUser2 = handler.User{
-		Id:       MockUsers[1].ID,
-		Name:     MockUsers[1].Name,
+		Id:       userID2,
+		Name:     userName2,
 		RealName: MockPortalUsers[1].RealName,
 	}
 	HMockUser3 = handler.User{
-		Id:       MockUsers[2].ID,
-		Name:     MockUsers[2].Name,
+		Id:       userID3,
+		Name:     userName2,
 		RealName: MockPortalUsers[2].RealName,
 	}
 

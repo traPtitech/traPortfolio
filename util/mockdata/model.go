@@ -3,7 +3,6 @@ package mockdata
 import (
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
@@ -14,22 +13,22 @@ var (
 	CloneMockUsers = func() []*model.User {
 		return []*model.User{
 			{
-				ID:          uuid.FromStringOrNil("11111111-1111-1111-1111-111111111111"),
+				ID:          userID1,
 				Description: "I am user1",
 				Check:       true,
-				Name:        "user1",
+				Name:        userName1,
 			},
 			{
-				ID:          uuid.FromStringOrNil("22222222-2222-2222-2222-222222222222"),
+				ID:          userID2,
 				Description: "I am user2",
 				Check:       true,
-				Name:        "user2",
+				Name:        userName2,
 			},
 			{
-				ID:          uuid.FromStringOrNil("33333333-3333-3333-3333-333333333333"),
+				ID:          userID3,
 				Description: "I am lolico",
 				Check:       false,
-				Name:        "lolico",
+				Name:        userName3,
 			},
 		}
 	}
@@ -37,11 +36,11 @@ var (
 	MockAccount      = CloneMockAccount()
 	CloneMockAccount = func() model.Account {
 		return model.Account{
-			ID:     uuid.FromStringOrNil("d834e180-2af9-4cfe-838a-8a3930666490"),
+			ID:     accountID,
 			Type:   0,
 			Name:   "sample_account_display_name",
 			URL:    "https://sample.accounts.com",
-			UserID: MockUsers[0].ID,
+			UserID: userID1,
 			Check:  true,
 		}
 	}
@@ -49,7 +48,7 @@ var (
 	MockContest      = CloneMockContest()
 	CloneMockContest = func() model.Contest {
 		return model.Contest{
-			ID:          uuid.FromStringOrNil("08eec963-0f29-48d1-929f-004cb67d8ce6"),
+			ID:          contestID,
 			Name:        "sample_contest_name",
 			Description: "sample_contest_description",
 			Link:        "https://sample.contests.com",
@@ -61,8 +60,8 @@ var (
 	MockContestTeam      = CloneMockContestTeam()
 	CloneMockContestTeam = func() model.ContestTeam {
 		return model.ContestTeam{
-			ID:          uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750d"),
-			ContestID:   MockContest.ID,
+			ID:          contestTeamID,
+			ContestID:   contestID,
 			Name:        "sample_contest_team_name",
 			Description: "sample_contest_team_description",
 			Result:      "sample_contest_team_result",
@@ -73,15 +72,15 @@ var (
 	MockContestTeamUserBelonging      = CloneMockContestTeam()
 	CloneMockContestTeamUserBelonging = func() model.ContestTeamUserBelonging {
 		return model.ContestTeamUserBelonging{
-			TeamID: MockContestTeam.ID,
-			UserID: MockUsers[0].ID,
+			TeamID: contestTeamID,
+			UserID: userID1,
 		}
 	}
 
 	MockEventLevelRelation      = CloneMockEventLevelRelation()
 	CloneMockEventLevelRelation = func() model.EventLevelRelation {
 		return model.EventLevelRelation{
-			ID:    uuid.FromStringOrNil("e32a0431-aa0e-4825-98e6-479912275bbd"),
+			ID:    eventID,
 			Level: domain.EventLevelPublic,
 		}
 	}
@@ -89,10 +88,10 @@ var (
 	MockGroup      = CloneMockGroup()
 	CloneMockGroup = func() model.Group {
 		return model.Group{
-			GroupID:     uuid.FromStringOrNil("455938b1-635f-4b43-ae74-66550b04c5d4"),
+			GroupID:     groupID,
 			Name:        "sample_group_name",
 			Link:        "https://sample.groups.com",
-			Leader:      uuid.FromStringOrNil("3a3cb018-76df-49e2-ad1b-85ee3a48c7e2"),
+			Leader:      userID1,
 			Description: "sample_group_description",
 		}
 	}
@@ -100,7 +99,7 @@ var (
 	MockGroupUserBelonging      = CloneMockGroupUserBelonging()
 	CloneMockGroupUserBelonging = func() model.GroupUserBelonging {
 		return model.GroupUserBelonging{
-			UserID:        MockUsers[0].ID,
+			UserID:        userID1,
 			GroupID:       MockGroup.GroupID,
 			SinceYear:     2022,
 			SinceSemester: 1,
@@ -112,7 +111,7 @@ var (
 	MockProject      = CloneMockProject()
 	CloneMockProject = func() model.Project {
 		return model.Project{
-			ID:            uuid.FromStringOrNil("bf9c1aec-7e3a-4587-8adc-651895aa6ec0"),
+			ID:            projectID,
 			Name:          "sample_project_name",
 			Description:   "sample_project_description",
 			Link:          "https://sample.projects.com",
@@ -126,9 +125,9 @@ var (
 	MockProjectMember      = CloneMockProjectMember()
 	CloneMockProjectMember = func() model.ProjectMember {
 		return model.ProjectMember{
-			ID:            uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c7"),
-			ProjectID:     MockProject.ID,
-			UserID:        MockUsers[0].ID,
+			ID:            projectMemberID,
+			ProjectID:     projectID,
+			UserID:        userID1,
 			SinceYear:     2022,
 			SinceSemester: 1,
 			UntilYear:     2022,
