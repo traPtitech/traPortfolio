@@ -59,7 +59,7 @@ func DoRequest(t *testing.T, e *echo.Echo, method string, path string, body inte
 	return rec
 }
 
-// OptRetrieveIDなどですぐに変更される可能性があるUUIDを生成する
-func MutableUUID() uuid.UUID {
+// OptRetrieveIDなどですぐに変更され得るUUIDであることの明示に使う
+func DummyUUID() uuid.UUID {
 	return random.UUID()
 }

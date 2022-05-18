@@ -369,10 +369,6 @@ func TestAddUserAccount(t *testing.T) {
 			switch want := tt.want.(type) {
 			case handler.Account:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
-				if tt.statusCode == http.StatusCreated {
-					res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, want.Id), nil)
-					testutils.AssertResponse(t, http.StatusOK, want, res)
-				}
 			case error:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
@@ -400,7 +396,7 @@ func TestEditUserAccount(t *testing.T) {
 		"204": {
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
-			testutils.MutableUUID(),
+			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 				PrPermitted: (*handler.PrPermitted)(&prPermitted),
@@ -412,7 +408,7 @@ func TestEditUserAccount(t *testing.T) {
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
-			testutils.MutableUUID(),
+			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
 		},
@@ -513,7 +509,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		"204": {
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
-			testutils.MutableUUID(),
+			testutils.DummyUUID(),
 			nil,
 			true,
 		},
