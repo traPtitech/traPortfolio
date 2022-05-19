@@ -65,12 +65,28 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 
 func CloneHandlerMockEvents() []handler.EventDetail {
 	var (
-		mEventLevel = CloneMockEventLevelRelation()
-		knoqEvents  = CloneMockKnoqEvents()
-		hEvents     = make([]handler.EventDetail, len(knoqEvents))
+		mEventLevels = CloneMockEventLevelRelations()
+		knoqEvents   = CloneMockKnoqEvents()
+		hEvents      = make([]handler.EventDetail, len(knoqEvents))
 	)
 
 	for i, e := range knoqEvents {
+		var (
+			eventLevel handler.EventLevel
+			hostname   = make([]handler.User, len(e.Admins))
+		)
+
+		for _, l := range mEventLevels {
+			if l.ID == e.ID {
+				eventLevel = handler.EventLevel(l.Level)
+				break
+			}
+		}
+
+		for j, uid := range e.Admins {
+			hostname[j] = getUser(uid).User
+		}
+
 		hEvents[i] = handler.EventDetail{
 			Event: handler.Event{
 				Duration: handler.Duration{
@@ -81,19 +97,9 @@ func CloneHandlerMockEvents() []handler.EventDetail {
 				Name: e.Name,
 			},
 			Description: e.Description,
-			Hostname:    make([]handler.User, len(e.Admins)),
+			EventLevel:  eventLevel,
+			Hostname:    hostname,
 			Place:       e.Place,
-		}
-
-		for j, uid := range e.Admins {
-			hEvents[i].Hostname[j] = getUser(uid).User
-		}
-
-		// TODO: 綺麗にする
-		if i == 0 {
-			hEvents[i].EventLevel = handler.EventLevel(mEventLevel.Level)
-		} else if i == 1 {
-			hEvents[i].EventLevel = handler.EventLevel(0)
 		}
 	}
 

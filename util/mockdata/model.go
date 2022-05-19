@@ -14,7 +14,7 @@ var (
 	MockContest                  = CloneMockContest()
 	MockContestTeam              = CloneMockContestTeam()
 	MockContestTeamUserBelonging = CloneMockContestTeam()
-	MockEventLevelRelation       = CloneMockEventLevelRelation()
+	MockEventLevelRelations      = CloneMockEventLevelRelations()
 	MockGroup                    = CloneMockGroup()
 	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
 	MockProject                  = CloneMockProject()
@@ -84,10 +84,16 @@ func CloneMockContestTeamUserBelonging() model.ContestTeamUserBelonging {
 	}
 }
 
-func CloneMockEventLevelRelation() model.EventLevelRelation {
-	return model.EventLevelRelation{
-		ID:    eventID,
-		Level: domain.EventLevelPublic,
+func CloneMockEventLevelRelations() []model.EventLevelRelation {
+	return []model.EventLevelRelation{
+		{
+			ID:    knoqEventID1,
+			Level: domain.EventLevelPublic,
+		},
+		{
+			ID:    knoqEventID2,
+			Level: domain.EventLevelPrivate,
+		},
 	}
 }
 
@@ -163,7 +169,7 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockEventLevelRelation := CloneMockEventLevelRelation()
+	mockEventLevelRelation := CloneMockEventLevelRelations()
 	if err := h.Create(&mockEventLevelRelation).Error(); err != nil {
 		return err
 	}
