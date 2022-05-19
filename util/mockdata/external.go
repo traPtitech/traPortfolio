@@ -14,7 +14,13 @@ type TraQUser struct {
 }
 
 var (
-	MockKnoqEvents = []*external.EventResponse{
+	MockKnoqEvents  = CloneMockKnoqEvents()
+	MockPortalUsers = CloneMockPortalUsers()
+	MockTraQUsers   = CloneMockTraQUsers()
+)
+
+func CloneMockKnoqEvents() []*external.EventResponse {
+	return []*external.EventResponse{
 		{
 			ID:          knoqEventID1,
 			Name:        "第n回進捗回",
@@ -46,7 +52,10 @@ var (
 			},
 		},
 	}
-	MockPortalUsers = []*external.PortalUserResponse{
+}
+
+func CloneMockPortalUsers() []*external.PortalUserResponse {
+	return []*external.PortalUserResponse{
 		{
 			TraQID:         userName1,
 			RealName:       userRealname1,
@@ -63,7 +72,10 @@ var (
 			AlphabeticName: "Noriko Azuma",
 		},
 	}
-	MockTraQUsers = []*TraQUser{
+}
+
+func CloneMockTraQUsers() []*TraQUser {
+	return []*TraQUser{
 		{
 			User: &external.TraQUserResponse{
 				ID:    userID1,
@@ -86,4 +98,4 @@ var (
 			Name: userName3,
 		},
 	}
-)
+}
