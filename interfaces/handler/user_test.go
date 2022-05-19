@@ -901,72 +901,89 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_GetUserProjects(t *testing.T) {
+
+	makeProjects := func(s *mock_service.MockUserService, projectsLen int) (hres []*UserProject, path string) {
+		userID := random.UUID()
+
+		repoProjects := []*domain.UserProject{}
+		hresProjects := []*UserProject{}
+
+		for i := 0; i < projectsLen; i++ {
+
+			//TODO: DurationはUserDurationを包含しているべき
+			rproject := domain.UserProject{
+				ID:           random.UUID(),
+				Name:         random.AlphaNumeric(),
+				Duration:     random.Duration(),
+				UserDuration: random.Duration(),
+			}
+
+			hproject := UserProject{
+				Project: Project{
+					Duration: YearWithSemesterDuration{
+						Since: YearWithSemester{
+							Semester: Semester(rproject.Duration.Since.Semester),
+							Year:     rproject.Duration.Since.Year,
+						},
+						Until: &YearWithSemester{
+							Semester: Semester(rproject.Duration.Until.Semester),
+							Year:     rproject.Duration.Until.Year,
+						},
+					},
+					Id:   rproject.ID,
+					Name: rproject.Name,
+				},
+				UserDuration: YearWithSemesterDuration{
+					Since: YearWithSemester{
+						Semester: Semester(rproject.UserDuration.Since.Semester),
+						Year:     rproject.UserDuration.Since.Year,
+					},
+					Until: &YearWithSemester{
+						Semester: Semester(rproject.UserDuration.Until.Semester),
+						Year:     rproject.UserDuration.Until.Year,
+					},
+				},
+			}
+
+			repoProjects = append(repoProjects, &rproject)
+			hresProjects = append(hresProjects, &hproject)
+
+		}
+
+		s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(repoProjects, nil)
+		path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+		return hresProjects, path
+	}
+
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*UserProject, path string)
 		statusCode int
 	}{
 		{
-			name: "success",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
-
-				userID := random.UUID()
-
-				repoProjects := []*domain.UserProject{}
-				hresProjects := []*UserProject{}
-
-				for i := 0; i < casenum; i++ {
-
-					//TODO: DurationはUserDurationを包含しているべき
-					rproject := domain.UserProject{
-						ID:           random.UUID(),
-						Name:         random.AlphaNumeric(),
-						Duration:     random.Duration(),
-						UserDuration: random.Duration(),
-					}
-
-					hproject := UserProject{
-						Project: Project{
-							Duration: YearWithSemesterDuration{
-								Since: YearWithSemester{
-									Semester: Semester(rproject.Duration.Since.Semester),
-									Year:     rproject.Duration.Since.Year,
-								},
-								Until: &YearWithSemester{
-									Semester: Semester(rproject.Duration.Until.Semester),
-									Year:     rproject.Duration.Until.Year,
-								},
-							},
-							Id:   rproject.ID,
-							Name: rproject.Name,
-						},
-						UserDuration: YearWithSemesterDuration{
-							Since: YearWithSemester{
-								Semester: Semester(rproject.UserDuration.Since.Semester),
-								Year:     rproject.UserDuration.Since.Year,
-							},
-							Until: &YearWithSemester{
-								Semester: Semester(rproject.UserDuration.Until.Semester),
-								Year:     rproject.UserDuration.Until.Year,
-							},
-						},
-					}
-
-					repoProjects = append(repoProjects, &rproject)
-					hresProjects = append(hresProjects, &hproject)
-
-				}
-
-				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(repoProjects, nil)
-				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
-				return hresProjects, path
-
+			name: "success 1",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+				return makeProjects(s, 1)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 2",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+				return makeProjects(s, 2)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 32",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+				return makeProjects(s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
 
 				userID := random.UUID()
 
@@ -977,20 +994,8 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			statusCode: http.StatusNotFound,
 		},
 		{
-			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
-
-				userID := random.UUID()
-
-				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(nil, repository.ErrValidate)
-				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
-				return nil, path
-			},
-			statusCode: http.StatusBadRequest,
-		},
-		{
-			name: "Bad Request: validate error: nonUUID",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*UserProject, path string) {
+			name: "Bad Request: validate error",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -1005,18 +1010,14 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			casenum := []int{1, 2, 32}
+			hresUsers, path := tt.setup(s)
+			var resBody []*UserProject
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
-			for _, testcase := range casenum {
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
 
-				hresUsers, path := tt.setup(s, testcase)
-				var resBody []*UserProject
-				statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
-
-				// Assertion
-				assert.Equal(t, tt.statusCode, statusCode)
-				assert.Equal(t, hresUsers, resBody)
-			}
 		})
 	}
 }
