@@ -18,7 +18,6 @@ var (
 	accountID         = uuid.FromStringOrNil("d834e180-2af9-4cfe-838a-8a3930666490")
 	contestID         = uuid.FromStringOrNil("08eec963-0f29-48d1-929f-004cb67d8ce6")
 	contestTeamID     = uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750d")
-	eventID           = uuid.FromStringOrNil("e32a0431-aa0e-4825-98e6-479912275bbd")
 	groupID           = uuid.FromStringOrNil("455938b1-635f-4b43-ae74-66550b04c5d4")
 	projectID         = uuid.FromStringOrNil("bf9c1aec-7e3a-4587-8adc-651895aa6ec0")
 	projectMemberID   = uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c7")
