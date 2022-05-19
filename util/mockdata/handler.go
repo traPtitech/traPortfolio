@@ -1,6 +1,9 @@
 package mockdata
 
-import "github.com/traPtitech/traPortfolio/interfaces/handler"
+import (
+	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
+)
 
 var (
 	HMockContest        = CloneHandlerMockContest()
@@ -42,8 +45,8 @@ func CloneHandlerMockContest() handler.ContestDetail {
 
 func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 	var (
-		mContestTeam = CloneMockContestTeam()
-		hUsers       = CloneHandlerMockUsers()
+		mContestTeam              = CloneMockContestTeam()
+		mContestTeamUserBelonging = CloneMockContestTeamUserBelonging()
 	)
 
 	return handler.ContestTeamDetail{
@@ -55,7 +58,7 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 		Description: mContestTeam.Description,
 		Link:        mContestTeam.Link,
 		Members: []handler.User{
-			hUsers[0].User,
+			getUser(mContestTeamUserBelonging.UserID).User,
 		},
 	}
 }
@@ -64,7 +67,6 @@ func CloneHandlerMockEvents() []handler.EventDetail {
 	var (
 		mEventLevel = CloneMockEventLevelRelation()
 		knoqEvents  = CloneMockKnoqEvents()
-		hUsers      = CloneHandlerMockUsers()
 		hEvents     = make([]handler.EventDetail, len(knoqEvents))
 	)
 
@@ -79,22 +81,19 @@ func CloneHandlerMockEvents() []handler.EventDetail {
 				Name: e.Name,
 			},
 			Description: e.Description,
+			Hostname:    make([]handler.User, len(e.Admins)),
 			Place:       e.Place,
+		}
+
+		for j, uid := range e.Admins {
+			hEvents[i].Hostname[j] = getUser(uid).User
 		}
 
 		// TODO: 綺麗にする
 		if i == 0 {
 			hEvents[i].EventLevel = handler.EventLevel(mEventLevel.Level)
-			hEvents[i].Hostname = []handler.User{
-				hUsers[0].User,
-			}
 		} else if i == 1 {
 			hEvents[i].EventLevel = handler.EventLevel(0)
-			hEvents[i].Hostname = []handler.User{
-				hUsers[0].User,
-				hUsers[1].User,
-				hUsers[2].User,
-			}
 		}
 	}
 
@@ -113,21 +112,20 @@ func CloneHandlerMockGroup() handler.GroupDetail {
 			Name: mGroup.Name,
 		},
 		Description: mGroup.Description,
-		// Leader:      hUsers[0].User, // TODO
-		Link:    mGroup.Link,
-		Members: hGroupMembers,
+		Leader:      getUser(mGroup.Leader).User,
+		Link:        mGroup.Link,
+		Members:     hGroupMembers,
 	}
 }
 
 func CloneHandlerMockGroupMembers() []handler.GroupMember {
 	var (
 		mGroupUserbelonging = CloneMockGroupUserBelonging()
-		hUsers              = CloneHandlerMockUsers()
 	)
 
 	return []handler.GroupMember{
 		{
-			User: hUsers[0].User,
+			User: getUser(mGroupUserbelonging.UserID).User,
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
 					Year:     mGroupUserbelonging.SinceYear,
@@ -160,14 +158,11 @@ func CloneHandlerMockProject() handler.ProjectDetail {
 }
 
 func CloneHandlerMockProjectMembers() []handler.ProjectMember {
-	var (
-		hUsers         = CloneHandlerMockUsers()
-		mProjectMember = CloneMockProjectMember()
-	)
+	var mProjectMember = CloneMockProjectMember()
 
 	return []handler.ProjectMember{
 		{
-			User: hUsers[0].User,
+			User: getUser(mProjectMember.UserID).User,
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
 					Year:     mProjectMember.Project.SinceYear,
@@ -257,4 +252,16 @@ func CloneHandlerMockUserProject() handler.UserProject {
 		Project:      hProject.Project,
 		UserDuration: hProjectMembers[0].Duration,
 	}
+}
+
+func getUser(userID uuid.UUID) handler.UserDetail {
+	var hUsers = CloneHandlerMockUsers()
+
+	for _, hUser := range hUsers {
+		if hUser.User.Id == userID {
+			return hUser
+		}
+	}
+
+	return handler.UserDetail{}
 }
