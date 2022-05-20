@@ -1103,7 +1103,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 				userID := random.AlphaNumericn(36)
 
-				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
 				return nil, path
 			},
 			statusCode: http.StatusBadRequest,
