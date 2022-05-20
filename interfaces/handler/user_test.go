@@ -1125,34 +1125,124 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 	}
 }
 
-/*
-func TestUserHandler_GetGroupsByUserID(t *testing.T) {
-	type fields struct {
-		srv service.UserService
+func TestUserHandler_GetUserGroups(t *testing.T) {
+
+	makeGroups := func(s *mock_service.MockUserService, projectsLen int) (hres []*UserGroup, path string) {
+		userID := random.UUID()
+
+		repoGroups := []*domain.GroupUser{}
+		hresGroups := []*UserGroup{}
+
+		for i := 0; i < projectsLen; i++ {
+
+			rgroup := domain.GroupUser{
+				ID:       random.UUID(),
+				Name:     random.AlphaNumeric(),
+				Duration: random.Duration(),
+			}
+
+			hgroup := UserGroup{
+				Group: Group{
+					Id:   rgroup.ID,
+					Name: rgroup.Name,
+				},
+				Duration: YearWithSemesterDuration{
+					Since: YearWithSemester{
+						Semester: Semester(rgroup.Duration.Since.Semester),
+						Year:     rgroup.Duration.Since.Year,
+					},
+					Until: &YearWithSemester{
+						Semester: Semester(rgroup.Duration.Until.Semester),
+						Year:     rgroup.Duration.Until.Year,
+					},
+				},
+			}
+
+			repoGroups = append(repoGroups, &rgroup)
+			hresGroups = append(hresGroups, &hgroup)
+
+		}
+
+		s.EXPECT().GetGroupsByUserID(gomock.Any(), userID).Return(repoGroups, nil)
+		path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
+		return hresGroups, path
+
 	}
-	type args struct {
-		_c echo.Context
-	}
+
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService) (hres []*UserGroup, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success 0",
+			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+				return makeGroups(s, 0)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 1",
+			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+				return makeGroups(s, 1)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 2",
+			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+				return makeGroups(s, 2)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 32",
+			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+				return makeGroups(s, 32)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+
+				userID := random.UUID()
+
+				s.EXPECT().GetGroupsByUserID(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
+				return nil, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+
+				userID := random.AlphaNumericn(36)
+
+				path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := GetGroupsByUserID(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserGetGroupsByUserID() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			hresUsers, path := tt.setup(s)
+			var resBody []*UserGroup
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
 		})
 	}
 }
 
+/*
 func TestUserHandler_GetEvents(t *testing.T) {
 	type fields struct {
 		srv service.UserService
