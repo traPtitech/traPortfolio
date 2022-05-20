@@ -1023,54 +1023,71 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 }
 
 func TestUserHandler_GetUserContests(t *testing.T) {
+
+	makeContests := func(s *mock_service.MockUserService, projectsLen int) (hres []*ContestTeamWithContestName, path string) {
+		userID := random.UUID()
+
+		repoContests := []*domain.UserContest{}
+		hresContests := []*ContestTeamWithContestName{}
+
+		for i := 0; i < projectsLen; i++ {
+
+			rcontest := domain.UserContest{
+				ID:          random.UUID(),
+				Name:        random.AlphaNumeric(),
+				Result:      random.AlphaNumeric(),
+				ContestName: random.AlphaNumeric(),
+			}
+
+			hcontest := ContestTeamWithContestName{
+				ContestTeam: ContestTeam{
+					Id:     rcontest.ID,
+					Name:   rcontest.Name,
+					Result: rcontest.Result,
+				},
+				ContestName: rcontest.ContestName,
+			}
+
+			repoContests = append(repoContests, &rcontest)
+			hresContests = append(hresContests, &hcontest)
+
+		}
+
+		s.EXPECT().GetUserContests(gomock.Any(), userID).Return(repoContests, nil)
+		path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
+		return hresContests, path
+
+	}
+
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string)
 		statusCode int
 	}{
 		{
-			name: "success",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string) {
-
-				userID := random.UUID()
-
-				repoContests := []*domain.UserContest{}
-				hresContests := []*ContestTeamWithContestName{}
-
-				for i := 0; i < casenum; i++ {
-
-					//TODO: DurationはUserDurationを包含しているべき
-					rcontest := domain.UserContest{
-						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(),
-						Result:      random.AlphaNumeric(),
-						ContestName: random.AlphaNumeric(),
-					}
-
-					hcontest := ContestTeamWithContestName{
-						ContestTeam: ContestTeam{
-							Id:     rcontest.ID,
-							Name:   rcontest.Name,
-							Result: rcontest.Result,
-						},
-						ContestName: rcontest.ContestName,
-					}
-
-					repoContests = append(repoContests, &rcontest)
-					hresContests = append(hresContests, &hcontest)
-
-				}
-
-				s.EXPECT().GetUserContests(gomock.Any(), userID).Return(repoContests, nil)
-				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
-				return hresContests, path
-
+			name: "success 1",
+			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+				return makeContests(s, 1)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 2",
+			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+				return makeContests(s, 2)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 32",
+			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+				return makeContests(s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
 
 				userID := random.UUID()
 
@@ -1081,8 +1098,8 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			statusCode: http.StatusNotFound,
 		},
 		{
-			name: "Bad Request: validate error: nonUUID",
-			setup: func(s *mock_service.MockUserService, casenum int) (hres []*ContestTeamWithContestName, path string) {
+			name: "Bad Request: validate error",
+			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -1097,18 +1114,13 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			casenum := []int{1, 2, 32}
+			hresUsers, path := tt.setup(s)
+			var resBody []*ContestTeamWithContestName
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
-			for _, testcase := range casenum {
-
-				hresUsers, path := tt.setup(s, testcase)
-				var resBody []*ContestTeamWithContestName
-				statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
-
-				// Assertion
-				assert.Equal(t, tt.statusCode, statusCode)
-				assert.Equal(t, hresUsers, resBody)
-			}
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
 		})
 	}
 }
