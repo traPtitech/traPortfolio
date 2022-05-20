@@ -68,7 +68,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUser'
+              $ref: '#/components/schemas/EditUserRequest'
   '/users/{userId}/accounts':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -95,7 +95,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddAccount'
+              $ref: '#/components/schemas/AddAccountRequest'
     get:
       summary: ユーザーアカウントのリストを取得
       operationId: getUserAccounts
@@ -235,7 +235,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProject'
+              $ref: '#/components/schemas/CreateProjectRequest'
   '/projects/{projectId}':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
@@ -274,7 +274,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditProject'
+              $ref: '#/components/schemas/EditProjectRequest'
   /events:
     get:
       summary: イベントリストを取得
@@ -329,7 +329,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditEvent'
+              $ref: '#/components/schemas/EditEventRequest'
   /groups:
     get:
       summary: 班のリストの取得
@@ -397,7 +397,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateContest'
+              $ref: '#/components/schemas/CreateContestRequest'
       tags:
         - contest
       description: コンテストを作成します
@@ -437,7 +437,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContest'
+              $ref: '#/components/schemas/EditContestRequest'
       tags:
         - contest
     delete:
@@ -494,7 +494,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddContestTeam'
+              $ref: '#/components/schemas/AddContestTeamRequest'
       tags:
         - contest
   '/contests/{contestId}/teams/{teamId}':
@@ -535,7 +535,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContestTeam'
+              $ref: '#/components/schemas/EditContestTeamRequest'
     delete:
       summary: コンテストチームの削除
       operationId: deleteContestTeam
@@ -651,7 +651,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUserAccount'
+              $ref: '#/components/schemas/EditUserAccountRequest'
         description: ''
       tags:
         - user
@@ -707,7 +707,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddProjectMembers'
+              $ref: '#/components/schemas/AddProjectMembersRequest'
       tags:
         - project
         - user
@@ -813,7 +813,7 @@ components:
             - state
             - bio
             - accounts
-    EditUser:
+    EditUserRequest:
       title: EditUserRequest
       type: object
       description: ユーザー情報変更リクエスト
@@ -1171,8 +1171,8 @@ components:
               $ref: '#/components/schemas/YearWithSemesterDuration'
           required:
             - duration
-    CreateProject:
-      title: CreateProject
+    CreateProjectRequest:
+      title: CreateProjectRequest
       type: object
       description: 新規プロジェクトリクエスト
       properties:
@@ -1196,8 +1196,8 @@ components:
         - name
         - description
         - duration
-    EditProject:
-      title: EditProject
+    EditProjectRequest:
+      title: EditProjectRequest
       type: object
       description: プロジェクト変更リクエスト
       properties:
@@ -1217,8 +1217,8 @@ components:
           description: プロジェクト説明
         duration:
           $ref: '#/components/schemas/YearWithSemesterDuration'
-    CreateContest:
-      title: CreateContest
+    CreateContestRequest:
+      title: CreateContestRequest
       type: object
       description: 新規コンテストリクエスト
       properties:
@@ -1241,8 +1241,8 @@ components:
         - name
         - description
         - duration
-    EditContest:
-      title: EditContest
+    EditContestRequest:
+      title: EditContestRequest
       type: object
       description: コンテスト情報変更リクエスト
       properties:
@@ -1261,8 +1261,8 @@ components:
         duration:
           # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
-    AddContestTeam:
-      title: AddContestTeam
+    AddContestTeamRequest:
+      title: AddContestTeamRequest
       type: object
       description: 新規コンテストチームリクエスト
       properties:
@@ -1284,8 +1284,8 @@ components:
       required:
         - name
         - description
-    EditContestTeam:
-      title: EditContestTeam
+    EditContestTeamRequest:
+      title: EditContestTeamRequest
       type: object
       description: コンテストチーム情報修正リクエスト
       properties:
@@ -1383,15 +1383,15 @@ components:
         - 前期
         - 後期
       format: int32
-    EditEvent:
-      title: EditEvent
+    EditEventRequest:
+      title: EditEventRequest
       type: object
       description: イベント情報修正リクエスト
       properties:
         eventLevel:
           $ref: '#/components/schemas/EventLevel'
-    AddProjectMembers:
-      title: AddProjectMembers
+    AddProjectMembersRequest:
+      title: AddProjectMembersRequest
       type: object
       description: プロジェクトメンバー追加リクエスト
       properties:
@@ -1429,8 +1429,8 @@ components:
             x-go-type: uuid.UUID
       required:
         - members
-    AddAccount:
-      title: AddAccount
+    AddAccountRequest:
+      title: AddAccountRequest
       type: object
       description: 新規アカウントリクエスト
       properties:
@@ -1452,8 +1452,8 @@ components:
         - prPermitted
         - url
         - displayName
-    EditUserAccount:
-      title: EditUserAccount
+    EditUserAccountRequest:
+      title: EditUserAccountRequest
       type: object
       description: アカウント変更リクエスト
       properties:

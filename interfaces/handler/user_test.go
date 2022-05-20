@@ -216,12 +216,12 @@ func TestUserHandler_GetByID(t *testing.T) {
 func TestUserHandler_Update(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *EditUser, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUserRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -230,7 +230,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -248,7 +248,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -257,7 +257,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -275,7 +275,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -284,7 +284,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -302,7 +302,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
