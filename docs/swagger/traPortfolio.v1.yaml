@@ -769,27 +769,6 @@ components:
         - id
         - name
         - realName
-    UserAccountState:
-      type: integer
-      title: UserAccountState
-      description: |-
-        ユーザーアカウント状態
-        0: 凍結
-        1: 有効
-        2: 一時停止
-      enum:
-        - 0
-        - 1
-        - 2
-      x-enum-varnames:
-        - deactivated
-        - active
-        - suspended
-      x-enum-descriptions:
-        - 凍結
-        - 有効
-        - 一時停止
-      format: int32
     UserDetail:
       title: UserDetail
       type: object
@@ -813,21 +792,27 @@ components:
             - state
             - bio
             - accounts
-    EditUserRequest:
-      title: EditUserRequest
-      type: object
-      description: ユーザー情報変更リクエスト
-      properties:
-        bio:
-          type: string
-          description: 自己紹介(biography)
-        check:
-          type: boolean
-          description: |-
-            本名を公開するかどうか
-            true: 公開
-            false: 非公開
-          default: true
+    UserAccountState:
+      type: integer
+      title: UserAccountState
+      description: |-
+        ユーザーアカウント状態
+        0: 凍結
+        1: 有効
+        2: 一時停止
+      enum:
+        - 0
+        - 1
+        - 2
+      x-enum-varnames:
+        - deactivated
+        - active
+        - suspended
+      x-enum-descriptions:
+        - 凍結
+        - 有効
+        - 一時停止
+      format: int32
     Account:
       title: Account
       type: object
@@ -1003,6 +988,93 @@ components:
             - hostname
             - eventLevel
       type: object
+    EventLevel:
+      type: integer
+      title: EventLevel
+      description: |-
+        公開範囲設定
+        0 イベント企画者の名前を伏せて公開
+        1 全て公開
+        2 外部に非公開
+      enum:
+        - 0
+        - 1
+        - 2
+      x-enum-varnames:
+        - Anonymous
+        - Public
+        - Private
+      x-enum-descriptions:
+        - イベントの企画者の名前を伏せて公開
+        - 全て公開
+        - 外部に非公開
+    Group:
+      title: Group
+      type: object
+      description: 班情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: 班uuid
+        name:
+          type: string
+          description: 班名
+      required:
+        - id
+        - name
+    UserGroup:
+      title: UserGroup
+      type: object
+      description: ユーザーの班の情報
+      allOf:
+        - $ref: '#/components/schemas/Group'
+        - type: object
+          properties:
+            duration:
+              $ref: '#/components/schemas/YearWithSemesterDuration'
+          required:
+            - duration
+    GroupDetail:
+      title: GroupDetail
+      type: object
+      description: 班の詳細情報
+      allOf:
+        - $ref: '#/components/schemas/Group'
+        - type: object
+          properties:
+            link:
+              type: string
+              format: uri
+              description: 班の詳細が載っているページへのリンク
+            leader:
+              $ref: '#/components/schemas/User'
+            members:
+              type: array
+              description: 班メンバー
+              items:
+                $ref: '#/components/schemas/GroupMember'
+            description:
+              type: string
+              description: 班説明
+          required:
+            - link
+            - leader
+            - members
+            - description
+    GroupMember:
+      title: GroupMember
+      type: object
+      description: 班所属メンバー情報
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            duration:
+              $ref: '#/components/schemas/YearWithSemesterDuration'
+          required:
+            - duration
     Contest:
       title: Contest
       type: object
@@ -1104,73 +1176,160 @@ components:
               description: コンテスト名
           required:
             - contestName
-    Group:
-      title: Group
+    PrPermitted:
+      title: PrPermitted
+      type: boolean
+      description: 広報での利用が許可されているかどうか
+    Duration:
+      title: Duration
       type: object
-      description: 班情報
       properties:
-        id:
+        since:
+          type: string
+          format: date-time
+          description: 期間始まり
+        until:
+          type: string
+          format: date-time
+          description: |-
+            期間終わり
+            untilがなかったらまだ存続している
+      required:
+        - since
+      description: イベントやコンテストなどの存続期間
+    YearWithSemesterDuration:
+      title: YearWithSemesterDuration
+      type: object
+      properties:
+        since:
+          $ref: '#/components/schemas/YearWithSemester'
+        until:
+          $ref: '#/components/schemas/YearWithSemester'
+      required:
+        - since
+      description: |-
+        班やプロジェクトの期間
+        年と前期/後期がある
+        untilがなかった場合存続中
+    YearWithSemester:
+      title: YearWithSemester
+      type: object
+      properties:
+        year:
+          type: integer
+        semester:
+          $ref: '#/components/schemas/Semester'
+      required:
+        - year
+        - semester
+      description: 年度と前期/後期
+    Semester:
+      title: Semester
+      type: integer
+      description: |-
+        0: 前期
+        1: 後期
+      enum:
+        - 0
+        - 1
+      x-enum-varnames:
+        - first
+        - second
+      x-enum-descriptions:
+        - 前期
+        - 後期
+      format: int32
+    MemberIDWithYearWithSemesterDuration:
+      title: MemberIDWithYearWithSemesterDuration
+      type: object
+      description: プロジェクトメンバーのユーザーUUID(期間含む)
+      properties:
+        userId:
           type: string
           format: uuid
           x-go-type: uuid.UUID
-          description: 班uuid
-        name:
-          type: string
-          description: 班名
+        duration:
+          $ref: '#/components/schemas/YearWithSemesterDuration'
       required:
-        - id
-        - name
-    UserGroup:
-      title: UserGroup
+        - userId
+        - duration
+    MemberIDs:
+      title: MemberIDs
       type: object
-      description: ユーザーの班の情報
-      allOf:
-        - $ref: '#/components/schemas/Group'
-        - type: object
-          properties:
-            duration:
-              $ref: '#/components/schemas/YearWithSemesterDuration'
-          required:
-            - duration
-    GroupDetail:
-      title: GroupDetail
+      description: ユーザーのUUIDの配列
+      properties:
+        members:
+          type: array
+          description: ユーザーのUUIDの配列
+          items:
+            type: string
+            format: uuid
+            x-go-type: uuid.UUID
+      required:
+        - members
+    EditUserRequest:
+      title: EditUserRequest
       type: object
-      description: 班の詳細情報
-      allOf:
-        - $ref: '#/components/schemas/Group'
-        - type: object
-          properties:
-            link:
-              type: string
-              format: uri
-              description: 班の詳細が載っているページへのリンク
-            leader:
-              $ref: '#/components/schemas/User'
-            members:
-              type: array
-              description: 班メンバー
-              items:
-                $ref: '#/components/schemas/GroupMember'
-            description:
-              type: string
-              description: 班説明
-          required:
-            - link
-            - leader
-            - members
-            - description
-    GroupMember:
-      title: GroupMember
+      description: ユーザー情報変更リクエスト
+      properties:
+        bio:
+          type: string
+          description: 自己紹介(biography)
+        check:
+          type: boolean
+          description: |-
+            本名を公開するかどうか
+            true: 公開
+            false: 非公開
+          default: true
+    AddAccountRequest:
+      title: AddAccountRequest
       type: object
-      description: 班所属メンバー情報
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          properties:
-            duration:
-              $ref: '#/components/schemas/YearWithSemesterDuration'
-          required:
-            - duration
+      description: 新規アカウントリクエスト
+      properties:
+        type:
+          $ref: '#/components/schemas/AccountType'
+        prPermitted:
+          $ref: '#/components/schemas/PrPermitted'
+        url:
+          type: string
+          description: アカウントurl
+          format: uri
+          x-oapi-codegen-extra-tags:
+            validate: url
+        displayName:
+          type: string
+          description: 外部アカウントの表示名
+      required:
+        - type
+        - prPermitted
+        - url
+        - displayName
+    EditUserAccountRequest:
+      title: EditUserAccountRequest
+      type: object
+      description: アカウント変更リクエスト
+      properties:
+        type:
+          $ref: '#/components/schemas/AccountType'
+        prPermitted:
+          $ref: '#/components/schemas/PrPermitted'
+        url:
+          type: string
+          description: アカウントurl
+          format: uri
+          x-oapi-codegen-extra-tags:
+            validate: omitempty,url # TODO: requiredになるので暫定的にomitemptyタグで対処
+        displayName:
+          type: string
+          description: 外部アカウントの表示名
+    EditEventRequest:
+      title: EditEventRequest
+      type: object
+      description: イベント情報修正リクエスト
+      properties:
+        eventLevel:
+          $ref: '#/components/schemas/EventLevel'
     CreateProjectRequest:
       title: CreateProjectRequest
       type: object
@@ -1217,6 +1376,17 @@ components:
           description: プロジェクト説明
         duration:
           $ref: '#/components/schemas/YearWithSemesterDuration'
+    AddProjectMembersRequest:
+      title: AddProjectMembersRequest
+      type: object
+      description: プロジェクトメンバー追加リクエスト
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberIDWithYearWithSemesterDuration'
+      required:
+        - members
     CreateContestRequest:
       title: CreateContestRequest
       type: object
@@ -1304,176 +1474,6 @@ components:
         result:
           type: string
           description: 順位などの結果
-    EventLevel:
-      type: integer
-      title: EventLevel
-      description: |-
-        公開範囲設定
-        0 イベント企画者の名前を伏せて公開
-        1 全て公開
-        2 外部に非公開
-      enum:
-        - 0
-        - 1
-        - 2
-      x-enum-varnames:
-        - Anonymous
-        - Public
-        - Private
-      x-enum-descriptions:
-        - イベントの企画者の名前を伏せて公開
-        - 全て公開
-        - 外部に非公開
-    Duration:
-      title: Duration
-      type: object
-      properties:
-        since:
-          type: string
-          format: date-time
-          description: 期間始まり
-        until:
-          type: string
-          format: date-time
-          description: |-
-            期間終わり
-            untilがなかったらまだ存続している
-      required:
-        - since
-      description: イベントやコンテストなどの存続期間
-    YearWithSemesterDuration:
-      title: YearWithSemesterDuration
-      type: object
-      properties:
-        since:
-          $ref: '#/components/schemas/YearWithSemester'
-        until:
-          $ref: '#/components/schemas/YearWithSemester'
-      required:
-        - since
-      description: |-
-        班やプロジェクトの期間
-        年と前期/後期がある
-        untilがなかった場合存続中
-    YearWithSemester:
-      title: YearWithSemester
-      type: object
-      properties:
-        year:
-          type: integer
-        semester:
-          $ref: '#/components/schemas/Semester'
-      required:
-        - year
-        - semester
-      description: 年度と前期/後期
-    Semester:
-      title: Semester
-      type: integer
-      description: |-
-        0: 前期
-        1: 後期
-      enum:
-        - 0
-        - 1
-      x-enum-varnames:
-        - first
-        - second
-      x-enum-descriptions:
-        - 前期
-        - 後期
-      format: int32
-    EditEventRequest:
-      title: EditEventRequest
-      type: object
-      description: イベント情報修正リクエスト
-      properties:
-        eventLevel:
-          $ref: '#/components/schemas/EventLevel'
-    AddProjectMembersRequest:
-      title: AddProjectMembersRequest
-      type: object
-      description: プロジェクトメンバー追加リクエスト
-      properties:
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/MemberIDWithYearWithSemesterDuration'
-      required:
-        - members
-    MemberIDWithYearWithSemesterDuration:
-      title: MemberIDWithYearWithSemesterDuration
-      type: object
-      description: プロジェクトメンバーのユーザーUUID(期間含む)
-      properties:
-        userId:
-          type: string
-          format: uuid
-          x-go-type: uuid.UUID
-        duration:
-          $ref: '#/components/schemas/YearWithSemesterDuration'
-      required:
-        - userId
-        - duration
-    MemberIDs:
-      title: MemberIDs
-      type: object
-      description: ユーザーのUUIDの配列
-      properties:
-        members:
-          type: array
-          description: ユーザーのUUIDの配列
-          items:
-            type: string
-            format: uuid
-            x-go-type: uuid.UUID
-      required:
-        - members
-    AddAccountRequest:
-      title: AddAccountRequest
-      type: object
-      description: 新規アカウントリクエスト
-      properties:
-        type:
-          $ref: '#/components/schemas/AccountType'
-        prPermitted:
-          $ref: '#/components/schemas/PrPermitted'
-        url:
-          type: string
-          description: アカウントurl
-          format: uri
-          x-oapi-codegen-extra-tags:
-            validate: url
-        displayName:
-          type: string
-          description: 外部アカウントの表示名
-      required:
-        - type
-        - prPermitted
-        - url
-        - displayName
-    EditUserAccountRequest:
-      title: EditUserAccountRequest
-      type: object
-      description: アカウント変更リクエスト
-      properties:
-        type:
-          $ref: '#/components/schemas/AccountType'
-        prPermitted:
-          $ref: '#/components/schemas/PrPermitted'
-        url:
-          type: string
-          description: アカウントurl
-          format: uri
-          x-oapi-codegen-extra-tags:
-            validate: omitempty,url # TODO: requiredになるので暫定的にomitemptyタグで対処
-        displayName:
-          type: string
-          description: 外部アカウントの表示名
-    PrPermitted:
-      title: PrPermitted
-      type: boolean
-      description: 広報での利用が許可されているかどうか
   parameters:
     userIdInPath:
       name: userId
@@ -1484,15 +1484,15 @@ components:
         type: string
         format: uuid
         x-go-type: uuid.UUID
-    groupIdInPath:
-      name: groupId
+    accountIdInPath:
+      name: accountId
       in: path
-      required: true
-      description: 班UUID
       schema:
         type: string
         format: uuid
         x-go-type: uuid.UUID
+      description: アカウントUUID
+      required: true
     projectIdInPath:
       name: projectId
       in: path
@@ -1507,6 +1507,15 @@ components:
       in: path
       required: true
       description: イベントUUID
+      schema:
+        type: string
+        format: uuid
+        x-go-type: uuid.UUID
+    groupIdInPath:
+      name: groupId
+      in: path
+      required: true
+      description: 班UUID
       schema:
         type: string
         format: uuid
@@ -1529,15 +1538,6 @@ components:
         type: string
         format: uuid
         x-go-type: uuid.UUID
-    accountIdInPath:
-      name: accountId
-      in: path
-      schema:
-        type: string
-        format: uuid
-        x-go-type: uuid.UUID
-      description: アカウントUUID
-      required: true
     includeSuspendedInQuery:
       name: includeSuspended
       in: query
