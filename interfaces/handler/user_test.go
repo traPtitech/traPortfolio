@@ -1225,19 +1225,19 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 
 		for i := 0; i < eventsLen; i++ {
 
-			termStart, termEnd := random.SinceAndUntil()
+			timeStart, timeEnd := random.SinceAndUntil()
 
 			revent := domain.Event{
 				ID:        random.UUID(),
 				Name:      random.AlphaNumeric(),
-				TimeStart: termStart,
-				TimeEnd:   termEnd,
+				TimeStart: timeStart,
+				TimeEnd:   timeEnd,
 			}
 
 			hevent := Event{
 				Duration: Duration{
-					Since: termStart,
-					Until: &termEnd,
+					Since: timeStart,
+					Until: &timeEnd,
 				},
 				Id:   revent.ID,
 				Name: revent.Name,
