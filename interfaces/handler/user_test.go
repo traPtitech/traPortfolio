@@ -1109,13 +1109,13 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 func TestUserHandler_GetUserGroups(t *testing.T) {
 
-	makeGroups := func(s *mock_service.MockUserService, projectsLen int) (hres []*UserGroup, path string) {
+	makeGroups := func(s *mock_service.MockUserService, groupsLen int) (hres []*UserGroup, path string) {
 		userID := random.UUID()
 
 		repoGroups := []*domain.GroupUser{}
 		hresGroups := []*UserGroup{}
 
-		for i := 0; i < projectsLen; i++ {
+		for i := 0; i < groupsLen; i++ {
 
 			rgroup := domain.GroupUser{
 				ID:       random.UUID(),
