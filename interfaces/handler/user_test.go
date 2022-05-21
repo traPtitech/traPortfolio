@@ -1024,13 +1024,13 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 func TestUserHandler_GetUserContests(t *testing.T) {
 
-	makeContests := func(s *mock_service.MockUserService, projectsLen int) (hres []*ContestTeamWithContestName, path string) {
+	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*ContestTeamWithContestName, path string) {
 		userID := random.UUID()
 
 		repoContests := []*domain.UserContest{}
 		hresContests := []*ContestTeamWithContestName{}
 
-		for i := 0; i < projectsLen; i++ {
+		for i := 0; i < contestsLen; i++ {
 
 			rcontest := domain.UserContest{
 				ID:          random.UUID(),
