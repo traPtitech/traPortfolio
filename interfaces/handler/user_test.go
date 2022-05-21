@@ -1217,13 +1217,13 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 
 func TestUserHandler_GetUserEvents(t *testing.T) {
 
-	makeEvents := func(s *mock_service.MockUserService, projectsLen int) (hres []*Event, path string) {
+	makeEvents := func(s *mock_service.MockUserService, eventsLen int) (hres []*Event, path string) {
 		userID := random.UUID()
 
 		repoEvents := []*domain.Event{}
 		hresEvents := []*Event{}
 
-		for i := 0; i < projectsLen; i++ {
+		for i := 0; i < eventsLen; i++ {
 
 			termStart, termEnd := random.SinceAndUntil()
 
