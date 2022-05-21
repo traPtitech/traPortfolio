@@ -920,29 +920,11 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 			hproject := UserProject{
 				Project: Project{
-					Duration: YearWithSemesterDuration{
-						Since: YearWithSemester{
-							Semester: Semester(rproject.Duration.Since.Semester),
-							Year:     rproject.Duration.Since.Year,
-						},
-						Until: &YearWithSemester{
-							Semester: Semester(rproject.Duration.Until.Semester),
-							Year:     rproject.Duration.Until.Year,
-						},
-					},
-					Id:   rproject.ID,
-					Name: rproject.Name,
+					Duration: convertDuration(rproject.Duration),
+					Id:       rproject.ID,
+					Name:     rproject.Name,
 				},
-				UserDuration: YearWithSemesterDuration{
-					Since: YearWithSemester{
-						Semester: Semester(rproject.UserDuration.Since.Semester),
-						Year:     rproject.UserDuration.Since.Year,
-					},
-					Until: &YearWithSemester{
-						Semester: Semester(rproject.UserDuration.Until.Semester),
-						Year:     rproject.UserDuration.Until.Year,
-					},
-				},
+				UserDuration: convertDuration(rproject.UserDuration),
 			}
 
 			repoProjects = append(repoProjects, &rproject)
@@ -1146,16 +1128,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 					Id:   rgroup.ID,
 					Name: rgroup.Name,
 				},
-				Duration: YearWithSemesterDuration{
-					Since: YearWithSemester{
-						Semester: Semester(rgroup.Duration.Since.Semester),
-						Year:     rgroup.Duration.Since.Year,
-					},
-					Until: &YearWithSemester{
-						Semester: Semester(rgroup.Duration.Until.Semester),
-						Year:     rgroup.Duration.Until.Year,
-					},
-				},
+				Duration: convertDuration(rgroup.Duration),
 			}
 
 			repoGroups = append(repoGroups, &rgroup)
