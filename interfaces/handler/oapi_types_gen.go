@@ -56,7 +56,7 @@ type Account struct {
 type AccountType int64
 
 // 新規アカウントリクエスト
-type AddAccount struct {
+type AddAccountRequest struct {
 	// 外部アカウントの表示名
 	DisplayName string `json:"displayName"`
 
@@ -71,7 +71,7 @@ type AddAccount struct {
 }
 
 // 新規コンテストチームリクエスト
-type AddContestTeam struct {
+type AddContestTeamRequest struct {
 	// チーム情報
 	Description string `json:"description"`
 
@@ -86,7 +86,7 @@ type AddContestTeam struct {
 }
 
 // プロジェクトメンバー追加リクエスト
-type AddProjectMembers struct {
+type AddProjectMembersRequest struct {
 	Members []MemberIDWithYearWithSemesterDuration `json:"members"`
 }
 
@@ -154,7 +154,7 @@ type ContestTeamWithContestName struct {
 }
 
 // 新規コンテストリクエスト
-type CreateContest struct {
+type CreateContestRequest struct {
 	// コンテスト説明
 	Description string `json:"description"`
 
@@ -169,7 +169,7 @@ type CreateContest struct {
 }
 
 // 新規プロジェクトリクエスト
-type CreateProject struct {
+type CreateProjectRequest struct {
 	// プロジェクト説明
 	Description string `json:"description"`
 
@@ -196,7 +196,7 @@ type Duration struct {
 }
 
 // コンテスト情報変更リクエスト
-type EditContest struct {
+type EditContestRequest struct {
 	// コンテスト説明
 	Description *string `json:"description,omitempty"`
 
@@ -211,7 +211,7 @@ type EditContest struct {
 }
 
 // コンテストチーム情報修正リクエスト
-type EditContestTeam struct {
+type EditContestTeamRequest struct {
 	// チーム情報
 	Description *string `json:"description,omitempty"`
 
@@ -226,7 +226,7 @@ type EditContestTeam struct {
 }
 
 // イベント情報修正リクエスト
-type EditEvent struct {
+type EditEventRequest struct {
 	// 公開範囲設定
 	// 0 イベント企画者の名前を伏せて公開
 	// 1 全て公開
@@ -235,7 +235,7 @@ type EditEvent struct {
 }
 
 // プロジェクト変更リクエスト
-type EditProject struct {
+type EditProjectRequest struct {
 	// プロジェクト説明
 	Description *string `json:"description,omitempty"`
 
@@ -251,19 +251,8 @@ type EditProject struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// ユーザー情報変更リクエスト
-type EditUser struct {
-	// 自己紹介(biography)
-	Bio *string `json:"bio,omitempty"`
-
-	// 本名を公開するかどうか
-	// true: 公開
-	// false: 非公開
-	Check *bool `json:"check,omitempty"`
-}
-
 // アカウント変更リクエスト
-type EditUserAccount struct {
+type EditUserAccountRequest struct {
 	// 外部アカウントの表示名
 	DisplayName *string `json:"displayName,omitempty"`
 
@@ -275,6 +264,17 @@ type EditUserAccount struct {
 
 	// アカウントurl
 	Url *string `json:"url,omitempty" validate:"omitempty,url"`
+}
+
+// ユーザー情報変更リクエスト
+type EditUserRequest struct {
+	// 自己紹介(biography)
+	Bio *string `json:"bio,omitempty"`
+
+	// 本名を公開するかどうか
+	// true: 公開
+	// false: 非公開
+	Check *bool `json:"check,omitempty"`
 }
 
 // イベント情報
@@ -521,16 +521,16 @@ type TeamIdInPath uuid.UUID
 type UserIdInPath uuid.UUID
 
 // CreateContestJSONBody defines parameters for CreateContest.
-type CreateContestJSONBody CreateContest
+type CreateContestJSONBody CreateContestRequest
 
 // EditContestJSONBody defines parameters for EditContest.
-type EditContestJSONBody EditContest
+type EditContestJSONBody EditContestRequest
 
 // AddContestTeamJSONBody defines parameters for AddContestTeam.
-type AddContestTeamJSONBody AddContestTeam
+type AddContestTeamJSONBody AddContestTeamRequest
 
 // EditContestTeamJSONBody defines parameters for EditContestTeam.
-type EditContestTeamJSONBody EditContestTeam
+type EditContestTeamJSONBody EditContestTeamRequest
 
 // DeleteContestTeamMembersJSONBody defines parameters for DeleteContestTeamMembers.
 type DeleteContestTeamMembersJSONBody MemberIDs
@@ -539,19 +539,19 @@ type DeleteContestTeamMembersJSONBody MemberIDs
 type AddContestTeamMembersJSONBody MemberIDs
 
 // EditEventJSONBody defines parameters for EditEvent.
-type EditEventJSONBody EditEvent
+type EditEventJSONBody EditEventRequest
 
 // CreateProjectJSONBody defines parameters for CreateProject.
-type CreateProjectJSONBody CreateProject
+type CreateProjectJSONBody CreateProjectRequest
 
 // EditProjectJSONBody defines parameters for EditProject.
-type EditProjectJSONBody EditProject
+type EditProjectJSONBody EditProjectRequest
 
 // DeleteProjectMembersJSONBody defines parameters for DeleteProjectMembers.
 type DeleteProjectMembersJSONBody MemberIDs
 
 // AddProjectMembersJSONBody defines parameters for AddProjectMembers.
-type AddProjectMembersJSONBody AddProjectMembers
+type AddProjectMembersJSONBody AddProjectMembersRequest
 
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
@@ -563,13 +563,13 @@ type GetUsersParams struct {
 }
 
 // EditUserJSONBody defines parameters for EditUser.
-type EditUserJSONBody EditUser
+type EditUserJSONBody EditUserRequest
 
 // AddUserAccountJSONBody defines parameters for AddUserAccount.
-type AddUserAccountJSONBody AddAccount
+type AddUserAccountJSONBody AddAccountRequest
 
 // EditUserAccountJSONBody defines parameters for EditUserAccount.
-type EditUserAccountJSONBody EditUserAccount
+type EditUserAccountJSONBody EditUserAccountRequest
 
 // CreateContestJSONRequestBody defines body for CreateContest for application/json ContentType.
 type CreateContestJSONRequestBody CreateContestJSONBody

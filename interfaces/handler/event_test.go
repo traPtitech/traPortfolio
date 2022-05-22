@@ -201,19 +201,19 @@ func TestEventHandler_GetByID(t *testing.T) {
 func TestEventHandler_PatchEvent(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService) (reqBody *EditEvent, path string)
+		setup      func(s *mock_service.MockEventService) (reqBody *EditEventRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &EditEvent{
+				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
@@ -229,14 +229,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &EditEvent{
+				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
@@ -252,14 +252,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &EditEvent{
+				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
@@ -275,14 +275,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: bind error",
-			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &EditEvent{
+				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
@@ -298,14 +298,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockEventService) (*EditEvent, string) {
+			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
 				eventLevelDomain := domain.EventLevel(eventLevelUint)
 
-				reqBody := &EditEvent{
+				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 

@@ -216,12 +216,12 @@ func TestUserHandler_GetByID(t *testing.T) {
 func TestUserHandler_Update(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *EditUser, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUserRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -230,7 +230,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -248,7 +248,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -257,7 +257,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -275,7 +275,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -284,7 +284,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -302,7 +302,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -900,61 +900,129 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 	}
 }
 
+func TestUserHandler_GetUserProjects(t *testing.T) {
+
+	makeProjects := func(s *mock_service.MockUserService, projectsLen int) (hres []*UserProject, path string) {
+		userID := random.UUID()
+
+		repoProjects := []*domain.UserProject{}
+		hresProjects := []*UserProject{}
+
+		for i := 0; i < projectsLen; i++ {
+
+			//TODO: DurationはUserDurationを包含しているべき
+			rproject := domain.UserProject{
+				ID:           random.UUID(),
+				Name:         random.AlphaNumeric(),
+				Duration:     random.Duration(),
+				UserDuration: random.Duration(),
+			}
+
+			hproject := UserProject{
+				Project: Project{
+					Duration: YearWithSemesterDuration{
+						Since: YearWithSemester{
+							Semester: Semester(rproject.Duration.Since.Semester),
+							Year:     rproject.Duration.Since.Year,
+						},
+						Until: &YearWithSemester{
+							Semester: Semester(rproject.Duration.Until.Semester),
+							Year:     rproject.Duration.Until.Year,
+						},
+					},
+					Id:   rproject.ID,
+					Name: rproject.Name,
+				},
+				UserDuration: YearWithSemesterDuration{
+					Since: YearWithSemester{
+						Semester: Semester(rproject.UserDuration.Since.Semester),
+						Year:     rproject.UserDuration.Since.Year,
+					},
+					Until: &YearWithSemester{
+						Semester: Semester(rproject.UserDuration.Until.Semester),
+						Year:     rproject.UserDuration.Until.Year,
+					},
+				},
+			}
+
+			repoProjects = append(repoProjects, &rproject)
+			hresProjects = append(hresProjects, &hproject)
+
+		}
+
+		s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(repoProjects, nil)
+		path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+		return hresProjects, path
+	}
+
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockUserService) (hres []*UserProject, path string)
+		statusCode int
+	}{
+		{
+			name: "success 1",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+				return makeProjects(s, 1)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 2",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+				return makeProjects(s, 2)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 32",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+				return makeProjects(s, 32)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+
+				userID := random.UUID()
+
+				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return nil, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+
+				userID := random.AlphaNumericn(36)
+
+				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			hresUsers, path := tt.setup(s)
+			var resBody []*UserProject
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
+
+		})
+	}
+}
+
 /*
-func TestUserHandler_DeleteAccount(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := DeleteAccount(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserDeleteAccount() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestUserHandler_GetProjects(t *testing.T) {
-	type fields struct {
-		srv service.UserService
-	}
-	type args struct {
-		_c echo.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := GetProjects(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserGetProjects() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestUserHandler_GetUsers(t *testing.T) {
 	type fields struct {
 		srv service.UserService
