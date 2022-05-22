@@ -147,18 +147,16 @@ func TestUserHandler_GetByID(t *testing.T) {
 				}
 
 				hresUser := UserDetail{
-					User: User{
-						Id:       repoUser.User.ID,
-						Name:     repoUser.User.Name,
-						RealName: repoUser.User.RealName,
-					},
 					Accounts: hAccounts,
 					Bio:      repoUser.Bio,
+					Id:       repoUser.User.ID,
+					Name:     repoUser.User.Name,
+					RealName: repoUser.User.RealName,
 					State:    UserAccountState(repoUser.State),
 				}
 
 				s.EXPECT().GetUser(gomock.Any(), repoUser.User.ID).Return(&repoUser, nil)
-				path := fmt.Sprintf("/api/v1/users/%s", hresUser.User.Id)
+				path := fmt.Sprintf("/api/v1/users/%s", hresUser.Id)
 				return &hresUser, path
 			},
 			statusCode: http.StatusOK,
@@ -919,20 +917,18 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			}
 
 			hproject := UserProject{
-				Project: Project{
-					Duration: YearWithSemesterDuration{
-						Since: YearWithSemester{
-							Semester: Semester(rproject.Duration.Since.Semester),
-							Year:     rproject.Duration.Since.Year,
-						},
-						Until: &YearWithSemester{
-							Semester: Semester(rproject.Duration.Until.Semester),
-							Year:     rproject.Duration.Until.Year,
-						},
+				Duration: YearWithSemesterDuration{
+					Since: YearWithSemester{
+						Semester: Semester(rproject.Duration.Since.Semester),
+						Year:     rproject.Duration.Since.Year,
 					},
-					Id:   rproject.ID,
-					Name: rproject.Name,
+					Until: &YearWithSemester{
+						Semester: Semester(rproject.Duration.Until.Semester),
+						Year:     rproject.Duration.Until.Year,
+					},
 				},
+				Id:   rproject.ID,
+				Name: rproject.Name,
 				UserDuration: YearWithSemesterDuration{
 					Since: YearWithSemester{
 						Semester: Semester(rproject.UserDuration.Since.Semester),

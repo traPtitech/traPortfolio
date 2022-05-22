@@ -14,6 +14,7 @@ var (
 	HMockProject        = CloneHandlerMockProject()
 	HMockProjectMembers = CloneHandlerMockProjectMembers()
 	HMockUsers          = CloneHandlerMockUsers()
+	HMockUserDetails    = CloneHandlerMockUserDetails()
 	HMockUserAccount    = CloneHandlerMockUserAccount()
 	HMockUserContest    = CloneHandlerMockUserContest()
 	HMockUserGroup      = CloneHandlerMockUserGroup()
@@ -27,18 +28,20 @@ func CloneHandlerMockContest() handler.ContestDetail {
 	)
 
 	return handler.ContestDetail{
-		Contest: handler.Contest{
-			Duration: handler.Duration{
-				Since: mContest.Since,
-				Until: &mContest.Until,
-			},
-			Id:   mContest.ID,
-			Name: mContest.Name,
-		},
 		Description: mContest.Description,
-		Link:        mContest.Link,
+		Duration: handler.Duration{
+			Since: mContest.Since,
+			Until: &mContest.Until,
+		},
+		Id:   mContest.ID,
+		Link: mContest.Link,
+		Name: mContest.Name,
 		Teams: []handler.ContestTeam{
-			hContestTeam.ContestTeam,
+			{
+				Id:     hContestTeam.Id,
+				Name:   hContestTeam.Name,
+				Result: hContestTeam.Result,
+			},
 		},
 	}
 }
@@ -47,19 +50,22 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 	var (
 		mContestTeam              = CloneMockContestTeam()
 		mContestTeamUserBelonging = CloneMockContestTeamUserBelonging()
+		hUser                     = getUser(mContestTeamUserBelonging.UserID)
 	)
 
 	return handler.ContestTeamDetail{
-		ContestTeam: handler.ContestTeam{
-			Id:     mContestTeam.ContestID,
-			Name:   mContestTeam.Name,
-			Result: mContestTeam.Result,
-		},
 		Description: mContestTeam.Description,
+		Id:          mContestTeam.ContestID,
 		Link:        mContestTeam.Link,
 		Members: []handler.User{
-			getUser(mContestTeamUserBelonging.UserID).User,
+			{
+				Id:       hUser.Id,
+				Name:     hUser.Name,
+				RealName: hUser.RealName,
+			},
 		},
+		Name:   mContestTeam.Name,
+		Result: mContestTeam.Result,
 	}
 }
 
@@ -84,22 +90,20 @@ func CloneHandlerMockEvents() []handler.EventDetail {
 		}
 
 		for j, uid := range e.Admins {
-			hostname[j] = getUser(uid).User
+			hostname[j] = getUser(uid)
 		}
 
 		hEvents[i] = handler.EventDetail{
-			Event: handler.Event{
-				Duration: handler.Duration{
-					Since: e.TimeStart,
-					Until: &e.TimeEnd,
-				},
-				Id:   e.ID,
-				Name: e.Name,
-			},
 			Description: e.Description,
-			EventLevel:  eventLevel,
-			Hostname:    hostname,
-			Place:       e.Place,
+			Duration: handler.Duration{
+				Since: e.TimeStart,
+				Until: &e.TimeEnd,
+			},
+			EventLevel: eventLevel,
+			Hostname:   hostname,
+			Id:         e.ID,
+			Name:       e.Name,
+			Place:      e.Place,
 		}
 	}
 
@@ -113,25 +117,23 @@ func CloneHandlerMockGroup() handler.GroupDetail {
 	)
 
 	return handler.GroupDetail{
-		Group: handler.Group{
-			Id:   mGroup.GroupID,
-			Name: mGroup.Name,
-		},
 		Description: mGroup.Description,
-		Leader:      getUser(mGroup.Leader).User,
+		Id:          mGroup.GroupID,
+		Leader:      getUser(mGroup.Leader),
 		Link:        mGroup.Link,
 		Members:     hGroupMembers,
+		Name:        mGroup.Name,
 	}
 }
 
 func CloneHandlerMockGroupMembers() []handler.GroupMember {
 	var (
 		mGroupUserbelonging = CloneMockGroupUserBelonging()
+		hUser               = getUser(mGroupUserbelonging.UserID)
 	)
 
 	return []handler.GroupMember{
 		{
-			User: getUser(mGroupUserbelonging.UserID).User,
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
 					Year:     mGroupUserbelonging.SinceYear,
@@ -142,6 +144,9 @@ func CloneHandlerMockGroupMembers() []handler.GroupMember {
 					Semester: handler.Semester(mGroupUserbelonging.UntilSemester),
 				},
 			},
+			Id:       hUser.Id,
+			Name:     hUser.Name,
+			RealName: hUser.RealName,
 		},
 	}
 }
@@ -153,22 +158,32 @@ func CloneHandlerMockProject() handler.ProjectDetail {
 	)
 
 	return handler.ProjectDetail{
-		Project: handler.Project{
-			Id:   mProject.ID,
-			Name: mProject.Name,
-		},
 		Description: mProject.Description,
-		Link:        mProject.Link,
-		Members:     hProjectMembers,
+		Duration: handler.YearWithSemesterDuration{
+			Since: handler.YearWithSemester{
+				Year:     mProject.SinceYear,
+				Semester: handler.Semester(mProject.SinceSemester),
+			},
+			Until: &handler.YearWithSemester{
+				Year:     mProject.UntilYear,
+				Semester: handler.Semester(mProject.UntilSemester),
+			},
+		},
+		Id:      mProject.ID,
+		Link:    mProject.Link,
+		Members: hProjectMembers,
+		Name:    mProject.Name,
 	}
 }
 
 func CloneHandlerMockProjectMembers() []handler.ProjectMember {
-	var mProjectMember = CloneMockProjectMember()
+	var (
+		mProjectMember = CloneMockProjectMember()
+		hUser          = getUser(mProjectMember.UserID)
+	)
 
 	return []handler.ProjectMember{
 		{
-			User: getUser(mProjectMember.UserID).User,
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
 					Year:     mProjectMember.Project.SinceYear,
@@ -179,11 +194,32 @@ func CloneHandlerMockProjectMembers() []handler.ProjectMember {
 					Semester: handler.Semester(mProjectMember.UntilSemester),
 				},
 			},
+			Id:       hUser.Id,
+			Name:     hUser.Name,
+			RealName: hUser.RealName,
 		},
 	}
 }
 
-func CloneHandlerMockUsers() []handler.UserDetail {
+func CloneHandlerMockUsers() []handler.User {
+	var (
+		mUsers      = CloneMockUsers()
+		portalUsers = CloneMockPortalUsers()
+		hUsers      = make([]handler.User, len(mUsers))
+	)
+
+	for i, u := range mUsers {
+		hUsers[i] = handler.User{
+			Id:       u.ID,
+			Name:     u.Name,
+			RealName: portalUsers[i].RealName,
+		}
+	}
+
+	return hUsers
+}
+
+func CloneHandlerMockUserDetails() []handler.UserDetail {
 	var (
 		mUsers      = CloneMockUsers()
 		portalUsers = CloneMockPortalUsers()
@@ -194,13 +230,11 @@ func CloneHandlerMockUsers() []handler.UserDetail {
 
 	for i, mu := range mUsers {
 		hUsers[i] = handler.UserDetail{
-			User: handler.User{
-				Id:       mu.ID,
-				Name:     mu.Name,
-				RealName: portalUsers[i].RealName,
-			},
 			Accounts: []handler.Account{},
 			Bio:      mu.Description,
+			Id:       mu.ID,
+			Name:     mu.Name,
+			RealName: portalUsers[i].RealName,
 			State:    handler.UserAccountState(traqUsers[i].User.State),
 		}
 
@@ -231,8 +265,10 @@ func CloneHandlerMockUserContest() handler.ContestTeamWithContestName {
 	)
 
 	return handler.ContestTeamWithContestName{
-		ContestTeam: hContestTeam.ContestTeam,
 		ContestName: hContest.Name,
+		Id:          hContestTeam.Id,
+		Name:        hContestTeam.Name,
+		Result:      hContestTeam.Result,
 	}
 }
 
@@ -243,8 +279,9 @@ func CloneHandlerMockUserGroup() handler.UserGroup {
 	)
 
 	return handler.UserGroup{
-		Group:    hGroup.Group,
 		Duration: hGroupMembers[0].Duration,
+		Id:       hGroup.Id,
+		Name:     hGroup.Name,
 	}
 }
 
@@ -255,19 +292,21 @@ func CloneHandlerMockUserProject() handler.UserProject {
 	)
 
 	return handler.UserProject{
-		Project:      hProject.Project,
+		Duration:     hProjectMembers[0].Duration,
+		Id:           hProject.Id,
+		Name:         hProject.Name,
 		UserDuration: hProjectMembers[0].Duration,
 	}
 }
 
-func getUser(userID uuid.UUID) handler.UserDetail {
+func getUser(userID uuid.UUID) handler.User {
 	var hUsers = CloneHandlerMockUsers()
 
 	for _, hUser := range hUsers {
-		if hUser.User.Id == userID {
+		if hUser.Id == userID {
 			return hUser
 		}
 	}
 
-	return handler.UserDetail{}
+	return handler.User{}
 }
