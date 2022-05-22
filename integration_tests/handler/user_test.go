@@ -134,13 +134,13 @@ func TestUpdateUser(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		reqBody    handler.EditUser
+		reqBody    handler.EditUserRequest
 		want       interface{} // nil or error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.HMockUser1.Id,
-			handler.EditUser{
+			handler.EditUserRequest{
 				Bio:   &bio,
 				Check: &check,
 			},
@@ -149,13 +149,13 @@ func TestUpdateUser(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.HMockUser2.Id,
-			handler.EditUser{},
+			handler.EditUserRequest{},
 			nil,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.EditUser{},
+			handler.EditUserRequest{},
 			handler.ConvertError(t, repository.ErrValidate),
 		},
 	}
@@ -376,8 +376,8 @@ func TestAddUserAccount(t *testing.T) {
 	}
 }
 
-// EditUserAccount PATCH /users/:userID/accounts/:accountID
-func TestEditUserAccount(t *testing.T) {
+// EditUserRequestAccount PATCH /users/:userID/accounts/:accountID
+func TestEditUserRequestAccount(t *testing.T) {
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
