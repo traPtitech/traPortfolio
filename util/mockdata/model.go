@@ -169,8 +169,8 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockEventLevelRelation := CloneMockEventLevelRelations()
-	if err := h.Create(&mockEventLevelRelation).Error(); err != nil {
+	mockEventLevelRelations := CloneMockEventLevelRelations()
+	if err := h.Create(&mockEventLevelRelations).Error(); err != nil {
 		return err
 	}
 
