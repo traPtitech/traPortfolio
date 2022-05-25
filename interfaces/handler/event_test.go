@@ -141,19 +141,16 @@ func TestEventHandler_GetByID(t *testing.T) {
 				}
 
 				hevent := EventDetail{
-					Event: Event{
-						Id:   revent.Event.ID,
-						Name: revent.Event.Name,
-						Duration: Duration{
-							Since: revent.Event.TimeStart,
-							Until: &revent.Event.TimeEnd,
-						},
-					},
-
 					Description: revent.Description,
-					Place:       revent.Place,
-					Hostname:    hHost,
-					EventLevel:  EventLevel(revent.Level),
+					Duration: Duration{
+						Since: revent.Event.TimeStart,
+						Until: &revent.Event.TimeEnd,
+					},
+					EventLevel: EventLevel(revent.Level),
+					Hostname:   hHost,
+					Id:         revent.Event.ID,
+					Name:       revent.Event.Name,
+					Place:      revent.Place,
 				}
 
 				repoEvent := &revent
