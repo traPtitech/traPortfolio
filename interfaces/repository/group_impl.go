@@ -70,19 +70,14 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		erAdmin = append(erAdmin, &domain.User{ID: v.UserID})
 	}
 
-	group := new(model.Group)
-	if err := repo.h.Where(&model.Group{GroupID: groupID}).First(group).Error(); err != nil {
-		return nil, convertError(err)
-	}
-
 	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
 		ID:          groupID,
-		Name:        group.Name,
-		Link:        group.Link,
+		Name:        admins[0].Group.Name,
+		Link:        admins[0].Group.Link,
 		Admin:       erAdmin,
 		Members:     erMembers,
-		Description: group.Description,
+		Description: admins[0].Group.Description,
 	}
 	return result, nil
 }
