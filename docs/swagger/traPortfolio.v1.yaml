@@ -68,7 +68,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUser'
+              $ref: '#/components/schemas/EditUserRequest'
   '/users/{userId}/accounts':
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
@@ -95,7 +95,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddAccount'
+              $ref: '#/components/schemas/AddAccountRequest'
     get:
       summary: ユーザーアカウントのリストを取得
       operationId: getUserAccounts
@@ -235,7 +235,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProject'
+              $ref: '#/components/schemas/CreateProjectRequest'
   '/projects/{projectId}':
     parameters:
       - $ref: '#/components/parameters/projectIdInPath'
@@ -274,7 +274,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditProject'
+              $ref: '#/components/schemas/EditProjectRequest'
   /events:
     get:
       summary: イベントリストを取得
@@ -329,7 +329,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditEvent'
+              $ref: '#/components/schemas/EditEventRequest'
   /groups:
     get:
       summary: 班のリストの取得
@@ -397,7 +397,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateContest'
+              $ref: '#/components/schemas/CreateContestRequest'
       tags:
         - contest
       description: コンテストを作成します
@@ -437,7 +437,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContest'
+              $ref: '#/components/schemas/EditContestRequest'
       tags:
         - contest
     delete:
@@ -494,7 +494,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddContestTeam'
+              $ref: '#/components/schemas/AddContestTeamRequest'
       tags:
         - contest
   '/contests/{contestId}/teams/{teamId}':
@@ -535,7 +535,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditContestTeam'
+              $ref: '#/components/schemas/EditContestTeamRequest'
     delete:
       summary: コンテストチームの削除
       operationId: deleteContestTeam
@@ -651,7 +651,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditUserAccount'
+              $ref: '#/components/schemas/EditUserAccountRequest'
         description: ''
       tags:
         - user
@@ -707,7 +707,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddProjectMembers'
+              $ref: '#/components/schemas/AddProjectMembersRequest'
       tags:
         - project
         - user
@@ -769,27 +769,6 @@ components:
         - id
         - name
         - realName
-    UserAccountState:
-      type: integer
-      title: UserAccountState
-      description: |-
-        ユーザーアカウント状態
-        0: 凍結
-        1: 有効
-        2: 一時停止
-      enum:
-        - 0
-        - 1
-        - 2
-      x-enum-varnames:
-        - deactivated
-        - active
-        - suspended
-      x-enum-descriptions:
-        - 凍結
-        - 有効
-        - 一時停止
-      format: int32
     UserDetail:
       title: UserDetail
       type: object
@@ -813,21 +792,27 @@ components:
             - state
             - bio
             - accounts
-    EditUser:
-      title: EditUserRequest
-      type: object
-      description: ユーザー情報変更リクエスト
-      properties:
-        bio:
-          type: string
-          description: 自己紹介(biography)
-        check:
-          type: boolean
-          description: |-
-            本名を公開するかどうか
-            true: 公開
-            false: 非公開
-          default: true
+    UserAccountState:
+      type: integer
+      title: UserAccountState
+      description: |-
+        ユーザーアカウント状態
+        0: 凍結
+        1: 有効
+        2: 一時停止
+      enum:
+        - 0
+        - 1
+        - 2
+      x-enum-varnames:
+        - deactivated
+        - active
+        - suspended
+      x-enum-descriptions:
+        - 凍結
+        - 有効
+        - 一時停止
+      format: int32
     Account:
       title: Account
       type: object
@@ -1003,6 +988,93 @@ components:
             - hostname
             - eventLevel
       type: object
+    EventLevel:
+      type: integer
+      title: EventLevel
+      description: |-
+        公開範囲設定
+        0 イベント企画者の名前を伏せて公開
+        1 全て公開
+        2 外部に非公開
+      enum:
+        - 0
+        - 1
+        - 2
+      x-enum-varnames:
+        - Anonymous
+        - Public
+        - Private
+      x-enum-descriptions:
+        - イベントの企画者の名前を伏せて公開
+        - 全て公開
+        - 外部に非公開
+    Group:
+      title: Group
+      type: object
+      description: 班情報
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: 班uuid
+        name:
+          type: string
+          description: 班名
+      required:
+        - id
+        - name
+    UserGroup:
+      title: UserGroup
+      type: object
+      description: ユーザーの班の情報
+      allOf:
+        - $ref: '#/components/schemas/Group'
+        - type: object
+          properties:
+            duration:
+              $ref: '#/components/schemas/YearWithSemesterDuration'
+          required:
+            - duration
+    GroupDetail:
+      title: GroupDetail
+      type: object
+      description: 班の詳細情報
+      allOf:
+        - $ref: '#/components/schemas/Group'
+        - type: object
+          properties:
+            link:
+              type: string
+              format: uri
+              description: 班の詳細が載っているページへのリンク
+            leader:
+              $ref: '#/components/schemas/User'
+            members:
+              type: array
+              description: 班メンバー
+              items:
+                $ref: '#/components/schemas/GroupMember'
+            description:
+              type: string
+              description: 班説明
+          required:
+            - link
+            - leader
+            - members
+            - description
+    GroupMember:
+      title: GroupMember
+      type: object
+      description: 班所属メンバー情報
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            duration:
+              $ref: '#/components/schemas/YearWithSemesterDuration'
+          required:
+            - duration
     Contest:
       title: Contest
       type: object
@@ -1104,226 +1176,10 @@ components:
               description: コンテスト名
           required:
             - contestName
-    Group:
-      title: Group
-      type: object
-      description: 班情報
-      properties:
-        id:
-          type: string
-          format: uuid
-          x-go-type: uuid.UUID
-          description: 班uuid
-        name:
-          type: string
-          description: 班名
-      required:
-        - id
-        - name
-    UserGroup:
-      title: UserGroup
-      type: object
-      description: ユーザーの班の情報
-      allOf:
-        - $ref: '#/components/schemas/Group'
-        - type: object
-          properties:
-            duration:
-              $ref: '#/components/schemas/YearWithSemesterDuration'
-          required:
-            - duration
-    GroupDetail:
-      title: GroupDetail
-      type: object
-      description: 班の詳細情報
-      allOf:
-        - $ref: '#/components/schemas/Group'
-        - type: object
-          properties:
-            link:
-              type: string
-              format: uri
-              description: 班の詳細が載っているページへのリンク
-            leader:
-              $ref: '#/components/schemas/User'
-            members:
-              type: array
-              description: 班メンバー
-              items:
-                $ref: '#/components/schemas/GroupMember'
-            description:
-              type: string
-              description: 班説明
-          required:
-            - link
-            - leader
-            - members
-            - description
-    GroupMember:
-      title: GroupMember
-      type: object
-      description: 班所属メンバー情報
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          properties:
-            duration:
-              $ref: '#/components/schemas/YearWithSemesterDuration'
-          required:
-            - duration
-    CreateProject:
-      title: CreateProject
-      type: object
-      description: 新規プロジェクトリクエスト
-      properties:
-        name:
-          type: string
-          minLength: 1
-          maxLength: 30
-          description: プロジェクト名
-        link:
-          type: string
-          format: uri
-          description: プロジェクトの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
-        description:
-          type: string
-          description: プロジェクト説明
-        duration:
-          $ref: '#/components/schemas/YearWithSemesterDuration'
-      required:
-        - name
-        - description
-        - duration
-    EditProject:
-      title: EditProject
-      type: object
-      description: プロジェクト変更リクエスト
-      properties:
-        name:
-          type: string
-          minLength: 1
-          maxLength: 30
-          description: プロジェクト名
-        link:
-          type: string
-          format: uri
-          description: プロジェクトの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
-        description:
-          type: string
-          description: プロジェクト説明
-        duration:
-          $ref: '#/components/schemas/YearWithSemesterDuration'
-    CreateContest:
-      title: CreateContest
-      type: object
-      description: 新規コンテストリクエスト
-      properties:
-        name:
-          type: string
-          description: コンテスト名
-        link:
-          type: string
-          format: uri
-          description: コンテストの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
-        description:
-          type: string
-          description: コンテスト説明
-        duration:
-          # description: コンテストの開催期間
-          $ref: '#/components/schemas/Duration'
-      required:
-        - name
-        - description
-        - duration
-    EditContest:
-      title: EditContest
-      type: object
-      description: コンテスト情報変更リクエスト
-      properties:
-        name:
-          type: string
-          description: コンテスト名
-        link:
-          type: string
-          format: uri
-          description: コンテストの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
-        description:
-          type: string
-          description: コンテスト説明
-        duration:
-          # description: コンテストの開催期間
-          $ref: '#/components/schemas/Duration'
-    AddContestTeam:
-      title: AddContestTeam
-      type: object
-      description: 新規コンテストチームリクエスト
-      properties:
-        name:
-          type: string
-          description: チーム名
-        link:
-          type: string
-          format: uri
-          description: コンテストチームの説明が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
-        description:
-          type: string
-          description: チーム情報
-        result:
-          type: string
-          description: 順位などの結果
-      required:
-        - name
-        - description
-    EditContestTeam:
-      title: EditContestTeam
-      type: object
-      description: コンテストチーム情報修正リクエスト
-      properties:
-        name:
-          type: string
-          description: チーム名
-        link:
-          type: string
-          format: uri
-          description: コンテストチームの説明が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
-        description:
-          type: string
-          description: チーム情報
-        result:
-          type: string
-          description: 順位などの結果
-    EventLevel:
-      type: integer
-      title: EventLevel
-      description: |-
-        公開範囲設定
-        0 イベント企画者の名前を伏せて公開
-        1 全て公開
-        2 外部に非公開
-      enum:
-        - 0
-        - 1
-        - 2
-      x-enum-varnames:
-        - Anonymous
-        - Public
-        - Private
-      x-enum-descriptions:
-        - イベントの企画者の名前を伏せて公開
-        - 全て公開
-        - 外部に非公開
+    PrPermitted:
+      title: PrPermitted
+      type: boolean
+      description: 広報での利用が許可されているかどうか
     Duration:
       title: Duration
       type: object
@@ -1383,24 +1239,6 @@ components:
         - 前期
         - 後期
       format: int32
-    EditEvent:
-      title: EditEvent
-      type: object
-      description: イベント情報修正リクエスト
-      properties:
-        eventLevel:
-          $ref: '#/components/schemas/EventLevel'
-    AddProjectMembers:
-      title: AddProjectMembers
-      type: object
-      description: プロジェクトメンバー追加リクエスト
-      properties:
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/MemberIDWithYearWithSemesterDuration'
-      required:
-        - members
     MemberIDWithYearWithSemesterDuration:
       title: MemberIDWithYearWithSemesterDuration
       type: object
@@ -1429,8 +1267,23 @@ components:
             x-go-type: uuid.UUID
       required:
         - members
-    AddAccount:
-      title: AddAccount
+    EditUserRequest:
+      title: EditUserRequest
+      type: object
+      description: ユーザー情報変更リクエスト
+      properties:
+        bio:
+          type: string
+          description: 自己紹介(biography)
+        check:
+          type: boolean
+          description: |-
+            本名を公開するかどうか
+            true: 公開
+            false: 非公開
+          default: true
+    AddAccountRequest:
+      title: AddAccountRequest
       type: object
       description: 新規アカウントリクエスト
       properties:
@@ -1452,8 +1305,8 @@ components:
         - prPermitted
         - url
         - displayName
-    EditUserAccount:
-      title: EditUserAccount
+    EditUserAccountRequest:
+      title: EditUserAccountRequest
       type: object
       description: アカウント変更リクエスト
       properties:
@@ -1470,10 +1323,157 @@ components:
         displayName:
           type: string
           description: 外部アカウントの表示名
-    PrPermitted:
-      title: PrPermitted
-      type: boolean
-      description: 広報での利用が許可されているかどうか
+    EditEventRequest:
+      title: EditEventRequest
+      type: object
+      description: イベント情報修正リクエスト
+      properties:
+        eventLevel:
+          $ref: '#/components/schemas/EventLevel'
+    CreateProjectRequest:
+      title: CreateProjectRequest
+      type: object
+      description: 新規プロジェクトリクエスト
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: プロジェクト名
+        link:
+          type: string
+          format: uri
+          description: プロジェクトの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
+        description:
+          type: string
+          description: プロジェクト説明
+        duration:
+          $ref: '#/components/schemas/YearWithSemesterDuration'
+      required:
+        - name
+        - description
+        - duration
+    EditProjectRequest:
+      title: EditProjectRequest
+      type: object
+      description: プロジェクト変更リクエスト
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: プロジェクト名
+        link:
+          type: string
+          format: uri
+          description: プロジェクトの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
+        description:
+          type: string
+          description: プロジェクト説明
+        duration:
+          $ref: '#/components/schemas/YearWithSemesterDuration'
+    AddProjectMembersRequest:
+      title: AddProjectMembersRequest
+      type: object
+      description: プロジェクトメンバー追加リクエスト
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberIDWithYearWithSemesterDuration'
+      required:
+        - members
+    CreateContestRequest:
+      title: CreateContestRequest
+      type: object
+      description: 新規コンテストリクエスト
+      properties:
+        name:
+          type: string
+          description: コンテスト名
+        link:
+          type: string
+          format: uri
+          description: コンテストの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
+        description:
+          type: string
+          description: コンテスト説明
+        duration:
+          # description: コンテストの開催期間
+          $ref: '#/components/schemas/Duration'
+      required:
+        - name
+        - description
+        - duration
+    EditContestRequest:
+      title: EditContestRequest
+      type: object
+      description: コンテスト情報変更リクエスト
+      properties:
+        name:
+          type: string
+          description: コンテスト名
+        link:
+          type: string
+          format: uri
+          description: コンテストの詳細が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
+        description:
+          type: string
+          description: コンテスト説明
+        duration:
+          # description: コンテストの開催期間
+          $ref: '#/components/schemas/Duration'
+    AddContestTeamRequest:
+      title: AddContestTeamRequest
+      type: object
+      description: 新規コンテストチームリクエスト
+      properties:
+        name:
+          type: string
+          description: チーム名
+        link:
+          type: string
+          format: uri
+          description: コンテストチームの説明が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
+        description:
+          type: string
+          description: チーム情報
+        result:
+          type: string
+          description: 順位などの結果
+      required:
+        - name
+        - description
+    EditContestTeamRequest:
+      title: EditContestTeamRequest
+      type: object
+      description: コンテストチーム情報修正リクエスト
+      properties:
+        name:
+          type: string
+          description: チーム名
+        link:
+          type: string
+          format: uri
+          description: コンテストチームの説明が載っているページへのリンク
+          x-oapi-codegen-extra-tags:
+            validate: url
+        description:
+          type: string
+          description: チーム情報
+        result:
+          type: string
+          description: 順位などの結果
   parameters:
     userIdInPath:
       name: userId
@@ -1484,15 +1484,15 @@ components:
         type: string
         format: uuid
         x-go-type: uuid.UUID
-    groupIdInPath:
-      name: groupId
+    accountIdInPath:
+      name: accountId
       in: path
-      required: true
-      description: 班UUID
       schema:
         type: string
         format: uuid
         x-go-type: uuid.UUID
+      description: アカウントUUID
+      required: true
     projectIdInPath:
       name: projectId
       in: path
@@ -1507,6 +1507,15 @@ components:
       in: path
       required: true
       description: イベントUUID
+      schema:
+        type: string
+        format: uuid
+        x-go-type: uuid.UUID
+    groupIdInPath:
+      name: groupId
+      in: path
+      required: true
+      description: 班UUID
       schema:
         type: string
         format: uuid
@@ -1529,15 +1538,6 @@ components:
         type: string
         format: uuid
         x-go-type: uuid.UUID
-    accountIdInPath:
-      name: accountId
-      in: path
-      schema:
-        type: string
-        format: uuid
-        x-go-type: uuid.UUID
-      description: アカウントUUID
-      required: true
     includeSuspendedInQuery:
       name: includeSuspended
       in: query
