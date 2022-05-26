@@ -33,7 +33,7 @@ type UserProject struct {
 }
 
 type UserContest struct {
-	ID          uuid.UUID //TeamID
+	ID          uuid.UUID // チームID
 	Name        string    // チーム名
 	Result      string
 	ContestName string
