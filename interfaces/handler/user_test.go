@@ -1207,34 +1207,119 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 	}
 }
 
-/*
-func TestUserHandler_GetEvents(t *testing.T) {
-	type fields struct {
-		srv service.UserService
+func TestUserHandler_GetUserEvents(t *testing.T) {
+
+	makeEvents := func(s *mock_service.MockUserService, eventsLen int) (hres []*Event, path string) {
+		userID := random.UUID()
+
+		repoEvents := []*domain.Event{}
+		hresEvents := []*Event{}
+
+		for i := 0; i < eventsLen; i++ {
+
+			timeStart, timeEnd := random.SinceAndUntil()
+
+			revent := domain.Event{
+				ID:        random.UUID(),
+				Name:      random.AlphaNumeric(),
+				TimeStart: timeStart,
+				TimeEnd:   timeEnd,
+			}
+
+			hevent := Event{
+				Duration: Duration{
+					Since: timeStart,
+					Until: &timeEnd,
+				},
+				Id:   revent.ID,
+				Name: revent.Name,
+			}
+
+			repoEvents = append(repoEvents, &revent)
+			hresEvents = append(hresEvents, &hevent)
+
+		}
+
+		s.EXPECT().GetUserEvents(gomock.Any(), userID).Return(repoEvents, nil)
+		path = fmt.Sprintf("/api/v1/users/%s/events", userID)
+		return hresEvents, path
+
 	}
-	type args struct {
-		_c echo.Context
-	}
+
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockUserService) (hres []*Event, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success 0",
+			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+				return makeEvents(s, 0)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 1",
+			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+				return makeEvents(s, 1)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 2",
+			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+				return makeEvents(s, 2)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "success 32",
+			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+				return makeEvents(s, 32)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "Not Found",
+			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+
+				userID := random.UUID()
+
+				s.EXPECT().GetUserEvents(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				path = fmt.Sprintf("/api/v1/users/%s/events", userID)
+				return nil, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error",
+			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+
+				userID := random.AlphaNumericn(36)
+
+				path = fmt.Sprintf("/api/v1/users/%s/events", userID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := &UserHandler{
-				srv: tt.fields.srv,
-			}
-			if err := GetEvents(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("UserGetEvents() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			hresUsers, path := tt.setup(s)
+			var resBody []*Event
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
 		})
 	}
 }
 
+/*
 func Test_newUser(t *testing.T) {
 	type args struct {
 		id       uuid.UUID
