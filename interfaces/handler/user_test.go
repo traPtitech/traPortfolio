@@ -1036,12 +1036,10 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			}
 
 			hcontest := ContestTeamWithContestName{
-				ContestTeam: ContestTeam{
-					Id:     rcontest.ID,
-					Name:   rcontest.Name,
-					Result: rcontest.Result,
-				},
 				ContestName: rcontest.ContestName,
+				Id:          rcontest.ID,
+				Name:        rcontest.Name,
+				Result:      rcontest.Result,
 			}
 
 			repoContests = append(repoContests, &rcontest)
