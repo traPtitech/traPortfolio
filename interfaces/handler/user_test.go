@@ -26,7 +26,7 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, API) {
 	return s, api
 }
 
-func TestUserHandler_GetAll(t *testing.T) {
+func TestUserHandler_GetUsers(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*User, path string)
@@ -94,7 +94,7 @@ func TestUserHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestUserHandler_GetByID(t *testing.T) {
+func TestUserHandler_GetUser(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *UserDetail, userpath string)
@@ -211,7 +211,7 @@ func TestUserHandler_GetByID(t *testing.T) {
 	}
 }
 
-func TestUserHandler_Update(t *testing.T) {
+func TestUserHandler_UpdateUser(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *EditUserRequest, path string)
@@ -1318,160 +1318,3 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		})
 	}
 }
-
-/*
-func Test_newUser(t *testing.T) {
-	type args struct {
-		id       uuid.UUID
-		name     string
-		realName string
-	}
-	tests := []struct {
-		name string
-		args args
-		want User
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newUser(tt.args.id, tt.args.name, tt.args.realName); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newUser() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newUserDetail(t *testing.T) {
-	type args struct {
-		user     User
-		accounts []Account
-		bio      string
-		state    domain.TraQState
-	}
-	tests := []struct {
-		name string
-		args args
-		want UserDetail
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newUserDetail(tt.args.user, tt.args.accounts, tt.args.bio, tt.args.state); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newUserDetail() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newAccount(t *testing.T) {
-	type args struct {
-		id          uuid.UUID
-		name        string
-		atype       uint
-		url         string
-		prPermitted bool
-	}
-	tests := []struct {
-		name string
-		args args
-		want Account
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newAccount(tt.args.id, tt.args.name, tt.args.atype, tt.args.url, tt.args.prPermitted); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newAccount() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newUserProject(t *testing.T) {
-	type args struct {
-		id           uuid.UUID
-		name         string
-		duration     YearWithSemesterDuration
-		userDuration YearWithSemesterDuration
-	}
-	tests := []struct {
-		name string
-		args args
-		want UserProject
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newUserProject(tt.args.id, tt.args.name, tt.args.duration, tt.args.userDuration); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newUserProject() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newUserTeamWithUserName(t *testing.T) {
-	type args struct {
-		UserTeam UserTeam
-		UserName string
-	}
-	tests := []struct {
-		name string
-		args args
-		want UserTeamWithUserName
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newUserTeamWithUserName(tt.args.UserTeam, tt.args.UserName); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newUserTeamWithUserName() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newGroup(t *testing.T) {
-	type args struct {
-		id   uuid.UUID
-		name string
-	}
-	tests := []struct {
-		name string
-		args args
-		want Group
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newGroup(tt.args.id, tt.args.name); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newGroup() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newUserGroup(t *testing.T) {
-	type args struct {
-		group    Group
-		Duration YearWithSemesterDuration
-	}
-	tests := []struct {
-		name string
-		args args
-		want UserGroup
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newUserGroup(tt.args.group, tt.args.Duration); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newUserGroup() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-*/
