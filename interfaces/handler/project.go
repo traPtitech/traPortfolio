@@ -234,16 +234,20 @@ func newProject(id uuid.UUID, name string, duration YearWithSemesterDuration) Pr
 
 func newProjectDetail(project Project, description string, link string, members []ProjectMember) ProjectDetail {
 	return ProjectDetail{
-		Project:     project,
 		Description: description,
+		Duration:    project.Duration,
 		Link:        link,
+		Id:          project.Id,
 		Members:     members,
+		Name:        project.Name,
 	}
 }
 
 func newProjectMember(user User, duration YearWithSemesterDuration) ProjectMember {
 	return ProjectMember{
-		User:     user,
 		Duration: duration,
+		Id:       user.Id,
+		Name:     user.Name,
+		RealName: user.RealName,
 	}
 }

@@ -147,18 +147,16 @@ func TestUserHandler_GetByID(t *testing.T) {
 				}
 
 				hresUser := UserDetail{
-					User: User{
-						Id:       repoUser.User.ID,
-						Name:     repoUser.User.Name,
-						RealName: repoUser.User.RealName,
-					},
 					Accounts: hAccounts,
 					Bio:      repoUser.Bio,
+					Id:       repoUser.User.ID,
+					Name:     repoUser.User.Name,
+					RealName: repoUser.User.RealName,
 					State:    UserAccountState(repoUser.State),
 				}
 
 				s.EXPECT().GetUser(gomock.Any(), repoUser.User.ID).Return(&repoUser, nil)
-				path := fmt.Sprintf("/api/v1/users/%s", hresUser.User.Id)
+				path := fmt.Sprintf("/api/v1/users/%s", hresUser.Id)
 				return &hresUser, path
 			},
 			statusCode: http.StatusOK,
@@ -216,12 +214,12 @@ func TestUserHandler_GetByID(t *testing.T) {
 func TestUserHandler_Update(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *EditUser, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUserRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -230,7 +228,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -248,7 +246,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -257,7 +255,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -275,7 +273,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -284,7 +282,7 @@ func TestUserHandler_Update(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUser{
+				reqBody := &EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -302,7 +300,7 @@ func TestUserHandler_Update(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (*EditUser, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -919,11 +917,9 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			}
 
 			hproject := UserProject{
-				Project: Project{
-					Duration: convertDuration(rproject.Duration),
-					Id:       rproject.ID,
-					Name:     rproject.Name,
-				},
+				Duration:     convertDuration(rproject.Duration),
+				Id:           rproject.ID,
+				Name:         rproject.Name,
 				UserDuration: convertDuration(rproject.UserDuration),
 			}
 
@@ -1006,13 +1002,13 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 func TestUserHandler_GetUserContests(t *testing.T) {
 
-	makeContests := func(s *mock_service.MockUserService, projectsLen int) (hres []*ContestTeamWithContestName, path string) {
+	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*ContestTeamWithContestName, path string) {
 		userID := random.UUID()
 
 		repoContests := []*domain.UserContest{}
 		hresContests := []*ContestTeamWithContestName{}
 
-		for i := 0; i < projectsLen; i++ {
+		for i := 0; i < contestsLen; i++ {
 
 			rcontest := domain.UserContest{
 				ID:          random.UUID(),
@@ -1022,12 +1018,10 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			}
 
 			hcontest := ContestTeamWithContestName{
-				ContestTeam: ContestTeam{
-					Id:     rcontest.ID,
-					Name:   rcontest.Name,
-					Result: rcontest.Result,
-				},
 				ContestName: rcontest.ContestName,
+				Id:          rcontest.ID,
+				Name:        rcontest.Name,
+				Result:      rcontest.Result,
 			}
 
 			repoContests = append(repoContests, &rcontest)
@@ -1124,11 +1118,9 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 			}
 
 			hgroup := UserGroup{
-				Group: Group{
-					Id:   rgroup.ID,
-					Name: rgroup.Name,
-				},
 				Duration: convertDuration(rgroup.Duration),
+				Id:       rgroup.ID,
+				Name:     rgroup.Name,
 			}
 
 			repoGroups = append(repoGroups, &rgroup)

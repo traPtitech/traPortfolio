@@ -333,9 +333,11 @@ func newUser(id uuid.UUID, name string, realName string) User {
 
 func newUserDetail(user User, accounts []Account, bio string, state domain.TraQState) UserDetail {
 	return UserDetail{
-		User:     user,
 		Accounts: accounts,
 		Bio:      bio,
+		Id:       user.Id,
+		Name:     user.Name,
+		RealName: user.RealName,
 		State:    UserAccountState(state),
 	}
 }
@@ -352,11 +354,9 @@ func newAccount(id uuid.UUID, displayName string, atype uint, url string, prPerm
 
 func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration, userDuration YearWithSemesterDuration) UserProject {
 	return UserProject{
-		Project: Project{
-			Id:       id,
-			Name:     name,
-			Duration: duration,
-		},
+		Duration:     duration,
+		Id:           id,
+		Name:         name,
 		UserDuration: userDuration,
 	}
 }
@@ -364,8 +364,10 @@ func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration
 // TODO: UserContestのほうがいいかも
 func newContestTeamWithContestName(contestTeam ContestTeam, contestName string) ContestTeamWithContestName {
 	return ContestTeamWithContestName{
-		ContestTeam: contestTeam,
 		ContestName: contestName,
+		Id:          contestTeam.Id,
+		Name:        contestTeam.Name,
+		Result:      contestTeam.Result,
 	}
 }
 
@@ -378,7 +380,8 @@ func newGroup(id uuid.UUID, name string) Group {
 
 func newUserGroup(group Group, Duration YearWithSemesterDuration) UserGroup {
 	return UserGroup{
-		Group:    group,
 		Duration: Duration,
+		Id:       group.Id,
+		Name:     group.Name,
 	}
 }

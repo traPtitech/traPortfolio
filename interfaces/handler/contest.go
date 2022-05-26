@@ -370,9 +370,11 @@ func newContest(id uuid.UUID, name string, since time.Time, until time.Time) Con
 
 func newContestDetail(contest Contest, link string, description string, teams []ContestTeam) ContestDetail {
 	return ContestDetail{
-		Contest:     contest,
-		Link:        link,
 		Description: description,
+		Duration:    contest.Duration,
+		Id:          contest.Id,
+		Link:        link,
+		Name:        contest.Name,
 		Teams:       teams,
 	}
 }
@@ -387,9 +389,11 @@ func newContestTeam(id uuid.UUID, name string, result string) ContestTeam {
 
 func newContestTeamDetail(team ContestTeam, link string, description string, members []User) ContestTeamDetail {
 	return ContestTeamDetail{
-		ContestTeam: team,
-		Link:        link,
 		Description: description,
+		Id:          team.Id,
+		Link:        link,
 		Members:     members,
+		Name:        team.Name,
+		Result:      team.Result,
 	}
 }

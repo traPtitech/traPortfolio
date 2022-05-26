@@ -153,11 +153,6 @@ func TestProjectHandler_GetByID(t *testing.T) {
 				var members []ProjectMember
 				for _, v := range repo.Members {
 					members = append(members, ProjectMember{
-						User: User{
-							Id:       v.UserID,
-							Name:     v.Name,
-							RealName: v.RealName,
-						},
 						Duration: YearWithSemesterDuration{
 							Since: YearWithSemester{
 								Year:     v.Duration.Since.Year,
@@ -168,26 +163,27 @@ func TestProjectHandler_GetByID(t *testing.T) {
 								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
+						Id:       v.UserID,
+						Name:     v.Name,
+						RealName: v.RealName,
 					})
 				}
 				reqBody := ProjectDetail{
-					Project: Project{
-						Duration: YearWithSemesterDuration{
-							Since: YearWithSemester{
-								Semester: Semester(repo.Duration.Since.Semester),
-								Year:     repo.Duration.Since.Year,
-							},
-							Until: &YearWithSemester{
-								Semester: Semester(repo.Duration.Until.Semester),
-								Year:     repo.Duration.Until.Year,
-							},
-						},
-						Id:   repo.ID,
-						Name: repo.Name,
-					},
 					Description: repo.Description,
-					Link:        repo.Link,
-					Members:     members,
+					Duration: YearWithSemesterDuration{
+						Since: YearWithSemester{
+							Semester: Semester(repo.Duration.Since.Semester),
+							Year:     repo.Duration.Since.Year,
+						},
+						Until: &YearWithSemester{
+							Semester: Semester(repo.Duration.Until.Semester),
+							Year:     repo.Duration.Until.Year,
+						},
+					},
+					Id:      repo.ID,
+					Link:    repo.Link,
+					Members: members,
+					Name:    repo.Name,
 				}
 
 				s.EXPECT().GetProject(gomock.Any(), projectID).Return(&repo, nil)
