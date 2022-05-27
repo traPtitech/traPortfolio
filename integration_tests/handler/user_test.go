@@ -205,7 +205,12 @@ func TestGetUserAccounts(t *testing.T) {
 			mockdata.HMockUsers[0].Id,
 			mockdata.HMockUserAccounts,
 		},
-		"200 no accounts": {
+		"200 no accounts with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Account{},
+		},
+		"200 no accounts with not-existing userID": {
 			http.StatusOK,
 			random.UUID(),
 			[]handler.Account{},
