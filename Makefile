@@ -3,7 +3,7 @@ DB_PASS := password
 DB_HOST := 127.0.0.1
 DB_PORT := 3307
 DB_NAME := portfolio
-MARIADB_DSN := mariadb://${DB_USER}:${DB_PASS}@${DB_HOST}:$(DB_PORT)/${DB_NAME}
+MARIADB_DSN := mariadb://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 
 GOFILES=$(wildcard *.go **/*.go)
 
@@ -26,25 +26,25 @@ SPECTRAL := docker run --rm -it -w /tmp -v $$PWD:/tmp stoplight/spectral:${SPECT
 all: clean mod build
 
 clean:
-	@$(RM) $(BINARY)
+	@${RM} ${BINARY}
 	@go clean
 
 mod:
 	@go mod tidy
 
-build: $(GOFILES)
-	@go build -o $(BINARY)
+build: ${GOFILES}
+	@go build -o ${BINARY}
 
 check: all lint test-all db-lint openapi-lint
 
-test: $(GOFILES)
+test: ${GOFILES}
 	go test -v -cover -race ./...
 
-test-all: $(GOFILES)
-	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./...
+test-all: ${GOFILES}
+	go test -v -cover -race -tags=${TEST_INTEGRATION_TAGS} ./...
 
-test-integration-db: $(GOFILES)
-	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/...
+test-integration-db: ${GOFILES}
+	go test -v -cover -race -tags=${TEST_INTEGRATION_TAGS} ./integration_tests/...
 
 lint:
 	@${GOLANGCI_LINT} run --fix ./...
@@ -63,7 +63,7 @@ db-lint: migrate
 	@${TBLS} lint
 
 up-test-db:
-	@TEST_DB_PORT=$(DB_PORT) ./dev/bin/up-test-db.sh
+	@TEST_DB_PORT=${DB_PORT} ./dev/bin/up-test-db.sh
 
 rm-test-db:
 	@./dev/bin/down-test-db.sh
