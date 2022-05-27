@@ -8,6 +8,9 @@ BINARY=./bin/traPortfolio
 
 TEST_INTEGRATION_TAGS := "integration db"
 
+GOLANGCI_LINT_VERSION := latest
+GOLANGCI_LINT := go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
+
 .PHONY: all
 all: clean mod build
 
@@ -36,9 +39,9 @@ test-all: $(GOFILES)
 test-integration-db: $(GOFILES)
 	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/...
 
-.PHONY: golangci-lint
-golangci-lint:
-	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run ./...
+.PHONY: lint
+lint:
+	@${GOLANGCI_LINT} run --fix ./...
 
 .PHONY: up-test-db
 up-test-db:
