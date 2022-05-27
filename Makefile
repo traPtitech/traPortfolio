@@ -9,7 +9,20 @@ BINARY=./bin/traPortfolio
 TEST_INTEGRATION_TAGS := "integration db"
 
 .PHONY: all
-all: clean build
+all: clean mod build
+
+.PHONY: clean
+clean:
+	@$(RM) $(BINARY)
+	@go clean
+
+.PHONY: mod
+mod:
+	@go mod tidy
+
+.PHONY: build
+build: $(GOFILES)
+	@go build -o $(BINARY)
 
 .PHONY: test
 test: $(GOFILES)
@@ -22,15 +35,6 @@ test-all: $(GOFILES)
 .PHONY: test-integration-db
 test-integration-db: $(GOFILES)
 	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/...
-
-.PHONY: build
-build: $(GOFILES)
-	go build -o $(BINARY)
-
-.PHONY: clean
-clean: ## Cleanup working directory
-	@$(RM) $(BINARY)
-	@go clean
 
 .PHONY: golangci-lint
 golangci-lint:
