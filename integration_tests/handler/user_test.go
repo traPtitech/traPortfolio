@@ -249,7 +249,7 @@ func TestGetUserAccount(t *testing.T) {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
 			mockdata.HMockUserAccounts[0].Id,
-			mockdata.HMockUserAccounts,
+			mockdata.HMockUserAccounts[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
