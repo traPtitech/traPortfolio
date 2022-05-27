@@ -563,30 +563,49 @@ func TestDeleteUserAccount(t *testing.T) {
 	}
 }
 
-// // GetUserProjects GET /users/:userID/projects
-// func TestGetUserProjects(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserProjects GET /users/:userID/projects
+func TestGetUserProjects(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUsers[0].Id,
+			mockdata.HMockUserProjects,
+		},
+		"200 no projects with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Project{},
+		},
+		"200 no projects with non-existing userID": {
+			http.StatusOK,
+			random.UUID(),
+			[]handler.Project{},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_projects")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-// 			t.Parallel()
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_projects")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
 // // GetUserContests GET /users/:userID/contests
 // func TestGetUserContests(t *testing.T) {
