@@ -8,6 +8,7 @@ MARIADB_DSN := mariadb://${DB_USER}:${DB_PASS}@${DB_HOST}:$(DB_PORT)/${DB_NAME}
 GOFILES=$(wildcard *.go **/*.go)
 
 BINARY=./bin/traPortfolio
+GO_RUN := ${BINARY} --db-user ${DB_USER} --db-pass ${DB_PASS} --db-host ${DB_HOST} --db-port ${DB_PORT} --db-name ${DB_NAME}
 
 TEST_INTEGRATION_TAGS := "integration db"
 
@@ -53,13 +54,17 @@ lint:
 go-gen:
 	@go generate -x ./...
 
+.PHONY: migrate
+migrate: ${BINARY} # require test-db
+	@${GO_RUN} --migrate
+
 .PHONY: db-gen-docs
-db-gen-docs: # require test-db & migration
+db-gen-docs: migrate
 	@${RM} -rf ./docs/dbschema
 	@${TBLS} doc
 
 .PHONY: db-lint
-db-lint: # require test-db & migration
+db-lint: migrate
 	@${TBLS} lint
 
 .PHONY: up-test-db
