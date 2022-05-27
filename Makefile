@@ -18,6 +18,9 @@ GOLANGCI_LINT := go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GO
 TBLS_VERSION := latest
 TBLS := TBLS_DSN=${MARIADB_DSN} go run github.com/k1LoW/tbls@${TBLS_VERSION}
 
+SPECTRAL_VERSION := latest
+SPECTRAL := docker run --rm -it -w /tmp -v $$PWD:/tmp stoplight/spectral:${SPECTRAL_VERSION}
+
 .PHONY: all
 all: clean mod build
 
@@ -33,6 +36,9 @@ mod:
 .PHONY: build
 build: $(GOFILES)
 	@go build -o $(BINARY)
+
+.PHONY: check
+check: all lint test-all db-lint openapi-lint
 
 .PHONY: test
 test: $(GOFILES)
@@ -74,3 +80,7 @@ up-test-db:
 .PHONY: rm-test-db
 rm-test-db:
 	@./dev/bin/down-test-db.sh
+
+.PHONY: openapi-lint
+openapi-lint:
+	@${SPECTRAL} lint ./docs/swagger/traPortfolio.v1.yaml
