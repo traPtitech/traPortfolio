@@ -203,9 +203,7 @@ func TestGetUserAccounts(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			[]handler.Account{
-				mockdata.HMockUserAccount,
-			},
+			mockdata.HMockUserAccounts,
 		},
 		"200 no accounts": {
 			http.StatusOK,
@@ -245,13 +243,13 @@ func TestGetUserAccount(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserAccount.Id,
-			mockdata.HMockUserAccount,
+			mockdata.HMockUserAccounts[0].Id,
+			mockdata.HMockUserAccounts,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.HMockUserAccount.Id,
+			mockdata.HMockUserAccounts[0].Id,
 			handler.ConvertError(t, repository.ErrValidate),
 		},
 		"400 invalid accountID": {
@@ -263,7 +261,7 @@ func TestGetUserAccount(t *testing.T) {
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
-			mockdata.HMockUserAccount.Id,
+			mockdata.HMockUserAccounts[0].Id,
 			handler.ConvertError(t, repository.ErrNotFound),
 		},
 		"404 accountID not found": {
@@ -415,7 +413,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.HMockUserAccount.Id,
+			mockdata.HMockUserAccounts[0].Id,
 			handler.EditUserAccountJSONRequestBody{},
 			handler.ConvertError(t, repository.ErrValidate),
 		},
