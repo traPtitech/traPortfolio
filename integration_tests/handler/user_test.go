@@ -700,27 +700,48 @@ func TestGetUserGroups(t *testing.T) {
 	}
 }
 
-// // GetUserEvents GET /users/:userID/events
-// func TestGetUserEvents(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserEvents GET /users/:userID/events
+func TestGetUserEvents(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUsers[0].Id,
+			mockdata.HMockUserEvents,
+		},
+		"200 no events with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Event{
+				mockdata.HMockUserEvents[1],
+			},
+		},
+		"200 no events with non-existing userID": {
+			http.StatusOK,
+			random.UUID(),
+			[]handler.Event{},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_events")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-//			t.Parallel()
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_events")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
