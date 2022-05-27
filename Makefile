@@ -1,6 +1,9 @@
-TEST_DB_PORT := 3307
-
-TBLS_VERSION := 1.49.6
+DB_USER := root
+DB_PASS := password
+DB_HOST := 127.0.0.1
+DB_PORT := 3307
+DB_NAME := portfolio
+MARIADB_DSN := mariadb://${DB_USER}:${DB_PASS}@${DB_HOST}:$(DB_PORT)/${DB_NAME}
 
 GOFILES=$(wildcard *.go **/*.go)
 
@@ -10,6 +13,9 @@ TEST_INTEGRATION_TAGS := "integration db"
 
 GOLANGCI_LINT_VERSION := latest
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
+
+TBLS_VERSION := latest
+TBLS := TBLS_DSN=${MARIADB_DSN} go run github.com/k1LoW/tbls@${TBLS_VERSION}
 
 .PHONY: all
 all: clean mod build
@@ -43,23 +49,18 @@ test-integration-db: $(GOFILES)
 lint:
 	@${GOLANGCI_LINT} run --fix ./...
 
-.PHONY: up-test-db
-up-test-db:
-	@TEST_DB_PORT=$(TEST_DB_PORT) ./dev/bin/up-test-db.sh
-
 .PHONY: db-gen-docs
-db-gen-docs:
-	# @./dev/bin/db-gen-docs.sh $(TEST_DB_PORT) $(TBLS_VERSION)
-	@if [ -d "./docs/dbschema" ]; then \
-		rm -r ./docs/dbschema; \
-	fi
-	DB_HOST=localhost DB_PORT=$(TEST_DB_PORT) go run main.go -migrate true
-	docker run -u $$(id -u) --rm --net=host -e TBLS_DSN="mariadb://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
+db-gen-docs: # require test-db & migration
+	@${RM} -rf ./docs/dbschema
+	@${TBLS} doc
 
 .PHONY: db-lint
-db-lint:
-	DB_HOST=localhost DB_PORT=$(TEST_DB_PORT) go run main.go -migrate true
-	docker run --rm --net=host -e TBLS_DSN="mariadb://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
+db-lint: # require test-db & migration
+	@${TBLS} lint
+
+.PHONY: up-test-db
+up-test-db:
+	@TEST_DB_PORT=$(DB_PORT) ./dev/bin/up-test-db.sh
 
 .PHONY: rm-test-db
 rm-test-db:
