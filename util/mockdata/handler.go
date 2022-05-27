@@ -186,7 +186,7 @@ func CloneHandlerMockProjectMembers() []handler.ProjectMember {
 		{
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
-					Year:     mProjectMember.Project.SinceYear,
+					Year:     mProjectMember.SinceYear,
 					Semester: handler.Semester(mProjectMember.SinceSemester),
 				},
 				Until: &handler.YearWithSemester{
