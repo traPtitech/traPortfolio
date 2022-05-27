@@ -55,7 +55,7 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 
 	return handler.ContestTeamDetail{
 		Description: mContestTeam.Description,
-		Id:          mContestTeam.ContestID,
+		Id:          mContestTeam.ID,
 		Link:        mContestTeam.Link,
 		Members: []handler.User{
 			{
