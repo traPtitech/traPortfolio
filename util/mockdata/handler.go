@@ -16,6 +16,7 @@ var (
 	HMockUsers          = CloneHandlerMockUsers()
 	HMockUserDetails    = CloneHandlerMockUserDetails()
 	HMockUserAccounts   = CloneHandlerMockUserAccounts()
+	HMockUserEvents     = CloneHandlerMockUserEvents()
 	HMockUserContests   = CloneHandlerMockUserContests()
 	HMockUserGroups     = CloneHandlerMockUserGroups()
 	HMockUserProjects   = CloneHandlerMockUserProjects()
@@ -258,6 +259,23 @@ func CloneHandlerMockUserAccounts() []handler.Account {
 			Url:         mAccount.URL,
 		},
 	}
+}
+
+func CloneHandlerMockUserEvents() []handler.Event {
+	var (
+		hEventDetails = CloneHandlerMockEvents()
+		mUserEvents   = make([]handler.Event, len(hEventDetails))
+	)
+
+	for i, e := range hEventDetails {
+		mUserEvents[i] = handler.Event{
+			Duration: e.Duration,
+			Id:       e.Id,
+			Name:     e.Name,
+		}
+	}
+
+	return mUserEvents
 }
 
 func CloneHandlerMockUserContests() []handler.ContestTeamWithContestName {
