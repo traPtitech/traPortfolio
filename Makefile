@@ -49,6 +49,10 @@ test-integration-db: $(GOFILES)
 lint:
 	@${GOLANGCI_LINT} run --fix ./...
 
+.PHONY: go-gen
+go-gen:
+	@go generate -x ./...
+
 .PHONY: db-gen-docs
 db-gen-docs: # require test-db & migration
 	@${RM} -rf ./docs/dbschema
@@ -65,7 +69,3 @@ up-test-db:
 .PHONY: rm-test-db
 rm-test-db:
 	@./dev/bin/down-test-db.sh
-
-.PHONY: go-gen
-go-gen:
-	@go generate ./...
