@@ -85,10 +85,18 @@ Make sure MySQL is running.
 make db-lint
 ```
 
+#### OpenAPI linter (spectral)
+
+Make sure MySQL is running.
+
+```bash
+make openapi-lint
+```
+
 #### Go linter (golangci-lint)
 
 ```bash
-make golangci-lint
+make lint
 ```
 
 ### Run tests

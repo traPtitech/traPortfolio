@@ -1,63 +1,72 @@
+TEST_DB_USER := root
+TEST_DB_PASS := password
+TEST_DB_HOST := 127.0.0.1
 TEST_DB_PORT := 3307
-
-TBLS_VERSION := 1.49.6
+TEST_DB_NAME := portfolio
+TEST_MARIADB_DSN := mariadb://${TEST_DB_USER}:${TEST_DB_PASS}@${TEST_DB_HOST}:${TEST_DB_PORT}/${TEST_DB_NAME}
 
 GOFILES=$(wildcard *.go **/*.go)
 
 BINARY=./bin/traPortfolio
+GO_RUN := ${BINARY} --db-user ${TEST_DB_USER} --db-pass ${TEST_DB_PASS} --db-host ${TEST_DB_HOST} --db-port ${TEST_DB_PORT} --db-name ${TEST_DB_NAME}
 
 TEST_INTEGRATION_TAGS := "integration db"
 
-.PHONY: all
-all: clean build
+GOLANGCI_LINT_VERSION := latest
+GOLANGCI_LINT := go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
 
-.PHONY: test
-test: $(GOFILES)
-	go test -v -cover -race ./...
+TBLS_VERSION := latest
+TBLS := TBLS_DSN=${TEST_MARIADB_DSN} go run github.com/k1LoW/tbls@${TBLS_VERSION}
 
-.PHONY: test-all
-test-all: $(GOFILES)
-	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./...
+SPECTRAL_VERSION := latest
+SPECTRAL := docker run --rm -it -w /tmp -v $$PWD:/tmp stoplight/spectral:${SPECTRAL_VERSION}
 
-.PHONY: test-integration-db
-test-integration-db: $(GOFILES)
-	go test -v -cover -race -tags=$(TEST_INTEGRATION_TAGS) ./integration_tests/...
+.PHONY: ${shell egrep -o ^[a-zA-Z_-]+: ./Makefile | sed 's/://'}
 
-.PHONY: build
-build: $(GOFILES)
-	go build -o $(BINARY)
+all: clean mod build
 
-.PHONY: clean
-clean: ## Cleanup working directory
-	@$(RM) $(BINARY)
+clean:
+	@${RM} ${BINARY}
 	@go clean
 
-.PHONY: golangci-lint
-golangci-lint:
-	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run ./...
+mod:
+	@go mod tidy
 
-.PHONY: up-test-db
+build: ${GOFILES}
+	@go build -o ${BINARY}
+
+check: all lint test-all db-lint openapi-lint
+
+test: ${GOFILES}
+	go test -v -cover -race ./...
+
+test-all: ${GOFILES}
+	go test -v -cover -race -tags=${TEST_INTEGRATION_TAGS} ./...
+
+test-integration-db: ${GOFILES}
+	go test -v -cover -race -tags=${TEST_INTEGRATION_TAGS} ./integration_tests/...
+
+lint:
+	@${GOLANGCI_LINT} run --fix ./...
+
+go-gen:
+	@go generate -x ./...
+
+migrate: ${BINARY} # require test-db
+	@${GO_RUN} --migrate
+
+db-gen-docs: migrate
+	@${RM} -rf ./docs/dbschema
+	@${TBLS} doc
+
+db-lint: migrate
+	@${TBLS} lint
+
 up-test-db:
-	@TEST_DB_PORT=$(TEST_DB_PORT) ./dev/bin/up-test-db.sh
+	@TEST_DB_PORT=${TEST_DB_PORT} ./dev/bin/up-test-db.sh
 
-.PHONY: db-gen-docs
-db-gen-docs:
-	# @./dev/bin/db-gen-docs.sh $(TEST_DB_PORT) $(TBLS_VERSION)
-	@if [ -d "./docs/dbschema" ]; then \
-		rm -r ./docs/dbschema; \
-	fi
-	DB_HOST=localhost DB_PORT=$(TEST_DB_PORT) go run main.go -migrate true
-	docker run -u $$(id -u) --rm --net=host -e TBLS_DSN="mariadb://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) doc
-
-.PHONY: db-lint
-db-lint:
-	DB_HOST=localhost DB_PORT=$(TEST_DB_PORT) go run main.go -migrate true
-	docker run --rm --net=host -e TBLS_DSN="mariadb://root:password@127.0.0.1:$(TEST_DB_PORT)/portfolio" -v $$PWD:/work k1low/tbls:$(TBLS_VERSION) lint
-
-.PHONY: rm-test-db
 rm-test-db:
 	@./dev/bin/down-test-db.sh
 
-.PHONY: go-gen
-go-gen:
-	@go generate ./...
+openapi-lint:
+	@${SPECTRAL} lint ./docs/swagger/traPortfolio.v1.yaml
