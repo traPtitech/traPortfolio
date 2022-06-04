@@ -335,8 +335,8 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// DeleteContestTeamMember PUT /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
+// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) EditContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない

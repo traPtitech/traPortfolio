@@ -390,7 +390,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest_team_members")
+	conf := testutils.GetConfigWithDBName("contest_repository_edit_contest_team_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)

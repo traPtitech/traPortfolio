@@ -1001,7 +1001,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
+func TestContestHandler_EditContestTeamMember(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
