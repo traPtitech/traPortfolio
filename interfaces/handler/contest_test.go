@@ -1072,7 +1072,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 
 			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, api, http.MethodDelete, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
