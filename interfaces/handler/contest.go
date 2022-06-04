@@ -335,7 +335,7 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
+// DeleteContestTeamMember PUT /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()

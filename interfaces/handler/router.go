@@ -130,7 +130,7 @@ func Setup(e *echo.Echo, api API) error {
 
 							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMembers)
 							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMember)
-							apiContestsCIDTeamsTIDMembers.DELETE("", api.Contest.DeleteContestTeamMember)
+							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.DeleteContestTeamMember)
 						}
 					}
 				}

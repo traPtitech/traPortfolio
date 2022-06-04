@@ -594,7 +594,7 @@ paths:
       tags:
         - contest
         - user
-    delete:
+    put:
       summary: コンテストチームメンバーの削除
       operationId: deleteContestTeamMembers
       responses:
