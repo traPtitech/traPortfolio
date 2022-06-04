@@ -146,17 +146,15 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 	}
 
 	hres := ContestDetail{
-		Contest: Contest{
-			Id:   d.ID,
-			Name: d.Name,
-			Duration: Duration{
-				Since: d.TimeStart,
-				Until: &d.TimeEnd,
-			},
-		},
-		Link:        d.Link,
 		Description: d.Description,
-		Teams:       teams,
+		Duration: Duration{
+			Since: d.TimeStart,
+			Until: &d.TimeEnd,
+		},
+		Id:    d.ID,
+		Link:  d.Link,
+		Name:  d.Name,
+		Teams: teams,
 	}
 
 	return &d, &hres
@@ -580,14 +578,12 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 				}
 
 				hres := ContestTeamDetail{
-					ContestTeam: ContestTeam{
-						Id:     repoContestTeamDetail.ID,
-						Name:   repoContestTeamDetail.Name,
-						Result: repoContestTeamDetail.Result,
-					},
-					Link:        repoContestTeamDetail.Link,
 					Description: repoContestTeamDetail.Description,
+					Id:          repoContestTeamDetail.ID,
+					Link:        repoContestTeamDetail.Link,
 					Members:     members,
+					Name:        repoContestTeamDetail.Name,
+					Result:      repoContestTeamDetail.Result,
 				}
 
 				s.EXPECT().GetContestTeam(gomock.Any(), contestID, teamID).Return(&repoContestTeamDetail, nil)

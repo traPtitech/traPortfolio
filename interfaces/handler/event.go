@@ -106,10 +106,15 @@ func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) Event
 
 func newEventDetail(event Event, description string, eventLevel domain.EventLevel, hostname []User, place string) EventDetail {
 	return EventDetail{
-		Event:       event,
 		Description: description,
-		EventLevel:  EventLevel(eventLevel),
-		Hostname:    hostname,
-		Place:       place,
+		Duration: Duration{
+			Since: event.Duration.Since,
+			Until: event.Duration.Until,
+		},
+		EventLevel: EventLevel(eventLevel),
+		Hostname:   hostname,
+		Id:         event.Id,
+		Name:       event.Name,
+		Place:      place,
 	}
 }
