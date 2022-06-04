@@ -350,7 +350,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeamMembers(ctx, req.TeamID, req.Members)
+	err = h.srv.EditContestTeamMembers(ctx, req.TeamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}

@@ -1027,7 +1027,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(nil)
+				s.EXPECT().EditContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNoContent,
@@ -1059,7 +1059,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(repository.ErrNotFound)
+				s.EXPECT().EditContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,

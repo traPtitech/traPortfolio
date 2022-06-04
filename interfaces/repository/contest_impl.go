@@ -399,7 +399,7 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 
 }
 
-func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
+func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	// 存在チェック
 	err := repo.h.
 		Where(&model.ContestTeam{ID: teamID}).

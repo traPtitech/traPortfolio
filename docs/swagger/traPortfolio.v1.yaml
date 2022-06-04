@@ -595,8 +595,8 @@ paths:
         - contest
         - user
     put:
-      summary: コンテストチームメンバーの削除
-      operationId: deleteContestTeamMembers
+      summary: コンテストチームメンバーの修正
+      operationId: editContestTeamMembers
       responses:
         '204':
           description: No Content
@@ -604,7 +604,7 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
-      description: コンテストチームメンバーを削除します
+      description: コンテストチームメンバーを修正します
       requestBody:
         content:
           application/json:

@@ -1153,7 +1153,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 	}
 }
 
-func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
+func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		teamID  uuid.UUID
@@ -1275,7 +1275,7 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.DeleteContestTeamMembers(tt.args.teamID, tt.args.members))
+			tt.assertion(t, repo.EditContestTeamMembers(tt.args.teamID, tt.args.members))
 		})
 	}
 }
