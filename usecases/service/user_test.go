@@ -434,7 +434,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(nil)
+				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
