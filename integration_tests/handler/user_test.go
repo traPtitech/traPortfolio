@@ -210,15 +210,15 @@ func TestGetUserAccounts(t *testing.T) {
 			mockdata.HMockUsers[1].Id,
 			[]handler.Account{},
 		},
-		"200 no accounts with not-existing userID": {
-			http.StatusOK,
-			random.UUID(),
-			[]handler.Account{},
-		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
@@ -586,15 +586,15 @@ func TestGetUserProjects(t *testing.T) {
 			mockdata.HMockUsers[1].Id,
 			[]handler.Project{},
 		},
-		"200 no projects with non-existing userID": {
-			http.StatusOK,
-			random.UUID(),
-			[]handler.Project{},
-		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
@@ -630,15 +630,15 @@ func TestGetUserContests(t *testing.T) {
 			mockdata.HMockUsers[1].Id,
 			[]handler.Contest{},
 		},
-		"200 no contests with non-existing userID": {
-			http.StatusOK,
-			random.UUID(),
-			[]handler.Contest{},
-		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
@@ -674,15 +674,15 @@ func TestGetUserGroups(t *testing.T) {
 			mockdata.HMockUsers[1].Id,
 			[]handler.Group{},
 		},
-		"200 no groups with non-existing userID": {
-			http.StatusOK,
-			random.UUID(),
-			[]handler.Group{},
-		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
