@@ -599,6 +599,18 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			},
 			assertion: assert.Error,
 		},
+		{
+			name: "User not found",
+			args: args{userID: random.UUID()},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.Account) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.userID).
+					WillReturnError(gorm.ErrRecordNotFound)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -1156,6 +1168,18 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			},
 			assertion: assert.Error,
 		},
+		{
+			name: "User not found",
+			args: args{userID: random.UUID()},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserProject) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.userID).
+					WillReturnError(gorm.ErrRecordNotFound)
+			},
+			assertion: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -1234,6 +1258,18 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "User not found",
+			args: args{userID: random.UUID()},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.userID).
+					WillReturnError(gorm.ErrRecordNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1325,6 +1361,18 @@ func TestUserRepository_GetContests(t *testing.T) {
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "User not found",
+			args: args{userID: random.UUID()},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.userID).
+					WillReturnError(gorm.ErrRecordNotFound)
 			},
 			assertion: assert.Error,
 		},
