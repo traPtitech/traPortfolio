@@ -410,8 +410,8 @@ func TestUserService_EditAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx       context.Context
-		accountID uuid.UUID
 		userID    uuid.UUID
+		accountID uuid.UUID
 		args      *repository.UpdateAccountArgs
 	}
 	tests := []struct {
@@ -424,8 +424,8 @@ func TestUserService_EditAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				accountID: random.UUID(),
 				userID:    random.UUID(),
+				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -434,7 +434,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(nil)
+				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -442,8 +442,8 @@ func TestUserService_EditAccount(t *testing.T) {
 			name: "Notfound",
 			args: args{
 				ctx:       context.Background(),
-				accountID: random.UUID(),
 				userID:    random.UUID(),
+				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -452,7 +452,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -470,7 +470,7 @@ func TestUserService_EditAccount(t *testing.T) {
 			tt.setup(repo, event, tt.args)
 
 			s := NewUserService(repo, event)
-			tt.assertion(t, s.EditAccount(tt.args.ctx, tt.args.accountID, tt.args.userID, tt.args.args))
+			tt.assertion(t, s.EditAccount(tt.args.ctx, tt.args.userID, tt.args.accountID, tt.args.args))
 		})
 	}
 }
@@ -479,8 +479,8 @@ func TestUserService_DeleteAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx       context.Context
-		accountid uuid.UUID
-		userid    uuid.UUID
+		userID    uuid.UUID
+		accountID uuid.UUID
 	}
 	tests := []struct {
 		name      string
@@ -492,11 +492,11 @@ func TestUserService_DeleteAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				accountid: random.UUID(),
-				userid:    random.UUID(),
+				userID:    random.UUID(),
+				accountID: random.UUID(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().DeleteAccount(args.accountid, args.userid).Return(nil)
+				repo.EXPECT().DeleteAccount(args.userID, args.accountID).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -514,7 +514,7 @@ func TestUserService_DeleteAccount(t *testing.T) {
 			tt.setup(repo, event, tt.args)
 
 			s := NewUserService(repo, event)
-			tt.assertion(t, s.DeleteAccount(tt.args.ctx, tt.args.accountid, tt.args.userid))
+			tt.assertion(t, s.DeleteAccount(tt.args.ctx, tt.args.userID, tt.args.accountID))
 		})
 	}
 }
