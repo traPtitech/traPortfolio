@@ -422,11 +422,26 @@ func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members 
 		belongings[v.UserID] = struct{}{}
 	}
 
+	membersMap := make(map[uuid.UUID]struct{}, len(members))
+	for _, v := range members {
+		membersMap[v] = struct{}{}
+	}
+
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		//チームに所属していなくて渡された配列に入っているメンバーをチームに追加
 		for _, memberID := range members {
-			if _, ok := belongings[memberID]; ok {
+			if _, ok := belongings[memberID]; !ok {
+				err = tx.Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
+				if err != nil {
+					return convertError(err)
+				}
+			}
+		}
+		//チームに所属していて渡された配列に入っていないメンバーをチームから削除
+		for _, belonging := range _belongings {
+			if _, ok := membersMap[belonging.UserID]; !ok {
 				err = tx.
-					Where(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).
+					Where(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: belonging.UserID}).
 					Delete(&model.ContestTeamUserBelonging{}).
 					Error()
 				if err != nil {
