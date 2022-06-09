@@ -14,14 +14,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type ContestIDInPath struct {
-	ContestID uuid.UUID `param:"contestID" validate:"is-uuid"`
-}
-
-type TeamIDInPath struct {
-	TeamID uuid.UUID `param:"teamID" validate:"is-uuid"`
-}
-
 type ContestHandler struct {
 	srv service.ContestService
 }
@@ -34,6 +26,7 @@ func NewContestHandler(service service.ContestService) *ContestHandler {
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(_c echo.Context) error {
 	c := _c.(*Context)
+
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetContests(ctx)
 	if err != nil {
@@ -51,13 +44,14 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 // GetContest GET /contests/:contestID
 func (h *ContestHandler) GetContest(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := ContestIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	contestID, err := c.getID(keyContestID)
+	if err != nil {
 		return convertError(err)
 	}
 
-	contest, err := h.srv.GetContest(ctx, req.ContestID)
+	ctx := c.Request().Context()
+	contest, err := h.srv.GetContest(ctx, contestID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -80,10 +74,9 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 // CreateContest POST /contests
 func (h *ContestHandler) CreateContest(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
+
 	req := CreateContestJSONRequestBody{}
-	err := c.BindAndValidate(&req)
-	if err != nil {
+	if err := c.BindAndValidate(&req); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
@@ -95,6 +88,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 		Until:       optional.TimeFrom(req.Duration.Until),
 	}
 
+	ctx := c.Request().Context()
 	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
 		return convertError(err)
@@ -112,13 +106,14 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 // EditContest PATCH /contests/:contestID
 func (h *ContestHandler) EditContest(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ContestIDInPath
-		EditContestJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	contestID, err := c.getID(keyContestID)
 	if err != nil {
+		return convertError(err)
+	}
+
+	req := EditContestJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
@@ -132,38 +127,43 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 		patchReq.Until = optional.TimeFrom(req.Duration.Until)
 	}
 
-	err = h.srv.UpdateContest(ctx, req.ContestID, &patchReq)
+	ctx := c.Request().Context()
+	err = h.srv.UpdateContest(ctx, contestID, &patchReq)
 	if err != nil {
 		return convertError(err)
 	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteContest DELETE /contests/:contestID
 func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := ContestIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
-	}
-	err := h.srv.DeleteContest(ctx, req.ContestID)
+
+	contestID, err := c.getID(keyContestID)
 	if err != nil {
 		return convertError(err)
 	}
+
+	ctx := c.Request().Context()
+	if err := h.srv.DeleteContest(ctx, contestID); err != nil {
+		return convertError(err)
+	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetContestTeams GET /contests/:contestID/teams
 func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := ContestIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	contestID, err := c.getID(keyContestID)
+	if err != nil {
 		return convertError(err)
 	}
 
-	contestTeams, err := h.srv.GetContestTeams(ctx, req.ContestID)
+	ctx := c.Request().Context()
+	contestTeams, err := h.srv.GetContestTeams(ctx, contestID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -179,15 +179,19 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 // GetContestTeams GET /contests/:contestID/teams/:teamID
 func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ContestIDInPath
-		TeamIDInPath
-	}{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	contestID, err := c.getID(keyContestID)
+	if err != nil {
 		return convertError(err)
 	}
-	contestTeam, err := h.srv.GetContestTeam(ctx, req.ContestID, req.TeamID)
+
+	teamID, err := c.getID(keyContestTeamID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	contestTeam, err := h.srv.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -210,13 +214,14 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 // AddContestTeam POST /contests/:contestID/teams
 func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ContestIDInPath
-		AddContestTeamJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	contestID, err := c.getID(keyContestID)
 	if err != nil {
+		return convertError(err)
+	}
+
+	req := AddContestTeamJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
@@ -227,7 +232,8 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 		Description: req.Description,
 	}
 
-	contestTeam, err := h.srv.CreateContestTeam(ctx, req.ContestID, &args)
+	ctx := c.Request().Context()
+	contestTeam, err := h.srv.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -240,17 +246,23 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 // EditContestTeam PATCH /contests/:contestID/teams/:teamID
 func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	// todo contestIDが必要ない
-	req := struct {
-		ContestIDInPath
-		TeamIDInPath
-		EditContestTeamJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	// TODO: contestIDをUpdateContestTeamの引数に含める
+	_, err := c.getID(keyContestID)
 	if err != nil {
+		return convertError(err)
+	}
+
+	teamID, err := c.getID(keyContestTeamID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := EditContestTeamJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
+
 	args := repository.UpdateContestTeamArgs{
 		Name:        optional.StringFrom(req.Name),
 		Result:      optional.StringFrom(req.Result),
@@ -258,46 +270,52 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 		Description: optional.StringFrom(req.Description),
 	}
 
-	err = h.srv.UpdateContestTeam(ctx, req.TeamID, &args)
-	if err != nil {
+	ctx := c.Request().Context()
+	if err = h.srv.UpdateContestTeam(ctx, teamID, &args); err != nil {
 		return convertError(err)
 	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
 func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ContestIDInPath
-		TeamIDInPath
-	}{}
-	err := c.BindAndValidate(&req)
-	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
-	}
 
-	err = h.srv.DeleteContestTeam(ctx, req.ContestID, req.TeamID)
+	contestID, err := c.getID(keyContestID)
 	if err != nil {
 		return convertError(err)
 	}
+
+	teamID, err := c.getID(keyContestTeamID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	if err = h.srv.DeleteContestTeam(ctx, contestID, teamID); err != nil {
+		return convertError(err)
+	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ContestIDInPath
-		TeamIDInPath
-	}{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	contestID, err := c.getID(keyContestID)
+	if err != nil {
 		return convertError(err)
 	}
 
-	users, err := h.srv.GetContestTeamMembers(ctx, req.ContestID, req.TeamID)
+	teamID, err := c.getID(keyContestTeamID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	users, err := h.srv.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -317,18 +335,24 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
-	// todo contestIDが必要ない
-	req := struct {
-		ContestIDInPath
-		TeamIDInPath
-		MemberIDs
-	}{}
-	err := c.BindAndValidate(&req)
+
+	// TODO: contestIDをAddContestTeamMembersの引数に含める
+	_, err := c.getID(keyContestID)
 	if err != nil {
+		return convertError(err)
+	}
+
+	teamID, err := c.getID(keyContestTeamID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := MemberIDs{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.AddContestTeamMembers(ctx, req.TeamID, req.Members)
+	err = h.srv.AddContestTeamMembers(ctx, teamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
@@ -338,20 +362,25 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 // DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	// todo contestIDが必要ない
-	req := struct {
-		ContestIDInPath
-		TeamIDInPath
-		MemberIDs
-	}{}
-	err := c.BindAndValidate(&req)
+
+	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
+	_, err := c.getID(keyContestID)
 	if err != nil {
+		return convertError(err)
+	}
+
+	teamID, err := c.getID(keyContestTeamID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := MemberIDs{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeamMembers(ctx, req.TeamID, req.Members)
-	if err != nil {
+	ctx := c.Request().Context()
+	if err := h.srv.DeleteContestTeamMembers(ctx, teamID, req.Members); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
