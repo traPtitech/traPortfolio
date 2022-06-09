@@ -442,15 +442,20 @@ func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members 
 			}
 		}
 		//チームに所属していて渡された配列に入っていないメンバーをチームから削除
+		membersToBeRemoved := make([]uuid.UUID, 0, len(members))
 		for _, belonging := range _belongings {
 			if _, ok := membersMap[belonging.UserID]; !ok {
-				err = tx.
-					Where(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: belonging.UserID}).
-					Delete(&model.ContestTeamUserBelonging{}).
-					Error()
-				if err != nil {
-					return convertError(err)
-				}
+				membersToBeRemoved = append(membersToBeRemoved, belonging.UserID)
+			}
+		}
+		if len(membersToBeRemoved) > 0 {
+			err = tx.
+				Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+				Where("`contest_team_user_belongings`.`user_id` IN (?)", membersToBeRemoved).
+				Delete(&model.ContestTeamUserBelonging{}).
+				Error()
+			if err != nil {
+				return convertError(err)
 			}
 		}
 		return nil
