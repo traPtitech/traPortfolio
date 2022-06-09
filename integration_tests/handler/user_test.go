@@ -66,7 +66,7 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			handler.ConvertError(t, repository.ErrInvalidArg),
+			handler.ConvertError(t, repository.ErrValidate),
 		},
 	}
 

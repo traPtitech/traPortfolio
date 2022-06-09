@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"errors"
+
 	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/labstack/echo/v4"
@@ -26,6 +28,7 @@ func (v *validator) Validate(i interface{}) error {
 		}
 	} else {
 		v.logger.Errorf("%T is not validatable", i)
+		return vd.ErrInInvalid
 	}
 
 	return nil
@@ -37,6 +40,19 @@ var (
 	vdRuleAccountType       = []vd.Rule{vd.Min(0), vd.Max(int(domain.AccountLimit) - 1)}
 	vdRuleEventLevel        = []vd.Rule{vd.Min(0), vd.Max(int(domain.EventLevelLimit) - 1)}
 )
+
+// path parameter structs
+
+func (p GetUsersParams) Validate() error {
+	if p.IncludeSuspended != nil && p.Name != nil {
+		return errors.New("include_suspended and name cannot be specified at the same time")
+	}
+
+	return vd.ValidateStruct(&p,
+		vd.Field(&p.IncludeSuspended),
+		vd.Field(&p.Name, vd.NilOrNotEmpty),
+	)
+}
 
 // request body structs
 
