@@ -353,7 +353,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        handler.AccountType(domain.AccountLimit),
 				Url:         url,
 			},
-			handler.ConvertError(t, repository.ErrInvalidArg),
+			handler.ConvertError(t, repository.ErrValidate),
 		},
 	}
 

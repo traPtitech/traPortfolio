@@ -586,15 +586,8 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					Url:         random.RandURLString(),
 				}
 
-				args := repository.CreateAccountArgs{
-					DisplayName: reqBody.DisplayName,
-					Type:        uint(reqBody.Type),
-					URL:         reqBody.Url,
-					PrPermitted: bool(reqBody.PrPermitted),
-				}
-
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(nil, repository.ErrInvalidArg)
+
 				return &reqBody, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -612,15 +605,8 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					Url:         random.RandURLString(),
 				}
 
-				args := repository.CreateAccountArgs{
-					DisplayName: reqBody.DisplayName,
-					Type:        uint(reqBody.Type),
-					URL:         reqBody.Url,
-					PrPermitted: bool(reqBody.PrPermitted),
-				}
-
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(nil, repository.ErrInvalidArg)
+
 				return &reqBody, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -745,7 +731,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(domain.AccountLimit)
+				accountType := int64(rand.Intn(int(domain.AccountLimit)))
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
