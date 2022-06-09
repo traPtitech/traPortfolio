@@ -28,7 +28,6 @@ func (v *validator) Validate(i interface{}) error {
 		}
 	} else {
 		v.logger.Errorf("%T is not validatable", i)
-		return vd.ErrInInvalid
 	}
 
 	return nil
