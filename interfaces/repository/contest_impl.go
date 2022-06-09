@@ -429,12 +429,16 @@ func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members 
 
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
 		//チームに所属していなくて渡された配列に入っているメンバーをチームに追加
+		membersToBeAdded := make([]*model.ContestTeamUserBelonging, 0, len(members))
 		for _, memberID := range members {
 			if _, ok := belongings[memberID]; !ok {
-				err = tx.Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
-				if err != nil {
-					return convertError(err)
-				}
+				membersToBeAdded = append(membersToBeAdded, &model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID})
+			}
+		}
+		if len(membersToBeAdded) > 0 {
+			err = tx.Create(&membersToBeAdded).Error()
+			if err != nil {
+				return convertError(err)
 			}
 		}
 		//チームに所属していて渡された配列に入っていないメンバーをチームから削除
