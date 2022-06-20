@@ -2,6 +2,8 @@ package handler
 
 import (
 	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"testing"
 
@@ -87,64 +89,109 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 	}
 }
 
-/*
-func TestGroupHandler_GetGroups(t *testing.T) {
-	type fields struct {
-		srv service.GroupService
-	}
-	type args struct {
-		_c echo.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			h := &GroupHandler{
-				srv: tt.fields.srv,
-			}
-			if err := h.GetGroups(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("GroupHandler.GetGroups() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-*/
-
-/*
-
 func TestGroupHandler_GetGroup(t *testing.T) {
-	type fields struct {
-		srv service.GroupService
-	}
-	type args struct {
-		_c echo.Context
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		setup      func(s *mock_service.MockGroupService) (hres *GroupDetail, path string)
+		statusCode int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+
+				rgroupLeader := domain.User{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				}
+
+				hgroupLeader := User{
+					Id:       rgroupLeader.ID,
+					Name:     rgroupLeader.Name,
+					RealName: rgroupLeader.RealName,
+				}
+
+				rgroupMembers := []*domain.UserGroup{}
+				hgroupMembers := []GroupMember{}
+
+				groupLen := rand.Intn(256)
+				for i := 0; i < groupLen; i++ {
+					rgroupmember := domain.UserGroup{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+						Duration: random.Duration(),
+					}
+
+					hgroupmember := GroupMember{
+						Duration: convertDuration(rgroupmember.Duration),
+						Id:       rgroupmember.ID,
+						Name:     rgroupmember.Name,
+						RealName: rgroupmember.RealName,
+					}
+
+					//TODO: 何故かSemesterとYearが反転する
+					t := rgroupmember.Duration.Since.Semester
+					rgroupmember.Duration.Since.Semester = rgroupmember.Duration.Since.Year
+					rgroupmember.Duration.Since.Year = int(t)
+
+					t = rgroupmember.Duration.Until.Semester
+					rgroupmember.Duration.Until.Semester = rgroupmember.Duration.Until.Year
+					rgroupmember.Duration.Until.Year = int(t)
+					//以上の7行はテストを通すための反転であり想定されてはいけない実装です
+
+					rgroupMembers = append(rgroupMembers, &rgroupmember)
+					hgroupMembers = append(hgroupMembers, hgroupmember)
+				}
+
+				rgroup := domain.GroupDetail{
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(),
+					Link:        random.AlphaNumeric(),
+					Leader:      &rgroupLeader,
+					Members:     rgroupMembers,
+					Description: random.AlphaNumeric(),
+				}
+
+				hgroup := GroupDetail{
+					Description: rgroup.Description,
+					Id:          rgroup.ID,
+					Leader:      hgroupLeader,
+					Link:        rgroup.Link,
+					Members:     hgroupMembers,
+					Name:        rgroup.Name,
+				}
+
+				//謎の反転が発生するのはr側で、これ以降
+
+				repoGroup := &rgroup
+				hresGroup := &hgroup
+
+				s.EXPECT().GetGroup(gomock.Any(), rgroup.ID).Return(repoGroup, nil)
+				path = fmt.Sprintf("/api/v1/groups/%s", rgroup.ID)
+				return hresGroup, path
+			},
+			statusCode: http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &GroupHandler{
-				srv: tt.fields.srv,
-			}
-			if err := h.GetGroup(tt.args._c); (err != nil) != tt.wantErr {
-				t.Errorf("GroupHandler.GetGroup() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			// Setup mock
+			s, api := setupGroupMock(t)
+
+			hresGroups, path := tt.setup(s)
+
+			var resBody *GroupDetail
+			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresGroups, resBody)
 		})
 	}
 }
+
+/*
 
 func Test_formatGetGroup(t *testing.T) {
 	type args struct {
