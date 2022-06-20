@@ -10,6 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -162,16 +163,45 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					Name:        rgroup.Name,
 				}
 
-				//謎の反転が発生するのはr側で、これ以降
-
 				repoGroup := &rgroup
 				hresGroup := &hgroup
+
+				//謎の反転が発生するのはrepoGroup側で、ここ以降
 
 				s.EXPECT().GetGroup(gomock.Any(), rgroup.ID).Return(repoGroup, nil)
 				path = fmt.Sprintf("/api/v1/groups/%s", rgroup.ID)
 				return hresGroup, path
 			},
 			statusCode: http.StatusOK,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+				groupID := random.UUID()
+				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, errors.New("Internal Server Error"))
+				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
+				return nil, path
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Bad Request: validate error: UUID",
+			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+				groupID := random.UUID()
+				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, repository.ErrValidate)
+				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error nonUUID",
+			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+				groupID := random.AlphaNumericn(36)
+				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
+				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
