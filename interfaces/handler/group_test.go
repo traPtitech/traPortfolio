@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 
@@ -10,6 +11,8 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
+
+//TODO: anyCtxを書く
 
 func setupGroupMock(t *testing.T) (*mock_service.MockGroupService, API) {
 	t.Helper()
@@ -56,6 +59,15 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 				return hresGroups, "/api/v1/groups"
 			},
 			statusCode: http.StatusOK,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockGroupService) (hres []*Group, path string) {
+
+				s.EXPECT().GetAllGroups(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				return nil, "/api/v1/groups"
+			},
+			statusCode: http.StatusInternalServerError,
 		},
 	}
 	for _, tt := range tests {
