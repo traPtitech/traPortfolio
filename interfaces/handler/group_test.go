@@ -131,16 +131,6 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 						RealName: rgroupmember.RealName,
 					}
 
-					//TODO: 何故かSemesterとYearが反転する
-					t := rgroupmember.Duration.Since.Semester
-					rgroupmember.Duration.Since.Semester = rgroupmember.Duration.Since.Year
-					rgroupmember.Duration.Since.Year = int(t)
-
-					t = rgroupmember.Duration.Until.Semester
-					rgroupmember.Duration.Until.Semester = rgroupmember.Duration.Until.Year
-					rgroupmember.Duration.Until.Year = int(t)
-					//以上の7行はテストを通すための反転であり想定されてはいけない実装です
-
 					rgroupMembers = append(rgroupMembers, &rgroupmember)
 					hgroupMembers = append(hgroupMembers, hgroupmember)
 				}
@@ -165,8 +155,6 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 
 				repoGroup := &rgroup
 				hresGroup := &hgroup
-
-				//謎の反転が発生するのはrepoGroup側で、ここ以降
 
 				s.EXPECT().GetGroup(gomock.Any(), rgroup.ID).Return(repoGroup, nil)
 				path = fmt.Sprintf("/api/v1/groups/%s", rgroup.ID)
