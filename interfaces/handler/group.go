@@ -90,17 +90,20 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 
 func newGroupMember(user User, Duration YearWithSemesterDuration) GroupMember {
 	return GroupMember{
-		User:     user,
 		Duration: Duration,
+		Id:       user.Id,
+		Name:     user.Name,
+		RealName: user.RealName,
 	}
 }
 
 func newGroupDetail(group Group, desc string, admin []User, link string, members []GroupMember) GroupDetail {
 	return GroupDetail{
-		Group:       group,
 		Description: desc,
+		Id:          group.Id,
 		Admin:       admin,
 		Link:        link,
 		Members:     members,
+		Name:        group.Name,
 	}
 }

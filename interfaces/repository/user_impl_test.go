@@ -1003,8 +1003,8 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		accountID uuid.UUID
 		userID    uuid.UUID
+		accountID uuid.UUID
 	}
 	tests := []struct {
 		name      string
@@ -1015,17 +1015,38 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				accountID: random.UUID(),
 				userID:    random.UUID(),
+				accountID: random.UUID(),
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
-				f.h.Mock.ExpectExec(makeSQLQueryRegexp("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
-					WithArgs(args.userID, args.accountID).
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				f.h.Mock.
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
+					WithArgs(args.accountID, args.userID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
+		},
+		{
+			name: "NotFound",
+			args: args{
+				userID:    random.UUID(),
+				accountID: random.UUID(),
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnError(gorm.ErrRecordNotFound)
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
 		},
 		{
 			name: "UnexpectedError",
@@ -1035,6 +1056,10 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.accountID, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("DELETE FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ?")).
 					WithArgs(args.userID, args.accountID).
 					WillReturnError(errUnexpected)
@@ -1053,7 +1078,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.DeleteAccount(tt.args.accountID, tt.args.userID))
+			tt.assertion(t, repo.DeleteAccount(tt.args.userID, tt.args.accountID))
 		})
 	}
 }
@@ -1127,6 +1152,79 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetProjects(tt.args.userID)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestUserRepository_GetGroupsByUserID(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		userID uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      []*domain.GroupUser
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.GroupUser)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{userID: random.UUID()},
+			want: []*domain.GroupUser{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					Duration: random.Duration(),
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+				rows := sqlmock.NewRows([]string{"id", "group_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"})
+				for _, v := range want {
+					d := v.Duration
+					rows.AddRow(random.UUID(), v.ID, args.userID, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+				for _, v := range want {
+					f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ?")).
+						WithArgs(v.ID).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"group_id", "name"}).
+								AddRow(v.ID, v.Name),
+						)
+				}
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{userID: random.UUID()},
+			want: nil,
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockUserRepositoryFields(ctrl)
+			tt.setup(f, tt.args, tt.want)
+			repo := NewUserRepository(f.h, f.portal, f.traq)
+			// Assertion
+			got, err := repo.GetGroupsByUserID(tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
