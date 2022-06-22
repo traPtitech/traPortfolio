@@ -173,6 +173,26 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 			statusCode: http.StatusInternalServerError,
 		},
 		{
+			name: "forbidden",
+			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+				groupID := random.UUID()
+				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, repository.ErrForbidden)
+				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
+				return nil, path
+			},
+			statusCode: http.StatusForbidden,
+		},
+		{
+			name: "not found",
+			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+				groupID := random.UUID()
+				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, repository.ErrNotFound)
+				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
+				return nil, path
+			},
+			statusCode: http.StatusNotFound,
+		},
+		{
 			name: "Bad Request: validate error: UUID",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 				groupID := random.UUID()
