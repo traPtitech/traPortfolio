@@ -58,7 +58,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 
 				}
 
-				s.EXPECT().GetAllGroups(gomock.Any()).Return(repoGroups, nil)
+				s.EXPECT().GetAllGroups(anyCtx{}).Return(repoGroups, nil)
 				return hresGroups, "/api/v1/groups"
 			},
 			statusCode: http.StatusOK,
@@ -67,7 +67,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockGroupService) (hres []*Group, path string) {
 
-				s.EXPECT().GetAllGroups(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetAllGroups(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/groups"
 			},
 			statusCode: http.StatusInternalServerError,
@@ -153,7 +153,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					Name:        rgroup.Name,
 				}
 
-				s.EXPECT().GetGroup(gomock.Any(), rgroup.ID).Return(&rgroup, nil)
+				s.EXPECT().GetGroup(anyCtx{}, rgroup.ID).Return(&rgroup, nil)
 				path = fmt.Sprintf("/api/v1/groups/%s", rgroup.ID)
 				return &hgroup, path
 			},
@@ -163,7 +163,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 				groupID := random.UUID()
-				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path
 			},
@@ -173,7 +173,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 			name: "forbidden",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 				groupID := random.UUID()
-				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, repository.ErrForbidden)
+				s.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, repository.ErrForbidden)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path
 			},
@@ -183,7 +183,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 			name: "not found",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 				groupID := random.UUID()
-				s.EXPECT().GetGroup(gomock.Any(), groupID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path
 			},
