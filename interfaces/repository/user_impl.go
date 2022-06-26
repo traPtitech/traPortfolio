@@ -216,8 +216,16 @@ func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.Update
 }
 
 func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
-	accounts := make([]*model.Account, 0)
 	err := repo.h.
+		Where(&model.User{ID: userID}).
+		First(&model.User{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	accounts := make([]*model.Account, 0)
+	err = repo.h.
 		Where(&model.Account{UserID: userID}).
 		Find(&accounts).
 		Error()
@@ -353,8 +361,16 @@ func (repo *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID)
 }
 
 func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
-	projects := make([]*model.ProjectMember, 0)
 	err := repo.h.
+		Where(&model.User{ID: userID}).
+		First(&model.User{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	projects := make([]*model.ProjectMember, 0)
+	err = repo.h.
 		Preload("Project").
 		Where(&model.ProjectMember{UserID: userID}).
 		Find(&projects).
@@ -377,8 +393,16 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 }
 
 func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
-	groups := make([]*model.GroupUserBelonging, 0)
 	err := repo.h.
+		Where(&model.User{ID: userID}).
+		First(&model.User{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	groups := make([]*model.GroupUserBelonging, 0)
+	err = repo.h.
 		Preload("Group").
 		Where(&model.GroupUserBelonging{UserID: userID}).
 		Find(&groups).
@@ -409,8 +433,16 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.Group
 }
 
 func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
-	contests := make([]*model.ContestTeamUserBelonging, 0)
 	err := repo.h.
+		Where(&model.User{ID: userID}).
+		First(&model.User{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	contests := make([]*model.ContestTeamUserBelonging, 0)
+	err = repo.h.
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
 		Find(&contests).
