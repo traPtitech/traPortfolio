@@ -1295,8 +1295,6 @@ components:
           type: string
           description: アカウントurl
           format: uri
-          x-oapi-codegen-extra-tags:
-            validate: url
         displayName:
           type: string
           description: 外部アカウントの表示名
@@ -1318,8 +1316,6 @@ components:
           type: string
           description: アカウントurl
           format: uri
-          x-oapi-codegen-extra-tags:
-            validate: omitempty,url # TODO: requiredになるので暫定的にomitemptyタグで対処
         displayName:
           type: string
           description: 外部アカウントの表示名
@@ -1344,8 +1340,6 @@ components:
           type: string
           format: uri
           description: プロジェクトの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: プロジェクト説明
@@ -1369,8 +1363,6 @@ components:
           type: string
           format: uri
           description: プロジェクトの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: プロジェクト説明
@@ -1399,8 +1391,6 @@ components:
           type: string
           format: uri
           description: コンテストの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: コンテスト説明
@@ -1423,8 +1413,6 @@ components:
           type: string
           format: uri
           description: コンテストの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: コンテスト説明
@@ -1443,8 +1431,6 @@ components:
           type: string
           format: uri
           description: コンテストチームの説明が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: チーム情報
@@ -1466,8 +1452,6 @@ components:
           type: string
           format: uri
           description: コンテストチームの説明が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: チーム情報

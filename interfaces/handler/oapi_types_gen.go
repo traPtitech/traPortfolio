@@ -62,7 +62,7 @@ type AddAccountRequest struct {
 	Type AccountType `json:"type"`
 
 	// アカウントurl
-	Url string `json:"url" validate:"url"`
+	Url string `json:"url"`
 }
 
 // 新規コンテストチームリクエスト
@@ -71,7 +71,7 @@ type AddContestTeamRequest struct {
 	Description string `json:"description"`
 
 	// コンテストチームの説明が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// チーム名
 	Name string `json:"name"`
@@ -175,7 +175,7 @@ type CreateContestRequest struct {
 	Duration Duration `json:"duration"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// コンテスト名
 	Name string `json:"name"`
@@ -192,7 +192,7 @@ type CreateProjectRequest struct {
 	Duration YearWithSemesterDuration `json:"duration"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// プロジェクト名
 	Name string `json:"name"`
@@ -217,7 +217,7 @@ type EditContestRequest struct {
 	Duration *Duration `json:"duration,omitempty"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// コンテスト名
 	Name *string `json:"name,omitempty"`
@@ -229,7 +229,7 @@ type EditContestTeamRequest struct {
 	Description *string `json:"description,omitempty"`
 
 	// コンテストチームの説明が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// チーム名
 	Name *string `json:"name,omitempty"`
@@ -258,7 +258,7 @@ type EditProjectRequest struct {
 	Duration *YearWithSemesterDuration `json:"duration,omitempty"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// プロジェクト名
 	Name *string `json:"name,omitempty"`
@@ -276,7 +276,7 @@ type EditUserAccountRequest struct {
 	Type *AccountType `json:"type,omitempty"`
 
 	// アカウントurl
-	Url *string `json:"url,omitempty" validate:"omitempty,url"`
+	Url *string `json:"url,omitempty"`
 }
 
 // ユーザー情報変更リクエスト
