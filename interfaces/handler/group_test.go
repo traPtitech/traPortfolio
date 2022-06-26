@@ -15,8 +15,6 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-//TODO: anyCtxを書く
-
 func setupGroupMock(t *testing.T) (*mock_service.MockGroupService, API) {
 	t.Helper()
 
