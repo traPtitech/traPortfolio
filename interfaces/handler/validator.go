@@ -102,27 +102,27 @@ func (r CreateProjectRequest) Validate() error {
 
 func (r EditUserAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.DisplayName),
+		vd.Field(&r.DisplayName, vd.NilOrNotEmpty),
 		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
-		vd.Field(&r.Url, is.URL),
+		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
 	)
 }
 
 func (r EditContestRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Description, vdRuleDescriptionLength),
-		vd.Field(&r.Duration),
+		vd.Field(&r.Description, vd.NilOrNotEmpty, vdRuleDescriptionLength),
+		vd.Field(&r.Duration, vd.NilOrNotEmpty),
 		vd.Field(&r.Link, is.URL),
-		vd.Field(&r.Name, vdRuleNameLength),
+		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 	)
 }
 
 func (r EditContestTeamRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Description, vdRuleDescriptionLength),
+		vd.Field(&r.Description, vd.NilOrNotEmpty, vdRuleDescriptionLength),
 		vd.Field(&r.Link, is.URL),
-		vd.Field(&r.Name, vdRuleNameLength),
+		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 		vd.Field(&r.Result, vdRuleResultLength),
 	)
 }
@@ -135,10 +135,10 @@ func (r EditEventRequest) Validate() error {
 
 func (r EditProjectRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Description, vdRuleDescriptionLength),
-		vd.Field(&r.Duration),
+		vd.Field(&r.Description, vd.NilOrNotEmpty, vdRuleDescriptionLength),
+		vd.Field(&r.Duration, vd.NilOrNotEmpty),
 		vd.Field(&r.Link, is.URL),
-		vd.Field(&r.Name, vdRuleNameLength),
+		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 	)
 }
 
