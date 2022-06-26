@@ -589,7 +589,7 @@ func TestGetUserProjects(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -633,7 +633,7 @@ func TestGetUserContests(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -677,7 +677,7 @@ func TestGetUserGroups(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -728,7 +728,7 @@ func TestGetUserEvents(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 	}
 
