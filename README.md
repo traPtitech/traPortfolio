@@ -31,7 +31,7 @@ If you want to contribute to traPortfolio, then follow these pages.
 docker compose up
 ```
 
-Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
+Tips: You can change the configuration by rewriting [./dev/config_docker.yaml](./dev/config_docker.yaml)
 
 Now you can access to
 
@@ -59,13 +59,13 @@ make rm-test-db
 Make sure MySQL is running.
 
 ```bash
-go run main.go
+go run main.go -c ./dev/docker_local.yaml
 ```
 
 Tips: You can change the configuration by
 
 - Specifying it with flags (Run `go run main.go --help`)
-- Creating a configuration file (ex: [config.yaml](./util/config/testdata/config.yaml)) and specifing it with a `--config` flag.
+- Rewriting [./dev/config_local.yaml](./dev/config_local.yaml)
 
 ### Generate DB docs
 
