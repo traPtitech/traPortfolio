@@ -36,6 +36,7 @@ func (v *validator) Validate(i interface{}) error {
 var (
 	vdRuleNameLength        = vd.Length(1, 32)
 	vdRuleDescriptionLength = vd.Length(1, 256)
+	vdRuleResultLength      = vd.Length(0, 32)
 	vdRuleAccountTypeMin    = vd.Min(0) // TODO: handler.AccountTypeをuint型にしたら消す
 	vdRuleAccountTypeMax    = vd.Max(domain.AccountLimit - 1)
 	vdRuleEventLevelMin     = vd.Min(0) // TODO: handler.EventLevelをuint型にしたら消す
@@ -71,7 +72,7 @@ func (r AddContestTeamRequest) Validate() error {
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
 		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
-		vd.Field(&r.Result),
+		vd.Field(&r.Result, vdRuleResultLength),
 	)
 }
 
@@ -122,7 +123,7 @@ func (r EditContestTeamRequest) Validate() error {
 		vd.Field(&r.Description, vdRuleDescriptionLength),
 		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vdRuleNameLength),
-		vd.Field(&r.Result),
+		vd.Field(&r.Result, vdRuleResultLength),
 	)
 }
 
