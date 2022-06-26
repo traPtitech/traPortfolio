@@ -59,7 +59,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 
 				args := repository.GetUsersArgs{}
 
-				s.EXPECT().GetUsers(gomock.Any(), &args).Return(repoUsers, nil)
+				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
 				return hresUsers, "/api/v1/users"
 			},
 			statusCode: http.StatusOK,
@@ -71,7 +71,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 				args := repository.GetUsersArgs{}
 
-				s.EXPECT().GetUsers(gomock.Any(), &args).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetUsers(anyCtx{}, &args).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/users"
 			},
 			statusCode: http.StatusInternalServerError,
@@ -155,7 +155,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 					State:    UserAccountState(repoUser.State),
 				}
 
-				s.EXPECT().GetUser(gomock.Any(), repoUser.User.ID).Return(&repoUser, nil)
+				s.EXPECT().GetUser(anyCtx{}, repoUser.User.ID).Return(&repoUser, nil)
 				path := fmt.Sprintf("/api/v1/users/%s", hresUser.Id)
 				return &hresUser, path
 			},
@@ -166,7 +166,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.UUID()
-				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetUser(anyCtx{}, id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
 			},
@@ -176,7 +176,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 			name: "Bad Request: validate error: UUID",
 			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.UUID()
-				s.EXPECT().GetUser(gomock.Any(), id).Return(nil, repository.ErrValidate)
+				s.EXPECT().GetUser(anyCtx{}, id).Return(nil, repository.ErrValidate)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
 			},
@@ -239,7 +239,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
-				s.EXPECT().Update(gomock.Any(), userID, &args).Return(nil)
+				s.EXPECT().Update(anyCtx{}, userID, &args).Return(nil)
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
@@ -266,7 +266,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
-				s.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrAlreadyExists)
+				s.EXPECT().Update(anyCtx{}, userID, &args).Return(repository.ErrAlreadyExists)
 				return reqBody, path
 			},
 			statusCode: http.StatusConflict,
@@ -293,7 +293,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
-				s.EXPECT().Update(gomock.Any(), userID, &args).Return(repository.ErrNotFound)
+				s.EXPECT().Update(anyCtx{}, userID, &args).Return(repository.ErrNotFound)
 				return reqBody, path
 			},
 			statusCode: http.StatusNotFound,
@@ -372,7 +372,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 
 				}
 
-				s.EXPECT().GetAccounts(gomock.Any()).Return(rAccounts, nil)
+				s.EXPECT().GetAccounts(userID).Return(rAccounts, nil)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return hAccounts, path
 			},
@@ -383,7 +383,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
-				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetAccounts(userID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -394,7 +394,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
-				s.EXPECT().GetAccounts(gomock.Any()).Return(nil, repository.ErrValidate)
+				s.EXPECT().GetAccounts(userID).Return(nil, repository.ErrValidate)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -459,7 +459,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 					Url:         rAccount.URL,
 				}
 
-				s.EXPECT().GetAccount(gomock.Any(), rAccount.ID).Return(&rAccount, nil)
+				s.EXPECT().GetAccount(userID, rAccount.ID).Return(&rAccount, nil)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, rAccount.ID)
 				return &hAccount, path
 
@@ -473,7 +473,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
-				s.EXPECT().GetAccount(gomock.Any(), accountID).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetAccount(userID, accountID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
 
@@ -487,7 +487,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
-				s.EXPECT().GetAccount(gomock.Any(), accountID).Return(nil, repository.ErrValidate)
+				s.EXPECT().GetAccount(userID, accountID).Return(nil, repository.ErrValidate)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
 
@@ -568,7 +568,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				s.EXPECT().CreateAccount(gomock.Any(), userID, &args).Return(&want, nil)
+				s.EXPECT().CreateAccount(anyCtx{}, userID, &args).Return(&want, nil)
 				return &reqBody, expectedResBody, path
 			},
 			statusCode: http.StatusCreated,
@@ -587,7 +587,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-
 				return &reqBody, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -606,7 +605,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-
 				return &reqBody, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -686,7 +684,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(nil)
+				s.EXPECT().EditAccount(anyCtx{}, userID, accountID, &args).Return(nil)
 				return &reqBody, path
 			},
 			statusCode: http.StatusNoContent,
@@ -720,7 +718,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(repository.ErrForbidden)
+				s.EXPECT().EditAccount(anyCtx{}, userID, accountID, &args).Return(repository.ErrForbidden)
 				return &reqBody, path
 			},
 			statusCode: http.StatusForbidden,
@@ -754,7 +752,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().EditAccount(gomock.Any(), userID, accountID, &args).Return(repository.ErrNotFound)
+				s.EXPECT().EditAccount(anyCtx{}, userID, accountID, &args).Return(repository.ErrNotFound)
 				return &reqBody, path
 			},
 			statusCode: http.StatusNotFound,
@@ -813,7 +811,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 				accountID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().DeleteAccount(gomock.Any(), userID, accountID).Return(nil)
+				s.EXPECT().DeleteAccount(anyCtx{}, userID, accountID).Return(nil)
 				return path
 			},
 			statusCode: http.StatusNoContent,
@@ -826,7 +824,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 				accountID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().DeleteAccount(gomock.Any(), userID, accountID).Return(repository.ErrForbidden)
+				s.EXPECT().DeleteAccount(anyCtx{}, userID, accountID).Return(repository.ErrForbidden)
 				return path
 			},
 			statusCode: http.StatusForbidden,
@@ -839,7 +837,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 				accountID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().DeleteAccount(gomock.Any(), userID, accountID).Return(repository.ErrNotFound)
+				s.EXPECT().DeleteAccount(anyCtx{}, userID, accountID).Return(repository.ErrNotFound)
 				return path
 			},
 			statusCode: http.StatusNotFound,
@@ -914,7 +912,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 		}
 
-		s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(repoProjects, nil)
+		s.EXPECT().GetUserProjects(anyCtx{}, userID).Return(repoProjects, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
 		return hresProjects, path
 	}
@@ -951,7 +949,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 				userID := random.UUID()
 
-				s.EXPECT().GetUserProjects(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetUserProjects(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
 				return nil, path
 			},
@@ -1015,7 +1013,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 		}
 
-		s.EXPECT().GetUserContests(gomock.Any(), userID).Return(repoContests, nil)
+		s.EXPECT().GetUserContests(anyCtx{}, userID).Return(repoContests, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
 		return hresContests, path
 
@@ -1053,7 +1051,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 				userID := random.UUID()
 
-				s.EXPECT().GetUserContests(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetUserContests(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
 				return nil, path
 			},
@@ -1114,7 +1112,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 
 		}
 
-		s.EXPECT().GetGroupsByUserID(gomock.Any(), userID).Return(repoGroups, nil)
+		s.EXPECT().GetGroupsByUserID(anyCtx{}, userID).Return(repoGroups, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
 		return hresGroups, path
 
@@ -1159,7 +1157,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 
 				userID := random.UUID()
 
-				s.EXPECT().GetGroupsByUserID(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetGroupsByUserID(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
 				return nil, path
 			},
@@ -1226,7 +1224,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 
 		}
 
-		s.EXPECT().GetUserEvents(gomock.Any(), userID).Return(repoEvents, nil)
+		s.EXPECT().GetUserEvents(anyCtx{}, userID).Return(repoEvents, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/events", userID)
 		return hresEvents, path
 
@@ -1271,7 +1269,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 
 				userID := random.UUID()
 
-				s.EXPECT().GetUserEvents(gomock.Any(), userID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetUserEvents(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/users/%s/events", userID)
 				return nil, path
 			},
