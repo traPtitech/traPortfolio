@@ -77,7 +77,7 @@ func (r AddContestTeamRequest) Validate() error {
 
 func (r AddProjectMembersRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Members, vd.Required),
+		vd.Field(&r.Members, vd.Required, vd.Each(vd.Required, is.UUID)),
 	)
 }
 
@@ -149,20 +149,6 @@ func (r EditUserRequest) Validate() error {
 }
 
 // embedded structs
-
-func (r MemberIDs) Validate() error {
-	if len(r.Members) == 0 {
-		return vd.ErrEmpty
-	}
-
-	for _, m := range r.Members {
-		if err := vd.Validate(&m, vd.Required, is.UUID); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
 
 func (r Duration) Validate() error {
 	if err := vd.ValidateStruct(&r,
