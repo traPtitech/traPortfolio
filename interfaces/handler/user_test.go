@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -16,17 +15,6 @@ import (
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
-
-type anyCtx struct{}
-
-func (anyCtx) Matches(v interface{}) bool {
-	_, ok := v.(context.Context)
-	return ok
-}
-
-func (anyCtx) String() string {
-	return "is Context"
-}
 
 func setupUserMock(t *testing.T) (*mock_service.MockUserService, API) {
 	t.Helper()
