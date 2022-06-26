@@ -83,7 +83,7 @@ func (r CreateContestRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
 		vd.Field(&r.Duration, vd.Required),
-		vd.Field(&r.Link, vd.Required, is.URL),
+		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
 	)
 }
@@ -92,7 +92,7 @@ func (r CreateProjectRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
 		vd.Field(&r.Duration, vd.Required),
-		vd.Field(&r.Link, vd.Required, is.URL),
+		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
 	)
 }
