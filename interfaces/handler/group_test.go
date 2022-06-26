@@ -153,12 +153,9 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					Name:        rgroup.Name,
 				}
 
-				repoGroup := &rgroup
-				hresGroup := &hgroup
-
-				s.EXPECT().GetGroup(gomock.Any(), rgroup.ID).Return(repoGroup, nil)
+				s.EXPECT().GetGroup(gomock.Any(), rgroup.ID).Return(&rgroup, nil)
 				path = fmt.Sprintf("/api/v1/groups/%s", rgroup.ID)
-				return hresGroup, path
+				return &hgroup, path
 			},
 			statusCode: http.StatusOK,
 		},
@@ -228,71 +225,3 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		})
 	}
 }
-
-/*
-
-func Test_formatGetGroup(t *testing.T) {
-	type args struct {
-		group *domain.GroupDetail
-	}
-	tests := []struct {
-		name string
-		args args
-		want GroupDetail
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := formatGetGroup(tt.args.group); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("formatGetGroup() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newGroupMember(t *testing.T) {
-	type args struct {
-		user     User
-		Duration YearWithSemesterDuration
-	}
-	tests := []struct {
-		name string
-		args args
-		want GroupMember
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newGroupMember(tt.args.user, tt.args.Duration); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newGroupMember() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_newGroupDetail(t *testing.T) {
-	type args struct {
-		group   Group
-		desc    string
-		leader  User
-		link    string
-		members []GroupMember
-	}
-	tests := []struct {
-		name string
-		args args
-		want GroupDetail
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newGroupDetail(tt.args.group, tt.args.desc, tt.args.leader, tt.args.link, tt.args.members); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newGroupDetail() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-*/
