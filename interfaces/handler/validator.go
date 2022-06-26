@@ -67,9 +67,9 @@ func (r AddAccountRequest) Validate() error {
 func (r AddContestTeamRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
-		vd.Field(&r.Link, vd.Required, is.URL),
+		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
-		vd.Field(&r.Result, vd.Required),
+		vd.Field(&r.Result),
 	)
 }
 
