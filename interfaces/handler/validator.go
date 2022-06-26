@@ -38,9 +38,9 @@ var (
 	vdRuleDescriptionLength = vd.Length(1, 256)
 	vdRuleResultLength      = vd.Length(0, 32)
 	vdRuleAccountTypeMin    = vd.Min(0) // TODO: handler.AccountTypeをuint型にしたら消す
-	vdRuleAccountTypeMax    = vd.Max(domain.AccountLimit - 1)
+	vdRuleAccountTypeMax    = vd.Max(int(domain.AccountLimit) - 1)
 	vdRuleEventLevelMin     = vd.Min(0) // TODO: handler.EventLevelをuint型にしたら消す
-	vdRuleEventLevelMax     = vd.Max(domain.EventLevelLimit - 1)
+	vdRuleEventLevelMax     = vd.Max(int(domain.EventLevelLimit) - 1)
 )
 
 // path parameter structs
