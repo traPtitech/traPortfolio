@@ -106,15 +106,18 @@ jobs:
             ${{ runner.os }}-go-build-
       - name: Run tests
         run: |
-          go test ./... -coverprofile=coverage.txt -race -vet=off -tags="integration db"
+          go test ./... -coverprofile=unit_test.txt -race -vet=off
+          go test github.com/traPtitech/traPortfolio/integration_tests/... -coverprofile=integration_test.txt -race -vet=off -tags="integration,db"
       - name: Upload coverage data
         uses: codecov/codecov-action@v2
         with:
-          file: ./coverage.txt
+          file: ./unit_test.txt,./integration_test.txt
       - uses: actions/upload-artifact@v3
         with:
-          name: coverage.txt
-          path: coverage.txt
+          name: coverages
+          path: |
+            unit_test.txt
+            integration_test.txt
   tbls:
     name: TBLS
     runs-on: ubuntu-latest
