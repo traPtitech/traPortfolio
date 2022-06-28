@@ -64,8 +64,73 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
-		// TODO: オプションありのテストを追加する
-		// TODO: Validationのテストを追加する
+		{
+			name: "Success_WithOpts_IncludeSuspended",
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
+				casenum := 2
+				repoUsers := []*domain.User{}
+				hresUsers := []*User{}
+
+				for i := 0; i < casenum; i++ {
+					ruser := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					}
+					huser := User{
+						Id:       ruser.ID,
+						Name:     ruser.Name,
+						RealName: ruser.RealName,
+					}
+
+					repoUsers = append(repoUsers, &ruser)
+					hresUsers = append(hresUsers, &huser)
+				}
+
+				includeSuspened := random.Bool()
+				args := repository.GetUsersArgs{
+					IncludeSuspended: optional.NewBool(includeSuspened, true),
+				}
+
+				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
+				return hresUsers, fmt.Sprintf("/api/v1/users?includeSuspended=%t", includeSuspened)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "Success_WithOpts_Name",
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
+				repoUsers := []*domain.User{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					},
+				}
+				hresUsers := []*User{
+					{
+						Id:       repoUsers[0].ID,
+						Name:     repoUsers[0].Name,
+						RealName: repoUsers[0].RealName,
+					},
+				}
+
+				args := repository.GetUsersArgs{
+					Name: optional.NewString(repoUsers[0].Name, true),
+				}
+
+				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
+				return hresUsers, fmt.Sprintf("/api/v1/users?name=%s", repoUsers[0].Name)
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "invalid args: multiple options",
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
+				return nil, fmt.Sprintf("/api/v1/users?includeSuspended=%t&name=%s", random.Bool(), random.AlphaNumeric())
+			},
+			statusCode: http.StatusBadRequest,
+		},
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
