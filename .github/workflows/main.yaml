@@ -106,8 +106,8 @@ jobs:
             ${{ runner.os }}-go-build-
       - name: Run tests
         run: |
-          go test ./... -coverprofile=coverage_unit.txt -race -vet=off 
-          go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off -tags="integration,db"
+          go test ./... -coverprofile=coverage_unit.txt -race -vet=off
+          go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off
       - name: Upload unit_test coverage data
         uses: codecov/codecov-action@v2
         with:
