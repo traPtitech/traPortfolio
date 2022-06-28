@@ -589,13 +589,12 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 			statusCode: http.StatusInternalServerError,
 		},
 		{
-			name: "Bad Request: validate error: UUID",
+			name: "Bad Request: validate error: invalid userID",
 			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
-				userID := random.UUID()
+				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
-				s.EXPECT().GetAccount(userID, accountID).Return(nil, repository.ErrValidate)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
 
@@ -603,11 +602,11 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
-			name: "Bad Request: validate error nonUUID",
+			name: "Bad Request: validate error: invalid accountID",
 			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
 
-				userID := random.AlphaNumericn(36)
-				accountID := random.UUID()
+				userID := random.UUID()
+				accountID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
