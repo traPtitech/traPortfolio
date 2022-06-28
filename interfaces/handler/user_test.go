@@ -717,17 +717,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
-			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
-
-				userID := random.UUID()
-
-				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
-				return nil, Account{}, path
-			},
-			statusCode: http.StatusBadRequest,
-		},
-		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
@@ -737,6 +726,31 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 				return nil, Account{}, path
 			},
 			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+				userID := random.UUID()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(random.Bool()),
+					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.CreateAccountArgs{
+					DisplayName: reqBody.DisplayName,
+					Type:        uint(reqBody.Type),
+					URL:         reqBody.Url,
+					PrPermitted: bool(reqBody.PrPermitted),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(anyCtx{}, userID, &args).Return(nil, errors.New("internal error"))
+				return &reqBody, Account{}, path
+			},
+			statusCode: http.StatusInternalServerError,
 		},
 	}
 	for _, tt := range tests {
