@@ -35,14 +35,17 @@ build: ${GOFILES}
 
 check: all lint test-all db-lint openapi-lint
 
-test: ${GOFILES}
+# `test` is an alias for `test-unit`
+test: ${GOFILES} test-unit
+
+test-unit: ${GOFILES}
 	go test ${GOTEST_FLAGS} $$(go list ./... | grep -v "integration_tests")
+
+test-integration: ${GOFILES}
+	go test ${GOTEST_FLAGS} ./integration_tests/...
 
 test-all: ${GOFILES}
 	go test ${GOTEST_FLAGS} ./...
-
-test-integration-db: ${GOFILES}
-	go test ${GOTEST_FLAGS} ./integration_tests/...
 
 lint:
 	@${GOLANGCI_LINT} run --fix ./...

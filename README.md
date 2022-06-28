@@ -112,7 +112,7 @@ make test
 Make sure MySQL is running.
 
 ```bash
-make test-integration-db
+make test-integration
 ```
 
 If you want to test both of them, run the following command.
