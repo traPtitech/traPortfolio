@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -310,6 +311,33 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			statusCode: http.StatusNoContent,
 		},
 		{
+			name: "Success with description args(len=256)",
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+
+				userID := random.UUID()
+				userBio := strings.Repeat("a", 256)
+				userCheck := false
+				if rand.Intn(2) == 1 {
+					userCheck = true
+				}
+
+				reqBody := &EditUserRequest{
+					Bio:   &userBio,
+					Check: &userCheck,
+				}
+
+				args := repository.UpdateUserArgs{
+					Description: optional.StringFrom(&userBio),
+					Check:       optional.BoolFrom(&userCheck),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				s.EXPECT().Update(anyCtx{}, userID, &args).Return(nil)
+				return reqBody, path
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
 			name: "Conflict",
 			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 
@@ -364,10 +392,25 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			statusCode: http.StatusNotFound,
 		},
 		{
-			name: "Bad Request: validate error",
+			name: "Bad Request: invalid userID",
 			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: too long description(len>256)",
+			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+				userID := random.UUID()
+				userBio := strings.Repeat("a", 257)
+
+				reqBody := &EditUserRequest{
+					Bio: &userBio,
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s", userID)
+				return reqBody, path
 			},
 			statusCode: http.StatusBadRequest,
 		},
