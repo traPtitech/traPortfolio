@@ -32,6 +32,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvents), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
@@ -39,6 +40,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 }
 
 /*
+// GetXXX GET /XXX
 func TestGetXXX(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
@@ -55,6 +57,7 @@ func TestGetXXX(t *testing.T) {
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
+                        t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.XXX.GetXXX, tt.userID), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
