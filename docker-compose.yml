@@ -14,7 +14,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./dev/config.yaml:/opt/portfolio/config.yaml
+      - ./dev/config_docker.yaml:/opt/portfolio/config.yaml
 
   mysql:
     image: mariadb:10.6.4

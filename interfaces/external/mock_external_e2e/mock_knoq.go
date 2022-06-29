@@ -29,5 +29,17 @@ func (m *MockKnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, 
 }
 
 func (m *MockKnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
-	return mockdata.MockKnoqEvents, nil
+	events := make([]*external.EventResponse, 0, len(mockdata.MockKnoqEvents))
+
+	// TODO: adminsではなくattendeesを取得して判定する？
+	for _, v := range mockdata.MockKnoqEvents {
+		for _, admin := range v.Admins {
+			if admin == userID {
+				events = append(events, v)
+				break
+			}
+		}
+	}
+
+	return events, nil
 }

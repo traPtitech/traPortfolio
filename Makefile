@@ -6,11 +6,9 @@ TEST_DB_NAME := portfolio
 TEST_MARIADB_DSN := mariadb://${TEST_DB_USER}:${TEST_DB_PASS}@${TEST_DB_HOST}:${TEST_DB_PORT}/${TEST_DB_NAME}
 
 GOFILES=$(wildcard *.go **/*.go)
-
 BINARY=./bin/traPortfolio
 GO_RUN := ${BINARY} --db-user ${TEST_DB_USER} --db-pass ${TEST_DB_PASS} --db-host ${TEST_DB_HOST} --db-port ${TEST_DB_PORT} --db-name ${TEST_DB_NAME}
-
-TEST_INTEGRATION_TAGS := "integration db"
+GOTEST_FLAGS := -v -cover -race
 
 GOLANGCI_LINT_VERSION := latest
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
@@ -37,14 +35,17 @@ build: ${GOFILES}
 
 check: all lint test-all db-lint openapi-lint
 
-test: ${GOFILES}
-	go test -v -cover -race ./...
+# `test` is an alias for `test-unit`
+test: ${GOFILES} test-unit
+
+test-unit: ${GOFILES}
+	go test ${GOTEST_FLAGS} $$(go list ./... | grep -v "integration_tests")
+
+test-integration: ${GOFILES}
+	go test ${GOTEST_FLAGS} ./integration_tests/...
 
 test-all: ${GOFILES}
-	go test -v -cover -race -tags=${TEST_INTEGRATION_TAGS} ./...
-
-test-integration-db: ${GOFILES}
-	go test -v -cover -race -tags=${TEST_INTEGRATION_TAGS} ./integration_tests/...
+	go test ${GOTEST_FLAGS} ./...
 
 lint:
 	@${GOLANGCI_LINT} run --fix ./...

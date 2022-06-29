@@ -69,7 +69,6 @@ func TestProjectService_GetProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
@@ -140,7 +139,6 @@ func TestProjectService_GetProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
@@ -248,7 +246,6 @@ func TestProjectService_CreateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
@@ -366,7 +363,6 @@ func TestProjectService_UpdateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
@@ -428,7 +424,6 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args, tt.want)
@@ -522,7 +517,6 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
@@ -578,7 +572,6 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockProjectRepository(ctrl)
 			tt.setup(repo, tt.args)
