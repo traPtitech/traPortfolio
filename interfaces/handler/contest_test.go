@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -379,36 +380,62 @@ func TestContestHandler_PatchContest(t *testing.T) {
 			},
 			statusCode: http.StatusBadRequest,
 		},
-		// todo validate url
-
-		// {
-		// 	name: "BadRequest: Invalid URL",
-		// 	setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
-		// 		contestID := random.UUID()
-		//    since, until := random.SinceAndUntil()
-		// 		reqBody := &EditContestJSONRequestBody{
-		// 			ContestID:   contestID,
-		// 			Name:        ptr(t,random.AlphaNumeric(rand.Intn(30) + 1)),
-		// 			Link:        random.AlphaNumeric(rand.Intn(30) + 1),
-		// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
-		// 			Duration: OptionalDuration{
-		// 				Since: optional.TimeFrom(since),
-		// 				Until: optional.TimeFrom(until),
-		// 			},
-		// 		}
-		// 		args := repository.UpdateContestArgs{
-		// 			Name:        reqBody.Name,
-		// 			Description: reqBody.Description,
-		// 			Link:        reqBody.Link,
-		// 			Since:       reqBody.Duration.Since,
-		// 			Until:       reqBody.Duration.Until,
-		// 		}
-		// 		path := fmt.Sprintf("/api/v1/contests/%s", random.UUID())
-		// 		s.EXPECT().UpdateContest(anyCtx{}, contestID, &args).Return(nil)
-		// 		return reqBody, path
-		// 	},
-		// 	statusCode: http.StatusBadRequest,
-		// },
+		{
+			name: "BadRequest: too long description",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				description := strings.Repeat("a", 257)
+				reqBody := &EditContestJSONRequestBody{
+					Description: &description,
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid link",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				link := random.AlphaNumeric()
+				reqBody := &EditContestJSONRequestBody{
+					Link: &link,
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid duration",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				since, until := random.SinceAndUntil()
+				since, until = until, since
+				reqBody := &EditContestJSONRequestBody{
+					Duration: &Duration{
+						Since: since,
+						Until: &until,
+					},
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: too long name",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				name := strings.Repeat("a", 33)
+				reqBody := &EditContestJSONRequestBody{
+					Name: &name,
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
