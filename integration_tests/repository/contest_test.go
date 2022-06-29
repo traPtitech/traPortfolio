@@ -463,14 +463,14 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			RealName: portalUser2.RealName,
 		},
 	}
-	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{user1.ID})
+	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{user2.ID})
 	assert.NoError(t, err)
 	users4, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
 	expected5 := []*domain.User{}
-	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{user2.ID})
+	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{})
 	assert.NoError(t, err)
 	users5, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
