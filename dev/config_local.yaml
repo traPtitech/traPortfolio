@@ -3,6 +3,6 @@ insertMockData: false
 db:
   user: 'root'
   pass: 'password'
-  host: 'mysql'
+  host: 'localhost'
   name: 'portfolio'
-  port: 3306
+  port: 3307
