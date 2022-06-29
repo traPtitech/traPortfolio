@@ -228,7 +228,7 @@ func makeCreateContestRequest(description string, since time.Time, until time.Ti
 	}
 }
 
-func TestContestHandler_PostContest(t *testing.T) {
+func TestContestHandler_CreateContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
@@ -661,7 +661,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 	}
 }
 
-func TestContestHandler_PostContestTeam(t *testing.T) {
+func TestContestHandler_AddContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
@@ -952,7 +952,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_PostContestTeamMember(t *testing.T) {
+func TestContestHandler_AddContestTeamMember(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
