@@ -810,40 +810,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			},
 			statusCode: http.StatusNoContent,
 		},
-		/*{
-			name: "Forbidden",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
-
-				userID := random.UUID()
-				accountID := random.UUID()
-				accountType := int64(domain.AccountLimit)
-				accountPermit := random.Bool()
-
-				argsName := random.AlphaNumeric()
-				argsPermit := PrPermitted(accountPermit)
-				argsType := AccountType(accountType)
-				argsURL := random.RandURLString()
-
-				reqBody := EditUserAccountJSONBody{
-					DisplayName: &argsName,
-					PrPermitted: &argsPermit,
-					Type:        &argsType,
-					Url:         &argsURL,
-				}
-
-				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&argsName),
-					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&argsURL),
-					PrPermitted: optional.BoolFrom(&accountPermit),
-				}
-
-				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
-				s.EXPECT().EditAccount(anyCtx{}, userID, accountID, &args).Return(repository.ErrForbidden)
-				return &reqBody, path
-			},
-			statusCode: http.StatusForbidden,
-		},*/
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
@@ -877,6 +843,60 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				return &reqBody, path
 			},
 			statusCode: http.StatusNotFound,
+		},
+		{
+			name: "Bad Request: validate error: empty display name(but not nil)",
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				argsName := "" // empty but not nil
+
+				reqBody := EditUserAccountJSONBody{
+					DisplayName: &argsName,
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+
+				return &reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: too large account type",
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				argsType := AccountType(domain.AccountLimit)
+
+				reqBody := EditUserAccountJSONBody{
+					Type: &argsType,
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+
+				return &reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: validate error: invalid url",
+			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+				userID := random.UUID()
+				accountID := random.UUID()
+
+				argsURL := random.AlphaNumeric()
+
+				reqBody := EditUserAccountJSONBody{
+					Url: &argsURL,
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
+
+				return &reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
