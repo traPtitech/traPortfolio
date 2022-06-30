@@ -1176,10 +1176,10 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				memberToBeRemained := args.members[0]
 				memberToBeAdded := args.members[1]
-				memberToBeDeleted := random.UUID()
+				memberToBeRemoved := random.UUID()
 				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
 				rows.AddRow(args.teamID, memberToBeRemained)
-				rows.AddRow(args.teamID, memberToBeDeleted)
+				rows.AddRow(args.teamID, memberToBeRemoved)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
@@ -1199,7 +1199,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("DELETE FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ? AND `contest_team_user_belongings`.`user_id` IN (?)")).
-					WithArgs(args.teamID, memberToBeDeleted).
+					WithArgs(args.teamID, memberToBeRemoved).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
