@@ -1048,8 +1048,11 @@ components:
               type: string
               format: uri
               description: 班の詳細が載っているページへのリンク
-            leader:
-              $ref: '#/components/schemas/User'
+            admin:
+              type: array
+              description: 班管理者
+              items:
+                $ref: '#/components/schemas/User'
             members:
               type: array
               description: 班メンバー
@@ -1060,7 +1063,7 @@ components:
               description: 班説明
           required:
             - link
-            - leader
+            - admin
             - members
             - description
     GroupMember:
@@ -1197,60 +1200,6 @@ components:
       required:
         - since
       description: イベントやコンテストなどの存続期間
-    UserGroup:
-      title: UserGroup
-      type: object
-      description: ユーザーの班の情報
-      allOf:
-        - $ref: '#/components/schemas/Group'
-        - type: object
-          properties:
-            duration:
-              $ref: '#/components/schemas/YearWithSemesterDuration'
-          required:
-            - duration
-    GroupDetail:
-      title: GroupDetail
-      type: object
-      description: 班の詳細情報
-      allOf:
-        - $ref: '#/components/schemas/Group'
-        - type: object
-          properties:
-            link:
-              type: string
-              format: uri
-              description: 班の詳細が載っているページへのリンク
-            admin:
-              type: array
-              description: 班管理者
-              items:
-                $ref: '#/components/schemas/User'
-            members:
-              type: array
-              description: 班メンバー
-              items:
-                $ref: '#/components/schemas/GroupMember'
-            description:
-              type: string
-              description: 班説明
-          required:
-            - link
-            - admin
-            - members
-            - description
-    GroupMember:
-      title: GroupMember
-      type: object
-      description: 班所属メンバー情報
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          properties:
-            duration:
-              $ref: '#/components/schemas/YearWithSemesterDuration'
-          required:
-            - duration
     YearWithSemesterDuration:
       title: YearWithSemesterDuration
       type: object
