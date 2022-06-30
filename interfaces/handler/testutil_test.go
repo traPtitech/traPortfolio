@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -55,4 +56,15 @@ func ptr(t *testing.T, s string) *string {
 	t.Helper()
 
 	return &s
+}
+
+type anyCtx struct{}
+
+func (anyCtx) Matches(v interface{}) bool {
+	_, ok := v.(context.Context)
+	return ok
+}
+
+func (anyCtx) String() string {
+	return "is Context"
 }

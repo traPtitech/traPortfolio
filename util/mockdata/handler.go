@@ -9,16 +9,18 @@ var (
 	HMockContest        = CloneHandlerMockContest()
 	HMockContestTeam    = CloneHandlerMockContestTeam()
 	HMockEvents         = CloneHandlerMockEvents()
+	HMockEventDetails   = CloneHandlerMockEventDetails()
 	HMockGroup          = CloneHandlerMockGroup()
 	HMockGroupMembers   = CloneHandlerMockGroupMembers()
 	HMockProject        = CloneHandlerMockProject()
 	HMockProjectMembers = CloneHandlerMockProjectMembers()
 	HMockUsers          = CloneHandlerMockUsers()
 	HMockUserDetails    = CloneHandlerMockUserDetails()
-	HMockUserAccount    = CloneHandlerMockUserAccount()
-	HMockUserContest    = CloneHandlerMockUserContest()
-	HMockUserGroup      = CloneHandlerMockUserGroup()
-	HMockUserProject    = CloneHandlerMockUserProject()
+	HMockUserAccounts   = CloneHandlerMockUserAccounts()
+	HMockUserEvents     = CloneHandlerMockUserEvents()
+	HMockUserContests   = CloneHandlerMockUserContests()
+	HMockUserGroups     = CloneHandlerMockUserGroups()
+	HMockUserProjects   = CloneHandlerMockUserProjects()
 )
 
 func CloneHandlerMockContest() handler.ContestDetail {
@@ -55,7 +57,7 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 
 	return handler.ContestTeamDetail{
 		Description: mContestTeam.Description,
-		Id:          mContestTeam.ContestID,
+		Id:          mContestTeam.ID,
 		Link:        mContestTeam.Link,
 		Members: []handler.User{
 			{
@@ -69,7 +71,35 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 	}
 }
 
-func CloneHandlerMockEvents() []handler.EventDetail {
+func CloneHandlerMockEvents() []handler.Event {
+	var (
+		knoqEvents = CloneMockKnoqEvents()
+		hEvents    = make([]handler.Event, len(knoqEvents))
+	)
+
+	for i, e := range knoqEvents {
+		var (
+			hostname = make([]handler.User, len(e.Admins))
+		)
+
+		for j, uid := range e.Admins {
+			hostname[j] = getUser(uid)
+		}
+
+		hEvents[i] = handler.Event{
+			Duration: handler.Duration{
+				Since: e.TimeStart,
+				Until: &e.TimeEnd,
+			},
+			Id:   e.ID,
+			Name: e.Name,
+		}
+	}
+
+	return hEvents
+}
+
+func CloneHandlerMockEventDetails() []handler.EventDetail {
 	var (
 		mEventLevels = CloneMockEventLevelRelations()
 		knoqEvents   = CloneMockKnoqEvents()
@@ -192,7 +222,7 @@ func CloneHandlerMockProjectMembers() []handler.ProjectMember {
 		{
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
-					Year:     mProjectMember.Project.SinceYear,
+					Year:     mProjectMember.SinceYear,
 					Semester: handler.Semester(mProjectMember.SinceSemester),
 				},
 				Until: &handler.YearWithSemester{
@@ -230,7 +260,7 @@ func CloneHandlerMockUserDetails() []handler.UserDetail {
 		mUsers      = CloneMockUsers()
 		portalUsers = CloneMockPortalUsers()
 		traqUsers   = CloneMockTraQUsers()
-		hAccount    = CloneHandlerMockUserAccount()
+		hAccounts   = CloneHandlerMockUserAccounts()
 		hUsers      = make([]handler.UserDetail, len(mUsers))
 	)
 
@@ -244,65 +274,96 @@ func CloneHandlerMockUserDetails() []handler.UserDetail {
 			State:    handler.UserAccountState(traqUsers[i].User.State),
 		}
 
-		if i == 0 {
-			hUsers[i].Accounts = append(hUsers[i].Accounts, hAccount)
+		if mu.ID == userID1.uuid() {
+			hUsers[i].Accounts = hAccounts
 		}
 	}
 
 	return hUsers
 }
 
-func CloneHandlerMockUserAccount() handler.Account {
+func CloneHandlerMockUserAccounts() []handler.Account {
 	var mAccount = CloneMockAccount()
 
-	return handler.Account{
-		DisplayName: mAccount.Name,
-		Id:          mAccount.ID,
-		PrPermitted: handler.PrPermitted(mAccount.Check),
-		Type:        handler.AccountType(mAccount.Type),
-		Url:         mAccount.URL,
+	return []handler.Account{
+		{
+			DisplayName: mAccount.Name,
+			Id:          mAccount.ID,
+			PrPermitted: handler.PrPermitted(mAccount.Check),
+			Type:        handler.AccountType(mAccount.Type),
+			Url:         mAccount.URL,
+		},
 	}
 }
 
-func CloneHandlerMockUserContest() handler.ContestTeamWithContestName {
+func CloneHandlerMockUserEvents() []handler.Event {
+	var (
+		hEventDetails = CloneHandlerMockEventDetails()
+		mUserEvents   = make([]handler.Event, len(hEventDetails))
+	)
+
+	for i, e := range hEventDetails {
+		mUserEvents[i] = handler.Event{
+			Duration: e.Duration,
+			Id:       e.Id,
+			Name:     e.Name,
+		}
+	}
+
+	return mUserEvents
+}
+
+func CloneHandlerMockUserContests() []handler.ContestTeamWithContestName {
 	var (
 		hContest     = CloneHandlerMockContest()
 		hContestTeam = CloneHandlerMockContestTeam()
 	)
 
-	return handler.ContestTeamWithContestName{
-		ContestName: hContest.Name,
-		Id:          hContestTeam.Id,
-		Name:        hContestTeam.Name,
-		Result:      hContestTeam.Result,
+	return []handler.ContestTeamWithContestName{
+		{
+			ContestName: hContest.Name,
+			Id:          hContestTeam.Id,
+			Name:        hContestTeam.Name,
+			Result:      hContestTeam.Result,
+		},
 	}
 }
 
-func CloneHandlerMockUserGroup() handler.UserGroup {
+func CloneHandlerMockUserGroups() []handler.UserGroup {
 	var (
 		hGroup        = CloneHandlerMockGroup()
 		hGroupMembers = CloneHandlerMockGroupMembers()
+		hUserGroups   = make([]handler.UserGroup, len(hGroupMembers))
 	)
 
-	return handler.UserGroup{
-		Duration: hGroupMembers[0].Duration,
-		Id:       hGroup.Id,
-		Name:     hGroup.Name,
+	for i, gm := range hGroupMembers {
+		hUserGroups[i] = handler.UserGroup{
+			Duration: gm.Duration,
+			Id:       hGroup.Id,
+			Name:     hGroup.Name,
+		}
 	}
+
+	return hUserGroups
 }
 
-func CloneHandlerMockUserProject() handler.UserProject {
+func CloneHandlerMockUserProjects() []handler.UserProject {
 	var (
 		hProject        = CloneHandlerMockProject()
 		hProjectMembers = CloneHandlerMockProjectMembers()
+		hUserProjects   = make([]handler.UserProject, len(hProjectMembers))
 	)
 
-	return handler.UserProject{
-		Duration:     hProjectMembers[0].Duration,
-		Id:           hProject.Id,
-		Name:         hProject.Name,
-		UserDuration: hProjectMembers[0].Duration,
+	for i, pm := range hProjectMembers {
+		hUserProjects[i] = handler.UserProject{
+			Duration:     hProject.Duration,
+			Id:           hProject.Id,
+			Name:         hProject.Name,
+			UserDuration: pm.Duration,
+		}
 	}
+
+	return hUserProjects
 }
 
 func getUser(userID uuid.UUID) handler.User {
