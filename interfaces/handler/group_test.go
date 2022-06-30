@@ -98,16 +98,25 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 			name: "success",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 
-				rgroupLeader := domain.User{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				}
+				rgroupAdmins := []*domain.User{}
+				hgroupAdmins := []User{}
 
-				hgroupLeader := User{
-					Id:       rgroupLeader.ID,
-					Name:     rgroupLeader.Name,
-					RealName: rgroupLeader.RealName,
+				adminLen := rand.Intn(256)
+				for i := 0; i < adminLen; i++ {
+					rgroupAdmin := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					}
+
+					hgroupAdmin := User{
+						Id:       rgroupAdmin.ID,
+						Name:     rgroupAdmin.Name,
+						RealName: rgroupAdmin.RealName,
+					}
+
+					rgroupAdmins = append(rgroupAdmins, &rgroupAdmin)
+					hgroupAdmins = append(hgroupAdmins, hgroupAdmin)
 				}
 
 				rgroupMembers := []*domain.UserGroup{}
@@ -137,7 +146,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					ID:          random.UUID(),
 					Name:        random.AlphaNumeric(),
 					Link:        random.AlphaNumeric(),
-					Leader:      &rgroupLeader,
+					Admin:       rgroupAdmins,
 					Members:     rgroupMembers,
 					Description: random.AlphaNumeric(),
 				}
@@ -145,7 +154,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				hgroup := GroupDetail{
 					Description: rgroup.Description,
 					Id:          rgroup.ID,
-					Leader:      hgroupLeader,
+					Admin:       hgroupAdmins,
 					Link:        rgroup.Link,
 					Members:     hgroupMembers,
 					Name:        rgroup.Name,
