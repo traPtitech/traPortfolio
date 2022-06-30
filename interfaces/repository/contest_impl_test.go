@@ -1174,9 +1174,11 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 					random.UUID(),
 				}},
 			setup: func(f mockContestRepositoryFields, args args) {
-				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
-				rows.AddRow(args.teamID, args.members[0])
+				memberToBeRemained := args.members[0]
+				memberToBeAdded := args.members[1]
 				memberToBeDeleted := random.UUID()
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				rows.AddRow(args.teamID, memberToBeRemained)
 				rows.AddRow(args.teamID, memberToBeDeleted)
 
 				f.h.Mock.
@@ -1193,7 +1195,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contest_team_user_belongings` (`team_id`,`user_id`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
-					WithArgs(args.teamID, args.members[1], anyTime{}, anyTime{}).
+					WithArgs(args.teamID, memberToBeAdded, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("DELETE FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ? AND `contest_team_user_belongings`.`user_id` IN (?)")).
@@ -1253,7 +1255,9 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
-				rows.AddRow(args.teamID, args.members[0])
+				memberToBeRemained := args.members[0]
+				memberToBeAdded := args.members[1]
+				rows.AddRow(args.teamID, memberToBeRemained)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
@@ -1268,7 +1272,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contest_team_user_belongings` (`team_id`,`user_id`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
-					WithArgs(args.teamID, args.members[1], anyTime{}, anyTime{}).
+					WithArgs(args.teamID, memberToBeAdded, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -1285,9 +1289,11 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
-				rows.AddRow(args.teamID, args.members[0])
-				memberToBeDeleted := random.UUID()
-				rows.AddRow(args.teamID, memberToBeDeleted)
+				memberToBeRemained := args.members[0]
+				memberToBeAdded := args.members[1]
+				memberToBeRemoved := random.UUID()
+				rows.AddRow(args.teamID, memberToBeRemained)
+				rows.AddRow(args.teamID, memberToBeRemoved)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
@@ -1303,11 +1309,11 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contest_team_user_belongings` (`team_id`,`user_id`,`created_at`,`updated_at`) VALUES (?,?,?,?)")).
-					WithArgs(args.teamID, args.members[1], anyTime{}, anyTime{}).
+					WithArgs(args.teamID, memberToBeAdded, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("DELETE FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ? AND `contest_team_user_belongings`.`user_id` IN (?)")).
-					WithArgs(args.teamID, memberToBeDeleted).
+					WithArgs(args.teamID, memberToBeRemoved).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
