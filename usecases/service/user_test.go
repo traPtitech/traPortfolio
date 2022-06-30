@@ -66,7 +66,6 @@ func TestUserService_GetUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -140,7 +139,6 @@ func TestUserService_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -204,7 +202,6 @@ func TestUserService_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -253,7 +250,6 @@ func TestUserService_GetAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -301,7 +297,6 @@ func TestUserService_GetAccounts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -358,7 +353,6 @@ func TestUserService_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -429,7 +423,6 @@ func TestUserService_EditAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -473,7 +466,6 @@ func TestUserService_DeleteAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -536,7 +528,6 @@ func TestUserService_GetUserProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -601,7 +592,6 @@ func TestUserService_GetUserContests(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -728,7 +718,6 @@ func TestUserService_GetUserEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)

@@ -9,6 +9,7 @@ var (
 	HMockContest        = CloneHandlerMockContest()
 	HMockContestTeam    = CloneHandlerMockContestTeam()
 	HMockEvents         = CloneHandlerMockEvents()
+	HMockEventDetails   = CloneHandlerMockEventDetails()
 	HMockGroup          = CloneHandlerMockGroup()
 	HMockGroupMembers   = CloneHandlerMockGroupMembers()
 	HMockProject        = CloneHandlerMockProject()
@@ -70,7 +71,35 @@ func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 	}
 }
 
-func CloneHandlerMockEvents() []handler.EventDetail {
+func CloneHandlerMockEvents() []handler.Event {
+	var (
+		knoqEvents = CloneMockKnoqEvents()
+		hEvents    = make([]handler.Event, len(knoqEvents))
+	)
+
+	for i, e := range knoqEvents {
+		var (
+			hostname = make([]handler.User, len(e.Admins))
+		)
+
+		for j, uid := range e.Admins {
+			hostname[j] = getUser(uid)
+		}
+
+		hEvents[i] = handler.Event{
+			Duration: handler.Duration{
+				Since: e.TimeStart,
+				Until: &e.TimeEnd,
+			},
+			Id:   e.ID,
+			Name: e.Name,
+		}
+	}
+
+	return hEvents
+}
+
+func CloneHandlerMockEventDetails() []handler.EventDetail {
 	var (
 		mEventLevels = CloneMockEventLevelRelations()
 		knoqEvents   = CloneMockKnoqEvents()
@@ -263,7 +292,7 @@ func CloneHandlerMockUserAccounts() []handler.Account {
 
 func CloneHandlerMockUserEvents() []handler.Event {
 	var (
-		hEventDetails = CloneHandlerMockEvents()
+		hEventDetails = CloneHandlerMockEventDetails()
 		mUserEvents   = make([]handler.Event, len(hEventDetails))
 	)
 

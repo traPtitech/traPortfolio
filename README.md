@@ -59,7 +59,7 @@ make rm-test-db
 Make sure MySQL is running.
 
 ```bash
-go run main.go -c ./dev/docker_local.yaml
+go run main.go -c ./dev/config_local.yaml
 ```
 
 Tips: You can change the configuration by
@@ -112,7 +112,7 @@ make test
 Make sure MySQL is running.
 
 ```bash
-make test-integration-db
+make test-integration
 ```
 
 If you want to test both of them, run the following command.

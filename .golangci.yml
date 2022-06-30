@@ -13,11 +13,6 @@ linters:
     - gofmt
     - revive
 
-run:
-  build-tags:
-    - integration
-    - db
-
 linters-settings:
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
