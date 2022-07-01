@@ -1155,7 +1155,7 @@ func TestContestHandler_AddContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
+func TestContestHandler_EditContestTeamMember(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
@@ -1177,7 +1177,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(nil)
+				s.EXPECT().EditContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNoContent,
@@ -1209,7 +1209,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(repository.ErrNotFound)
+				s.EXPECT().EditContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -1222,7 +1222,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 
 			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, api, http.MethodDelete, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)

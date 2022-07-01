@@ -359,8 +359,8 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
+// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) EditContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
 
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
@@ -380,7 +380,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := h.srv.DeleteContestTeamMembers(ctx, teamID, req.Members); err != nil {
+	if err = h.srv.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)

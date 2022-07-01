@@ -55,5 +55,5 @@ type ContestRepository interface {
 	DeleteContestTeam(contestID uuid.UUID, teamID uuid.UUID) error
 	GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)
 	AddContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error
-	DeleteContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error
+	EditContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error
 }
