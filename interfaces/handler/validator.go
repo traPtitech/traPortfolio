@@ -78,7 +78,7 @@ func (r AddContestTeamRequest) Validate() error {
 
 func (r AddProjectMembersRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Members, vd.Required, vd.Each(vd.Required, is.UUID)),
+		vd.Field(&r.Members, vd.Required),
 	)
 }
 
@@ -172,5 +172,12 @@ func (r MemberIDWithYearWithSemesterDuration) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Duration),
 		vd.Field(&r.UserId, vd.Required, is.UUID),
+	)
+}
+
+// TODO: MemberIDsを埋め込んだリクエストボディを実装する
+func (r MemberIDs) Validate() error {
+	return vd.ValidateStruct(&r,
+		vd.Field(&r.Members, vd.Required, vd.Each(vd.Required, is.UUID)),
 	)
 }
