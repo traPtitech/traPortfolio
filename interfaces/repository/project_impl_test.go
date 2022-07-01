@@ -890,7 +890,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 	}
 }
 
-func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
+func TestProjectRepository_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		projectID uuid.UUID
@@ -991,7 +991,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.DeleteProjectMembers(tt.args.projectID, tt.args.members))
+			tt.assertion(t, repo.EditProjectMembers(tt.args.projectID, tt.args.members))
 		})
 	}
 }

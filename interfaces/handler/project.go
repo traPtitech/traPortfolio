@@ -204,20 +204,20 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	return nil
 }
 
-// DeleteProjectMembers DELETE /projects/:projectID/members
-func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
+// EditProjectMembers PUT /projects/:projectID/members
+func (h *ProjectHandler) EditProjectMembers(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	req := struct {
 		ProjectIDInPath
-		DeleteProjectMembersJSONRequestBody
+		EditProjectMembersJSONRequestBody
 	}{}
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		return convertError(err)
 	}
 
-	err = h.service.DeleteProjectMembers(ctx, req.ProjectID, req.Members)
+	err = h.service.EditProjectMembers(ctx, req.ProjectID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}

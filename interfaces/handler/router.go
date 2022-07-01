@@ -82,7 +82,7 @@ func Setup(e *echo.Echo, api API) error {
 
 				apiProjectsPIDMembers.GET("", api.Project.GetProjectMembers)
 				apiProjectsPIDMembers.POST("", api.Project.AddProjectMembers)
-				apiProjectsPIDMembers.DELETE("", api.Project.DeleteProjectMembers)
+				apiProjectsPIDMembers.PUT("", api.Project.EditProjectMembers)
 			}
 		}
 

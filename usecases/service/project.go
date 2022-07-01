@@ -17,7 +17,7 @@ type ProjectService interface {
 	UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error
 	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error)
 	AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error
-	DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error
+	EditProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error
 }
 
 type projectService struct {
@@ -113,8 +113,8 @@ func (s *projectService) AddProjectMembers(ctx context.Context, projectID uuid.U
 	return nil
 }
 
-func (s *projectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.DeleteProjectMembers(projectID, memberIDs)
+func (s *projectService) EditProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
+	err := s.repo.EditProjectMembers(projectID, memberIDs)
 	if err != nil {
 		return err
 	}

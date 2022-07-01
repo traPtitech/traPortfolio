@@ -606,11 +606,11 @@ type CreateProjectJSONBody = CreateProjectRequest
 // EditProjectJSONBody defines parameters for EditProject.
 type EditProjectJSONBody = EditProjectRequest
 
-// DeleteProjectMembersJSONBody defines parameters for DeleteProjectMembers.
-type DeleteProjectMembersJSONBody = MemberIDs
-
 // AddProjectMembersJSONBody defines parameters for AddProjectMembers.
 type AddProjectMembersJSONBody = AddProjectMembersRequest
+
+// EditProjectMembersJSONBody defines parameters for EditProjectMembers.
+type EditProjectMembersJSONBody = MemberIDs
 
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
@@ -657,11 +657,11 @@ type CreateProjectJSONRequestBody = CreateProjectJSONBody
 // EditProjectJSONRequestBody defines body for EditProject for application/json ContentType.
 type EditProjectJSONRequestBody = EditProjectJSONBody
 
-// DeleteProjectMembersJSONRequestBody defines body for DeleteProjectMembers for application/json ContentType.
-type DeleteProjectMembersJSONRequestBody = DeleteProjectMembersJSONBody
-
 // AddProjectMembersJSONRequestBody defines body for AddProjectMembers for application/json ContentType.
 type AddProjectMembersJSONRequestBody = AddProjectMembersJSONBody
+
+// EditProjectMembersJSONRequestBody defines body for EditProjectMembers for application/json ContentType.
+type EditProjectMembersJSONRequestBody = EditProjectMembersJSONBody
 
 // EditUserJSONRequestBody defines body for EditUser for application/json ContentType.
 type EditUserJSONRequestBody = EditUserJSONBody

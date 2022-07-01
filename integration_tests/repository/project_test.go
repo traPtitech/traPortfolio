@@ -159,10 +159,10 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 // func TestProjectRepository_AddProjectMembers(t *testing.T) {
 // }
 
-func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
+func TestProjectRepository_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
+	conf := testutils.GetConfigWithDBName("project_repository_edit_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -196,21 +196,21 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{user1.ID})
+	err = repo.EditProjectMembers(project1.ID, []uuid.UUID{user1.ID})
 	assert.NoError(t, err)
 	expected3 := []*domain.User{user2}
 	users3, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, users3)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{user2.ID})
+	err = repo.EditProjectMembers(project1.ID, []uuid.UUID{user2.ID})
 	assert.NoError(t, err)
 	expected4 := []*domain.User{}
 	users4, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
-	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{user2.ID})
+	err = repo.EditProjectMembers(project2.ID, []uuid.UUID{user2.ID})
 	assert.NoError(t, err)
 	expected5 := []*domain.User{}
 	users5, err := repo.GetProjectMembers(project2.ID)

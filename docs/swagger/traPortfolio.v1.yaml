@@ -711,9 +711,9 @@ paths:
       tags:
         - project
         - user
-    delete:
-      summary: プロジェクトメンバーの削除
-      operationId: deleteProjectMembers
+    put:
+      summary: プロジェクトメンバーの修正
+      operationId: editProjectMembers
       responses:
         '204':
           description: No Content
@@ -723,7 +723,7 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
-      description: プロジェクトメンバーを削除します
+      description: プロジェクトメンバーを修正します
       requestBody:
         content:
           application/json:

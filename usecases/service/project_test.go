@@ -528,7 +528,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 	}
 }
 
-func TestProjectService_DeleteProjectMembers(t *testing.T) {
+func TestProjectService_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx       context.Context
@@ -549,7 +549,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 				memberIDs: []uuid.UUID{random.UUID()},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(nil)
+				repo.EXPECT().EditProjectMembers(args.projectID, args.memberIDs).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -561,7 +561,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 				memberIDs: []uuid.UUID{random.UUID()},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(gorm.ErrInvalidDB)
+				repo.EXPECT().EditProjectMembers(args.projectID, args.memberIDs).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -578,7 +578,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 
 			s := NewProjectService(repo)
 
-			tt.assertion(t, s.DeleteProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.memberIDs))
+			tt.assertion(t, s.EditProjectMembers(tt.args.ctx, tt.args.projectID, tt.args.memberIDs))
 		})
 	}
 }

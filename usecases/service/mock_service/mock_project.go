@@ -66,18 +66,18 @@ func (mr *MockProjectServiceMockRecorder) CreateProject(ctx, args interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectService)(nil).CreateProject), ctx, args)
 }
 
-// DeleteProjectMembers mocks base method.
-func (m *MockProjectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
+// EditProjectMembers mocks base method.
+func (m *MockProjectService) EditProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteProjectMembers", ctx, projectID, memberIDs)
+	ret := m.ctrl.Call(m, "EditProjectMembers", ctx, projectID, memberIDs)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteProjectMembers indicates an expected call of DeleteProjectMembers.
-func (mr *MockProjectServiceMockRecorder) DeleteProjectMembers(ctx, projectID, memberIDs interface{}) *gomock.Call {
+// EditProjectMembers indicates an expected call of EditProjectMembers.
+func (mr *MockProjectServiceMockRecorder) EditProjectMembers(ctx, projectID, memberIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProjectMembers", reflect.TypeOf((*MockProjectService)(nil).DeleteProjectMembers), ctx, projectID, memberIDs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditProjectMembers", reflect.TypeOf((*MockProjectService)(nil).EditProjectMembers), ctx, projectID, memberIDs)
 }
 
 // GetProject mocks base method.

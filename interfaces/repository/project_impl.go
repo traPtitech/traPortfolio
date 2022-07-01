@@ -259,7 +259,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	return nil
 }
 
-func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
+func (repo *ProjectRepository) EditProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
 	if len(members) == 0 {
 		return repository.ErrInvalidArg
 	}
