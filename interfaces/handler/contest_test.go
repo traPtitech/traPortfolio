@@ -1100,6 +1100,29 @@ func TestContestHandler_AddContestTeamMember(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
+			name: "BadRequest: Invalid request body: members is empty",
+			setup: func(s *mock_service.MockContestService) (*Req, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				return &Req{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid request body: memberID is invalid",
+			setup: func(s *mock_service.MockContestService) (*Req, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				return &Req{
+					Members: []uuid.UUID{
+						random.UUID(),
+						uuid.Nil,
+					},
+				}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Contest or team not exist",
 			setup: func(s *mock_service.MockContestService) (*Req, string) {
 				contestID := random.UUID()
