@@ -995,7 +995,7 @@ func TestContestService_AddContestTeamMembers(t *testing.T) {
 	}
 }
 
-func TestContestService_DeleteContestTeamMembers(t *testing.T) {
+func TestContestService_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	type fields struct {
 		repo repository.ContestRepository
@@ -1021,12 +1021,12 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().DeleteContestTeamMembers(args.teamID, args.memberIDs).Return(nil)
+				repo.EXPECT().EditContestTeamMembers(args.teamID, args.memberIDs).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
 		{
-			name: "ErrDeleteContestTeamMembers",
+			name: "ErrEditContestTeamMembers",
 			args: args{
 				ctx:       context.Background(),
 				teamID:    random.UUID(),
@@ -1034,7 +1034,7 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().DeleteContestTeamMembers(args.teamID, args.memberIDs).Return(repository.ErrNotFound)
+				repo.EXPECT().EditContestTeamMembers(args.teamID, args.memberIDs).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1051,7 +1051,7 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 			tt.setup(tt.fields, tt.args)
 			s := NewContestService(tt.fields.repo)
 			// Assertion
-			tt.assertion(t, s.DeleteContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
+			tt.assertion(t, s.EditContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
 		})
 	}
 }

@@ -335,8 +335,8 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// DeleteContestTeamMember DELETE /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
+// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) EditContestTeamMember(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 	// todo contestIDが必要ない
@@ -350,7 +350,7 @@ func (h *ContestHandler) DeleteContestTeamMember(_c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = h.srv.DeleteContestTeamMembers(ctx, req.TeamID, req.Members)
+	err = h.srv.EditContestTeamMembers(ctx, req.TeamID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
