@@ -171,13 +171,13 @@ func (r Duration) Validate() error {
 func (r MemberIDWithYearWithSemesterDuration) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Duration),
-		vd.Field(&r.UserId, vd.Required, is.UUID),
+		vd.Field(&r.UserId, vd.Required, is.UUIDv4),
 	)
 }
 
 // TODO: MemberIDsを埋め込んだリクエストボディを実装する
 func (r MemberIDs) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Members, vd.Required, vd.Each(vd.Required, is.UUID)),
+		vd.Field(&r.Members, vd.Required, vd.Each(vd.Required, is.UUIDv4)),
 	)
 }
