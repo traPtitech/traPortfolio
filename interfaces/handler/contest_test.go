@@ -1199,6 +1199,15 @@ func TestContestHandler_EditContestTeamMember(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
+			name: "BadRequest: Invalid request body: members is empty",
+			setup: func(s *mock_service.MockContestService) (*Req, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				return &Req{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Contest or team not exist",
 			setup: func(s *mock_service.MockContestService) (*Req, string) {
 				contestID := random.UUID()
