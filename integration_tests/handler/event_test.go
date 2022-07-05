@@ -8,7 +8,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 // GetEvents GET /events
@@ -50,6 +53,16 @@ func TestEventHandler_GetEvent(t *testing.T) {
 			http.StatusOK,
 			mockdata.HMockEventDetails[0].Id,
 			mockdata.HMockEventDetails[0],
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
