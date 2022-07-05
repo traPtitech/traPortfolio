@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
@@ -32,6 +33,35 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvents), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
+
+// GetEvents GET /events/:eventID
+func TestEventHandler_GetEvent(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		eventId    uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockEventDetails[0].Id,
+			mockdata.HMockEventDetails[0],
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("event_handler_get_event")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventId), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
