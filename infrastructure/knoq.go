@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/gofrs/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
@@ -56,7 +56,7 @@ func (knoq *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, e
 	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusNotFound {
-		return nil, echo.NewHTTPError(http.StatusNotFound, fmt.Errorf("not found: %w", err).Error())
+		return nil, repository.ErrNotFound
 	}
 
 	if res.StatusCode != http.StatusOK {
