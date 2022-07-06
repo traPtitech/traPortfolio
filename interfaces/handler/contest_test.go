@@ -121,7 +121,7 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		},
 		Link:        random.RandURLString(),
 		Description: random.AlphaNumeric(),
-		Teams: []*domain.ContestTeam{
+		ContestTeams: []*domain.ContestTeam{
 			{
 				ID:        getContestID[1],
 				ContestID: getContestID[0],
@@ -137,8 +137,8 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		},
 	}
 
-	teams := make([]ContestTeam, len(d.Teams))
-	for i, v := range d.Teams {
+	teams := make([]ContestTeam, len(d.ContestTeams))
+	for i, v := range d.ContestTeams {
 		teams[i] = ContestTeam{
 			Id:     v.ID,
 			Name:   v.Name,
@@ -260,9 +260,9 @@ func TestContestHandler_CreateContest(t *testing.T) {
 						TimeStart: args.Since,
 						TimeEnd:   args.Until.Time,
 					},
-					Link:        args.Link.String,
-					Description: args.Description,
-					Teams:       []*domain.ContestTeam{},
+					Link:         args.Link.String,
+					Description:  args.Description,
+					ContestTeams: []*domain.ContestTeam{},
 				}
 				expectedResBody = &Contest{
 					Id:   want.ID,

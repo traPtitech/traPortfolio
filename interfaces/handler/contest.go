@@ -56,8 +56,8 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	teams := make([]ContestTeam, len(contest.Teams))
-	for i, v := range contest.Teams {
+	teams := make([]ContestTeam, len(contest.ContestTeams))
+	for i, v := range contest.ContestTeams {
 		teams[i] = newContestTeam(v.ID, v.Name, v.Result)
 	}
 
@@ -94,8 +94,8 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	contestTeams := make([]ContestTeam, 0, len(contest.Teams))
-	for _, team := range contest.Teams {
+	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
+	for _, team := range contest.ContestTeams {
 		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
 	}
 	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
