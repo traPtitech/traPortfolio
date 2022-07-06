@@ -17,6 +17,7 @@ var (
 	MockEventLevelRelations      = CloneMockEventLevelRelations()
 	MockGroup                    = CloneMockGroup()
 	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
+	MockGroupUserAdmin           = CloneMockGroupUserAdmin()
 	MockProject                  = CloneMockProject()
 	MockProjectMember            = CloneMockProjectMember()
 )
@@ -97,15 +98,6 @@ func CloneMockEventLevelRelations() []model.EventLevelRelation {
 	}
 }
 
-func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
-	return []model.GroupUserAdmin{
-		{
-			UserID:  userID1.uuid(),
-			GroupID: groupID.uuid(),
-		},
-	}
-}
-
 func CloneMockGroup() model.Group {
 	return model.Group{
 		GroupID:     groupID.uuid(),
@@ -123,6 +115,15 @@ func CloneMockGroupUserBelonging() model.GroupUserBelonging {
 		SinceSemester: 1,
 		UntilYear:     2022,
 		UntilSemester: 2,
+	}
+}
+
+func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
+	return []model.GroupUserAdmin{
+		{
+			UserID:  userID1.uuid(),
+			GroupID: groupID.uuid(),
+		},
 	}
 }
 

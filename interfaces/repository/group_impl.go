@@ -35,7 +35,11 @@ func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 
 func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
 	users := make([]*model.GroupUserBelonging, 0)
-	err := repo.h.Preload("Group").Where(&model.GroupUserBelonging{GroupID: groupID}).Find(&users).Error()
+	err := repo.h.
+		Preload("Group").
+		Where(&model.GroupUserBelonging{GroupID: groupID}).
+		Find(&users).
+		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -61,7 +65,12 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	admins := make([]*model.GroupUserAdmin, 0)
-	if err := repo.h.Preload("Group").Where(&model.GroupUserAdmin{GroupID: groupID}).Find(&admins).Error(); err != nil {
+	err = repo.h.
+		Preload("Group").
+		Where(&model.GroupUserAdmin{GroupID: groupID}).
+		Find(&admins).
+		Error()
+	if err != nil {
 		return nil, convertError(err)
 	}
 
