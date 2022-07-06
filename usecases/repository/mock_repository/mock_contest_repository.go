@@ -108,18 +108,18 @@ func (mr *MockContestRepositoryMockRecorder) DeleteContestTeam(contestID, teamID
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContestTeam", reflect.TypeOf((*MockContestRepository)(nil).DeleteContestTeam), contestID, teamID)
 }
 
-// DeleteContestTeamMembers mocks base method.
-func (m *MockContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error {
+// EditContestTeamMembers mocks base method.
+func (m *MockContestRepository) EditContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteContestTeamMembers", teamID, memberIDs)
+	ret := m.ctrl.Call(m, "EditContestTeamMembers", teamID, memberIDs)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteContestTeamMembers indicates an expected call of DeleteContestTeamMembers.
-func (mr *MockContestRepositoryMockRecorder) DeleteContestTeamMembers(teamID, memberIDs interface{}) *gomock.Call {
+// EditContestTeamMembers indicates an expected call of EditContestTeamMembers.
+func (mr *MockContestRepositoryMockRecorder) EditContestTeamMembers(teamID, memberIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContestTeamMembers", reflect.TypeOf((*MockContestRepository)(nil).DeleteContestTeamMembers), teamID, memberIDs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditContestTeamMembers", reflect.TypeOf((*MockContestRepository)(nil).EditContestTeamMembers), teamID, memberIDs)
 }
 
 // GetContest mocks base method.

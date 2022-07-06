@@ -62,7 +62,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 
 				}
 
-				s.EXPECT().GetEvents(gomock.Any()).Return(repoEvents, nil)
+				s.EXPECT().GetEvents(anyCtx{}).Return(repoEvents, nil)
 				return hresEvents, "/api/v1/events"
 			},
 			statusCode: http.StatusOK,
@@ -70,7 +70,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockEventService) (hres []*Event, path string) {
-				s.EXPECT().GetEvents(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetEvents(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
 			statusCode: http.StatusInternalServerError,
@@ -156,7 +156,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 				repoEvent := &revent
 				hresEvent := &hevent
 
-				s.EXPECT().GetEventByID(gomock.Any(), revent.Event.ID).Return(repoEvent, nil)
+				s.EXPECT().GetEventByID(anyCtx{}, revent.Event.ID).Return(repoEvent, nil)
 				path := fmt.Sprintf("/api/v1/events/%s", revent.Event.ID)
 				return hresEvent, path
 			},
@@ -167,7 +167,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
 				id := random.UUID()
-				s.EXPECT().GetEventByID(gomock.Any(), id).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetEventByID(anyCtx{}, id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
 				return nil, path
 			},
@@ -219,7 +219,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(nil)
+				s.EXPECT().UpdateEventLevel(anyCtx{}, eventID, &args).Return(nil)
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
@@ -242,7 +242,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrAlreadyExists)
+				s.EXPECT().UpdateEventLevel(anyCtx{}, eventID, &args).Return(repository.ErrAlreadyExists)
 				return reqBody, path
 			},
 			statusCode: http.StatusConflict,
@@ -265,7 +265,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrNotFound)
+				s.EXPECT().UpdateEventLevel(anyCtx{}, eventID, &args).Return(repository.ErrNotFound)
 				return reqBody, path
 			},
 			statusCode: http.StatusNotFound,
@@ -288,7 +288,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrBind)
+				s.EXPECT().UpdateEventLevel(anyCtx{}, eventID, &args).Return(repository.ErrBind)
 				return reqBody, path
 			},
 			statusCode: http.StatusBadRequest,
@@ -311,7 +311,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				s.EXPECT().UpdateEventLevel(gomock.Any(), eventID, &args).Return(repository.ErrValidate)
+				s.EXPECT().UpdateEventLevel(anyCtx{}, eventID, &args).Return(repository.ErrValidate)
 				return reqBody, path
 			},
 			statusCode: http.StatusBadRequest,

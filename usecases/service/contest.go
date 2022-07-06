@@ -26,7 +26,7 @@ type ContestService interface {
 	DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error
 	GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)
 	AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
-	DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
+	EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
 }
 
 type contestService struct {
@@ -154,8 +154,8 @@ func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.
 	return nil
 }
 
-func (s *contestService) DeleteContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	if err := s.repo.DeleteContestTeamMembers(teamID, memberIDs); err != nil {
+func (s *contestService) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
+	if err := s.repo.EditContestTeamMembers(teamID, memberIDs); err != nil {
 		return err
 	}
 

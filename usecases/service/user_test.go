@@ -66,7 +66,6 @@ func TestUserService_GetUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -140,7 +139,6 @@ func TestUserService_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -204,7 +202,6 @@ func TestUserService_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -253,7 +250,6 @@ func TestUserService_GetAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -301,7 +297,6 @@ func TestUserService_GetAccounts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -392,7 +387,6 @@ func TestUserService_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -410,8 +404,8 @@ func TestUserService_EditAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx       context.Context
-		accountID uuid.UUID
 		userID    uuid.UUID
+		accountID uuid.UUID
 		args      *repository.UpdateAccountArgs
 	}
 	tests := []struct {
@@ -424,8 +418,8 @@ func TestUserService_EditAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				accountID: random.UUID(),
 				userID:    random.UUID(),
+				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -434,7 +428,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(nil)
+				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -442,8 +436,8 @@ func TestUserService_EditAccount(t *testing.T) {
 			name: "Notfound",
 			args: args{
 				ctx:       context.Background(),
-				accountID: random.UUID(),
 				userID:    random.UUID(),
+				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -452,7 +446,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.accountID, args.userID, args.args).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -463,14 +457,13 @@ func TestUserService_EditAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args)
 
 			s := NewUserService(repo, event)
-			tt.assertion(t, s.EditAccount(tt.args.ctx, tt.args.accountID, tt.args.userID, tt.args.args))
+			tt.assertion(t, s.EditAccount(tt.args.ctx, tt.args.userID, tt.args.accountID, tt.args.args))
 		})
 	}
 }
@@ -479,8 +472,8 @@ func TestUserService_DeleteAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx       context.Context
-		accountid uuid.UUID
-		userid    uuid.UUID
+		userID    uuid.UUID
+		accountID uuid.UUID
 	}
 	tests := []struct {
 		name      string
@@ -492,11 +485,11 @@ func TestUserService_DeleteAccount(t *testing.T) {
 			name: "Success",
 			args: args{
 				ctx:       context.Background(),
-				accountid: random.UUID(),
-				userid:    random.UUID(),
+				userID:    random.UUID(),
+				accountID: random.UUID(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().DeleteAccount(args.accountid, args.userid).Return(nil)
+				repo.EXPECT().DeleteAccount(args.userID, args.accountID).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -507,14 +500,13 @@ func TestUserService_DeleteAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
 			tt.setup(repo, event, tt.args)
 
 			s := NewUserService(repo, event)
-			tt.assertion(t, s.DeleteAccount(tt.args.ctx, tt.args.accountid, tt.args.userid))
+			tt.assertion(t, s.DeleteAccount(tt.args.ctx, tt.args.userID, tt.args.accountID))
 		})
 	}
 }
@@ -570,7 +562,6 @@ func TestUserService_GetUserProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -635,7 +626,6 @@ func TestUserService_GetUserContests(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
@@ -762,7 +752,6 @@ func TestUserService_GetUserEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			repo := mock_repository.NewMockUserRepository(ctrl)
 			event := mock_repository.NewMockEventRepository(ctrl)
