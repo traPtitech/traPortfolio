@@ -41,7 +41,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	}
 }
 
-// GetEvents GET /events/:eventID
+// GetEvent GET /events/:eventID
 func TestEventHandler_GetEvent(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
