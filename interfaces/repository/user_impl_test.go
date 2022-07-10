@@ -753,7 +753,6 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnError(gorm.ErrRecordNotFound)
 				f.h.Mock.ExpectRollback()
-				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.Error,
 		},
@@ -775,12 +774,10 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.id),
 					)
-				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
-				f.h.Mock.ExpectRollback()
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -991,11 +988,9 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
-				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
-				f.h.Mock.ExpectRollback()
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
