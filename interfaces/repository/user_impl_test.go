@@ -729,12 +729,10 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.id), // TODO: もっとちゃんと返したほうがいいかも
 					)
-				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				f.h.Mock.ExpectCommit()
 				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
@@ -946,11 +944,9 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
-				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				f.h.Mock.ExpectCommit()
 				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
