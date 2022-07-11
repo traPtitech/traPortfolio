@@ -90,7 +90,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		eventId    uuid.UUID
+		eventID    uuid.UUID
 		reqBody    handler.EditEventRequest
 		want       interface{} // nil or error
 	}{
@@ -115,12 +115,12 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
 				var event handler.EventDetail
-				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventId), nil)
+				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &event)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
 
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventId), tt.reqBody)
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert
@@ -128,7 +128,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 					event.EventLevel = *tt.reqBody.EventLevel
 				}
 				// if tt.reqBody.Check != nil {} // TODO: Checkに応じて処理を書く
-				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventId), nil)
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventID), nil)
 				testutils.AssertResponse(t, http.StatusOK, event, res)
 			}
 		})
