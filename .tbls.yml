@@ -126,3 +126,5 @@ comments:
     columnComments:
       user_id: ユーザーUUID
       group_id: グループUUID
+      created_at: 関係テーブル作成日時
+      updated_at: 関係テーブル更新日時
