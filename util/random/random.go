@@ -121,6 +121,14 @@ func OptInt64() optional.Int64 {
 	return optional.NewInt64(rand.Int63(), Bool())
 }
 
+func OptUint() optional.Uint {
+	return optional.NewUint(uint(rand.Uint64()), Bool())
+}
+
+func OptUint8() optional.Uint8 {
+	return optional.NewUint8(uint8(rand.Uint64()), Bool())
+}
+
 func OptAlphaNumericn(n int) optional.String {
 	return optional.NewString(AlphaNumericn(n), Bool())
 }

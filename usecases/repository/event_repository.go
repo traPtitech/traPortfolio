@@ -14,7 +14,7 @@ type CreateEventLevelArgs struct {
 }
 
 type UpdateEventLevelArgs struct {
-	Level optional.Uint
+	Level optional.Uint8
 }
 
 type EventRepository interface {

@@ -107,15 +107,15 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
-	updatedLevel := uint(rand.Intn(domain.EventLevelLimit))
+	updatedLevel := uint8(rand.Intn(domain.EventLevelLimit))
 	err = repo.UpdateEventLevel(selected.EventID, &urepository.UpdateEventLevelArgs{
-		Level: optional.NewUint(updatedLevel, true),
+		Level: optional.NewUint8(updatedLevel, true),
 	})
 	assert.NoError(t, err)
 
 	got, err = repo.GetEvent(selected.EventID)
 	assert.NoError(t, err)
-	assert.Equal(t, updatedLevel, uint(got.Level))
+	assert.Equal(t, updatedLevel, uint8(got.Level))
 }
 
 func TestEventRepository_GetUserEvents(t *testing.T) {
