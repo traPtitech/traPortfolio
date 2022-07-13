@@ -20,8 +20,8 @@ func newValidator(logger echo.Logger) echo.Validator {
 func (v *validator) Validate(i interface{}) error {
 	if vld, ok := i.(vd.Validatable); ok {
 		if err := vld.Validate(); err != nil {
-			if e, ok := err.(vd.InternalError); ok {
-				return e.InternalError()
+			if ie, ok := err.(vd.InternalError); ok {
+				v.logger.Fatalf("ozzo-validation internal error: %s", ie.Error())
 			}
 
 			return err
