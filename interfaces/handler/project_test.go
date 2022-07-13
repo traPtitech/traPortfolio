@@ -9,6 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -199,6 +200,23 @@ func TestProjectHandler_GetByID(t *testing.T) {
 				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Validation Error",
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+				projectID := random.AlphaNumericn(36)
+				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Not Found Error",
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+				projectID := random.UUID()
+				s.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, repository.ErrNotFound)
+				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusNotFound,
 		},
 	}
 	for _, tt := range tests {
