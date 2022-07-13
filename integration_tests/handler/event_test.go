@@ -127,7 +127,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				if tt.reqBody.EventLevel != nil {
 					event.EventLevel = *tt.reqBody.EventLevel
 				}
-				// if tt.reqBody.Check != nil {} // TODO: Checkに応じて処理を書く
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventID), nil)
 				testutils.AssertResponse(t, http.StatusOK, event, res)
 			}
