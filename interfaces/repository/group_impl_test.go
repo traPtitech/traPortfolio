@@ -98,32 +98,25 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 				Link: random.RandURLString(),
 				Admin: []*domain.User{
 					{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						ID: random.UUID(),
+						// usecasesで後付けしているのでここでは不要
+						// Name:     random.AlphaNumeric(),
+						// RealName: random.AlphaNumeric(),
 					},
 				},
 				Members: []*domain.UserGroup{
 					{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						ID: random.UUID(),
+						// Name:     random.AlphaNumeric(),
+						// RealName: random.AlphaNumeric(),
 						Duration: random.Duration(),
 					},
 				},
 				Description: random.AlphaNumeric(),
 			},
 			setup: func(f mockGroupRepositoryFields, args args, want *domain.GroupDetail) {
-				wm := want.Members[0]
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`group_id` = ?")).
-					WithArgs(args.id).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"user_id", "group_id", "since_year", "since_semester", "until_year", "until_semester"}).
-							AddRow(wm.ID, want.ID, wm.Duration.Since.Year, wm.Duration.Since.Semester, wm.Duration.Until.Year, wm.Duration.Until.Semester),
-					)
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ?")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"group_id", "name", "link", "description"}).
@@ -136,6 +129,14 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 					WillReturnRows(
 						sqlmock.NewRows([]string{"user_id", "group_id"}).
 							AddRow(wad.ID, want.ID),
+					)
+				wm := want.Members[0]
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`group_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"user_id", "group_id", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(wm.ID, want.ID, wm.Duration.Since.Year, wm.Duration.Since.Semester, wm.Duration.Until.Year, wm.Duration.Until.Semester),
 					)
 			},
 			assertion: assert.NoError,
