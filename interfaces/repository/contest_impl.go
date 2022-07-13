@@ -142,7 +142,7 @@ func (repo *ContestRepository) UpdateContest(contestID uuid.UUID, args *reposito
 
 func (repo *ContestRepository) DeleteContest(contestID uuid.UUID) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if err := repo.h.
+		if err := tx.
 			Where(&model.Contest{ID: contestID}).
 			First(&model.Contest{}).
 			Error(); err != nil {
