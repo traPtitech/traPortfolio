@@ -102,9 +102,12 @@ func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := repo.getEventLevelByID(eventID); err != nil {
 			return convertError(err)
-		} else if elv.Level == arg.Level {
+		} else if uint(elv.Level) == uint(arg.Level.Int64) {
 			return nil // updateする必要がないのでここでcommitする
 		}
+		/*} else if elv.Level == arg.Level {
+			return nil // updateする必要がないのでここでcommitする
+		}*/
 
 		if err := tx.Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
 			return convertError(err)

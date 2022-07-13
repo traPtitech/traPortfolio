@@ -12,6 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -208,14 +209,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				//eventLevelDomain := domain.EventLevel(eventLevelUint)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewInt64((int64)(eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -231,14 +232,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				//eventLevelDomain := domain.EventLevel(eventLevelUint)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewInt64((int64)(eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -254,14 +255,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				//eventLevelDomain := domain.EventLevel(eventLevelUint)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewInt64((int64)(eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -277,14 +278,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				//eventLevelDomain := domain.EventLevel(eventLevelUint)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewInt64((int64)(eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -300,14 +301,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventID := random.UUID()
 				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
 				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				//eventLevelDomain := domain.EventLevel(eventLevelUint)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewInt64((int64)(eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)

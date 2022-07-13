@@ -12,6 +12,7 @@ import (
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -106,15 +107,15 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
-	updatedLevel := domain.EventLevel(rand.Intn(domain.EventLevelLimit))
+	updatedLevel := uint(rand.Intn(domain.EventLevelLimit))
 	err = repo.UpdateEventLevel(selected.EventID, &urepository.UpdateEventLevelArgs{
-		Level: updatedLevel,
+		Level: optional.NewInt64((int64)(updatedLevel), true),
 	})
 	assert.NoError(t, err)
 
 	got, err = repo.GetEvent(selected.EventID)
 	assert.NoError(t, err)
-	assert.Equal(t, updatedLevel, got.Level)
+	assert.Equal(t, updatedLevel, uint(got.Level))
 }
 
 func TestEventRepository_GetUserEvents(t *testing.T) {
