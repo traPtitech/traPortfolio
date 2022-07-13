@@ -109,7 +109,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 
 	updatedLevel := uint(rand.Intn(domain.EventLevelLimit))
 	err = repo.UpdateEventLevel(selected.EventID, &urepository.UpdateEventLevelArgs{
-		Level: optional.NewInt64((int64)(updatedLevel), true),
+		Level: optional.NewUint(updatedLevel, true),
 	})
 	assert.NoError(t, err)
 

@@ -216,7 +216,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64((int64)(eventLevelUint), true),
+					Level: optional.NewUint((eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -239,7 +239,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64((int64)(eventLevelUint), true),
+					Level: optional.NewUint((eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -262,7 +262,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64((int64)(eventLevelUint), true),
+					Level: optional.NewUint((eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -285,7 +285,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64((int64)(eventLevelUint), true),
+					Level: optional.NewUint((eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -308,7 +308,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64((int64)(eventLevelUint), true),
+					Level: optional.NewUint((eventLevelUint), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)

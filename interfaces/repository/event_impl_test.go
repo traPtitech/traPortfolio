@@ -337,7 +337,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64(domain.EventLevelPublic, true),
+					Level: optional.NewUint(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -360,7 +360,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64(domain.EventLevelPublic, true),
+					Level: optional.NewUint(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -377,7 +377,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64(domain.EventLevelPublic, true),
+					Level: optional.NewUint(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -397,7 +397,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewInt64(domain.EventLevelPublic, true),
+					Level: optional.NewUint(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
