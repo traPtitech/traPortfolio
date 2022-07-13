@@ -60,7 +60,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404": {
 			http.StatusNotFound,
