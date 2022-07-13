@@ -109,6 +109,14 @@ func Duration() domain.YearWithSemesterDuration {
 	}
 }
 
+func Uintn(n uint) uint {
+	return uint(rand.Int31n(int32(n)))
+}
+
+func Uint8n(n uint8) uint8 {
+	return uint8(rand.Int31n(int32(n)))
+}
+
 func Bool() bool {
 	return rand.Int()%2 == 0
 }
@@ -119,14 +127,6 @@ func OptBool() optional.Bool {
 
 func OptInt64() optional.Int64 {
 	return optional.NewInt64(rand.Int63(), Bool())
-}
-
-func OptUint() optional.Uint {
-	return optional.NewUint(uint(rand.Uint64()), Bool())
-}
-
-func OptUint8() optional.Uint8 {
-	return optional.NewUint8(uint8(rand.Uint64()), Bool())
 }
 
 func OptAlphaNumericn(n int) optional.String {
