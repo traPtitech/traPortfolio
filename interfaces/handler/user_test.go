@@ -681,6 +681,47 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			statusCode: http.StatusCreated,
 		},
 		{
+			name: "Success: Account Type is 0",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+				userID := random.UUID()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(random.Bool()),
+					Type:        0,
+					Url:         random.RandURLString(),
+				}
+
+				args := repository.CreateAccountArgs{
+					DisplayName: reqBody.DisplayName,
+					Type:        uint(reqBody.Type),
+					URL:         reqBody.Url,
+					PrPermitted: bool(reqBody.PrPermitted),
+				}
+
+				want := domain.Account{
+					ID:          userID,
+					DisplayName: args.DisplayName,
+					Type:        args.Type,
+					PrPermitted: args.PrPermitted,
+					URL:         args.URL,
+				}
+
+				expectedResBody := Account{
+					Id:          userID,
+					DisplayName: reqBody.DisplayName,
+					PrPermitted: reqBody.PrPermitted,
+					Type:        reqBody.Type,
+					Url:         reqBody.Url,
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				s.EXPECT().CreateAccount(anyCtx{}, userID, &args).Return(&want, nil)
+				return &reqBody, expectedResBody, path
+			},
+			statusCode: http.StatusCreated,
+		},
+		{
 			name: "Bad Request: DisplayName is empty",
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
@@ -690,6 +731,23 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: "",
 					PrPermitted: PrPermitted(random.Bool()),
 					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
+					Url:         random.RandURLString(),
+				}
+
+				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
+				return &reqBody, Account{}, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Bad Request: Account Type is empty",
+			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+				userID := random.UUID()
+
+				reqBody := AddUserAccountJSONBody{
+					DisplayName: random.AlphaNumeric(),
+					PrPermitted: PrPermitted(random.Bool()),
+					Type:        0,
 					Url:         random.RandURLString(),
 				}
 
