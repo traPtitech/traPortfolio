@@ -35,6 +35,7 @@ func (v *validator) Validate(i interface{}) error {
 
 var (
 	vdRuleNameLength        = vd.Length(1, 32)
+	vdRuleDisplayNameLength = vd.Length(1, 256) // 外部アカウントのアカウント名文字数上限
 	vdRuleDescriptionLength = vd.Length(1, 256)
 	vdRuleResultLength      = vd.Length(0, 32)
 	vdRuleAccountTypeMin    = vd.Min(0) // TODO: handler.AccountTypeをuint型にしたら消す
@@ -60,7 +61,7 @@ func (p GetUsersParams) Validate() error {
 
 func (r AddAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.DisplayName, vd.Required),
+		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted, vd.NotNil),
 		vd.Field(&r.Type, vd.NotNil, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.Required, is.URL),
@@ -102,7 +103,7 @@ func (r CreateProjectRequest) Validate() error {
 
 func (r EditUserAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.DisplayName, vd.NilOrNotEmpty),
+		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
