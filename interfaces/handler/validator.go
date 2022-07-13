@@ -62,8 +62,8 @@ func (p GetUsersParams) Validate() error {
 func (r AddAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
-		vd.Field(&r.PrPermitted, vd.NotNil),
-		vd.Field(&r.Type, vd.NotNil, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
+		vd.Field(&r.PrPermitted),
+		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.Required, is.URL),
 	)
 }
