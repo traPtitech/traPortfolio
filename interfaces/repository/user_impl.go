@@ -194,7 +194,7 @@ func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.Update
 
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
-		err := repo.h.
+		err := tx.
 			Where(&model.User{ID: userID}).
 			First(user).
 			Error()
@@ -202,7 +202,7 @@ func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.Update
 			return convertError(err)
 		}
 
-		err = repo.h.Model(user).Updates(changes).Error()
+		err = tx.Model(user).Updates(changes).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -319,7 +319,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
-		err := repo.h.
+		err := tx.
 			Where(&model.Account{ID: accountID, UserID: userID}).
 			First(account).
 			Error()
@@ -327,7 +327,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 			return convertError(err)
 		}
 
-		err = repo.h.Model(account).Updates(changes).Error()
+		err = tx.Model(account).Updates(changes).Error()
 		if err != nil {
 			return convertError(err)
 		}
