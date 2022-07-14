@@ -53,7 +53,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 		{
 			name: "success",
 			setup: func(s *mock_service.MockContestService, want []*domain.Contest) string {
-				s.EXPECT().GetContests(gomock.Any()).Return(want, nil)
+				s.EXPECT().GetContests(anyCtx{}).Return(want, nil)
 				return "/api/v1/contests"
 			},
 			statusCode: http.StatusOK,
@@ -120,7 +120,7 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		},
 		Link:        random.RandURLString(),
 		Description: random.AlphaNumeric(),
-		Teams: []*domain.ContestTeam{
+		ContestTeams: []*domain.ContestTeam{
 			{
 				ID:        getContestID[1],
 				ContestID: getContestID[0],
@@ -136,8 +136,8 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		},
 	}
 
-	teams := make([]ContestTeam, len(d.Teams))
-	for i, v := range d.Teams {
+	teams := make([]ContestTeam, len(d.ContestTeams))
+	for i, v := range d.ContestTeams {
 		teams[i] = ContestTeam{
 			Id:     v.ID,
 			Name:   v.Name,
@@ -171,7 +171,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockContestService) (*domain.ContestDetail, *ContestDetail, string) {
 				want, hres := makeContest(t)
-				s.EXPECT().GetContest(gomock.Any(), want.ID).Return(want, nil)
+				s.EXPECT().GetContest(anyCtx{}, want.ID).Return(want, nil)
 				path := fmt.Sprintf("/api/v1/contests/%s", want.ID.String())
 
 				return want, hres, path
@@ -190,7 +190,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 			name: "Not Found",
 			setup: func(s *mock_service.MockContestService) (*domain.ContestDetail, *ContestDetail, string) {
 				uid := random.UUID()
-				s.EXPECT().GetContest(gomock.Any(), uid).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetContest(anyCtx{}, uid).Return(nil, repository.ErrNotFound)
 
 				return &domain.ContestDetail{}, &ContestDetail{}, fmt.Sprintf("/api/v1/contests/%s", uid)
 			},
@@ -259,9 +259,9 @@ func TestContestHandler_PostContest(t *testing.T) {
 						TimeStart: args.Since,
 						TimeEnd:   args.Until.Time,
 					},
-					Link:        args.Link.String,
-					Description: args.Description,
-					Teams:       []*domain.ContestTeam{},
+					Link:         args.Link.String,
+					Description:  args.Description,
+					ContestTeams: []*domain.ContestTeam{},
 				}
 				expectedResBody = &Contest{
 					Id:   want.ID,
@@ -271,7 +271,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 						Until: &want.TimeEnd,
 					},
 				}
-				s.EXPECT().CreateContest(gomock.Any(), &args).Return(&want, nil)
+				s.EXPECT().CreateContest(anyCtx{}, &args).Return(&want, nil)
 				path = "/api/v1/contests"
 				return reqBody, expectedResBody, &Contest{}, path
 			},
@@ -311,7 +311,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 					Since:       reqBody.Duration.Since,
 					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
-				s.EXPECT().CreateContest(gomock.Any(), &args).Return(nil, repository.ErrAlreadyExists)
+				s.EXPECT().CreateContest(anyCtx{}, &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, nil, nil, "/api/v1/contests"
 			},
 			statusCode: http.StatusConflict,
@@ -366,7 +366,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 					Until:       optional.TimeFrom(reqBody.Duration.Until),
 				}
 				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
-				s.EXPECT().UpdateContest(gomock.Any(), contestID, &args).Return(nil)
+				s.EXPECT().UpdateContest(anyCtx{}, contestID, &args).Return(nil)
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
@@ -404,7 +404,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		// 			Until:       reqBody.Duration.Until,
 		// 		}
 		// 		path := fmt.Sprintf("/api/v1/contests/%s", random.UUID())
-		// 		s.EXPECT().UpdateContest(gomock.Any(), contestID, &args).Return(nil)
+		// 		s.EXPECT().UpdateContest(anyCtx{}, contestID, &args).Return(nil)
 		// 		return reqBody, path
 		// 	},
 		// 	statusCode: http.StatusBadRequest,
@@ -437,7 +437,7 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockContestService) string {
 				contestID := random.UUID()
-				s.EXPECT().DeleteContest(gomock.Any(), contestID).Return(nil)
+				s.EXPECT().DeleteContest(anyCtx{}, contestID).Return(nil)
 				return fmt.Sprintf("/api/v1/contests/%s", contestID)
 			},
 			statusCode: http.StatusNoContent,
@@ -503,7 +503,7 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 						Result: repoContestTeams[1].Result,
 					},
 				}
-				s.EXPECT().GetContestTeams(gomock.Any(), contestID).Return(repoContestTeams, nil)
+				s.EXPECT().GetContestTeams(anyCtx{}, contestID).Return(repoContestTeams, nil)
 				return hres, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusOK,
@@ -586,7 +586,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 					Result:      repoContestTeamDetail.Result,
 				}
 
-				s.EXPECT().GetContestTeam(gomock.Any(), contestID, teamID).Return(&repoContestTeamDetail, nil)
+				s.EXPECT().GetContestTeam(anyCtx{}, contestID, teamID).Return(&repoContestTeamDetail, nil)
 				return hres, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)
 			},
 			statusCode: http.StatusOK,
@@ -610,7 +610,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 			setup: func(s *mock_service.MockContestService) (ContestTeamDetail, string) {
 				teamID := random.UUID()
 				contestID := random.UUID()
-				s.EXPECT().GetContestTeam(gomock.Any(), contestID, teamID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetContestTeam(anyCtx{}, contestID, teamID).Return(nil, repository.ErrNotFound)
 				return ContestTeamDetail{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -674,7 +674,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Name:   want.Name,
 					Result: want.Result,
 				}
-				s.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(&want, nil)
+				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(&want, nil)
 				return reqBody, expectedResBody, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusCreated,
@@ -708,7 +708,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Link:        optional.StringFrom(reqBody.Link),
 					Description: reqBody.Description,
 				}
-				s.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(nil, repository.ErrNotFound)
+				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(nil, repository.ErrNotFound)
 				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusNotFound,
@@ -729,7 +729,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Link:        optional.StringFrom(reqBody.Link),
 					Description: reqBody.Description,
 				}
-				s.EXPECT().CreateContestTeam(gomock.Any(), contestID, &args).Return(nil, repository.ErrAlreadyExists)
+				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusConflict,
@@ -777,7 +777,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Result:      optional.StringFrom(reqBody.Result),
 					Description: optional.StringFrom(reqBody.Description),
 				}
-				s.EXPECT().UpdateContestTeam(gomock.Any(), teamID, &args).Return(nil)
+				s.EXPECT().UpdateContestTeam(anyCtx{}, teamID, &args).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)
 			},
 			statusCode: http.StatusNoContent,
@@ -825,7 +825,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Result:      optional.StringFrom(reqBody.Result),
 					Description: optional.StringFrom(reqBody.Description),
 				}
-				s.EXPECT().UpdateContestTeam(gomock.Any(), teamID, &args).Return(repository.ErrNotFound)
+				s.EXPECT().UpdateContestTeam(anyCtx{}, teamID, &args).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -875,7 +875,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 					}
 				}
 
-				s.EXPECT().GetContestTeamMembers(gomock.Any(), contestID, teamID).Return(users, nil)
+				s.EXPECT().GetContestTeamMembers(anyCtx{}, contestID, teamID).Return(users, nil)
 				return hres, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusOK,
@@ -901,7 +901,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 			setup: func(s *mock_service.MockContestService) ([]*User, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
-				s.EXPECT().GetContestTeamMembers(gomock.Any(), contestID, teamID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetContestTeamMembers(anyCtx{}, contestID, teamID).Return(nil, repository.ErrNotFound)
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -947,7 +947,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().AddContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(nil)
+				s.EXPECT().AddContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNoContent,
@@ -979,7 +979,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().AddContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(repository.ErrNotFound)
+				s.EXPECT().AddContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -1001,7 +1001,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
+func TestContestHandler_EditContestTeamMember(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
@@ -1023,7 +1023,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(nil)
+				s.EXPECT().EditContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNoContent,
@@ -1055,7 +1055,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(gomock.Any(), teamID, reqBody.Members).Return(repository.ErrNotFound)
+				s.EXPECT().EditContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -1068,7 +1068,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 
 			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, api, http.MethodDelete, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)

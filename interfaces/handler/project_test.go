@@ -91,7 +91,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 					})
 				}
 
-				s.EXPECT().GetProjects(gomock.Any()).Return(repo, nil)
+				s.EXPECT().GetProjects(anyCtx{}).Return(repo, nil)
 				return reqBody, "/api/v1/projects"
 			},
 			statusCode: http.StatusOK,
@@ -99,7 +99,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 		{
 			name: "Internal Error",
 			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
-				s.EXPECT().GetProjects(gomock.Any()).Return(nil, errInternal)
+				s.EXPECT().GetProjects(anyCtx{}).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
 			statusCode: http.StatusInternalServerError,
@@ -187,7 +187,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 					Name:    repo.Name,
 				}
 
-				s.EXPECT().GetProject(gomock.Any(), projectID).Return(&repo, nil)
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&repo, nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusOK,
@@ -196,7 +196,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 			name: "Internal Error",
 			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
 				projectID := random.UUID()
-				s.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, errInternal)
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, errInternal)
 				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,

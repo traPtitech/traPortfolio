@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
@@ -48,14 +49,18 @@ func (knoq *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 }
 
 func (knoq *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
-	res, err := knoq.apiGet(fmt.Sprintf("/events/%v", eventID))
+	res, err := knoq.apiGet(fmt.Sprintf("/events/%s", eventID))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode == http.StatusNotFound {
+		return nil, repository.ErrNotFound
+	}
+
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /events/%v failed", eventID)
+		return nil, fmt.Errorf("GET /events/%s failed: %d", eventID, res.StatusCode)
 	}
 
 	var er external.EventResponse
@@ -66,14 +71,14 @@ func (knoq *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, e
 }
 
 func (knoq *KnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
-	res, err := knoq.apiGet(fmt.Sprintf("/users/%v/events", userID))
+	res, err := knoq.apiGet(fmt.Sprintf("/users/%s/events", userID))
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users/%v/events failed", userID)
+		return nil, fmt.Errorf("GET /users/%s/events failed", userID)
 	}
 
 	var er []*external.EventResponse

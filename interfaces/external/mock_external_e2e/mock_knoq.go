@@ -1,10 +1,9 @@
 package mock_external_e2e //nolint:revive
 
 import (
-	"fmt"
-
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 
@@ -25,9 +24,21 @@ func (m *MockKnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, 
 		}
 	}
 
-	return nil, fmt.Errorf("GET /events/%v failed: 404", eventID)
+	return nil, repository.ErrNotFound
 }
 
 func (m *MockKnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
-	return mockdata.MockKnoqEvents, nil
+	events := make([]*external.EventResponse, 0, len(mockdata.MockKnoqEvents))
+
+	// TODO: adminsではなくattendeesを取得して判定する？
+	for _, v := range mockdata.MockKnoqEvents {
+		for _, admin := range v.Admins {
+			if admin == userID {
+				events = append(events, v)
+				break
+			}
+		}
+	}
+
+	return events, nil
 }

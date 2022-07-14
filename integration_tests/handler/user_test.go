@@ -1,5 +1,3 @@
-//go:build integration && db
-
 package handler
 
 import (
@@ -203,19 +201,22 @@ func TestGetUserAccounts(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			[]handler.Account{
-				mockdata.HMockUserAccount,
-			},
+			mockdata.HMockUserAccounts,
 		},
-		"200 no accounts": {
+		"200 no accounts with existing userID": {
 			http.StatusOK,
-			random.UUID(),
+			mockdata.HMockUsers[1].Id,
 			[]handler.Account{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
 
@@ -245,13 +246,13 @@ func TestGetUserAccount(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserAccount.Id,
-			mockdata.HMockUserAccount,
+			mockdata.HMockUserAccounts[0].Id,
+			mockdata.HMockUserAccounts[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.HMockUserAccount.Id,
+			mockdata.HMockUserAccounts[0].Id,
 			handler.ConvertError(t, repository.ErrValidate),
 		},
 		"400 invalid accountID": {
@@ -263,7 +264,7 @@ func TestGetUserAccount(t *testing.T) {
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
-			mockdata.HMockUserAccount.Id,
+			mockdata.HMockUserAccounts[0].Id,
 			handler.ConvertError(t, repository.ErrNotFound),
 		},
 		"404 accountID not found": {
@@ -415,7 +416,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.HMockUserAccount.Id,
+			mockdata.HMockUserAccounts[0].Id,
 			handler.EditUserAccountJSONRequestBody{},
 			handler.ConvertError(t, repository.ErrValidate),
 		},
@@ -565,102 +566,180 @@ func TestDeleteUserAccount(t *testing.T) {
 	}
 }
 
-// // GetUserProjects GET /users/:userID/projects
-// func TestGetUserProjects(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserProjects GET /users/:userID/projects
+func TestGetUserProjects(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUsers[0].Id,
+			mockdata.HMockUserProjects,
+		},
+		"200 no projects with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Project{},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_projects")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-// 			t.Parallel()
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_projects")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
-// // GetUserContests GET /users/:userID/contests
-// func TestGetUserContests(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserContests GET /users/:userID/contests
+func TestGetUserContests(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUsers[0].Id,
+			mockdata.HMockUserContests,
+		},
+		"200 no contests with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Contest{},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_contests")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-//    	t.Parallel()
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_contests")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
-// // GetUserGroups GET /users/:userID/groups
-// func TestGetUserGroups(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserGroups GET /users/:userID/groups
+func TestGetUserGroups(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUsers[0].Id,
+			mockdata.HMockUserGroups,
+		},
+		"200 no groups with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Group{},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+		"404 no accounts with not-existing userID": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.ConvertError(t, repository.ErrNotFound),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_groups")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-//			t.Parallel()
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_groups")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
-// // GetUserEvents GET /users/:userID/events
-// func TestGetUserEvents(t *testing.T) {
-// 	t.Parallel()
-// 	tests := map[string]struct {
-// 		statusCode int
-// 		userID     uuid.UUID
-// 		want       interface{}
-// 	}{
-// 		// TODO: Add cases
-// 	}
+// GetUserEvents GET /users/:userID/events
+func TestGetUserEvents(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		userID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.HMockUsers[0].Id,
+			mockdata.HMockUserEvents,
+		},
+		"200 no events with existing userID": {
+			http.StatusOK,
+			mockdata.HMockUsers[1].Id,
+			[]handler.Event{
+				mockdata.HMockUserEvents[1],
+			},
+		},
+		"200 no events with non-existing userID": {
+			http.StatusOK,
+			random.UUID(),
+			[]handler.Event{},
+		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.ConvertError(t, repository.ErrValidate),
+		},
+	}
 
-// 	e := echo.New()
-// 	conf := testutils.GetConfigWithDBName("user_handler_get_user_events")
-// 	api, err := testutils.SetupRoutes(t, e, conf)
-// 	assert.NoError(t, err)
-// 	for name, tt := range tests {
-// 		tt := tt
-// 		t.Run(name, func(t *testing.T) {
-//			t.Parallel()
-// 			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
-// 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-// 		})
-// 	}
-// }
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("user_handler_get_user_events")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}

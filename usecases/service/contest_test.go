@@ -116,7 +116,7 @@ func TestContestService_GetContest(t *testing.T) {
 				},
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(),
-				Teams: []*domain.ContestTeam{
+				ContestTeams: []*domain.ContestTeam{
 					{
 						ID:        random.UUID(),
 						ContestID: cid,
@@ -128,7 +128,7 @@ func TestContestService_GetContest(t *testing.T) {
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().GetContest(args.id).Return(want, nil)
-				repo.EXPECT().GetContestTeams(args.id).Return(want.Teams, nil)
+				repo.EXPECT().GetContestTeams(args.id).Return(want.ContestTeams, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -145,9 +145,9 @@ func TestContestService_GetContest(t *testing.T) {
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Link:        random.RandURLString(),
-				Description: random.AlphaNumeric(),
-				Teams:       nil,
+				Link:         random.RandURLString(),
+				Description:  random.AlphaNumeric(),
+				ContestTeams: nil,
 			},
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -241,9 +241,9 @@ func TestContestService_CreateContest(t *testing.T) {
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
-				Link:        random.AlphaNumeric(),
-				Description: random.AlphaNumeric(),
-				Teams:       []*domain.ContestTeam{},
+				Link:         random.AlphaNumeric(),
+				Description:  random.AlphaNumeric(),
+				ContestTeams: []*domain.ContestTeam{},
 			},
 			setup: func(f fields, args args, want *domain.ContestDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -995,7 +995,7 @@ func TestContestService_AddContestTeamMembers(t *testing.T) {
 	}
 }
 
-func TestContestService_DeleteContestTeamMembers(t *testing.T) {
+func TestContestService_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	type fields struct {
 		repo repository.ContestRepository
@@ -1021,12 +1021,12 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().DeleteContestTeamMembers(args.teamID, args.memberIDs).Return(nil)
+				repo.EXPECT().EditContestTeamMembers(args.teamID, args.memberIDs).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
 		{
-			name: "ErrDeleteContestTeamMembers",
+			name: "ErrEditContestTeamMembers",
 			args: args{
 				ctx:       context.Background(),
 				teamID:    random.UUID(),
@@ -1034,7 +1034,7 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
-				repo.EXPECT().DeleteContestTeamMembers(args.teamID, args.memberIDs).Return(repository.ErrNotFound)
+				repo.EXPECT().EditContestTeamMembers(args.teamID, args.memberIDs).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1051,7 +1051,7 @@ func TestContestService_DeleteContestTeamMembers(t *testing.T) {
 			tt.setup(tt.fields, tt.args)
 			s := NewContestService(tt.fields.repo)
 			// Assertion
-			tt.assertion(t, s.DeleteContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
+			tt.assertion(t, s.EditContestTeamMembers(tt.args.ctx, tt.args.teamID, tt.args.memberIDs))
 		})
 	}
 }

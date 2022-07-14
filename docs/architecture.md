@@ -13,7 +13,7 @@
 ├── domain # domain層。他層に依存しないドメインオブジェクトを格納する
 ├── infrastructure # infrastructure層。他3層に依存する。
 │  └── migration # DBのマイグレーション(go-gormigrate/gormigrateを使用)
-├── integration_tests # 結合テスト。build tagsをつけて管理
+├── integration_tests # 結合テスト
 │  ├── handler
 │  ├── repository
 │  ├── testdata

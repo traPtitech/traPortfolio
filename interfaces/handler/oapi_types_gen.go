@@ -591,11 +591,11 @@ type AddContestTeamJSONBody = AddContestTeamRequest
 // EditContestTeamJSONBody defines parameters for EditContestTeam.
 type EditContestTeamJSONBody = EditContestTeamRequest
 
-// DeleteContestTeamMembersJSONBody defines parameters for DeleteContestTeamMembers.
-type DeleteContestTeamMembersJSONBody = MemberIDs
-
 // AddContestTeamMembersJSONBody defines parameters for AddContestTeamMembers.
 type AddContestTeamMembersJSONBody = MemberIDs
+
+// EditContestTeamMembersJSONBody defines parameters for EditContestTeamMembers.
+type EditContestTeamMembersJSONBody = MemberIDs
 
 // EditEventJSONBody defines parameters for EditEvent.
 type EditEventJSONBody = EditEventRequest
@@ -642,11 +642,11 @@ type AddContestTeamJSONRequestBody = AddContestTeamJSONBody
 // EditContestTeamJSONRequestBody defines body for EditContestTeam for application/json ContentType.
 type EditContestTeamJSONRequestBody = EditContestTeamJSONBody
 
-// DeleteContestTeamMembersJSONRequestBody defines body for DeleteContestTeamMembers for application/json ContentType.
-type DeleteContestTeamMembersJSONRequestBody = DeleteContestTeamMembersJSONBody
-
 // AddContestTeamMembersJSONRequestBody defines body for AddContestTeamMembers for application/json ContentType.
 type AddContestTeamMembersJSONRequestBody = AddContestTeamMembersJSONBody
+
+// EditContestTeamMembersJSONRequestBody defines body for EditContestTeamMembers for application/json ContentType.
+type EditContestTeamMembersJSONRequestBody = EditContestTeamMembersJSONBody
 
 // EditEventJSONRequestBody defines body for EditEvent for application/json ContentType.
 type EditEventJSONRequestBody = EditEventJSONBody
