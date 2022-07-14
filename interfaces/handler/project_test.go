@@ -213,7 +213,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 			name: "Not Found Error",
 			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
 				projectID := random.UUID()
-				s.EXPECT().GetProject(gomock.Any(), projectID).Return(nil, repository.ErrNotFound)
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, repository.ErrNotFound)
 				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusNotFound,
