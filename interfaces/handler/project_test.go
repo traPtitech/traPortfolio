@@ -3,6 +3,8 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"net/http"
 	"testing"
 
@@ -25,6 +27,18 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	api := NewAPI(nil, nil, NewProjectHandler(s), nil, nil, nil)
 
 	return s, api
+}
+
+func makeCreateProjectRequest(description string, since YearWithSemester, until YearWithSemester, name string, link string) *CreateProjectJSONRequestBody {
+	return &CreateProjectJSONRequestBody{
+		Description: description,
+		Duration: YearWithSemesterDuration{
+			Since: since,
+			Until: &until,
+		},
+		Name: name,
+		Link: &link,
+	}
 }
 
 func TestProjectHandler_GetAll(t *testing.T) {
@@ -214,6 +228,79 @@ func TestProjectHandler_GetByID(t *testing.T) {
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, expectedHres, hres)
+		})
+	}
+}
+
+func TestProjectHandler_CreateProject(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockProjectService) (reqBody *CreateProjectJSONRequestBody, expectedResBody Project, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockProjectService) (reqBody *CreateProjectJSONRequestBody, expectedResBody Project, path string) {
+				duration := random.Duration()
+				reqBody = makeCreateProjectRequest(
+					random.AlphaNumeric(),
+					convertDuration(duration).Since,
+					*convertDuration(duration).Until,
+					random.AlphaNumeric(),
+					random.RandURLString(),
+				)
+				args := repository.CreateProjectArgs{
+					Name:          reqBody.Name,
+					Description:   reqBody.Description,
+					Link:          optional.StringFrom(reqBody.Link),
+					SinceYear:     reqBody.Duration.Since.Year,
+					SinceSemester: int(reqBody.Duration.Since.Semester),
+					UntilYear:     reqBody.Duration.Until.Year,
+					UntilSemester: int(reqBody.Duration.Until.Semester),
+				}
+				want := domain.Project{
+					ID:   random.UUID(),
+					Name: args.Name,
+					Duration: domain.YearWithSemesterDuration{
+						Since: domain.YearWithSemester{
+							Year:     args.SinceYear,
+							Semester: args.SinceSemester,
+						},
+						Until: domain.YearWithSemester{
+							Year:     args.UntilYear,
+							Semester: args.UntilSemester,
+						},
+					},
+					Description: args.Description,
+					Link:        args.Link.String,
+					Members:     nil,
+				}
+				expectedResBody = Project{
+					Duration: convertDuration(want.Duration),
+					Id:       want.ID,
+					Name:     want.Name,
+				}
+				s.EXPECT().CreateProject(anyCtx{}, &args).Return(&want, nil)
+				return reqBody, expectedResBody, "/api/v1/projects"
+			},
+			statusCode: http.StatusCreated,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupProjectMock(t)
+
+			reqBody, res, path := tt.setup(s)
+
+			var resBody Project
+			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, resBody, res)
 		})
 	}
 }
