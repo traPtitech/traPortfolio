@@ -30,6 +30,7 @@ type GroupUserBelonging struct {
 	UpdatedAt     time.Time `gorm:"precision:6"`
 
 	Group Group `gorm:"foreignKey:GroupID"`
+	User  User  `gorm:"foreignKey:UserID"`
 }
 
 func (*GroupUserBelonging) TableName() string {

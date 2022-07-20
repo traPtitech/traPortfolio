@@ -88,7 +88,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success_singles",
+			name: "Success_Singles",
 			args: args{
 				id: gid,
 			},
@@ -140,6 +140,83 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 					)
 			},
 			assertion: assert.NoError,
+		},
+		{
+			name: "Success_Multiples",
+			args: args{
+				id: gid,
+			},
+			want: &domain.GroupDetail{
+				ID:   gid,
+				Name: random.AlphaNumeric(),
+				Link: random.RandURLString(),
+				Admin: []*domain.User{
+					{
+						ID: random.UUID(),
+					},
+					{
+						ID: random.UUID(),
+					},
+					{
+						ID: random.UUID(),
+					},
+				},
+				Members: []*domain.UserGroup{
+					{
+						ID:       random.UUID(),
+						Duration: random.Duration(),
+					},
+					{
+						ID:       random.UUID(),
+						Duration: random.Duration(),
+					},
+					{
+						ID:       random.UUID(),
+						Duration: random.Duration(),
+					},
+				},
+				Description: random.AlphaNumeric(),
+			},
+			setup: func(f mockGroupRepositoryFields, args args, want *domain.GroupDetail) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"group_id", "name", "link", "description"}).
+							AddRow(want.ID, want.Name, want.Link, want.Description),
+					)
+				memberRows := sqlmock.NewRows([]string{"user_id", "group_id", "since_year", "since_semester", "until_year", "until_semester"})
+				for _, m := range want.Members {
+					memberRows.AddRow(m.ID, want.ID, m.Duration.Since.Year, m.Duration.Since.Semester, m.Duration.Until.Year, m.Duration.Until.Semester)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`group_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(memberRows)
+				adminRows := sqlmock.NewRows([]string{"user_id", "group_id"})
+				for _, a := range want.Admin {
+					adminRows.AddRow(a.ID, want.ID)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_admins` WHERE `group_user_admins`.`group_id` = ?")).
+					WithArgs(args.id).
+					WillReturnRows(adminRows)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "UnexpectedError",
+			args: args{
+				id: gid,
+			},
+			want: nil,
+			setup: func(f mockGroupRepositoryFields, args args, want *domain.GroupDetail) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT 1")).
+					WithArgs(args.id).
+					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
 		},
 	}
 	for _, tt := range tests {
