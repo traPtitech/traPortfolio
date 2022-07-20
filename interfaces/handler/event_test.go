@@ -198,7 +198,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 func TestEventHandler_PatchEvent(t *testing.T) {
 
-	LevelHandler := func(l uint8) *EventLevel {
+	hLevel := func(l uint8) *EventLevel {
 		r := EventLevel(l)
 		return &r
 	}
@@ -216,7 +216,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: LevelHandler(eventLevelUint8),
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -237,7 +237,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: LevelHandler(eventLevelUint8),
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -258,7 +258,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: LevelHandler(eventLevelUint8),
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -279,7 +279,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: LevelHandler(eventLevelUint8),
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -300,7 +300,7 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: LevelHandler(eventLevelUint8),
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
