@@ -83,9 +83,10 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 		return convertError(err)
 	}
 
+	eLevel := uint8(*req.EventLevel)
 	ctx := c.Request().Context()
 	patchReq := repository.UpdateEventLevelArgs{
-		Level: optional.NewUint8((uint8)(*req.EventLevel), true),
+		Level: optional.Uint8From(&eLevel),
 	}
 
 	if err := h.srv.UpdateEventLevel(ctx, req.EventID, &patchReq); err != nil {
