@@ -34,13 +34,19 @@ func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 }
 
 func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
+	group := &model.Group{}
+	if err := repo.h.
+		Where(&model.Group{GroupID: groupID}).
+		First(group).
+		Error(); err != nil {
+		return nil, convertError(err)
+	}
+
 	users := make([]*model.GroupUserBelonging, 0)
-	err := repo.h.
-		Preload("Group").
+	if err := repo.h.
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
-		Error()
-	if err != nil {
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -65,12 +71,10 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	admins := make([]*model.GroupUserAdmin, 0)
-	err = repo.h.
-		Preload("Group").
+	if err := repo.h.
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
-		Error()
-	if err != nil {
+		Error(); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -82,11 +86,11 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
 		ID:          groupID,
-		Name:        admins[0].Group.Name,
-		Link:        admins[0].Group.Link,
+		Name:        group.Name,
+		Link:        group.Link,
 		Admin:       erAdmin,
 		Members:     erMembers,
-		Description: admins[0].Group.Description,
+		Description: group.Description,
 	}
 	return result, nil
 }
