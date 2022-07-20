@@ -197,9 +197,6 @@ func TestEventHandler_GetByID(t *testing.T) {
 }
 
 func TestEventHandler_PatchEvent(t *testing.T) {
-	LevelValue := func(l EventLevel) uint8 {
-		return uint8(l)
-	}
 
 	tests := []struct {
 		name       string
@@ -211,10 +208,8 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelHandler := EventLevel(rand.Intn(domain.EventLevelLimit))
-				eventLevelUint8 := LevelValue(eventLevelHandler)
-				//eventLevelHandler := EventLevel(eventLevelUint8)
-				//eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
@@ -235,10 +230,8 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelHandler := EventLevel(rand.Intn(domain.EventLevelLimit))
-				eventLevelUint8 := LevelValue(eventLevelHandler)
-				//eventLevelHandler := EventLevel(eventLevelUint8)
-				//eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
@@ -259,10 +252,8 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelHandler := EventLevel(rand.Intn(domain.EventLevelLimit))
-				eventLevelUint8 := LevelValue(eventLevelHandler)
-				//eventLevelHandler := EventLevel(eventLevelUint8)
-				//eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
@@ -283,10 +274,8 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelHandler := EventLevel(rand.Intn(domain.EventLevelLimit))
-				eventLevelUint8 := LevelValue(eventLevelHandler)
-				//eventLevelHandler := EventLevel(eventLevelUint8)
-				//eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
@@ -307,10 +296,8 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelHandler := EventLevel(rand.Intn(domain.EventLevelLimit))
-				eventLevelUint8 := LevelValue(eventLevelHandler)
-				//eventLevelHandler := EventLevel(eventLevelUint8)
-				//eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
 					EventLevel: &eventLevelHandler,
