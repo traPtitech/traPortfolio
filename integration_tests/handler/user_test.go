@@ -20,8 +20,8 @@ import (
 // GetUsers GET /users
 func TestGetUsers(t *testing.T) {
 	var (
-		includeSuspended handler.IncludeSuspendedInQuery = true
-		name                                             = handler.NameInQuery(mockdata.MockUsers[0].Name)
+		includeSuspended = handler.IncludeSuspendedInQuery(true)
+		name             = handler.NameInQuery(mockdata.MockUsers[0].Name)
 	)
 
 	t.Parallel()
