@@ -102,7 +102,7 @@ func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := repo.getEventLevelByID(eventID); err != nil {
 			return convertError(err)
-		} else if elv.Level == arg.Level {
+		} else if uint8(elv.Level) == arg.Level.Byte {
 			return nil // updateする必要がないのでここでcommitする
 		}
 

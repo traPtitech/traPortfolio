@@ -12,6 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -196,6 +197,12 @@ func TestEventHandler_GetByID(t *testing.T) {
 }
 
 func TestEventHandler_PatchEvent(t *testing.T) {
+
+	hLevel := func(l uint8) *EventLevel {
+		r := EventLevel(l)
+		return &r
+	}
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockEventService) (reqBody *EditEventRequest, path string)
@@ -206,16 +213,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -229,16 +234,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -252,16 +255,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -275,16 +276,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -298,16 +297,14 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint := (uint)(rand.Intn(domain.EventLevelLimit))
-				eventLevelHandler := EventLevel(eventLevelUint)
-				eventLevelDomain := domain.EventLevel(eventLevelUint)
+				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: hLevel(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: eventLevelDomain,
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
