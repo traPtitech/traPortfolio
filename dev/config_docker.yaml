@@ -1,5 +1,5 @@
 port: 1323
-insertMockData: true
+insertMockData: false
 db:
   user: 'root'
   pass: 'password'

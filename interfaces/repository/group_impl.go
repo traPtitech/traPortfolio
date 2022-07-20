@@ -34,18 +34,19 @@ func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 }
 
 func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
-	group := &model.Group{}
-	if err := repo.h.
-		Preload("Members").
-		Preload("Admins").
-		Where(&model.Group{GroupID: groupID}).
-		First(group).Error(); err != nil {
+	users := make([]*model.GroupUserBelonging, 0)
+	err := repo.h.
+		Preload("Group").
+		Where(&model.GroupUserBelonging{GroupID: groupID}).
+		Find(&users).
+		Error()
+	if err != nil {
 		return nil, convertError(err)
 	}
 
 	// Name, RealNameはusecasesでPortalから取得する
-	erMembers := make([]*domain.UserGroup, 0, len(group.Members))
-	for _, v := range group.Members {
+	erMembers := make([]*domain.UserGroup, 0, len(users))
+	for _, v := range users {
 		erMembers = append(erMembers, &domain.UserGroup{
 			ID: v.UserID,
 			// Name:     v.Name,
@@ -63,19 +64,29 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		})
 	}
 
-	erAdmin := make([]*domain.User, 0, len(group.Admins))
-	for _, v := range group.Admins {
+	admins := make([]*model.GroupUserAdmin, 0)
+	err = repo.h.
+		Preload("Group").
+		Where(&model.GroupUserAdmin{GroupID: groupID}).
+		Find(&admins).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	erAdmin := make([]*domain.User, 0, len(admins))
+	for _, v := range admins {
 		erAdmin = append(erAdmin, &domain.User{ID: v.UserID})
 	}
 
 	// Name,RealNameはPortalから取得する
 	result := &domain.GroupDetail{
 		ID:          groupID,
-		Name:        group.Name,
-		Link:        group.Link,
+		Name:        admins[0].Group.Name,
+		Link:        admins[0].Group.Link,
 		Admin:       erAdmin,
 		Members:     erMembers,
-		Description: group.Description,
+		Description: admins[0].Group.Description,
 	}
 	return result, nil
 }
