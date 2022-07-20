@@ -120,7 +120,7 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		},
 		Link:        random.RandURLString(),
 		Description: random.AlphaNumeric(),
-		Teams: []*domain.ContestTeam{
+		ContestTeams: []*domain.ContestTeam{
 			{
 				ID:        getContestID[1],
 				ContestID: getContestID[0],
@@ -136,8 +136,8 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		},
 	}
 
-	teams := make([]ContestTeam, len(d.Teams))
-	for i, v := range d.Teams {
+	teams := make([]ContestTeam, len(d.ContestTeams))
+	for i, v := range d.ContestTeams {
 		teams[i] = ContestTeam{
 			Id:     v.ID,
 			Name:   v.Name,
@@ -259,9 +259,9 @@ func TestContestHandler_PostContest(t *testing.T) {
 						TimeStart: args.Since,
 						TimeEnd:   args.Until.Time,
 					},
-					Link:        args.Link.String,
-					Description: args.Description,
-					Teams:       []*domain.ContestTeam{},
+					Link:         args.Link.String,
+					Description:  args.Description,
+					ContestTeams: []*domain.ContestTeam{},
 				}
 				expectedResBody = &Contest{
 					Id:   want.ID,
@@ -1001,7 +1001,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
+func TestContestHandler_EditContestTeamMember(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
@@ -1023,7 +1023,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(nil)
+				s.EXPECT().EditContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNoContent,
@@ -1055,7 +1055,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 						random.UUID(),
 					},
 				}
-				s.EXPECT().DeleteContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(repository.ErrNotFound)
+				s.EXPECT().EditContestTeamMembers(anyCtx{}, teamID, reqBody.Members).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusNotFound,
@@ -1068,7 +1068,7 @@ func TestContestHandler_DeleteContestTeamMember(t *testing.T) {
 
 			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, api, http.MethodDelete, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)

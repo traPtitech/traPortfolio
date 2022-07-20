@@ -142,7 +142,7 @@ func (repo *ContestRepository) UpdateContest(contestID uuid.UUID, args *reposito
 
 func (repo *ContestRepository) DeleteContest(contestID uuid.UUID) error {
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if err := repo.h.
+		if err := tx.
 			Where(&model.Contest{ID: contestID}).
 			First(&model.Contest{}).
 			Error(); err != nil {
@@ -399,7 +399,7 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 
 }
 
-func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
+func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	// 存在チェック
 	err := repo.h.
 		Where(&model.ContestTeam{ID: teamID}).
@@ -422,16 +422,40 @@ func (repo *ContestRepository) DeleteContestTeamMembers(teamID uuid.UUID, member
 		belongings[v.UserID] = struct{}{}
 	}
 
+	membersMap := make(map[uuid.UUID]struct{}, len(members))
+	for _, v := range members {
+		membersMap[v] = struct{}{}
+	}
+
 	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+		//チームに所属していなくて渡された配列に入っているメンバーをチームに追加
+		membersToBeAdded := make([]*model.ContestTeamUserBelonging, 0, len(members))
 		for _, memberID := range members {
-			if _, ok := belongings[memberID]; ok {
-				err = tx.
-					Where(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).
-					Delete(&model.ContestTeamUserBelonging{}).
-					Error()
-				if err != nil {
-					return convertError(err)
-				}
+			if _, ok := belongings[memberID]; !ok {
+				membersToBeAdded = append(membersToBeAdded, &model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID})
+			}
+		}
+		if len(membersToBeAdded) > 0 {
+			err = tx.Create(&membersToBeAdded).Error()
+			if err != nil {
+				return convertError(err)
+			}
+		}
+		//チームに所属していて渡された配列に入っていないメンバーをチームから削除
+		membersToBeRemoved := make([]uuid.UUID, 0, len(members))
+		for _, belonging := range _belongings {
+			if _, ok := membersMap[belonging.UserID]; !ok {
+				membersToBeRemoved = append(membersToBeRemoved, belonging.UserID)
+			}
+		}
+		if len(membersToBeRemoved) > 0 {
+			err = tx.
+				Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+				Where("`contest_team_user_belongings`.`user_id` IN (?)", membersToBeRemoved).
+				Delete(&model.ContestTeamUserBelonging{}).
+				Error()
+			if err != nil {
+				return convertError(err)
 			}
 		}
 		return nil

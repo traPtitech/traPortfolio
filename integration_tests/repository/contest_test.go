@@ -385,10 +385,10 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 // func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 // }
 
-func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
+func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest_team_members")
+	conf := testutils.GetConfigWithDBName("contest_repository_edit_contest_team_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupDB(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -463,14 +463,14 @@ func TestContestRepository_DeleteContestTeamMembers(t *testing.T) {
 			RealName: portalUser2.RealName,
 		},
 	}
-	err = repo.DeleteContestTeamMembers(team1.ID, []uuid.UUID{user1.ID})
+	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{user2.ID})
 	assert.NoError(t, err)
 	users4, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
 	expected5 := []*domain.User{}
-	err = repo.DeleteContestTeamMembers(team1.ID, []uuid.UUID{user2.ID})
+	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{})
 	assert.NoError(t, err)
 	users5, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
