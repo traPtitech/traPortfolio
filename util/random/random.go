@@ -109,10 +109,6 @@ func Duration() domain.YearWithSemesterDuration {
 	}
 }
 
-func Uintn(n uint) uint {
-	return uint(rand.Int31n(int32(n)))
-}
-
 func Uint8n(n uint8) uint8 {
 	return uint8(rand.Int31n(int32(n)))
 }
