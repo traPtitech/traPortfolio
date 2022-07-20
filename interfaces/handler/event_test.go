@@ -198,6 +198,11 @@ func TestEventHandler_GetByID(t *testing.T) {
 
 func TestEventHandler_PatchEvent(t *testing.T) {
 
+	LevelHandler := func(l uint8) *EventLevel {
+		r := EventLevel(l)
+		return &r
+	}
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockEventService) (reqBody *EditEventRequest, path string)
@@ -209,10 +214,9 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 
 				eventID := random.UUID()
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
-				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: LevelHandler(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -231,10 +235,9 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 
 				eventID := random.UUID()
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
-				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: LevelHandler(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -253,10 +256,9 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 
 				eventID := random.UUID()
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
-				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: LevelHandler(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -275,10 +277,9 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 
 				eventID := random.UUID()
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
-				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: LevelHandler(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -297,10 +298,9 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 
 				eventID := random.UUID()
 				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
-				eventLevelHandler := EventLevel(eventLevelUint8)
 
 				reqBody := &EditEventRequest{
-					EventLevel: &eventLevelHandler,
+					EventLevel: LevelHandler(eventLevelUint8),
 				}
 
 				args := repository.UpdateEventLevelArgs{
