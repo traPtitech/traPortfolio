@@ -189,7 +189,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(_ *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 				groupID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path
