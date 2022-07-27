@@ -102,6 +102,12 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			},
 			nil,
 		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.HMockEventDetails[1].Id,
+			handler.EditEventRequest{},
+			nil,
+		},
 	}
 
 	e := echo.New()
@@ -120,7 +126,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &event)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
 
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), tt.reqBody)
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert

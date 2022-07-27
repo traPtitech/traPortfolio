@@ -83,8 +83,13 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	eLevel := uint8(*req.EventLevel)
 	ctx := c.Request().Context()
+
+	if req.EventLevel == nil {
+		return c.NoContent(http.StatusNoContent)
+	}
+
+	eLevel := uint8(*req.EventLevel)
 	patchReq := repository.UpdateEventLevelArgs{
 		Level: optional.Uint8From(&eLevel),
 	}
