@@ -85,7 +85,9 @@ func TestEventHandler_GetEvent(t *testing.T) {
 
 // EditEvent PATCH /events/:eventID
 func TestEventHandler_EditEvent(t *testing.T) {
-	var eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+	var (
+		eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+	)
 
 	t.Parallel()
 	tests := map[string]struct {
