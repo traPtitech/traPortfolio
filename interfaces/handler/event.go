@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
+	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/traPtitech/traPortfolio/domain"
 
@@ -84,9 +85,10 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 		return convertError(err)
 	}
 
+	eLevel := uint8(*req.EventLevel)
 	ctx := c.Request().Context()
 	patchReq := repository.UpdateEventLevelArgs{
-		Level: domain.EventLevel(*req.EventLevel),
+		Level: optional.Uint8From(&eLevel),
 	}
 
 	if err := h.srv.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {

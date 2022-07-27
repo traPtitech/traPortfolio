@@ -9,13 +9,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// Defines values for EventLevel.
-const (
-	EventLevelN0 EventLevel = 0
-	EventLevelN1 EventLevel = 1
-	EventLevelN2 EventLevel = 2
-)
-
 // Defines values for Semester.
 const (
 	SemesterN0 Semester = 0
@@ -24,9 +17,9 @@ const (
 
 // Defines values for UserAccountState.
 const (
-	N0 UserAccountState = 0
-	N1 UserAccountState = 1
-	N2 UserAccountState = 2
+	UserAccountStateN0 UserAccountState = 0
+	UserAccountStateN1 UserAccountState = 1
+	UserAccountStateN2 UserAccountState = 2
 )
 
 // アカウントへのリンク
@@ -333,7 +326,7 @@ type EventDetail struct {
 // 0 イベント企画者の名前を伏せて公開
 // 1 全て公開
 // 2 外部に非公開
-type EventLevel int
+type EventLevel uint8
 
 // 班情報
 type Group struct {

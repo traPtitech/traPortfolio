@@ -207,7 +207,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 						Name:     random.AlphaNumeric(),
 						RealName: random.AlphaNumeric(),
 					},
-					State:    domain.TraQState(uint8(rand.Intn(int(domain.TraqStateLimit)))),
+					State:    domain.TraQState(random.Uint8n(uint8(domain.TraqStateLimit))),
 					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
 					Accounts: rAccounts,
 				}
