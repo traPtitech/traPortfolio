@@ -202,8 +202,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 	}
 }
 
-func TestEventHandler_PatchEvent(t *testing.T) {
-
+func TestEventHandler_EditEvent(t *testing.T) {
 	hLevel := func(l uint8) *EventLevel {
 		r := EventLevel(l)
 		return &r

@@ -14,11 +14,11 @@ type Context struct {
 
 func (c *Context) BindAndValidate(i interface{}) error {
 	if err := c.Bind(i); err != nil {
-		c.Logger().Error(err)
+		c.Logger().Error(fmt.Errorf("%w: %+v", err, i))
 		return repository.ErrBind
 	}
 	if err := c.Validate(i); err != nil {
-		c.Logger().Error(err)
+		c.Logger().Error(fmt.Errorf("%w: %+v", err, i))
 		return repository.ErrValidate
 	}
 

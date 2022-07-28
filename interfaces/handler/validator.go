@@ -40,8 +40,7 @@ var (
 	vdRuleResultLength      = vd.Length(0, 32)
 	vdRuleAccountTypeMin    = vd.Min(0) // TODO: handler.AccountTypeをuint型にしたら消す
 	vdRuleAccountTypeMax    = vd.Max(int(domain.AccountLimit) - 1)
-	vdRuleEventLevelMin     = vd.Min(0) // TODO: handler.EventLevelをuint型にしたら消す
-	vdRuleEventLevelMax     = vd.Max(int(domain.EventLevelLimit) - 1)
+	vdRuleEventLevelMax     = vd.Max(uint8(domain.EventLevelLimit) - 1)
 )
 
 // path parameter structs
@@ -63,7 +62,7 @@ func (r AddAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
-		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
+		vd.Field(&r.Type, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.Required, is.URL),
 	)
 }
@@ -105,7 +104,7 @@ func (r EditUserAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
-		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
+		vd.Field(&r.Type, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
 	)
 }
@@ -130,7 +129,7 @@ func (r EditContestTeamRequest) Validate() error {
 
 func (r EditEventRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.EventLevel, vdRuleEventLevelMin, vdRuleEventLevelMax),
+		vd.Field(&r.EventLevel, vdRuleEventLevelMax),
 	)
 }
 
