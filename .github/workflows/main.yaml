@@ -45,7 +45,6 @@ jobs:
       - name: Run linters
         uses: reviewdog/action-golangci-lint@v2
         with:
-          github_token: ${{ github.token }}
           filter_mode: nofilter
   test:
     name: Test
