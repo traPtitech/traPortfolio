@@ -85,7 +85,9 @@ func TestEventHandler_GetEvent(t *testing.T) {
 
 // EditEvent PATCH /events/:eventID
 func TestEventHandler_EditEvent(t *testing.T) {
-	var eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+	var (
+		eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+	)
 
 	t.Parallel()
 	tests := map[string]struct {
@@ -100,6 +102,12 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			handler.EditEventRequest{
 				EventLevel: &eventLevel,
 			},
+			nil,
+		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.HMockEventDetails[1].Id,
+			handler.EditEventRequest{},
 			nil,
 		},
 	}
@@ -120,7 +128,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &event)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
 
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), tt.reqBody)
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert

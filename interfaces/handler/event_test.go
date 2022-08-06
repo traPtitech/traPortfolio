@@ -172,7 +172,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, _ int) (hres *EventDetail, eventpath string) {
 				id := random.UUID()
 				s.EXPECT().GetEventByID(anyCtx{}, id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
