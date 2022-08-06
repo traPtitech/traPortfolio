@@ -180,7 +180,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		},
 		{
 			name: "Invalid ID",
-			setup: func(s *mock_service.MockContestService) (*domain.ContestDetail, *ContestDetail, string) {
+			setup: func(_ *mock_service.MockContestService) (*domain.ContestDetail, *ContestDetail, string) {
 				path := fmt.Sprintf("/api/v1/contests/%s", invalidID)
 				return &domain.ContestDetail{}, &ContestDetail{}, path
 			},
@@ -279,7 +279,7 @@ func TestContestHandler_PostContest(t *testing.T) {
 		},
 		{
 			name: "Bad Request: invalid url",
-			setup: func(s *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
+			setup: func(_ *mock_service.MockContestService) (reqBody *CreateContestJSONRequestBody, expectedResBody *Contest, resBody *Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					random.AlphaNumeric(),
@@ -373,7 +373,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid ID",
-			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
 				path := fmt.Sprintf("/api/v1/contests/%s", invalidID)
 				return &EditContestJSONRequestBody{}, path
 			},
@@ -681,7 +681,7 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+			setup: func(_ *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
 				reqBody := &AddContestTeamJSONRequestBody{
 					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
@@ -784,7 +784,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(s *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
 				reqBody := &EditContestTeamJSONRequestBody{
 					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
@@ -797,7 +797,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(s *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
 				reqBody := &EditContestTeamJSONRequestBody{
 					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
@@ -882,7 +882,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(s *mock_service.MockContestService) ([]*User, string) {
+			setup: func(_ *mock_service.MockContestService) ([]*User, string) {
 				teamID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
@@ -890,7 +890,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(s *mock_service.MockContestService) ([]*User, string) {
+			setup: func(_ *mock_service.MockContestService) ([]*User, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},
@@ -954,7 +954,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(s *mock_service.MockContestService) (*Req, string) {
+			setup: func(_ *mock_service.MockContestService) (*Req, string) {
 				teamID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
@@ -962,7 +962,7 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(s *mock_service.MockContestService) (*Req, string) {
+			setup: func(_ *mock_service.MockContestService) (*Req, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},
@@ -1030,7 +1030,7 @@ func TestContestHandler_EditContestTeamMember(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(s *mock_service.MockContestService) (*Req, string) {
+			setup: func(_ *mock_service.MockContestService) (*Req, string) {
 				teamID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
@@ -1038,7 +1038,7 @@ func TestContestHandler_EditContestTeamMember(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(s *mock_service.MockContestService) (*Req, string) {
+			setup: func(_ *mock_service.MockContestService) (*Req, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},

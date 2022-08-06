@@ -184,7 +184,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
+			setup: func(_ *mock_service.MockUserService) (hres *UserDetail, userpath string) {
 				id := random.AlphaNumericn(36)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
@@ -300,7 +300,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -402,7 +402,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -496,7 +496,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
@@ -627,7 +627,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
@@ -638,7 +638,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -775,7 +775,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
@@ -787,7 +787,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID2",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
@@ -860,7 +860,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
-			setup: func(s *mock_service.MockUserService) string {
+			setup: func(_ *mock_service.MockUserService) string {
 
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
@@ -872,7 +872,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID2",
-			setup: func(s *mock_service.MockUserService) string {
+			setup: func(_ *mock_service.MockUserService) string {
 
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
@@ -973,7 +973,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres []*UserProject, path string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -1075,7 +1075,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -1181,7 +1181,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres []*UserGroup, path string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -1293,7 +1293,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres []*Event, path string) {
 
 				userID := random.AlphaNumericn(36)
 
