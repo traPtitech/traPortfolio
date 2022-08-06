@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Download go modules
         run: go mod download
@@ -28,7 +27,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Compile go packages
         run: go build -o traPortfolio .
@@ -55,7 +53,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Run tests
         run: go test $(go list ./... | grep -v "integration_tests") -coverprofile=coverage_unit.txt -race -vet=off
@@ -86,7 +83,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Run tests
         run: go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off
