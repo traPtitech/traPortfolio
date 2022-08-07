@@ -26,7 +26,7 @@ func setupEventMock(t *testing.T) (*mock_service.MockEventService, API) {
 	return s, api
 }
 
-func TestEventHandler_GetAll(t *testing.T) {
+func TestEventHandler_GetEvents(t *testing.T) {
 
 	tests := []struct {
 		name       string
@@ -94,7 +94,7 @@ func TestEventHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestEventHandler_GetByID(t *testing.T) {
+func TestEventHandler_GetEvent(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string)
@@ -163,7 +163,13 @@ func TestEventHandler_GetByID(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
-
+		{
+			name: "BadRequest: Invalid event ID",
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
+				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockEventService, _ int) (hres *EventDetail, eventpath string) {
@@ -196,8 +202,7 @@ func TestEventHandler_GetByID(t *testing.T) {
 	}
 }
 
-func TestEventHandler_PatchEvent(t *testing.T) {
-
+func TestEventHandler_EditEvent(t *testing.T) {
 	hLevel := func(l uint8) *EventLevel {
 		r := EventLevel(l)
 		return &r
@@ -228,6 +233,13 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 				return reqBody, path
 			},
 			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "BadRequest: Invalid event ID",
+			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
+				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Conflict",
@@ -293,22 +305,17 @@ func TestEventHandler_PatchEvent(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
-			name: "Bad Request: validate error",
+			name: "Bad Request: validate error: too large level",
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
-
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevel := EventLevel(domain.EventLevelLimit)
 
 				reqBody := &EditEventRequest{
-					EventLevel: hLevel(eventLevelUint8),
-				}
-
-				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8((eventLevelUint8), true),
+					EventLevel: &eventLevel,
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
-				s.EXPECT().UpdateEventLevel(anyCtx{}, eventID, &args).Return(repository.ErrValidate)
+
 				return reqBody, path
 			},
 			statusCode: http.StatusBadRequest,
