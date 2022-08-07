@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Download go modules
         run: go mod download
