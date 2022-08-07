@@ -30,7 +30,7 @@ jobs:
           go-version-file: ./go.mod
           cache: true
       - name: Compile go packages
-        run: go build -o traPortfolio .
+        run: CGO_ENABLED=0 go build -ldflags "-s -w" -o traPortfolio .
       - uses: actions/upload-artifact@v3
         with:
           name: traPortfolio
