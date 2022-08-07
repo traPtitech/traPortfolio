@@ -31,7 +31,7 @@ mod:
 	@go mod tidy
 
 build: ${GOFILES}
-	@go build -o ${BINARY}
+	@CGO_ENABLED=0 go build -ldflags "-s -w" -o ${BINARY}
 
 check: all lint test-all db-lint openapi-lint
 
