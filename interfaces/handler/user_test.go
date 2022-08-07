@@ -401,7 +401,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: too long description(len>256)",
-			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 257)
 
@@ -590,7 +590,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: invalid userID",
-			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
@@ -603,7 +603,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres *Account, path string) {
 
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
@@ -723,7 +723,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: DisplayName is empty",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
@@ -741,7 +741,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: Account Type is invalid",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
@@ -759,7 +759,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.UUID()
 
@@ -770,7 +770,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONBody, Account, string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -898,7 +898,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: empty display name(but not nil)",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -916,7 +916,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large account type",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -934,7 +934,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: invalid url",
-			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONBody, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 

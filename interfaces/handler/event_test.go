@@ -306,7 +306,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large level",
-			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
+			setup: func(_ *mock_service.MockEventService) (*EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := EventLevel(domain.EventLevelLimit)
 
