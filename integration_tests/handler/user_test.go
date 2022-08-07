@@ -64,7 +64,7 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			handler.ConvertError(t, repository.ErrInvalidArg),
+			handler.ConvertError(t, repository.ErrValidate),
 		},
 	}
 
@@ -98,7 +98,7 @@ func TestGetUser(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404": {
 			http.StatusNotFound,
@@ -154,7 +154,7 @@ func TestUpdateUser(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.EditUserRequest{},
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 	}
 
@@ -211,7 +211,7 @@ func TestGetUserAccounts(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -253,13 +253,13 @@ func TestGetUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.HMockUserAccounts[0].Id,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.HMockUsers[0].Id,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 userID not found": {
 			http.StatusNotFound,
@@ -332,7 +332,7 @@ func TestAddUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.AddUserAccountJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
@@ -354,7 +354,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        handler.AccountType(domain.AccountLimit),
 				Url:         url,
 			},
-			handler.ConvertError(t, repository.ErrInvalidArg),
+			handler.ConvertError(t, repository.ErrValidate),
 		},
 	}
 
@@ -418,14 +418,14 @@ func TestEditUserRequestAccount(t *testing.T) {
 			uuid.Nil,
 			mockdata.HMockUserAccounts[0].Id,
 			handler.EditUserAccountJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.HMockUsers[0].Id,
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 user not found": {
 			http.StatusNotFound,
@@ -518,7 +518,7 @@ func TestDeleteUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 			false,
 		},
 		"404 user not found": {
@@ -587,7 +587,7 @@ func TestGetUserProjects(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -631,7 +631,7 @@ func TestGetUserContests(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -675,7 +675,7 @@ func TestGetUserGroups(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
@@ -726,7 +726,7 @@ func TestGetUserEvents(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			handler.ConvertError(t, repository.ErrNilID),
 		},
 	}
 

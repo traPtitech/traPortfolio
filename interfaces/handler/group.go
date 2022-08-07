@@ -7,17 +7,11 @@ import (
 
 	"github.com/traPtitech/traPortfolio/domain"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/labstack/echo/v4"
 )
 
 type GroupHandler struct {
 	srv service.GroupService
-}
-
-type groupParam struct {
-	GroupID uuid.UUID `param:"groupID" validate:"is-uuid"`
 }
 
 // NewGroupHandler creates a GroupHandler
@@ -28,6 +22,7 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 // GetGroups GET /groups
 func (h *GroupHandler) GetGroups(_c echo.Context) error {
 	c := _c.(*Context)
+
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
 	if err != nil {
@@ -45,13 +40,14 @@ func (h *GroupHandler) GetGroups(_c echo.Context) error {
 // GetGroup GET /groups/:groupID
 func (h *GroupHandler) GetGroup(_c echo.Context) error {
 	c := _c.(*Context)
-	req := groupParam{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	groupID, err := c.getID(keyGroupID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	group, err := h.srv.GetGroup(ctx, req.GroupID)
+	group, err := h.srv.GetGroup(ctx, groupID)
 	if err != nil {
 		return convertError(err)
 	}
