@@ -127,12 +127,12 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (ProjectDetail, string)
+		setup      func(s *mock_service.MockProjectService) (*ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.Project{
@@ -169,7 +169,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 						RealName: v.RealName,
 					})
 				}
-				reqBody := ProjectDetail{
+				reqBody := &ProjectDetail{
 					Description: repo.Description,
 					Duration: YearWithSemesterDuration{
 						Since: YearWithSemester{
@@ -194,27 +194,27 @@ func TestProjectHandler_GetByID(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, errInternal)
-				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
 		},
 		{
 			name: "Validation Error",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				projectID := random.AlphaNumericn(36)
-				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Not Found Error",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, repository.ErrNotFound)
-				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusNotFound,
 		},
