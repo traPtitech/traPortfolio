@@ -226,7 +226,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := ProjectDetail{}
+			var hres *ProjectDetail
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
