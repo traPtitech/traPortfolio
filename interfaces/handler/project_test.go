@@ -194,8 +194,8 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Bad Request: Validate error: invalid projectID",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
-				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", invalidID)
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				return nil, fmt.Sprintf("/api/v1/projects/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
