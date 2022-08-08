@@ -61,3 +61,9 @@ func DoRequest(t *testing.T, e *echo.Echo, method string, path string, body inte
 func DummyUUID() uuid.UUID {
 	return random.UUID()
 }
+
+func HTTPError(message string) echo.HTTPError {
+	return echo.HTTPError{
+		Message: message,
+	}
+}
