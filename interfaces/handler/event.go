@@ -15,10 +15,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type EventIDInPath struct {
-	EventID uuid.UUID `param:"eventID" validate:"is-uuid"`
-}
-
 type EventHandler struct {
 	srv service.EventService
 }
@@ -29,7 +25,9 @@ func NewEventHandler(service service.EventService) *EventHandler {
 }
 
 // GetEvents GET /events
-func (h *EventHandler) GetEvents(c echo.Context) error {
+func (h *EventHandler) GetEvents(_c echo.Context) error {
+	c := _c.(*Context)
+
 	ctx := c.Request().Context()
 	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
@@ -47,13 +45,14 @@ func (h *EventHandler) GetEvents(c echo.Context) error {
 // GetEvent GET /events/:eventID
 func (h *EventHandler) GetEvent(_c echo.Context) error {
 	c := _c.(*Context)
-	req := EventIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	eventID, err := c.getID(keyEventID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	event, err := h.srv.GetEventByID(ctx, req.EventID)
+	event, err := h.srv.GetEventByID(ctx, eventID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -75,10 +74,13 @@ func (h *EventHandler) GetEvent(_c echo.Context) error {
 // EditEvent PATCH /events/:eventID
 func (h *EventHandler) EditEvent(_c echo.Context) error {
 	c := _c.(*Context)
-	req := struct {
-		EventIDInPath
-		EditEventJSONRequestBody
-	}{}
+
+	eventID, err := c.getID(keyEventID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := EditEventJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -89,7 +91,7 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 		Level: optional.Uint8From((*uint8)(req.EventLevel)),
 	}
 
-	if err := h.srv.UpdateEventLevel(ctx, req.EventID, &patchReq); err != nil {
+	if err := h.srv.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)

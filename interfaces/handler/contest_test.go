@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -227,7 +228,7 @@ func makeCreateContestRequest(description string, since time.Time, until time.Ti
 	}
 }
 
-func TestContestHandler_PostContest(t *testing.T) {
+func TestContestHandler_CreateContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
@@ -379,36 +380,62 @@ func TestContestHandler_PatchContest(t *testing.T) {
 			},
 			statusCode: http.StatusBadRequest,
 		},
-		// todo validate url
-
-		// {
-		// 	name: "BadRequest: Invalid URL",
-		// 	setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
-		// 		contestID := random.UUID()
-		//    since, until := random.SinceAndUntil()
-		// 		reqBody := &EditContestJSONRequestBody{
-		// 			ContestID:   contestID,
-		// 			Name:        ptr(t,random.AlphaNumeric(rand.Intn(30) + 1)),
-		// 			Link:        random.AlphaNumeric(rand.Intn(30) + 1),
-		// 			Description: random.AlphaNumeric(rand.Intn(30) + 1),
-		// 			Duration: OptionalDuration{
-		// 				Since: optional.TimeFrom(since),
-		// 				Until: optional.TimeFrom(until),
-		// 			},
-		// 		}
-		// 		args := repository.UpdateContestArgs{
-		// 			Name:        reqBody.Name,
-		// 			Description: reqBody.Description,
-		// 			Link:        reqBody.Link,
-		// 			Since:       reqBody.Duration.Since,
-		// 			Until:       reqBody.Duration.Until,
-		// 		}
-		// 		path := fmt.Sprintf("/api/v1/contests/%s", random.UUID())
-		// 		s.EXPECT().UpdateContest(anyCtx{}, contestID, &args).Return(nil)
-		// 		return reqBody, path
-		// 	},
-		// 	statusCode: http.StatusBadRequest,
-		// },
+		{
+			name: "BadRequest: too long description",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				description := strings.Repeat("a", 257)
+				reqBody := &EditContestJSONRequestBody{
+					Description: &description,
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid link",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				link := random.AlphaNumeric()
+				reqBody := &EditContestJSONRequestBody{
+					Link: &link,
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid duration",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				since, until := random.SinceAndUntil()
+				since, until = until, since
+				reqBody := &EditContestJSONRequestBody{
+					Duration: &Duration{
+						Since: since,
+						Until: &until,
+					},
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: too long name",
+			setup: func(s *mock_service.MockContestService) (*EditContestJSONRequestBody, string) {
+				contestID := random.UUID()
+				name := strings.Repeat("a", 33)
+				reqBody := &EditContestJSONRequestBody{
+					Name: &name,
+				}
+				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
+				return reqBody, path
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -634,7 +661,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 	}
 }
 
-func TestContestHandler_PostContestTeam(t *testing.T) {
+func TestContestHandler_AddContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
@@ -689,6 +716,76 @@ func TestContestHandler_PostContestTeam(t *testing.T) {
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: missing required arg",
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+				contestID := random.UUID()
+				reqBody := &AddContestTeamJSONRequestBody{
+					// Name:        random.AlphaNumeric(), // missing
+					Link:        ptr(t, random.RandURLString()),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
+				}
+				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: too long description",
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+				contestID := random.UUID()
+				reqBody := &AddContestTeamJSONRequestBody{
+					Name:        random.AlphaNumeric(),
+					Link:        ptr(t, random.RandURLString()),
+					Description: strings.Repeat("a", 257),
+					Result:      ptr(t, random.AlphaNumeric()),
+				}
+				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid link",
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+				contestID := random.UUID()
+				reqBody := &AddContestTeamJSONRequestBody{
+					Name:        random.AlphaNumeric(),
+					Link:        ptr(t, random.AlphaNumeric()),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
+				}
+				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: too long name",
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+				contestID := random.UUID()
+				reqBody := &AddContestTeamJSONRequestBody{
+					Name:        strings.Repeat("a", 33),
+					Link:        ptr(t, random.RandURLString()),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, random.AlphaNumeric()),
+				}
+				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: too long result",
+			setup: func(s *mock_service.MockContestService) (*AddContestTeamJSONRequestBody, ContestTeam, string) {
+				contestID := random.UUID()
+				reqBody := &AddContestTeamJSONRequestBody{
+					Name:        random.AlphaNumeric(),
+					Link:        ptr(t, random.RandURLString()),
+					Description: random.AlphaNumeric(),
+					Result:      ptr(t, strings.Repeat("a", 33)),
+				}
+				return reqBody, ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -809,6 +906,40 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
+			name: "BadRequest: Invalid request body: not nil but empty",
+			setup: func(s *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
+				emptyStr := ""
+				reqBody := &EditContestTeamJSONRequestBody{
+					Description: &emptyStr,
+					Name:        &emptyStr,
+				}
+				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), random.UUID())
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid request body: too long string",
+			setup: func(s *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
+				reqBody := &EditContestTeamJSONRequestBody{
+					Description: ptr(t, strings.Repeat("a", 257)),
+					Name:        ptr(t, strings.Repeat("a", 33)),
+					Result:      ptr(t, strings.Repeat("a", 33)),
+				}
+				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), random.UUID())
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid request body: invalid link",
+			setup: func(s *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
+				reqBody := &EditContestTeamJSONRequestBody{
+					Link: ptr(t, random.AlphaNumeric()),
+				}
+				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), random.UUID())
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Contest not exist",
 			setup: func(s *mock_service.MockContestService) (*EditContestTeamJSONRequestBody, string) {
 				contestID := random.UUID()
@@ -925,7 +1056,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_PostContestTeamMember(t *testing.T) {
+func TestContestHandler_AddContestTeamMember(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
@@ -965,6 +1096,29 @@ func TestContestHandler_PostContestTeamMember(t *testing.T) {
 			setup: func(_ *mock_service.MockContestService) (*Req, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid request body: members is empty",
+			setup: func(s *mock_service.MockContestService) (*Req, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				return &Req{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid request body: memberID is invalid",
+			setup: func(s *mock_service.MockContestService) (*Req, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				return &Req{
+					Members: []uuid.UUID{
+						random.UUID(),
+						uuid.Nil,
+					},
+				}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -1041,6 +1195,15 @@ func TestContestHandler_EditContestTeamMember(t *testing.T) {
 			setup: func(_ *mock_service.MockContestService) (*Req, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: Invalid request body: members is empty",
+			setup: func(s *mock_service.MockContestService) (*Req, string) {
+				contestID := random.UUID()
+				teamID := random.UUID()
+				return &Req{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
