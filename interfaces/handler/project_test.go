@@ -28,7 +28,7 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-func TestProjectHandler_GetAll(t *testing.T) {
+func TestProjectHandler_GetProjects(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -122,7 +122,7 @@ func TestProjectHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestProjectHandler_GetByID(t *testing.T) {
+func TestProjectHandler_GetProject(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -191,6 +191,13 @@ func TestProjectHandler_GetByID(t *testing.T) {
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusOK,
+		},
+		{
+			name: "Bad Request: Validate error: invalid projectID",
+			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Internal Error",

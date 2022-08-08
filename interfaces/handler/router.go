@@ -7,11 +7,7 @@ import (
 
 func Setup(e *echo.Echo, api API) error {
 	// Setup validator
-	v, err := newValidator()
-	if err != nil {
-		return err
-	}
-	e.Validator = v
+	e.Validator = newValidator(e.Logger)
 
 	// Middleware
 	e.Use(middleware.Logger())
