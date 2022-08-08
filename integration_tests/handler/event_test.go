@@ -12,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -60,12 +59,12 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrNilID),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
