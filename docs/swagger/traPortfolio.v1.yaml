@@ -1049,8 +1049,11 @@ components:
               type: string
               format: uri
               description: 班の詳細が載っているページへのリンク
-            leader:
-              $ref: '#/components/schemas/User'
+            admin:
+              type: array
+              description: 班管理者
+              items:
+                $ref: '#/components/schemas/User'
             members:
               type: array
               description: 班メンバー
@@ -1061,7 +1064,7 @@ components:
               description: 班説明
           required:
             - link
-            - leader
+            - admin
             - members
             - description
     GroupMember:
