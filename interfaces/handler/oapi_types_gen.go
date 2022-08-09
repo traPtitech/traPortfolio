@@ -346,18 +346,14 @@ type Group struct {
 
 // GroupDetail defines model for GroupDetail.
 type GroupDetail struct {
-	// Embedded struct due to allOf(#/components/schemas/Group)
-	Group `yaml:",inline"`
-	// Embedded fields due to inline allOf schema
-
-	// 班uuid
-	Id uuid.UUID `json:"id"`
-
 	// 班管理者
 	Admin []User `json:"admin"`
 
 	// 班説明
 	Description string `json:"description"`
+
+	// 班uuid
+	Id uuid.UUID `json:"id"`
 
 	// 班の詳細が載っているページへのリンク
 	Link string `json:"link"`
