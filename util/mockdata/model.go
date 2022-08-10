@@ -112,9 +112,9 @@ func CloneMockGroupUserBelonging() model.GroupUserBelonging {
 		UserID:        userID1.uuid(),
 		GroupID:       MockGroup.GroupID,
 		SinceYear:     2022,
-		SinceSemester: 1,
+		SinceSemester: 0,
 		UntilYear:     2022,
-		UntilSemester: 2,
+		UntilSemester: 1,
 	}
 }
 
@@ -135,9 +135,9 @@ func CloneMockProjects() []*model.Project {
 			Description:   "sample_project_description1",
 			Link:          "https://sample.project1.com",
 			SinceYear:     2021,
-			SinceSemester: 1,
+			SinceSemester: 0,
 			UntilYear:     2021,
-			UntilSemester: 2,
+			UntilSemester: 1,
 		},
 		{
 			ID:            projectID2.uuid(),
@@ -145,9 +145,9 @@ func CloneMockProjects() []*model.Project {
 			Description:   "sample_project_description2",
 			Link:          "https://sample.project2.com",
 			SinceYear:     2022,
-			SinceSemester: 1,
+			SinceSemester: 0,
 			UntilYear:     2022,
-			UntilSemester: 2,
+			UntilSemester: 1,
 		},
 	}
 }
@@ -158,9 +158,9 @@ func CloneMockProjectMember() model.ProjectMember {
 		ProjectID:     projectID1.uuid(),
 		UserID:        userID1.uuid(),
 		SinceYear:     2022,
-		SinceSemester: 1,
+		SinceSemester: 0,
 		UntilYear:     2022,
-		UntilSemester: 2,
+		UntilSemester: 1,
 	}
 }
 

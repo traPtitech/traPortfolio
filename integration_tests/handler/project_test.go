@@ -173,7 +173,7 @@ func TestEditProject(t *testing.T) {
 		},
 		"204 without changes": {
 			http.StatusNoContent,
-			mockdata.HMockProjects[1].Id,
+			mockdata.HMockProjects[0].Id,
 			handler.EditProjectJSONRequestBody{},
 			nil,
 		},
