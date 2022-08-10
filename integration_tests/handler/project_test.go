@@ -272,8 +272,8 @@ func TestAddProjectMembers(t *testing.T) {
 		reqBody    handler.AddProjectMembersJSONRequestBody
 		want       interface{}
 	}{
-		"204": {
-			http.StatusCreated,
+		"200": {
+			http.StatusOK,
 			mockdata.HMockProjects[0].Id,
 			handler.AddProjectMembersJSONRequestBody{
 				Members: []handler.MemberIDWithYearWithSemesterDuration{{Duration: duration1, UserId: userID1}, {Duration: duration2, UserId: userID2}},

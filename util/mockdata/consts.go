@@ -3,9 +3,9 @@ package mockdata
 import "github.com/gofrs/uuid"
 
 const (
-	userID1           uuidStr = "11111111-1111-1111-1111-111111111111"
-	userID2           uuidStr = "22222222-2222-2222-2222-222222222222"
-	userID3           uuidStr = "33333333-3333-3333-3333-333333333333"
+	userID1           uuidStr = "11111111-1111-4111-8111-111111111111"
+	userID2           uuidStr = "22222222-2222-4222-8222-222222222222"
+	userID3           uuidStr = "33333333-3333-4333-8333-333333333333"
 	accountID         uuidStr = "d834e180-2af9-4cfe-838a-8a3930666490"
 	contestID         uuidStr = "08eec963-0f29-48d1-929f-004cb67d8ce6"
 	contestTeamID     uuidStr = "a9d07124-ffee-412f-adfc-02d3db0b750d"
