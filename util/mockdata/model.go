@@ -17,6 +17,7 @@ var (
 	MockEventLevelRelations      = CloneMockEventLevelRelations()
 	MockGroup                    = CloneMockGroup()
 	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
+	MockProjects                 = CloneMockProjects()
 	MockProject                  = CloneMockProject()
 	MockProjectMember            = CloneMockProjectMember()
 )
@@ -115,6 +116,27 @@ func CloneMockGroupUserBelonging() model.GroupUserBelonging {
 		SinceSemester: 1,
 		UntilYear:     2022,
 		UntilSemester: 2,
+	}
+}
+
+func CloneMockProjects() []*model.Project {
+	return []*model.Project{
+		{
+			ID:            projectID.uuid(),
+			Name:          "sample_project_name 1",
+			SinceYear:     2021,
+			SinceSemester: 1,
+			UntilYear:     2021,
+			UntilSemester: 2,
+		},
+		{
+			ID:            projectID.uuid(),
+			Name:          "sample_project_name 2",
+			SinceYear:     2022,
+			SinceSemester: 1,
+			UntilYear:     2022,
+			UntilSemester: 2,
+		},
 	}
 }
 

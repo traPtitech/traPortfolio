@@ -12,6 +12,7 @@ var (
 	HMockEventDetails   = CloneHandlerMockEventDetails()
 	HMockGroup          = CloneHandlerMockGroup()
 	HMockGroupMembers   = CloneHandlerMockGroupMembers()
+	HMockProjects       = CloneHandlerMockProjects()
 	HMockProject        = CloneHandlerMockProject()
 	HMockProjectMembers = CloneHandlerMockProjectMembers()
 	HMockUsers          = CloneHandlerMockUsers()
@@ -179,6 +180,32 @@ func CloneHandlerMockGroupMembers() []handler.GroupMember {
 			RealName: hUser.RealName,
 		},
 	}
+}
+
+func CloneHandlerMockProjects() []handler.Project {
+	var (
+		mProjects = CloneMockProjects()
+		hProjects = make([]handler.Project, len(mProjects))
+	)
+
+	for i, p := range mProjects {
+		hProjects[i] = handler.Project{
+			Id:   p.ID,
+			Name: p.Name,
+			Duration: handler.YearWithSemesterDuration{
+				Since: handler.YearWithSemester{
+					Year:     p.SinceYear,
+					Semester: handler.Semester(p.SinceSemester),
+				},
+				Until: &handler.YearWithSemester{
+					Year:     p.UntilYear,
+					Semester: handler.Semester(p.UntilSemester),
+				},
+			},
+		}
+	}
+
+	return hProjects
 }
 
 func CloneHandlerMockProject() handler.ProjectDetail {
