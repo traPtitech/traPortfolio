@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -31,7 +30,7 @@ func TestGetProjects(t *testing.T) {
 		},
 		"404": {
 			http.StatusBadRequest,
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -65,12 +64,12 @@ func TestGetProject(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: invalid project id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -126,7 +125,7 @@ func TestAddProjecct(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: invalid url"),
 		},
 	}
 
@@ -181,13 +180,13 @@ func TestEditProject(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.EditProjectJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: invalid project id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
 			handler.EditProjectJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -238,12 +237,12 @@ func TestGetProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: invalid project id"),
 		},
 		"404 no project with not-existing projectID": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -289,7 +288,7 @@ func TestAddProjectMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.AddProjectMembersJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: invalid project id"),
 		},
 	}
 
@@ -329,12 +328,12 @@ func TestDeleteProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: invalid project id"),
 		},
 		"404 project not found": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
