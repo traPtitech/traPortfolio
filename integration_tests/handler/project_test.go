@@ -280,7 +280,7 @@ func TestAddProjectMembers(t *testing.T) {
 			http.StatusCreated,
 			mockdata.HMockProjects[0].Id,
 			handler.AddProjectMembersJSONRequestBody{
-				Members: []handler.MemberIDWithYearWithSemesterDuration{{duration1, userID1}, {duration2, userID2}},
+				Members: []handler.MemberIDWithYearWithSemesterDuration{{Duration: duration1, UserId: userID1}, {Duration: duration2, UserId: userID2}},
 			},
 			nil,
 		},
