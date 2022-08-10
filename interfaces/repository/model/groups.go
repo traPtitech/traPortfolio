@@ -10,7 +10,6 @@ type Group struct {
 	GroupID     uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Name        string    `gorm:"type:varchar(32)"`
 	Link        string    `gorm:"type:text"`
-	Leader      uuid.UUID `gorm:"type:char(36);not null"`
 	Description string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
@@ -36,4 +35,17 @@ type GroupUserBelonging struct {
 
 func (*GroupUserBelonging) TableName() string {
 	return "group_user_belongings"
+}
+
+type GroupUserAdmin struct {
+	UserID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	GroupID   uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	CreatedAt time.Time `gorm:"precision:6"`
+	UpdatedAt time.Time `gorm:"precision:6"`
+
+	Group Group `gorm:"foreignKey:GroupID"`
+}
+
+func (*GroupUserAdmin) TableName() string {
+	return "group_user_admins"
 }

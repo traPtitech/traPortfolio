@@ -145,12 +145,18 @@ func CloneHandlerMockGroup() handler.GroupDetail {
 	var (
 		mGroup        = CloneMockGroup()
 		hGroupMembers = CloneHandlerMockGroupMembers()
+		mGroupAdmins  = CloneMockGroupUserAdmin()
+		mAdmin        = make([]handler.User, len(mGroupAdmins))
 	)
+
+	for i, adm := range mGroupAdmins {
+		mAdmin[i] = getUser(adm.UserID)
+	}
 
 	return handler.GroupDetail{
 		Description: mGroup.Description,
 		Id:          mGroup.GroupID,
-		Leader:      getUser(mGroup.Leader),
+		Admin:       mAdmin,
 		Link:        mGroup.Link,
 		Members:     hGroupMembers,
 		Name:        mGroup.Name,

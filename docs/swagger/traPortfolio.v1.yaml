@@ -991,6 +991,7 @@ components:
     EventLevel:
       type: integer
       title: EventLevel
+      x-go-type: uint8
       description: |-
         公開範囲設定
         0 イベント企画者の名前を伏せて公開
@@ -1048,8 +1049,11 @@ components:
               type: string
               format: uri
               description: 班の詳細が載っているページへのリンク
-            leader:
-              $ref: '#/components/schemas/User'
+            admin:
+              type: array
+              description: 班管理者
+              items:
+                $ref: '#/components/schemas/User'
             members:
               type: array
               description: 班メンバー
@@ -1060,7 +1064,7 @@ components:
               description: 班説明
           required:
             - link
-            - leader
+            - admin
             - members
             - description
     GroupMember:
@@ -1295,8 +1299,6 @@ components:
           type: string
           description: アカウントurl
           format: uri
-          x-oapi-codegen-extra-tags:
-            validate: url
         displayName:
           type: string
           description: 外部アカウントの表示名
@@ -1318,8 +1320,6 @@ components:
           type: string
           description: アカウントurl
           format: uri
-          x-oapi-codegen-extra-tags:
-            validate: omitempty,url # TODO: requiredになるので暫定的にomitemptyタグで対処
         displayName:
           type: string
           description: 外部アカウントの表示名
@@ -1344,8 +1344,6 @@ components:
           type: string
           format: uri
           description: プロジェクトの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: プロジェクト説明
@@ -1369,8 +1367,6 @@ components:
           type: string
           format: uri
           description: プロジェクトの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: プロジェクト説明
@@ -1399,8 +1395,6 @@ components:
           type: string
           format: uri
           description: コンテストの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: コンテスト説明
@@ -1423,8 +1417,6 @@ components:
           type: string
           format: uri
           description: コンテストの詳細が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: コンテスト説明
@@ -1443,8 +1435,6 @@ components:
           type: string
           format: uri
           description: コンテストチームの説明が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: チーム情報
@@ -1466,8 +1456,6 @@ components:
           type: string
           format: uri
           description: コンテストチームの説明が載っているページへのリンク
-          x-oapi-codegen-extra-tags:
-            validate: url
         description:
           type: string
           description: チーム情報

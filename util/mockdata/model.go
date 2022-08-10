@@ -17,6 +17,7 @@ var (
 	MockEventLevelRelations      = CloneMockEventLevelRelations()
 	MockGroup                    = CloneMockGroup()
 	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
+	MockGroupUserAdmin           = CloneMockGroupUserAdmin()
 	MockProjects                 = CloneMockProjects()
 	MockProject                  = CloneMockProject()
 	MockProjectMember            = CloneMockProjectMember()
@@ -103,7 +104,6 @@ func CloneMockGroup() model.Group {
 		GroupID:     groupID.uuid(),
 		Name:        "sample_group_name",
 		Link:        "https://sample.groups.com",
-		Leader:      userID1.uuid(),
 		Description: "sample_group_description",
 	}
 }
@@ -116,6 +116,15 @@ func CloneMockGroupUserBelonging() model.GroupUserBelonging {
 		SinceSemester: 1,
 		UntilYear:     2022,
 		UntilSemester: 2,
+	}
+}
+
+func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
+	return []model.GroupUserAdmin{
+		{
+			UserID:  userID1.uuid(),
+			GroupID: groupID.uuid(),
+		},
 	}
 }
 
@@ -208,6 +217,11 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 
 	mockProject := CloneMockProject()
 	if err := h.Create(&mockProject).Error(); err != nil {
+		return err
+	}
+
+	mockGroupUserAdmin := CloneMockGroupUserAdmin()
+	if err := h.Create(&mockGroupUserAdmin).Error(); err != nil {
 		return err
 	}
 

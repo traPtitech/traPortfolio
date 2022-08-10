@@ -24,5 +24,6 @@ func AllTables() []interface{} {
 		model.ContestTeamUserBelonging{},
 		model.Group{},
 		model.GroupUserBelonging{},
+		model.GroupUserAdmin{},
 	}
 }

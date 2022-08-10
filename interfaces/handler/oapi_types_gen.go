@@ -9,13 +9,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// Defines values for EventLevel.
-const (
-	EventLevelN0 EventLevel = 0
-	EventLevelN1 EventLevel = 1
-	EventLevelN2 EventLevel = 2
-)
-
 // Defines values for Semester.
 const (
 	SemesterN0 Semester = 0
@@ -24,9 +17,9 @@ const (
 
 // Defines values for UserAccountState.
 const (
-	N0 UserAccountState = 0
-	N1 UserAccountState = 1
-	N2 UserAccountState = 2
+	UserAccountStateN0 UserAccountState = 0
+	UserAccountStateN1 UserAccountState = 1
+	UserAccountStateN2 UserAccountState = 2
 )
 
 // アカウントへのリンク
@@ -62,7 +55,7 @@ type AddAccountRequest struct {
 	Type AccountType `json:"type"`
 
 	// アカウントurl
-	Url string `json:"url" validate:"url"`
+	Url string `json:"url"`
 }
 
 // 新規コンテストチームリクエスト
@@ -71,7 +64,7 @@ type AddContestTeamRequest struct {
 	Description string `json:"description"`
 
 	// コンテストチームの説明が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// チーム名
 	Name string `json:"name"`
@@ -175,7 +168,7 @@ type CreateContestRequest struct {
 	Duration Duration `json:"duration"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// コンテスト名
 	Name string `json:"name"`
@@ -192,7 +185,7 @@ type CreateProjectRequest struct {
 	Duration YearWithSemesterDuration `json:"duration"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// プロジェクト名
 	Name string `json:"name"`
@@ -217,7 +210,7 @@ type EditContestRequest struct {
 	Duration *Duration `json:"duration,omitempty"`
 
 	// コンテストの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// コンテスト名
 	Name *string `json:"name,omitempty"`
@@ -229,7 +222,7 @@ type EditContestTeamRequest struct {
 	Description *string `json:"description,omitempty"`
 
 	// コンテストチームの説明が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// チーム名
 	Name *string `json:"name,omitempty"`
@@ -258,7 +251,7 @@ type EditProjectRequest struct {
 	Duration *YearWithSemesterDuration `json:"duration,omitempty"`
 
 	// プロジェクトの詳細が載っているページへのリンク
-	Link *string `json:"link,omitempty" validate:"url"`
+	Link *string `json:"link,omitempty"`
 
 	// プロジェクト名
 	Name *string `json:"name,omitempty"`
@@ -276,7 +269,7 @@ type EditUserAccountRequest struct {
 	Type *AccountType `json:"type,omitempty"`
 
 	// アカウントurl
-	Url *string `json:"url,omitempty" validate:"omitempty,url"`
+	Url *string `json:"url,omitempty"`
 }
 
 // ユーザー情報変更リクエスト
@@ -333,7 +326,7 @@ type EventDetail struct {
 // 0 イベント企画者の名前を伏せて公開
 // 1 全て公開
 // 2 外部に非公開
-type EventLevel int
+type EventLevel uint8
 
 // 班情報
 type Group struct {
@@ -346,14 +339,14 @@ type Group struct {
 
 // GroupDetail defines model for GroupDetail.
 type GroupDetail struct {
+	// 班管理者
+	Admin []User `json:"admin"`
+
 	// 班説明
 	Description string `json:"description"`
 
 	// 班uuid
 	Id uuid.UUID `json:"id"`
-
-	// ユーザー情報
-	Leader User `json:"leader"`
 
 	// 班の詳細が載っているページへのリンク
 	Link string `json:"link"`

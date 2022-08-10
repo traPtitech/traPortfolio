@@ -9,6 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -27,7 +28,7 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-func TestProjectHandler_GetAll(t *testing.T) {
+func TestProjectHandler_GetProjects(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -121,17 +122,17 @@ func TestProjectHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestProjectHandler_GetByID(t *testing.T) {
+func TestProjectHandler_GetProject(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (ProjectDetail, string)
+		setup      func(s *mock_service.MockProjectService) (*ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.Project{
@@ -168,7 +169,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 						RealName: v.RealName,
 					})
 				}
-				reqBody := ProjectDetail{
+				reqBody := &ProjectDetail{
 					Description: repo.Description,
 					Duration: YearWithSemesterDuration{
 						Since: YearWithSemester{
@@ -192,13 +193,37 @@ func TestProjectHandler_GetByID(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
+			name: "Bad Request: Validate error: invalid projectID",
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				return nil, fmt.Sprintf("/api/v1/projects/%s", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, errInternal)
-				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Validation Error",
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				projectID := random.AlphaNumericn(36)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Not Found Error",
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				projectID := random.UUID()
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, repository.ErrNotFound)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusNotFound,
 		},
 	}
 	for _, tt := range tests {
@@ -208,7 +233,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := ProjectDetail{}
+			var hres *ProjectDetail
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
