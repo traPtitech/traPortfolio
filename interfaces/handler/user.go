@@ -244,8 +244,8 @@ func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 		res[i] = newUserProject(
 			v.ID,
 			v.Name,
-			convertDuration(v.Duration),
-			convertDuration(v.UserDuration),
+			ConvertDuration(v.Duration),
+			ConvertDuration(v.UserDuration),
 		)
 	}
 
@@ -295,7 +295,7 @@ func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	for i, group := range groups {
 		res[i] = newUserGroup(
 			newGroup(group.ID, group.Name),
-			convertDuration(group.Duration),
+			ConvertDuration(group.Duration),
 		)
 	}
 	return c.JSON(http.StatusOK, res)

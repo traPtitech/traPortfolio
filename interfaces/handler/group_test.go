@@ -123,7 +123,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					}
 
 					hgroupmember := GroupMember{
-						Duration: convertDuration(rgroupmember.Duration),
+						Duration: ConvertDuration(rgroupmember.Duration),
 						Id:       rgroupmember.ID,
 						Name:     rgroupmember.Name,
 						RealName: rgroupmember.RealName,

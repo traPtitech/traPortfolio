@@ -33,7 +33,7 @@ func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 
 	res := make([]Project, len(projects))
 	for i, v := range projects {
-		res[i] = newProject(v.ID, v.Name, convertDuration(v.Duration))
+		res[i] = newProject(v.ID, v.Name, ConvertDuration(v.Duration))
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -57,12 +57,12 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
 			newUser(v.UserID, v.Name, v.RealName),
-			convertDuration(v.Duration),
+			ConvertDuration(v.Duration),
 		)
 	}
 
 	return c.JSON(http.StatusOK, newProjectDetail(
-		newProject(project.ID, project.Name, convertDuration(project.Duration)),
+		newProject(project.ID, project.Name, ConvertDuration(project.Duration)),
 		project.Description,
 		project.Link,
 		members,
@@ -100,7 +100,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, newProject(
 		project.ID,
 		project.Name,
-		convertDuration(project.Duration),
+		ConvertDuration(project.Duration),
 	))
 }
 

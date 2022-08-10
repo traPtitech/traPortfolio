@@ -917,10 +917,10 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			}
 
 			hproject := UserProject{
-				Duration:     convertDuration(rproject.Duration),
+				Duration:     ConvertDuration(rproject.Duration),
 				Id:           rproject.ID,
 				Name:         rproject.Name,
-				UserDuration: convertDuration(rproject.UserDuration),
+				UserDuration: ConvertDuration(rproject.UserDuration),
 			}
 
 			repoProjects = append(repoProjects, &rproject)
@@ -1118,7 +1118,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 			}
 
 			hgroup := UserGroup{
-				Duration: convertDuration(rgroup.Duration),
+				Duration: ConvertDuration(rgroup.Duration),
 				Id:       rgroup.ID,
 				Name:     rgroup.Name,
 			}

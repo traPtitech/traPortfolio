@@ -95,7 +95,7 @@ func TestAddProjecct(t *testing.T) {
 		link        = random.RandURLString()
 		invalidLink = "invalid link"
 		description = random.AlphaNumeric()
-		duration    = random.Duration()
+		duration    = handler.ConvertDuration(random.Duration())
 	)
 
 	t.Parallel()
@@ -149,9 +149,8 @@ func TestEditProject(t *testing.T) {
 	var (
 		name        = random.AlphaNumeric()
 		link        = random.RandURLString()
-		invalidLink = "invalid link"
 		description = random.AlphaNumeric()
-		duration    = random.Duration()
+		duration    = handler.ConvertDuration(random.Duration())
 	)
 
 	t.Parallel()
@@ -265,8 +264,10 @@ func TestGetProjectMembers(t *testing.T) {
 // AddProjectMembers POST /projects/:projectID/members
 func TestAddProjectMembers(t *testing.T) {
 	var (
-		userId   = random.UUID()
-		duration = random.Duration()
+		userID1   = random.UUID()
+		duration1 = handler.ConvertDuration(random.Duration())
+		userID2   = random.UUID()
+		duration2 = handler.ConvertDuration(random.Duration())
 	)
 
 	t.Parallel()
@@ -280,7 +281,7 @@ func TestAddProjectMembers(t *testing.T) {
 			http.StatusCreated,
 			mockdata.HMockProjects[0].Id,
 			handler.AddProjectMembersJSONRequestBody{
-				Members: []handler.MemberIDWithYearWithSemesterDuration{{duration, userId}, {duration, userId}},
+				Members: []handler.MemberIDWithYearWithSemesterDuration{{duration1, userID1}, {duration2, userID2}},
 			},
 			nil,
 		},
@@ -312,7 +313,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 	var (
 		link        = random.RandURLString()
 		description = random.AlphaNumeric()
-		duration    = random.Duration()
+		duration    = handler.ConvertDuration(random.Duration())
 	)
 	t.Parallel()
 	tests := map[string]struct {
@@ -349,7 +350,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 				Name:        random.AlphaNumeric(),
 				Link:        &link,
 				Description: description,
-				Duration:    duraion,
+				Duration:    duration,
 			}
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject, tt.projectID), &reqBody)
 			testutils.AssertResponse(t, http.StatusCreated, handler.Project{
