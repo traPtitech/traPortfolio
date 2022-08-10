@@ -140,7 +140,7 @@ func CloneMockProjects() []*model.Project {
 			UntilSemester: 2,
 		},
 		{
-			ID:            projectID1.uuid(),
+			ID:            projectID2.uuid(),
 			Name:          "sample_project_name2",
 			Description:   "sample_project_description2",
 			Link:          "https://sample.project2.com",
