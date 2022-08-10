@@ -108,7 +108,7 @@ func TestAddProjecct(t *testing.T) {
 				Duration:    duration,
 			},
 			handler.Project{
-				Id:       uuid.Nil,
+				Id:       uuid.Nil, //todo:どうにかする
 				Name:     name,
 				Duration: duration,
 			},
@@ -121,7 +121,7 @@ func TestAddProjecct(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError("bad request: invalid url"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 	}
 
@@ -248,9 +248,9 @@ func TestGetProjectMembers(t *testing.T) {
 // AddProjectMembers POST /projects/:projectID/members
 func TestAddProjectMembers(t *testing.T) {
 	var (
-		userID1   = random.UUID()
+		userID1   = mockdata.HMockUsers[0].Id
 		duration1 = handler.ConvertDuration(random.Duration())
-		userID2   = random.UUID()
+		userID2   = mockdata.HMockUsers[1].Id
 		duration2 = handler.ConvertDuration(random.Duration())
 	)
 
