@@ -108,7 +108,7 @@ func TestAddProjecct(t *testing.T) {
 				Duration:    duration,
 			},
 			handler.Project{
-				Id:       uuid.Nil, //todo:どうにかする
+				Id:       uuid.Nil,
 				Name:     name,
 				Duration: duration,
 			},
@@ -134,7 +134,12 @@ func TestAddProjecct(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject), &tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			switch want := tt.want.(type) {
+			case handler.Project:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
+			case error:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
 		})
 	}
 }
@@ -164,6 +169,12 @@ func TestEditProject(t *testing.T) {
 				Description: &description,
 				Duration:    &duration,
 			},
+			nil,
+		},
+		"204 without changes": {
+			http.StatusNoContent,
+			mockdata.HMockProjects[1].Id,
+			handler.EditProjectJSONRequestBody{},
 			nil,
 		},
 		"400 invalid projectID": {
