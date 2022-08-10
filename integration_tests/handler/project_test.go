@@ -259,9 +259,9 @@ func TestGetProjectMembers(t *testing.T) {
 // AddProjectMembers POST /projects/:projectID/members
 func TestAddProjectMembers(t *testing.T) {
 	var (
-		userID1   = random.UUID()
+		userID1   = mockdata.MockUsers[0].ID
 		duration1 = handler.ConvertDuration(random.Duration())
-		userID2   = random.UUID()
+		userID2   = mockdata.MockUsers[1].ID
 		duration2 = handler.ConvertDuration(random.Duration())
 	)
 
@@ -306,29 +306,37 @@ func TestAddProjectMembers(t *testing.T) {
 // DeleteProjectMembers DELETE /projects/:projectID/members
 func TestDeleteProjectMembers(t *testing.T) {
 	var (
-		link        = random.RandURLString()
-		description = random.AlphaNumeric()
-		duration    = handler.ConvertDuration(random.Duration())
+		userID1 = mockdata.MockProjectMember.ID
 	)
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
 		projectID  uuid.UUID
+		reqBody    handler.DeleteProjectMembersJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.HMockProjects[0].Id,
+			handler.DeleteProjectMembersJSONRequestBody{
+				Members: []uuid.UUID{userID1},
+			},
 			nil,
 		},
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
+			handler.DeleteProjectMembersJSONRequestBody{
+				Members: []uuid.UUID{userID1},
+			},
 			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 project not found": {
 			http.StatusNotFound,
 			random.UUID(),
+			handler.DeleteProjectMembersJSONRequestBody{
+				Members: []uuid.UUID{userID1},
+			},
 			testutils.HTTPError("not found: not found"),
 		},
 	}
@@ -341,19 +349,15 @@ func TestDeleteProjectMembers(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			reqBody := handler.CreateProjectJSONRequestBody{
-				Name:        random.AlphaNumeric(),
-				Link:        &link,
-				Description: description,
-				Duration:    duration,
-			}
-			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject, tt.projectID), &reqBody)
-			testutils.AssertResponse(t, http.StatusCreated, handler.Project{
-				Duration: reqBody.Duration,
-				Id:       tt.projectID,
-				Name:     reqBody.Name,
-			}, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.projectID))
-			res = testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), nil)
+			// reqBody := handler.AddProjectMembersJSONRequestBody{
+			// 	Members: []handler.MemberIDWithYearWithSemesterDuration{{Duration: userDuration1, UserId: userID1}},
+			// }
+			// res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &reqBody)
+			// testutils.AssertResponse(t, http.StatusCreated, handler.Project{
+			// 	Id:       reqBody.Members[0].UserId,
+			// 	Duration: reqBody.Members[0].Duration,
+			// }, res)
+			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), &tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
