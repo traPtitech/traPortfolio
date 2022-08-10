@@ -28,10 +28,6 @@ func TestGetProjects(t *testing.T) {
 				mockdata.HMockProjects[1],
 			},
 		},
-		"404": {
-			http.StatusBadRequest,
-			testutils.HTTPError("not found: not found"),
-		},
 	}
 
 	e := echo.New()
@@ -64,7 +60,7 @@ func TestGetProject(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: invalid project id"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
@@ -180,7 +176,7 @@ func TestEditProject(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.EditProjectJSONRequestBody{},
-			testutils.HTTPError("bad request: invalid project id"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
@@ -237,7 +233,7 @@ func TestGetProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: invalid project id"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 no project with not-existing projectID": {
 			http.StatusNotFound,
@@ -288,7 +284,7 @@ func TestAddProjectMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.AddProjectMembersJSONRequestBody{},
-			testutils.HTTPError("bad request: invalid project id"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 	}
 
@@ -328,7 +324,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: invalid project id"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 project not found": {
 			http.StatusNotFound,

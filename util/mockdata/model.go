@@ -131,7 +131,7 @@ func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
 func CloneMockProjects() []*model.Project {
 	return []*model.Project{
 		{
-			ID:            projectID.uuid(),
+			ID:            projectID1.uuid(),
 			Name:          "sample_project_name 1",
 			SinceYear:     2021,
 			SinceSemester: 1,
@@ -139,7 +139,7 @@ func CloneMockProjects() []*model.Project {
 			UntilSemester: 2,
 		},
 		{
-			ID:            projectID.uuid(),
+			ID:            projectID2.uuid(),
 			Name:          "sample_project_name 2",
 			SinceYear:     2022,
 			SinceSemester: 1,
@@ -151,7 +151,7 @@ func CloneMockProjects() []*model.Project {
 
 func CloneMockProject() model.Project {
 	return model.Project{
-		ID:            projectID.uuid(),
+		ID:            projectID1.uuid(),
 		Name:          "sample_project_name",
 		Description:   "sample_project_description",
 		Link:          "https://sample.projects.com",
@@ -165,7 +165,7 @@ func CloneMockProject() model.Project {
 func CloneMockProjectMember() model.ProjectMember {
 	return model.ProjectMember{
 		ID:            projectMemberID.uuid(),
-		ProjectID:     projectID.uuid(),
+		ProjectID:     projectID1.uuid(),
 		UserID:        userID1.uuid(),
 		SinceYear:     2022,
 		SinceSemester: 1,
