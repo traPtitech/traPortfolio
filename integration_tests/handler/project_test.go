@@ -166,12 +166,6 @@ func TestEditProject(t *testing.T) {
 			},
 			nil,
 		},
-		"204 without changes": {
-			http.StatusNoContent,
-			mockdata.HMockProjects[1].Id,
-			handler.EditProjectJSONRequestBody{},
-			nil,
-		},
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
@@ -235,11 +229,6 @@ func TestGetProjectMembers(t *testing.T) {
 			uuid.Nil,
 			testutils.HTTPError("bad request: nil id"),
 		},
-		"404 no project with not-existing projectID": {
-			http.StatusNotFound,
-			random.UUID(),
-			testutils.HTTPError("not found: not found"),
-		},
 	}
 
 	e := echo.New()
@@ -259,9 +248,9 @@ func TestGetProjectMembers(t *testing.T) {
 // AddProjectMembers POST /projects/:projectID/members
 func TestAddProjectMembers(t *testing.T) {
 	var (
-		userID1   = mockdata.MockUsers[0].ID
+		userID1   = random.UUID()
 		duration1 = handler.ConvertDuration(random.Duration())
-		userID2   = mockdata.MockUsers[1].ID
+		userID2   = random.UUID()
 		duration2 = handler.ConvertDuration(random.Duration())
 	)
 
