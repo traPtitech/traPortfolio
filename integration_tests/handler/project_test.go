@@ -272,7 +272,7 @@ func TestAddProjectMembers(t *testing.T) {
 		reqBody    handler.AddProjectMembersJSONRequestBody
 		want       interface{}
 	}{
-		"201": {
+		"204": {
 			http.StatusCreated,
 			mockdata.HMockProjects[0].Id,
 			handler.AddProjectMembersJSONRequestBody{
@@ -331,7 +331,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 			},
 			testutils.HTTPError("bad request: nil id"),
 		},
-		"404 project not found": {
+		"404 not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			handler.DeleteProjectMembersJSONRequestBody{
