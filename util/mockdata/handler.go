@@ -216,7 +216,7 @@ func CloneHandlerMockProjects() []handler.Project {
 
 func CloneHandlerMockProject() handler.ProjectDetail {
 	var (
-		mProject        = CloneMockProject()
+		mProject        = CloneMockProjects()[0]
 		hProjectMembers = CloneHandlerMockProjectMembers()
 	)
 

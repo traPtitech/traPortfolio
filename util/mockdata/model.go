@@ -19,7 +19,6 @@ var (
 	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
 	MockGroupUserAdmin           = CloneMockGroupUserAdmin()
 	MockProjects                 = CloneMockProjects()
-	MockProject                  = CloneMockProject()
 	MockProjectMember            = CloneMockProjectMember()
 )
 
@@ -132,33 +131,24 @@ func CloneMockProjects() []*model.Project {
 	return []*model.Project{
 		{
 			ID:            projectID1.uuid(),
-			Name:          "sample_project_name 1",
+			Name:          "sample_project_name1",
+			Description:   "sample_project_description1",
+			Link:          "https://sample.project1.com",
 			SinceYear:     2021,
 			SinceSemester: 1,
 			UntilYear:     2021,
 			UntilSemester: 2,
 		},
 		{
-			ID:            projectID2.uuid(),
-			Name:          "sample_project_name 2",
+			ID:            projectID1.uuid(),
+			Name:          "sample_project_name2",
+			Description:   "sample_project_description2",
+			Link:          "https://sample.project2.com",
 			SinceYear:     2022,
 			SinceSemester: 1,
 			UntilYear:     2022,
 			UntilSemester: 2,
 		},
-	}
-}
-
-func CloneMockProject() model.Project {
-	return model.Project{
-		ID:            projectID1.uuid(),
-		Name:          "sample_project_name",
-		Description:   "sample_project_description",
-		Link:          "https://sample.projects.com",
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
 	}
 }
 
@@ -212,11 +202,6 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 
 	mockGroupUserBelonging := CloneMockGroupUserBelonging()
 	if err := h.Create(&mockGroupUserBelonging).Error(); err != nil {
-		return err
-	}
-
-	mockProject := CloneMockProject()
-	if err := h.Create(&mockProject).Error(); err != nil {
 		return err
 	}
 
