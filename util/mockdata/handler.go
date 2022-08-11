@@ -241,7 +241,7 @@ func CloneHandlerMockProject() handler.ProjectDetail {
 
 func CloneHandlerMockProjectMembers() []handler.ProjectMember {
 	var (
-		mProjectMember = CloneMockProjectMember()
+		mProjectMember = CloneMockProjectMembers()[0]
 		hUser          = getUser(mProjectMember.UserID)
 	)
 
