@@ -15,6 +15,7 @@ const (
 	projectID3        uuidStr = "bf9c1aec-7e3a-4587-8adc-651895aa6ec2"
 	projectMemberID1  uuidStr = "a211a49c-9b30-48b9-8dbb-c449c99f12c7"
 	projectMemberID2  uuidStr = "a211a49c-9b30-48b9-8dbb-c449c99f12c8"
+	projectMemberID3  uuidStr = "a211a49c-9b30-48b9-8dbb-c449c99f12c9"
 	knoqEventID1      uuidStr = "d1274c6e-15cc-4ca0-b720-1c03ea3a60ec"
 	knoqEventID2      uuidStr = "e28ec610-226d-49c5-be7c-86af54f6839d"
 	knoqEventGroupID1 uuidStr = "7ecabb2a-8e2c-4ebe-bb0b-13254a6eae05"

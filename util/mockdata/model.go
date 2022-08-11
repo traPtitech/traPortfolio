@@ -163,23 +163,35 @@ func CloneMockProjects() []*model.Project {
 }
 
 func CloneMockProjectMembers() []*model.ProjectMember {
-	return []*model.ProjectMember{{
-		ID:            projectMemberID1.uuid(),
-		ProjectID:     projectID1.uuid(),
-		UserID:        userID1.uuid(),
-		SinceYear:     2021,
-		SinceSemester: 0,
-		UntilYear:     2021,
-		UntilSemester: 1,
-	}, {
-		ID:            projectMemberID2.uuid(),
-		ProjectID:     projectID1.uuid(),
-		UserID:        userID2.uuid(),
-		SinceYear:     2022,
-		SinceSemester: 0,
-		UntilYear:     2022,
-		UntilSemester: 1,
-	}}
+	return []*model.ProjectMember{
+		{
+			ID:            projectMemberID1.uuid(),
+			ProjectID:     projectID1.uuid(),
+			UserID:        userID1.uuid(),
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2021,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectMemberID2.uuid(),
+			ProjectID:     projectID1.uuid(),
+			UserID:        userID2.uuid(),
+			SinceYear:     2022,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectMemberID3.uuid(),
+			ProjectID:     projectID2.uuid(),
+			UserID:        userID2.uuid(),
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
+	}
 }
 
 func InsertSampleDataToDB(h database.SQLHandler) error {

@@ -23,10 +23,7 @@ func TestGetProjects(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			[]handler.Project{
-				mockdata.HMockProjects[0],
-				mockdata.HMockProjects[1],
-			},
+			mockdata.HMockProjects,
 		},
 	}
 
@@ -228,7 +225,7 @@ func TestGetProjectMembers(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockProjects[0].Id,
-			mockdata.HMockProjectMembers,
+			[]handler.ProjectMember{mockdata.HMockProjectMembers[0], mockdata.HMockProjectMembers[1]},
 		},
 		"200 no members with existing projectID": {
 			http.StatusOK,
