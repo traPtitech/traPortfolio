@@ -13,7 +13,7 @@ var (
 	HMockGroup          = CloneHandlerMockGroup()
 	HMockGroupMembers   = CloneHandlerMockGroupMembers()
 	HMockProjects       = CloneHandlerMockProjects()
-	HMockProject        = CloneHandlerMockProject()
+	HMockProjectDetails = CloneHandlerMockProjectDetails()
 	HMockProjectMembers = CloneHandlerMockProjectMembers()
 	HMockUsers          = CloneHandlerMockUsers()
 	HMockUserDetails    = CloneHandlerMockUserDetails()
@@ -214,29 +214,33 @@ func CloneHandlerMockProjects() []handler.Project {
 	return hProjects
 }
 
-func CloneHandlerMockProject() handler.ProjectDetail {
+func CloneHandlerMockProjectDetails() []handler.ProjectDetail {
 	var (
-		mProject        = CloneMockProjects()[0]
-		hProjectMembers = CloneHandlerMockProjectMembers()[0:2]
+		mProjects       = CloneMockProjects()
+		hProjectMembers = CloneHandlerMockProjectMembers()
+		hProjects       = make([]handler.ProjectDetail, len(mProjects))
 	)
 
-	return handler.ProjectDetail{
-		Description: mProject.Description,
-		Duration: handler.YearWithSemesterDuration{
-			Since: handler.YearWithSemester{
-				Year:     mProject.SinceYear,
-				Semester: handler.Semester(mProject.SinceSemester),
+	for i, mp := range mProjects {
+		hProjects[i] = handler.ProjectDetail{
+			Description: mp.Description,
+			Duration: handler.YearWithSemesterDuration{
+				Since: handler.YearWithSemester{
+					Year:     mp.SinceYear,
+					Semester: handler.Semester(mp.SinceSemester),
+				},
+				Until: &handler.YearWithSemester{
+					Year:     mp.UntilYear,
+					Semester: handler.Semester(mp.UntilSemester),
+				},
 			},
-			Until: &handler.YearWithSemester{
-				Year:     mProject.UntilYear,
-				Semester: handler.Semester(mProject.UntilSemester),
-			},
-		},
-		Id:      mProject.ID,
-		Link:    mProject.Link,
-		Members: hProjectMembers,
-		Name:    mProject.Name,
+			Id:      mp.ID,
+			Link:    mp.Link,
+			Members: hProjectMembers,
+			Name:    mp.Name,
+		}
 	}
+	return hProjects
 }
 
 func CloneHandlerMockProjectMembers() []handler.ProjectMember {
@@ -379,7 +383,7 @@ func CloneHandlerMockUserGroups() []handler.UserGroup {
 
 func CloneHandlerMockUserProjects() []handler.UserProject {
 	var (
-		hProject        = CloneHandlerMockProject()
+		hProject        = CloneHandlerMockProjects()[0]
 		hProjectMembers = CloneHandlerMockProjectMembers()
 		hUserProjects   = make([]handler.UserProject, len(hProjectMembers))
 	)

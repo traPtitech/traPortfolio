@@ -423,7 +423,6 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	projects1, err := userRepo.GetProjects(user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, projects1)
-
 }
 
 func TestUserRepository_GetContests(t *testing.T) {

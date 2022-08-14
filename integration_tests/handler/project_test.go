@@ -51,8 +51,8 @@ func TestGetProject(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockProject.Id,
-			mockdata.HMockProject,
+			mockdata.HMockProjectDetails[0].Id,
+			mockdata.HMockProjectDetails[0],
 		},
 		"400 invalid projectID": {
 			http.StatusBadRequest,
@@ -225,7 +225,10 @@ func TestGetProjectMembers(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockProjects[0].Id,
-			[]handler.ProjectMember{mockdata.HMockProjectMembers[0], mockdata.HMockProjectMembers[1]},
+			[]handler.ProjectMember{
+				mockdata.HMockProjectMembers[0],
+				mockdata.HMockProjectMembers[1],
+			},
 		},
 		"200 no members with existing projectID": {
 			http.StatusOK,
