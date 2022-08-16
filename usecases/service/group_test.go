@@ -10,6 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 )
 
@@ -22,7 +23,7 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 		name      string
 		args      args
 		want      []*domain.Group
-		setup     func(repo *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want []*domain.Group)
+		setup     func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want []*domain.Group)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -34,8 +35,8 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 					Name: random.AlphaNumeric(),
 				},
 			},
-			setup: func(repo *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want []*domain.Group) {
-				repo.EXPECT().GetAllGroups().Return(want, nil)
+			setup: func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want []*domain.Group) {
+				group.EXPECT().GetAllGroups().Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -47,11 +48,11 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
 
-			repo := mock_repository.NewMockGroupRepository(ctrl)
+			group := mock_repository.NewMockGroupRepository(ctrl)
 			user := mock_repository.NewMockUserRepository(ctrl)
-			tt.setup(repo, user, tt.args, tt.want)
+			tt.setup(group, user, tt.args, tt.want)
 
-			s := NewGroupService(repo, user)
+			s := NewGroupService(group, user)
 			got, err := s.GetAllGroups(tt.args.ctx)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -69,22 +70,59 @@ func TestGroupService_GetGroup(t *testing.T) {
 		name      string
 		args      args
 		want      *domain.GroupDetail
-		setup     func(repo *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want *domain.GroupDetail)
+		setup     func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want *domain.GroupDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
 			args: args{ctx: context.Background(), id: random.UUID()},
 			want: &domain.GroupDetail{
-				ID:          random.UUID(),
-				Name:        random.AlphaNumeric(),
-				Link:        random.AlphaNumeric(),
-				Admin:       []*domain.User{},
-				Members:     []*domain.UserGroup{},
+				// ID:   random.UUID(),
+				Name: random.AlphaNumeric(),
+				Link: random.AlphaNumeric(),
+				Admin: []*domain.User{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					},
+				},
+				Members: []*domain.UserGroup{
+					{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+						Duration: random.Duration(),
+					},
+				},
 				Description: random.AlphaNumeric(),
 			},
-			setup: func(repo *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want *domain.GroupDetail) {
-				repo.EXPECT().GetGroup(args.id).Return(want, nil)
+			setup: func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want *domain.GroupDetail) {
+				want.ID = args.id
+				users := make([]*domain.User, 0)
+				users = append(users, want.Admin[0], &domain.User{
+					ID:       want.Members[0].ID,
+					Name:     want.Members[0].Name,
+					RealName: want.Members[0].RealName,
+				})
+				group.EXPECT().GetGroup(args.id).Return(&domain.GroupDetail{
+					ID:   args.id,
+					Name: want.Name,
+					Link: want.Link,
+					Admin: []*domain.User{
+						{
+							ID: want.Admin[0].ID,
+						},
+					},
+					Members: []*domain.UserGroup{
+						{
+							ID:       want.Members[0].ID,
+							Duration: want.Members[0].Duration,
+						},
+					},
+					Description: want.Description,
+				}, nil)
+				user.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return(users, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -96,11 +134,11 @@ func TestGroupService_GetGroup(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
 
-			repo := mock_repository.NewMockGroupRepository(ctrl)
+			group := mock_repository.NewMockGroupRepository(ctrl)
 			user := mock_repository.NewMockUserRepository(ctrl)
-			tt.setup(repo, user, tt.args, tt.want)
+			tt.setup(group, user, tt.args, tt.want)
 
-			s := NewGroupService(repo, user)
+			s := NewGroupService(group, user)
 			got, err := s.GetGroup(tt.args.ctx, tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
