@@ -416,13 +416,22 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	project2 := mustMakeProject(t, projectRepo, nil)
 	user1 := mockdata.MockUsers[2]
 
+	expected1 := []*domain.ProjectMember{}
+	expected2 := []*domain.ProjectMember{}
+	users1, err := projectRepo.GetProjectMembers(project1.ID)
+	assert.NoError(t, err)
+	users2, err := projectRepo.GetProjectMembers(project2.ID)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, expected1, users1)
+	assert.ElementsMatch(t, expected2, users2)
+
 	args1 := mustAddProjectMember(t, projectRepo, project1.ID, user1.ID, nil)
 	args2 := mustAddProjectMember(t, projectRepo, project2.ID, user1.ID, nil)
 
-	expected1 := []*domain.UserProject{newUserProject(args1, project1), newUserProject(args2, project2)}
+	expected3 := []*domain.UserProject{newUserProject(args1, project1), newUserProject(args2, project2)}
 	projects1, err := userRepo.GetProjects(user1.ID)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected1, projects1)
+	assert.ElementsMatch(t, expected3, projects1)
 }
 
 func TestUserRepository_GetContests(t *testing.T) {
