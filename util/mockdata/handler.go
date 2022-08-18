@@ -218,6 +218,7 @@ func CloneHandlerMockProjectDetails() []handler.ProjectDetail {
 	var (
 		mProjects       = CloneMockProjects()
 		hProjectMembers = CloneHandlerMockProjectMembers()
+		mProjectMembers = CloneMockProjectMembers()
 		hProjects       = make([]handler.ProjectDetail, len(mProjects))
 	)
 
@@ -236,8 +237,13 @@ func CloneHandlerMockProjectDetails() []handler.ProjectDetail {
 			},
 			Id:      mp.ID,
 			Link:    mp.Link,
-			Members: hProjectMembers,
+			Members: []handler.ProjectMember{},
 			Name:    mp.Name,
+		}
+		for j, mpm := range mProjectMembers {
+			if mpm.ProjectID == mp.ID {
+				hProjects[i].Members = append(hProjects[i].Members, hProjectMembers[j])
+			}
 		}
 	}
 	return hProjects
