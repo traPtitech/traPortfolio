@@ -577,11 +577,11 @@ func TestGetUserProjects(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserProjects,
+			[]handler.UserProject{mockdata.HMockUserProjects[0]},
 		},
 		"200 no projects with existing userID": {
 			http.StatusOK,
-			mockdata.HMockUsers[1].Id,
+			mockdata.HMockUsers[2].Id,
 			[]handler.Project{},
 		},
 		"400 invalid userID": {

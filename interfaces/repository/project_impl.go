@@ -160,7 +160,7 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 	return nil
 }
 
-func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error) {
+func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.ProjectMember, error) {
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
@@ -181,11 +181,12 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	res := make([]*domain.User, len(members))
+	res := make([]*domain.ProjectMember, len(members))
 	for i, v := range members {
-		u := domain.User{
-			ID:   v.UserID,
-			Name: v.User.Name,
+		u := domain.ProjectMember{
+			UserID:   v.UserID,
+			Name:     v.User.Name,
+			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		}
 
 		if rn, ok := nameMap[v.User.Name]; ok {

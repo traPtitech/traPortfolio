@@ -19,7 +19,7 @@ var (
 	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
 	MockGroupUserAdmin           = CloneMockGroupUserAdmin()
 	MockProjects                 = CloneMockProjects()
-	MockProjectMember            = CloneMockProjectMember()
+	MockProjectMembers           = CloneMockProjectMembers()
 )
 
 func CloneMockUsers() []*model.User {
@@ -149,18 +149,48 @@ func CloneMockProjects() []*model.Project {
 			UntilYear:     2022,
 			UntilSemester: 1,
 		},
+		{
+			ID:            projectID3.uuid(),
+			Name:          "sample_project_name3",
+			Description:   "sample_project_description3",
+			Link:          "https://sample.project3.com",
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
 	}
 }
 
-func CloneMockProjectMember() model.ProjectMember {
-	return model.ProjectMember{
-		ID:            projectMemberID.uuid(),
-		ProjectID:     projectID1.uuid(),
-		UserID:        userID1.uuid(),
-		SinceYear:     2022,
-		SinceSemester: 0,
-		UntilYear:     2022,
-		UntilSemester: 1,
+func CloneMockProjectMembers() []*model.ProjectMember {
+	return []*model.ProjectMember{
+		{
+			ID:            projectMemberID1.uuid(),
+			ProjectID:     projectID1.uuid(),
+			UserID:        userID1.uuid(),
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2021,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectMemberID2.uuid(),
+			ProjectID:     projectID1.uuid(),
+			UserID:        userID2.uuid(),
+			SinceYear:     2022,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectMemberID3.uuid(),
+			ProjectID:     projectID2.uuid(),
+			UserID:        userID2.uuid(),
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
 	}
 }
 
@@ -215,8 +245,8 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockProjectMember := CloneMockProjectMember()
-	if err := h.Create(&mockProjectMember).Error(); err != nil {
+	mockProjectMembers := CloneMockProjectMembers()
+	if err := h.Create(&mockProjectMembers).Error(); err != nil {
 		return err
 	}
 

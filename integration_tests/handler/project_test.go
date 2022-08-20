@@ -23,10 +23,7 @@ func TestGetProjects(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			[]handler.Project{
-				mockdata.HMockProjects[0],
-				mockdata.HMockProjects[1],
-			},
+			mockdata.HMockProjects,
 		},
 	}
 
@@ -54,8 +51,8 @@ func TestGetProject(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockProject.Id,
-			mockdata.HMockProject,
+			mockdata.HMockProjectDetails[0].Id,
+			mockdata.HMockProjectDetails[0],
 		},
 		"400 invalid projectID": {
 			http.StatusBadRequest,
@@ -228,12 +225,15 @@ func TestGetProjectMembers(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockProjects[0].Id,
-			mockdata.HMockProjectMembers,
+			[]handler.ProjectMember{
+				mockdata.HMockProjectMembers[0],
+				mockdata.HMockProjectMembers[1],
+			},
 		},
 		"200 no members with existing projectID": {
 			http.StatusOK,
-			mockdata.HMockProjects[1].Id,
-			[]handler.User{},
+			mockdata.HMockProjects[2].Id,
+			[]handler.ProjectMember{},
 		},
 		"400 invalid projectID": {
 			http.StatusBadRequest,
@@ -306,7 +306,7 @@ func TestAddProjectMembers(t *testing.T) {
 // DeleteProjectMembers DELETE /projects/:projectID/members
 func TestDeleteProjectMembers(t *testing.T) {
 	var (
-		userID1 = mockdata.MockProjectMember.ID
+		userID1 = mockdata.MockProjectMembers[0].ID
 	)
 	t.Parallel()
 	tests := map[string]struct {

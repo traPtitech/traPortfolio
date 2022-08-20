@@ -95,10 +95,10 @@ func (mr *MockProjectRepositoryMockRecorder) GetProject(projectID interface{}) *
 }
 
 // GetProjectMembers mocks base method.
-func (m *MockProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error) {
+func (m *MockProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.ProjectMember, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProjectMembers", projectID)
-	ret0, _ := ret[0].([]*domain.User)
+	ret0, _ := ret[0].([]*domain.ProjectMember)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

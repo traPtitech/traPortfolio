@@ -163,8 +163,8 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	res := make([]ProjectMember, len(members))
 	for i, v := range members {
 		res[i] = newProjectMember(
-			newUser(v.ID, v.Name, v.RealName),
-			YearWithSemesterDuration{}, // TODO: 追加する
+			newUser(v.UserID, v.Name, v.RealName),
+			ConvertDuration(v.Duration),
 		)
 	}
 
