@@ -675,6 +675,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 func TestProjectRepository_AddProjectMembers(t *testing.T) {
 	duration := random.Duration()
+	duplicatedMemberID := random.UUID()
 
 	t.Parallel()
 	type args struct {
@@ -759,6 +760,30 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			args: args{
 				projectID:      random.UUID(),
 				projectMembers: nil,
+			},
+			setup:     func(f mockProjectRepositoryFields, args args) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "duplicatedMembers",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        duplicatedMemberID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+					{
+						UserID:        duplicatedMemberID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+				},
 			},
 			setup:     func(f mockProjectRepositoryFields, args args) {},
 			assertion: assert.Error,
