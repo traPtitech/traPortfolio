@@ -110,7 +110,7 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	return account
 }
 
-func mustMakeProject(t *testing.T, repo repository.ProjectRepository, args *repository.CreateProjectArgs) *domain.Project {
+func mustMakeProject(t *testing.T, repo repository.ProjectRepository, args *repository.CreateProjectArgs) *domain.ProjectDetail {
 	t.Helper()
 
 	if args == nil {

@@ -29,7 +29,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 	projectNum := 4
 	var projects []*domain.Project
 	for i := 0; i < projectNum; i++ {
-		projects = append(projects, mustMakeProject(t, repo, nil))
+		projects = append(projects, &mustMakeProject(t, repo, nil).Project)
 	}
 
 	got, err := repo.GetProjects()
@@ -47,7 +47,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
-	var projects []*domain.Project
+	var projects []*domain.ProjectDetail
 	for i := 0; i < projectNum; i++ {
 		projects = append(projects, mustMakeProject(t, repo, nil))
 	}
