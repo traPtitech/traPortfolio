@@ -203,6 +203,15 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 		return repository.ErrInvalidArg
 	}
 
+	// ユーザーの重複チェック
+	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
+	for _, v := range projectMembers {
+		if _, ok := projectMembersMap[v.UserID]; ok {
+			return repository.ErrInvalidArg
+		}
+		projectMembersMap[v.UserID] = struct{}{}
+	}
+
 	// プロジェクトの存在チェック
 	err := repo.h.
 		Where(&model.Project{ID: projectID}).
