@@ -47,7 +47,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, want []*domain.Project) {
-				rows := sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"})
+				rows := sqlmock.NewRows([]string{"id", "name", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, v := range want {
 					d := v.Duration
 					rows.AddRow(v.ID, v.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
