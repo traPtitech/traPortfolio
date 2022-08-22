@@ -412,8 +412,8 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 	projectRepo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := &mustMakeProject(t, projectRepo, nil).Project
-	project2 := &mustMakeProject(t, projectRepo, nil).Project
+	project1 := mustMakeProject(t, projectRepo, nil)
+	project2 := mustMakeProject(t, projectRepo, nil)
 	user1 := mockdata.MockUsers[1]
 	user2 := mockdata.MockUsers[2]
 
