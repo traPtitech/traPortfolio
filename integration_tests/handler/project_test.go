@@ -19,7 +19,7 @@ func TestGetProjects(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		want       interface{} // []handler.Project | echo.HTTPError
+		want       interface{} // []handler.Project
 	}{
 		"200": {
 			http.StatusOK,
@@ -81,7 +81,7 @@ func TestGetProject(t *testing.T) {
 }
 
 // CreateProject POST /projects
-func TestAddProjecct(t *testing.T) {
+func TestCreateProjecct(t *testing.T) {
 	var (
 		name        = random.AlphaNumeric()
 		link        = random.RandURLString()
@@ -94,7 +94,7 @@ func TestAddProjecct(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		reqBody    handler.CreateProjectJSONRequestBody
-		want       interface{}
+		want       interface{} // handler.Project | echo.HTTPError
 	}{
 		"201": {
 			http.StatusCreated,
@@ -105,10 +105,19 @@ func TestAddProjecct(t *testing.T) {
 				Duration:    duration,
 			},
 			handler.Project{
-				Id:       uuid.Nil,
+				Id:       uuid.Nil, // OptRetrieveIDで取得する
 				Name:     name,
 				Duration: duration,
 			},
+		},
+		"400 invalid name": {
+			http.StatusBadRequest,
+			handler.CreateProjectJSONRequestBody{
+				Link:        &link,
+				Description: description,
+				Duration:    duration,
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
@@ -117,6 +126,24 @@ func TestAddProjecct(t *testing.T) {
 				Link:        &invalidLink,
 				Description: description,
 				Duration:    duration,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			handler.CreateProjectJSONRequestBody{
+				Name:     name,
+				Link:     &link,
+				Duration: duration,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid duration": {
+			http.StatusBadRequest,
+			handler.CreateProjectJSONRequestBody{
+				Name:        name,
+				Link:        &link,
+				Description: description,
 			},
 			testutils.HTTPError("bad request: validate error"),
 		},
@@ -155,7 +182,7 @@ func TestEditProject(t *testing.T) {
 		statusCode int
 		projectID  uuid.UUID
 		reqBody    handler.EditProjectJSONRequestBody
-		want       interface{} // nil | error
+		want       interface{} // nil | echo.HTTPError
 	}{
 		"204": {
 			http.StatusNoContent,
@@ -205,7 +232,6 @@ func TestEditProject(t *testing.T) {
 				// Update & Assert
 				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Project.EditProject, tt.projectID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-
 			} else {
 				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Project.EditProject, tt.projectID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
@@ -220,7 +246,7 @@ func TestGetProjectMembers(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		projectID  uuid.UUID
-		want       interface{}
+		want       interface{} // []handler.ProjectMember | echo.HTTPError
 	}{
 		"200": {
 			http.StatusOK,
@@ -270,13 +296,22 @@ func TestAddProjectMembers(t *testing.T) {
 		statusCode int
 		projectID  uuid.UUID
 		reqBody    handler.AddProjectMembersJSONRequestBody
-		want       interface{}
+		want       interface{} // nil | echo.HTTPError
 	}{
 		"200": {
 			http.StatusOK,
 			mockdata.HMockProjects[0].Id,
 			handler.AddProjectMembersJSONRequestBody{
-				Members: []handler.MemberIDWithYearWithSemesterDuration{{Duration: duration1, UserId: userID1}, {Duration: duration2, UserId: userID2}},
+				Members: []handler.MemberIDWithYearWithSemesterDuration{
+					{
+						Duration: duration1,
+						UserId:   userID1,
+					},
+					{
+						Duration: duration2,
+						UserId:   userID2,
+					},
+				},
 			},
 			nil,
 		},
@@ -298,7 +333,6 @@ func TestAddProjectMembers(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-
 		})
 	}
 }
@@ -313,7 +347,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 		statusCode int
 		projectID  uuid.UUID
 		reqBody    handler.DeleteProjectMembersJSONRequestBody
-		want       interface{}
+		want       interface{} // nil | echo.HTTPError
 	}{
 		"204": {
 			http.StatusNoContent,
@@ -329,6 +363,20 @@ func TestDeleteProjectMembers(t *testing.T) {
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{userID1},
 			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid memberID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.DeleteProjectMembersJSONRequestBody{
+				Members: []uuid.UUID{uuid.Nil},
+			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid members": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.DeleteProjectMembersJSONRequestBody{},
 			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 not found": {
@@ -349,14 +397,6 @@ func TestDeleteProjectMembers(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			// reqBody := handler.AddProjectMembersJSONRequestBody{
-			// 	Members: []handler.MemberIDWithYearWithSemesterDuration{{Duration: userDuration1, UserId: userID1}},
-			// }
-			// res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &reqBody)
-			// testutils.AssertResponse(t, http.StatusCreated, handler.Project{
-			// 	Id:       reqBody.Members[0].UserId,
-			// 	Duration: reqBody.Members[0].Duration,
-			// }, res)
 			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), &tt.reqBody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
