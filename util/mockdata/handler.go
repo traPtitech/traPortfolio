@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	HMockContest = CloneHandlerMockContest()
-	//HMockContests       = CloneHandlerMockContests()
+	HMockContest        = CloneHandlerMockContest()
+	HMockContests       = CloneHandlerMockContests()
 	HMockContestTeam    = CloneHandlerMockContestTeam()
 	HMockEvents         = CloneHandlerMockEvents()
 	HMockEventDetails   = CloneHandlerMockEventDetails()
@@ -49,33 +49,22 @@ func CloneHandlerMockContest() handler.ContestDetail {
 	}
 }
 
-/*func CloneHandlerMockContests() []handler.Contest {
+func CloneHandlerMockContests() []handler.Contest {
 	var (
-		knoqContests = CloneMockContest()
-		hEvents      = make([]handler.Event, len(knoqEvents))
+		mContest = CloneMockContest()
 	)
 
-	for i, e := range knoqEvents {
-		var (
-			hostname = make([]handler.User, len(e.Admins))
-		)
-
-		for j, uid := range e.Admins {
-			hostname[j] = getUser(uid)
-		}
-
-		hEvents[i] = handler.Event{
+	return []handler.Contest{
+		{
 			Duration: handler.Duration{
-				Since: e.TimeStart,
-				Until: &e.TimeEnd,
+				Since: mContest.Since,
+				Until: &mContest.Until,
 			},
-			Id:   e.ID,
-			Name: e.Name,
-		}
+			Id:   mContest.ID,
+			Name: mContest.Name,
+		},
 	}
-
-	return hEvents
-}*/
+}
 
 func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
 	var (

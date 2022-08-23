@@ -19,7 +19,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockContest,
+			mockdata.HMockContests,
 		},
 	}
 
