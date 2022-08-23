@@ -51,10 +51,10 @@ func (mr *MockProjectRepositoryMockRecorder) AddProjectMembers(projectID, args i
 }
 
 // CreateProject mocks base method.
-func (m *MockProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.Project, error) {
+func (m *MockProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProject", args)
-	ret0, _ := ret[0].(*domain.Project)
+	ret0, _ := ret[0].(*domain.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockProjectRepositoryMockRecorder) DeleteProjectMembers(projectID, mem
 }
 
 // GetProject mocks base method.
-func (m *MockProjectRepository) GetProject(projectID uuid.UUID) (*domain.Project, error) {
+func (m *MockProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProject", projectID)
-	ret0, _ := ret[0].(*domain.Project)
+	ret0, _ := ret[0].(*domain.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
