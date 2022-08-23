@@ -110,15 +110,6 @@ func TestCreateProjecct(t *testing.T) {
 				Duration: duration,
 			},
 		},
-		"400 invalid name": {
-			http.StatusBadRequest,
-			handler.CreateProjectJSONRequestBody{
-				Link:        &link,
-				Description: description,
-				Duration:    duration,
-			},
-			testutils.HTTPError("bad request: validate error"),
-		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
 			handler.CreateProjectJSONRequestBody{
@@ -129,7 +120,16 @@ func TestCreateProjecct(t *testing.T) {
 			},
 			testutils.HTTPError("bad request: validate error"),
 		},
-		"400 invalid description": {
+		"400 empty name": {
+			http.StatusBadRequest,
+			handler.CreateProjectJSONRequestBody{
+				Link:        &link,
+				Description: description,
+				Duration:    duration,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 empty description": {
 			http.StatusBadRequest,
 			handler.CreateProjectJSONRequestBody{
 				Name:     name,
@@ -138,7 +138,7 @@ func TestCreateProjecct(t *testing.T) {
 			},
 			testutils.HTTPError("bad request: validate error"),
 		},
-		"400 invalid duration": {
+		"400 empty duration": {
 			http.StatusBadRequest,
 			handler.CreateProjectJSONRequestBody{
 				Name:        name,
