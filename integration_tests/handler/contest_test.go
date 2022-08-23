@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
+	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -71,6 +72,89 @@ func TestContestHandler_GetContest(t *testing.T) {
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
+}
+
+// CreateContest POST /contests
+func TestContestHandler_CreateContest(t *testing.T) {
+	var (
+		name         = random.AlphaNumeric()
+		link         = random.RandURLString()
+		description  = random.AlphaNumeric()
+		since, until = random.SinceAndUntil()
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		reqbody    handler.CreateContestJSONBody
+		want       interface{}
+	}{
+		"201": {
+			http.StatusCreated,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: name,
+			},
+			handler.ContestDetail{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Id:    uuid.Nil,
+				Link:  link,
+				Name:  name,
+				Teams: []handler.ContestTeam{},
+			},
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_create_contests")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.CreateContest), &tt.reqbody)
+			switch want := tt.want.(type) {
+			case handler.ContestDetail:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
+			case error:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
+		})
+	}
+}
+
+func PatchContest(t *testing.T) {
+}
+
+func DeleteContest(t *testing.T) {
+}
+
+func GetContestTeam(t *testing.T) {
+}
+
+func AddContestTeam(t *testing.T) {
+}
+
+func PatchContestTeam(t *testing.T) {
+}
+
+func GetContestTeamMember(t *testing.T) {
+}
+
+func AddContestTeamMember(t *testing.T) {
+}
+
+func EditContestTeamMember(t *testing.T) {
 }
 
 /*
