@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -36,7 +35,6 @@ func TestGetGroups(t *testing.T) {
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName("group_handler_get_groups")
 	api, err := testutils.SetupRoutes(t, e, conf)
-
 	assert.NoError(t, err)
 
 	for name, tt := range tests {
@@ -66,19 +64,18 @@ func TestGetGroup(t *testing.T) {
 		"400 invalid userID": {
 			statusCode: http.StatusBadRequest,
 			groupID:    uuid.Nil,
-			want:       handler.ConvertError(t, repository.ErrValidate),
+			want:       testutils.HTTPError("bad request: nil id"),
 		},
 		"404": {
 			statusCode: http.StatusNotFound,
 			groupID:    random.UUID(),
-			want:       handler.ConvertError(t, repository.ErrNotFound),
+			want:       testutils.HTTPError("not found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName("group_handler_get_group")
 	api, err := testutils.SetupRoutes(t, e, conf)
-
 	assert.NoError(t, err)
 
 	for name, tt := range tests {
