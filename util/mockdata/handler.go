@@ -7,6 +7,7 @@ import (
 
 var (
 	HMockContest        = CloneHandlerMockContest()
+	HMockContests       = CloneHandlerMockContests()
 	HMockContestTeam    = CloneHandlerMockContestTeam()
 	HMockEvents         = CloneHandlerMockEvents()
 	HMockEventDetails   = CloneHandlerMockEventDetails()
@@ -44,6 +45,23 @@ func CloneHandlerMockContest() handler.ContestDetail {
 				Name:   hContestTeam.Name,
 				Result: hContestTeam.Result,
 			},
+		},
+	}
+}
+
+func CloneHandlerMockContests() []handler.Contest {
+	var (
+		mContest = CloneMockContest()
+	)
+
+	return []handler.Contest{
+		{
+			Duration: handler.Duration{
+				Since: mContest.Since,
+				Until: &mContest.Until,
+			},
+			Id:   mContest.ID,
+			Name: mContest.Name,
 		},
 	}
 }
