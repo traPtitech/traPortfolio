@@ -11,6 +11,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 // GetGroups GET /groups
@@ -69,7 +70,7 @@ func TestGetGroup(t *testing.T) {
 		},
 		"404": {
 			statusCode: http.StatusNotFound,
-			groupID:    uuid.Nil,
+			groupID:    random.UUID(),
 			want:       handler.ConvertError(t, repository.ErrNotFound),
 		},
 	}
