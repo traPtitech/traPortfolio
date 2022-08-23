@@ -52,6 +52,11 @@ func TestContestHandler_GetContest(t *testing.T) {
 			mockdata.HMockContest.Id,
 			mockdata.HMockContest,
 		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			testutils.HTTPError("bad request: nil id"),
+		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
