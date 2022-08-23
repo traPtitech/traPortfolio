@@ -62,6 +62,7 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 
 func TestGroupService_GetGroup(t *testing.T) {
 	t.Parallel()
+	groupId := random.UUID()
 	type args struct {
 		ctx context.Context
 		id  uuid.UUID
@@ -75,9 +76,9 @@ func TestGroupService_GetGroup(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{ctx: context.Background(), id: random.UUID()},
+			args: args{ctx: context.Background(), id: groupId},
 			want: &domain.GroupDetail{
-				// ID:   random.UUID(),
+				ID:   groupId,
 				Name: random.AlphaNumeric(),
 				Link: random.AlphaNumeric(),
 				Admin: []*domain.User{
@@ -98,15 +99,8 @@ func TestGroupService_GetGroup(t *testing.T) {
 				Description: random.AlphaNumeric(),
 			},
 			setup: func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want *domain.GroupDetail) {
-				want.ID = args.id
-				users := make([]*domain.User, 0)
-				users = append(users, want.Admin[0], &domain.User{
-					ID:       want.Members[0].ID,
-					Name:     want.Members[0].Name,
-					RealName: want.Members[0].RealName,
-				})
-				group.EXPECT().GetGroup(args.id).Return(&domain.GroupDetail{
-					ID:   args.id,
+				group.EXPECT().GetGroup(groupId).Return(&domain.GroupDetail{
+					ID:   groupId,
 					Name: want.Name,
 					Link: want.Link,
 					Admin: []*domain.User{
@@ -122,7 +116,14 @@ func TestGroupService_GetGroup(t *testing.T) {
 					},
 					Description: want.Description,
 				}, nil)
-				user.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return(users, nil)
+				user.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return([]*domain.User{
+					want.Admin[0],
+					{
+						ID:       want.Members[0].ID,
+						Name:     want.Members[0].Name,
+						RealName: want.Members[0].RealName,
+					},
+				}, nil)
 			},
 			assertion: assert.NoError,
 		},
