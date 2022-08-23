@@ -138,7 +138,7 @@ func CreateContest(t *testing.T) {
 	}
 }
 
-func PatchContest(t *testing.T) {
+func EditContest(t *testing.T) {
 }
 
 func DeleteContest(t *testing.T) {
@@ -150,7 +150,7 @@ func GetContestTeam(t *testing.T) {
 func AddContestTeam(t *testing.T) {
 }
 
-func PatchContestTeam(t *testing.T) {
+func EditContestTeam(t *testing.T) {
 }
 
 func GetContestTeamMember(t *testing.T) {
