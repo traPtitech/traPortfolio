@@ -339,14 +339,14 @@ type Group struct {
 
 // GroupDetail defines model for GroupDetail.
 type GroupDetail struct {
+	// 班管理者
+	Admin []User `json:"admin"`
+
 	// 班説明
 	Description string `json:"description"`
 
 	// 班uuid
 	Id uuid.UUID `json:"id"`
-
-	// ユーザー情報
-	Leader User `json:"leader"`
 
 	// 班の詳細が載っているページへのリンク
 	Link string `json:"link"`

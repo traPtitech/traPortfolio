@@ -7,29 +7,17 @@ on:
   pull_request:
 
 jobs:
-  mod:
-    name: Mod
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-          check-latest: true
-          cache: true
-      - name: Download go modules
-        run: go mod download
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [mod]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
+      - name: Download go modules
+        run: go mod download
       - name: Compile go packages
         run: go build -o traPortfolio .
       - uses: actions/upload-artifact@v3
@@ -39,7 +27,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    needs: [mod]
     steps:
       - uses: actions/checkout@v3
       - name: Run linters
@@ -55,7 +42,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Run tests
         run: go test $(go list ./... | grep -v "integration_tests") -coverprofile=coverage_unit.txt -race -vet=off
@@ -86,7 +72,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          check-latest: true
           cache: true
       - name: Run tests
         run: go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off

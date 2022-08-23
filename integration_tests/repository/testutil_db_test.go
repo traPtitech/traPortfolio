@@ -113,6 +113,14 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 func mustMakeProject(t *testing.T, repo repository.ProjectRepository, args *repository.CreateProjectArgs) *domain.Project {
 	t.Helper()
 
+	project := mustMakeProjectDetail(t, repo, args)
+
+	return &project.Project
+}
+
+func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args *repository.CreateProjectArgs) *domain.ProjectDetail {
+	t.Helper()
+
 	if args == nil {
 		args = &repository.CreateProjectArgs{
 			Name:          random.AlphaNumeric(),
