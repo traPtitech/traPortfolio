@@ -14,7 +14,7 @@ import (
 )
 
 // GetContests GET /contests
-func TestContestHandler_GetContests(t *testing.T) {
+func GetContests(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -41,7 +41,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 }
 
 // GetContest GET /contests/:contestID
-func TestContestHandler_GetContest(t *testing.T) {
+func GetContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -80,7 +80,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 }
 
 // CreateContest POST /contests
-func TestContestHandler_CreateContest(t *testing.T) {
+func CreateContest(t *testing.T) {
 	var (
 		name         = random.AlphaNumeric()
 		link         = random.RandURLString()
