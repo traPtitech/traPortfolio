@@ -5,9 +5,13 @@ import (
 )
 
 type Project struct {
-	ID          uuid.UUID
-	Name        string
-	Duration    YearWithSemesterDuration
+	ID       uuid.UUID
+	Name     string
+	Duration YearWithSemesterDuration
+}
+
+type ProjectDetail struct {
+	Project
 	Description string
 	Link        string
 	Members     []*ProjectMember

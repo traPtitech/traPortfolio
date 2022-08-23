@@ -42,34 +42,14 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 				duration := random.Duration()
 				repo := []*domain.Project{
 					{
-						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(),
-						Duration:    duration,
-						Description: random.AlphaNumeric(),
-						Link:        random.RandURLString(),
-						Members: []*domain.ProjectMember{
-							{
-								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(),
-								RealName: random.AlphaNumeric(),
-								Duration: random.Duration(),
-							},
-						},
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						Duration: duration,
 					},
 					{
-						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(),
-						Duration:    duration,
-						Description: random.AlphaNumeric(),
-						Link:        random.RandURLString(),
-						Members: []*domain.ProjectMember{
-							{
-								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(),
-								RealName: random.AlphaNumeric(),
-								Duration: random.Duration(),
-							},
-						},
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						Duration: duration,
 					},
 				}
 
@@ -135,10 +115,12 @@ func TestProjectHandler_GetProject(t *testing.T) {
 			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				duration := random.Duration()
 				projectID := random.UUID()
-				repo := domain.Project{
-					ID:          projectID,
-					Name:        random.AlphaNumeric(),
-					Duration:    duration,
+				repo := domain.ProjectDetail{
+					Project: domain.Project{
+						ID:       projectID,
+						Name:     random.AlphaNumeric(),
+						Duration: duration,
+					},
 					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
 					Members: []*domain.ProjectMember{
