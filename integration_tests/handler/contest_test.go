@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -86,6 +87,7 @@ func CreateContest(t *testing.T) {
 		link         = random.RandURLString()
 		description  = random.AlphaNumeric()
 		since, until = random.SinceAndUntil()
+		invalidUrl   = "invalid url"
 	)
 
 	t.Parallel()
@@ -117,6 +119,21 @@ func CreateContest(t *testing.T) {
 				Teams: []handler.ContestTeam{},
 			},
 		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &invalidUrl,
+				Name: name,
+			},
+			testutils.HTTPError(repository.ErrValidate.Error()),
+		},
+		// TODO: validationもテストする
+		// https://github.com/traPtitech/traPortfolio/pull/391#discussion_r952794355
 	}
 
 	e := echo.New()
