@@ -367,17 +367,25 @@ func TestDeleteProjectMembers(t *testing.T) {
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
-			uuid.Nil,
+			random.UUID(),
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{uuid.Nil},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("bad request: validate error"),
 		},
-		"400 invalid members": {
+		"400 empty members": {
 			http.StatusBadRequest,
-			uuid.Nil,
+			random.UUID(),
 			handler.DeleteProjectMembersJSONRequestBody{},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 empty memberIDs": {
+			http.StatusBadRequest,
+			random.UUID(),
+			handler.DeleteProjectMembersJSONRequestBody{
+				Members: []uuid.UUID{},
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"404 not found": {
 			http.StatusNotFound,
