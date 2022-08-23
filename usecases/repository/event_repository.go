@@ -5,6 +5,7 @@ package repository
 import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 type CreateEventLevelArgs struct {
@@ -13,7 +14,7 @@ type CreateEventLevelArgs struct {
 }
 
 type UpdateEventLevelArgs struct {
-	Level domain.EventLevel
+	Level optional.Uint8
 }
 
 type EventRepository interface {

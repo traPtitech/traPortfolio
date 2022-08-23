@@ -47,9 +47,9 @@ func TestProjectRepository_GetProject(t *testing.T) {
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
-	var projects []*domain.Project
+	var projects []*domain.ProjectDetail
 	for i := 0; i < projectNum; i++ {
-		projects = append(projects, mustMakeProject(t, repo, nil))
+		projects = append(projects, mustMakeProjectDetail(t, repo, nil))
 	}
 
 	opt := cmpopts.EquateEmpty()
@@ -74,8 +74,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	h := testutils.SetupDB(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProject(t, repo, nil)
-	mustMakeProject(t, repo, nil)
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	mustMakeProjectDetail(t, repo, nil)
 
 	arg1 := urepository.UpdateProjectArgs{
 		Name:          random.OptAlphaNumeric(),
@@ -127,8 +127,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProject(t, repo, nil)
-	project2 := mustMakeProject(t, repo, nil)
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	project2 := mustMakeProjectDetail(t, repo, nil)
 	user1 := &domain.User{
 		ID:       mockdata.MockUsers[1].ID,
 		Name:     mockdata.MockUsers[1].Name,
@@ -169,8 +169,8 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProject(t, repo, nil)
-	project2 := mustMakeProject(t, repo, nil)
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	project2 := mustMakeProjectDetail(t, repo, nil)
 	user1 := &domain.User{
 		ID:       mockdata.MockUsers[1].ID,
 		Name:     mockdata.MockUsers[1].Name,

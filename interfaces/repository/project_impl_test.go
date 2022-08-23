@@ -41,19 +41,16 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			name: "Success",
 			want: []*domain.Project{
 				{
-					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(),
-					Duration:    random.Duration(),
-					Description: random.AlphaNumeric(),
-					Link:        random.RandURLString(),
-					Members:     nil,
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					Duration: random.Duration(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, want []*domain.Project) {
-				rows := sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"})
+				rows := sqlmock.NewRows([]string{"id", "name", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, v := range want {
 					d := v.Duration
-					rows.AddRow(v.ID, v.Name, v.Description, v.Link, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
+					rows.AddRow(v.ID, v.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects`")).
@@ -99,8 +96,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      *domain.Project
-		setup     func(f mockProjectRepositoryFields, args args, want *domain.Project)
+		want      *domain.ProjectDetail
+		setup     func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -108,10 +105,12 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			args: args{
 				id: pid,
 			},
-			want: &domain.Project{
-				ID:          pid,
-				Name:        random.AlphaNumeric(),
-				Duration:    random.Duration(),
+			want: &domain.ProjectDetail{
+				Project: domain.Project{
+					ID:       pid,
+					Name:     random.AlphaNumeric(),
+					Duration: random.Duration(),
+				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
@@ -123,7 +122,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					},
 				},
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				wd := want.Duration
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
@@ -162,10 +161,12 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			args: args{
 				id: pid,
 			},
-			want: &domain.Project{
-				ID:          pid,
-				Name:        random.AlphaNumeric(),
-				Duration:    random.Duration(),
+			want: &domain.ProjectDetail{
+				Project: domain.Project{
+					ID:       pid,
+					Name:     random.AlphaNumeric(),
+					Duration: random.Duration(),
+				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
 				Members: []*domain.ProjectMember{
@@ -183,7 +184,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					},
 				},
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				wd := want.Duration
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
@@ -228,7 +229,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.id).
@@ -242,7 +243,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				d := random.Duration()
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
@@ -273,7 +274,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				d := random.Duration()
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
@@ -358,8 +359,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      *domain.Project
-		setup     func(f mockProjectRepositoryFields, args args, want *domain.Project)
+		want      *domain.ProjectDetail
+		setup     func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -367,23 +368,25 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			args: args{
 				project: successProject,
 			},
-			want: &domain.Project{
-				// ID: 比較しない
-				Name: successProject.Name,
-				Duration: domain.YearWithSemesterDuration{
-					Since: domain.YearWithSemester{
-						Year:     successProject.SinceYear,
-						Semester: successProject.SinceSemester,
-					},
-					Until: domain.YearWithSemester{
-						Year:     successProject.UntilYear,
-						Semester: successProject.UntilSemester,
+			want: &domain.ProjectDetail{
+				Project: domain.Project{
+					// ID: 比較しない
+					Name: successProject.Name,
+					Duration: domain.YearWithSemesterDuration{
+						Since: domain.YearWithSemester{
+							Year:     successProject.SinceYear,
+							Semester: successProject.SinceSemester,
+						},
+						Until: domain.YearWithSemester{
+							Year:     successProject.UntilYear,
+							Semester: successProject.UntilSemester,
+						},
 					},
 				},
 				Description: successProject.Description,
 				Link:        successProject.Link.String,
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				f.h.Mock.ExpectBegin()
 				p := args.project
 				f.h.Mock.
@@ -408,7 +411,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				},
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want *domain.Project) {
+			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				f.h.Mock.ExpectBegin()
 				p := args.project
 				f.h.Mock.
@@ -675,6 +678,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 func TestProjectRepository_AddProjectMembers(t *testing.T) {
 	duration := random.Duration()
+	duplicatedMemberID := random.UUID()
 
 	t.Parallel()
 	type args struct {
@@ -759,6 +763,30 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			args: args{
 				projectID:      random.UUID(),
 				projectMembers: nil,
+			},
+			setup:     func(f mockProjectRepositoryFields, args args) {},
+			assertion: assert.Error,
+		},
+		{
+			name: "duplicatedMembers",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        duplicatedMemberID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+					{
+						UserID:        duplicatedMemberID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+				},
 			},
 			setup:     func(f mockProjectRepositoryFields, args args) {},
 			assertion: assert.Error,
