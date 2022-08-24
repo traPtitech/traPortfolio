@@ -92,18 +92,11 @@ jobs:
         with:
           files: ./coverage_unit.txt
           flags: unit
-          path_to_write_report: ./unit.txt
       - name: Upload coverage data (Integration)
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage_integration.txt
           flags: integration
-          path_to_write_report: ./integration.txt
-      - name:
-        uses: actions/upload-artifact@v3
-        with:
-          name: codecov_reports
-          path: ./codecov_reports
   tbls:
     name: TBLS
     runs-on: ubuntu-latest
