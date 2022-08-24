@@ -67,14 +67,14 @@ func Time() time.Time {
 	return time.UnixMicro(sec).In(time.UTC)
 }
 
-func URL(useHTTPS bool, domainLength uint16) *url.URL {
+func URL(useHTTPS bool, domainLength int) *url.URL {
 	scheme := "https"
 	if !useHTTPS {
 		scheme = "http"
 	}
 	scheme += "://"
 
-	scheme += AlphaNumericn(int(domainLength))
+	scheme += AlphaNumericn(domainLength)
 	url, err := url.Parse(scheme)
 	if err != nil {
 		panic(err)
@@ -83,7 +83,7 @@ func URL(useHTTPS bool, domainLength uint16) *url.URL {
 }
 
 func RandURLString() string {
-	return URL(rand.Intn(2) < 1, uint16(rand.Intn(20)+1)).String()
+	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
 }
 
 func Duration() domain.YearWithSemesterDuration {
