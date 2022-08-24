@@ -665,7 +665,7 @@ func TestGetUserGroups(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserGroups,
+			mockdata.HMockUsersGroups[0],
 		},
 		"200 no groups with existing userID": {
 			http.StatusOK,

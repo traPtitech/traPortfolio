@@ -15,9 +15,9 @@ var (
 	MockContestTeam              = CloneMockContestTeam()
 	MockContestTeamUserBelonging = CloneMockContestTeam()
 	MockEventLevelRelations      = CloneMockEventLevelRelations()
-	MockGroup                    = CloneMockGroup()
-	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
-	MockGroupUserAdmin           = CloneMockGroupUserAdmin()
+	MockGroups                   = CloneMockGroups()
+	MockGroupUserBelongings      = CloneMockGroupUserBelongings()
+	MockGroupUserAdmins          = CloneMockGroupUserAdmins()
 	MockProjects                 = CloneMockProjects()
 	MockProjectMembers           = CloneMockProjectMembers()
 )
@@ -98,27 +98,31 @@ func CloneMockEventLevelRelations() []model.EventLevelRelation {
 	}
 }
 
-func CloneMockGroup() model.Group {
-	return model.Group{
-		GroupID:     groupID.uuid(),
-		Name:        "sample_group_name",
-		Link:        "https://sample.groups.com",
-		Description: "sample_group_description",
+func CloneMockGroups() []model.Group {
+	return []model.Group{
+		{
+			GroupID:     groupID.uuid(),
+			Name:        "sample_group_name",
+			Link:        "https://sample.groups.com",
+			Description: "sample_group_description",
+		},
 	}
 }
 
-func CloneMockGroupUserBelonging() model.GroupUserBelonging {
-	return model.GroupUserBelonging{
-		UserID:        userID1.uuid(),
-		GroupID:       MockGroup.GroupID,
-		SinceYear:     2022,
-		SinceSemester: 0,
-		UntilYear:     2022,
-		UntilSemester: 1,
+func CloneMockGroupUserBelongings() []model.GroupUserBelonging {
+	return []model.GroupUserBelonging{
+		{
+			UserID:        userID1.uuid(),
+			GroupID:       groupID.uuid(),
+			SinceYear:     2022,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
 	}
 }
 
-func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
+func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 	return []model.GroupUserAdmin{
 		{
 			UserID:  userID1.uuid(),
@@ -225,13 +229,13 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockGroup := CloneMockGroup()
-	if err := h.Create(&mockGroup).Error(); err != nil {
+	mockGroups := CloneMockGroups()
+	if err := h.Create(&mockGroups).Error(); err != nil {
 		return err
 	}
 
-	mockGroupUserBelonging := CloneMockGroupUserBelonging()
-	if err := h.Create(&mockGroupUserBelonging).Error(); err != nil {
+	mockGroupUserBelongings := CloneMockGroupUserBelongings()
+	if err := h.Create(&mockGroupUserBelongings).Error(); err != nil {
 		return err
 	}
 
@@ -240,8 +244,8 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockGroupUserAdmin := CloneMockGroupUserAdmin()
-	if err := h.Create(&mockGroupUserAdmin).Error(); err != nil {
+	mockGroupUserAdmins := CloneMockGroupUserAdmins()
+	if err := h.Create(&mockGroupUserAdmins).Error(); err != nil {
 		return err
 	}
 
