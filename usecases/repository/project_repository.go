@@ -41,7 +41,7 @@ type ProjectRepository interface {
 	GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error)
 	CreateProject(args *CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(projectID uuid.UUID, args *UpdateProjectArgs) error
-	GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error)
+	GetProjectMembers(projectID uuid.UUID) ([]*domain.ProjectMember, error)
 	AddProjectMembers(projectID uuid.UUID, args []*CreateProjectMemberArgs) error
 	DeleteProjectMembers(projectID uuid.UUID, memberIDs []uuid.UUID) error
 }

@@ -15,7 +15,7 @@ type ProjectService interface {
 	GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error)
 	CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error
-	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error)
+	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.ProjectMember, error)
 	AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error
 	DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error
 }
@@ -89,7 +89,7 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 	return nil
 }
 
-func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error) {
+func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.ProjectMember, error) {
 	members, err := s.repo.GetProjectMembers(projectID)
 	if err != nil {
 		return nil, err

@@ -383,8 +383,8 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.User
-		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User)
+		want      []*domain.ProjectMember
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.ProjectMember)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -393,14 +393,14 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 			},
-			want: []*domain.User{
+			want: []*domain.ProjectMember{
 				{
-					ID:       random.UUID(),
+					UserID:   random.UUID(),
 					Name:     random.AlphaNumeric(),
 					RealName: random.AlphaNumeric(),
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.ProjectMember) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
@@ -412,7 +412,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.ProjectMember) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
