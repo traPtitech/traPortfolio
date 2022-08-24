@@ -84,16 +84,19 @@ jobs:
       - test-integration
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverages
       - name: Upload coverage data (Unit)
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage_unit.txt
+          files: ./coveraes/coverage_unit.txt
           flags: unit
           path_to_write_report: ./codecov_reports/unit.txt
       - name: Upload coverage data (Integration)
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage_integration.txt
+          files: ./coverages/coverage_integration.txt
           flags: integration
           path_to_write_report: ./codecov_reports/integration.txt
       - name:
