@@ -82,7 +82,7 @@ func TestGetGroup(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroup), tt.groupID)
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroup, tt.groupID), nil)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
