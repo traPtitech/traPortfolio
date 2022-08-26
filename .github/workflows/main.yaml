@@ -36,7 +36,8 @@ jobs:
   test-unit:
     name: Test (Unit)
     runs-on: ubuntu-latest
-    needs: [build]
+    needs:
+      - build
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -45,11 +46,6 @@ jobs:
           cache: true
       - name: Run tests
         run: go test $(go list ./... | grep -v "integration_tests") -coverprofile=coverage_unit.txt -race -vet=off
-      - name: Upload coverage data
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./coverage_unit.txt
-          flags: unit
       - uses: actions/upload-artifact@v3
         with:
           name: coverages
@@ -57,7 +53,8 @@ jobs:
   test-integration:
     name: Test (Integration)
     runs-on: ubuntu-latest
-    needs: [build]
+    needs:
+      - build
     services:
       mysql:
         image: mariadb:10.6.4
@@ -75,19 +72,36 @@ jobs:
           cache: true
       - name: Run tests
         run: go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off
-      - name: Upload coverage data
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./coverage_integration.txt
-          flags: integration
       - uses: actions/upload-artifact@v3
         with:
           name: coverages
           path: coverage_integration.txt
+  upload-codecov:
+    name: Analyze coverages
+    runs-on: ubuntu-latest
+    needs:
+      - test-unit
+      - test-integration
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverages
+      - name: Upload coverage data (Unit)
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage_unit.txt
+          flags: unit
+      - name: Upload coverage data (Integration)
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage_integration.txt
+          flags: integration
   tbls:
     name: TBLS
     runs-on: ubuntu-latest
-    needs: [build]
+    needs:
+      - build
     services:
       mysql:
         image: mariadb:10.6.4
