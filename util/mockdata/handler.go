@@ -6,23 +6,23 @@ import (
 )
 
 var (
-	HMockContest        = CloneHandlerMockContest()
-	HMockContests       = CloneHandlerMockContests()
-	HMockContestTeam    = CloneHandlerMockContestTeam()
-	HMockEvents         = CloneHandlerMockEvents()
-	HMockEventDetails   = CloneHandlerMockEventDetails()
-	HMockGroups         = CloneHandlerMockGroups()
-	HMockGroupsMembers  = CloneHandlerMockGroupsMembers()
-	HMockProjects       = CloneHandlerMockProjects()
-	HMockProjectDetails = CloneHandlerMockProjectDetails()
-	HMockProjectMembers = CloneHandlerMockProjectMembers()
-	HMockUsers          = CloneHandlerMockUsers()
-	HMockUserDetails    = CloneHandlerMockUserDetails()
-	HMockUserAccounts   = CloneHandlerMockUserAccounts()
-	HMockUserEvents     = CloneHandlerMockUserEvents()
-	HMockUserContests   = CloneHandlerMockUserContests()
-	HMockUsersGroups    = CloneHandlerMockUsersGroups()
-	HMockUserProjects   = CloneHandlerMockUserProjects()
+	HMockContest           = CloneHandlerMockContest()
+	HMockContests          = CloneHandlerMockContests()
+	HMockContestTeam       = CloneHandlerMockContestTeam()
+	HMockEvents            = CloneHandlerMockEvents()
+	HMockEventDetails      = CloneHandlerMockEventDetails()
+	HMockGroups            = CloneHandlerMockGroups()
+	HMockGroupsMembersByID = CloneHandlerMockGroupsMembersByID()
+	HMockProjects          = CloneHandlerMockProjects()
+	HMockProjectDetails    = CloneHandlerMockProjectDetails()
+	HMockProjectMembers    = CloneHandlerMockProjectMembers()
+	HMockUsers             = CloneHandlerMockUsers()
+	HMockUserDetails       = CloneHandlerMockUserDetails()
+	HMockUserAccounts      = CloneHandlerMockUserAccounts()
+	HMockUserEvents        = CloneHandlerMockUserEvents()
+	HMockUserContests      = CloneHandlerMockUserContests()
+	HMockUsersGroupsByID   = CloneHandlerMockUsersGroupsByID()
+	HMockUserProjects      = CloneHandlerMockUserProjects()
 )
 
 func CloneHandlerMockContest() handler.ContestDetail {
@@ -162,7 +162,7 @@ func CloneHandlerMockEventDetails() []handler.EventDetail {
 func CloneHandlerMockGroups() []handler.GroupDetail {
 	var (
 		mGroups        = CloneMockGroups()
-		hGroupsMembers = CloneHandlerMockGroupsMembers()
+		hGroupsMembers = CloneHandlerMockGroupsMembersByID()
 		mGroupAdmins   = CloneMockGroupUserAdmins()
 		hGroups        = make([]handler.GroupDetail, len(mGroups))
 	)
@@ -179,7 +179,7 @@ func CloneHandlerMockGroups() []handler.GroupDetail {
 			Id:          g.GroupID,
 			Admin:       mAdmins,
 			Link:        g.Link,
-			Members:     hGroupsMembers[i],
+			Members:     hGroupsMembers[g.GroupID],
 			Name:        g.Name,
 		}
 	}
@@ -187,18 +187,18 @@ func CloneHandlerMockGroups() []handler.GroupDetail {
 	return hGroups
 }
 
-func CloneHandlerMockGroupsMembers() [][]handler.GroupMember {
+func CloneHandlerMockGroupsMembersByID() map[uuid.UUID][]handler.GroupMember {
 	var (
 		mGroups              = CloneMockGroups()
 		mGroupUserbelongings = CloneMockGroupUserBelongings()
-		hGroupMembers        = make([][]handler.GroupMember, len(mGroups))
+		hGroupMembers        = make(map[uuid.UUID][]handler.GroupMember, len(mGroups))
 	)
 
 	for _, gub := range mGroupUserbelongings {
-		for j, g := range mGroups {
+		for _, g := range mGroups {
 			if gub.GroupID == g.GroupID {
 				hUser := getUser(gub.UserID)
-				hGroupMembers[j] = append(hGroupMembers[j],
+				hGroupMembers[g.GroupID] = append(hGroupMembers[g.GroupID],
 					handler.GroupMember{
 						Duration: handler.YearWithSemesterDuration{
 							Since: handler.YearWithSemester{
@@ -401,19 +401,19 @@ func CloneHandlerMockUserContests() []handler.ContestTeamWithContestName {
 	}
 }
 
-func CloneHandlerMockUsersGroups() [][]handler.UserGroup {
+func CloneHandlerMockUsersGroupsByID() map[uuid.UUID][]handler.UserGroup {
 	var (
 		hUsers        = CloneHandlerMockUsers()
 		hGroups       = CloneHandlerMockGroups()
-		hGroupMembers = CloneHandlerMockGroupsMembers()
-		hUserGroups   = make([][]handler.UserGroup, len(hUsers))
+		hGroupMembers = CloneHandlerMockGroupsMembersByID()
+		hUserGroups   = make(map[uuid.UUID][]handler.UserGroup, len(hUsers))
 	)
 
-	for i, u := range hUsers {
-		for j, g := range hGroups {
-			for _, gm := range hGroupMembers[j] {
+	for _, u := range hUsers {
+		for _, g := range hGroups {
+			for _, gm := range hGroupMembers[g.Id] {
 				if u.Id == gm.Id {
-					hUserGroups[i] = append(hUserGroups[i], handler.UserGroup{
+					hUserGroups[u.Id] = append(hUserGroups[u.Id], handler.UserGroup{
 						Duration: gm.Duration,
 						Id:       g.Id,
 						Name:     g.Name,
