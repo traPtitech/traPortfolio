@@ -11,9 +11,9 @@ import (
 var (
 	MockUsers                    = CloneMockUsers()
 	MockAccount                  = CloneMockAccount()
-	MockContest                  = CloneMockContest()
-	MockContestTeam              = CloneMockContestTeam()
-	MockContestTeamUserBelonging = CloneMockContestTeam()
+	MockContests                 = CloneMockContests()
+	MockContestTeams             = CloneMockContestTeams()
+	MockContestTeamUserBelonging = CloneMockContestTeamUserBelonging()
 	MockEventLevelRelations      = CloneMockEventLevelRelations()
 	MockGroups                   = CloneMockGroups()
 	MockGroupUserBelongings      = CloneMockGroupUserBelongings()
@@ -56,32 +56,38 @@ func CloneMockAccount() model.Account {
 	}
 }
 
-func CloneMockContest() model.Contest {
-	return model.Contest{
-		ID:          contestID.uuid(),
-		Name:        "sample_contest_name",
-		Description: "sample_contest_description",
-		Link:        "https://sample.contests.com",
-		Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
-		Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+func CloneMockContests() []model.Contest {
+	return []model.Contest{
+		{
+			ID:          contestID.uuid(),
+			Name:        "sample_contest_name",
+			Description: "sample_contest_description",
+			Link:        "https://sample.contests.com",
+			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+		},
 	}
 }
 
-func CloneMockContestTeam() model.ContestTeam {
-	return model.ContestTeam{
-		ID:          contestTeamID.uuid(),
-		ContestID:   contestID.uuid(),
-		Name:        "sample_contest_team_name",
-		Description: "sample_contest_team_description",
-		Result:      "sample_contest_team_result",
-		Link:        "https://sample.contest_teams.com",
+func CloneMockContestTeams() []model.ContestTeam {
+	return []model.ContestTeam{
+		{
+			ID:          contestTeamID.uuid(),
+			ContestID:   contestID.uuid(),
+			Name:        "sample_contest_team_name",
+			Description: "sample_contest_team_description",
+			Result:      "sample_contest_team_result",
+			Link:        "https://sample.contest_teams.com",
+		},
 	}
 }
 
-func CloneMockContestTeamUserBelonging() model.ContestTeamUserBelonging {
-	return model.ContestTeamUserBelonging{
-		TeamID: contestTeamID.uuid(),
-		UserID: userID1.uuid(),
+func CloneMockContestTeamUserBelonging() []model.ContestTeamUserBelonging {
+	return []model.ContestTeamUserBelonging{
+		{
+			TeamID: contestTeamID.uuid(),
+			UserID: userID1.uuid(),
+		},
 	}
 }
 
@@ -209,13 +215,13 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockContest := CloneMockContest()
-	if err := h.Create(&mockContest).Error(); err != nil {
+	mockContests := CloneMockContests()
+	if err := h.Create(&mockContests).Error(); err != nil {
 		return err
 	}
 
-	mockContestTeam := CloneMockContestTeam()
-	if err := h.Create(&mockContestTeam).Error(); err != nil {
+	mockContestTeams := CloneMockContestTeams()
+	if err := h.Create(&mockContestTeams).Error(); err != nil {
 		return err
 	}
 
