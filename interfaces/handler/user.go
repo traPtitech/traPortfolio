@@ -33,6 +33,7 @@ func (handler *UserHandler) GetUsers(_c echo.Context) error {
 	args := repository.GetUsersArgs{
 		IncludeSuspended: optional.BoolFrom((*bool)(req.IncludeSuspended)),
 		Name:             optional.StringFrom((*string)(req.Name)),
+		Limit:			  optional.Int64From((*int64)(req.Limit)),
 	}
 
 	users, err := handler.srv.GetUsers(ctx, &args)

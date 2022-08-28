@@ -39,6 +39,13 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 
 func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
+
+	limit := -1
+
+	if lv := args.Limit.Valid; lv {
+		limit = int(args.Limit.Int64)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +103,10 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 					RealName: v.RealName,
 				})
 			}
+		}
+
+		if (limit != -1) && (len(users) > limit) {
+			return result[:limit], nil
 		}
 
 		return result, nil
