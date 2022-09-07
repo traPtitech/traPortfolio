@@ -25,19 +25,19 @@ var (
 func CloneMockUsers() []*model.User {
 	return []*model.User{
 		{
-			ID:          userID1.uuid(),
+			ID:          UserID1(),
 			Description: "I am user1",
 			Check:       true,
 			Name:        userName1,
 		},
 		{
-			ID:          userID2.uuid(),
+			ID:          UserID2(),
 			Description: "I am user2",
 			Check:       true,
 			Name:        userName2,
 		},
 		{
-			ID:          userID3.uuid(),
+			ID:          UserID3(),
 			Description: "I am lolico",
 			Check:       false,
 			Name:        userName3,
@@ -47,11 +47,11 @@ func CloneMockUsers() []*model.User {
 
 func CloneMockAccount() model.Account {
 	return model.Account{
-		ID:     accountID.uuid(),
+		ID:     AccountID(),
 		Type:   0,
 		Name:   "sample_account_display_name",
 		URL:    "https://sample.accounts.com",
-		UserID: userID1.uuid(),
+		UserID: UserID1(),
 		Check:  true,
 	}
 }
@@ -59,7 +59,7 @@ func CloneMockAccount() model.Account {
 func CloneMockContests() []model.Contest {
 	return []model.Contest{
 		{
-			ID:          contestID.uuid(),
+			ID:          ContestID(),
 			Name:        "sample_contest_name",
 			Description: "sample_contest_description",
 			Link:        "https://sample.contests.com",
@@ -72,8 +72,8 @@ func CloneMockContests() []model.Contest {
 func CloneMockContestTeams() []model.ContestTeam {
 	return []model.ContestTeam{
 		{
-			ID:          contestTeamID.uuid(),
-			ContestID:   contestID.uuid(),
+			ID:          ContestTeamID(),
+			ContestID:   ContestID(),
 			Name:        "sample_contest_team_name",
 			Description: "sample_contest_team_description",
 			Result:      "sample_contest_team_result",
@@ -85,8 +85,8 @@ func CloneMockContestTeams() []model.ContestTeam {
 func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 	return []model.ContestTeamUserBelonging{
 		{
-			TeamID: contestTeamID.uuid(),
-			UserID: userID1.uuid(),
+			TeamID: ContestTeamID(),
+			UserID: UserID1(),
 		},
 	}
 }
@@ -94,11 +94,11 @@ func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 func CloneMockEventLevelRelations() []model.EventLevelRelation {
 	return []model.EventLevelRelation{
 		{
-			ID:    knoqEventID1.uuid(),
+			ID:    KnoqEventID1(),
 			Level: domain.EventLevelPublic,
 		},
 		{
-			ID:    knoqEventID2.uuid(),
+			ID:    KnoqEventID2(),
 			Level: domain.EventLevelPrivate,
 		},
 	}
@@ -107,7 +107,7 @@ func CloneMockEventLevelRelations() []model.EventLevelRelation {
 func CloneMockGroups() []model.Group {
 	return []model.Group{
 		{
-			GroupID:     groupID.uuid(),
+			GroupID:     GroupID(),
 			Name:        "sample_group_name",
 			Link:        "https://sample.groups.com",
 			Description: "sample_group_description",
@@ -118,8 +118,8 @@ func CloneMockGroups() []model.Group {
 func CloneMockGroupUserBelongings() []model.GroupUserBelonging {
 	return []model.GroupUserBelonging{
 		{
-			UserID:        userID1.uuid(),
-			GroupID:       groupID.uuid(),
+			UserID:        UserID1(),
+			GroupID:       GroupID(),
 			SinceYear:     2022,
 			SinceSemester: 0,
 			UntilYear:     2022,
@@ -131,8 +131,8 @@ func CloneMockGroupUserBelongings() []model.GroupUserBelonging {
 func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 	return []model.GroupUserAdmin{
 		{
-			UserID:  userID1.uuid(),
-			GroupID: groupID.uuid(),
+			UserID:  UserID1(),
+			GroupID: GroupID(),
 		},
 	}
 }
@@ -140,7 +140,7 @@ func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 func CloneMockProjects() []*model.Project {
 	return []*model.Project{
 		{
-			ID:            projectID1.uuid(),
+			ID:            ProjectID1(),
 			Name:          "sample_project_name1",
 			Description:   "sample_project_description1",
 			Link:          "https://sample.project1.com",
@@ -150,7 +150,7 @@ func CloneMockProjects() []*model.Project {
 			UntilSemester: 1,
 		},
 		{
-			ID:            projectID2.uuid(),
+			ID:            ProjectID2(),
 			Name:          "sample_project_name2",
 			Description:   "sample_project_description2",
 			Link:          "https://sample.project2.com",
@@ -160,7 +160,7 @@ func CloneMockProjects() []*model.Project {
 			UntilSemester: 1,
 		},
 		{
-			ID:            projectID3.uuid(),
+			ID:            ProjectID3(),
 			Name:          "sample_project_name3",
 			Description:   "sample_project_description3",
 			Link:          "https://sample.project3.com",
@@ -175,27 +175,27 @@ func CloneMockProjects() []*model.Project {
 func CloneMockProjectMembers() []*model.ProjectMember {
 	return []*model.ProjectMember{
 		{
-			ID:            projectMemberID1.uuid(),
-			ProjectID:     projectID1.uuid(),
-			UserID:        userID1.uuid(),
+			ID:            ProjectMemberID1(),
+			ProjectID:     ProjectID1(),
+			UserID:        UserID1(),
 			SinceYear:     2021,
 			SinceSemester: 0,
 			UntilYear:     2021,
 			UntilSemester: 1,
 		},
 		{
-			ID:            projectMemberID2.uuid(),
-			ProjectID:     projectID1.uuid(),
-			UserID:        userID2.uuid(),
+			ID:            ProjectMemberID2(),
+			ProjectID:     ProjectID1(),
+			UserID:        UserID2(),
 			SinceYear:     2022,
 			SinceSemester: 0,
 			UntilYear:     2022,
 			UntilSemester: 1,
 		},
 		{
-			ID:            projectMemberID3.uuid(),
-			ProjectID:     projectID2.uuid(),
-			UserID:        userID2.uuid(),
+			ID:            ProjectMemberID3(),
+			ProjectID:     ProjectID2(),
+			UserID:        UserID2(),
 			SinceYear:     2021,
 			SinceSemester: 0,
 			UntilYear:     2022,
