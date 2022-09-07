@@ -14,14 +14,6 @@ type GroupDetail struct {
 	Name        string
 	Link        string
 	Admin       []*User
-	Members     []*GroupMember
+	Members     []*UserWithDuration
 	Description string
-}
-
-// GroupMember indicates User who belongs to Group
-type GroupMember struct {
-	ID       uuid.UUID // User ID
-	Name     string    // User Name
-	RealName string
-	Duration YearWithSemesterDuration
 }

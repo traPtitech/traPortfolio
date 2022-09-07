@@ -49,9 +49,9 @@ func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain
 
 	// fill members info
 	for i, v := range groups.Members {
-		if u, ok := umap[v.ID]; ok {
-			groups.Members[i].Name = u.Name
-			groups.Members[i].RealName = u.RealName
+		if u, ok := umap[v.User.ID]; ok {
+			groups.Members[i].User.Name = u.Name
+			groups.Members[i].User.RealName = u.RealName
 		}
 	}
 
