@@ -9,17 +9,17 @@ import (
 )
 
 var (
-	MockUsers                    = CloneMockUsers()
-	MockAccount                  = CloneMockAccount()
-	MockContests                 = CloneMockContests()
-	MockContestTeams             = CloneMockContestTeams()
-	MockContestTeamUserBelonging = CloneMockContestTeamUserBelonging()
-	MockEventLevelRelations      = CloneMockEventLevelRelations()
-	MockGroups                   = CloneMockGroups()
-	MockGroupUserBelongings      = CloneMockGroupUserBelongings()
-	MockGroupUserAdmins          = CloneMockGroupUserAdmins()
-	MockProjects                 = CloneMockProjects()
-	MockProjectMembers           = CloneMockProjectMembers()
+	MockUsers                     = CloneMockUsers()
+	MockAccount                   = CloneMockAccount()
+	MockContests                  = CloneMockContests()
+	MockContestTeams              = CloneMockContestTeams()
+	MockContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
+	MockEventLevelRelations       = CloneMockEventLevelRelations()
+	MockGroups                    = CloneMockGroups()
+	MockGroupUserBelongings       = CloneMockGroupUserBelongings()
+	MockGroupUserAdmins           = CloneMockGroupUserAdmins()
+	MockProjects                  = CloneMockProjects()
+	MockProjectMembers            = CloneMockProjectMembers()
 )
 
 func CloneMockUsers() []*model.User {
@@ -82,7 +82,7 @@ func CloneMockContestTeams() []model.ContestTeam {
 	}
 }
 
-func CloneMockContestTeamUserBelonging() []model.ContestTeamUserBelonging {
+func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 	return []model.ContestTeamUserBelonging{
 		{
 			TeamID: contestTeamID.uuid(),
@@ -225,8 +225,8 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockContestTeamUserBelonging := CloneMockContestTeamUserBelonging()
-	if err := h.Create(&mockContestTeamUserBelonging).Error(); err != nil {
+	mockContestTeamUserBelongings := CloneMockContestTeamUserBelongings()
+	if err := h.Create(&mockContestTeamUserBelongings).Error(); err != nil {
 		return err
 	}
 

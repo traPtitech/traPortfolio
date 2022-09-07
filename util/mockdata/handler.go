@@ -75,14 +75,14 @@ func CloneHandlerMockContests() []handler.Contest {
 
 func CloneHandlerMockContestTeamsByID() map[uuid.UUID]handler.ContestTeamDetail {
 	var (
-		mContestTeams             = CloneMockContestTeams()
-		mContestTeamUserBelonging = CloneMockContestTeamUserBelonging()
-		hContestTeamDetails       = make(map[uuid.UUID]handler.ContestTeamDetail)
+		mContestTeams              = CloneMockContestTeams()
+		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
+		hContestTeamDetails        = make(map[uuid.UUID]handler.ContestTeamDetail)
 	)
 
 	for _, ct := range mContestTeams {
-		hUsers := make([]handler.User, len(mContestTeamUserBelonging))
-		for _, u := range mContestTeamUserBelonging {
+		hUsers := make([]handler.User, len(mContestTeamUserBelongings))
+		for _, u := range mContestTeamUserBelongings {
 			if u.TeamID == ct.ID {
 				hUsers = append(hUsers, getUser(u.UserID))
 			}
@@ -399,7 +399,7 @@ func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.ContestTeamWithC
 		uUsers              = CloneMockUsers()
 		hContests           = CloneHandlerMockContests()
 		hContestTeams       = CloneHandlerMockContestTeamsByID()
-		mContestTeamMembers = CloneMockContestTeamUserBelonging()
+		mContestTeamMembers = CloneMockContestTeamUserBelongings()
 		hUserContests       = make(map[uuid.UUID][]handler.ContestTeamWithContestName, len(hContests))
 	)
 
