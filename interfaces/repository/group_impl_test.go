@@ -104,7 +104,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 						// RealName: random.AlphaNumeric(),
 					},
 				},
-				Members: []*domain.UserGroup{
+				Members: []*domain.GroupMember{
 					{
 						ID: random.UUID(),
 						// Name:     random.AlphaNumeric(),
@@ -161,7 +161,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 						ID: random.UUID(),
 					},
 				},
-				Members: []*domain.UserGroup{
+				Members: []*domain.GroupMember{
 					{
 						ID:       random.UUID(),
 						Duration: random.Duration(),

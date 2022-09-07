@@ -88,7 +88,7 @@ func TestGroupService_GetGroup(t *testing.T) {
 						RealName: random.AlphaNumeric(),
 					},
 				},
-				Members: []*domain.UserGroup{
+				Members: []*domain.GroupMember{
 					{
 						ID:       random.UUID(),
 						Name:     random.AlphaNumeric(),
@@ -108,7 +108,7 @@ func TestGroupService_GetGroup(t *testing.T) {
 							ID: want.Admin[0].ID,
 						},
 					},
-					Members: []*domain.UserGroup{
+					Members: []*domain.GroupMember{
 						{
 							ID:       want.Members[0].ID,
 							Duration: want.Members[0].Duration,

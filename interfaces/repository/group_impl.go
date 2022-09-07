@@ -51,9 +51,9 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	// Name, RealNameはusecasesでPortalから取得する
-	erMembers := make([]*domain.UserGroup, 0, len(users))
+	erMembers := make([]*domain.GroupMember, 0, len(users))
 	for _, v := range users {
-		erMembers = append(erMembers, &domain.UserGroup{
+		erMembers = append(erMembers, &domain.GroupMember{
 			ID: v.UserID,
 			// Name:     v.Name,
 			// RealName: v.RealName,
