@@ -621,7 +621,7 @@ func TestGetUserContests(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserContests,
+			mockdata.HMockUserContestsByID[mockdata.HMockUsers[0].Id],
 		},
 		"200 no contests with existing userID": {
 			http.StatusOK,
