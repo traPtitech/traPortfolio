@@ -10,6 +10,11 @@ type User struct {
 	RealName string
 }
 
+type UserWithDuration struct {
+	User     User
+	Duration YearWithSemesterDuration
+}
+
 type Account struct {
 	ID          uuid.UUID
 	DisplayName string

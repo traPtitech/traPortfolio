@@ -416,8 +416,8 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	project2 := mustMakeProject(t, projectRepo, nil)
 	user1 := mockdata.MockUsers[2]
 
-	expected1 := []*domain.ProjectMember{}
-	expected2 := []*domain.ProjectMember{}
+	expected1 := []*domain.UserWithDuration{}
+	expected2 := []*domain.UserWithDuration{}
 	users1, err := projectRepo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	users2, err := projectRepo.GetProjectMembers(project2.ID)

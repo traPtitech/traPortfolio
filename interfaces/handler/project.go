@@ -54,7 +54,7 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 	members := make([]ProjectMember, len(project.Members))
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
-			newUser(v.UserID, v.Name, v.RealName),
+			newUser(v.User.ID, v.User.Name, v.User.RealName),
 			ConvertDuration(v.Duration),
 		)
 	}
@@ -163,7 +163,7 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	res := make([]ProjectMember, len(members))
 	for i, v := range members {
 		res[i] = newProjectMember(
-			newUser(v.UserID, v.Name, v.RealName),
+			newUser(v.User.ID, v.User.Name, v.User.RealName),
 			ConvertDuration(v.Duration),
 		)
 	}
