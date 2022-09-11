@@ -127,11 +127,9 @@ jobs:
   spectral:
     name: Spectral
     runs-on: ubuntu-latest
+    container:
+      image: stoplight/spectral:6.5.1
     steps:
       - uses: actions/checkout@v3
       - name: Spectral checks
-        uses: stoplightio/spectral-action@v0.8.2
-        with:
-          file_glob: docs/swagger/traPortfolio.v1.yaml
-          repo_token: ${{ github.token }}
-          event_name: ${{ github.event_name }}
+        run: spectral lint ./docs/swagger/traPortfolio.v1.yaml
