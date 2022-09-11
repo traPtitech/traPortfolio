@@ -123,11 +123,13 @@ func TestProjectHandler_GetProject(t *testing.T) {
 					},
 					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
-					Members: []*domain.ProjectMember{
+					Members: []*domain.UserWithDuration{
 						{
-							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(),
-							RealName: random.AlphaNumeric(),
+							User: domain.User{
+								ID:       random.UUID(),
+								Name:     random.AlphaNumeric(),
+								RealName: random.AlphaNumeric(),
+							},
 							Duration: random.Duration(),
 						},
 					},
@@ -146,9 +148,9 @@ func TestProjectHandler_GetProject(t *testing.T) {
 								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
-						Id:       v.UserID,
-						Name:     v.Name,
-						RealName: v.RealName,
+						Id:       v.User.ID,
+						Name:     v.User.Name,
+						RealName: v.User.RealName,
 					})
 				}
 				reqBody := &ProjectDetail{

@@ -119,23 +119,25 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					hgroupAdmins = append(hgroupAdmins, hgroupAdmin)
 				}
 
-				rgroupMembers := []*domain.UserGroup{}
+				rgroupMembers := []*domain.UserWithDuration{}
 				hgroupMembers := []GroupMember{}
 
 				groupLen := rand.Intn(256)
 				for i := 0; i < groupLen; i++ {
-					rgroupmember := domain.UserGroup{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+					rgroupmember := domain.UserWithDuration{
+						User: domain.User{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					}
 
 					hgroupmember := GroupMember{
 						Duration: ConvertDuration(rgroupmember.Duration),
-						Id:       rgroupmember.ID,
-						Name:     rgroupmember.Name,
-						RealName: rgroupmember.RealName,
+						Id:       rgroupmember.User.ID,
+						Name:     rgroupmember.User.Name,
+						RealName: rgroupmember.User.RealName,
 					}
 
 					rgroupMembers = append(rgroupMembers, &rgroupmember)

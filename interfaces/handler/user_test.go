@@ -1283,12 +1283,12 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 	makeGroups := func(s *mock_service.MockUserService, groupsLen int) (hres []*UserGroup, path string) {
 		userID := random.UUID()
 
-		repoGroups := []*domain.GroupUser{}
+		repoGroups := []*domain.UserGroup{}
 		hresGroups := []*UserGroup{}
 
 		for i := 0; i < groupsLen; i++ {
 
-			rgroup := domain.GroupUser{
+			rgroup := domain.UserGroup{
 				ID:       random.UUID(),
 				Name:     random.AlphaNumeric(),
 				Duration: random.Duration(),
