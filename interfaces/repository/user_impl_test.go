@@ -930,7 +930,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumeric(),
-					URL:         optional.NewString(random.RandURLString(), true),
+					URL:         random.OptURLString(),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        random.OptInt64(),
 				},
@@ -955,7 +955,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumeric(),
-					URL:         optional.NewString(random.RandURLString(), true),
+					URL:         random.OptURLString(),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        random.OptInt64(),
 				},
@@ -977,7 +977,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumeric(),
-					URL:         optional.NewString(random.RandURLString(), true),
+					URL:         random.OptURLString(),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        random.OptInt64(),
 				},

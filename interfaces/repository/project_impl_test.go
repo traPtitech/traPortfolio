@@ -13,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -345,7 +344,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(),
 		Description:   random.AlphaNumeric(),
-		Link:          optional.NewString(random.RandURLString(), true),
+		Link:          random.OptURLString(),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
 		UntilYear:     duration.Until.Year,
@@ -403,7 +402,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -462,7 +461,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				args: &repository.UpdateProjectArgs{
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     random.OptInt64(),
 					SinceSemester: random.OptInt64(),
 					UntilYear:     random.OptInt64(),
@@ -486,7 +485,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				args: &repository.UpdateProjectArgs{
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     random.OptInt64(),
 					SinceSemester: random.OptInt64(),
 					UntilYear:     random.OptInt64(),

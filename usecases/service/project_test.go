@@ -201,7 +201,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Until.Year,
 					SinceSemester: duration.Until.Semester,
 					UntilYear:     duration.Since.Year,
@@ -220,7 +220,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,

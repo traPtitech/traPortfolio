@@ -220,7 +220,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -242,7 +242,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -303,7 +303,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 				args: &repository.UpdateContestArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -339,7 +339,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 				args: &repository.UpdateContestArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -361,7 +361,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 				args: &repository.UpdateContestArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -660,7 +660,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
 		Result:      random.OptAlphaNumeric(),
-		Link:        optional.NewString(random.RandURLString(), true),
+		Link:        random.OptURLString(),
 		Description: random.AlphaNumeric(),
 	}
 
@@ -710,7 +710,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
 					Result:      random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -765,7 +765,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 				args: &repository.UpdateContestTeamArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Result:      random.OptAlphaNumeric(),
 				},
 			},
@@ -801,7 +801,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 				args: &repository.UpdateContestTeamArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Result:      random.OptAlphaNumeric(),
 				},
 			},
@@ -822,7 +822,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 				args: &repository.UpdateContestTeamArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Result:      random.OptAlphaNumeric(),
 				},
 			},

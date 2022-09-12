@@ -229,7 +229,7 @@ func TestContestService_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       time.Now(),
 					Until:       optional.NewTime(time.Now(), true),
 				},
@@ -315,7 +315,7 @@ func TestContestService_UpdateContest(t *testing.T) {
 				args: &repository.UpdateContestArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       optional.NewTime(time.Now(), true),
 					Until:       optional.NewTime(time.Now(), true),
 				},
@@ -334,7 +334,7 @@ func TestContestService_UpdateContest(t *testing.T) {
 				args: &repository.UpdateContestArgs{
 					Name:        random.OptAlphaNumeric(),
 					Description: random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       optional.NewTime(time.Now(), true),
 					Until:       optional.NewTime(time.Now(), true),
 				},
@@ -686,7 +686,7 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 				args: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
 					Result:      random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -742,7 +742,7 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				args: &repository.UpdateContestTeamArgs{
 					Name:        random.OptAlphaNumeric(),
 					Result:      random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Description: random.OptAlphaNumeric(),
 				},
 			},
@@ -773,7 +773,7 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				args: &repository.UpdateContestTeamArgs{
 					Name:        random.OptAlphaNumeric(),
 					Result:      random.OptAlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Description: random.OptAlphaNumeric(),
 				},
 			},
