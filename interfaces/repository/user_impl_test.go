@@ -932,7 +932,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -957,7 +957,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -979,7 +979,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {

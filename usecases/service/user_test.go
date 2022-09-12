@@ -388,7 +388,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64(),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
 				},
@@ -406,7 +406,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64(),
 					URL:         optional.NewString(random.RandURLString(), true),
 					PrPermitted: optional.NewBool(true, true),
 				},

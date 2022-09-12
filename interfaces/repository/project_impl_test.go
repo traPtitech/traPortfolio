@@ -444,8 +444,6 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 }
 
 func TestProjectRepository_UpdateProject(t *testing.T) {
-	d := random.Duration()
-
 	t.Parallel()
 	type args struct {
 		id   uuid.UUID
@@ -465,10 +463,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          optional.NewString(random.AlphaNumeric(), true),
 					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
+					SinceYear:     random.OptInt64(),
+					SinceSemester: random.OptInt64(),
+					UntilYear:     random.OptInt64(),
+					UntilSemester: random.OptInt64(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
@@ -489,10 +487,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          optional.NewString(random.AlphaNumeric(), true),
 					Description:   optional.NewString(random.AlphaNumeric(), true),
 					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
+					SinceYear:     random.OptInt64(),
+					SinceSemester: random.OptInt64(),
+					UntilYear:     random.OptInt64(),
+					UntilSemester: random.OptInt64(),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {

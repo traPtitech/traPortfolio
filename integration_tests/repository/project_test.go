@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"math/rand"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -14,7 +13,6 @@ import (
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -81,10 +79,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		Name:          random.OptAlphaNumeric(),
 		Description:   random.OptAlphaNumeric(),
 		Link:          random.OptAlphaNumeric(),
-		SinceYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-		SinceSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
-		UntilYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-		UntilSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
+		SinceYear:     random.OptInt64(),
+		SinceSemester: random.OptInt64(),
+		UntilYear:     random.OptInt64(),
+		UntilSemester: random.OptInt64(),
 	}
 
 	if arg1.Name.Valid {
