@@ -301,8 +301,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -337,8 +337,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -359,8 +359,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
@@ -659,7 +659,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      optional.NewString(random.AlphaNumeric(), true),
+		Result:      random.OptAlphaNumeric(),
 		Link:        optional.NewString(random.RandURLString(), true),
 		Description: random.AlphaNumeric(),
 	}
@@ -709,7 +709,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Result:      random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
 					Description: random.AlphaNumeric(),
 				},
@@ -763,10 +763,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Result:      random.OptAlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -799,10 +799,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Result:      random.OptAlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -820,10 +820,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
 					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Result:      random.OptAlphaNumeric(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {

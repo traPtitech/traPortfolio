@@ -460,8 +460,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
+					Name:          random.OptAlphaNumeric(),
+					Description:   random.OptAlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     random.OptInt64(),
 					SinceSemester: random.OptInt64(),
@@ -484,8 +484,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
+					Name:          random.OptAlphaNumeric(),
+					Description:   random.OptAlphaNumeric(),
 					Link:          optional.NewString(random.RandURLString(), true),
 					SinceYear:     random.OptInt64(),
 					SinceSemester: random.OptInt64(),

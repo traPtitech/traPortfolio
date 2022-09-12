@@ -29,7 +29,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	if args == nil {
 		var link optional.String
 		if rand.Intn(2) == 1 {
-			link = optional.NewString(random.AlphaNumeric(), true)
+			link = random.OptAlphaNumeric()
 		}
 
 		since, until := random.SinceAndUntil()
