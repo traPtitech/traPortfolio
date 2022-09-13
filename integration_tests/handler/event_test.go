@@ -53,7 +53,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockEventDetails[0].Id,
+			mockdata.KnoqEventGroupID1(),
 			mockdata.HMockEventDetails[0],
 		},
 		"400 invalid userID": {
@@ -97,7 +97,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockEventDetails[0].Id,
+			mockdata.KnoqEventGroupID1(),
 			handler.EditEventRequest{
 				EventLevel: &eventLevel,
 			},
@@ -105,7 +105,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		"204 without change": {
 			http.StatusNoContent,
-			mockdata.HMockEventDetails[1].Id,
+			mockdata.KnoqEventGroupID2(),
 			handler.EditEventRequest{},
 			nil,
 		},
