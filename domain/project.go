@@ -14,12 +14,5 @@ type ProjectDetail struct {
 	Project
 	Description string
 	Link        string
-	Members     []*ProjectMember
-}
-
-type ProjectMember struct {
-	UserID   uuid.UUID
-	Name     string
-	RealName string
-	Duration YearWithSemesterDuration
+	Members     []*UserWithDuration
 }

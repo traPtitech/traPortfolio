@@ -66,16 +66,18 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	m := make([]*domain.ProjectMember, len(members))
+	m := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
-		pm := domain.ProjectMember{
-			UserID:   v.UserID,
-			Name:     v.User.Name,
+		pm := domain.UserWithDuration{
+			User: domain.User{
+				ID:   v.UserID,
+				Name: v.User.Name,
+			},
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		}
 
 		if rn, ok := nameMap[v.User.Name]; ok {
-			pm.RealName = rn
+			pm.User.RealName = rn
 		}
 
 		m[i] = &pm
@@ -162,7 +164,7 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 	return nil
 }
 
-func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error) {
+func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
@@ -183,15 +185,18 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	res := make([]*domain.User, len(members))
+	res := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
-		u := domain.User{
-			ID:   v.UserID,
-			Name: v.User.Name,
+		u := domain.UserWithDuration{
+			User: domain.User{
+				ID:   v.UserID,
+				Name: v.User.Name,
+			},
+			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		}
 
 		if rn, ok := nameMap[v.User.Name]; ok {
-			u.RealName = rn
+			u.User.RealName = rn
 		}
 
 		res[i] = &u

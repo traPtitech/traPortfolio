@@ -1197,21 +1197,21 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.GroupUser
-		setup     func(f mockUserRepositoryFields, args args, want []*domain.GroupUser)
+		want      []*domain.UserGroup
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.UserGroup)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
 			args: args{userID: random.UUID()},
-			want: []*domain.GroupUser{
+			want: []*domain.UserGroup{
 				{
 					ID:       random.UUID(),
 					Name:     random.AlphaNumeric(),
 					Duration: random.Duration(),
 				},
 			},
-			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserGroup) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
@@ -1240,7 +1240,7 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{userID: random.UUID()},
 			want: nil,
-			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserGroup) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
@@ -1256,7 +1256,7 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 			name: "User not found",
 			args: args{userID: random.UUID()},
 			want: nil,
-			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserGroup) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).

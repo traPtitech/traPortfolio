@@ -113,11 +113,13 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
-				Members: []*domain.ProjectMember{
+				Members: []*domain.UserWithDuration{
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User: domain.User{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					},
 				},
@@ -138,19 +140,19 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
-							AddRow(wm.UserID, wm.Name, wmd.Since.Year, wmd.Since.Semester, wmd.Until.Year, wmd.Until.Semester),
+							AddRow(wm.User.ID, wm.User.Name, wmd.Since.Year, wmd.Since.Semester, wmd.Until.Year, wmd.Until.Semester),
 					)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
-					WithArgs(wm.UserID).
+					WithArgs(wm.User.ID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(wm.UserID, wm.Name),
+							AddRow(wm.User.ID, wm.User.Name),
 					)
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
-						TraQID:   wm.Name,
-						RealName: wm.RealName,
+						TraQID:   wm.User.Name,
+						RealName: wm.User.RealName,
 					},
 				}, nil)
 			},
@@ -169,17 +171,21 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
-				Members: []*domain.ProjectMember{
+				Members: []*domain.UserWithDuration{
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User: domain.User{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					},
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User: domain.User{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					},
 				},
@@ -196,7 +202,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				memberRows := sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, v := range want.Members {
 					d := v.Duration
-					memberRows.AddRow(v.UserID, v.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
+					memberRows.AddRow(v.User.ID, v.User.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -205,8 +211,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				userIDs := make([]driver.Value, len(want.Members))
 				userRows := sqlmock.NewRows([]string{"id", "name"})
 				for i, v := range want.Members {
-					userIDs[i] = v.UserID
-					userRows.AddRow(v.UserID, v.Name)
+					userIDs[i] = v.User.ID
+					userRows.AddRow(v.User.ID, v.User.Name)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
@@ -215,8 +221,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				wp := make([]*external.PortalUserResponse, len(want.Members))
 				for i, v := range want.Members {
 					wp[i] = &external.PortalUserResponse{
-						TraQID:   v.Name,
-						RealName: v.RealName,
+						TraQID:   v.User.Name,
+						RealName: v.User.RealName,
 					}
 				}
 				f.portal.EXPECT().GetAll().Return(wp, nil)
@@ -529,8 +535,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.User
-		setup     func(f mockProjectRepositoryFields, args args, want []*domain.User)
+		want      []*domain.UserWithDuration
+		setup     func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -538,17 +544,19 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 			},
-			want: []*domain.User{
+			want: []*domain.UserWithDuration{
 				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
+					User: domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					},
 				},
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				rows := sqlmock.NewRows([]string{"user_id"})
-				for _, u := range want {
-					rows.AddRow(u.ID)
+				for _, pm := range want {
+					rows.AddRow(pm.User.ID)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -556,15 +564,15 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					WillReturnRows(rows)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
-					WithArgs(want[0].ID).
+					WithArgs(want[0].User.ID).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(want[0].ID, want[0].Name),
+							AddRow(want[0].User.ID, want[0].User.Name),
 					)
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
-						TraQID:   want[0].Name,
-						RealName: want[0].RealName,
+						TraQID:   want[0].User.Name,
+						RealName: want[0].User.RealName,
 					},
 				}, nil)
 			},
@@ -575,21 +583,26 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 			},
-			want: []*domain.User{
+			want: []*domain.UserWithDuration{
 				{
-					ID:   random.UUID(),
-					Name: random.AlphaNumeric(),
-					// RealName:
+					User: domain.User{
+						ID:   random.UUID(),
+						Name: random.AlphaNumeric(),
+						// RealName:
+					},
 				},
 				{
-					ID:   random.UUID(),
-					Name: random.AlphaNumeric(),
+					User: domain.User{
+						ID:   random.UUID(),
+						Name: random.AlphaNumeric(),
+						// RealName:
+					},
 				},
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				rows := sqlmock.NewRows([]string{"user_id"})
-				for _, u := range want {
-					rows.AddRow(u.ID)
+				for _, pm := range want {
+					rows.AddRow(pm.User.ID)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -598,8 +611,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				userIDs := make([]driver.Value, len(want))
 				userRows := sqlmock.NewRows([]string{"id", "name"})
 				for i, v := range want {
-					userIDs[i] = v.ID
-					userRows.AddRow(v.ID, v.Name)
+					userIDs[i] = v.User.ID
+					userRows.AddRow(v.User.ID, v.User.Name)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
@@ -608,8 +621,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				wp := make([]*external.PortalUserResponse, len(want))
 				for i, v := range want {
 					wp[i] = &external.PortalUserResponse{
-						TraQID:   v.Name,
-						RealName: v.RealName,
+						TraQID:   v.User.Name,
+						RealName: v.User.RealName,
 					}
 				}
 				f.portal.EXPECT().GetAll().Return(wp, nil)
@@ -622,7 +635,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
@@ -637,7 +650,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.User) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				uid := random.UUID()
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -729,11 +742,11 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args) {
 				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
 				newUsers := make([]*repository.CreateProjectMemberArgs, 0, len(args.projectMembers))
-				for i, u := range args.projectMembers {
+				for i, pm := range args.projectMembers {
 					if i%2 == 0 {
-						rows.AddRow(args.projectID, u.UserID)
+						rows.AddRow(args.projectID, pm.UserID)
 					} else {
-						newUsers = append(newUsers, u)
+						newUsers = append(newUsers, pm)
 					}
 				}
 				f.h.Mock.
@@ -748,10 +761,10 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 					WithArgs(args.projectID).
 					WillReturnRows(rows)
 				f.h.Mock.ExpectBegin()
-				for _, u := range newUsers {
+				for _, pm := range newUsers {
 					f.h.Mock.
 						ExpectExec(makeSQLQueryRegexp("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?)")).
-						WithArgs(anyUUID{}, args.projectID, u.UserID, u.SinceYear, u.SinceSemester, u.UntilYear, u.UntilSemester, anyTime{}, anyTime{}).
+						WithArgs(anyUUID{}, args.projectID, pm.UserID, pm.SinceYear, pm.SinceSemester, pm.UntilYear, pm.UntilSemester, anyTime{}, anyTime{}).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 				}
 				f.h.Mock.ExpectCommit()

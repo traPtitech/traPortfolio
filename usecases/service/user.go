@@ -21,7 +21,7 @@ type UserService interface {
 	DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error
 	GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
 	GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error)
-	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error)
+	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error)
 	GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error)
 }
 
@@ -105,7 +105,7 @@ func (s *userService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 	return contests, nil
 }
 
-func (s *userService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
+func (s *userService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error) {
 	groups, err := s.repo.GetGroupsByUserID(userID)
 	if err != nil {
 		return nil, err

@@ -392,7 +392,7 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 	return res, nil
 }
 
-func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
+func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserGroup, error) {
 	err := repo.h.
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
@@ -411,10 +411,10 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.Group
 		return nil, err
 	}
 
-	result := make([]*domain.GroupUser, 0, len(groups))
+	result := make([]*domain.UserGroup, 0, len(groups))
 	for _, v := range groups {
 		gr := v.Group
-		result = append(result, &domain.GroupUser{
+		result = append(result, &domain.UserGroup{
 			ID:   gr.GroupID,
 			Name: gr.Name,
 			Duration: domain.YearWithSemesterDuration{

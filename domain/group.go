@@ -4,13 +4,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// GroupUser indicates Group which User belongs
-type GroupUser struct {
-	ID       uuid.UUID // Group ID
-	Name     string    // Group name
-	Duration YearWithSemesterDuration
-}
-
 type Group struct {
 	ID   uuid.UUID
 	Name string
@@ -21,6 +14,6 @@ type GroupDetail struct {
 	Name        string
 	Link        string
 	Admin       []*User
-	Members     []*UserGroup
+	Members     []*UserWithDuration
 	Description string
 }

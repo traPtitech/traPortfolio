@@ -9,17 +9,17 @@ import (
 )
 
 var (
-	MockUsers                    = CloneMockUsers()
-	MockAccount                  = CloneMockAccount()
-	MockContest                  = CloneMockContest()
-	MockContestTeam              = CloneMockContestTeam()
-	MockContestTeamUserBelonging = CloneMockContestTeam()
-	MockEventLevelRelations      = CloneMockEventLevelRelations()
-	MockGroup                    = CloneMockGroup()
-	MockGroupUserBelonging       = CloneMockGroupUserBelonging()
-	MockGroupUserAdmin           = CloneMockGroupUserAdmin()
-	MockProject                  = CloneMockProject()
-	MockProjectMember            = CloneMockProjectMember()
+	MockUsers                     = CloneMockUsers()
+	MockAccount                   = CloneMockAccount()
+	MockContests                  = CloneMockContests()
+	MockContestTeams              = CloneMockContestTeams()
+	MockContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
+	MockEventLevelRelations       = CloneMockEventLevelRelations()
+	MockGroups                    = CloneMockGroups()
+	MockGroupUserBelongings       = CloneMockGroupUserBelongings()
+	MockGroupUserAdmins           = CloneMockGroupUserAdmins()
+	MockProjects                  = CloneMockProjects()
+	MockProjectMembers            = CloneMockProjectMembers()
 )
 
 func CloneMockUsers() []*model.User {
@@ -56,32 +56,38 @@ func CloneMockAccount() model.Account {
 	}
 }
 
-func CloneMockContest() model.Contest {
-	return model.Contest{
-		ID:          contestID.uuid(),
-		Name:        "sample_contest_name",
-		Description: "sample_contest_description",
-		Link:        "https://sample.contests.com",
-		Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
-		Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+func CloneMockContests() []model.Contest {
+	return []model.Contest{
+		{
+			ID:          contestID.uuid(),
+			Name:        "sample_contest_name",
+			Description: "sample_contest_description",
+			Link:        "https://sample.contests.com",
+			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+		},
 	}
 }
 
-func CloneMockContestTeam() model.ContestTeam {
-	return model.ContestTeam{
-		ID:          contestTeamID.uuid(),
-		ContestID:   contestID.uuid(),
-		Name:        "sample_contest_team_name",
-		Description: "sample_contest_team_description",
-		Result:      "sample_contest_team_result",
-		Link:        "https://sample.contest_teams.com",
+func CloneMockContestTeams() []model.ContestTeam {
+	return []model.ContestTeam{
+		{
+			ID:          contestTeamID.uuid(),
+			ContestID:   contestID.uuid(),
+			Name:        "sample_contest_team_name",
+			Description: "sample_contest_team_description",
+			Result:      "sample_contest_team_result",
+			Link:        "https://sample.contest_teams.com",
+		},
 	}
 }
 
-func CloneMockContestTeamUserBelonging() model.ContestTeamUserBelonging {
-	return model.ContestTeamUserBelonging{
-		TeamID: contestTeamID.uuid(),
-		UserID: userID1.uuid(),
+func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
+	return []model.ContestTeamUserBelonging{
+		{
+			TeamID: contestTeamID.uuid(),
+			UserID: userID1.uuid(),
+		},
 	}
 }
 
@@ -98,27 +104,31 @@ func CloneMockEventLevelRelations() []model.EventLevelRelation {
 	}
 }
 
-func CloneMockGroup() model.Group {
-	return model.Group{
-		GroupID:     groupID.uuid(),
-		Name:        "sample_group_name",
-		Link:        "https://sample.groups.com",
-		Description: "sample_group_description",
+func CloneMockGroups() []model.Group {
+	return []model.Group{
+		{
+			GroupID:     groupID.uuid(),
+			Name:        "sample_group_name",
+			Link:        "https://sample.groups.com",
+			Description: "sample_group_description",
+		},
 	}
 }
 
-func CloneMockGroupUserBelonging() model.GroupUserBelonging {
-	return model.GroupUserBelonging{
-		UserID:        userID1.uuid(),
-		GroupID:       MockGroup.GroupID,
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
+func CloneMockGroupUserBelongings() []model.GroupUserBelonging {
+	return []model.GroupUserBelonging{
+		{
+			UserID:        userID1.uuid(),
+			GroupID:       groupID.uuid(),
+			SinceYear:     2022,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
 	}
 }
 
-func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
+func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 	return []model.GroupUserAdmin{
 		{
 			UserID:  userID1.uuid(),
@@ -127,28 +137,70 @@ func CloneMockGroupUserAdmin() []model.GroupUserAdmin {
 	}
 }
 
-func CloneMockProject() model.Project {
-	return model.Project{
-		ID:            projectID.uuid(),
-		Name:          "sample_project_name",
-		Description:   "sample_project_description",
-		Link:          "https://sample.projects.com",
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
+func CloneMockProjects() []*model.Project {
+	return []*model.Project{
+		{
+			ID:            projectID1.uuid(),
+			Name:          "sample_project_name1",
+			Description:   "sample_project_description1",
+			Link:          "https://sample.project1.com",
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2021,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectID2.uuid(),
+			Name:          "sample_project_name2",
+			Description:   "sample_project_description2",
+			Link:          "https://sample.project2.com",
+			SinceYear:     2022,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectID3.uuid(),
+			Name:          "sample_project_name3",
+			Description:   "sample_project_description3",
+			Link:          "https://sample.project3.com",
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
 	}
 }
 
-func CloneMockProjectMember() model.ProjectMember {
-	return model.ProjectMember{
-		ID:            projectMemberID.uuid(),
-		ProjectID:     projectID.uuid(),
-		UserID:        userID1.uuid(),
-		SinceYear:     2022,
-		SinceSemester: 1,
-		UntilYear:     2022,
-		UntilSemester: 2,
+func CloneMockProjectMembers() []*model.ProjectMember {
+	return []*model.ProjectMember{
+		{
+			ID:            projectMemberID1.uuid(),
+			ProjectID:     projectID1.uuid(),
+			UserID:        userID1.uuid(),
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2021,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectMemberID2.uuid(),
+			ProjectID:     projectID1.uuid(),
+			UserID:        userID2.uuid(),
+			SinceYear:     2022,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
+		{
+			ID:            projectMemberID3.uuid(),
+			ProjectID:     projectID2.uuid(),
+			UserID:        userID2.uuid(),
+			SinceYear:     2021,
+			SinceSemester: 0,
+			UntilYear:     2022,
+			UntilSemester: 1,
+		},
 	}
 }
 
@@ -163,18 +215,18 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockContest := CloneMockContest()
-	if err := h.Create(&mockContest).Error(); err != nil {
+	mockContests := CloneMockContests()
+	if err := h.Create(&mockContests).Error(); err != nil {
 		return err
 	}
 
-	mockContestTeam := CloneMockContestTeam()
-	if err := h.Create(&mockContestTeam).Error(); err != nil {
+	mockContestTeams := CloneMockContestTeams()
+	if err := h.Create(&mockContestTeams).Error(); err != nil {
 		return err
 	}
 
-	mockContestTeamUserBelonging := CloneMockContestTeamUserBelonging()
-	if err := h.Create(&mockContestTeamUserBelonging).Error(); err != nil {
+	mockContestTeamUserBelongings := CloneMockContestTeamUserBelongings()
+	if err := h.Create(&mockContestTeamUserBelongings).Error(); err != nil {
 		return err
 	}
 
@@ -183,28 +235,28 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockGroup := CloneMockGroup()
-	if err := h.Create(&mockGroup).Error(); err != nil {
+	mockGroups := CloneMockGroups()
+	if err := h.Create(&mockGroups).Error(); err != nil {
 		return err
 	}
 
-	mockGroupUserBelonging := CloneMockGroupUserBelonging()
-	if err := h.Create(&mockGroupUserBelonging).Error(); err != nil {
+	mockGroupUserBelongings := CloneMockGroupUserBelongings()
+	if err := h.Create(&mockGroupUserBelongings).Error(); err != nil {
 		return err
 	}
 
-	mockProject := CloneMockProject()
-	if err := h.Create(&mockProject).Error(); err != nil {
+	mockProjects := CloneMockProjects()
+	if err := h.Create(&mockProjects).Error(); err != nil {
 		return err
 	}
 
-	mockGroupUserAdmin := CloneMockGroupUserAdmin()
-	if err := h.Create(&mockGroupUserAdmin).Error(); err != nil {
+	mockGroupUserAdmins := CloneMockGroupUserAdmins()
+	if err := h.Create(&mockGroupUserAdmins).Error(); err != nil {
 		return err
 	}
 
-	mockProjectMember := CloneMockProjectMember()
-	if err := h.Create(&mockProjectMember).Error(); err != nil {
+	mockProjectMembers := CloneMockProjectMembers()
+	if err := h.Create(&mockProjectMembers).Error(); err != nil {
 		return err
 	}
 

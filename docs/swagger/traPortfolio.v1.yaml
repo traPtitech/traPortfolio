@@ -687,7 +687,7 @@ paths:
                 type: array
                 description: プロジェクトメンバーの配列
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/ProjectMember'
       operationId: getProjectMembers
       description: プロジェクトメンバーを取得します
     post:

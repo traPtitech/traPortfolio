@@ -98,11 +98,13 @@ func TestProjectService_GetProject(t *testing.T) {
 				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
-				Members: []*domain.ProjectMember{
+				Members: []*domain.UserWithDuration{
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User: domain.User{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					},
 				},
@@ -383,8 +385,8 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.User
-		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User)
+		want      []*domain.UserWithDuration
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -393,14 +395,16 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 			},
-			want: []*domain.User{
+			want: []*domain.UserWithDuration{
 				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
+					User: domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					},
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
@@ -412,7 +416,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.User) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
