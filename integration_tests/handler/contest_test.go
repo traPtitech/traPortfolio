@@ -15,7 +15,7 @@ import (
 )
 
 // GetContests GET /contests
-func GetContests(t *testing.T) {
+func TestGetContests(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -42,7 +42,7 @@ func GetContests(t *testing.T) {
 }
 
 // GetContest GET /contests/:contestID
-func GetContest(t *testing.T) {
+func TestGetContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -81,7 +81,7 @@ func GetContest(t *testing.T) {
 }
 
 // CreateContest POST /contests
-func CreateContest(t *testing.T) {
+func TestCreateContest(t *testing.T) {
 	var (
 		name          = random.AlphaNumeric()
 		link          = random.RandURLString()
@@ -181,28 +181,28 @@ func CreateContest(t *testing.T) {
 	}
 }
 
-func EditContest(t *testing.T) {
+func TestEditContest(t *testing.T) {
 }
 
-func DeleteContest(t *testing.T) {
+func TestDeleteContest(t *testing.T) {
 }
 
-func GetContestTeam(t *testing.T) {
+func TestGetContestTeam(t *testing.T) {
 }
 
-func AddContestTeam(t *testing.T) {
+func TestAddContestTeam(t *testing.T) {
 }
 
-func EditContestTeam(t *testing.T) {
+func TestEditContestTeam(t *testing.T) {
 }
 
-func GetContestTeamMember(t *testing.T) {
+func TestGetContestTeamMember(t *testing.T) {
 }
 
-func AddContestTeamMember(t *testing.T) {
+func TestAddContestTeamMember(t *testing.T) {
 }
 
-func EditContestTeamMember(t *testing.T) {
+func TestEditContestTeamMember(t *testing.T) {
 }
 
 /*
