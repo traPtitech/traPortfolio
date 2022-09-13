@@ -88,7 +88,7 @@ func TestCreateContest(t *testing.T) {
 		description   = random.AlphaNumeric()
 		since, until  = random.SinceAndUntil()
 		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		invalidUrl    = "invalid url"
+		invalidURL    = "invalid url"
 		//tooLongStringは260文字
 	)
 
@@ -142,7 +142,7 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &invalidUrl,
+				Link: &invalidURL,
 				Name: name,
 			},
 			testutils.HTTPError(repository.ErrValidate.Error()),
