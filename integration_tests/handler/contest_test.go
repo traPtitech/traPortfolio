@@ -83,11 +83,13 @@ func GetContest(t *testing.T) {
 // CreateContest POST /contests
 func CreateContest(t *testing.T) {
 	var (
-		name         = random.AlphaNumeric()
-		link         = random.RandURLString()
-		description  = random.AlphaNumeric()
-		since, until = random.SinceAndUntil()
-		invalidUrl   = "invalid url"
+		name          = random.AlphaNumeric()
+		link          = random.RandURLString()
+		description   = random.AlphaNumeric()
+		since, until  = random.SinceAndUntil()
+		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		invalidUrl    = "invalid url"
+		//tooLongStringは260文字
 	)
 
 	t.Parallel()
@@ -119,6 +121,19 @@ func CreateContest(t *testing.T) {
 				Teams: []handler.ContestTeam{},
 			},
 		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: tooLongString,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError(repository.ErrValidate.Error()),
+		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			handler.CreateContestJSONBody{
@@ -132,8 +147,19 @@ func CreateContest(t *testing.T) {
 			},
 			testutils.HTTPError(repository.ErrValidate.Error()),
 		},
-		// TODO: validationもテストする
-		// https://github.com/traPtitech/traPortfolio/pull/391#discussion_r952794355
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: tooLongString,
+			},
+			testutils.HTTPError(repository.ErrValidate.Error()),
+		},
 	}
 
 	e := echo.New()
