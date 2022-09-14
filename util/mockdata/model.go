@@ -47,7 +47,7 @@ func CloneMockUsers() []*model.User {
 
 func CloneMockAccount() model.Account {
 	return model.Account{
-		ID:     AccountID(),
+		ID:     AccountID1(),
 		Type:   0,
 		Name:   "sample_account_display_name",
 		URL:    "https://sample.accounts.com",
@@ -59,7 +59,7 @@ func CloneMockAccount() model.Account {
 func CloneMockContests() []model.Contest {
 	return []model.Contest{
 		{
-			ID:          ContestID(),
+			ID:          ContestID1(),
 			Name:        "sample_contest_name",
 			Description: "sample_contest_description",
 			Link:        "https://sample.contests.com",
@@ -72,8 +72,8 @@ func CloneMockContests() []model.Contest {
 func CloneMockContestTeams() []model.ContestTeam {
 	return []model.ContestTeam{
 		{
-			ID:          ContestTeamID(),
-			ContestID:   ContestID(),
+			ID:          ContestTeamID1(),
+			ContestID:   ContestID1(),
 			Name:        "sample_contest_team_name",
 			Description: "sample_contest_team_description",
 			Result:      "sample_contest_team_result",
@@ -85,7 +85,7 @@ func CloneMockContestTeams() []model.ContestTeam {
 func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 	return []model.ContestTeamUserBelonging{
 		{
-			TeamID: ContestTeamID(),
+			TeamID: ContestTeamID1(),
 			UserID: UserID1(),
 		},
 	}
@@ -107,7 +107,7 @@ func CloneMockEventLevelRelations() []model.EventLevelRelation {
 func CloneMockGroups() []model.Group {
 	return []model.Group{
 		{
-			GroupID:     GroupID(),
+			GroupID:     GroupID1(),
 			Name:        "sample_group_name",
 			Link:        "https://sample.groups.com",
 			Description: "sample_group_description",
@@ -119,7 +119,7 @@ func CloneMockGroupUserBelongings() []model.GroupUserBelonging {
 	return []model.GroupUserBelonging{
 		{
 			UserID:        UserID1(),
-			GroupID:       GroupID(),
+			GroupID:       GroupID1(),
 			SinceYear:     2022,
 			SinceSemester: 0,
 			UntilYear:     2022,
@@ -132,7 +132,7 @@ func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 	return []model.GroupUserAdmin{
 		{
 			UserID:  UserID1(),
-			GroupID: GroupID(),
+			GroupID: GroupID1(),
 		},
 	}
 }

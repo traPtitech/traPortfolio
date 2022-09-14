@@ -246,13 +246,13 @@ func TestGetUserAccount(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.UserID1(),
-			mockdata.AccountID(),
+			mockdata.AccountID1(),
 			mockdata.HMockUserAccounts[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.AccountID(),
+			mockdata.AccountID1(),
 			testutils.HTTPError("bad request: nil id"),
 		},
 		"400 invalid accountID": {
@@ -264,7 +264,7 @@ func TestGetUserAccount(t *testing.T) {
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
-			mockdata.AccountID(),
+			mockdata.AccountID1(),
 			testutils.HTTPError("not found: not found"),
 		},
 		"404 accountID not found": {
@@ -416,7 +416,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.AccountID(),
+			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("bad request: nil id"),
 		},
