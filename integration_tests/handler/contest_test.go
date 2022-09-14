@@ -51,8 +51,8 @@ func TestGetContest(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockContests[0].Id,
-			mockdata.HMockContests[0],
+			mockdata.HMockContestDetails[0].Id,
+			mockdata.HMockContestDetails[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
