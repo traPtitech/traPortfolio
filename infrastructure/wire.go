@@ -58,18 +58,20 @@ var externalSet = wire.NewSet(
 var apiSet = wire.NewSet(handler.NewAPI)
 
 var confSet = wire.NewSet(
+	provideIsDevelopMent,
 	provideSQLConf,
 	provideTraqConf,
 	provideKnoqConf,
 	providePortalConf,
 )
 
+func provideIsDevelopMent(c *config.Config) bool		  				{ return c.IsDevelopment() }
 func provideSQLConf(c *config.Config) *config.SQLConfig       { return c.SQLConf() }
 func provideTraqConf(c *config.Config) *config.TraqConfig     { return c.TraqConf() }
 func provideKnoqConf(c *config.Config) *config.KnoqConfig     { return c.KnoqConf() }
 func providePortalConf(c *config.Config) *config.PortalConfig { return c.PortalConf() }
 
-func InjectAPIServer(c *config.Config, isDevelopment bool) (handler.API, error) {
+func InjectAPIServer(c *config.Config) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

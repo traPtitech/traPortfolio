@@ -35,7 +35,7 @@ func main() {
 		}
 	}
 
-	api, err := infrastructure.InjectAPIServer(appConf, appConf.IsDevelopment())
+	api, err := infrastructure.InjectAPIServer(appConf)
 	if err != nil {
 		log.Fatal(err)
 	}
