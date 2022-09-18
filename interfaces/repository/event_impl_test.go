@@ -168,7 +168,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.NoError,
 		},
@@ -367,7 +367,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,

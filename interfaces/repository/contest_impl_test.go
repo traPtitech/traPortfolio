@@ -15,7 +15,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
-	"gorm.io/gorm"
 )
 
 type mockContestRepositoryFields struct {
@@ -349,7 +348,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -442,7 +441,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -538,7 +537,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.contestID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -633,7 +632,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID, args.contestID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -810,7 +809,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -1082,7 +1081,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1217,7 +1216,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
