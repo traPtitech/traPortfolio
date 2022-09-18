@@ -20,7 +20,7 @@ func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	groups := make([]*model.Group, 0)
 	err := repo.h.Find(&groups).Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := make([]*domain.Group, 0, len(groups))
@@ -39,7 +39,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		Where(&model.Group{GroupID: groupID}).
 		First(group).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	users := make([]*model.GroupUserBelonging, 0)
@@ -47,7 +47,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	// Name, RealNameはusecasesでPortalから取得する
@@ -77,7 +77,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	erAdmin := make([]*domain.User, 0, len(admins))
