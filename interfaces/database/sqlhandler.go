@@ -1,5 +1,7 @@
 package database
 
+import "gorm.io/gorm/clause"
+
 type SQLHandler interface {
 	Find(out interface{}, where ...interface{}) SQLHandler
 	First(out interface{}, where ...interface{}) SQLHandler
@@ -14,6 +16,7 @@ type SQLHandler interface {
 	Preload(query string, args ...interface{}) SQLHandler
 	Rollback() SQLHandler
 	Transaction(fc func(handler SQLHandler) error) error
+	Clauses(conds ...clause.Expression) SQLHandler
 	Ping() error
 
 	Error() error

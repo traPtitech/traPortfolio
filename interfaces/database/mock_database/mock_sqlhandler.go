@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -101,6 +102,11 @@ func (handler *MockSQLHandler) Transaction(fc func(database.SQLHandler) error) e
 		return fc(driver)
 	}
 	return handler.Conn.Transaction(ffc)
+}
+
+func (handler *MockSQLHandler) Clauses(conds ...clause.Expression) database.SQLHandler {
+	db := handler.Conn.Clauses(conds...)
+	return &MockSQLHandler{Conn: db}
 }
 
 func (handler *MockSQLHandler) Ping() error {

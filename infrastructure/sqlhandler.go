@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -117,6 +118,11 @@ func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error
 		return fc(driver)
 	}
 	return handler.conn.Transaction(ffc)
+}
+
+func (handler *SQLHandler) Clauses(conds ...clause.Expression) database.SQLHandler {
+	db := handler.conn.Clauses(conds...)
+	return &SQLHandler{conn: db}
 }
 
 func (handler *SQLHandler) Ping() error {
