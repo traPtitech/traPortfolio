@@ -25,7 +25,7 @@ func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API,
 		return nil, err
 	}
 
-	api, err := infrastructure.InjectAPIServer(conf, true)
+	api, err := infrastructure.InjectAPIServer(conf)
 	if err != nil {
 		return nil, err
 	}

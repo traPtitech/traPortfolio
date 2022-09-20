@@ -355,7 +355,7 @@ func CloneHandlerMockUserDetails() []handler.UserDetail {
 			State:    handler.UserAccountState(traqUsers[i].User.State),
 		}
 
-		if mu.ID == userID1.uuid() {
+		if mu.ID == UserID1() {
 			hUsers[i].Accounts = hAccounts
 		}
 	}
