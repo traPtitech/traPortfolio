@@ -1,6 +1,8 @@
 package infrastructure
 
 import (
+	"errors"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -128,7 +130,12 @@ func (handler *SQLHandler) Ping() error {
 }
 
 func (handler *SQLHandler) Error() error {
-	return handler.conn.Error
+	err := handler.conn.Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return database.ErrNoRows
+	}
+
+	return err
 }
 
 // Interface guards
