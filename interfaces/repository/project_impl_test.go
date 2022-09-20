@@ -474,6 +474,13 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1 FOR UPDATE")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.id),
+					)
+				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
 					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -497,6 +504,13 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1 FOR UPDATE")).
+					WithArgs(args.id).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.id),
+					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
 					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
