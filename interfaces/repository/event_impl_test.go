@@ -9,6 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
@@ -141,7 +142,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByEventID(args.id).Return(nil, repository.ErrNotFound)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(nil, database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -168,7 +169,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.NoError,
 		},
@@ -269,7 +270,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
-				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(nil, repository.ErrNotFound)
+				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(nil, database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -367,7 +368,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,

@@ -12,6 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
@@ -606,7 +607,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -750,7 +751,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -887,7 +888,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -964,7 +965,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.accountID, args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -1053,7 +1054,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.accountID, args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -1166,7 +1167,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -1259,7 +1260,7 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -1362,7 +1363,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(repository.ErrNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
