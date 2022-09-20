@@ -490,38 +490,6 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "Success_ConcurrentUpdate",
-			args: args{
-				id: random.UUID(),
-				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
-					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
-				},
-			},
-			setup: func(f mockProjectRepositoryFields, args args) {
-				f.h.Mock.ExpectBegin()
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1 FOR UPDATE")).
-					WithArgs(args.id).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}).
-							AddRow(args.id),
-					)
-				f.h.Mock.
-					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
-					WillReturnResult(sqlmock.NewResult(1, 1))
-				f.h.Mock.ExpectCommit()
-
-			},
-			assertion: assert.NoError,
-		},
-		{
 			name: "ErrorUpdate",
 			args: args{
 				id: random.UUID(),
