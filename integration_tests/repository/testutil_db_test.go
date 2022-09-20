@@ -79,7 +79,7 @@ func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *rep
 	if args == nil {
 		args = &repository.CreateEventLevelArgs{
 			EventID: random.UUID(),
-			Level:   domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+			Level:   domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
 		}
 	}
 
@@ -95,7 +95,7 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	if args == nil {
 		args = &repository.CreateAccountArgs{
 			DisplayName: random.AlphaNumeric(),
-			Type:        uint(rand.Intn(int(domain.AccountLimit))),
+			Type:        random.Uint8n(uint8(domain.AccountLimit)),
 			URL:         random.RandURLString(),
 			PrPermitted: random.Bool(),
 		}

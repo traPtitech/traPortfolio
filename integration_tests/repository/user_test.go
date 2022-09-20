@@ -359,7 +359,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		account1.DisplayName = args.DisplayName.String
 	}
 	if args.Type.Valid {
-		account1.Type = uint(args.Type.Int64)
+		account1.Type = uint8(args.Type.Int64)
 	}
 	if args.URL.Valid {
 		account1.URL = args.URL.String

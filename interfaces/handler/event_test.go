@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"testing"
 
@@ -135,7 +134,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 
 					Description: random.AlphaNumeric(),
 					Place:       random.AlphaNumeric(),
-					Level:       domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+					Level:       domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
 					HostName:    rHost,
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
@@ -218,7 +217,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
 
 				reqBody := &EditEventRequest{
 					EventLevel: hLevel(eventLevelUint8),
@@ -246,7 +245,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
 
 				reqBody := &EditEventRequest{
 					EventLevel: hLevel(eventLevelUint8),
@@ -267,7 +266,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
 
 				reqBody := &EditEventRequest{
 					EventLevel: hLevel(eventLevelUint8),
@@ -288,7 +287,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventRequest, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(domain.EventLevelLimit)
+				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
 
 				reqBody := &EditEventRequest{
 					EventLevel: hLevel(eventLevelUint8),

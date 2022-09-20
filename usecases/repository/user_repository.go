@@ -26,7 +26,7 @@ type UpdateUserArgs struct {
 
 type CreateAccountArgs struct {
 	DisplayName string // 外部アカウントの表示名
-	Type        uint
+	Type        uint8
 	URL         string
 	PrPermitted bool
 }

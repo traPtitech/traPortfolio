@@ -163,7 +163,7 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
 		DisplayName: req.DisplayName,
-		Type:        uint(req.Type),
+		Type:        uint8(req.Type),
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
@@ -352,7 +352,7 @@ func newUserDetail(user User, accounts []Account, bio string, state domain.TraQS
 	}
 }
 
-func newAccount(id uuid.UUID, displayName string, atype uint, url string, prPermitted bool) Account {
+func newAccount(id uuid.UUID, displayName string, atype uint8, url string, prPermitted bool) Account {
 	return Account{
 		Id:          id,
 		DisplayName: displayName,
