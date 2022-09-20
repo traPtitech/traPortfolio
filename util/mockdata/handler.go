@@ -18,7 +18,7 @@ var (
 	HMockProjectMembers   = CloneHandlerMockProjectMembers()
 	HMockUsers            = CloneHandlerMockUsers()
 	HMockUserDetails      = CloneHandlerMockUserDetails()
-	HMockUserAccounts     = CloneHandlerMockUserAccounts()
+	HMockUserAccountsByID = CloneHandlerMockUserAccountsByID()
 	HMockUserEvents       = CloneHandlerMockUserEvents()
 	HMockUserContestsByID = CloneHandlerMockUserContestsByID()
 	HMockUserGroupsByID   = CloneHandlerMockUserGroupsByID()
@@ -341,40 +341,41 @@ func CloneHandlerMockUserDetails() []handler.UserDetail {
 		mUsers      = CloneMockUsers()
 		portalUsers = CloneMockPortalUsers()
 		traqUsers   = CloneMockTraQUsers()
-		hAccounts   = CloneHandlerMockUserAccounts()
+		hAccounts   = CloneHandlerMockUserAccountsByID()
 		hUsers      = make([]handler.UserDetail, len(mUsers))
 	)
 
 	for i, mu := range mUsers {
 		hUsers[i] = handler.UserDetail{
-			Accounts: []handler.Account{},
+			Accounts: hAccounts[mu.ID],
 			Bio:      mu.Description,
 			Id:       mu.ID,
 			Name:     mu.Name,
 			RealName: portalUsers[i].RealName,
 			State:    handler.UserAccountState(traqUsers[i].User.State),
 		}
-
-		if mu.ID == UserID1() {
-			hUsers[i].Accounts = hAccounts
-		}
 	}
 
 	return hUsers
 }
 
-func CloneHandlerMockUserAccounts() []handler.Account {
-	var mAccount = CloneMockAccount()
+func CloneHandlerMockUserAccountsByID() map[uuid.UUID][]handler.Account {
+	var (
+		mAccounts = CloneMockAccounts()
+		hAccounts = make(map[uuid.UUID][]handler.Account)
+	)
 
-	return []handler.Account{
-		{
-			DisplayName: mAccount.Name,
-			Id:          mAccount.ID,
-			PrPermitted: handler.PrPermitted(mAccount.Check),
-			Type:        handler.AccountType(mAccount.Type),
-			Url:         mAccount.URL,
-		},
+	for _, a := range mAccounts {
+		hAccounts[a.UserID] = append(hAccounts[a.UserID], handler.Account{
+			DisplayName: a.Name,
+			Id:          a.ID,
+			PrPermitted: a.Check,
+			Type:        handler.AccountType(a.Type),
+			Url:         a.URL,
+		})
 	}
+
+	return hAccounts
 }
 
 func CloneHandlerMockUserEvents() []handler.Event {

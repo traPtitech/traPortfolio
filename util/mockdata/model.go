@@ -10,7 +10,7 @@ import (
 
 var (
 	MockUsers                     = CloneMockUsers()
-	MockAccount                   = CloneMockAccount()
+	MockAccounts                  = CloneMockAccounts()
 	MockContests                  = CloneMockContests()
 	MockContestTeams              = CloneMockContestTeams()
 	MockContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
@@ -45,14 +45,16 @@ func CloneMockUsers() []*model.User {
 	}
 }
 
-func CloneMockAccount() model.Account {
-	return model.Account{
-		ID:     AccountID1(),
-		Type:   0,
-		Name:   "sample_account_display_name",
-		URL:    "https://sample.accounts.com",
-		UserID: UserID1(),
-		Check:  true,
+func CloneMockAccounts() []model.Account {
+	return []model.Account{
+		{
+			ID:     AccountID1(),
+			Type:   0,
+			Name:   "sample_account_display_name",
+			URL:    "https://sample.accounts.com",
+			UserID: UserID1(),
+			Check:  true,
+		},
 	}
 }
 
@@ -210,8 +212,8 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 		return err
 	}
 
-	mockAccount := CloneMockAccount()
-	if err := h.Create(&mockAccount).Error(); err != nil {
+	mockAccounts := CloneMockAccounts()
+	if err := h.Create(&mockAccounts).Error(); err != nil {
 		return err
 	}
 

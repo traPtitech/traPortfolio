@@ -163,11 +163,11 @@ func TestUserRepository_GetUser(t *testing.T) {
 				Bio:   mockdata.MockUsers[0].Description,
 				Accounts: []*domain.Account{
 					{
-						ID:          mockdata.MockAccount.ID,
-						DisplayName: mockdata.MockAccount.Name,
-						Type:        mockdata.MockAccount.Type,
-						PrPermitted: mockdata.MockAccount.Check,
-						URL:         mockdata.MockAccount.URL,
+						ID:          mockdata.MockAccounts[0].ID,
+						DisplayName: mockdata.MockAccounts[0].Name,
+						Type:        mockdata.MockAccounts[0].Type,
+						PrPermitted: mockdata.MockAccounts[0].Check,
+						URL:         mockdata.MockAccounts[0].URL,
 					},
 				},
 			},
