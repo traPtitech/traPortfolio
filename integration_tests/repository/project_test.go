@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"math/rand"
 	"sync"
 	"testing"
 
@@ -82,10 +81,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		Name:          random.OptAlphaNumeric(),
 		Description:   random.OptAlphaNumeric(),
 		Link:          random.OptAlphaNumeric(),
-		SinceYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-		SinceSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
-		UntilYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-		UntilSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
+		SinceYear:     optional.NewInt64(int64(random.Duration().Since.Year), random.Bool()),
+		SinceSemester: optional.NewInt64(int64(random.Duration().Since.Semester), random.Bool()),
+		UntilYear:     optional.NewInt64(int64(random.Duration().Until.Year), random.Bool()),
+		UntilSemester: optional.NewInt64(int64(random.Duration().Until.Semester), random.Bool()),
 	}
 
 	if arg1.Name.Valid {
@@ -139,10 +138,10 @@ func TestProjectRepository_UpdateProject_Concurrent(t *testing.T) {
 				Name:          random.OptAlphaNumeric(),
 				Description:   random.OptAlphaNumeric(),
 				Link:          random.OptAlphaNumeric(),
-				SinceYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-				SinceSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
-				UntilYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-				UntilSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
+				SinceYear:     optional.NewInt64(int64(random.Duration().Since.Year), random.Bool()),
+				SinceSemester: optional.NewInt64(int64(random.Duration().Since.Semester), random.Bool()),
+				UntilYear:     optional.NewInt64(int64(random.Duration().Until.Year), random.Bool()),
+				UntilSemester: optional.NewInt64(int64(random.Duration().Until.Semester), random.Bool()),
 			}
 
 			if arg1.Name.Valid {
