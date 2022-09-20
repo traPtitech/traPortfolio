@@ -105,7 +105,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		"204 without change": {
 			http.StatusNoContent,
-			mockdata.KnoqEventGroupID2(),
+			mockdata.KnoqEventID2(),
 			handler.EditEventRequest{},
 			nil,
 		},
