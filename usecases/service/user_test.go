@@ -171,7 +171,7 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumericNotNull(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -186,7 +186,7 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumericNotNull(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -387,7 +387,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumeric(),
+					DisplayName: random.OptAlphaNumericNotNull(),
 					Type:        random.OptInt64(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: optional.NewBool(true, true),
@@ -405,7 +405,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumeric(),
+					DisplayName: random.OptAlphaNumericNotNull(),
 					Type:        random.OptInt64(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: optional.NewBool(true, true),

@@ -133,6 +133,10 @@ func OptAlphaNumeric() optional.String {
 	return optional.NewString(AlphaNumeric(), Bool())
 }
 
+func OptAlphaNumericNotNull() optional.String {
+	return optional.NewString(AlphaNumeric(), true)
+}
+
 func OptTime() optional.Time {
 	return optional.NewTime(Time(), Bool())
 }
