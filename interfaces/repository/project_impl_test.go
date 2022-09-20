@@ -530,11 +530,14 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
 
+			repo := NewProjectRepository(f.h, f.portal)
+			// Assertion
+			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
+
 			// concurrently test
 			wg := sync.WaitGroup{}
 			for i := 0; i < 3; i++ {
 				tt.setup(f, tt.args)
-				repo := NewProjectRepository(f.h, f.portal)
 
 				wg.Add(1)
 				go func(t *testing.T) {
