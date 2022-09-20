@@ -344,7 +344,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(),
 		Description:   random.AlphaNumeric(),
-		Link:          random.OptURLString(),
+		Link:          random.OptURLStringNotNull(),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
 		UntilYear:     duration.Until.Year,
@@ -402,7 +402,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          random.OptURLString(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -461,7 +461,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				args: &repository.UpdateProjectArgs{
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
-					Link:          random.OptURLString(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     random.OptInt64(),
 					SinceSemester: random.OptInt64(),
 					UntilYear:     random.OptInt64(),
@@ -485,7 +485,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				args: &repository.UpdateProjectArgs{
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
-					Link:          random.OptURLString(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     random.OptInt64(),
 					SinceSemester: random.OptInt64(),
 					UntilYear:     random.OptInt64(),

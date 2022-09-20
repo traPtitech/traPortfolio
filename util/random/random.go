@@ -140,3 +140,7 @@ func OptTime() optional.Time {
 func OptURLString() optional.String {
 	return optional.NewString(RandURLString(), Bool())
 }
+
+func OptURLStringNotNull() optional.String {
+	return optional.NewString(RandURLString(), true)
+}
