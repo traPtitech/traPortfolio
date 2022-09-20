@@ -3,13 +3,13 @@ package handler
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -52,7 +52,7 @@ func TestGetContest(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.ContestID1(),
-			mockdata.HMockContests[0],
+			mockdata.HMockContestDetails[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -83,13 +83,14 @@ func TestGetContest(t *testing.T) {
 // CreateContest POST /contests
 func TestCreateContest(t *testing.T) {
 	var (
-		name          = random.AlphaNumeric()
-		link          = random.RandURLString()
-		description   = random.AlphaNumeric()
-		since, until  = random.SinceAndUntil()
-		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		invalidURL    = "invalid url"
+		name         = random.AlphaNumeric()
+		link         = random.RandURLString()
+		description  = random.AlphaNumeric()
+		since, until = random.SinceAndUntil()
 		//tooLongStringは260文字
+		tooLongString  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		invalidURL     = "invalid url"
+		unexpectedTime = time.Date(2100, 1, 0, 0, 0, 0, 0, time.UTC)
 	)
 
 	t.Parallel()
@@ -132,7 +133,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError(repository.ErrValidate.Error()),
+			testutils.HTTPError("bad request: description is too short or too long"),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
@@ -145,7 +146,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &invalidURL,
 				Name: name,
 			},
-			testutils.HTTPError(repository.ErrValidate.Error()),
+			testutils.HTTPError("bad request: invalid link"),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -158,7 +159,46 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: tooLongString,
 			},
-			testutils.HTTPError(repository.ErrValidate.Error()),
+			testutils.HTTPError("bad request: name is too short or too long"),
+		},
+		"400 unexpected since time": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: unexpectedTime,
+					Until: &until,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: unexpected since time"),
+		},
+		"400 unexpected until time": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &unexpectedTime,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: unexpected until time"),
+		},
+		"400 since time is after until time": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: until,
+					Until: &since,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: since time is after until time"),
 		},
 	}
 
