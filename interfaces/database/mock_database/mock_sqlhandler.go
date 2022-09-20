@@ -104,8 +104,8 @@ func (handler *MockSQLHandler) Transaction(fc func(database.SQLHandler) error) e
 	return handler.Conn.Transaction(ffc)
 }
 
-func (handler *MockSQLHandler) Clauses(conds ...clause.Expression) database.SQLHandler {
-	db := handler.Conn.Clauses(conds...)
+func (handler *MockSQLHandler) FirstForUpdate(out interface{}, where ...interface{}) database.SQLHandler {
+	db := handler.Conn.Clauses(clause.Locking{Strength: "UPDATE"}).First(out, where...)
 	return &MockSQLHandler{Conn: db}
 }
 

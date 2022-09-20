@@ -120,8 +120,8 @@ func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error
 	return handler.conn.Transaction(ffc)
 }
 
-func (handler *SQLHandler) Clauses(conds ...clause.Expression) database.SQLHandler {
-	db := handler.conn.Clauses(conds...)
+func (handler *SQLHandler) FirstForUpdate(out interface{}, where ...interface{}) database.SQLHandler {
+	db := handler.conn.Clauses(clause.Locking{Strength: "UPDATE"}).First(out, where...)
 	return &SQLHandler{conn: db}
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
-	"gorm.io/gorm/clause"
 )
 
 type ProjectRepository struct {
@@ -153,9 +152,8 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		//存在チェック
 		if err := tx.
-			Clauses(clause.Locking{Strength: "UPDATE"}).
 			Where(&model.Project{ID: projectID}).
-			First(&model.Project{}).
+			FirstForUpdate(&model.Project{}).
 			Error(); err != nil {
 			return convertError(err)
 		}
