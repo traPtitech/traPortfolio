@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql/driver"
-	"sync"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -475,13 +474,6 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1 FOR UPDATE")).
-					WithArgs(args.id).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}).
-							AddRow(args.id),
-					)
-				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
 					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -506,13 +498,6 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1 FOR UPDATE")).
-					WithArgs(args.id).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}).
-							AddRow(args.id),
-					)
-				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
 					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
@@ -525,29 +510,13 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-
 			// Setup mock
 			ctrl := gomock.NewController(t)
 			f := newMockProjectRepositoryFields(ctrl)
-
+			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
-
-			// concurrently test
-			wg := sync.WaitGroup{}
-			for i := 0; i < 3; i++ {
-				tt.setup(f, tt.args)
-
-				wg.Add(1)
-				go func(t *testing.T) {
-					defer wg.Done()
-					// Assertion
-					tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
-				}(t)
-			}
-
-			wg.Wait()
 		})
 	}
 }
