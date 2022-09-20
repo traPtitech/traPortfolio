@@ -1,14 +1,11 @@
 package infrastructure
 
 import (
-	"errors"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
@@ -131,12 +128,7 @@ func (handler *SQLHandler) Ping() error {
 }
 
 func (handler *SQLHandler) Error() error {
-	err := handler.conn.Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return repository.ErrNotFound
-	}
-
-	return err
+	return handler.conn.Error
 }
 
 // Interface guards

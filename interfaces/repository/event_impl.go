@@ -23,7 +23,7 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) reposito
 func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
 	events, err := repo.knoq.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	result := make([]*domain.Event, 0, len(events))
@@ -43,7 +43,7 @@ func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
 func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
 	er, err := repo.knoq.GetByEventID(eventID)
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	// IDのリストだけ取得、Name,RealNameはPortalから取得する
@@ -73,7 +73,7 @@ func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, e
 	} else if errors.Is(err, repository.ErrNotFound) {
 		result.Level = domain.EventLevelAnonymous
 	} else {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	return result, nil
@@ -82,7 +82,7 @@ func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, e
 func (repo *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelArgs) error {
 	_, err := repo.knoq.GetByEventID(arg.EventID)
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	relation := model.EventLevelRelation{
@@ -92,7 +92,7 @@ func (repo *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelAr
 
 	err = repo.h.Create(&relation).Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
@@ -105,19 +105,19 @@ func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository
 
 	err := repo.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := repo.getEventLevelByID(eventID); err != nil {
-			return err
+			return convertError(err)
 		} else if uint8(elv.Level) == arg.Level.Byte {
 			return nil // updateする必要がないのでここでcommitする
 		}
 
 		if err := tx.Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
-			return err
+			return convertError(err)
 		}
 
 		return nil
 	})
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
@@ -126,7 +126,7 @@ func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository
 func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
 	events, err := repo.knoq.GetByUserID(userID)
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	result := make([]*domain.Event, 0, len(events))
@@ -149,7 +149,7 @@ func (repo *EventRepository) getEventLevelByID(eventID uuid.UUID) (*model.EventL
 		First(elv).
 		Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	return elv, nil
 }

@@ -23,7 +23,7 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	projects := make([]*model.Project, 0)
 	err := repo.h.Find(&projects).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 	res := make([]*domain.Project, 0, len(projects))
 	for _, v := range projects {
@@ -43,7 +43,7 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 		Where(&model.Project{ID: projectID}).
 		First(project).
 		Error(); err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	members := make([]*model.ProjectMember, 0)
@@ -53,7 +53,7 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 		Find(&members).
 		Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	portalUsers, err := repo.portal.GetAll()
@@ -112,7 +112,7 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 
 	err := repo.h.Create(&p).Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	res := &domain.ProjectDetail{
@@ -158,7 +158,7 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 		Updates(changes).
 		Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
@@ -172,7 +172,7 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 		Find(&members).
 		Error()
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	portalUsers, err := repo.portal.GetAll()
@@ -225,7 +225,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 		First(&model.Project{}).
 		Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
@@ -235,7 +235,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 		Find(&_mmbs).
 		Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 	for _, v := range _mmbs {
 		mmbsMp[v.UserID] = struct{}{}
@@ -263,13 +263,13 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 			}
 			err = tx.Create(v).Error()
 			if err != nil {
-				return err
+				return convertError(err)
 			}
 		}
 		return nil
 	})
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
@@ -286,7 +286,7 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 		First(&model.Project{}).
 		Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	err = repo.h.
@@ -295,7 +295,7 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 		Delete(&model.ProjectMember{}).
 		Error()
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return nil
