@@ -117,6 +117,11 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	}
 }
 
+type project struct {
+	mu sync.Mutex
+	v  *domain.ProjectDetail
+}
+
 func TestProjectRepository_UpdateProject_Concurrent(t *testing.T) {
 	t.Parallel()
 
@@ -128,12 +133,14 @@ func TestProjectRepository_UpdateProject_Concurrent(t *testing.T) {
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	mustMakeProjectDetail(t, repo, nil)
 
+	p := project{v: project1}
+
 	wg := sync.WaitGroup{}
 	for i := 0; i < 3; i++ {
-
 		wg.Add(1)
 		go func(t *testing.T) {
 			defer wg.Done()
+			p.mu.Lock()
 			arg1 := urepository.UpdateProjectArgs{
 				Name:          random.OptAlphaNumeric(),
 				Description:   random.OptAlphaNumeric(),
@@ -145,29 +152,31 @@ func TestProjectRepository_UpdateProject_Concurrent(t *testing.T) {
 			}
 
 			if arg1.Name.Valid {
-				project1.Name = arg1.Name.String
+				p.v.Name = arg1.Name.String
 			}
 			if arg1.Description.Valid {
-				project1.Description = arg1.Description.String
+				p.v.Description = arg1.Description.String
 			}
 			if arg1.Link.Valid {
-				project1.Link = arg1.Link.String
+				p.v.Link = arg1.Link.String
 			}
 			if arg1.SinceYear.Valid && arg1.SinceSemester.Valid {
-				project1.Duration.Since.Year = int(arg1.SinceYear.Int64)
-				project1.Duration.Since.Semester = int(arg1.SinceSemester.Int64)
+				p.v.Duration.Since.Year = int(arg1.SinceYear.Int64)
+				p.v.Duration.Since.Semester = int(arg1.SinceSemester.Int64)
 			}
 			if arg1.UntilYear.Valid && arg1.UntilSemester.Valid {
-				project1.Duration.Until.Year = int(arg1.UntilYear.Int64)
-				project1.Duration.Until.Semester = int(arg1.UntilSemester.Int64)
+				p.v.Duration.Until.Year = int(arg1.UntilYear.Int64)
+				p.v.Duration.Until.Semester = int(arg1.UntilSemester.Int64)
 			}
 
+			p.mu.Unlock()
 			err := repo.UpdateProject(project1.ID, &arg1)
 			assert.NoError(t, err)
 		}(t)
 	}
 
 	wg.Wait()
+	project1 = p.v
 
 	got, err := repo.GetProject(project1.ID)
 	assert.NoError(t, err)
