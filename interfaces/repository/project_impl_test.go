@@ -526,20 +526,25 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockProjectRepositoryFields(ctrl)
+
+			// concurrently test
 			wg := sync.WaitGroup{}
 			for i := 0; i < 3; i++ {
+				tt.setup(f, tt.args)
+				repo := NewProjectRepository(f.h, f.portal)
+
 				wg.Add(1)
 				go func(t *testing.T) {
 					defer wg.Done()
-					// Setup mock
-					ctrl := gomock.NewController(t)
-					f := newMockProjectRepositoryFields(ctrl)
-					tt.setup(f, tt.args)
-					repo := NewProjectRepository(f.h, f.portal)
 					// Assertion
 					tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
 				}(t)
 			}
+
+			wg.Wait()
 		})
 	}
 }
