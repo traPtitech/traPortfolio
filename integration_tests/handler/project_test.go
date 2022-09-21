@@ -145,7 +145,7 @@ func TestCreateProjecct(t *testing.T) {
 				Link:        &link,
 				Description: description,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("bad request: argument error"),
 		},
 	}
 
