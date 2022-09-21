@@ -12,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -343,7 +342,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        handler.AccountType(atype),
 				Url:         "invalid url",
 			},
-			testutils.HTTPError(repository.ErrValidate.Error()),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
@@ -354,7 +353,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        handler.AccountType(domain.AccountLimit),
 				Url:         url,
 			},
-			testutils.HTTPError(repository.ErrValidate.Error()),
+			testutils.HTTPError("bad request: validate error"),
 		},
 	}
 
