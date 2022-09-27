@@ -11,7 +11,7 @@ import (
 type GetUsersArgs struct {
 	IncludeSuspended optional.Bool
 	Name             optional.String
-	Limit 		  	 optional.Int64
+	Limit            optional.Int64
 }
 
 type CreateUserArgs struct {
