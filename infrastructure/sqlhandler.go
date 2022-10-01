@@ -15,6 +15,10 @@ type SQLHandler struct {
 	conn *gorm.DB
 }
 
+func NewSQLHandler(db *gorm.DB) database.SQLHandler {
+	return &SQLHandler{conn: db}
+}
+
 func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	engine, err := gorm.Open(
 		mysql.New(mysql.Config{DSN: conf.Dsn()}),
@@ -36,10 +40,6 @@ func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	}
 
 	return engine, nil
-}
-
-func NewSQLHandler(db *gorm.DB) database.SQLHandler {
-	return &SQLHandler{conn: db}
 }
 
 // initDB データベースのスキーマを更新
