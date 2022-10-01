@@ -9,6 +9,7 @@ import (
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
+	"gorm.io/gorm"
 )
 
 var pingSet = wire.NewSet(
@@ -46,7 +47,7 @@ var contestSet = wire.NewSet(
 )
 
 var sqlSet = wire.NewSet(
-	NewSQLHandler,
+	FromDB,
 )
 
 var externalSet = wire.NewSet(
@@ -59,19 +60,17 @@ var apiSet = wire.NewSet(handler.NewAPI)
 
 var confSet = wire.NewSet(
 	provideIsDevelopMent,
-	provideSQLConf,
 	provideTraqConf,
 	provideKnoqConf,
 	providePortalConf,
 )
 
-func provideIsDevelopMent(c *config.Config) bool		  				{ return c.IsDevelopment() }
-func provideSQLConf(c *config.Config) *config.SQLConfig       { return c.SQLConf() }
+func provideIsDevelopMent(c *config.Config) bool              { return c.IsDevelopment() }
 func provideTraqConf(c *config.Config) *config.TraqConfig     { return c.TraqConf() }
 func provideKnoqConf(c *config.Config) *config.KnoqConfig     { return c.KnoqConf() }
 func providePortalConf(c *config.Config) *config.PortalConfig { return c.PortalConf() }
 
-func InjectAPIServer(c *config.Config) (handler.API, error) {
+func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

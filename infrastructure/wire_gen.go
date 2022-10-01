@@ -12,17 +12,14 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
+	"gorm.io/gorm"
 )
 
 // Injectors from wire.go:
 
-func InjectAPIServer(c *config.Config) (handler.API, error) {
+func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
-	sqlConfig := provideSQLConf(c)
-	sqlHandler, err := NewSQLHandler(sqlConfig)
-	if err != nil {
-		return handler.API{}, err
-	}
+	sqlHandler := FromDB(db)
 	portalConfig := providePortalConf(c)
 	bool2 := provideIsDevelopMent(c)
 	portalAPI, err := NewPortalAPI(portalConfig, bool2)
@@ -73,7 +70,7 @@ var groupSet = wire.NewSet(repository.NewGroupRepository, service.NewGroupServic
 var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
 
 var sqlSet = wire.NewSet(
-	NewSQLHandler,
+	FromDB,
 )
 
 var externalSet = wire.NewSet(
@@ -86,15 +83,12 @@ var apiSet = wire.NewSet(handler.NewAPI)
 
 var confSet = wire.NewSet(
 	provideIsDevelopMent,
-	provideSQLConf,
 	provideTraqConf,
 	provideKnoqConf,
 	providePortalConf,
 )
 
 func provideIsDevelopMent(c *config.Config) bool { return c.IsDevelopment() }
-
-func provideSQLConf(c *config.Config) *config.SQLConfig { return c.SQLConf() }
 
 func provideTraqConf(c *config.Config) *config.TraqConfig { return c.TraqConf() }
 

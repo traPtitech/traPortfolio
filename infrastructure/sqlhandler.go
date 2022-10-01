@@ -15,15 +15,15 @@ type SQLHandler struct {
 	conn *gorm.DB
 }
 
-func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
+func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	engine, err := gorm.Open(
 		mysql.New(mysql.Config{DSN: conf.Dsn()}),
 		conf.GormConfig(),
 	)
 	if err != nil {
-		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
 	}
+
 	db, err := engine.DB()
 	if err != nil {
 		return nil, err
@@ -35,9 +35,7 @@ func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
 		return nil, err
 	}
 
-	sqlHandler := new(SQLHandler)
-	sqlHandler.conn = engine
-	return sqlHandler, nil
+	return engine, nil
 }
 
 func FromDB(db *gorm.DB) database.SQLHandler {

@@ -16,7 +16,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
+func SetupGormDB(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	t.Helper()
 
 	db := establishTestDBConnection(t, sqlConf)
@@ -28,6 +28,15 @@ func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
 		panic(err)
 	}
 	assert.NoError(t, err)
+
+	return db
+}
+
+func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
+	t.Helper()
+
+	db := SetupGormDB(t, sqlConf)
+
 	h := infrastructure.FromDB(db)
 	return h
 }

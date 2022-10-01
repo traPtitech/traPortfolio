@@ -15,10 +15,11 @@ func main() {
 	appConf := config.GetConfig()
 	s := appConf.SQLConf()
 	// migration
-	h, err := infrastructure.NewSQLHandler(s)
+	db, err := infrastructure.NewGormDB(s)
 	if err != nil {
 		log.Fatal(err)
 	}
+	h := infrastructure.FromDB(db) // TODO: tmp
 
 	if appConf.IsMigrate() {
 		log.Println("migration finished")
@@ -35,7 +36,7 @@ func main() {
 		}
 	}
 
-	api, err := infrastructure.InjectAPIServer(appConf)
+	api, err := infrastructure.InjectAPIServer(appConf, db)
 	if err != nil {
 		log.Fatal(err)
 	}
