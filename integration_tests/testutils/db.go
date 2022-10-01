@@ -37,7 +37,7 @@ func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
 
 	db := SetupGormDB(t, sqlConf)
 
-	h := infrastructure.FromDB(db)
+	h := infrastructure.NewSQLHandler(db)
 	return h
 }
 

@@ -19,7 +19,7 @@ import (
 
 func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
-	sqlHandler := FromDB(db)
+	sqlHandler := NewSQLHandler(db)
 	portalConfig := providePortalConf(c)
 	bool2 := provideIsDevelopMent(c)
 	portalAPI, err := NewPortalAPI(portalConfig, bool2)
@@ -70,7 +70,7 @@ var groupSet = wire.NewSet(repository.NewGroupRepository, service.NewGroupServic
 var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
 
 var sqlSet = wire.NewSet(
-	FromDB,
+	NewSQLHandler,
 )
 
 var externalSet = wire.NewSet(

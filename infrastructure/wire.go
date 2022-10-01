@@ -47,7 +47,7 @@ var contestSet = wire.NewSet(
 )
 
 var sqlSet = wire.NewSet(
-	FromDB,
+	NewSQLHandler,
 )
 
 var externalSet = wire.NewSet(

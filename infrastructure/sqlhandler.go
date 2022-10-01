@@ -38,7 +38,7 @@ func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	return engine, nil
 }
 
-func FromDB(db *gorm.DB) database.SQLHandler {
+func NewSQLHandler(db *gorm.DB) database.SQLHandler {
 	return &SQLHandler{conn: db}
 }
 
