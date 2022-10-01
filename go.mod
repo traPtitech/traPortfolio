@@ -11,7 +11,7 @@ require (
 	github.com/google/go-cmp v0.5.8
 	github.com/google/wire v0.5.0
 	github.com/json-iterator/go v1.1.12
-	github.com/labstack/echo/v4 v4.8.0
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.12.0
