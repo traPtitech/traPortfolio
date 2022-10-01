@@ -12,14 +12,12 @@ import (
 
 func main() {
 	config.Parse()
+
 	appConf := config.GetConfig()
-	s := appConf.SQLConf()
-	// migration
-	db, err := infrastructure.NewGormDB(s)
+	db, err := infrastructure.NewGormDB(appConf.SQLConf())
 	if err != nil {
 		log.Fatal(err)
 	}
-	h := infrastructure.FromDB(db) // TODO: tmp
 
 	if appConf.IsMigrate() {
 		log.Println("migration finished")
@@ -31,7 +29,7 @@ func main() {
 			log.Fatal("cannot specify both `production` and `insert-mock-data`")
 		}
 
-		if err := mockdata.InsertSampleDataToDB(h); err != nil {
+		if err := mockdata.InsertSampleDataToDB(infrastructure.FromDB(db)); err != nil {
 			log.Fatal(err)
 		}
 	}
