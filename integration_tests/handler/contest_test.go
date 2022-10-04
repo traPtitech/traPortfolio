@@ -153,13 +153,170 @@ func AddContestTeam(t *testing.T) {
 func EditContestTeam(t *testing.T) {
 }
 
-func GetContestTeamMember(t *testing.T) {
+// GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
+func TestGetContestTeamMembers(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		teamID     uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			[]handler.User{
+				mockdata.CloneHandlerMockUsers()[0],
+			},
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.ContestTeamID1(),
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid teamID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			uuid.Nil,
+			testutils.HTTPError("bad request: nil id"),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_get_contest_team_members")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeamMembers, tt.contestID, tt.teamID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
 }
 
-func AddContestTeamMember(t *testing.T) {
+// AddContestTeamMember POST /contests/:contestID/teams/:teamID/members
+func TestAddContestTeamMember(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		teamID     uuid.UUID
+		reqbody    handler.AddContestTeamMembersJSONBody
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.AddContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID2(),
+				},
+			},
+			nil,
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.ContestTeamID1(),
+			handler.AddContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID2(),
+				},
+			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid teamID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			uuid.Nil,
+			handler.AddContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID2(),
+				},
+			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_add_contest_team_member")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
 }
 
-func EditContestTeamMember(t *testing.T) {
+// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
+func TestEditContestTeamMember(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		teamID     uuid.UUID
+		reqbody    handler.EditContestTeamMembersJSONBody
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID1(),
+					mockdata.UserID2(),
+				},
+			},
+			nil,
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID1(),
+					mockdata.UserID2(),
+				},
+			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid teamID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			uuid.Nil,
+			handler.EditContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID1(),
+					mockdata.UserID2(),
+				},
+			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest_team_member")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
 }
 
 /*
