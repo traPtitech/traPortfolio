@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 
 	"github.com/gofrs/uuid"
@@ -225,7 +224,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8(domain.EventLevelAnonymous, true),
+					Level: random.OptUint8NotNull(domain.EventLevelAnonymous),
 				},
 			},
 			setup: func(f fields, args args) {

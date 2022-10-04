@@ -12,7 +12,6 @@ import (
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -109,7 +108,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 
 	updatedLevel := random.Uint8n(domain.EventLevelLimit)
 	err = repo.UpdateEventLevel(selected.EventID, &urepository.UpdateEventLevelArgs{
-		Level: optional.NewUint8(updatedLevel, true),
+		Level: random.OptUint8NotNull(updatedLevel),
 	})
 	assert.NoError(t, err)
 
