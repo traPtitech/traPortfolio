@@ -153,10 +153,10 @@ func OptURLStringNotNull() optional.String {
 	return optional.NewString(RandURLString(), true)
 }
 
-func OptUint8(n uint8) optional.Uint8 {
-	return optional.NewUint8(n, Bool())
+func OptUint8n(n uint8) optional.Uint8 {
+	return optional.NewUint8(Uint8n(n), Bool())
 }
 
 func OptUint8NotNull(n uint8) optional.Uint8 {
-	return optional.NewUint8(n, true)
+	return optional.NewUint8(Uint8n(n), true)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -449,6 +450,8 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 }
 
 func TestProjectRepository_UpdateProject(t *testing.T) {
+	d := random.Duration()
+
 	t.Parallel()
 	type args struct {
 		id   uuid.UUID
@@ -468,10 +471,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumericNotNull(),
 					Description:   random.OptAlphaNumericNotNull(),
 					Link:          random.OptURLStringNotNull(),
-					SinceYear:     random.OptInt64NotNull(),
-					SinceSemester: random.OptInt64NotNull(),
-					UntilYear:     random.OptInt64NotNull(),
-					UntilSemester: random.OptInt64NotNull(),
+					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
+					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
+					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
+					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
@@ -492,10 +495,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumericNotNull(),
 					Description:   random.OptAlphaNumericNotNull(),
 					Link:          random.OptURLStringNotNull(),
-					SinceYear:     random.OptInt64NotNull(),
-					SinceSemester: random.OptInt64NotNull(),
-					UntilYear:     random.OptInt64NotNull(),
-					UntilSemester: random.OptInt64NotNull(),
+					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
+					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
+					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
+					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {

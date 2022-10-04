@@ -12,6 +12,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -224,7 +225,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(eventLevelUint8),
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -252,7 +253,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(eventLevelUint8),
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -273,7 +274,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(eventLevelUint8),
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -294,7 +295,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(eventLevelUint8),
+					Level: optional.NewUint8((eventLevelUint8), true),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)

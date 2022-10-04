@@ -14,6 +14,7 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
 )
@@ -337,7 +338,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(domain.EventLevelPublic),
+					Level: optional.NewUint8(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -360,7 +361,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(domain.EventLevelPublic),
+					Level: optional.NewUint8(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -377,7 +378,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(domain.EventLevelPublic),
+					Level: optional.NewUint8(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -397,7 +398,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: random.OptUint8NotNull(domain.EventLevelPublic),
+					Level: optional.NewUint8(domain.EventLevelPublic, true),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
