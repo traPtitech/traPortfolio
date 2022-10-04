@@ -127,6 +127,12 @@ func (handler *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
+func (handler *SQLHandler) Limit(limit int) database.SQLHandler {
+	db := handler.conn.Limit(limit)
+	return &SQLHandler{conn: db}
+}
+
+
 func (handler *SQLHandler) Error() error {
 	return handler.conn.Error
 }

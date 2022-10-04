@@ -64,6 +64,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	if err := repo.h.
 		Where("`users`.`id` IN (?)", traqUserIDs).
 		Find(&users).
+		Limit(limit).
 		Error(); err != nil {
 		return nil, convertError(err)
 	}
@@ -103,10 +104,6 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 					RealName: v.RealName,
 				})
 			}
-		}
-
-		if (limit > 0) && (len(users) > limit) {
-			return result[:limit], nil
 		}
 
 		return result, nil
