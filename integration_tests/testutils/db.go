@@ -32,7 +32,7 @@ func SetupGormDB(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	return db
 }
 
-func SetupDB(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
+func SetupSQLHandler(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
 	t.Helper()
 
 	db := SetupGormDB(t, sqlConf)
