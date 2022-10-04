@@ -79,10 +79,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		Name:          random.OptAlphaNumeric(),
 		Description:   random.OptAlphaNumeric(),
 		Link:          random.OptAlphaNumeric(),
-		SinceYear:     random.OptInt64NotNull(),
-		SinceSemester: random.OptInt64NotNull(),
-		UntilYear:     random.OptInt64NotNull(),
-		UntilSemester: random.OptInt64NotNull(),
+		SinceYear:     random.OptInt64n(2100),
+		SinceSemester: random.OptInt64n(2),
+		UntilYear:     random.OptInt64n(2100),
+		UntilSemester: random.OptInt64n(2),
 	}
 
 	if arg1.Name.Valid {

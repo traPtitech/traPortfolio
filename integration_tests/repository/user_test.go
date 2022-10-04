@@ -350,7 +350,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
-		Type:        random.OptInt64(),
+		Type:        random.OptInt64n(int64(domain.AccountLimit)),
 		URL:         random.OptAlphaNumeric(),
 		PrPermitted: random.OptBool(),
 	}
