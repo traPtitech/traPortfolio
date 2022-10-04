@@ -560,8 +560,8 @@ type GroupIdInPath uuid.UUID
 // IncludeSuspendedInQuery defines model for includeSuspendedInQuery.
 type IncludeSuspendedInQuery = bool
 
-// Limit defines model for limit.
-type Limit = int64
+// LimitInQuery defines model for limitInQuery.
+type LimitInQuery = int64
 
 // NameInQuery defines model for nameInQuery.
 type NameInQuery = string
@@ -617,7 +617,7 @@ type GetUsersParams struct {
 	Name *NameInQuery `form:"name,omitempty" json:"name,omitempty" query:"name"`
 
 	// 取得数の上限
-	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // EditUserJSONBody defines parameters for EditUser.

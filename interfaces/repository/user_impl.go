@@ -105,7 +105,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 			}
 		}
 
-		if (limit != -1) && (len(users) > limit) {
+		if (limit > 0) && (len(users) > limit) {
 			return result[:limit], nil
 		}
 

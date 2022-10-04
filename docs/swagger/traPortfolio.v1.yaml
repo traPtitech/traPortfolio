@@ -29,7 +29,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/includeSuspendedInQuery'
         - $ref: '#/components/parameters/nameInQuery'
-        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/limitInQuery'
       tags:
         - user
   '/users/{userId}':
@@ -1545,13 +1545,13 @@ components:
       description: 指定した文字列がtraP IDに含まれているかどうか
       x-oapi-codegen-extra-tags:
         query: name
-    limit:
+    limitInQuery:
       name: limit
       in: query
       schema:
         type: integer
         format: int64
-        default: 1e9
+        default: 0
       required: false
       description: 取得数の上限
 tags:
