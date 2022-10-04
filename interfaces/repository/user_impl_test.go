@@ -7,12 +7,12 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
-	"gorm.io/gorm"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
@@ -607,7 +607,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -751,7 +751,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -888,7 +888,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -965,7 +965,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.accountID, args.userID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -1054,7 +1054,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.accountID, args.userID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -1167,7 +1167,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -1197,21 +1197,21 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.GroupUser
-		setup     func(f mockUserRepositoryFields, args args, want []*domain.GroupUser)
+		want      []*domain.UserGroup
+		setup     func(f mockUserRepositoryFields, args args, want []*domain.UserGroup)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Success",
 			args: args{userID: random.UUID()},
-			want: []*domain.GroupUser{
+			want: []*domain.UserGroup{
 				{
 					ID:       random.UUID(),
 					Name:     random.AlphaNumeric(),
 					Duration: random.Duration(),
 				},
 			},
-			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserGroup) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
@@ -1240,7 +1240,7 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 			name: "UnexpectedError",
 			args: args{userID: random.UUID()},
 			want: nil,
-			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserGroup) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
@@ -1256,11 +1256,11 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 			name: "User not found",
 			args: args{userID: random.UUID()},
 			want: nil,
-			setup: func(f mockUserRepositoryFields, args args, want []*domain.GroupUser) {
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserGroup) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},
@@ -1363,7 +1363,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
-					WillReturnError(gorm.ErrRecordNotFound)
+					WillReturnError(database.ErrNoRows)
 			},
 			assertion: assert.Error,
 		},

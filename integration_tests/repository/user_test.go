@@ -162,11 +162,11 @@ func TestUserRepository_GetUser(t *testing.T) {
 				Bio:   mockdata.MockUsers[0].Description,
 				Accounts: []*domain.Account{
 					{
-						ID:          mockdata.MockAccount.ID,
-						DisplayName: mockdata.MockAccount.Name,
-						Type:        mockdata.MockAccount.Type,
-						PrPermitted: mockdata.MockAccount.Check,
-						URL:         mockdata.MockAccount.URL,
+						ID:          mockdata.MockAccounts[0].ID,
+						DisplayName: mockdata.MockAccounts[0].Name,
+						Type:        mockdata.MockAccounts[0].Type,
+						PrPermitted: mockdata.MockAccounts[0].Check,
+						URL:         mockdata.MockAccounts[0].URL,
 					},
 				},
 			},
@@ -415,8 +415,8 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	project2 := mustMakeProject(t, projectRepo, nil)
 	user1 := mockdata.MockUsers[2]
 
-	expected1 := []*domain.ProjectMember{}
-	expected2 := []*domain.ProjectMember{}
+	expected1 := []*domain.UserWithDuration{}
+	expected2 := []*domain.UserWithDuration{}
 	users1, err := projectRepo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	users2, err := projectRepo.GetProjectMembers(project2.ID)

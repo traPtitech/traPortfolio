@@ -142,10 +142,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	args2 := mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
 	args3 := mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
 
-	projectMember1 := &domain.ProjectMember{
-		UserID:   user1.ID,
-		Name:     user1.Name,
-		RealName: user1.RealName,
+	projectMember1 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user1.ID,
+			Name:     user1.Name,
+			RealName: user1.RealName,
+		},
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args1.SinceYear,
@@ -157,10 +159,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	projectMember2 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember2 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args2.SinceYear,
@@ -172,15 +176,17 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	expected1 := []*domain.ProjectMember{projectMember1, projectMember2}
+	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
-	projectMember3 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember3 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args3.SinceYear,
@@ -193,7 +199,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		},
 	}
 
-	expected2 := []*domain.ProjectMember{projectMember3}
+	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
@@ -230,10 +236,12 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	args2 := mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
 	args3 := mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
 
-	projectMember1 := &domain.ProjectMember{
-		UserID:   user1.ID,
-		Name:     user1.Name,
-		RealName: user1.RealName,
+	projectMember1 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user1.ID,
+			Name:     user1.Name,
+			RealName: user1.RealName,
+		},
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args1.SinceYear,
@@ -245,10 +253,12 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	projectMember2 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember2 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args2.SinceYear,
@@ -260,15 +270,17 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	expected1 := []*domain.ProjectMember{projectMember1, projectMember2}
+	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
-	projectMember3 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember3 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args3.SinceYear,
@@ -280,28 +292,28 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	expected2 := []*domain.ProjectMember{projectMember3}
+	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember1.UserID})
+	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember1.User.ID})
 	assert.NoError(t, err)
-	expected3 := []*domain.ProjectMember{projectMember2}
+	expected3 := []*domain.UserWithDuration{projectMember2}
 	users3, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, users3)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember2.UserID})
+	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember2.User.ID})
 	assert.NoError(t, err)
-	expected4 := []*domain.ProjectMember{}
+	expected4 := []*domain.UserWithDuration{}
 	users4, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
-	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{projectMember3.UserID})
+	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{projectMember3.User.ID})
 	assert.NoError(t, err)
-	expected5 := []*domain.ProjectMember{}
+	expected5 := []*domain.UserWithDuration{}
 	users5, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected5, users5)

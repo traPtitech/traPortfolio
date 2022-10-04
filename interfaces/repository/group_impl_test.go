@@ -104,11 +104,13 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 						// RealName: random.AlphaNumeric(),
 					},
 				},
-				Members: []*domain.UserGroup{
+				Members: []*domain.UserWithDuration{
 					{
-						ID: random.UUID(),
-						// Name:     random.AlphaNumeric(),
-						// RealName: random.AlphaNumeric(),
+						User: domain.User{
+							ID: random.UUID(),
+							// Name:     random.AlphaNumeric(),
+							// RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					},
 				},
@@ -128,7 +130,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"user_id", "group_id", "since_year", "since_semester", "until_year", "until_semester"}).
-							AddRow(wm.ID, want.ID, wm.Duration.Since.Year, wm.Duration.Since.Semester, wm.Duration.Until.Year, wm.Duration.Until.Semester),
+							AddRow(wm.User.ID, want.ID, wm.Duration.Since.Year, wm.Duration.Since.Semester, wm.Duration.Until.Year, wm.Duration.Until.Semester),
 					)
 				wad := want.Admin[0]
 				f.h.Mock.
@@ -161,17 +163,23 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 						ID: random.UUID(),
 					},
 				},
-				Members: []*domain.UserGroup{
+				Members: []*domain.UserWithDuration{
 					{
-						ID:       random.UUID(),
+						User: domain.User{
+							ID: random.UUID(),
+						},
 						Duration: random.Duration(),
 					},
 					{
-						ID:       random.UUID(),
+						User: domain.User{
+							ID: random.UUID(),
+						},
 						Duration: random.Duration(),
 					},
 					{
-						ID:       random.UUID(),
+						User: domain.User{
+							ID: random.UUID(),
+						},
 						Duration: random.Duration(),
 					},
 				},
@@ -187,7 +195,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 					)
 				memberRows := sqlmock.NewRows([]string{"user_id", "group_id", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, m := range want.Members {
-					memberRows.AddRow(m.ID, want.ID, m.Duration.Since.Year, m.Duration.Since.Semester, m.Duration.Until.Year, m.Duration.Until.Semester)
+					memberRows.AddRow(m.User.ID, want.ID, m.Duration.Since.Year, m.Duration.Since.Semester, m.Duration.Until.Year, m.Duration.Until.Semester)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `group_user_belongings` WHERE `group_user_belongings`.`group_id` = ?")).

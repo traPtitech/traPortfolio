@@ -22,33 +22,33 @@ var (
 func CloneMockKnoqEvents() []*external.EventResponse {
 	return []*external.EventResponse{
 		{
-			ID:          knoqEventID1.uuid(),
+			ID:          KnoqEventID1(),
 			Name:        "第n回進捗回",
 			Description: "第n回の進捗会です。",
 			Place:       "S516",
-			GroupID:     knoqEventGroupID1.uuid(),
-			RoomID:      knoqEventRoomID1.uuid(),
+			GroupID:     KnoqEventGroupID1(),
+			RoomID:      KnoqEventRoomID1(),
 			TimeStart:   time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
 			TimeEnd:     time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC),
 			SharedRoom:  true,
 			Admins: []uuid.UUID{
-				userID1.uuid(),
+				UserID1(),
 			},
 		},
 		{
-			ID:          knoqEventID2.uuid(),
+			ID:          KnoqEventID2(),
 			Name:        "sample event",
 			Description: "This is a sample event.",
 			Place:       "S516",
-			GroupID:     knoqEventGroupID2.uuid(),
-			RoomID:      knoqEventRoomID2.uuid(),
+			GroupID:     KnoqEventGroupID2(),
+			RoomID:      KnoqEventRoomID2(),
 			TimeStart:   time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
 			TimeEnd:     time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC),
 			SharedRoom:  false,
 			Admins: []uuid.UUID{
-				userID1.uuid(),
-				userID2.uuid(),
-				userID3.uuid(),
+				UserID1(),
+				UserID2(),
+				UserID3(),
 			},
 		},
 	}
@@ -78,21 +78,21 @@ func CloneMockTraQUsers() []*TraQUser {
 	return []*TraQUser{
 		{
 			User: &external.TraQUserResponse{
-				ID:    userID1.uuid(),
+				ID:    UserID1(),
 				State: domain.TraqStateActive,
 			},
 			Name: userName1,
 		},
 		{
 			User: &external.TraQUserResponse{
-				ID:    userID2.uuid(),
+				ID:    UserID2(),
 				State: domain.TraqStateDeactivated,
 			},
 			Name: userName2,
 		},
 		{
 			User: &external.TraQUserResponse{
-				ID:    userID3.uuid(),
+				ID:    UserID3(),
 				State: domain.TraqStateActive,
 			},
 			Name: userName3,

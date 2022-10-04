@@ -51,7 +51,7 @@ func TestGetProject(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockProjectDetails[0].Id,
+			mockdata.ProjectID1(),
 			mockdata.HMockProjectDetails[0],
 		},
 		"400 invalid projectID": {
@@ -145,7 +145,7 @@ func TestCreateProjecct(t *testing.T) {
 				Link:        &link,
 				Description: description,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("bad request: argument error"),
 		},
 	}
 
@@ -186,7 +186,7 @@ func TestEditProject(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockProjects[0].Id,
+			mockdata.ProjectID1(),
 			handler.EditProjectJSONRequestBody{
 				Name:        &name,
 				Link:        &link,
@@ -197,7 +197,7 @@ func TestEditProject(t *testing.T) {
 		},
 		"204 without changes": {
 			http.StatusNoContent,
-			mockdata.HMockProjects[0].Id,
+			mockdata.ProjectID1(),
 			handler.EditProjectJSONRequestBody{},
 			nil,
 		},
@@ -250,7 +250,7 @@ func TestGetProjectMembers(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockProjects[0].Id,
+			mockdata.ProjectID1(),
 			[]handler.ProjectMember{
 				mockdata.HMockProjectMembers[0],
 				mockdata.HMockProjectMembers[1],
@@ -258,7 +258,7 @@ func TestGetProjectMembers(t *testing.T) {
 		},
 		"200 no members with existing projectID": {
 			http.StatusOK,
-			mockdata.HMockProjects[2].Id,
+			mockdata.ProjectID3(),
 			[]handler.ProjectMember{},
 		},
 		"400 invalid projectID": {
@@ -285,9 +285,9 @@ func TestGetProjectMembers(t *testing.T) {
 // AddProjectMembers POST /projects/:projectID/members
 func TestAddProjectMembers(t *testing.T) {
 	var (
-		userID1   = mockdata.HMockUsers[0].Id
+		userID1   = mockdata.UserID1()
 		duration1 = handler.ConvertDuration(random.Duration())
-		userID2   = mockdata.HMockUsers[1].Id
+		userID2   = mockdata.UserID2()
 		duration2 = handler.ConvertDuration(random.Duration())
 	)
 
@@ -300,7 +300,7 @@ func TestAddProjectMembers(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockProjects[0].Id,
+			mockdata.ProjectID1(),
 			handler.AddProjectMembersJSONRequestBody{
 				Members: []handler.MemberIDWithYearWithSemesterDuration{
 					{
@@ -351,7 +351,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockProjects[0].Id,
+			mockdata.ProjectID1(),
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{userID1},
 			},

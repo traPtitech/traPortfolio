@@ -16,7 +16,7 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer(c *config.Config, isDevelopment bool) (handler.API, error) {
+func InjectAPIServer(c *config.Config) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
 	sqlConfig := provideSQLConf(c)
 	sqlHandler, err := NewSQLHandler(sqlConfig)
@@ -24,18 +24,19 @@ func InjectAPIServer(c *config.Config, isDevelopment bool) (handler.API, error) 
 		return handler.API{}, err
 	}
 	portalConfig := providePortalConf(c)
-	portalAPI, err := NewPortalAPI(portalConfig, isDevelopment)
+	bool2 := provideIsDevelopMent(c)
+	portalAPI, err := NewPortalAPI(portalConfig, bool2)
 	if err != nil {
 		return handler.API{}, err
 	}
 	traqConfig := provideTraqConf(c)
-	traQAPI, err := NewTraQAPI(traqConfig, isDevelopment)
+	traQAPI, err := NewTraQAPI(traqConfig, bool2)
 	if err != nil {
 		return handler.API{}, err
 	}
 	userRepository := repository.NewUserRepository(sqlHandler, portalAPI, traQAPI)
 	knoqConfig := provideKnoqConf(c)
-	knoqAPI, err := NewKnoqAPI(knoqConfig, isDevelopment)
+	knoqAPI, err := NewKnoqAPI(knoqConfig, bool2)
 	if err != nil {
 		return handler.API{}, err
 	}
@@ -84,11 +85,14 @@ var externalSet = wire.NewSet(
 var apiSet = wire.NewSet(handler.NewAPI)
 
 var confSet = wire.NewSet(
+	provideIsDevelopMent,
 	provideSQLConf,
 	provideTraqConf,
 	provideKnoqConf,
 	providePortalConf,
 )
+
+func provideIsDevelopMent(c *config.Config) bool { return c.IsDevelopment() }
 
 func provideSQLConf(c *config.Config) *config.SQLConfig { return c.SQLConf() }
 
