@@ -132,7 +132,6 @@ func (handler *SQLHandler) Limit(limit int) database.SQLHandler {
 	return &SQLHandler{conn: db}
 }
 
-
 func (handler *SQLHandler) Error() error {
 	return handler.conn.Error
 }

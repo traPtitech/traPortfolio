@@ -115,6 +115,11 @@ func (handler *MockSQLHandler) Error() error {
 	return handler.Conn.Error
 }
 
+func (handler *MockSQLHandler) Limit(limit int) database.SQLHandler {
+	db := handler.Conn.Limit(limit)
+	return &MockSQLHandler{Conn: db}
+}
+
 // Interface guards
 var (
 	_ database.SQLHandler = (*MockSQLHandler)(nil)
