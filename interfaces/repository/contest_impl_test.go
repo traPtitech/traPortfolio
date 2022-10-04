@@ -879,11 +879,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 				teamID:    random.UUID(),
 			},
 			want: []*domain.User{
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				u := want[0]
@@ -912,16 +908,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 				teamID:    random.UUID(),
 			},
 			want: []*domain.User{
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				belongingRows := sqlmock.NewRows([]string{"team_id", "user_id"})
@@ -969,11 +957,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
-				u := &domain.User{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				}
+				u := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
 					WithArgs(args.teamID).

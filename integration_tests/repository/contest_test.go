@@ -350,27 +350,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	mustAddContestTeamMembers(t, repo, team2.ID, []uuid.UUID{user2.ID})
 
 	expected1 := []*domain.User{
-		{
-			ID:       user1.ID,
-			Name:     user1.Name,
-			RealName: portalUser1.RealName,
-		},
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user1.ID, user1.Name, portalUser1.RealName, user1.Check),
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users1, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
 	expected2 := []*domain.User{
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users2, err := repo.GetContestTeamMembers(contest1.ID, team2.ID)
 	assert.NoError(t, err)
@@ -425,27 +413,15 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	mustAddContestTeamMembers(t, repo, team2.ID, []uuid.UUID{user2.ID})
 
 	expected1 := []*domain.User{
-		{
-			ID:       user1.ID,
-			Name:     user1.Name,
-			RealName: portalUser1.RealName,
-		},
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user1.ID, user1.Name, portalUser1.RealName, user1.Check),
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users1, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
 	expected2 := []*domain.User{
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users2, err := repo.GetContestTeamMembers(contest1.ID, team2.ID)
 	assert.NoError(t, err)
@@ -457,11 +433,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	assert.ElementsMatch(t, expected3, users3)
 
 	expected4 := []*domain.User{
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{user2.ID})
 	assert.NoError(t, err)

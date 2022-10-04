@@ -108,18 +108,14 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				hHost := []User{}
 
 				for i := 0; i < hostnum; i++ {
-					rhost := domain.User{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					}
+					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					hhost := User{
 						Id:       rhost.ID,
 						Name:     rhost.Name,
 						RealName: rhost.RealName,
 					}
 
-					rHost = append(rHost, &rhost)
+					rHost = append(rHost, rhost)
 					hHost = append(hHost, hhost)
 
 				}
