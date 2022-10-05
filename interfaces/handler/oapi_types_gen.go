@@ -617,7 +617,7 @@ type GetUsersParams struct {
 	Name *NameInQuery `form:"name,omitempty" json:"name,omitempty" query:"name"`
 
 	// 取得数の上限
-	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty"`
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
 }
 
 // EditUserJSONBody defines parameters for EditUser.

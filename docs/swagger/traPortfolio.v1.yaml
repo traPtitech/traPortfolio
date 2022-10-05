@@ -1554,6 +1554,8 @@ components:
         default: -1
       required: false
       description: 取得数の上限
+      x-oapi-codegen-extra-tags:
+        query: limit
 tags:
   - name: user
     description: ユーザーAPI

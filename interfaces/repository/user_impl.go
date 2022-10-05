@@ -42,7 +42,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 
 	limit := -1
 
-	if lv := args.Limit.Valid; lv {
+	if args.Limit.Valid {
 		limit = int(args.Limit.Int64)
 	}
 
