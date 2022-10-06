@@ -170,6 +170,12 @@ func TestGetContestTeamMembers(t *testing.T) {
 				mockdata.CloneHandlerMockUsers()[0],
 			},
 		},
+		"200 with empty array": {
+			http.StatusOK,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID2(),
+			[]handler.User{},
+		},
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
@@ -181,6 +187,18 @@ func TestGetContestTeamMembers(t *testing.T) {
 			mockdata.ContestID1(),
 			uuid.Nil,
 			testutils.HTTPError("bad request: nil id"),
+		},
+		"404 contestID not exist": {
+			http.StatusNotFound,
+			random.UUID(),
+			mockdata.ContestTeamID1(),
+			testutils.HTTPError("not found: not found"),
+		},
+		"404 teamID not exist": {
+			http.StatusNotFound,
+			mockdata.ContestID1(),
+			random.UUID(),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
