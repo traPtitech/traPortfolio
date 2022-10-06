@@ -219,13 +219,13 @@ func TestAddContestTeamMember(t *testing.T) {
 			},
 			nil,
 		},
-		"400 invalid contestID": {
+		"400 invalid memberID": {
 			http.StatusBadRequest,
-			uuid.Nil,
+			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			handler.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
-					mockdata.UserID2(),
+					uuid.Nil,
 				},
 			},
 			testutils.HTTPError("bad request: nil id"),
@@ -240,6 +240,17 @@ func TestAddContestTeamMember(t *testing.T) {
 				},
 			},
 			testutils.HTTPError("bad request: nil id"),
+		},
+		"404 team not found": {
+			http.StatusNotFound,
+			mockdata.ContestID1(),
+			random.UUID(),
+			handler.AddContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID2(),
+				},
+			},
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -279,14 +290,13 @@ func TestEditContestTeamMember(t *testing.T) {
 			},
 			nil,
 		},
-		"400 invalid contestID": {
+		"400 invalid memberID": {
 			http.StatusBadRequest,
-			uuid.Nil,
+			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			handler.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
-					mockdata.UserID1(),
-					mockdata.UserID2(),
+					uuid.Nil,
 				},
 			},
 			testutils.HTTPError("bad request: nil id"),
@@ -302,6 +312,18 @@ func TestEditContestTeamMember(t *testing.T) {
 				},
 			},
 			testutils.HTTPError("bad request: nil id"),
+		},
+		"404 team not found": {
+			http.StatusNotFound,
+			mockdata.ContestID1(),
+			random.UUID(),
+			handler.EditContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					mockdata.UserID1(),
+					mockdata.UserID2(),
+				},
+			},
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
