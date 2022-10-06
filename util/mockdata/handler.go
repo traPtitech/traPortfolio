@@ -44,9 +44,9 @@ func CloneHandlerMockContestDetails() []handler.ContestDetail {
 			Name: c.Name,
 			Teams: []handler.ContestTeam{
 				{
-					Id:     hContestTeams[c.ID].Id,
-					Name:   hContestTeams[c.ID].Name,
-					Result: hContestTeams[c.ID].Result,
+					Id:     hContestTeams[c.ID][0].Id,
+					Name:   hContestTeams[c.ID][0].Name,
+					Result: hContestTeams[c.ID][0].Result,
 				},
 			},
 		}
@@ -73,11 +73,11 @@ func CloneHandlerMockContests() []handler.Contest {
 	return hContests
 }
 
-func CloneHandlerMockContestTeamsByID() map[uuid.UUID]handler.ContestTeamDetail {
+func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeamDetail {
 	var (
 		mContestTeams              = CloneMockContestTeams()
 		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
-		hContestTeamDetails        = make(map[uuid.UUID]handler.ContestTeamDetail)
+		hContestTeamDetails        = make(map[uuid.UUID][]handler.ContestTeamDetail)
 	)
 
 	for _, ct := range mContestTeams {
@@ -87,14 +87,14 @@ func CloneHandlerMockContestTeamsByID() map[uuid.UUID]handler.ContestTeamDetail 
 				hUsers = append(hUsers, getUser(u.UserID))
 			}
 		}
-		hContestTeamDetails[ct.ContestID] = handler.ContestTeamDetail{
+		hContestTeamDetails[ct.ContestID] = append(hContestTeamDetails[ct.ContestID], handler.ContestTeamDetail{
 			Description: ct.Description,
 			Id:          ct.ID,
 			Link:        ct.Link,
 			Members:     hUsers,
 			Name:        ct.Name,
 			Result:      ct.Result,
-		}
+		})
 	}
 	return hContestTeamDetails
 }
@@ -410,9 +410,9 @@ func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.ContestTeamWithC
 				if u.ID == ctm.UserID {
 					hUserContests[u.ID] = append(hUserContests[u.ID], handler.ContestTeamWithContestName{
 						ContestName: c.Name,
-						Id:          hContestTeams[c.Id].Id,
-						Name:        hContestTeams[c.Id].Name,
-						Result:      hContestTeams[c.Id].Result,
+						Id:          hContestTeams[c.Id][0].Id,
+						Name:        hContestTeams[c.Id][0].Name,
+						Result:      hContestTeams[c.Id][0].Result,
 					})
 				}
 			}
