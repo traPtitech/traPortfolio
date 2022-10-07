@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -353,8 +355,27 @@ func TestEditContestTeamMember(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			if tt.statusCode == http.StatusNoContent {
+				// Update & Assert
+				res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+
+				// Assert
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeamMembers, tt.contestID, tt.teamID), nil)
+				var response []model.User
+				var userIDs []uuid.UUID
+				err := json.Unmarshal(res.Body.Bytes(), &response)
+				if err != nil {
+					assert.Error(t, err)
+				}
+				for _, memberID := range response {
+					userIDs = append(userIDs, memberID.ID)
+				}
+				assert.Equal(t, tt.reqbody.Members, userIDs)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
 		})
 	}
 }
