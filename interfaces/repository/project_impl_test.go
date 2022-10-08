@@ -142,8 +142,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
 					WithArgs(wm.User.ID).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(wm.User.ID, wm.User.Name),
+						sqlmock.NewRows([]string{"id", "name", "check"}).
+							AddRow(wm.User.ID, wm.User.Name, wm.User.Check),
 					)
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
@@ -197,10 +197,10 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(memberRows)
 				userIDs := make([]driver.Value, len(want.Members))
-				userRows := sqlmock.NewRows([]string{"id", "name"})
+				userRows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for i, v := range want.Members {
 					userIDs[i] = v.User.ID
-					userRows.AddRow(v.User.ID, v.User.Name)
+					userRows.AddRow(v.User.ID, v.User.Name, v.User.Check)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
@@ -550,8 +550,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
 					WithArgs(want[0].User.ID).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(want[0].User.ID, want[0].User.Name),
+						sqlmock.NewRows([]string{"id", "name", "check"}).
+							AddRow(want[0].User.ID, want[0].User.Name, want[0].User.Check),
 					)
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{

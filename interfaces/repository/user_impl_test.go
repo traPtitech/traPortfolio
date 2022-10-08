@@ -87,9 +87,9 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
 				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
-				rows := sqlmock.NewRows([]string{"id", "name"})
+				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {
-					rows.AddRow(v.ID, v.Name)
+					rows.AddRow(v.ID, v.Name, v.Check)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?)")).
@@ -107,21 +107,22 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				},
 			},
 			want: []*domain.User{
-				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				domain.NewUser(random.UUID(), name, random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				id := want[0].ID
+				u := want[0]
 
 				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
-					WithArgs(id).
+					WithArgs(u.ID).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "name"}).AddRow(id, name),
+						sqlmock.NewRows([]string{"id", "name", "check"}).
+							AddRow(u.ID, u.Name, u.Check),
 					)
 
-				f.portal.EXPECT().GetByTraqID(name).Return(makePortalUser(want[0]), nil)
+				f.portal.EXPECT().GetByTraqID(u.Name).Return(makePortalUser(want[0]), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -264,7 +265,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 			name: "Success",
 			args: args{uid},
 			want: &domain.UserDetail{
-				User:  *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				User:  *domain.NewUser(uid, random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				State: domain.TraqStateActive,
 				Bio:   random.AlphaNumeric(),
 				Accounts: []*domain.Account{
@@ -281,8 +282,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows(
-							[]string{"id", "name", "description"}).
-							AddRow(want.User.ID, want.User.Name, want.Bio),
+							[]string{"id", "name", "check", "description"}).
+							AddRow(want.User.ID, want.User.Name, want.Check, want.Bio),
 					)
 				rows := sqlmock.NewRows([]string{"id", "user_id", "type", "check"})
 				for _, v := range want.Accounts {
@@ -417,7 +418,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 				},
 			},
 			want: &domain.UserDetail{
-				User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				User:     *domain.NewUser(random.UUID(), name, realName, check),
 				Bio:      description,
 				Accounts: []*domain.Account{},
 			},

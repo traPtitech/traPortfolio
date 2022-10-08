@@ -78,9 +78,9 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 			),
 		}, nil
 	} else {
-		idMap := make(map[string]uuid.UUID, l)
+		userMap := make(map[string]*model.User, l)
 		for _, v := range users {
-			idMap[v.Name] = v.ID
+			userMap[v.Name] = v
 		}
 
 		portalUsers, err := repo.portal.GetAll()
@@ -90,12 +90,12 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 
 		result := make([]*domain.User, 0, l)
 		for _, v := range portalUsers {
-			if id, ok := idMap[v.TraQID]; ok {
+			if u, ok := userMap[v.TraQID]; ok {
 				result = append(result, domain.NewUser(
-					id,
-					v.TraQID,
+					u.ID,
+					u.Name,
 					v.RealName,
-					users[0].Check,
+					u.Check,
 				))
 			}
 		}
