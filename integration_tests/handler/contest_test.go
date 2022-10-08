@@ -248,7 +248,7 @@ func TestAddContestTeamMember(t *testing.T) {
 					uuid.Nil,
 				},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
@@ -319,7 +319,7 @@ func TestEditContestTeamMember(t *testing.T) {
 					uuid.Nil,
 				},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
