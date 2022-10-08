@@ -239,16 +239,16 @@ func TestAddContestTeamMember(t *testing.T) {
 			},
 			nil,
 		},
-		"400 invalid memberID": {
+		"400 invalid contestID": {
 			http.StatusBadRequest,
-			mockdata.ContestID1(),
+			uuid.Nil,
 			mockdata.ContestTeamID1(),
 			handler.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
-					uuid.Nil,
+					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
@@ -260,6 +260,17 @@ func TestAddContestTeamMember(t *testing.T) {
 				},
 			},
 			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid memberID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.AddContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					uuid.Nil,
+				},
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,
@@ -310,16 +321,17 @@ func TestEditContestTeamMember(t *testing.T) {
 			},
 			nil,
 		},
-		"400 invalid memberID": {
+		"400 invalid contestID": {
 			http.StatusBadRequest,
-			mockdata.ContestID1(),
+			uuid.Nil,
 			mockdata.ContestTeamID1(),
 			handler.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
-					uuid.Nil,
+					mockdata.UserID1(),
+					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
@@ -332,6 +344,17 @@ func TestEditContestTeamMember(t *testing.T) {
 				},
 			},
 			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid memberID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					uuid.Nil,
+				},
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,
