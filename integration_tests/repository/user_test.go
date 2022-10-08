@@ -212,6 +212,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		args *urepository.CreateUserArgs
 	}
 
+	check := random.Bool()
 	description := random.AlphaNumeric()
 	cases := []struct {
 		name      string
@@ -224,7 +225,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			args: args{
 				args: &urepository.CreateUserArgs{
 					Description: description,
-					Check:       random.Bool(),
+					Check:       check,
 					Name:        mockdata.MockUsers[1].Name,
 				},
 			},
@@ -233,7 +234,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 					uuid.Nil, // ID is replaced by generated one.
 					mockdata.MockUsers[1].Name,
 					mockdata.MockPortalUsers[1].RealName,
-					mockdata.MockUsers[1].Check,
+					check,
 				),
 				State:    mockdata.MockTraQUsers[1].User.State,
 				Bio:      description,
