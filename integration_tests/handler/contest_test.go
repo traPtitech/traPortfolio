@@ -172,7 +172,7 @@ func TestGetContestTeamMembers(t *testing.T) {
 				mockdata.CloneHandlerMockUsers()[0],
 			},
 		},
-		"200 with empty array": {
+		"200 with no members": {
 			http.StatusOK,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID2(),
