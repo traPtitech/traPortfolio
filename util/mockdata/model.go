@@ -81,6 +81,14 @@ func CloneMockContestTeams() []model.ContestTeam {
 			Result:      "sample_contest_team_result",
 			Link:        "https://sample.contest_teams.com",
 		},
+		{
+			ID:          ContestTeamID2(),
+			ContestID:   ContestID1(),
+			Name:        "sample_contest_team_name2",
+			Description: "sample_contest_team_description2",
+			Result:      "sample_contest_team_result2",
+			Link:        "https://sample.contest_teams.com",
+		},
 	}
 }
 
