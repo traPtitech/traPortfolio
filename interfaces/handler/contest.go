@@ -331,8 +331,8 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// AddContestTeamMember POST /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
+// AddContestTeamMembers POST /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 
@@ -359,8 +359,8 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) EditContestTeamMember(_c echo.Context) error {
+// EditContestTeamMembers PUT /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
 
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
