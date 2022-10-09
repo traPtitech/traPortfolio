@@ -218,8 +218,8 @@ func TestGetContestTeamMembers(t *testing.T) {
 	}
 }
 
-// AddContestTeamMember POST /contests/:contestID/teams/:teamID/members
-func TestAddContestTeamMember(t *testing.T) {
+// AddContestTeamMembers POST /contests/:contestID/teams/:teamID/members
+func TestAddContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -293,14 +293,14 @@ func TestAddContestTeamMember(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeamMembers, tt.contestID, tt.teamID), &tt.reqbody)
 			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
 
-// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
-func TestEditContestTeamMember(t *testing.T) {
+// EditContestTeamMembers PUT /contests/:contestID/teams/:teamID/members
+func TestEditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -380,7 +380,7 @@ func TestEditContestTeamMember(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Update & Assert
-				res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+				res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMembers, tt.contestID, tt.teamID), &tt.reqbody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Assert
@@ -396,7 +396,7 @@ func TestEditContestTeamMember(t *testing.T) {
 				}
 				assert.Equal(t, tt.reqbody.Members, userIDs)
 			} else {
-				res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMember, tt.contestID, tt.teamID), &tt.reqbody)
+				res := testutils.DoRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMembers, tt.contestID, tt.teamID), &tt.reqbody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})

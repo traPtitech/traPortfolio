@@ -125,8 +125,8 @@ func Setup(e *echo.Echo, api API) error {
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
 							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMembers)
-							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMember)
-							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.EditContestTeamMember)
+							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMembers)
+							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.EditContestTeamMembers)
 						}
 					}
 				}
