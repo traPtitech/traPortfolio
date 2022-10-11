@@ -268,19 +268,24 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 					UntilYear:     reqBody.Duration.Until.Year,
 					UntilSemester: int(reqBody.Duration.Until.Semester),
 				}
-				want := domain.Project{
-					ID:   random.UUID(),
-					Name: args.Name,
-					Duration: domain.YearWithSemesterDuration{
-						Since: domain.YearWithSemester{
-							Year:     args.SinceYear,
-							Semester: args.SinceSemester,
-						},
-						Until: domain.YearWithSemester{
-							Year:     args.UntilYear,
-							Semester: args.UntilSemester,
+				want := domain.ProjectDetail{
+					Project: domain.Project{
+						ID:   random.UUID(),
+						Name: args.Name,
+						Duration: domain.YearWithSemesterDuration{
+							Since: domain.YearWithSemester{
+								Year:     args.SinceYear,
+								Semester: args.SinceSemester,
+							},
+							Until: domain.YearWithSemester{
+								Year:     args.UntilYear,
+								Semester: args.UntilSemester,
+							},
 						},
 					},
+					Description: args.Description,
+					Link:        args.Link.String,
+					Members:     nil,
 				}
 				expectedResBody = Project{
 					Duration: ConvertDuration(want.Duration),
