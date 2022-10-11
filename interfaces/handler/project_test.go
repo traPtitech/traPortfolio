@@ -29,12 +29,12 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-func makeCreateProjectRequest(description string, since YearWithSemester, until YearWithSemester, name string, link string) *CreateProjectJSONRequestBody {
+func makeCreateProjectRequest(description string, since YearWithSemester, until *YearWithSemester, name string, link string) *CreateProjectJSONRequestBody {
 	return &CreateProjectJSONRequestBody{
 		Description: description,
 		Duration: YearWithSemesterDuration{
 			Since: since,
-			Until: &until,
+			Until: until,
 		},
 		Name: name,
 		Link: &link,
@@ -255,7 +255,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 				reqBody = makeCreateProjectRequest(
 					random.AlphaNumeric(),
 					ConvertDuration(duration).Since,
-					*ConvertDuration(duration).Until,
+					ConvertDuration(duration).Until,
 					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
