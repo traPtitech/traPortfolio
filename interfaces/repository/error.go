@@ -3,12 +3,12 @@ package repository
 import (
 	"errors"
 
+	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"gorm.io/gorm"
 )
 
 func convertError(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(err, database.ErrNoRows) {
 		return repository.ErrNotFound
 	}
 	return err

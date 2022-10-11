@@ -978,7 +978,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 	}
 }
 
-func TestContestHandler_GetContestTeamMember(t *testing.T) {
+func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
@@ -1056,7 +1056,7 @@ func TestContestHandler_GetContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_AddContestTeamMember(t *testing.T) {
+func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
@@ -1155,7 +1155,7 @@ func TestContestHandler_AddContestTeamMember(t *testing.T) {
 	}
 }
 
-func TestContestHandler_EditContestTeamMember(t *testing.T) {
+func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
 	type Req struct {
