@@ -7,11 +7,7 @@ import (
 
 func Setup(e *echo.Echo, api API) error {
 	// Setup validator
-	v, err := newValidator()
-	if err != nil {
-		return err
-	}
-	e.Validator = v
+	e.Validator = newValidator(e.Logger)
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -129,8 +125,8 @@ func Setup(e *echo.Echo, api API) error {
 							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
 
 							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMembers)
-							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMember)
-							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.EditContestTeamMember)
+							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMembers)
+							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.EditContestTeamMembers)
 						}
 					}
 				}

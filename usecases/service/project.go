@@ -12,10 +12,10 @@ import (
 
 type ProjectService interface {
 	GetProjects(ctx context.Context) ([]*domain.Project, error)
-	GetProject(ctx context.Context, projectID uuid.UUID) (*domain.Project, error)
-	CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error)
+	GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error)
+	CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error
-	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error)
+	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error)
 	AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error
 	DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error
 }
@@ -38,7 +38,7 @@ func (s *projectService) GetProjects(ctx context.Context) ([]*domain.Project, er
 	return res, nil
 }
 
-func (s *projectService) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.Project, error) {
+func (s *projectService) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error) {
 	project, err := s.repo.GetProject(projectID)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (s *projectService) GetProject(ctx context.Context, projectID uuid.UUID) (*
 	return project, nil
 }
 
-func (s *projectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
+func (s *projectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	d := domain.NewYearWithSemesterDuration(args.SinceYear, args.SinceSemester, args.UntilYear, args.UntilSemester)
 	if !d.IsValid() {
 		return nil, repository.ErrInvalidArg
@@ -89,7 +89,7 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 	return nil
 }
 
-func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error) {
+func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	members, err := s.repo.GetProjectMembers(projectID)
 	if err != nil {
 		return nil, err

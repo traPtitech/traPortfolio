@@ -10,6 +10,11 @@ type User struct {
 	RealName string
 }
 
+type UserWithDuration struct {
+	User     User
+	Duration YearWithSemesterDuration
+}
+
 type Account struct {
 	ID          uuid.UUID
 	DisplayName string
@@ -39,11 +44,9 @@ type UserContest struct {
 	ContestName string
 }
 
-// UserGroup indicates User who belongs to Group
 type UserGroup struct {
-	ID       uuid.UUID // User ID
-	Name     string    // User Name
-	RealName string
+	ID       uuid.UUID // Group ID
+	Name     string    // Group name
 	Duration YearWithSemesterDuration
 }
 

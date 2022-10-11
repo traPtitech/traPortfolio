@@ -12,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -20,8 +19,8 @@ import (
 // GetUsers GET /users
 func TestGetUsers(t *testing.T) {
 	var (
-		includeSuspended handler.IncludeSuspendedInQuery = true
-		name             handler.NameInQuery             = handler.NameInQuery(mockdata.MockUsers[0].Name)
+		includeSuspended = handler.IncludeSuspendedInQuery(true)
+		name             = handler.NameInQuery(mockdata.MockUsers[0].Name)
 	)
 
 	t.Parallel()
@@ -64,7 +63,7 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			handler.ConvertError(t, repository.ErrInvalidArg),
+			testutils.HTTPError("bad request: validate error"),
 		},
 	}
 
@@ -92,18 +91,18 @@ func TestGetUser(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUserDetails[0].Id,
+			mockdata.UserID1(),
 			mockdata.HMockUserDetails[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -137,7 +136,7 @@ func TestUpdateUser(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			handler.EditUserRequest{
 				Bio:   &bio,
 				Check: &check,
@@ -146,7 +145,7 @@ func TestUpdateUser(t *testing.T) {
 		},
 		"204 without changes": {
 			http.StatusNoContent,
-			mockdata.HMockUsers[1].Id,
+			mockdata.UserID2(),
 			handler.EditUserRequest{},
 			nil,
 		},
@@ -154,7 +153,7 @@ func TestUpdateUser(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.EditUserRequest{},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 	}
 
@@ -200,23 +199,23 @@ func TestGetUserAccounts(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserAccounts,
+			mockdata.UserID1(),
+			mockdata.HMockUserAccountsByID[mockdata.UserID1()],
 		},
 		"200 no accounts with existing userID": {
 			http.StatusOK,
-			mockdata.HMockUsers[1].Id,
+			mockdata.UserID2(),
 			[]handler.Account{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -245,39 +244,39 @@ func TestGetUserAccount(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserAccounts[0].Id,
-			mockdata.HMockUserAccounts[0],
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			mockdata.HMockUserAccountsByID[mockdata.UserID1()][0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.HMockUserAccounts[0].Id,
-			handler.ConvertError(t, repository.ErrValidate),
+			mockdata.AccountID1(),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
-			mockdata.HMockUserAccounts[0].Id,
-			handler.ConvertError(t, repository.ErrNotFound),
+			mockdata.AccountID1(),
+			testutils.HTTPError("not found: not found"),
 		},
 		"404 accountID not found": {
 			http.StatusNotFound,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 		"404 both userID and accountID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -313,7 +312,7 @@ func TestAddUserAccount(t *testing.T) {
 	}{
 		"201": {
 			http.StatusCreated,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
@@ -332,29 +331,29 @@ func TestAddUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.AddUserAccountJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
 				Type:        handler.AccountType(atype),
 				Url:         "invalid url",
 			},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
 				Type:        handler.AccountType(domain.AccountLimit),
 				Url:         url,
 			},
-			handler.ConvertError(t, repository.ErrInvalidArg),
+			testutils.HTTPError("bad request: validate error"),
 		},
 	}
 
@@ -396,7 +395,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
@@ -408,7 +407,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 		},
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
@@ -416,16 +415,16 @@ func TestEditUserRequestAccount(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			mockdata.HMockUserAccounts[0].Id,
+			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 user not found": {
 			http.StatusNotFound,
@@ -434,16 +433,16 @@ func TestEditUserRequestAccount(t *testing.T) {
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 		"404 account not found": {
 			http.StatusNotFound,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			random.UUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -509,7 +508,7 @@ func TestDeleteUserAccount(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			testutils.DummyUUID(),
 			nil,
 			true,
@@ -518,21 +517,21 @@ func TestDeleteUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 			false,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 			false,
 		},
 	}
@@ -576,23 +575,23 @@ func TestGetUserProjects(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserProjects,
+			mockdata.UserID1(),
+			[]handler.UserProject{mockdata.HMockUserProjects[0]},
 		},
 		"200 no projects with existing userID": {
 			http.StatusOK,
-			mockdata.HMockUsers[1].Id,
+			mockdata.UserID3(),
 			[]handler.Project{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -620,23 +619,23 @@ func TestGetUserContests(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserContests,
+			mockdata.UserID1(),
+			mockdata.HMockUserContestsByID[mockdata.UserID1()],
 		},
 		"200 no contests with existing userID": {
 			http.StatusOK,
-			mockdata.HMockUsers[1].Id,
+			mockdata.UserID2(),
 			[]handler.Contest{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -664,23 +663,23 @@ func TestGetUserGroups(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUsers[0].Id,
-			mockdata.HMockUserGroups,
+			mockdata.UserID1(),
+			mockdata.HMockUserGroupsByID[mockdata.UserID1()],
 		},
 		"200 no groups with existing userID": {
 			http.StatusOK,
-			mockdata.HMockUsers[1].Id,
+			mockdata.UserID2(),
 			[]handler.Group{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -708,12 +707,12 @@ func TestGetUserEvents(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockUsers[0].Id,
+			mockdata.UserID1(),
 			mockdata.HMockUserEvents,
 		},
 		"200 no events with existing userID": {
 			http.StatusOK,
-			mockdata.HMockUsers[1].Id,
+			mockdata.UserID2(),
 			[]handler.Event{
 				mockdata.HMockUserEvents[1],
 			},
@@ -726,7 +725,7 @@ func TestGetUserEvents(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 	}
 

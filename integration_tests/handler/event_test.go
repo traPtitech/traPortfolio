@@ -12,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -54,18 +53,18 @@ func TestEventHandler_GetEvent(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			mockdata.HMockEventDetails[0].Id,
+			mockdata.KnoqEventID1(),
 			mockdata.HMockEventDetails[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.ConvertError(t, repository.ErrValidate),
+			testutils.HTTPError("bad request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.ConvertError(t, repository.ErrNotFound),
+			testutils.HTTPError("not found: not found"),
 		},
 	}
 
@@ -85,7 +84,9 @@ func TestEventHandler_GetEvent(t *testing.T) {
 
 // EditEvent PATCH /events/:eventID
 func TestEventHandler_EditEvent(t *testing.T) {
-	var eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+	var (
+		eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+	)
 
 	t.Parallel()
 	tests := map[string]struct {
@@ -96,10 +97,16 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.HMockEventDetails[0].Id,
+			mockdata.KnoqEventID1(),
 			handler.EditEventRequest{
 				EventLevel: &eventLevel,
 			},
+			nil,
+		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.KnoqEventID2(),
+			handler.EditEventRequest{},
 			nil,
 		},
 	}
@@ -120,7 +127,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &event)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
 
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), tt.reqBody)
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Event.EditEvent, tt.eventID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert

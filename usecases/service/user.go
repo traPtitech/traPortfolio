@@ -21,7 +21,7 @@ type UserService interface {
 	DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error
 	GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
 	GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error)
-	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error)
+	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error)
 	GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error)
 }
 
@@ -67,23 +67,7 @@ func (s *userService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
 }
 
 func (s *userService) CreateAccount(ctx context.Context, userID uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
-
-	/*userのaccount.type番目のアカウントを追加する処理をしたい*/
-
-	if len(account.DisplayName) == 0 {
-		return nil, repository.ErrInvalidArg
-	}
-
-	if account.Type >= domain.AccountLimit {
-		return nil, repository.ErrInvalidArg
-	}
-
-	//implに実装は書く
-	//accountの構造体たりないので補う
-	//ここらへんのコメントアウトはリファクタのときにでも消す
-
 	return s.repo.CreateAccount(userID, account)
-
 }
 
 func (s *userService) EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
@@ -121,7 +105,7 @@ func (s *userService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 	return contests, nil
 }
 
-func (s *userService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
+func (s *userService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error) {
 	groups, err := s.repo.GetGroupsByUserID(userID)
 	if err != nil {
 		return nil, err

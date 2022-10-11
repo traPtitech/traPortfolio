@@ -320,8 +320,24 @@ func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uui
 }
 
 func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	var belongings []*model.ContestTeamUserBelonging
+	// 存在チェック
 	err := repo.h.
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	err = repo.h.
+		Where(&model.ContestTeam{ID: teamID}).
+		First(&model.ContestTeam{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	var belongings []*model.ContestTeamUserBelonging
+	err = repo.h.
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).

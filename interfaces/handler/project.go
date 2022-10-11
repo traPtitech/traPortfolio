@@ -10,10 +10,6 @@ import (
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
-type ProjectIDInPath struct {
-	ProjectID uuid.UUID `param:"projectID" validate:"is-uuid"`
-}
-
 type ProjectHandler struct {
 	service service.ProjectService
 }
@@ -25,6 +21,7 @@ func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 // GetProjects GET /projects
 func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 	c := _c.(*Context)
+
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
@@ -33,7 +30,7 @@ func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 
 	res := make([]Project, len(projects))
 	for i, v := range projects {
-		res[i] = newProject(v.ID, v.Name, convertDuration(v.Duration))
+		res[i] = newProject(v.ID, v.Name, ConvertDuration(v.Duration))
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -42,13 +39,14 @@ func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 // GetProject GET /projects/:projectID
 func (h *ProjectHandler) GetProject(_c echo.Context) error {
 	c := _c.(*Context)
-	req := ProjectIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	projectID, err := c.getID(keyProject)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	project, err := h.service.GetProject(ctx, req.ProjectID)
+	project, err := h.service.GetProject(ctx, projectID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -56,13 +54,13 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 	members := make([]ProjectMember, len(project.Members))
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
-			newUser(v.UserID, v.Name, v.RealName),
-			convertDuration(v.Duration),
+			newUser(v.User.ID, v.User.Name, v.User.RealName),
+			ConvertDuration(v.Duration),
 		)
 	}
 
 	return c.JSON(http.StatusOK, newProjectDetail(
-		newProject(project.ID, project.Name, convertDuration(project.Duration)),
+		newProject(project.ID, project.Name, ConvertDuration(project.Duration)),
 		project.Description,
 		project.Link,
 		members,
@@ -72,10 +70,9 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 // CreateProject POST /projects
 func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
+
 	req := CreateProjectJSONRequestBody{}
-	err := c.BindAndValidate(&req)
-	if err != nil {
+	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
@@ -92,6 +89,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 		createReq.UntilSemester = int(req.Duration.Until.Semester)
 	}
 
+	ctx := c.Request().Context()
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
 		return convertError(err)
@@ -100,20 +98,21 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, newProject(
 		project.ID,
 		project.Name,
-		convertDuration(project.Duration),
+		ConvertDuration(project.Duration),
 	))
 }
 
 // EditProject PATCH /projects/:projectID
 func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ProjectIDInPath
-		EditProjectJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	projectID, err := c.getID(keyProject)
 	if err != nil {
+		return convertError(err)
+	}
+
+	req := EditProjectJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
@@ -137,23 +136,26 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 		}
 	}
 
-	err = h.service.UpdateProject(ctx, req.ProjectID, &patchReq)
+	ctx := c.Request().Context()
+	err = h.service.UpdateProject(ctx, projectID, &patchReq)
 	if err != nil {
 		return convertError(err)
 	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetProjectMembers GET /projects/:projectID/members
 func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	c := _c.(*Context)
-	req := ProjectIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	projectID, err := c.getID(keyProject)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	members, err := h.service.GetProjectMembers(ctx, req.ProjectID)
+	members, err := h.service.GetProjectMembers(ctx, projectID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -161,8 +163,8 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 	res := make([]ProjectMember, len(members))
 	for i, v := range members {
 		res[i] = newProjectMember(
-			newUser(v.ID, v.Name, v.RealName),
-			YearWithSemesterDuration{}, // TODO: 追加する
+			newUser(v.User.ID, v.User.Name, v.User.RealName),
+			ConvertDuration(v.Duration),
 		)
 	}
 
@@ -172,13 +174,14 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 // AddProjectMembers POST /projects/:projectID/members
 func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ProjectIDInPath
-		AddProjectMembersJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	projectID, err := c.getID(keyProject)
 	if err != nil {
+		return convertError(err)
+	}
+
+	req := AddProjectMembersJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
@@ -197,30 +200,36 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 
 		createReq = append(createReq, m)
 	}
-	err = h.service.AddProjectMembers(ctx, req.ProjectID, createReq)
+
+	ctx := c.Request().Context()
+	err = h.service.AddProjectMembers(ctx, projectID, createReq)
 	if err != nil {
 		return convertError(err)
 	}
+
 	return nil
 }
 
 // DeleteProjectMembers DELETE /projects/:projectID/members
 func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	c := _c.(*Context)
-	ctx := c.Request().Context()
-	req := struct {
-		ProjectIDInPath
-		DeleteProjectMembersJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	projectID, err := c.getID(keyProject)
 	if err != nil {
 		return convertError(err)
 	}
 
-	err = h.service.DeleteProjectMembers(ctx, req.ProjectID, req.Members)
+	req := DeleteProjectMembersJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
+		return convertError(err)
+	}
+
+	ctx := c.Request().Context()
+	err = h.service.DeleteProjectMembers(ctx, projectID, req.Members)
 	if err != nil {
 		return convertError(err)
 	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 

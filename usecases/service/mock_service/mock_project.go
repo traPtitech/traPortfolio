@@ -52,10 +52,10 @@ func (mr *MockProjectServiceMockRecorder) AddProjectMembers(ctx, projectID, args
 }
 
 // CreateProject mocks base method.
-func (m *MockProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.Project, error) {
+func (m *MockProjectService) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProject", ctx, args)
-	ret0, _ := ret[0].(*domain.Project)
+	ret0, _ := ret[0].(*domain.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockProjectServiceMockRecorder) DeleteProjectMembers(ctx, projectID, m
 }
 
 // GetProject mocks base method.
-func (m *MockProjectService) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.Project, error) {
+func (m *MockProjectService) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProject", ctx, projectID)
-	ret0, _ := ret[0].(*domain.Project)
+	ret0, _ := ret[0].(*domain.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,10 +96,10 @@ func (mr *MockProjectServiceMockRecorder) GetProject(ctx, projectID interface{})
 }
 
 // GetProjectMembers mocks base method.
-func (m *MockProjectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.User, error) {
+func (m *MockProjectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProjectMembers", ctx, projectID)
-	ret0, _ := ret[0].([]*domain.User)
+	ret0, _ := ret[0].([]*domain.UserWithDuration)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

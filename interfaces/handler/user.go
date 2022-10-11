@@ -13,18 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-type UserIDInPath struct {
-	UserID uuid.UUID `param:"userID" validate:"is-uuid"`
-}
-
-type AccountIDInPath struct {
-	AccountID uuid.UUID `param:"accountID" validate:"is-uuid"`
-}
-
-type GroupIDInPath struct {
-	GroupID uuid.UUID `param:"groupID" validate:"is-uuid"`
-}
-
 type UserHandler struct {
 	srv service.UserService
 }
@@ -63,13 +51,14 @@ func (handler *UserHandler) GetUsers(_c echo.Context) error {
 // GetUser GET /users/:userID
 func (handler *UserHandler) GetUser(_c echo.Context) error {
 	c := _c.(*Context)
-	req := UserIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	user, err := handler.srv.GetUser(ctx, req.UserID)
+	user, err := handler.srv.GetUser(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -90,10 +79,13 @@ func (handler *UserHandler) GetUser(_c echo.Context) error {
 // UpdateUser PATCH /users/:userID
 func (handler *UserHandler) UpdateUser(_c echo.Context) error {
 	c := _c.(*Context)
-	req := struct {
-		UserIDInPath
-		EditUserJSONRequestBody
-	}{}
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := EditUserJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -104,8 +96,7 @@ func (handler *UserHandler) UpdateUser(_c echo.Context) error {
 		Check:       optional.BoolFrom(req.Check),
 	}
 
-	err := handler.srv.Update(ctx, req.UserID, &u)
-	if err != nil {
+	if err := handler.srv.Update(ctx, userID, &u); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -114,12 +105,13 @@ func (handler *UserHandler) UpdateUser(_c echo.Context) error {
 // GetUserAccounts GET /users/:userID/accounts
 func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 	c := _c.(*Context)
-	req := UserIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
-	accounts, err := handler.srv.GetAccounts(req.UserID)
+	accounts, err := handler.srv.GetAccounts(userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -135,15 +127,18 @@ func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 // GetUserAccount GET /users/:userID/accounts/:accountID
 func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
-	req := struct {
-		UserIDInPath
-		AccountIDInPath
-	}{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
-	account, err := handler.srv.GetAccount(req.UserID, req.AccountID)
+	accountID, err := c.getID(keyUserAccountID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	account, err := handler.srv.GetAccount(userID, accountID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -154,10 +149,13 @@ func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
 // AddUserAccount POST /users/:userID/accounts
 func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
-	req := struct {
-		UserIDInPath
-		AddUserAccountJSONRequestBody
-	}{}
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := AddUserAccountJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -169,7 +167,7 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
-	account, err := handler.srv.CreateAccount(ctx, req.UserID, &args)
+	account, err := handler.srv.CreateAccount(ctx, userID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -180,13 +178,19 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
 func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
-	req := struct {
-		UserIDInPath
-		AccountIDInPath
-		EditUserAccountJSONRequestBody
-	}{}
-	err := c.BindAndValidate(&req)
+
+	userID, err := c.getID(keyUserID)
 	if err != nil {
+		return convertError(err)
+	}
+
+	accountID, err := c.getID(keyUserAccountID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	req := EditUserAccountJSONRequestBody{}
+	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
 
@@ -198,7 +202,7 @@ func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
 		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
 	}
 
-	err = handler.srv.EditAccount(ctx, req.UserID, req.AccountID, &args)
+	err = handler.srv.EditAccount(ctx, userID, accountID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -209,17 +213,19 @@ func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
 // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
 func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
-	req := struct {
-		UserIDInPath
-		AccountIDInPath
-	}{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
+		return convertError(err)
+	}
+
+	accountID, err := c.getID(keyUserAccountID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	err := handler.srv.DeleteAccount(ctx, req.UserID, req.AccountID)
-	if err != nil {
+	if err := handler.srv.DeleteAccount(ctx, userID, accountID); err != nil {
 		return convertError(err)
 	}
 
@@ -229,13 +235,14 @@ func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 // GetUserProjects GET /users/:userID/projects
 func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 	c := _c.(*Context)
-	req := UserIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	projects, err := handler.srv.GetUserProjects(ctx, req.UserID)
+	projects, err := handler.srv.GetUserProjects(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -244,8 +251,8 @@ func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 		res[i] = newUserProject(
 			v.ID,
 			v.Name,
-			convertDuration(v.Duration),
-			convertDuration(v.UserDuration),
+			ConvertDuration(v.Duration),
+			ConvertDuration(v.UserDuration),
 		)
 	}
 
@@ -255,13 +262,14 @@ func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 // GetUserContests GET /users/:userID/contests
 func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 	c := _c.(*Context)
-	req := UserIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	contests, err := handler.srv.GetUserContests(ctx, req.UserID)
+	contests, err := handler.srv.GetUserContests(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -280,13 +288,14 @@ func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 // GetUserGroups GET /users/:userID/groups
 func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	c := _c.(*Context)
-	req := UserIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	groups, err := handler.srv.GetGroupsByUserID(ctx, req.UserID)
+	groups, err := handler.srv.GetGroupsByUserID(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -295,7 +304,7 @@ func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	for i, group := range groups {
 		res[i] = newUserGroup(
 			newGroup(group.ID, group.Name),
-			convertDuration(group.Duration),
+			ConvertDuration(group.Duration),
 		)
 	}
 	return c.JSON(http.StatusOK, res)
@@ -304,13 +313,14 @@ func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 // GetUserEvents GET /users/:userID/events
 func (handler *UserHandler) GetUserEvents(_c echo.Context) error {
 	c := _c.(*Context)
-	req := UserIDInPath{}
-	if err := c.BindAndValidate(&req); err != nil {
+
+	userID, err := c.getID(keyUserID)
+	if err != nil {
 		return convertError(err)
 	}
 
 	ctx := c.Request().Context()
-	events, err := handler.srv.GetUserEvents(ctx, req.UserID)
+	events, err := handler.srv.GetUserEvents(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}

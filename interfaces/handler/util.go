@@ -22,7 +22,7 @@ type OptionalYearWithSemester struct {
 	Semester optional.Int64
 }
 
-func convertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {
+func ConvertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {
 	return newYearWithSemesterDuration(d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
 }
 

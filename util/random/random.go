@@ -3,6 +3,7 @@ package random
 import (
 	"math/rand"
 	"net/url"
+	"sort"
 	"time"
 	"unsafe"
 
@@ -67,14 +68,14 @@ func Time() time.Time {
 	return time.UnixMicro(sec).In(time.UTC)
 }
 
-func URL(useHTTPS bool, domainLength uint16) *url.URL {
+func URL(useHTTPS bool, domainLength int) *url.URL {
 	scheme := "https"
 	if !useHTTPS {
 		scheme = "http"
 	}
 	scheme += "://"
 
-	scheme += AlphaNumericn(int(domainLength))
+	scheme += AlphaNumericn(domainLength)
 	url, err := url.Parse(scheme)
 	if err != nil {
 		panic(err)
@@ -83,30 +84,34 @@ func URL(useHTTPS bool, domainLength uint16) *url.URL {
 }
 
 func RandURLString() string {
-	return URL(rand.Intn(2) < 1, uint16(rand.Intn(20)+1)).String()
+	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
 }
 
 func Duration() domain.YearWithSemesterDuration {
-	ys1 := domain.YearWithSemester{
-		Year:     Time().Year(),
-		Semester: rand.Intn(2),
-	}
-	ys2 := domain.YearWithSemester{
-		Year:     Time().Year(),
-		Semester: rand.Intn(2),
+	yss := []domain.YearWithSemester{
+		{
+			Year:     Time().Year(),
+			Semester: rand.Intn(2),
+		},
+		{
+			Year:     Time().Year(),
+			Semester: rand.Intn(2),
+		},
 	}
 
-	if ys1.After(ys2) {
-		return domain.YearWithSemesterDuration{
-			Since: ys2,
-			Until: ys1,
-		}
-	}
+	// 時系列昇順に並べる
+	sort.Slice(yss, func(i, j int) bool {
+		return !yss[i].After(yss[j])
+	})
 
 	return domain.YearWithSemesterDuration{
-		Since: ys1,
-		Until: ys2,
+		Since: yss[0],
+		Until: yss[1],
 	}
+}
+
+func Uint8n(n uint8) uint8 {
+	return uint8(rand.Int31n(int32(n)))
 }
 
 func Bool() bool {

@@ -23,7 +23,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_projects")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
@@ -43,13 +43,13 @@ func TestProjectRepository_GetProject(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_project")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
-	var projects []*domain.Project
+	var projects []*domain.ProjectDetail
 	for i := 0; i < projectNum; i++ {
-		projects = append(projects, mustMakeProject(t, repo, nil))
+		projects = append(projects, mustMakeProjectDetail(t, repo, nil))
 	}
 
 	opt := cmpopts.EquateEmpty()
@@ -71,11 +71,11 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_update_project")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProject(t, repo, nil)
-	mustMakeProject(t, repo, nil)
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	mustMakeProjectDetail(t, repo, nil)
 
 	arg1 := urepository.UpdateProjectArgs{
 		Name:          random.OptAlphaNumeric(),
@@ -122,34 +122,86 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_project_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProject(t, repo, nil)
-	project2 := mustMakeProject(t, repo, nil)
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	project2 := mustMakeProjectDetail(t, repo, nil)
 	user1 := &domain.User{
+		ID:       mockdata.MockUsers[0].ID,
+		Name:     mockdata.MockUsers[0].Name,
+		RealName: mockdata.MockPortalUsers[0].RealName,
+	}
+	user2 := &domain.User{
 		ID:       mockdata.MockUsers[1].ID,
 		Name:     mockdata.MockUsers[1].Name,
 		RealName: mockdata.MockPortalUsers[1].RealName,
 	}
-	user2 := &domain.User{
-		ID:       mockdata.MockUsers[2].ID,
-		Name:     mockdata.MockUsers[2].Name,
-		RealName: mockdata.MockPortalUsers[2].RealName,
+
+	args1 := mustAddProjectMember(t, repo, project1.ID, user1.ID, nil)
+	args2 := mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
+	args3 := mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
+
+	projectMember1 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user1.ID,
+			Name:     user1.Name,
+			RealName: user1.RealName,
+		},
+		Duration: domain.YearWithSemesterDuration{
+			Since: domain.YearWithSemester{
+				Year:     args1.SinceYear,
+				Semester: args1.SinceSemester,
+			},
+			Until: domain.YearWithSemester{
+				Year:     args1.UntilYear,
+				Semester: args1.UntilSemester,
+			},
+		},
 	}
-
-	mustAddProjectMember(t, repo, project1.ID, user1.ID, nil)
-	mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
-	mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
-
-	expected1 := []*domain.User{user1, user2}
+	projectMember2 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
+		Duration: domain.YearWithSemesterDuration{
+			Since: domain.YearWithSemester{
+				Year:     args2.SinceYear,
+				Semester: args2.SinceSemester,
+			},
+			Until: domain.YearWithSemester{
+				Year:     args2.UntilYear,
+				Semester: args2.UntilSemester,
+			},
+		},
+	}
+	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
-	expected2 := []*domain.User{user2}
+	projectMember3 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
+		Duration: domain.YearWithSemesterDuration{
+			Since: domain.YearWithSemester{
+				Year:     args3.SinceYear,
+				Semester: args3.SinceSemester,
+			},
+			Until: domain.YearWithSemester{
+				Year:     args3.UntilYear,
+				Semester: args3.UntilSemester,
+			},
+		},
+	}
+
+	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
@@ -164,13 +216,13 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProject(t, repo, nil)
-	project2 := mustMakeProject(t, repo, nil)
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	project2 := mustMakeProjectDetail(t, repo, nil)
 	user1 := &domain.User{
 		ID:       mockdata.MockUsers[1].ID,
 		Name:     mockdata.MockUsers[1].Name,
@@ -182,37 +234,88 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		RealName: mockdata.MockPortalUsers[2].RealName,
 	}
 
-	mustAddProjectMember(t, repo, project1.ID, user1.ID, nil)
-	mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
-	mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
+	args1 := mustAddProjectMember(t, repo, project1.ID, user1.ID, nil)
+	args2 := mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
+	args3 := mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
 
-	expected1 := []*domain.User{user1, user2}
+	projectMember1 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user1.ID,
+			Name:     user1.Name,
+			RealName: user1.RealName,
+		},
+		Duration: domain.YearWithSemesterDuration{
+			Since: domain.YearWithSemester{
+				Year:     args1.SinceYear,
+				Semester: args1.SinceSemester,
+			},
+			Until: domain.YearWithSemester{
+				Year:     args1.UntilYear,
+				Semester: args1.UntilSemester,
+			},
+		},
+	}
+	projectMember2 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
+		Duration: domain.YearWithSemesterDuration{
+			Since: domain.YearWithSemester{
+				Year:     args2.SinceYear,
+				Semester: args2.SinceSemester,
+			},
+			Until: domain.YearWithSemester{
+				Year:     args2.UntilYear,
+				Semester: args2.UntilSemester,
+			},
+		},
+	}
+	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
-	expected2 := []*domain.User{user2}
+	projectMember3 := &domain.UserWithDuration{
+		User: domain.User{
+			ID:       user2.ID,
+			Name:     user2.Name,
+			RealName: user2.RealName,
+		},
+		Duration: domain.YearWithSemesterDuration{
+			Since: domain.YearWithSemester{
+				Year:     args3.SinceYear,
+				Semester: args3.SinceSemester,
+			},
+			Until: domain.YearWithSemester{
+				Year:     args3.UntilYear,
+				Semester: args3.UntilSemester,
+			},
+		},
+	}
+	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{user1.ID})
+	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember1.User.ID})
 	assert.NoError(t, err)
-	expected3 := []*domain.User{user2}
+	expected3 := []*domain.UserWithDuration{projectMember2}
 	users3, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, users3)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{user2.ID})
+	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember2.User.ID})
 	assert.NoError(t, err)
-	expected4 := []*domain.User{}
+	expected4 := []*domain.UserWithDuration{}
 	users4, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
-	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{user2.ID})
+	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{projectMember3.User.ID})
 	assert.NoError(t, err)
-	expected5 := []*domain.User{}
+	expected5 := []*domain.UserWithDuration{}
 	users5, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected5, users5)

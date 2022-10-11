@@ -28,18 +28,16 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	res := make([]*domain.Project, 0, len(projects))
 	for _, v := range projects {
 		p := &domain.Project{
-			ID:          v.ID,
-			Name:        v.Name,
-			Duration:    domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
-			Description: v.Description,
-			Link:        v.Link,
+			ID:       v.ID,
+			Name:     v.Name,
+			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		}
 		res = append(res, p)
 	}
 	return res, nil
 }
 
-func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.Project, error) {
+func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error) {
 	project := new(model.Project)
 	if err := repo.h.
 		Where(&model.Project{ID: projectID}).
@@ -68,25 +66,29 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.Project,
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	m := make([]*domain.ProjectMember, len(members))
+	m := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
-		pm := domain.ProjectMember{
-			UserID:   v.UserID,
-			Name:     v.User.Name,
+		pm := domain.UserWithDuration{
+			User: domain.User{
+				ID:   v.UserID,
+				Name: v.User.Name,
+			},
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		}
 
 		if rn, ok := nameMap[v.User.Name]; ok {
-			pm.RealName = rn
+			pm.User.RealName = rn
 		}
 
 		m[i] = &pm
 	}
 
-	res := &domain.Project{
-		ID:          projectID,
-		Name:        project.Name,
-		Duration:    domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
+	res := &domain.ProjectDetail{
+		Project: domain.Project{
+			ID:       projectID,
+			Name:     project.Name,
+			Duration: domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
+		},
 		Description: project.Description,
 		Link:        project.Link,
 		Members:     m,
@@ -94,7 +96,7 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.Project,
 	return res, nil
 }
 
-func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.Project, error) {
+func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	p := model.Project{
 		ID:            random.UUID(),
 		Name:          args.Name,
@@ -113,10 +115,12 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 		return nil, convertError(err)
 	}
 
-	res := &domain.Project{
-		ID:          p.ID,
-		Name:        p.Name,
-		Duration:    domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
+	res := &domain.ProjectDetail{
+		Project: domain.Project{
+			ID:       p.ID,
+			Name:     p.Name,
+			Duration: domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
+		},
 		Description: p.Description,
 		Link:        p.Link,
 	}
@@ -160,7 +164,7 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 	return nil
 }
 
-func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error) {
+func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	members := make([]*model.ProjectMember, 0)
 	err := repo.h.
 		Preload("User").
@@ -181,15 +185,18 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 		nameMap[v.TraQID] = v.RealName
 	}
 
-	res := make([]*domain.User, len(members))
+	res := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
-		u := domain.User{
-			ID:   v.UserID,
-			Name: v.User.Name,
+		u := domain.UserWithDuration{
+			User: domain.User{
+				ID:   v.UserID,
+				Name: v.User.Name,
+			},
+			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
 		}
 
 		if rn, ok := nameMap[v.User.Name]; ok {
-			u.RealName = rn
+			u.User.RealName = rn
 		}
 
 		res[i] = &u
@@ -201,6 +208,15 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
 	if len(projectMembers) == 0 {
 		return repository.ErrInvalidArg
+	}
+
+	// ユーザーの重複チェック
+	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
+	for _, v := range projectMembers {
+		if _, ok := projectMembersMap[v.UserID]; ok {
+			return repository.ErrInvalidArg
+		}
+		projectMembersMap[v.UserID] = struct{}{}
 	}
 
 	// プロジェクトの存在チェック

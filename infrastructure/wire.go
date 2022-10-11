@@ -1,4 +1,4 @@
-//go:generate go run github.com/google/wire/cmd/wire@v0.5.0
+//go:generate go run github.com/google/wire/cmd/wire@latest
 //go:build wireinject
 
 package infrastructure
@@ -9,6 +9,7 @@ import (
 	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
+	"gorm.io/gorm"
 )
 
 var pingSet = wire.NewSet(
@@ -58,18 +59,18 @@ var externalSet = wire.NewSet(
 var apiSet = wire.NewSet(handler.NewAPI)
 
 var confSet = wire.NewSet(
-	provideSQLConf,
+	provideIsDevelopMent,
 	provideTraqConf,
 	provideKnoqConf,
 	providePortalConf,
 )
 
-func provideSQLConf(c *config.Config) *config.SQLConfig       { return c.SQLConf() }
+func provideIsDevelopMent(c *config.Config) bool              { return c.IsDevelopment() }
 func provideTraqConf(c *config.Config) *config.TraqConfig     { return c.TraqConf() }
 func provideKnoqConf(c *config.Config) *config.KnoqConfig     { return c.KnoqConf() }
 func providePortalConf(c *config.Config) *config.PortalConfig { return c.PortalConf() }
 
-func InjectAPIServer(c *config.Config, isDevelopment bool) (handler.API, error) {
+func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	wire.Build(
 		pingSet,
 		userSet,

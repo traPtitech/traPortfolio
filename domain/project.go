@@ -5,17 +5,14 @@ import (
 )
 
 type Project struct {
-	ID          uuid.UUID
-	Name        string
-	Duration    YearWithSemesterDuration
-	Description string
-	Link        string
-	Members     []*ProjectMember
+	ID       uuid.UUID
+	Name     string
+	Duration YearWithSemesterDuration
 }
 
-type ProjectMember struct {
-	UserID   uuid.UUID
-	Name     string
-	RealName string
-	Duration YearWithSemesterDuration
+type ProjectDetail struct {
+	Project
+	Description string
+	Link        string
+	Members     []*UserWithDuration
 }

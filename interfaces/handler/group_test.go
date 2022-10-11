@@ -98,35 +98,46 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 			name: "success",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 
-				rgroupLeader := domain.User{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
+				rgroupAdmins := []*domain.User{}
+				hgroupAdmins := []User{}
+
+				adminLen := rand.Intn(256)
+				for i := 0; i < adminLen; i++ {
+					rgroupAdmin := domain.User{
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						RealName: random.AlphaNumeric(),
+					}
+
+					hgroupAdmin := User{
+						Id:       rgroupAdmin.ID,
+						Name:     rgroupAdmin.Name,
+						RealName: rgroupAdmin.RealName,
+					}
+
+					rgroupAdmins = append(rgroupAdmins, &rgroupAdmin)
+					hgroupAdmins = append(hgroupAdmins, hgroupAdmin)
 				}
 
-				hgroupLeader := User{
-					Id:       rgroupLeader.ID,
-					Name:     rgroupLeader.Name,
-					RealName: rgroupLeader.RealName,
-				}
-
-				rgroupMembers := []*domain.UserGroup{}
+				rgroupMembers := []*domain.UserWithDuration{}
 				hgroupMembers := []GroupMember{}
 
 				groupLen := rand.Intn(256)
 				for i := 0; i < groupLen; i++ {
-					rgroupmember := domain.UserGroup{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+					rgroupmember := domain.UserWithDuration{
+						User: domain.User{
+							ID:       random.UUID(),
+							Name:     random.AlphaNumeric(),
+							RealName: random.AlphaNumeric(),
+						},
 						Duration: random.Duration(),
 					}
 
 					hgroupmember := GroupMember{
-						Duration: convertDuration(rgroupmember.Duration),
-						Id:       rgroupmember.ID,
-						Name:     rgroupmember.Name,
-						RealName: rgroupmember.RealName,
+						Duration: ConvertDuration(rgroupmember.Duration),
+						Id:       rgroupmember.User.ID,
+						Name:     rgroupmember.User.Name,
+						RealName: rgroupmember.User.RealName,
 					}
 
 					rgroupMembers = append(rgroupMembers, &rgroupmember)
@@ -137,7 +148,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					ID:          random.UUID(),
 					Name:        random.AlphaNumeric(),
 					Link:        random.AlphaNumeric(),
-					Leader:      &rgroupLeader,
+					Admin:       rgroupAdmins,
 					Members:     rgroupMembers,
 					Description: random.AlphaNumeric(),
 				}
@@ -145,7 +156,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				hgroup := GroupDetail{
 					Description: rgroup.Description,
 					Id:          rgroup.ID,
-					Leader:      hgroupLeader,
+					Admin:       hgroupAdmins,
 					Link:        rgroup.Link,
 					Members:     hgroupMembers,
 					Name:        rgroup.Name,
@@ -189,7 +200,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(_ *mock_service.MockGroupService) (hres *GroupDetail, path string) {
 				groupID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path

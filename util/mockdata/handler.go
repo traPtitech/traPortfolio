@@ -6,69 +6,97 @@ import (
 )
 
 var (
-	HMockContest        = CloneHandlerMockContest()
-	HMockContestTeam    = CloneHandlerMockContestTeam()
-	HMockEvents         = CloneHandlerMockEvents()
-	HMockEventDetails   = CloneHandlerMockEventDetails()
-	HMockGroup          = CloneHandlerMockGroup()
-	HMockGroupMembers   = CloneHandlerMockGroupMembers()
-	HMockProject        = CloneHandlerMockProject()
-	HMockProjectMembers = CloneHandlerMockProjectMembers()
-	HMockUsers          = CloneHandlerMockUsers()
-	HMockUserDetails    = CloneHandlerMockUserDetails()
-	HMockUserAccounts   = CloneHandlerMockUserAccounts()
-	HMockUserEvents     = CloneHandlerMockUserEvents()
-	HMockUserContests   = CloneHandlerMockUserContests()
-	HMockUserGroups     = CloneHandlerMockUserGroups()
-	HMockUserProjects   = CloneHandlerMockUserProjects()
+	HMockContestDetails   = CloneHandlerMockContestDetails()
+	HMockContests         = CloneHandlerMockContests()
+	HMockContestTeamsByID = CloneHandlerMockContestTeamsByID()
+	HMockEvents           = CloneHandlerMockEvents()
+	HMockEventDetails     = CloneHandlerMockEventDetails()
+	HMockGroups           = CloneHandlerMockGroups()
+	HMockGroupMembersByID = CloneHandlerMockGroupMembersByID()
+	HMockProjects         = CloneHandlerMockProjects()
+	HMockProjectDetails   = CloneHandlerMockProjectDetails()
+	HMockProjectMembers   = CloneHandlerMockProjectMembers()
+	HMockUsers            = CloneHandlerMockUsers()
+	HMockUserDetails      = CloneHandlerMockUserDetails()
+	HMockUserAccountsByID = CloneHandlerMockUserAccountsByID()
+	HMockUserEvents       = CloneHandlerMockUserEvents()
+	HMockUserContestsByID = CloneHandlerMockUserContestsByID()
+	HMockUserGroupsByID   = CloneHandlerMockUserGroupsByID()
+	HMockUserProjects     = CloneHandlerMockUserProjects()
 )
 
-func CloneHandlerMockContest() handler.ContestDetail {
+func CloneHandlerMockContestDetails() []handler.ContestDetail {
 	var (
-		mContest     = CloneMockContest()
-		hContestTeam = CloneHandlerMockContestTeam()
+		mContests       = CloneMockContests()
+		hContestTeams   = CloneHandlerMockContestTeamsByID()
+		hContestDetails = make([]handler.ContestDetail, len(mContests))
 	)
 
-	return handler.ContestDetail{
-		Description: mContest.Description,
-		Duration: handler.Duration{
-			Since: mContest.Since,
-			Until: &mContest.Until,
-		},
-		Id:   mContest.ID,
-		Link: mContest.Link,
-		Name: mContest.Name,
-		Teams: []handler.ContestTeam{
-			{
-				Id:     hContestTeam.Id,
-				Name:   hContestTeam.Name,
-				Result: hContestTeam.Result,
+	for i, c := range mContests {
+		hContestDetails[i] = handler.ContestDetail{
+			Description: c.Description,
+			Duration: handler.Duration{
+				Since: c.Since,
+				Until: &c.Until,
 			},
-		},
+			Id:   c.ID,
+			Link: c.Link,
+			Name: c.Name,
+			Teams: []handler.ContestTeam{
+				{
+					Id:     hContestTeams[c.ID][0].Id,
+					Name:   hContestTeams[c.ID][0].Name,
+					Result: hContestTeams[c.ID][0].Result,
+				},
+			},
+		}
 	}
+	return hContestDetails
 }
 
-func CloneHandlerMockContestTeam() handler.ContestTeamDetail {
+func CloneHandlerMockContests() []handler.Contest {
 	var (
-		mContestTeam              = CloneMockContestTeam()
-		mContestTeamUserBelonging = CloneMockContestTeamUserBelonging()
-		hUser                     = getUser(mContestTeamUserBelonging.UserID)
+		mContests = CloneMockContests()
+		hContests = make([]handler.Contest, len(mContests))
 	)
 
-	return handler.ContestTeamDetail{
-		Description: mContestTeam.Description,
-		Id:          mContestTeam.ID,
-		Link:        mContestTeam.Link,
-		Members: []handler.User{
-			{
-				Id:       hUser.Id,
-				Name:     hUser.Name,
-				RealName: hUser.RealName,
+	for i, c := range mContests {
+		hContests[i] = handler.Contest{
+			Duration: handler.Duration{
+				Since: c.Since,
+				Until: &c.Until,
 			},
-		},
-		Name:   mContestTeam.Name,
-		Result: mContestTeam.Result,
+			Id:   c.ID,
+			Name: c.Name,
+		}
 	}
+	return hContests
+}
+
+func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeamDetail {
+	var (
+		mContestTeams              = CloneMockContestTeams()
+		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
+		hContestTeamDetails        = make(map[uuid.UUID][]handler.ContestTeamDetail)
+	)
+
+	for _, ct := range mContestTeams {
+		hUsers := make([]handler.User, len(mContestTeamUserBelongings))
+		for _, u := range mContestTeamUserBelongings {
+			if u.TeamID == ct.ID {
+				hUsers = append(hUsers, getUser(u.UserID))
+			}
+		}
+		hContestTeamDetails[ct.ContestID] = append(hContestTeamDetails[ct.ContestID], handler.ContestTeamDetail{
+			Description: ct.Description,
+			Id:          ct.ID,
+			Link:        ct.Link,
+			Members:     hUsers,
+			Name:        ct.Name,
+			Result:      ct.Result,
+		})
+	}
+	return hContestTeamDetails
 }
 
 func CloneHandlerMockEvents() []handler.Event {
@@ -140,95 +168,154 @@ func CloneHandlerMockEventDetails() []handler.EventDetail {
 	return hEvents
 }
 
-func CloneHandlerMockGroup() handler.GroupDetail {
+func CloneHandlerMockGroups() []handler.GroupDetail {
 	var (
-		mGroup        = CloneMockGroup()
-		hGroupMembers = CloneHandlerMockGroupMembers()
+		mGroups        = CloneMockGroups()
+		hGroupsMembers = CloneHandlerMockGroupMembersByID()
+		mGroupAdmins   = CloneMockGroupUserAdmins()
+		hGroups        = make([]handler.GroupDetail, len(mGroups))
 	)
 
-	return handler.GroupDetail{
-		Description: mGroup.Description,
-		Id:          mGroup.GroupID,
-		Leader:      getUser(mGroup.Leader),
-		Link:        mGroup.Link,
-		Members:     hGroupMembers,
-		Name:        mGroup.Name,
+	for i, g := range mGroups {
+		mAdmins := make([]handler.User, 0, len(mGroupAdmins))
+		for _, adm := range mGroupAdmins {
+			if g.GroupID == adm.GroupID {
+				mAdmins = append(mAdmins, getUser(adm.UserID))
+			}
+		}
+		hGroups[i] = handler.GroupDetail{
+			Description: g.Description,
+			Id:          g.GroupID,
+			Admin:       mAdmins,
+			Link:        g.Link,
+			Members:     hGroupsMembers[g.GroupID],
+			Name:        g.Name,
+		}
 	}
+
+	return hGroups
 }
 
-func CloneHandlerMockGroupMembers() []handler.GroupMember {
+func CloneHandlerMockGroupMembersByID() map[uuid.UUID][]handler.GroupMember {
 	var (
-		mGroupUserbelonging = CloneMockGroupUserBelonging()
-		hUser               = getUser(mGroupUserbelonging.UserID)
+		mGroups              = CloneMockGroups()
+		mGroupUserbelongings = CloneMockGroupUserBelongings()
+		hGroupMembers        = make(map[uuid.UUID][]handler.GroupMember, len(mGroups))
 	)
 
-	return []handler.GroupMember{
-		{
+	for _, gub := range mGroupUserbelongings {
+		for _, g := range mGroups {
+			if gub.GroupID == g.GroupID {
+				hUser := getUser(gub.UserID)
+				hGroupMembers[g.GroupID] = append(hGroupMembers[g.GroupID],
+					handler.GroupMember{
+						Duration: handler.YearWithSemesterDuration{
+							Since: handler.YearWithSemester{
+								Year:     gub.SinceYear,
+								Semester: handler.Semester(gub.SinceSemester),
+							},
+							Until: &handler.YearWithSemester{
+								Year:     gub.UntilYear,
+								Semester: handler.Semester(gub.UntilSemester),
+							},
+						},
+						Id:       hUser.Id,
+						Name:     hUser.Name,
+						RealName: hUser.RealName,
+					})
+			}
+		}
+	}
+	return hGroupMembers
+}
+
+func CloneHandlerMockProjects() []handler.Project {
+	var (
+		mProjects = CloneMockProjects()
+		hProjects = make([]handler.Project, len(mProjects))
+	)
+
+	for i, p := range mProjects {
+		hProjects[i] = handler.Project{
+			Id:   p.ID,
+			Name: p.Name,
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
-					Year:     mGroupUserbelonging.SinceYear,
-					Semester: handler.Semester(mGroupUserbelonging.SinceSemester),
+					Year:     p.SinceYear,
+					Semester: handler.Semester(p.SinceSemester),
 				},
 				Until: &handler.YearWithSemester{
-					Year:     mGroupUserbelonging.UntilYear,
-					Semester: handler.Semester(mGroupUserbelonging.UntilSemester),
+					Year:     p.UntilYear,
+					Semester: handler.Semester(p.UntilSemester),
 				},
 			},
-			Id:       hUser.Id,
-			Name:     hUser.Name,
-			RealName: hUser.RealName,
-		},
+		}
 	}
+
+	return hProjects
 }
 
-func CloneHandlerMockProject() handler.ProjectDetail {
+func CloneHandlerMockProjectDetails() []handler.ProjectDetail {
 	var (
-		mProject        = CloneMockProject()
+		mProjects       = CloneMockProjects()
 		hProjectMembers = CloneHandlerMockProjectMembers()
+		mProjectMembers = CloneMockProjectMembers()
+		hProjects       = make([]handler.ProjectDetail, len(mProjects))
 	)
 
-	return handler.ProjectDetail{
-		Description: mProject.Description,
-		Duration: handler.YearWithSemesterDuration{
-			Since: handler.YearWithSemester{
-				Year:     mProject.SinceYear,
-				Semester: handler.Semester(mProject.SinceSemester),
+	for i, mp := range mProjects {
+		hProjects[i] = handler.ProjectDetail{
+			Description: mp.Description,
+			Duration: handler.YearWithSemesterDuration{
+				Since: handler.YearWithSemester{
+					Year:     mp.SinceYear,
+					Semester: handler.Semester(mp.SinceSemester),
+				},
+				Until: &handler.YearWithSemester{
+					Year:     mp.UntilYear,
+					Semester: handler.Semester(mp.UntilSemester),
+				},
 			},
-			Until: &handler.YearWithSemester{
-				Year:     mProject.UntilYear,
-				Semester: handler.Semester(mProject.UntilSemester),
-			},
-		},
-		Id:      mProject.ID,
-		Link:    mProject.Link,
-		Members: hProjectMembers,
-		Name:    mProject.Name,
+			Id:      mp.ID,
+			Link:    mp.Link,
+			Members: []handler.ProjectMember{},
+			Name:    mp.Name,
+		}
+		for j, mpm := range mProjectMembers {
+			if mpm.ProjectID == mp.ID {
+				hProjects[i].Members = append(hProjects[i].Members, hProjectMembers[j])
+			}
+		}
 	}
+	return hProjects
 }
 
 func CloneHandlerMockProjectMembers() []handler.ProjectMember {
 	var (
-		mProjectMember = CloneMockProjectMember()
-		hUser          = getUser(mProjectMember.UserID)
+		mProjectMembers = CloneMockProjectMembers()
+		hProjectMembers = make([]handler.ProjectMember, len(mProjectMembers))
 	)
 
-	return []handler.ProjectMember{
-		{
+	for i, pm := range mProjectMembers {
+		hUser := getUser(pm.UserID)
+		hProjectMembers[i] = handler.ProjectMember{
 			Duration: handler.YearWithSemesterDuration{
 				Since: handler.YearWithSemester{
-					Year:     mProjectMember.SinceYear,
-					Semester: handler.Semester(mProjectMember.SinceSemester),
+					Year:     pm.SinceYear,
+					Semester: handler.Semester(pm.SinceSemester),
 				},
 				Until: &handler.YearWithSemester{
-					Year:     mProjectMember.UntilYear,
-					Semester: handler.Semester(mProjectMember.UntilSemester),
+					Year:     pm.UntilYear,
+					Semester: handler.Semester(pm.UntilSemester),
 				},
 			},
 			Id:       hUser.Id,
 			Name:     hUser.Name,
 			RealName: hUser.RealName,
-		},
+		}
 	}
+
+	return hProjectMembers
 }
 
 func CloneHandlerMockUsers() []handler.User {
@@ -254,40 +341,41 @@ func CloneHandlerMockUserDetails() []handler.UserDetail {
 		mUsers      = CloneMockUsers()
 		portalUsers = CloneMockPortalUsers()
 		traqUsers   = CloneMockTraQUsers()
-		hAccounts   = CloneHandlerMockUserAccounts()
+		hAccounts   = CloneHandlerMockUserAccountsByID()
 		hUsers      = make([]handler.UserDetail, len(mUsers))
 	)
 
 	for i, mu := range mUsers {
 		hUsers[i] = handler.UserDetail{
-			Accounts: []handler.Account{},
+			Accounts: hAccounts[mu.ID],
 			Bio:      mu.Description,
 			Id:       mu.ID,
 			Name:     mu.Name,
 			RealName: portalUsers[i].RealName,
 			State:    handler.UserAccountState(traqUsers[i].User.State),
 		}
-
-		if mu.ID == userID1.uuid() {
-			hUsers[i].Accounts = hAccounts
-		}
 	}
 
 	return hUsers
 }
 
-func CloneHandlerMockUserAccounts() []handler.Account {
-	var mAccount = CloneMockAccount()
+func CloneHandlerMockUserAccountsByID() map[uuid.UUID][]handler.Account {
+	var (
+		mAccounts = CloneMockAccounts()
+		hAccounts = make(map[uuid.UUID][]handler.Account)
+	)
 
-	return []handler.Account{
-		{
-			DisplayName: mAccount.Name,
-			Id:          mAccount.ID,
-			PrPermitted: handler.PrPermitted(mAccount.Check),
-			Type:        handler.AccountType(mAccount.Type),
-			Url:         mAccount.URL,
-		},
+	for _, a := range mAccounts {
+		hAccounts[a.UserID] = append(hAccounts[a.UserID], handler.Account{
+			DisplayName: a.Name,
+			Id:          a.ID,
+			PrPermitted: a.Check,
+			Type:        handler.AccountType(a.Type),
+			Url:         a.URL,
+		})
 	}
+
+	return hAccounts
 }
 
 func CloneHandlerMockUserEvents() []handler.Event {
@@ -307,43 +395,59 @@ func CloneHandlerMockUserEvents() []handler.Event {
 	return mUserEvents
 }
 
-func CloneHandlerMockUserContests() []handler.ContestTeamWithContestName {
+func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.ContestTeamWithContestName {
 	var (
-		hContest     = CloneHandlerMockContest()
-		hContestTeam = CloneHandlerMockContestTeam()
+		uUsers              = CloneMockUsers()
+		hContests           = CloneHandlerMockContests()
+		hContestTeams       = CloneHandlerMockContestTeamsByID()
+		mContestTeamMembers = CloneMockContestTeamUserBelongings()
+		hUserContests       = make(map[uuid.UUID][]handler.ContestTeamWithContestName, len(hContests))
 	)
 
-	return []handler.ContestTeamWithContestName{
-		{
-			ContestName: hContest.Name,
-			Id:          hContestTeam.Id,
-			Name:        hContestTeam.Name,
-			Result:      hContestTeam.Result,
-		},
-	}
-}
-
-func CloneHandlerMockUserGroups() []handler.UserGroup {
-	var (
-		hGroup        = CloneHandlerMockGroup()
-		hGroupMembers = CloneHandlerMockGroupMembers()
-		hUserGroups   = make([]handler.UserGroup, len(hGroupMembers))
-	)
-
-	for i, gm := range hGroupMembers {
-		hUserGroups[i] = handler.UserGroup{
-			Duration: gm.Duration,
-			Id:       hGroup.Id,
-			Name:     hGroup.Name,
+	for _, u := range uUsers {
+		for _, c := range hContests {
+			for _, ctm := range mContestTeamMembers {
+				if u.ID == ctm.UserID {
+					hUserContests[u.ID] = append(hUserContests[u.ID], handler.ContestTeamWithContestName{
+						ContestName: c.Name,
+						Id:          hContestTeams[c.Id][0].Id,
+						Name:        hContestTeams[c.Id][0].Name,
+						Result:      hContestTeams[c.Id][0].Result,
+					})
+				}
+			}
 		}
 	}
+	return hUserContests
+}
 
+func CloneHandlerMockUserGroupsByID() map[uuid.UUID][]handler.UserGroup {
+	var (
+		hUsers        = CloneHandlerMockUsers()
+		hGroups       = CloneHandlerMockGroups()
+		hGroupMembers = CloneHandlerMockGroupMembersByID()
+		hUserGroups   = make(map[uuid.UUID][]handler.UserGroup, len(hUsers))
+	)
+
+	for _, u := range hUsers {
+		for _, g := range hGroups {
+			for _, gm := range hGroupMembers[g.Id] {
+				if u.Id == gm.Id {
+					hUserGroups[u.Id] = append(hUserGroups[u.Id], handler.UserGroup{
+						Duration: gm.Duration,
+						Id:       g.Id,
+						Name:     g.Name,
+					})
+				}
+			}
+		}
+	}
 	return hUserGroups
 }
 
 func CloneHandlerMockUserProjects() []handler.UserProject {
 	var (
-		hProject        = CloneHandlerMockProject()
+		hProject        = CloneHandlerMockProjects()[0]
 		hProjectMembers = CloneHandlerMockProjectMembers()
 		hUserProjects   = make([]handler.UserProject, len(hProjectMembers))
 	)

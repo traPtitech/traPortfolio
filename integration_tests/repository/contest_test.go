@@ -22,7 +22,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contests")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -40,7 +40,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -60,7 +60,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_update_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -116,7 +116,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -147,7 +147,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_teams")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -181,7 +181,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -216,7 +216,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_update_contest_teams")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -267,7 +267,7 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest_teams")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -315,7 +315,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -390,7 +390,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_edit_contest_team_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())

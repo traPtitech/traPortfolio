@@ -41,7 +41,7 @@ func makeCreateProjectRequest(description string, since YearWithSemester, until 
 	}
 }
 
-func TestProjectHandler_GetAll(t *testing.T) {
+func TestProjectHandler_GetProjects(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -55,34 +55,14 @@ func TestProjectHandler_GetAll(t *testing.T) {
 				duration := random.Duration()
 				repo := []*domain.Project{
 					{
-						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(),
-						Duration:    duration,
-						Description: random.AlphaNumeric(),
-						Link:        random.RandURLString(),
-						Members: []*domain.ProjectMember{
-							{
-								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(),
-								RealName: random.AlphaNumeric(),
-								Duration: random.Duration(),
-							},
-						},
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						Duration: duration,
 					},
 					{
-						ID:          random.UUID(),
-						Name:        random.AlphaNumeric(),
-						Duration:    duration,
-						Description: random.AlphaNumeric(),
-						Link:        random.RandURLString(),
-						Members: []*domain.ProjectMember{
-							{
-								UserID:   random.UUID(),
-								Name:     random.AlphaNumeric(),
-								RealName: random.AlphaNumeric(),
-								Duration: random.Duration(),
-							},
-						},
+						ID:       random.UUID(),
+						Name:     random.AlphaNumeric(),
+						Duration: duration,
 					},
 				}
 
@@ -135,30 +115,34 @@ func TestProjectHandler_GetAll(t *testing.T) {
 	}
 }
 
-func TestProjectHandler_GetByID(t *testing.T) {
+func TestProjectHandler_GetProject(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (ProjectDetail, string)
+		setup      func(s *mock_service.MockProjectService) (*ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				duration := random.Duration()
 				projectID := random.UUID()
-				repo := domain.Project{
-					ID:          projectID,
-					Name:        random.AlphaNumeric(),
-					Duration:    duration,
+				repo := domain.ProjectDetail{
+					Project: domain.Project{
+						ID:       projectID,
+						Name:     random.AlphaNumeric(),
+						Duration: duration,
+					},
 					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
-					Members: []*domain.ProjectMember{
+					Members: []*domain.UserWithDuration{
 						{
-							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(),
-							RealName: random.AlphaNumeric(),
+							User: domain.User{
+								ID:       random.UUID(),
+								Name:     random.AlphaNumeric(),
+								RealName: random.AlphaNumeric(),
+							},
 							Duration: random.Duration(),
 						},
 					},
@@ -177,12 +161,12 @@ func TestProjectHandler_GetByID(t *testing.T) {
 								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
-						Id:       v.UserID,
-						Name:     v.Name,
-						RealName: v.RealName,
+						Id:       v.User.ID,
+						Name:     v.User.Name,
+						RealName: v.User.RealName,
 					})
 				}
-				reqBody := ProjectDetail{
+				reqBody := &ProjectDetail{
 					Description: repo.Description,
 					Duration: YearWithSemesterDuration{
 						Since: YearWithSemester{
@@ -206,13 +190,37 @@ func TestProjectHandler_GetByID(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
+			name: "Bad Request: Validate error: invalid projectID",
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				return nil, fmt.Sprintf("/api/v1/projects/%s", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, errInternal)
-				return ProjectDetail{}, fmt.Sprintf("/api/v1/projects/%s", projectID)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Validation Error",
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				projectID := random.AlphaNumericn(36)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Not Found Error",
+			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+				projectID := random.UUID()
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, repository.ErrNotFound)
+				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusNotFound,
 		},
 	}
 	for _, tt := range tests {
@@ -222,7 +230,7 @@ func TestProjectHandler_GetByID(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := ProjectDetail{}
+			var hres *ProjectDetail
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
@@ -246,8 +254,8 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 				duration := random.Duration()
 				reqBody = makeCreateProjectRequest(
 					random.AlphaNumeric(),
-					convertDuration(duration).Since,
-					*convertDuration(duration).Until,
+					ConvertDuration(duration).Since,
+					*ConvertDuration(duration).Until,
 					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
@@ -273,12 +281,9 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 							Semester: args.UntilSemester,
 						},
 					},
-					Description: args.Description,
-					Link:        args.Link.String,
-					Members:     nil,
 				}
 				expectedResBody = Project{
-					Duration: convertDuration(want.Duration),
+					Duration: ConvertDuration(want.Duration),
 					Id:       want.ID,
 					Name:     want.Name,
 				}

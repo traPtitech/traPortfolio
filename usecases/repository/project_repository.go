@@ -1,4 +1,4 @@
-//go:generate go run github.com/golang/mock/mockgen@v1.6.0 -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+//go:generate go run github.com/golang/mock/mockgen@latest -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
 
 package repository
 
@@ -38,10 +38,10 @@ type CreateProjectMemberArgs struct {
 
 type ProjectRepository interface {
 	GetProjects() ([]*domain.Project, error)
-	GetProject(projectID uuid.UUID) (*domain.Project, error)
-	CreateProject(args *CreateProjectArgs) (*domain.Project, error)
+	GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error)
+	CreateProject(args *CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(projectID uuid.UUID, args *UpdateProjectArgs) error
-	GetProjectMembers(projectID uuid.UUID) ([]*domain.User, error)
+	GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error)
 	AddProjectMembers(projectID uuid.UUID, args []*CreateProjectMemberArgs) error
 	DeleteProjectMembers(projectID uuid.UUID, memberIDs []uuid.UUID) error
 }

@@ -346,40 +346,6 @@ func TestUserService_CreateAccount(t *testing.T) {
 			},
 			assertion: assert.NoError,
 		},
-		{
-			name: "EmptyID",
-			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-				account: &repository.CreateAccountArgs{
-					DisplayName: "",
-					Type:        domain.HOMEPAGE,
-					URL:         "https://" + random.AlphaNumeric(),
-					PrPermitted: true,
-				},
-			},
-			want: nil,
-			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.Account) {
-			},
-			assertion: assert.Error,
-		},
-		{
-			name: "InvalidAccountType",
-			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-				account: &repository.CreateAccountArgs{
-					DisplayName: random.AlphaNumeric(),
-					Type:        10000,
-					URL:         "https://" + random.AlphaNumeric(),
-					PrPermitted: true,
-				},
-			},
-			want: nil,
-			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.Account) {
-			},
-			assertion: assert.Error,
-		},
 	}
 
 	for _, tt := range tests {
@@ -648,8 +614,8 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.GroupUser
-		setup     func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser)
+		want      []*domain.UserGroup
+		setup     func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -658,14 +624,14 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 				ctx:    context.Background(),
 				userID: random.UUID(),
 			},
-			want: []*domain.GroupUser{
+			want: []*domain.UserGroup{
 				{
 					ID:       random.UUID(),
 					Name:     random.AlphaNumeric(),
 					Duration: random.Duration(),
 				},
 			},
-			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser) {
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup) {
 				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
@@ -677,7 +643,7 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 				userID: random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser) {
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup) {
 				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
