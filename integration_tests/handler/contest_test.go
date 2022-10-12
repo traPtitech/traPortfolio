@@ -272,6 +272,17 @@ func TestAddContestTeamMembers(t *testing.T) {
 			},
 			testutils.HTTPError("bad request: validate error"),
 		},
+		"400 invalid member": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.AddContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					random.UUID(),
+				},
+			},
+			testutils.HTTPError("bad request: argument error"),
+		},
 		"404 team not found": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
@@ -355,6 +366,17 @@ func TestEditContestTeamMembers(t *testing.T) {
 				},
 			},
 			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid member": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamMembersJSONRequestBody{
+				Members: []uuid.UUID{
+					random.UUID(),
+				},
+			},
+			testutils.HTTPError("bad request: argument error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,

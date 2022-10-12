@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"encoding/json"
 	"errors"
 
 	"gorm.io/driver/mysql"
@@ -127,10 +128,25 @@ func (handler *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
+type GormErr struct {
+	Number int `json:"Number"`
+}
+
 func (handler *SQLHandler) Error() error {
 	err := handler.conn.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return database.ErrNoRows
+	}
+
+	// 外部キー制約エラーの変換
+	b, _ := json.Marshal(err)
+	var newError GormErr
+	error := json.Unmarshal((b), &newError)
+	if error != nil {
+		return err
+	}
+	if newError.Number == 1452 {
+		return database.ErrInvalidArgument
 	}
 
 	return err
