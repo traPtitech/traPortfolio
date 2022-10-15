@@ -128,6 +128,10 @@ func (handler *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
+const (
+	ErrCodeInvalidConstraint = 1452
+)
+
 func (handler *SQLHandler) Error() error {
 	err := handler.conn.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -136,7 +140,7 @@ func (handler *SQLHandler) Error() error {
 
 	// 外部キー制約エラーの変換
 	var mysqlErr *sqldriver.MySQLError
-	if errors.As(err, &mysqlErr) && mysqlErr.Number == database.ErrCodeInvalidConstraint {
+	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
 		return database.ErrInvalidArgument
 	}
 
