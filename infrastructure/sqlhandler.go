@@ -1,9 +1,9 @@
 package infrastructure
 
 import (
-	"encoding/json"
 	"errors"
 
+	sqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -128,10 +128,6 @@ func (handler *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
-type GormErr struct {
-	Number int `json:"Number"`
-}
-
 func (handler *SQLHandler) Error() error {
 	err := handler.conn.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -139,13 +135,8 @@ func (handler *SQLHandler) Error() error {
 	}
 
 	// 外部キー制約エラーの変換
-	b, _ := json.Marshal(err)
-	var newError GormErr
-	error := json.Unmarshal((b), &newError)
-	if error != nil {
-		return err
-	}
-	if newError.Number == 1452 {
+	var mysqlErr *sqldriver.MySQLError
+	if errors.As(err, &mysqlErr) && mysqlErr.Number == database.ErrCodeInvalidConstraint {
 		return database.ErrInvalidArgument
 	}
 
