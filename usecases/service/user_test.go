@@ -171,8 +171,8 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.NewBool(true, true),
+					Description: random.OptAlphaNumeric(),
+					Check:       random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -186,8 +186,8 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.NewBool(true, true),
+					Description: random.OptAlphaNumeric(),
+					Check:       random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -387,10 +387,10 @@ func TestUserService_EditAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumericNotNull(),
+					DisplayName: random.OptAlphaNumeric(),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
-					URL:         random.OptURLStringNotNull(),
-					PrPermitted: optional.NewBool(true, true),
+					URL:         random.OptURLString(),
+					PrPermitted: random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -405,10 +405,10 @@ func TestUserService_EditAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumericNotNull(),
+					DisplayName: random.OptAlphaNumeric(),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
-					URL:         random.OptURLStringNotNull(),
-					PrPermitted: optional.NewBool(true, true),
+					URL:         random.OptURLString(),
+					PrPermitted: random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
