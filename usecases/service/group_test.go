@@ -82,19 +82,11 @@ func TestGroupService_GetGroup(t *testing.T) {
 				Name: random.AlphaNumeric(),
 				Link: random.AlphaNumeric(),
 				Admin: []*domain.User{
-					{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					},
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 				Members: []*domain.UserWithDuration{
 					{
-						User: domain.User{
-							ID:       random.UUID(),
-							Name:     random.AlphaNumeric(),
-							RealName: random.AlphaNumeric(),
-						},
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					},
 				},
@@ -122,11 +114,7 @@ func TestGroupService_GetGroup(t *testing.T) {
 				}, nil)
 				user.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return([]*domain.User{
 					want.Admin[0],
-					{
-						ID:       want.Members[0].User.ID,
-						Name:     want.Members[0].User.Name,
-						RealName: want.Members[0].User.RealName,
-					},
+					&want.Members[0].User,
 				}, nil)
 			},
 			assertion: assert.NoError,
