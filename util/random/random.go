@@ -141,7 +141,7 @@ func OptAlphaNumeric() optional.String {
 	return optional.NewString(AlphaNumeric(), Bool())
 }
 
-func OptAlphaNumericNotNull() optional.String {
+func OptNotNullAlphaNumeric() optional.String {
 	return optional.NewString(AlphaNumeric(), true)
 }
 

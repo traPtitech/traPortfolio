@@ -173,7 +173,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			args: args{
 				&repository.GetUsersArgs{
 					IncludeSuspended: random.OptBoolNotNull(),
-					Name:             random.OptAlphaNumericNotNull(),
+					Name:             random.OptNotNullAlphaNumeric(),
 				},
 			},
 			want:      nil,
@@ -716,7 +716,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumericNotNull(),
+					Description: random.OptNotNullAlphaNumeric(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -742,7 +742,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumericNotNull(),
+					Description: random.OptNotNullAlphaNumeric(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -761,7 +761,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: random.OptAlphaNumericNotNull(),
+					Description: random.OptNotNullAlphaNumeric(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -929,7 +929,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumericNotNull(),
+					DisplayName: random.OptNotNullAlphaNumeric(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -954,7 +954,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumericNotNull(),
+					DisplayName: random.OptNotNullAlphaNumeric(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
@@ -976,7 +976,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: random.OptAlphaNumericNotNull(),
+					DisplayName: random.OptNotNullAlphaNumeric(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: optional.NewBool(true, true),
 					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
