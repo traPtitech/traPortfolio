@@ -20,8 +20,8 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) reposito
 	return &EventRepository{h: sql, knoq: knoq}
 }
 
-func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
-	events, err := repo.knoq.GetAll()
+func (r *EventRepository) GetEvents() ([]*domain.Event, error) {
+	events, err := r.knoq.GetAll()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -40,8 +40,8 @@ func (repo *EventRepository) GetEvents() ([]*domain.Event, error) {
 	return result, nil
 }
 
-func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
-	er, err := repo.knoq.GetByEventID(eventID)
+func (r *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
+	er, err := r.knoq.GetByEventID(eventID)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -67,7 +67,7 @@ func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, e
 		RoomID:   er.RoomID,
 	}
 
-	elv, err := repo.getEventLevelByID(eventID)
+	elv, err := r.getEventLevelByID(eventID)
 	if err == nil {
 		result.Level = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
@@ -79,8 +79,8 @@ func (repo *EventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, e
 	return result, nil
 }
 
-func (repo *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelArgs) error {
-	_, err := repo.knoq.GetByEventID(arg.EventID)
+func (r *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelArgs) error {
+	_, err := r.knoq.GetByEventID(arg.EventID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -90,7 +90,7 @@ func (repo *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelAr
 		Level: arg.Level,
 	}
 
-	err = repo.h.Create(&relation).Error()
+	err = r.h.Create(&relation).Error()
 	if err != nil {
 		return convertError(err)
 	}
@@ -98,13 +98,13 @@ func (repo *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelAr
 	return nil
 }
 
-func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
+func (r *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
 	if !arg.Level.Valid {
 		return nil // updateする必要がないのでここでcommitする
 	}
 
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
-		if elv, err := repo.getEventLevelByID(eventID); err != nil {
+	err := r.h.Transaction(func(tx database.SQLHandler) error {
+		if elv, err := r.getEventLevelByID(eventID); err != nil {
 			return convertError(err)
 		} else if uint8(elv.Level) == arg.Level.Byte {
 			return nil // updateする必要がないのでここでcommitする
@@ -123,8 +123,8 @@ func (repo *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository
 	return nil
 }
 
-func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
-	events, err := repo.knoq.GetByUserID(userID)
+func (r *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
+	events, err := r.knoq.GetByUserID(userID)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -142,9 +142,9 @@ func (repo *EventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, e
 	return result, nil
 }
 
-func (repo *EventRepository) getEventLevelByID(eventID uuid.UUID) (*model.EventLevelRelation, error) {
+func (r *EventRepository) getEventLevelByID(eventID uuid.UUID) (*model.EventLevelRelation, error) {
 	elv := &model.EventLevelRelation{}
-	err := repo.h.
+	err := r.h.
 		Where(&model.EventLevelRelation{ID: eventID}).
 		First(elv).
 		Error()

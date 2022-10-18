@@ -52,76 +52,76 @@ func initDB(db *gorm.DB) error {
 	return nil
 }
 
-func (handler *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.conn.Find(out, where...)
+func (h *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
+	db := h.conn.Find(out, where...)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) First(out interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.conn.First(out, where...)
+func (h *SQLHandler) First(out interface{}, where ...interface{}) database.SQLHandler {
+	db := h.conn.First(out, where...)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Create(value interface{}) database.SQLHandler {
-	db := handler.conn.Create(value)
+func (h *SQLHandler) Create(value interface{}) database.SQLHandler {
+	db := h.conn.Create(value)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.conn.Delete(value, where...)
+func (h *SQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
+	db := h.conn.Delete(value, where...)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
-	db := handler.conn.Where(query, args...)
+func (h *SQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
+	db := h.conn.Where(query, args...)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Model(value interface{}) database.SQLHandler {
-	db := handler.conn.Model(value)
+func (h *SQLHandler) Model(value interface{}) database.SQLHandler {
+	db := h.conn.Model(value)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Update(column string, value interface{}) database.SQLHandler {
-	db := handler.conn.Update(column, value)
+func (h *SQLHandler) Update(column string, value interface{}) database.SQLHandler {
+	db := h.conn.Update(column, value)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Updates(values interface{}) database.SQLHandler {
-	db := handler.conn.Updates(values)
+func (h *SQLHandler) Updates(values interface{}) database.SQLHandler {
+	db := h.conn.Updates(values)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Begin() database.SQLHandler {
-	tx := handler.conn.Begin()
+func (h *SQLHandler) Begin() database.SQLHandler {
+	tx := h.conn.Begin()
 	return &SQLHandler{conn: tx}
 }
 
-func (handler *SQLHandler) Commit() database.SQLHandler {
-	db := handler.conn.Commit()
+func (h *SQLHandler) Commit() database.SQLHandler {
+	db := h.conn.Commit()
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Preload(query string, args ...interface{}) database.SQLHandler {
-	db := handler.conn.Preload(query, args...)
+func (h *SQLHandler) Preload(query string, args ...interface{}) database.SQLHandler {
+	db := h.conn.Preload(query, args...)
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Rollback() database.SQLHandler {
-	db := handler.conn.Rollback()
+func (h *SQLHandler) Rollback() database.SQLHandler {
+	db := h.conn.Rollback()
 	return &SQLHandler{conn: db}
 }
 
-func (handler *SQLHandler) Transaction(fc func(database.SQLHandler) error) error {
+func (h *SQLHandler) Transaction(fc func(database.SQLHandler) error) error {
 	ffc := func(tx *gorm.DB) error {
 		driver := &SQLHandler{conn: tx}
 		return fc(driver)
 	}
-	return handler.conn.Transaction(ffc)
+	return h.conn.Transaction(ffc)
 }
 
-func (handler *SQLHandler) Ping() error {
-	db, err := handler.conn.DB()
+func (h *SQLHandler) Ping() error {
+	db, err := h.conn.DB()
 	if err != nil {
 		return err
 	}
@@ -132,8 +132,8 @@ const (
 	ErrCodeInvalidConstraint = 1452
 )
 
-func (handler *SQLHandler) Error() error {
-	err := handler.conn.Error
+func (h *SQLHandler) Error() error {
+	err := h.conn.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return database.ErrNoRows
 	}
