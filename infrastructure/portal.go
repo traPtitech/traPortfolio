@@ -37,13 +37,13 @@ func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.Porta
 	}, nil
 }
 
-func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
-	portalUsers, found := portal.cache.Get(cacheKey)
+func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
+	portalUsers, found := a.cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil
 	}
 
-	res, err := portal.apiGet("/user")
+	res, err := a.apiGet("/user")
 	if err != nil {
 		return nil, err
 	}
@@ -56,16 +56,16 @@ func (portal *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	if err := json.NewDecoder(res.Body).Decode(&userResponses); err != nil {
 		return nil, fmt.Errorf("decode failed: %v", err)
 	}
-	portal.cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
+	a.cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
 }
 
-func (portal *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
+func (a *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	if traQID == "" {
 		return nil, fmt.Errorf("invalid traQID")
 	}
 
-	res, err := portal.apiGet(fmt.Sprintf("/user/%v", traQID))
+	res, err := a.apiGet(fmt.Sprintf("/user/%v", traQID))
 	if err != nil {
 		return nil, err
 	}
