@@ -873,7 +873,7 @@ components:
         - Qiita (@は含まない)
         - AtCoder
         - SoundCloud
-      x-go-type: int64
+      x-go-type: uint64
     Project:
       title: Project
       type: object
