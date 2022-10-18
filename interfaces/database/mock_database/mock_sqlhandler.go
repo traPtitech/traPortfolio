@@ -35,84 +35,84 @@ func NewMockSQLHandler() *MockSQLHandler {
 	return &MockSQLHandler{engine, mock}
 }
 
-func (handler *MockSQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.Conn.Find(out, where...)
+func (h *MockSQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
+	db := h.Conn.Find(out, where...)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) First(out interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.Conn.First(out, where...)
+func (h *MockSQLHandler) First(out interface{}, where ...interface{}) database.SQLHandler {
+	db := h.Conn.First(out, where...)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Create(value interface{}) database.SQLHandler {
-	db := handler.Conn.Create(value)
+func (h *MockSQLHandler) Create(value interface{}) database.SQLHandler {
+	db := h.Conn.Create(value)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
-	db := handler.Conn.Delete(value, where...)
+func (h *MockSQLHandler) Delete(value interface{}, where ...interface{}) database.SQLHandler {
+	db := h.Conn.Delete(value, where...)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Update(column string, value interface{}) database.SQLHandler {
-	db := handler.Conn.Update(column, value)
+func (h *MockSQLHandler) Update(column string, value interface{}) database.SQLHandler {
+	db := h.Conn.Update(column, value)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
-	db := handler.Conn.Where(query, args...)
+func (h *MockSQLHandler) Where(query interface{}, args ...interface{}) database.SQLHandler {
+	db := h.Conn.Where(query, args...)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Model(value interface{}) database.SQLHandler {
-	db := handler.Conn.Model(value)
+func (h *MockSQLHandler) Model(value interface{}) database.SQLHandler {
+	db := h.Conn.Model(value)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Updates(values interface{}) database.SQLHandler {
-	db := handler.Conn.Updates(values)
+func (h *MockSQLHandler) Updates(values interface{}) database.SQLHandler {
+	db := h.Conn.Updates(values)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Begin() database.SQLHandler {
-	tx := handler.Conn.Begin()
+func (h *MockSQLHandler) Begin() database.SQLHandler {
+	tx := h.Conn.Begin()
 	return &MockSQLHandler{Conn: tx}
 }
 
-func (handler *MockSQLHandler) Commit() database.SQLHandler {
-	db := handler.Conn.Commit()
+func (h *MockSQLHandler) Commit() database.SQLHandler {
+	db := h.Conn.Commit()
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Preload(query string, args ...interface{}) database.SQLHandler {
-	db := handler.Conn.Preload(query, args...)
+func (h *MockSQLHandler) Preload(query string, args ...interface{}) database.SQLHandler {
+	db := h.Conn.Preload(query, args...)
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Rollback() database.SQLHandler {
-	db := handler.Conn.Rollback()
+func (h *MockSQLHandler) Rollback() database.SQLHandler {
+	db := h.Conn.Rollback()
 	return &MockSQLHandler{Conn: db}
 }
 
-func (handler *MockSQLHandler) Transaction(fc func(database.SQLHandler) error) error {
+func (h *MockSQLHandler) Transaction(fc func(database.SQLHandler) error) error {
 	ffc := func(tx *gorm.DB) error {
 		driver := &MockSQLHandler{Conn: tx}
 		return fc(driver)
 	}
-	return handler.Conn.Transaction(ffc)
+	return h.Conn.Transaction(ffc)
 }
 
-func (handler *MockSQLHandler) Ping() error {
-	db, err := handler.Conn.DB()
+func (h *MockSQLHandler) Ping() error {
+	db, err := h.Conn.DB()
 	if err != nil {
 		return err
 	}
 	return db.Ping()
 }
 
-func (handler *MockSQLHandler) Error() error {
-	return handler.Conn.Error
+func (h *MockSQLHandler) Error() error {
+	return h.Conn.Error
 }
 
 // Interface guards
