@@ -172,7 +172,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Error_WithMultipleOpts",
 			args: args{
 				&repository.GetUsersArgs{
-					IncludeSuspended: optional.NewBool(true, true),
+					IncludeSuspended: random.OptBoolNotNull(),
 					Name:             random.OptAlphaNumericNotNull(),
 				},
 			},

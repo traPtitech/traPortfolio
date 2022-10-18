@@ -121,6 +121,10 @@ func OptBool() optional.Bool {
 	return optional.NewBool(Bool(), Bool())
 }
 
+func OptBoolNotNull() optional.Bool {
+	return optional.NewBool(Bool(), true)
+}
+
 func OptInt64() optional.Int64 {
 	return optional.NewInt64(rand.Int63(), Bool())
 }

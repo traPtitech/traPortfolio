@@ -220,7 +220,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        random.OptURLStringNotNull(),
+					Link:        random.OptURLString(),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
