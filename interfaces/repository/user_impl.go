@@ -70,16 +70,17 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 		}
 
 		return []*domain.User{
-			{
-				ID:       users[0].ID,
-				Name:     users[0].Name,
-				RealName: portalUser.RealName,
-			},
+			domain.NewUser(
+				users[0].ID,
+				users[0].Name,
+				portalUser.RealName,
+				users[0].Check,
+			),
 		}, nil
 	} else {
-		idMap := make(map[string]uuid.UUID, l)
+		userMap := make(map[string]*model.User, l)
 		for _, v := range users {
-			idMap[v.Name] = v.ID
+			userMap[v.Name] = v
 		}
 
 		portalUsers, err := repo.portal.GetAll()
@@ -89,12 +90,13 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 
 		result := make([]*domain.User, 0, l)
 		for _, v := range portalUsers {
-			if id, ok := idMap[v.TraQID]; ok {
-				result = append(result, &domain.User{
-					ID:       id,
-					Name:     v.TraQID,
-					RealName: v.RealName,
-				})
+			if u, ok := userMap[v.TraQID]; ok {
+				result = append(result, domain.NewUser(
+					u.ID,
+					u.Name,
+					v.RealName,
+					u.Check,
+				))
 			}
 		}
 
@@ -135,11 +137,12 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 	}
 
 	result := domain.UserDetail{
-		User: domain.User{
-			ID:       user.ID,
-			Name:     user.Name,
-			RealName: portalUser.RealName,
-		},
+		User: *domain.NewUser(
+			user.ID,
+			user.Name,
+			portalUser.RealName,
+			user.Check,
+		),
 		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,
@@ -167,11 +170,12 @@ func (repo *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain
 	}
 
 	result := &domain.UserDetail{
-		User: domain.User{
-			ID:       user.ID,
-			Name:     user.Name,
-			RealName: portalUser.RealName,
-		},
+		User: *domain.NewUser(
+			user.ID,
+			user.Name,
+			portalUser.RealName,
+			user.Check,
+		),
 		State:    0,
 		Bio:      user.Description,
 		Accounts: []*domain.Account{},

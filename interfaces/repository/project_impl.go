@@ -68,16 +68,15 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 
 	m := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
+		realName := nameMap[v.User.Name]
 		pm := domain.UserWithDuration{
-			User: domain.User{
-				ID:   v.UserID,
-				Name: v.User.Name,
-			},
+			User: *domain.NewUser(
+				v.User.ID,
+				v.User.Name,
+				realName,
+				v.User.Check,
+			),
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
-		}
-
-		if rn, ok := nameMap[v.User.Name]; ok {
-			pm.User.RealName = rn
 		}
 
 		m[i] = &pm
@@ -187,16 +186,15 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 
 	res := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
+		realName := nameMap[v.User.Name]
 		u := domain.UserWithDuration{
-			User: domain.User{
-				ID:   v.UserID,
-				Name: v.User.Name,
-			},
+			User: *domain.NewUser(
+				v.User.ID,
+				v.User.Name,
+				realName,
+				v.User.Check,
+			),
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
-		}
-
-		if rn, ok := nameMap[v.User.Name]; ok {
-			u.User.RealName = rn
 		}
 
 		res[i] = &u
