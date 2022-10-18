@@ -22,7 +22,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_get_users")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -40,16 +40,18 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "All NotIncludeSuspended",
 			args: args{args: &urepository.GetUsersArgs{}},
 			expected: []*domain.User{
-				{
-					ID:       mockdata.MockTraQUsers[0].User.ID,
-					Name:     mockdata.MockTraQUsers[0].Name,
-					RealName: mockdata.MockPortalUsers[0].RealName,
-				},
-				{
-					ID:       mockdata.MockTraQUsers[2].User.ID,
-					Name:     mockdata.MockTraQUsers[2].Name,
-					RealName: mockdata.MockPortalUsers[2].RealName,
-				},
+				domain.NewUser(
+					mockdata.MockTraQUsers[0].User.ID,
+					mockdata.MockTraQUsers[0].Name,
+					mockdata.MockPortalUsers[0].RealName,
+					mockdata.MockUsers[0].Check,
+				),
+				domain.NewUser(
+					mockdata.MockTraQUsers[2].User.ID,
+					mockdata.MockTraQUsers[2].Name,
+					mockdata.MockPortalUsers[2].RealName,
+					mockdata.MockUsers[2].Check,
+				),
 			},
 			assertion: assert.NoError,
 		},
@@ -59,21 +61,24 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				IncludeSuspended: optional.NewBool(true, true),
 			}},
 			expected: []*domain.User{
-				{
-					ID:       mockdata.MockTraQUsers[0].User.ID,
-					Name:     mockdata.MockTraQUsers[0].Name,
-					RealName: mockdata.MockPortalUsers[0].RealName,
-				},
-				{
-					ID:       mockdata.MockTraQUsers[1].User.ID,
-					Name:     mockdata.MockTraQUsers[1].Name,
-					RealName: mockdata.MockPortalUsers[1].RealName,
-				},
-				{
-					ID:       mockdata.MockTraQUsers[2].User.ID,
-					Name:     mockdata.MockTraQUsers[2].Name,
-					RealName: mockdata.MockPortalUsers[2].RealName,
-				},
+				domain.NewUser(
+					mockdata.MockUsers[0].ID,
+					mockdata.MockUsers[0].Name,
+					mockdata.MockPortalUsers[0].RealName,
+					mockdata.MockUsers[0].Check,
+				),
+				domain.NewUser(
+					mockdata.MockUsers[1].ID,
+					mockdata.MockUsers[1].Name,
+					mockdata.MockPortalUsers[1].RealName,
+					mockdata.MockUsers[1].Check,
+				),
+				domain.NewUser(
+					mockdata.MockUsers[2].ID,
+					mockdata.MockUsers[2].Name,
+					mockdata.MockPortalUsers[2].RealName,
+					mockdata.MockUsers[2].Check,
+				),
 			},
 			assertion: assert.NoError,
 		},
@@ -83,11 +88,12 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				Name: optional.NewString(mockdata.MockTraQUsers[0].Name, true),
 			}},
 			expected: []*domain.User{
-				{
-					ID:       mockdata.MockTraQUsers[0].User.ID,
-					Name:     mockdata.MockTraQUsers[0].Name,
-					RealName: mockdata.MockPortalUsers[0].RealName,
-				},
+				domain.NewUser(
+					mockdata.MockUsers[0].ID,
+					mockdata.MockUsers[0].Name,
+					mockdata.MockPortalUsers[0].RealName,
+					mockdata.MockUsers[0].Check,
+				),
 			},
 			assertion: assert.NoError,
 		},
@@ -116,7 +122,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_get_user")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -137,11 +143,12 @@ func TestUserRepository_GetUser(t *testing.T) {
 				mockdata.MockTraQUsers[2].User.ID,
 			},
 			expected: &domain.UserDetail{
-				User: domain.User{
-					ID:       mockdata.MockTraQUsers[2].User.ID,
-					Name:     mockdata.MockTraQUsers[2].Name,
-					RealName: mockdata.MockPortalUsers[2].RealName,
-				},
+				User: *domain.NewUser(
+					mockdata.MockUsers[2].ID,
+					mockdata.MockUsers[2].Name,
+					mockdata.MockPortalUsers[2].RealName,
+					mockdata.MockUsers[2].Check,
+				),
 				State:    mockdata.MockTraQUsers[2].User.State,
 				Bio:      mockdata.MockUsers[2].Description,
 				Accounts: []*domain.Account{},
@@ -154,20 +161,21 @@ func TestUserRepository_GetUser(t *testing.T) {
 				mockdata.MockTraQUsers[0].User.ID,
 			},
 			expected: &domain.UserDetail{
-				User: domain.User{
-					ID:       mockdata.MockTraQUsers[0].User.ID,
-					Name:     mockdata.MockTraQUsers[0].Name,
-					RealName: mockdata.MockPortalUsers[0].RealName,
-				},
+				User: *domain.NewUser(
+					mockdata.MockUsers[0].ID,
+					mockdata.MockUsers[0].Name,
+					mockdata.MockPortalUsers[0].RealName,
+					mockdata.MockUsers[0].Check,
+				),
 				State: mockdata.MockTraQUsers[0].User.State,
 				Bio:   mockdata.MockUsers[0].Description,
 				Accounts: []*domain.Account{
 					{
-						ID:          mockdata.MockAccount.ID,
-						DisplayName: mockdata.MockAccount.Name,
-						Type:        mockdata.MockAccount.Type,
-						PrPermitted: mockdata.MockAccount.Check,
-						URL:         mockdata.MockAccount.URL,
+						ID:          mockdata.MockAccounts[0].ID,
+						DisplayName: mockdata.MockAccounts[0].Name,
+						Type:        mockdata.MockAccounts[0].Type,
+						PrPermitted: mockdata.MockAccounts[0].Check,
+						URL:         mockdata.MockAccounts[0].URL,
 					},
 				},
 			},
@@ -197,13 +205,14 @@ func TestUserRepository_CreateUser(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_create_user")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		args *urepository.CreateUserArgs
 	}
 
+	check := random.Bool()
 	description := random.AlphaNumeric()
 	cases := []struct {
 		name      string
@@ -216,16 +225,17 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			args: args{
 				args: &urepository.CreateUserArgs{
 					Description: description,
-					Check:       random.Bool(),
+					Check:       check,
 					Name:        mockdata.MockUsers[1].Name,
 				},
 			},
 			expected: &domain.UserDetail{
-				User: domain.User{
-					// ID is replaced by generated one.
-					Name:     mockdata.MockUsers[1].Name,
-					RealName: mockdata.MockPortalUsers[1].RealName,
-				},
+				User: *domain.NewUser(
+					uuid.Nil, // ID is replaced by generated one.
+					mockdata.MockUsers[1].Name,
+					mockdata.MockPortalUsers[1].RealName,
+					check,
+				),
 				State:    mockdata.MockTraQUsers[1].User.State,
 				Bio:      description,
 				Accounts: []*domain.Account{},
@@ -249,7 +259,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_update_user")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -274,11 +284,12 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	}
 
 	expected := &domain.UserDetail{
-		User: domain.User{
-			ID:       user.ID,
-			Name:     user.Name,
-			RealName: portalUser.RealName,
-		},
+		User: *domain.NewUser(
+			user.ID,
+			user.Name,
+			portalUser.RealName,
+			user.Check,
+		),
 		State:    traqUser.User.State,
 		Bio:      bio,
 		Accounts: []*domain.Account{},
@@ -294,7 +305,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -316,7 +327,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_get_account")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -339,7 +350,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_update_account")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -380,7 +391,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_delete_account")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -406,7 +417,7 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_get_user_projects")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -439,7 +450,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("user_repository_get_contests")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())

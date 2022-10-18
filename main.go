@@ -12,10 +12,9 @@ import (
 
 func main() {
 	config.Parse()
+
 	appConf := config.GetConfig()
-	s := appConf.SQLConf()
-	// migration
-	h, err := infrastructure.NewSQLHandler(s)
+	db, err := infrastructure.NewGormDB(appConf.SQLConf())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,12 +29,12 @@ func main() {
 			log.Fatal("cannot specify both `production` and `insert-mock-data`")
 		}
 
-		if err := mockdata.InsertSampleDataToDB(h); err != nil {
+		if err := mockdata.InsertSampleDataToDB(infrastructure.NewSQLHandler(db)); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	api, err := infrastructure.InjectAPIServer(appConf)
+	api, err := infrastructure.InjectAPIServer(appConf, db)
 	if err != nil {
 		log.Fatal(err)
 	}

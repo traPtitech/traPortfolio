@@ -1,6 +1,9 @@
 package infrastructure
 
 import (
+	"errors"
+
+	sqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -13,15 +16,19 @@ type SQLHandler struct {
 	conn *gorm.DB
 }
 
-func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
+func NewSQLHandler(db *gorm.DB) database.SQLHandler {
+	return &SQLHandler{conn: db}
+}
+
+func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	engine, err := gorm.Open(
 		mysql.New(mysql.Config{DSN: conf.Dsn()}),
 		conf.GormConfig(),
 	)
 	if err != nil {
-		// return fmt.Errorf("failed to connect database: %v", err)s
 		return nil, err
 	}
+
 	db, err := engine.DB()
 	if err != nil {
 		return nil, err
@@ -33,13 +40,7 @@ func NewSQLHandler(conf *config.SQLConfig) (database.SQLHandler, error) {
 		return nil, err
 	}
 
-	sqlHandler := new(SQLHandler)
-	sqlHandler.conn = engine
-	return sqlHandler, nil
-}
-
-func FromDB(db *gorm.DB) database.SQLHandler {
-	return &SQLHandler{conn: db}
+	return engine, nil
 }
 
 // initDB データベースのスキーマを更新
@@ -127,8 +128,23 @@ func (handler *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
+const (
+	ErrCodeInvalidConstraint = 1452
+)
+
 func (handler *SQLHandler) Error() error {
-	return handler.conn.Error
+	err := handler.conn.Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return database.ErrNoRows
+	}
+
+	// 外部キー制約エラーの変換
+	var mysqlErr *sqldriver.MySQLError
+	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
+		return database.ErrInvalidArgument
+	}
+
+	return err
 }
 
 // Interface guards

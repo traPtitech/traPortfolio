@@ -320,8 +320,24 @@ func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uui
 }
 
 func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	var belongings []*model.ContestTeamUserBelonging
+	// 存在チェック
 	err := repo.h.
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	err = repo.h.
+		Where(&model.ContestTeam{ID: teamID}).
+		First(&model.ContestTeam{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	var belongings []*model.ContestTeamUserBelonging
+	err = repo.h.
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).
@@ -338,16 +354,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 	result := make([]*domain.User, len(belongings))
 	for i, v := range belongings {
 		u := v.User
-		newUser := domain.User{
-			ID:   u.ID,
-			Name: u.Name,
-		}
-
-		if rn, ok := nameMap[u.Name]; ok {
-			newUser.RealName = rn
-		}
-
-		result[i] = &newUser
+		result[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
 	}
 	return result, nil
 }

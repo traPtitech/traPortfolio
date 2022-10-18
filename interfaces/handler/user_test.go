@@ -42,18 +42,14 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				hresUsers := []*User{}
 
 				for i := 0; i < casenum; i++ {
-					ruser := domain.User{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					}
+					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
 						RealName: ruser.RealName,
 					}
 
-					repoUsers = append(repoUsers, &ruser)
+					repoUsers = append(repoUsers, ruser)
 					hresUsers = append(hresUsers, &huser)
 
 				}
@@ -73,18 +69,14 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				hresUsers := []*User{}
 
 				for i := 0; i < casenum; i++ {
-					ruser := domain.User{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					}
+					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
 						RealName: ruser.RealName,
 					}
 
-					repoUsers = append(repoUsers, &ruser)
+					repoUsers = append(repoUsers, ruser)
 					hresUsers = append(hresUsers, &huser)
 				}
 
@@ -102,11 +94,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			name: "Success_WithOpts_Name",
 			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 				repoUsers := []*domain.User{
-					{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					},
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				}
 				hresUsers := []*User{
 					{
@@ -201,12 +189,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				}
 
 				repoUser := domain.UserDetail{
-
-					User: domain.User{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					},
+					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 					State:    domain.TraQState(random.Uint8n(uint8(domain.TraqStateLimit))),
 					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
 					Accounts: rAccounts,

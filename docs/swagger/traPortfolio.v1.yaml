@@ -853,6 +853,9 @@ components:
         - 6
         - 7
         - 8
+        - 9
+        - 10
+        - 11
       x-enum-varnames:
         - homepage
         - blog
@@ -861,8 +864,11 @@ components:
         - pixiv
         - github
         - qiita
+        - zenn
         - atcoder
         - soundcloud
+        - hackthebox
+        - ctftime
       x-enum-descriptions:
         - ホームページ (IDはリンクのURLそのまま)
         - ブログ (IDはリンクのURLそのまま)
@@ -871,8 +877,11 @@ components:
         - Pixiv
         - GitHub (@は含まない)
         - Qiita (@は含まない)
+        - Zenn
         - AtCoder
         - SoundCloud
+        - HackTheBox
+        - CTFtime
       x-go-type: uint64
     Project:
       title: Project

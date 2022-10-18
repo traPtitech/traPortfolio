@@ -20,12 +20,12 @@ import (
 func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API, error) {
 	t.Helper()
 
-	db := SetupDB(t, conf.SQLConf())
-	if err := mockdata.InsertSampleDataToDB(db); err != nil {
+	db := SetupGormDB(t, conf.SQLConf())
+	if err := mockdata.InsertSampleDataToDB(infrastructure.NewSQLHandler(db)); err != nil {
 		return nil, err
 	}
 
-	api, err := infrastructure.InjectAPIServer(conf)
+	api, err := infrastructure.InjectAPIServer(conf, db)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func DummyUUID() uuid.UUID {
 	return random.UUID()
 }
 
-func HTTPError(message string) echo.HTTPError {
-	return echo.HTTPError{
+func HTTPError(message string) *echo.HTTPError {
+	return &echo.HTTPError{
 		Message: message,
 	}
 }

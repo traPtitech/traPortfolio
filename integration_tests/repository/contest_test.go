@@ -22,7 +22,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contests")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -40,7 +40,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -60,7 +60,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_update_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -116,7 +116,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -147,7 +147,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_teams")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -181,7 +181,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -216,7 +216,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_update_contest_teams")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -267,7 +267,7 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest_teams")
 	sqlConf := conf.SQLConf()
 
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -315,7 +315,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -350,27 +350,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	mustAddContestTeamMembers(t, repo, team2.ID, []uuid.UUID{user2.ID})
 
 	expected1 := []*domain.User{
-		{
-			ID:       user1.ID,
-			Name:     user1.Name,
-			RealName: portalUser1.RealName,
-		},
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user1.ID, user1.Name, portalUser1.RealName, user1.Check),
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users1, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
 	expected2 := []*domain.User{
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users2, err := repo.GetContestTeamMembers(contest1.ID, team2.ID)
 	assert.NoError(t, err)
@@ -390,7 +378,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("contest_repository_edit_contest_team_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -425,27 +413,15 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	mustAddContestTeamMembers(t, repo, team2.ID, []uuid.UUID{user2.ID})
 
 	expected1 := []*domain.User{
-		{
-			ID:       user1.ID,
-			Name:     user1.Name,
-			RealName: portalUser1.RealName,
-		},
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user1.ID, user1.Name, portalUser1.RealName, user1.Check),
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users1, err := repo.GetContestTeamMembers(contest1.ID, team1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
 	expected2 := []*domain.User{
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	users2, err := repo.GetContestTeamMembers(contest1.ID, team2.ID)
 	assert.NoError(t, err)
@@ -457,11 +433,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	assert.ElementsMatch(t, expected3, users3)
 
 	expected4 := []*domain.User{
-		{
-			ID:       user2.ID,
-			Name:     user2.Name,
-			RealName: portalUser2.RealName,
-		},
+		domain.NewUser(user2.ID, user2.Name, portalUser2.RealName, user2.Check),
 	}
 	err = repo.EditContestTeamMembers(team1.ID, []uuid.UUID{user2.ID})
 	assert.NoError(t, err)

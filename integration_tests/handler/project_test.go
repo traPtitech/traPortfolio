@@ -81,7 +81,7 @@ func TestGetProject(t *testing.T) {
 }
 
 // CreateProject POST /projects
-func TestCreateProjecct(t *testing.T) {
+func TestCreateProject(t *testing.T) {
 	var (
 		name        = random.AlphaNumeric()
 		link        = random.RandURLString()
@@ -145,7 +145,7 @@ func TestCreateProjecct(t *testing.T) {
 				Link:        &link,
 				Description: description,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("bad request: argument error"),
 		},
 	}
 
