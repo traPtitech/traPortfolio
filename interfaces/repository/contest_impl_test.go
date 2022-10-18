@@ -242,7 +242,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        random.OptURLStringNotNull(),
+					Link:        random.OptURLString(),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -659,8 +659,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptNotNullAlphaNumeric(),
-		Link:        random.OptURLStringNotNull(),
+		Result:      random.OptAlphaNumeric(),
+		Link:        random.OptURLString(),
 		Description: random.AlphaNumeric(),
 	}
 
@@ -709,8 +709,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      random.OptNotNullAlphaNumeric(),
-					Link:        random.OptURLStringNotNull(),
+					Result:      random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
 					Description: random.AlphaNumeric(),
 				},
 			},
