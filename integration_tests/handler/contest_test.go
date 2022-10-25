@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
@@ -54,7 +53,7 @@ func TestGetContest(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.ContestID1(),
-			mockdata.HMockContestDetails[0],
+			mockdata.CloneHandlerMockContestDetails()[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -90,9 +89,10 @@ func TestCreateContest(t *testing.T) {
 		description  = random.AlphaNumeric()
 		since, until = random.SinceAndUntil()
 		//tooLongStringは260文字
-		tooLongString  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		invalidURL     = "invalid url"
-		unexpectedTime = time.Date(2100, 1, 0, 0, 0, 0, 0, time.UTC)
+		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		invalidURL    = "invalid url"
+		//unexpectedTimePast   = time.Date(1900, 1, 0, 0, 0, 0, 0, time.UTC)
+		//unexpectedTimeFuture = time.Date(2100, 1, 0, 0, 0, 0, 0, time.UTC)
 	)
 
 	t.Parallel()
@@ -135,7 +135,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: description is too short or too long"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
@@ -148,7 +148,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &invalidURL,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: invalid link"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -161,20 +161,20 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: tooLongString,
 			},
-			testutils.HTTPError("bad request: name is too short or too long"),
+			testutils.HTTPError("bad request: validate error"),
 		},
-		"400 unexpected since time": {
+		/*"400 unexpected since time": {
 			http.StatusBadRequest,
 			handler.CreateContestJSONBody{
 				Description: description,
 				Duration: handler.Duration{
-					Since: unexpectedTime,
+					Since: unexpectedTimePast,
 					Until: &until,
 				},
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: unexpected since time"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"400 unexpected until time": {
 			http.StatusBadRequest,
@@ -182,13 +182,13 @@ func TestCreateContest(t *testing.T) {
 				Description: description,
 				Duration: handler.Duration{
 					Since: since,
-					Until: &unexpectedTime,
+					Until: &unexpectedTimeFuture,
 				},
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: unexpected until time"),
-		},
+			testutils.HTTPError("bad request: validate error"),
+		},*/
 		"400 since time is after until time": {
 			http.StatusBadRequest,
 			handler.CreateContestJSONBody{
@@ -200,7 +200,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: since time is after until time"),
+			testutils.HTTPError("bad request: validate error"),
 		},
 	}
 
