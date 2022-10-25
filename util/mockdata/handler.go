@@ -27,11 +27,10 @@ var (
 
 func CloneHandlerMockContestDetails() []handler.ContestDetail {
 	var (
-		mContests     = CloneMockContests()
-		hContestTeams = CloneMockContestTeams()
-		//hContestTeams   = CloneHandlerMockContestTeamsByID()
-		hContestDetails = make([]handler.ContestDetail, len(mContests))
+		mContests       = CloneMockContests()
+		hContestTeams   = CloneMockContestTeams()
 		mContestTeams   = make([]handler.ContestTeam, len(hContestTeams))
+		hContestDetails = make([]handler.ContestDetail, len(mContests))
 	)
 
 	for i, c := range hContestTeams {
