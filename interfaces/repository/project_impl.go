@@ -19,9 +19,9 @@ func NewProjectRepository(h database.SQLHandler, portal external.PortalAPI) repo
 	return &ProjectRepository{h, portal}
 }
 
-func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
+func (r *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	projects := make([]*model.Project, 0)
-	err := repo.h.Find(&projects).Error()
+	err := r.h.Find(&projects).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -37,9 +37,9 @@ func (repo *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	return res, nil
 }
 
-func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error) {
+func (r *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error) {
 	project := new(model.Project)
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.Project{ID: projectID}).
 		First(project).
 		Error(); err != nil {
@@ -47,7 +47,7 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 	}
 
 	members := make([]*model.ProjectMember, 0)
-	err := repo.h.
+	err := r.h.
 		Preload("User").
 		Where(model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
@@ -56,7 +56,7 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 		return nil, convertError(err)
 	}
 
-	portalUsers, err := repo.portal.GetAll()
+	portalUsers, err := r.portal.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (repo *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectD
 	return res, nil
 }
 
-func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
+func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	p := model.Project{
 		ID:            random.UUID(),
 		Name:          args.Name,
@@ -109,7 +109,7 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 		p.Link = args.Link.String
 	}
 
-	err := repo.h.Create(&p).Error()
+	err := r.h.Create(&p).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -127,7 +127,7 @@ func (repo *ProjectRepository) CreateProject(args *repository.CreateProjectArgs)
 	return res, nil
 }
 
-func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
+func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -151,7 +151,7 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 		return nil
 	}
 
-	err := repo.h.
+	err := r.h.
 		Model(&model.Project{}).
 		Where(&model.Project{ID: projectID}).
 		Updates(changes).
@@ -163,9 +163,9 @@ func (repo *ProjectRepository) UpdateProject(projectID uuid.UUID, args *reposito
 	return nil
 }
 
-func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
+func (r *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	members := make([]*model.ProjectMember, 0)
-	err := repo.h.
+	err := r.h.
 		Preload("User").
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
@@ -174,7 +174,7 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 		return nil, convertError(err)
 	}
 
-	portalUsers, err := repo.portal.GetAll()
+	portalUsers, err := r.portal.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func (repo *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain
 	return res, nil
 }
 
-func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
+func (r *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
 	if len(projectMembers) == 0 {
 		return repository.ErrInvalidArg
 	}
@@ -218,7 +218,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	}
 
 	// プロジェクトの存在チェック
-	err := repo.h.
+	err := r.h.
 		Where(&model.Project{ID: projectID}).
 		First(&model.Project{}).
 		Error()
@@ -228,7 +228,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
 	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
-	err = repo.h.
+	err = r.h.
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&_mmbs).
 		Error()
@@ -254,7 +254,7 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 		members = append(members, m)
 	}
 
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+	err = r.h.Transaction(func(tx database.SQLHandler) error {
 		for _, v := range members {
 			if _, ok := mmbsMp[v.UserID]; ok {
 				continue
@@ -273,13 +273,13 @@ func (repo *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMem
 	return nil
 }
 
-func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
+func (r *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
 	if len(members) == 0 {
 		return repository.ErrInvalidArg
 	}
 
 	// プロジェクトの存在チェック
-	err := repo.h.
+	err := r.h.
 		Where(&model.Project{ID: projectID}).
 		First(&model.Project{}).
 		Error()
@@ -287,7 +287,7 @@ func (repo *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members
 		return convertError(err)
 	}
 
-	err = repo.h.
+	err = r.h.
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Where("`project_members`.`user_id` IN (?)", members).
 		Delete(&model.ProjectMember{}).

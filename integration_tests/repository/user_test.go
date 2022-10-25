@@ -283,12 +283,19 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 		bio = user.Description
 	}
 
+	var check bool
+	if args.Check.Valid {
+		check = args.Check.Bool
+	} else {
+		check = user.Check
+	}
+
 	expected := &domain.UserDetail{
 		User: *domain.NewUser(
 			user.ID,
 			user.Name,
 			portalUser.RealName,
-			user.Check,
+			check,
 		),
 		State:    traqUser.User.State,
 		Bio:      bio,
