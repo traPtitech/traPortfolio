@@ -37,13 +37,13 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 	return eargs, nil
 }
 
-func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
+func (r *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 	if err != nil {
 		return nil, err
 	}
 
-	traqUsers, err := repo.traQ.GetAll(eargs)
+	traqUsers, err := r.traQ.GetAll(eargs)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -54,7 +54,7 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	}
 
 	users := make([]*model.User, 0)
-	if err := repo.h.
+	if err := r.h.
 		Where("`users`.`id` IN (?)", traqUserIDs).
 		Find(&users).
 		Error(); err != nil {
@@ -64,37 +64,39 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	if l := len(users); l == 0 {
 		return []*domain.User{}, nil
 	} else if l == 1 {
-		portalUser, err := repo.portal.GetByTraqID(users[0].Name)
+		portalUser, err := r.portal.GetByTraqID(users[0].Name)
 		if err != nil {
 			return nil, convertError(err)
 		}
 
 		return []*domain.User{
-			{
-				ID:       users[0].ID,
-				Name:     users[0].Name,
-				RealName: portalUser.RealName,
-			},
+			domain.NewUser(
+				users[0].ID,
+				users[0].Name,
+				portalUser.RealName,
+				users[0].Check,
+			),
 		}, nil
 	} else {
-		idMap := make(map[string]uuid.UUID, l)
+		userMap := make(map[string]*model.User, l)
 		for _, v := range users {
-			idMap[v.Name] = v.ID
+			userMap[v.Name] = v
 		}
 
-		portalUsers, err := repo.portal.GetAll()
+		portalUsers, err := r.portal.GetAll()
 		if err != nil {
 			return nil, convertError(err)
 		}
 
 		result := make([]*domain.User, 0, l)
 		for _, v := range portalUsers {
-			if id, ok := idMap[v.TraQID]; ok {
-				result = append(result, &domain.User{
-					ID:       id,
-					Name:     v.TraQID,
-					RealName: v.RealName,
-				})
+			if u, ok := userMap[v.TraQID]; ok {
+				result = append(result, domain.NewUser(
+					u.ID,
+					u.Name,
+					v.RealName,
+					u.Check,
+				))
 			}
 		}
 
@@ -102,9 +104,9 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	}
 }
 
-func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error) {
+func (r *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error) {
 	user := new(model.User)
-	err := repo.h.
+	err := r.h.
 		Preload("Accounts").
 		Where(&model.User{ID: userID}).
 		First(user).
@@ -124,22 +126,23 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 		})
 	}
 
-	portalUser, err := repo.portal.GetByTraqID(user.Name)
+	portalUser, err := r.portal.GetByTraqID(user.Name)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	traQUser, err := repo.traQ.GetByUserID(userID)
+	traQUser, err := r.traQ.GetByUserID(userID)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	result := domain.UserDetail{
-		User: domain.User{
-			ID:       user.ID,
-			Name:     user.Name,
-			RealName: portalUser.RealName,
-		},
+		User: *domain.NewUser(
+			user.ID,
+			user.Name,
+			portalUser.RealName,
+			user.Check,
+		),
 		State:    traQUser.State,
 		Bio:      user.Description,
 		Accounts: accounts,
@@ -148,8 +151,8 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 	return &result, nil
 }
 
-func (repo *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain.UserDetail, error) {
-	portalUser, err := repo.portal.GetByTraqID(args.Name)
+func (r *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain.UserDetail, error) {
+	portalUser, err := r.portal.GetByTraqID(args.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -161,17 +164,18 @@ func (repo *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain
 		Name:        args.Name,
 	}
 
-	err = repo.h.Create(&user).Error()
+	err = r.h.Create(&user).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	result := &domain.UserDetail{
-		User: domain.User{
-			ID:       user.ID,
-			Name:     user.Name,
-			RealName: portalUser.RealName,
-		},
+		User: *domain.NewUser(
+			user.ID,
+			user.Name,
+			portalUser.RealName,
+			user.Check,
+		),
 		State:    0,
 		Bio:      user.Description,
 		Accounts: []*domain.Account{},
@@ -179,7 +183,7 @@ func (repo *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain
 	return result, nil
 }
 
-func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.UpdateUserArgs) error {
+func (r *UserRepository) UpdateUser(userID uuid.UUID, args *repository.UpdateUserArgs) error {
 	changes := map[string]interface{}{}
 	if args.Description.Valid {
 		changes["description"] = args.Description.String
@@ -192,7 +196,7 @@ func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.Update
 		return nil
 	}
 
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
 		err := tx.
 			Where(&model.User{ID: userID}).
@@ -215,8 +219,8 @@ func (repo *UserRepository) UpdateUser(userID uuid.UUID, args *repository.Update
 	return nil
 }
 
-func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
-	err := repo.h.
+func (r *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
+	err := r.h.
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -225,7 +229,7 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 	}
 
 	accounts := make([]*model.Account, 0)
-	err = repo.h.
+	err = r.h.
 		Where(&model.Account{UserID: userID}).
 		Find(&accounts).
 		Error()
@@ -246,9 +250,9 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 	return result, nil
 }
 
-func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
+func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
 	account := &model.Account{}
-	err := repo.h.
+	err := r.h.
 		Where(&model.Account{ID: accountID, UserID: userID}).
 		First(account).
 		Error()
@@ -267,7 +271,7 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 	return result, nil
 }
 
-func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
+func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
@@ -276,13 +280,13 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 		UserID: userID,
 		Check:  args.PrPermitted,
 	}
-	err := repo.h.Create(&account).Error()
+	err := r.h.Create(&account).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	ver := new(model.Account)
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.Account{ID: account.ID}).
 		First(ver).
 		Error(); err != nil {
@@ -298,7 +302,7 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 	}, nil
 }
 
-func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
+func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
 	if args.DisplayName.Valid {
 		changes["name"] = args.DisplayName.String
@@ -317,7 +321,7 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 		return nil
 	}
 
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
 		err := tx.
 			Where(&model.Account{ID: accountID, UserID: userID}).
@@ -336,8 +340,8 @@ func (repo *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID,
 	return convertError(err)
 }
 
-func (repo *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID) error {
-	if err := repo.h.Transaction(func(tx database.SQLHandler) error {
+func (r *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID) error {
+	if err := r.h.Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
 			Where(&model.Account{ID: accountID, UserID: userID}).
 			First(&model.Account{}).
@@ -360,8 +364,8 @@ func (repo *UserRepository) DeleteAccount(userID uuid.UUID, accountID uuid.UUID)
 	return nil
 }
 
-func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
-	err := repo.h.
+func (r *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject, error) {
+	err := r.h.
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -370,7 +374,7 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 	}
 
 	projects := make([]*model.ProjectMember, 0)
-	err = repo.h.
+	err = r.h.
 		Preload("Project").
 		Where(&model.ProjectMember{UserID: userID}).
 		Find(&projects).
@@ -392,8 +396,8 @@ func (repo *UserRepository) GetProjects(userID uuid.UUID) ([]*domain.UserProject
 	return res, nil
 }
 
-func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserGroup, error) {
-	err := repo.h.
+func (r *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserGroup, error) {
+	err := r.h.
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -402,7 +406,7 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserG
 	}
 
 	groups := make([]*model.GroupUserBelonging, 0)
-	err = repo.h.
+	err = r.h.
 		Preload("Group").
 		Where(&model.GroupUserBelonging{UserID: userID}).
 		Find(&groups).
@@ -432,8 +436,8 @@ func (repo *UserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserG
 	return result, nil
 }
 
-func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
-	err := repo.h.
+func (r *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, error) {
+	err := r.h.
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -442,7 +446,7 @@ func (repo *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest
 	}
 
 	contests := make([]*model.ContestTeamUserBelonging, 0)
-	err = repo.h.
+	err = r.h.
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
 		Find(&contests).

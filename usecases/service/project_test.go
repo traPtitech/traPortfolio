@@ -100,11 +100,7 @@ func TestProjectService_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.UserWithDuration{
 					{
-						User: domain.User{
-							ID:       random.UUID(),
-							Name:     random.AlphaNumeric(),
-							RealName: random.AlphaNumeric(),
-						},
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					},
 				},
@@ -397,11 +393,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			},
 			want: []*domain.UserWithDuration{
 				{
-					User: domain.User{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					},
+					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {

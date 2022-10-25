@@ -108,11 +108,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
 				HostName: []*domain.User{
-					{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					},
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 				GroupID: random.UUID(),
 				RoomID:  random.UUID(),

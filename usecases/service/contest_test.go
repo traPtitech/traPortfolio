@@ -531,11 +531,7 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(),
 				Members: []*domain.User{
-					{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					},
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 			},
 			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
@@ -888,11 +884,7 @@ func TestContestService_GetContestTeamMembers(t *testing.T) {
 				teamID:    random.UUID(),
 			},
 			want: []*domain.User{
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(f fields, args args, want []*domain.User) {
 				repo := f.repo.(*mock_repository.MockContestRepository)

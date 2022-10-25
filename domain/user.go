@@ -7,7 +7,17 @@ import (
 type User struct {
 	ID       uuid.UUID
 	Name     string
-	RealName string
+	RealName string // TODO: 後で消す
+	Check    bool
+}
+
+func NewUser(id uuid.UUID, name string, realName string, check bool) *User {
+	return &User{
+		ID:       id,
+		Name:     name,
+		RealName: realName,
+		Check:    check,
+	}
 }
 
 type UserWithDuration struct {
@@ -58,8 +68,11 @@ const (
 	PIXIV
 	GITHUB
 	QIITA
+	ZENN
 	ATCODER
 	SOUNDCLOUD
+	HACKTHEBOX
+	CTFTIME
 	AccountLimit
 )
 

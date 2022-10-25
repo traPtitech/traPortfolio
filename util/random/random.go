@@ -3,6 +3,7 @@ package random
 import (
 	"math/rand"
 	"net/url"
+	"sort"
 	"time"
 	"unsafe"
 
@@ -87,25 +88,25 @@ func RandURLString() string {
 }
 
 func Duration() domain.YearWithSemesterDuration {
-	ys1 := domain.YearWithSemester{
-		Year:     Time().Year(),
-		Semester: rand.Intn(2),
-	}
-	ys2 := domain.YearWithSemester{
-		Year:     Time().Year(),
-		Semester: rand.Intn(2),
+	yss := []domain.YearWithSemester{
+		{
+			Year:     Time().Year(),
+			Semester: rand.Intn(2),
+		},
+		{
+			Year:     Time().Year(),
+			Semester: rand.Intn(2),
+		},
 	}
 
-	if ys1.After(ys2) {
-		return domain.YearWithSemesterDuration{
-			Since: ys2,
-			Until: ys1,
-		}
-	}
+	// 時系列昇順に並べる
+	sort.Slice(yss, func(i, j int) bool {
+		return !yss[i].After(yss[j])
+	})
 
 	return domain.YearWithSemesterDuration{
-		Since: ys1,
-		Until: ys2,
+		Since: yss[0],
+		Until: yss[1],
 	}
 }
 

@@ -13,7 +13,7 @@ func Migrate(db *gorm.DB, tables []interface{}) (init bool, err error) {
 	m.InitSchema(func(db *gorm.DB) error {
 		init = true
 
-		return db.AutoMigrate(AllTables()...)
+		return db.AutoMigrate(tables...)
 	})
 	err = m.Migrate()
 	return

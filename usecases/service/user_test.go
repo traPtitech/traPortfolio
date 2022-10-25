@@ -35,11 +35,7 @@ func TestUserService_GetUsers(t *testing.T) {
 				args: &repository.GetUsersArgs{},
 			},
 			want: []*domain.User{
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
 				repo.EXPECT().GetUsers(args.args).Return(want, nil)
@@ -98,11 +94,8 @@ func TestUserService_GetUser(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: &domain.UserDetail{
-				User: domain.User{
-					ID:       uuid.Nil, // setupで変更する
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				// IDはsetupで変更する
+				User:  *domain.NewUser(uuid.Nil, random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				State: domain.TraqStateActive,
 				Bio:   random.AlphaNumeric(),
 				Accounts: []*domain.Account{
