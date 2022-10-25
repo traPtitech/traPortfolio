@@ -31,7 +31,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 		args = &repository.CreateContestArgs{
 			Name:        random.AlphaNumeric(),
 			Description: random.AlphaNumeric(),
-			Link:        random.OptAlphaNumeric(),
+			Link:        random.OptURLString(),
 			Since:       since,
 			Until:       optional.NewTime(until, random.Bool()),
 		}

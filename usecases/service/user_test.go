@@ -13,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 func TestUserService_GetUsers(t *testing.T) {
@@ -388,7 +387,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumeric(),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64n(int64(domain.AccountLimit)),
 					URL:         random.OptURLString(),
 					PrPermitted: random.OptBool(),
 				},
@@ -406,7 +405,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumeric(),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					Type:        random.OptInt64n(int64(domain.AccountLimit)),
 					URL:         random.OptURLString(),
 					PrPermitted: random.OptBool(),
 				},
