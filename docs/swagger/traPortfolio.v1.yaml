@@ -1118,8 +1118,13 @@ components:
           properties:
             team:
               $ref: '#/components/schemas/ContestTeam'
+            teamCount:
+              type: integer
+              x-go-type: uint8
+              description: チーム数
           required:
             - team
+            - teamCount
     ContestDetail:
       title: ContestDetail
       type: object
