@@ -134,6 +134,10 @@ func OptInt64n(n int64) optional.Int64 {
 	return optional.NewInt64(rand.Int63n(n), Bool())
 }
 
+func OptInt64nNotNull(n int64) optional.Int64 {
+	return optional.NewInt64(rand.Int63n(n), true)
+}
+
 func OptAlphaNumericn(n int) optional.String {
 	return optional.NewString(AlphaNumericn(n), Bool())
 }
