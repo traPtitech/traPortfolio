@@ -1104,10 +1104,16 @@ components:
         duration:
           # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
+        teams:
+          type: array
+          description: コンテストチーム
+          items:
+            $ref: '#/components/schemas/ContestTeam'
       required:
         - id
         - name
         - duration
+        - teams
     UserContest:
       title: UserContest
       type: object
@@ -1118,13 +1124,8 @@ components:
           properties:
             team:
               $ref: '#/components/schemas/ContestTeam'
-            teamCount:
-              type: integer
-              x-go-type: uint8
-              description: チーム数
           required:
             - team
-            - teamCount
     ContestDetail:
       title: ContestDetail
       type: object
@@ -1140,15 +1141,9 @@ components:
             description:
               type: string
               description: コンテストの説明
-            teams:
-              type: array
-              description: コンテストチーム
-              items:
-                $ref: '#/components/schemas/ContestTeam'
           required:
             - link
             - description
-            - teams
     ContestTeam:
       title: ContestTeam
       type: object
