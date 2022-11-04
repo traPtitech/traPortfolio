@@ -445,24 +445,38 @@ func (r *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, e
 		return nil, convertError(err)
 	}
 
-	contests := make([]*model.ContestTeamUserBelonging, 0)
+	contestTeamUserBelonging := make([]*model.ContestTeamUserBelonging, 0)
 	err = r.h.
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
-		Find(&contests).
+		Find(&contestTeamUserBelonging).
 		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	res := make([]*domain.UserContest, 0, len(contests))
-	for _, v := range contests {
-		ct := v.ContestTeam
+	res := make([]*domain.UserContest, 0, len(contestTeamUserBelonging))
+	for _, v := range contestTeamUserBelonging {
+		var contest *model.Contest
+		err = r.h.
+			Where(&model.Contest{ID: v.ContestTeam.ContestID}).
+			Find(&contest).
+			Error()
+		if err != nil {
+			return nil, convertError(err)
+		}
+
 		res = append(res, &domain.UserContest{
-			ID:          ct.ID,
-			Name:        ct.Name,
-			Result:      ct.Result,
-			ContestName: ct.Contest.Name,
+			ID:        contest.ID,
+			Name:      contest.Name,
+			TimeStart: contest.Since,
+			TimeEnd:   contest.Until,
+			Team: &domain.ContestTeam{
+				ID:        v.ContestTeam.ID,
+				ContestID: contest.ID,
+				Name:      v.ContestTeam.Name,
+				Result:    v.ContestTeam.Result,
+			},
 		})
 	}
 

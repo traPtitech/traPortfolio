@@ -274,11 +274,11 @@ func (h *UserHandler) GetUserContests(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := make([]ContestTeamWithContestName, len(contests))
+	res := make([]UserContest, len(contests))
 	for i, v := range contests {
-		res[i] = newContestTeamWithContestName(
-			newContestTeam(v.ID, v.Name, v.Result),
-			v.ContestName,
+		res[i] = newUserContest(
+			newContest(v.ID, v.Name, v.TimeStart, v.TimeEnd),
+			newContestTeam(v.Team.ID, v.Team.Name, v.Team.Result),
 		)
 	}
 
@@ -371,13 +371,12 @@ func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration
 	}
 }
 
-// TODO: UserContestのほうがいいかも
-func newContestTeamWithContestName(contestTeam ContestTeam, contestName string) ContestTeamWithContestName {
-	return ContestTeamWithContestName{
-		ContestName: contestName,
-		Id:          contestTeam.Id,
-		Name:        contestTeam.Name,
-		Result:      contestTeam.Result,
+func newUserContest(contest Contest, team ContestTeam) UserContest {
+	return UserContest{
+		Id:       contest.Id,
+		Name:     contest.Name,
+		Duration: contest.Duration,
+		Team:     team,
 	}
 }
 
