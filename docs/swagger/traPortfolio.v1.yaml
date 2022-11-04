@@ -376,7 +376,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Contest'
+                  $ref: '#/components/schemas/ContestWithTeams'
       operationId: getContests
       description: コンテストのリストを取得します
     parameters: []
@@ -1104,16 +1104,25 @@ components:
         duration:
           # description: コンテストの開催期間
           $ref: '#/components/schemas/Duration'
-        teams:
-          type: array
-          description: コンテストチーム
-          items:
-            $ref: '#/components/schemas/ContestTeam'
       required:
         - id
         - name
         - duration
-        - teams
+    ContestWithTeams:
+      title: ContestWithTeams
+      type: object
+      description: コンテストの情報(コンテストチームを含む)
+      allOf:
+        - $ref: '#/components/schemas/Contest'
+        - type: object
+          properties:
+            teams:
+              type: array
+              description: コンテストチーム
+              items:
+                $ref: '#/components/schemas/ContestTeam'
+          required:
+            - teams
     UserContest:
       title: UserContest
       type: object
@@ -1131,7 +1140,7 @@ components:
       type: object
       description: コンテストの詳細情報
       allOf:
-        - $ref: '#/components/schemas/Contest'
+        - $ref: '#/components/schemas/ContestWithTeams'
         - type: object
           properties:
             link:
