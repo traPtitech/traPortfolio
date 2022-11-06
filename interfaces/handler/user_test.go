@@ -1175,17 +1175,21 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 				Name:      random.AlphaNumeric(),
 				TimeStart: random.Time(),
 				TimeEnd:   random.Time(),
-				Team: &domain.ContestTeam{
-					ID:        random.UUID(),
-					ContestID: random.UUID(),
-					Name:      random.AlphaNumeric(),
-					Result:    random.AlphaNumeric(),
+				Teams: []*domain.ContestTeam{
+					{
+						ID:        random.UUID(),
+						ContestID: random.UUID(),
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
+					},
 				},
 			}
 
 			hcontest := newUserContest(
 				newContest(rcontest.ID, rcontest.Name, rcontest.TimeStart, rcontest.TimeEnd),
-				newContestTeam(rcontest.Team.ID, rcontest.Team.Name, rcontest.Team.Result),
+				[]ContestTeam{
+					newContestTeam(rcontest.Teams[0].ID, rcontest.Teams[0].Name, rcontest.Teams[0].Result),
+				},
 			)
 
 			repoContests = append(repoContests, &rcontest)

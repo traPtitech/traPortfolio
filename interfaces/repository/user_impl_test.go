@@ -1259,11 +1259,13 @@ func TestUserRepository_GetContests(t *testing.T) {
 					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
-					Team: &domain.ContestTeam{
-						ID:        random.UUID(),
-						ContestID: cid,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+					Teams: []*domain.ContestTeam{
+						{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
 					},
 				},
 			},
@@ -1272,9 +1274,16 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
-				rows := sqlmock.NewRows([]string{"team_id"})
+				rows := sqlmock.NewRows([]string{"id", "name", "since", "until"})
 				for _, v := range want {
-					rows.AddRow(v.Team.ID)
+					rows.AddRow(v.ID, v.Name, v.TimeStart, v.TimeEnd)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests`")).
+					WillReturnRows(rows)
+				rows = sqlmock.NewRows([]string{"team_id"})
+				for _, v := range want {
+					rows.AddRow(v.Teams[0].ID)
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
@@ -1282,10 +1291,10 @@ func TestUserRepository_GetContests(t *testing.T) {
 				for _, v := range want {
 					f.h.Mock.
 						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
-						WithArgs(v.Team.ID).
+						WithArgs(v.Teams[0].ID).
 						WillReturnRows(
 							sqlmock.NewRows([]string{"id", "contest_id", "name", "result"}).
-								AddRow(v.Team.ID, v.ID, v.Team.Name, v.Team.Result),
+								AddRow(v.Teams[0].ID, v.ID, v.Teams[0].Name, v.Teams[0].Result),
 						)
 				}
 				for _, v := range want {

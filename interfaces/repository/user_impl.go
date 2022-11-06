@@ -445,30 +445,43 @@ func (r *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, e
 		return nil, convertError(err)
 	}
 
-	contestTeamUserBelonging := make([]*model.ContestTeamUserBelonging, 0)
+	contests := make([]*model.Contest, 0)
+	err = r.h.Find(&contests).Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	contestTeamUserBelongings := make([]*model.ContestTeamUserBelonging, 0)
 	err = r.h.
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
-		Find(&contestTeamUserBelonging).
+		Find(&contestTeamUserBelongings).
 		Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	res := make([]*domain.UserContest, 0, len(contestTeamUserBelonging))
-	for _, v := range contestTeamUserBelonging {
-		res = append(res, &domain.UserContest{
-			ID:        v.ContestTeam.Contest.ID,
-			Name:      v.ContestTeam.Contest.Name,
-			TimeStart: v.ContestTeam.Contest.Since,
-			TimeEnd:   v.ContestTeam.Contest.Until,
-			Team: &domain.ContestTeam{
-				ID:        v.ContestTeam.ID,
-				ContestID: v.ContestTeam.Contest.ID,
-				Name:      v.ContestTeam.Name,
-				Result:    v.ContestTeam.Result,
-			},
-		})
+	res := make([]*domain.UserContest, 0, len(contestTeamUserBelongings))
+	for _, c := range contests {
+		userContest := &domain.UserContest{
+			ID:        c.ID,
+			Name:      c.Name,
+			TimeStart: c.Since,
+			TimeEnd:   c.Until,
+		}
+		for _, v := range contestTeamUserBelongings {
+			if c.ID == v.ContestTeam.ContestID {
+				userContest.Teams = append(userContest.Teams, &domain.ContestTeam{
+					ID:        v.TeamID,
+					ContestID: c.ID,
+					Name:      v.ContestTeam.Name,
+					Result:    v.ContestTeam.Result,
+				})
+			}
+		}
+		if len(userContest.Teams) > 0 {
+			res = append(res, userContest)
+		}
 	}
 
 	return res, nil

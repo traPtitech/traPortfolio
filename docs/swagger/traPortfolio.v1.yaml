@@ -1116,10 +1116,13 @@ components:
         - $ref: '#/components/schemas/Contest'
         - type: object
           properties:
-            team:
-              $ref: '#/components/schemas/ContestTeam'
+            teams:
+              type: array
+              description: コンテストチーム
+              items:
+                $ref: '#/components/schemas/ContestTeam'
           required:
-            - team
+            - teams
     ContestDetail:
       title: ContestDetail
       type: object

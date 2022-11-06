@@ -54,7 +54,7 @@ type UserContest struct {
 	Name      string    // コンテスト名
 	TimeStart time.Time
 	TimeEnd   time.Time
-	Team      *ContestTeam
+	Teams     []*ContestTeam
 }
 
 type UserGroup struct {

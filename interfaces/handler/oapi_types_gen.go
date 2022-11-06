@@ -465,8 +465,8 @@ type UserContest struct {
 	// コンテスト名
 	Name string `json:"name"`
 
-	// コンテストチーム情報
-	Team ContestTeam `json:"team"`
+	// コンテストチーム
+	Teams []ContestTeam `json:"teams"`
 }
 
 // UserDetail defines model for UserDetail.

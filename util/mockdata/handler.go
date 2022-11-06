@@ -412,10 +412,12 @@ func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.UserContest {
 						Id:       c.Id,
 						Name:     c.Name,
 						Duration: c.Duration,
-						Team: handler.ContestTeam{
-							Id:     hContestTeams[c.Id][0].Id,
-							Name:   hContestTeams[c.Id][0].Name,
-							Result: hContestTeams[c.Id][0].Result,
+						Teams: []handler.ContestTeam{
+							{
+								Id:     hContestTeams[c.Id][0].Id,
+								Name:   hContestTeams[c.Id][0].Name,
+								Result: hContestTeams[c.Id][0].Result,
+							},
 						},
 					})
 				}
