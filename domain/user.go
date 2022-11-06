@@ -50,8 +50,8 @@ type UserProject struct {
 }
 
 type UserContest struct {
-	ID        uuid.UUID // チームID
-	Name      string    // チーム名
+	ID        uuid.UUID // コンテストID
+	Name      string    // コンテスト名
 	TimeStart time.Time
 	TimeEnd   time.Time
 	Team      *ContestTeam

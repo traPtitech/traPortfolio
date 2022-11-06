@@ -1183,19 +1183,10 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 				},
 			}
 
-			hcontest := UserContest{
-				Id:   rcontest.ID,
-				Name: rcontest.Name,
-				Duration: Duration{
-					Since: rcontest.TimeStart,
-					Until: &rcontest.TimeEnd,
-				},
-				Team: ContestTeam{
-					Id:     rcontest.Team.ID,
-					Name:   rcontest.Team.Name,
-					Result: rcontest.Team.Result,
-				},
-			}
+			hcontest := newUserContest(
+				newContest(rcontest.ID, rcontest.Name, rcontest.TimeStart, rcontest.TimeEnd),
+				newContestTeam(rcontest.Team.ID, rcontest.Team.Name, rcontest.Team.Result),
+			)
 
 			repoContests = append(repoContests, &rcontest)
 			hresContests = append(hresContests, &hcontest)
