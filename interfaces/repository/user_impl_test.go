@@ -1274,14 +1274,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
-				rows := sqlmock.NewRows([]string{"id", "name", "since", "until"})
-				for _, v := range want {
-					rows.AddRow(v.ID, v.Name, v.TimeStart, v.TimeEnd)
-				}
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests`")).
-					WillReturnRows(rows)
-				rows = sqlmock.NewRows([]string{"team_id"})
+				rows := sqlmock.NewRows([]string{"team_id"})
 				for _, v := range want {
 					rows.AddRow(v.Teams[0].ID)
 				}

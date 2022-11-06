@@ -445,12 +445,6 @@ func (r *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, e
 		return nil, convertError(err)
 	}
 
-	contests := make([]*model.Contest, 0)
-	err = r.h.Find(&contests).Error()
-	if err != nil {
-		return nil, convertError(err)
-	}
-
 	contestTeamUserBelongings := make([]*model.ContestTeamUserBelonging, 0)
 	err = r.h.
 		Preload("ContestTeam.Contest").
@@ -461,27 +455,36 @@ func (r *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, e
 		return nil, convertError(err)
 	}
 
-	res := make([]*domain.UserContest, 0, len(contestTeamUserBelongings))
-	for _, c := range contests {
-		userContest := &domain.UserContest{
-			ID:        c.ID,
-			Name:      c.Name,
-			TimeStart: c.Since,
-			TimeEnd:   c.Until,
-		}
-		for _, v := range contestTeamUserBelongings {
-			if c.ID == v.ContestTeam.ContestID {
-				userContest.Teams = append(userContest.Teams, &domain.ContestTeam{
-					ID:        v.TeamID,
-					ContestID: c.ID,
-					Name:      v.ContestTeam.Name,
-					Result:    v.ContestTeam.Result,
-				})
+	contestsMap := make(map[uuid.UUID]*domain.UserContest)
+	for _, v := range contestTeamUserBelongings {
+		if _, ok := contestsMap[v.ContestTeam.ContestID]; ok {
+			contestsMap[v.ContestTeam.ContestID].Teams = append(contestsMap[v.ContestTeam.ContestID].Teams, &domain.ContestTeam{
+				ID:        v.ContestTeam.ID,
+				ContestID: v.ContestTeam.ContestID,
+				Name:      v.ContestTeam.Name,
+				Result:    v.ContestTeam.Result,
+			})
+		} else {
+			contestsMap[v.ContestTeam.ContestID] = &domain.UserContest{
+				ID:        v.ContestTeam.Contest.ID,
+				Name:      v.ContestTeam.Contest.Name,
+				TimeStart: v.ContestTeam.Contest.Since,
+				TimeEnd:   v.ContestTeam.Contest.Until,
+				Teams: []*domain.ContestTeam{
+					{
+						ID:        v.ContestTeam.ID,
+						ContestID: v.ContestTeam.ContestID,
+						Name:      v.ContestTeam.Name,
+						Result:    v.ContestTeam.Result,
+					},
+				},
 			}
 		}
-		if len(userContest.Teams) > 0 {
-			res = append(res, userContest)
-		}
+	}
+
+	res := make([]*domain.UserContest, 0, len(contestTeamUserBelongings))
+	for _, v := range contestsMap {
+		res = append(res, v)
 	}
 
 	return res, nil
