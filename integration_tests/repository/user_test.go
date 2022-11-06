@@ -519,10 +519,9 @@ func newUserProject(args *urepository.CreateProjectMemberArgs, project *domain.P
 
 func newUserContest(contest *domain.Contest, team *domain.ContestTeam) *domain.UserContest {
 	return &domain.UserContest{
-		ID:        contest.ID,
-		Name:      contest.Name,
-		TimeStart: contest.TimeStart,
-		TimeEnd:   contest.TimeEnd,
-		Team:      team,
+		ID:          team.ID,
+		Name:        team.Name,
+		Result:      team.Result,
+		ContestName: contest.Name,
 	}
 }

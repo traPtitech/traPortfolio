@@ -93,12 +93,12 @@ func CreateContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		reqbody    handler.CreateContestJSONRequestBody
+		reqbody    handler.CreateContestJSONBody
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
-			handler.CreateContestJSONRequestBody{
+			handler.CreateContestJSONBody{
 				Description: description,
 				Duration: handler.Duration{
 					Since: since,
@@ -225,7 +225,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    handler.AddContestTeamMembersJSONRequestBody
+		reqbody    handler.AddContestTeamMembersJSONBody
 		want       interface{}
 	}{
 		"204": {
@@ -317,7 +317,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    handler.EditContestTeamMembersJSONRequestBody
+		reqbody    handler.EditContestTeamMembersJSONBody
 		want       interface{}
 	}{
 		"204": {

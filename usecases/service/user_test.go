@@ -555,15 +555,10 @@ func TestUserService_GetUserContests(t *testing.T) {
 			},
 			want: []*domain.UserContest{
 				{
-					ID:        random.UUID(),
-					Name:      random.AlphaNumeric(),
-					TimeStart: random.Time(),
-					TimeEnd:   random.Time(),
-					Team: &domain.ContestTeam{
-						ID:     random.UUID(),
-						Name:   random.AlphaNumeric(),
-						Result: random.AlphaNumeric(),
-					},
+					ID:          random.UUID(),
+					Name:        random.AlphaNumeric(),
+					Result:      random.AlphaNumeric(),
+					ContestName: random.AlphaNumeric(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
