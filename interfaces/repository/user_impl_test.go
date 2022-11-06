@@ -1237,6 +1237,8 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 }
 
 func TestUserRepository_GetContests(t *testing.T) {
+	cid := random.UUID()
+
 	t.Parallel()
 	type args struct {
 		userID uuid.UUID
@@ -1253,14 +1255,15 @@ func TestUserRepository_GetContests(t *testing.T) {
 			args: args{userID: random.UUID()},
 			want: []*domain.UserContest{
 				{
-					ID:        random.UUID(),
+					ID:        cid,
 					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
 					Team: &domain.ContestTeam{
-						ID:     random.UUID(),
-						Name:   random.AlphaNumeric(),
-						Result: random.AlphaNumeric(),
+						ID:        random.UUID(),
+						ContestID: cid,
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
 					},
 				},
 			},
@@ -1281,8 +1284,8 @@ func TestUserRepository_GetContests(t *testing.T) {
 						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
 						WithArgs(v.Team.ID).
 						WillReturnRows(
-							sqlmock.NewRows([]string{"id", "name", "result"}).
-								AddRow(v.Team.ID, v.Team.Name, v.Team.Result),
+							sqlmock.NewRows([]string{"id", "contest_id", "name", "result"}).
+								AddRow(v.Team.ID, v.ID, v.Team.Name, v.Team.Result),
 						)
 				}
 				for _, v := range want {
