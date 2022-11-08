@@ -1303,6 +1303,66 @@ func TestUserRepository_GetContests(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
+			name: "Success with multiple teams",
+			args: args{userID: random.UUID()},
+			want: []*domain.UserContest{
+				{
+					ID:        cid,
+					Name:      random.AlphaNumeric(),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
+					Teams: []*domain.ContestTeam{
+						{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+					},
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
+				rows := sqlmock.NewRows([]string{"team_id"})
+				for _, v := range want {
+					rows.AddRow(v.Teams[0].ID)
+					rows.AddRow(v.Teams[1].ID)
+				}
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+				for _, v := range want {
+					rows = sqlmock.NewRows([]string{"id", "contest_id", "name", "result"})
+					for _, t := range v.Teams {
+						rows.AddRow(t.ID, t.ContestID, t.Name, t.Result)
+					}
+					f.h.Mock.
+						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` IN (?,?)")).
+						WithArgs(v.Teams[0].ID, v.Teams[1].ID).
+						WillReturnRows(rows)
+				}
+				for _, v := range want {
+					f.h.Mock.
+						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ?")).
+						WithArgs(v.ID).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"id", "name", "since", "until"}).
+								AddRow(v.ID, v.Name, v.TimeStart, v.TimeEnd),
+						)
+				}
+			},
+			assertion: assert.NoError,
+		},
+		{
 			name: "UnexpectedError",
 			args: args{userID: random.UUID()},
 			want: nil,
