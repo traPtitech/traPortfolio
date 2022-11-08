@@ -91,8 +91,6 @@ func TestCreateContest(t *testing.T) {
 		//tooLongStringは260文字
 		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		invalidURL    = "invalid url"
-		//unexpectedTimePast   = time.Date(1900, 1, 0, 0, 0, 0, 0, time.UTC)
-		//unexpectedTimeFuture = time.Date(2100, 1, 0, 0, 0, 0, 0, time.UTC)
 	)
 
 	t.Parallel()
