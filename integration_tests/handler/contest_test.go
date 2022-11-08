@@ -196,6 +196,68 @@ func TestCreateContest(t *testing.T) {
 }
 
 func TestEditContest(t *testing.T) {
+	var (
+		description = mockdata.CloneMockContests()[0].Description
+		since       = mockdata.CloneMockContests()[0].Since
+		until       = mockdata.CloneMockContests()[0].Until
+		link        = mockdata.CloneMockContests()[0].Link
+		name        = mockdata.CloneMockContests()[0].Name
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		reqBody    handler.EditContestJSONRequestBody
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			nil,
+		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{},
+			nil,
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			if tt.statusCode == http.StatusNoContent {
+				// Get response before update
+				var contest handler.ContestDetail
+				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
+				assert.Equal(t, http.StatusOK, res.Code)
+				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &contest)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
+
+				// Update & Assert
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContest, tt.contestID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+
+				// Get updated response & Assert
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
+				testutils.AssertResponse(t, http.StatusOK, contest, res)
+			}
+		})
+	}
 }
 
 func TestDeleteContest(t *testing.T) {
