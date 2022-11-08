@@ -108,7 +108,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					hgroupAdmin := User{
 						Id:       rgroupAdmin.ID,
 						Name:     rgroupAdmin.Name,
-						RealName: rgroupAdmin.RealName,
+						RealName: rgroupAdmin.RealName(),
 					}
 
 					rgroupAdmins = append(rgroupAdmins, rgroupAdmin)
@@ -129,7 +129,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 						Duration: ConvertDuration(rgroupmember.Duration),
 						Id:       rgroupmember.User.ID,
 						Name:     rgroupmember.User.Name,
-						RealName: rgroupmember.User.RealName,
+						RealName: rgroupmember.User.RealName(),
 					}
 
 					rgroupMembers = append(rgroupMembers, &rgroupmember)

@@ -59,7 +59,7 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 	groupRes := make([]GroupMember, len(group.Members))
 	for i, v := range group.Members {
 		groupRes[i] = newGroupMember(
-			newUser(v.User.ID, v.User.Name, v.User.RealName),
+			newUser(v.User.ID, v.User.Name, v.User.RealName()),
 			newYearWithSemesterDuration(
 				int(v.Duration.Since.Year),
 				int(v.Duration.Since.Semester),
@@ -70,7 +70,7 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 	}
 	adminRes := make([]User, len(group.Admin))
 	for i, v := range group.Admin {
-		adminRes[i] = newUser(v.ID, v.Name, v.RealName)
+		adminRes[i] = newUser(v.ID, v.Name, v.RealName())
 	}
 
 	res := newGroupDetail(

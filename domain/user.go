@@ -7,7 +7,7 @@ import (
 type User struct {
 	ID       uuid.UUID
 	Name     string
-	RealName string // TODO: 後で消す
+	realName string // private field
 	Check    bool
 }
 
@@ -15,9 +15,17 @@ func NewUser(id uuid.UUID, name string, realName string, check bool) *User {
 	return &User{
 		ID:       id,
 		Name:     name,
-		RealName: realName,
+		realName: realName,
 		Check:    check,
 	}
+}
+
+func (u User) RealName() string {
+	if !u.Check {
+		return ""
+	}
+
+	return u.realName
 }
 
 type UserWithDuration struct {

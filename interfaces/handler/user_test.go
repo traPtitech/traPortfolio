@@ -46,7 +46,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
-						RealName: ruser.RealName,
+						RealName: ruser.RealName(),
 					}
 
 					repoUsers = append(repoUsers, ruser)
@@ -73,7 +73,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
-						RealName: ruser.RealName,
+						RealName: ruser.RealName(),
 					}
 
 					repoUsers = append(repoUsers, ruser)
@@ -100,7 +100,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 					{
 						Id:       repoUsers[0].ID,
 						Name:     repoUsers[0].Name,
-						RealName: repoUsers[0].RealName,
+						RealName: repoUsers[0].RealName(),
 					},
 				}
 
@@ -200,7 +200,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 					Bio:      repoUser.Bio,
 					Id:       repoUser.User.ID,
 					Name:     repoUser.User.Name,
-					RealName: repoUser.User.RealName,
+					RealName: repoUser.User.RealName(),
 					State:    UserAccountState(repoUser.State),
 				}
 

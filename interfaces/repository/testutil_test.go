@@ -114,7 +114,7 @@ func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
 func makePortalUser(user *domain.User) *external.PortalUserResponse {
 	return &external.PortalUserResponse{
 		TraQID:         user.Name,
-		RealName:       user.RealName,
+		RealName:       user.RealName(),
 		AlphabeticName: random.AlphaNumeric(),
 	}
 }

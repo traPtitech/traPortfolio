@@ -50,14 +50,14 @@ func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain
 	// fill members info
 	for i, v := range groups.Members {
 		if u, ok := umap[v.User.ID]; ok {
-			groups.Members[i].User = *domain.NewUser(u.ID, u.Name, u.RealName, u.Check)
+			groups.Members[i].User = *domain.NewUser(u.ID, u.Name, u.RealName(), u.Check)
 		}
 	}
 
 	// fill leader info
 	for i, v := range groups.Admin {
 		if u, ok := umap[v.ID]; ok {
-			groups.Admin[i] = domain.NewUser(u.ID, u.Name, u.RealName, u.Check)
+			groups.Admin[i] = domain.NewUser(u.ID, u.Name, u.RealName(), u.Check)
 		}
 	}
 
