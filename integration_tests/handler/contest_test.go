@@ -16,7 +16,7 @@ import (
 )
 
 // GetContests GET /contests
-func GetContests(t *testing.T) {
+func TestGetContests(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -43,7 +43,7 @@ func GetContests(t *testing.T) {
 }
 
 // GetContest GET /contests/:contestID
-func GetContest(t *testing.T) {
+func TestGetContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -53,7 +53,7 @@ func GetContest(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.ContestID1(),
-			mockdata.HMockContests[0],
+			mockdata.CloneHandlerMockContestDetails()[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -82,12 +82,15 @@ func GetContest(t *testing.T) {
 }
 
 // CreateContest POST /contests
-func CreateContest(t *testing.T) {
+func TestCreateContest(t *testing.T) {
 	var (
 		name         = random.AlphaNumeric()
 		link         = random.RandURLString()
 		description  = random.AlphaNumeric()
 		since, until = random.SinceAndUntil()
+		//tooLongStringは260文字
+		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
@@ -119,6 +122,58 @@ func CreateContest(t *testing.T) {
 				Teams: []handler.ContestTeam{},
 			},
 		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: tooLongString,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &invalidURL,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: tooLongString,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 since time is after until time": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: until,
+					Until: &since,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
 	}
 
 	e := echo.New()
@@ -140,19 +195,19 @@ func CreateContest(t *testing.T) {
 	}
 }
 
-func EditContest(t *testing.T) {
+func TestEditContest(t *testing.T) {
 }
 
-func DeleteContest(t *testing.T) {
+func TestDeleteContest(t *testing.T) {
 }
 
-func GetContestTeam(t *testing.T) {
+func TestGetContestTeam(t *testing.T) {
 }
 
-func AddContestTeam(t *testing.T) {
+func TestAddContestTeam(t *testing.T) {
 }
 
-func EditContestTeam(t *testing.T) {
+func TestEditContestTeam(t *testing.T) {
 }
 
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members

@@ -28,9 +28,18 @@ var (
 func CloneHandlerMockContestDetails() []handler.ContestDetail {
 	var (
 		mContests       = CloneMockContests()
-		hContestTeams   = CloneHandlerMockContestTeamsByID()
+		hContestTeams   = CloneMockContestTeams()
+		mContestTeams   = make([]handler.ContestTeam, len(hContestTeams))
 		hContestDetails = make([]handler.ContestDetail, len(mContests))
 	)
+
+	for i, c := range hContestTeams {
+		mContestTeams[i] = handler.ContestTeam{
+			Id:     c.ID,
+			Name:   c.Name,
+			Result: c.Result,
+		}
+	}
 
 	for i, c := range mContests {
 		hContestDetails[i] = handler.ContestDetail{
@@ -39,16 +48,10 @@ func CloneHandlerMockContestDetails() []handler.ContestDetail {
 				Since: c.Since,
 				Until: &c.Until,
 			},
-			Id:   c.ID,
-			Link: c.Link,
-			Name: c.Name,
-			Teams: []handler.ContestTeam{
-				{
-					Id:     hContestTeams[c.ID][0].Id,
-					Name:   hContestTeams[c.ID][0].Name,
-					Result: hContestTeams[c.ID][0].Result,
-				},
-			},
+			Id:    c.ID,
+			Link:  c.Link,
+			Name:  c.Name,
+			Teams: mContestTeams,
 		}
 	}
 	return hContestDetails
