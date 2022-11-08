@@ -161,32 +161,6 @@ func TestCreateContest(t *testing.T) {
 			},
 			testutils.HTTPError("bad request: validate error"),
 		},
-		/*"400 unexpected since time": {
-			http.StatusBadRequest,
-			handler.CreateContestJSONBody{
-				Description: description,
-				Duration: handler.Duration{
-					Since: unexpectedTimePast,
-					Until: &until,
-				},
-				Link: &link,
-				Name: name,
-			},
-			testutils.HTTPError("bad request: validate error"),
-		},
-		"400 unexpected until time": {
-			http.StatusBadRequest,
-			handler.CreateContestJSONBody{
-				Description: description,
-				Duration: handler.Duration{
-					Since: since,
-					Until: &unexpectedTimeFuture,
-				},
-				Link: &link,
-				Name: name,
-			},
-			testutils.HTTPError("bad request: validate error"),
-		},*/
 		"400 since time is after until time": {
 			http.StatusBadRequest,
 			handler.CreateContestJSONBody{
