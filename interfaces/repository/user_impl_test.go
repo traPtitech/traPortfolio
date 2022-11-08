@@ -1334,8 +1334,9 @@ func TestUserRepository_GetContests(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
 				rows := sqlmock.NewRows([]string{"team_id"})
 				for _, v := range want {
-					rows.AddRow(v.Teams[0].ID)
-					rows.AddRow(v.Teams[1].ID)
+					for _, t := range v.Teams {
+						rows.AddRow(t.ID)
+					}
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
