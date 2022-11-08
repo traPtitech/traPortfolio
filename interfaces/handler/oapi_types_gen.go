@@ -144,21 +144,6 @@ type ContestTeamDetail struct {
 	Result string `json:"result"`
 }
 
-// ContestTeamWithContestName defines model for ContestTeamWithContestName.
-type ContestTeamWithContestName struct {
-	// コンテスト名
-	ContestName string `json:"contestName"`
-
-	// コンテストチームuuid
-	Id uuid.UUID `json:"id"`
-
-	// チーム名
-	Name string `json:"name"`
-
-	// 順位などの結果
-	Result string `json:"result"`
-}
-
 // 新規コンテストリクエスト
 type CreateContestRequest struct {
 	// コンテスト説明
@@ -468,6 +453,21 @@ type User struct {
 // 1: 有効
 // 2: 一時停止
 type UserAccountState int32
+
+// UserContest defines model for UserContest.
+type UserContest struct {
+	// イベントやコンテストなどの存続期間
+	Duration Duration `json:"duration"`
+
+	// コンテストuuid
+	Id uuid.UUID `json:"id"`
+
+	// コンテスト名
+	Name string `json:"name"`
+
+	// コンテストチーム
+	Teams []ContestTeam `json:"teams"`
+}
 
 // UserDetail defines model for UserDetail.
 type UserDetail struct {

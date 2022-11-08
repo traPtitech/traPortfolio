@@ -1162,27 +1162,35 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 func TestUserHandler_GetUserContests(t *testing.T) {
 
-	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*ContestTeamWithContestName, path string) {
+	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*UserContest, path string) {
 		userID := random.UUID()
 
 		repoContests := []*domain.UserContest{}
-		hresContests := []*ContestTeamWithContestName{}
+		hresContests := []*UserContest{}
 
 		for i := 0; i < contestsLen; i++ {
 
 			rcontest := domain.UserContest{
-				ID:          random.UUID(),
-				Name:        random.AlphaNumeric(),
-				Result:      random.AlphaNumeric(),
-				ContestName: random.AlphaNumeric(),
+				ID:        random.UUID(),
+				Name:      random.AlphaNumeric(),
+				TimeStart: random.Time(),
+				TimeEnd:   random.Time(),
+				Teams: []*domain.ContestTeam{
+					{
+						ID:        random.UUID(),
+						ContestID: random.UUID(),
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
+					},
+				},
 			}
 
-			hcontest := ContestTeamWithContestName{
-				ContestName: rcontest.ContestName,
-				Id:          rcontest.ID,
-				Name:        rcontest.Name,
-				Result:      rcontest.Result,
-			}
+			hcontest := newUserContest(
+				newContest(rcontest.ID, rcontest.Name, rcontest.TimeStart, rcontest.TimeEnd),
+				[]ContestTeam{
+					newContestTeam(rcontest.Teams[0].ID, rcontest.Teams[0].Name, rcontest.Teams[0].Result),
+				},
+			)
 
 			repoContests = append(repoContests, &rcontest)
 			hresContests = append(hresContests, &hcontest)
@@ -1197,33 +1205,33 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string)
+		setup      func(s *mock_service.MockUserService) (hres []*UserContest, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*UserContest, path string) {
 				return makeContests(s, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*UserContest, path string) {
 				return makeContests(s, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*UserContest, path string) {
 				return makeContests(s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(s *mock_service.MockUserService) (hres []*UserContest, path string) {
 
 				userID := random.UUID()
 
@@ -1235,7 +1243,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ *mock_service.MockUserService) (hres []*ContestTeamWithContestName, path string) {
+			setup: func(_ *mock_service.MockUserService) (hres []*UserContest, path string) {
 
 				userID := random.AlphaNumericn(36)
 
@@ -1251,7 +1259,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			s, api := setupUserMock(t)
 
 			hresUsers, path := tt.setup(s)
-			var resBody []*ContestTeamWithContestName
+			var resBody []*UserContest
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
