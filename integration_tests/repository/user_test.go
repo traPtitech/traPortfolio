@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"math/rand"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -369,7 +368,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
-		Type:        optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), random.Bool()),
+		Type:        random.OptInt64n(int64(domain.AccountLimit)),
 		URL:         random.OptAlphaNumeric(),
 		PrPermitted: random.OptBool(),
 	}

@@ -145,8 +145,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Error_WithMultipleOpts",
 			args: args{
 				&repository.GetUsersArgs{
-					IncludeSuspended: optional.NewBool(true, true),
-					Name:             optional.NewString(random.AlphaNumeric(), true),
+					IncludeSuspended: random.OptBoolNotNull(),
+					Name:             random.OptAlphaNumericNotNull(),
 				},
 			},
 			want:      nil,
@@ -670,7 +670,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Description: random.OptAlphaNumericNotNull(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -696,7 +696,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Description: random.OptAlphaNumericNotNull(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -715,7 +715,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Description: random.OptAlphaNumericNotNull(),
 					Check:       optional.NewBool(true, true),
 				},
 			},
@@ -883,10 +883,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					URL:         optional.NewString(random.RandURLString(), true),
-					PrPermitted: optional.NewBool(true, true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					DisplayName: random.OptAlphaNumericNotNull(),
+					URL:         random.OptURLStringNotNull(),
+					PrPermitted: random.OptBoolNotNull(),
+					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -908,10 +908,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					URL:         optional.NewString(random.RandURLString(), true),
-					PrPermitted: optional.NewBool(true, true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					DisplayName: random.OptAlphaNumericNotNull(),
+					URL:         random.OptURLStringNotNull(),
+					PrPermitted: random.OptBoolNotNull(),
+					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -930,10 +930,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					URL:         optional.NewString(random.RandURLString(), true),
-					PrPermitted: optional.NewBool(true, true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
+					DisplayName: random.OptAlphaNumericNotNull(),
+					URL:         random.OptURLStringNotNull(),
+					PrPermitted: random.OptBoolNotNull(),
+					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
