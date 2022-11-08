@@ -1551,7 +1551,6 @@ components:
       schema:
         type: integer
         format: int64
-        default: -1
       required: false
       description: 取得数の上限
       x-oapi-codegen-extra-tags:
