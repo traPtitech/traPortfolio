@@ -63,8 +63,8 @@ func (repo *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.U
 	users := make([]*model.User, 0)
 	if err := repo.h.
 		Where("`users`.`id` IN (?)", traqUserIDs).
-		Find(&users).
 		Limit(limit).
+		Find(&users).
 		Error(); err != nil {
 		return nil, convertError(err)
 	}
