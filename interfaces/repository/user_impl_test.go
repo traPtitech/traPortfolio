@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -169,6 +170,82 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
+			name: "Success_With_Limit10",
+			args: args{
+				&repository.GetUsersArgs{
+					Limit: optional.NewInt64(10, true),
+				},
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				},
+			},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+
+				rows := sqlmock.NewRows([]string{"id", "name"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.Name)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT 10")).
+					WithArgs(want[0].ID, want[1].ID, want[2].ID).
+					WillReturnRows(rows)
+
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success_With_Random_Limit",
+			args: args{
+				&repository.GetUsersArgs{
+					Name: optional.NewString(random.AlphaNumeric(), true), Limit: optional.NewInt64(random.OptInt64().Int64, true),
+				},
+			},
+			want: []*domain.User{
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				},
+				{
+					ID:       random.UUID(),
+					Name:     random.AlphaNumeric(),
+					RealName: random.AlphaNumeric(),
+				},
+			},
+			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
+
+				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				rows := sqlmock.NewRows([]string{"id", "name"})
+				for _, v := range want {
+					rows.AddRow(v.ID, v.Name)
+				}
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %v", args.args.Limit.Int64))).WithArgs(want[0].ID, want[1].ID, want[2].ID).WillReturnRows(rows)
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
 			name: "Error_WithMultipleOpts",
 			args: args{
 				&repository.GetUsersArgs{
@@ -267,45 +344,6 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
-		},
-		{
-			name: "Success_With_Limit10",
-			args: args{
-				&repository.GetUsersArgs{
-					Limit: optional.NewInt64(10, true),
-				},
-			},
-			want: []*domain.User{
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
-			},
-			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
-
-				rows := sqlmock.NewRows([]string{"id", "name"})
-				for _, v := range want {
-					rows.AddRow(v.ID, v.Name)
-				}
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT 10")).
-					WillReturnRows(rows)
-
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
-			},
-			assertion: assert.NoError,
 		},
 	}
 	for _, tt := range tests {
