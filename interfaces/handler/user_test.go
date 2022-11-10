@@ -263,12 +263,12 @@ func TestUserHandler_GetUser(t *testing.T) {
 func TestUserHandler_UpdateUser(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *EditUserRequest, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *EditUserJSONRequestBody, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -277,7 +277,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUserRequest{
+				reqBody := &EditUserJSONRequestBody{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -295,7 +295,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Success with description args(len=256)",
-			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
 
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 256)
@@ -304,7 +304,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUserRequest{
+				reqBody := &EditUserJSONRequestBody{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -322,7 +322,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -331,7 +331,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUserRequest{
+				reqBody := &EditUserJSONRequestBody{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -349,7 +349,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
 
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
@@ -358,7 +358,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &EditUserRequest{
+				reqBody := &EditUserJSONRequestBody{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -376,7 +376,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: invalid userID",
-			setup: func(_ *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -384,11 +384,11 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: too long description(len>256)",
-			setup: func(_ *mock_service.MockUserService) (*EditUserRequest, string) {
+			setup: func(_ *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 257)
 
-				reqBody := &EditUserRequest{
+				reqBody := &EditUserJSONRequestBody{
 					Bio: &userBio,
 				}
 
