@@ -17,15 +17,15 @@ type CreateContestArgs struct {
 	Description string
 	Link        optional.Of[string]
 	Since       time.Time
-	Until       optional.Time
+	Until       optional.Of[time.Time]
 }
 
 type UpdateContestArgs struct {
 	Name        optional.Of[string]
 	Description optional.Of[string]
 	Link        optional.Of[string]
-	Since       optional.Time
-	Until       optional.Time
+	Since       optional.Of[time.Time]
+	Until       optional.Of[time.Time]
 }
 
 type CreateContestTeamArgs struct {

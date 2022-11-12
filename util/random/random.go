@@ -210,8 +210,8 @@ func OptAlphaNumericNotNull() optional.Of[string] {
 	return optional.New(AlphaNumeric(), true)
 }
 
-func OptTime() optional.Time {
-	return optional.NewTime(Time(), Bool())
+func OptTime() optional.Of[time.Time] {
+	return optional.New(Time(), Bool())
 }
 
 func OptURLString() optional.Of[string] {

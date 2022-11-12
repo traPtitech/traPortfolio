@@ -102,10 +102,10 @@ func (r *ContestRepository) UpdateContest(contestID uuid.UUID, args *repository.
 		changes["link"] = args.Link.V
 	}
 	if args.Since.Valid {
-		changes["since"] = args.Since.Time
+		changes["since"] = args.Since.V
 	}
 	if args.Until.Valid {
-		changes["until"] = args.Until.Time
+		changes["until"] = args.Until.V
 	}
 
 	if len(changes) == 0 {

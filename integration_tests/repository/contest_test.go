@@ -82,10 +82,10 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 		contest1.Link = args.Link.V
 	}
 	if args.Since.Valid {
-		contest1.TimeStart = args.Since.Time
+		contest1.TimeStart = args.Since.V
 	}
 	if args.Until.Valid {
-		contest1.TimeEnd = args.Until.Time
+		contest1.TimeEnd = args.Until.V
 	}
 
 	err := repo.UpdateContest(contest1.ID, &args)

@@ -85,7 +85,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 		Description: req.Description,
 		Link:        optional.FromPtr(req.Link),
 		Since:       req.Duration.Since,
-		Until:       optional.TimeFrom(req.Duration.Until),
+		Until:       optional.FromPtr(req.Duration.Until),
 	}
 
 	ctx := c.Request().Context()
@@ -123,8 +123,8 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 		Link:        optional.FromPtr(req.Link),
 	}
 	if req.Duration != nil {
-		patchReq.Since = optional.TimeFrom(&req.Duration.Since)
-		patchReq.Until = optional.TimeFrom(req.Duration.Until)
+		patchReq.Since = optional.FromPtr(&req.Duration.Since)
+		patchReq.Until = optional.FromPtr(req.Duration.Until)
 	}
 
 	ctx := c.Request().Context()

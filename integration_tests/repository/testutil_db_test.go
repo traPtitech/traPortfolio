@@ -33,7 +33,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 			Description: random.AlphaNumeric(),
 			Link:        random.OptURLString(),
 			Since:       since,
-			Until:       optional.NewTime(until, random.Bool()),
+			Until:       optional.New(until, random.Bool()),
 		}
 	}
 

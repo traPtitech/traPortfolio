@@ -251,14 +251,14 @@ func TestContestHandler_CreateContest(t *testing.T) {
 					Description: reqBody.Description,
 					Link:        optional.FromPtr(reqBody.Link),
 					Since:       reqBody.Duration.Since,
-					Until:       optional.TimeFrom(reqBody.Duration.Until),
+					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
 				want := domain.ContestDetail{
 					Contest: domain.Contest{
 						ID:        random.UUID(),
 						Name:      args.Name,
 						TimeStart: args.Since,
-						TimeEnd:   args.Until.Time,
+						TimeEnd:   args.Until.ValueOrZero(),
 					},
 					Link:         args.Link.ValueOrZero(),
 					Description:  args.Description,
@@ -310,7 +310,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 					Description: reqBody.Description,
 					Link:        optional.FromPtr(reqBody.Link),
 					Since:       reqBody.Duration.Since,
-					Until:       optional.TimeFrom(reqBody.Duration.Until),
+					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
 				s.EXPECT().CreateContest(anyCtx{}, &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, nil, nil, "/api/v1/contests"
@@ -363,8 +363,8 @@ func TestContestHandler_PatchContest(t *testing.T) {
 					Name:        optional.FromPtr(reqBody.Name),
 					Description: optional.FromPtr(reqBody.Description),
 					Link:        optional.FromPtr(reqBody.Link),
-					Since:       optional.TimeFrom(&reqBody.Duration.Since),
-					Until:       optional.TimeFrom(reqBody.Duration.Until),
+					Since:       optional.FromPtr(&reqBody.Duration.Since),
+					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
 				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
 				s.EXPECT().UpdateContest(anyCtx{}, contestID, &args).Return(nil)
