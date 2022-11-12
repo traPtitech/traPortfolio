@@ -178,12 +178,12 @@ func Bool() bool {
 	return rand.Int()%2 == 0
 }
 
-func OptBool() optional.Bool {
-	return optional.NewBool(Bool(), Bool())
+func OptBool() optional.Of[bool] {
+	return optional.New(Bool(), Bool())
 }
 
-func OptBoolNotNull() optional.Bool {
-	return optional.NewBool(Bool(), true)
+func OptBoolNotNull() optional.Of[bool] {
+	return optional.New(Bool(), true)
 }
 
 func OptInt64() optional.Int64 {

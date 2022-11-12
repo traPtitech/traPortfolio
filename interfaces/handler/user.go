@@ -31,7 +31,7 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.GetUsersArgs{
-		IncludeSuspended: optional.BoolFrom((*bool)(req.IncludeSuspended)),
+		IncludeSuspended: optional.FromPtr((*bool)(req.IncludeSuspended)),
 		Name:             optional.StringFrom((*string)(req.Name)),
 	}
 
@@ -93,7 +93,7 @@ func (h *UserHandler) UpdateUser(_c echo.Context) error {
 	ctx := c.Request().Context()
 	u := repository.UpdateUserArgs{
 		Description: optional.StringFrom(req.Bio),
-		Check:       optional.BoolFrom(req.Check),
+		Check:       optional.FromPtr(req.Check),
 	}
 
 	if err := h.srv.Update(ctx, userID, &u); err != nil {
@@ -206,7 +206,7 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 		DisplayName: optional.StringFrom(req.DisplayName),
 		Type:        optional.Int64From(typeInt64),
 		URL:         optional.StringFrom(req.Url),
-		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
+		PrPermitted: optional.FromPtr(req.PrPermitted),
 	}
 
 	err = h.srv.EditAccount(ctx, userID, accountID, &args)

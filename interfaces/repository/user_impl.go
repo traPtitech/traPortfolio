@@ -29,7 +29,7 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
 		return nil, repository.ErrInvalidArg
 	} else if iv {
-		eargs.IncludeSuspended = rargs.IncludeSuspended.Bool
+		eargs.IncludeSuspended = rargs.IncludeSuspended.ValueOrZero()
 	} else if nv {
 		eargs.Name = rargs.Name.String
 	}
@@ -189,7 +189,7 @@ func (r *UserRepository) UpdateUser(userID uuid.UUID, args *repository.UpdateUse
 		changes["description"] = args.Description.String
 	}
 	if args.Check.Valid {
-		changes["check"] = args.Check.Bool
+		changes["check"] = args.Check.V
 	}
 
 	if len(changes) == 0 {
@@ -315,7 +315,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		changes["url"] = args.URL.String
 	}
 	if args.PrPermitted.Valid {
-		changes["check"] = args.PrPermitted.Bool
+		changes["check"] = args.PrPermitted.V
 	}
 	if args.Type.Valid {
 		changes["type"] = args.Type.Int64

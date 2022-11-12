@@ -9,7 +9,7 @@ import (
 )
 
 type GetUsersArgs struct {
-	IncludeSuspended optional.Bool
+	IncludeSuspended optional.Of[bool]
 	Name             optional.String
 }
 
@@ -21,7 +21,7 @@ type CreateUserArgs struct {
 
 type UpdateUserArgs struct {
 	Description optional.String
-	Check       optional.Bool
+	Check       optional.Of[bool]
 }
 
 type CreateAccountArgs struct {
@@ -35,7 +35,7 @@ type UpdateAccountArgs struct {
 	DisplayName optional.String // 外部アカウントの表示名
 	Type        optional.Int64
 	URL         optional.String
-	PrPermitted optional.Bool
+	PrPermitted optional.Of[bool]
 }
 
 type UserRepository interface {

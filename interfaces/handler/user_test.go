@@ -82,7 +82,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 
 				includeSuspened := random.Bool()
 				args := repository.GetUsersArgs{
-					IncludeSuspended: optional.NewBool(includeSuspened, true),
+					IncludeSuspended: optional.New(includeSuspened, true),
 				}
 
 				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
@@ -284,7 +284,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 
 				args := repository.UpdateUserArgs{
 					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -311,7 +311,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 
 				args := repository.UpdateUserArgs{
 					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -338,7 +338,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 
 				args := repository.UpdateUserArgs{
 					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -365,7 +365,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 
 				args := repository.UpdateUserArgs{
 					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -839,7 +839,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
 					URL:         optional.StringFrom(&argsURL),
-					PrPermitted: optional.BoolFrom(&accountPermit),
+					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -873,7 +873,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 					DisplayName: optional.StringFrom(&argsName),
 					Type:        optional.Int64From(&accountType),
 					URL:         optional.StringFrom(&argsURL),
-					PrPermitted: optional.BoolFrom(&accountPermit),
+					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)

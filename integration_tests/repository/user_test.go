@@ -58,7 +58,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "All IncludeSuspended",
 			args: args{args: &urepository.GetUsersArgs{
-				IncludeSuspended: optional.NewBool(true, true),
+				IncludeSuspended: optional.New(true, true),
 			}},
 			expected: []*domain.User{
 				domain.NewUser(
@@ -101,7 +101,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Invalid arg",
 			args: args{args: &urepository.GetUsersArgs{
 				Name:             optional.NewString(mockdata.MockTraQUsers[0].Name, true),
-				IncludeSuspended: optional.NewBool(true, true),
+				IncludeSuspended: optional.New(true, true),
 			}},
 			expected:  nil,
 			assertion: assert.Error,
@@ -285,7 +285,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 	var check bool
 	if args.Check.Valid {
-		check = args.Check.Bool
+		check = args.Check.V
 	} else {
 		check = user.Check
 	}
@@ -384,7 +384,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		account1.URL = args.URL.String
 	}
 	if args.PrPermitted.Valid {
-		account1.PrPermitted = args.PrPermitted.Bool
+		account1.PrPermitted = args.PrPermitted.V
 	}
 	err = repo.UpdateAccount(user.ID, account1.ID, args)
 	assert.NoError(t, err)
