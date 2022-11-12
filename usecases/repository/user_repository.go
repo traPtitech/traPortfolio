@@ -33,7 +33,7 @@ type CreateAccountArgs struct {
 
 type UpdateAccountArgs struct {
 	DisplayName optional.String // 外部アカウントの表示名
-	Type        optional.Int64
+	Type        optional.Of[int64]
 	URL         optional.String
 	PrPermitted optional.Of[bool]
 }

@@ -459,17 +459,17 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumericNotNull(),
 					Description:   random.OptAlphaNumericNotNull(),
 					Link:          random.OptURLStringNotNull(),
-					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
+					SinceYear:     optional.New(int64(d.Since.Year), true),
+					SinceSemester: optional.New(int64(d.Since.Semester), true),
+					UntilYear:     optional.New(int64(d.Until.Year), true),
+					UntilSemester: optional.New(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.ValueOrZero(), args.args.SinceYear.ValueOrZero(), args.args.UntilSemester.ValueOrZero(), args.args.UntilYear.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -483,17 +483,17 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumericNotNull(),
 					Description:   random.OptAlphaNumericNotNull(),
 					Link:          random.OptURLStringNotNull(),
-					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(d.Until.Semester), true),
+					SinceYear:     optional.New(int64(d.Since.Year), true),
+					SinceSemester: optional.New(int64(d.Since.Semester), true),
+					UntilYear:     optional.New(int64(d.Until.Year), true),
+					UntilSemester: optional.New(int64(d.Until.Semester), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.Int64, args.args.SinceYear.Int64, args.args.UntilSemester.Int64, args.args.UntilYear.Int64, anyTime{}, args.id).
+					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.ValueOrZero(), args.args.SinceYear.ValueOrZero(), args.args.UntilSemester.ValueOrZero(), args.args.UntilYear.ValueOrZero(), anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

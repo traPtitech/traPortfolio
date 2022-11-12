@@ -837,7 +837,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
-					Type:        optional.Int64From(&accountType),
+					Type:        optional.FromPtr(&accountType),
 					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.FromPtr(&accountPermit),
 				}
@@ -871,7 +871,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				args := repository.UpdateAccountArgs{
 					DisplayName: optional.StringFrom(&argsName),
-					Type:        optional.Int64From(&accountType),
+					Type:        optional.FromPtr(&accountType),
 					URL:         optional.StringFrom(&argsURL),
 					PrPermitted: optional.FromPtr(&accountPermit),
 				}

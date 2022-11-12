@@ -186,16 +186,16 @@ func OptBoolNotNull() optional.Of[bool] {
 	return optional.New(Bool(), true)
 }
 
-func OptInt64() optional.Int64 {
-	return optional.NewInt64(rand.Int63(), Bool())
+func OptInt64() optional.Of[int64] {
+	return optional.New(rand.Int63(), Bool())
 }
 
-func OptInt64n(n int64) optional.Int64 {
-	return optional.NewInt64(rand.Int63n(n), Bool())
+func OptInt64n(n int64) optional.Of[int64] {
+	return optional.New(rand.Int63n(n), Bool())
 }
 
-func OptInt64nNotNull(n int64) optional.Int64 {
-	return optional.NewInt64(rand.Int63n(n), true)
+func OptInt64nNotNull(n int64) optional.Of[int64] {
+	return optional.New(rand.Int63n(n), true)
 }
 
 func OptAlphaNumericn(n int) optional.String {

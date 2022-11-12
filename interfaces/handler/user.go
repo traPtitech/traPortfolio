@@ -204,7 +204,7 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 	}
 	args := repository.UpdateAccountArgs{
 		DisplayName: optional.StringFrom(req.DisplayName),
-		Type:        optional.Int64From(typeInt64),
+		Type:        optional.FromPtr(((*int64)(typeInt64))),
 		URL:         optional.StringFrom(req.Url),
 		PrPermitted: optional.FromPtr(req.PrPermitted),
 	}

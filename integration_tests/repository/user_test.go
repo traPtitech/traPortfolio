@@ -367,18 +367,18 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	mustMakeAccount(t, repo, user.ID, nil)
 
-	accountType := optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), true)
+	accountType := optional.New(rand.Int63n(int64(domain.AccountLimit)), true)
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
 		Type:        accountType,
-		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType.Int64)),
+		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType.V)),
 		PrPermitted: random.OptBool(),
 	}
 	if args.DisplayName.Valid {
 		account1.DisplayName = args.DisplayName.String
 	}
 	if args.Type.Valid {
-		account1.Type = domain.AccountType(args.Type.Int64)
+		account1.Type = domain.AccountType(args.Type.V)
 	}
 	if args.URL.Valid {
 		account1.URL = args.URL.String

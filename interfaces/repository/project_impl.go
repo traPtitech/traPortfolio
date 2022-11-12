@@ -139,12 +139,12 @@ func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.
 		changes["link"] = args.Link.String
 	}
 	if args.SinceYear.Valid && args.SinceSemester.Valid {
-		changes["since_year"] = args.SinceYear.Int64
-		changes["since_semester"] = args.SinceSemester.Int64
+		changes["since_year"] = args.SinceYear.V
+		changes["since_semester"] = args.SinceSemester.V
 	}
 	if args.UntilYear.Valid && args.UntilSemester.Valid {
-		changes["until_year"] = args.UntilYear.Int64
-		changes["until_semester"] = args.UntilSemester.Int64
+		changes["until_year"] = args.UntilYear.V
+		changes["until_semester"] = args.UntilSemester.V
 	}
 
 	if len(changes) == 0 {

@@ -95,12 +95,12 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		project1.Link = arg1.Link.String
 	}
 	if arg1.SinceYear.Valid && arg1.SinceSemester.Valid {
-		project1.Duration.Since.Year = int(arg1.SinceYear.Int64)
-		project1.Duration.Since.Semester = int(arg1.SinceSemester.Int64)
+		project1.Duration.Since.Year = int(arg1.SinceYear.V)
+		project1.Duration.Since.Semester = int(arg1.SinceSemester.V)
 	}
 	if arg1.UntilYear.Valid && arg1.UntilSemester.Valid {
-		project1.Duration.Until.Year = int(arg1.UntilYear.Int64)
-		project1.Duration.Until.Semester = int(arg1.UntilSemester.Int64)
+		project1.Duration.Until.Year = int(arg1.UntilYear.V)
+		project1.Duration.Until.Semester = int(arg1.UntilSemester.V)
 	}
 
 	err := repo.UpdateProject(project1.ID, &arg1)

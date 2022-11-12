@@ -18,8 +18,8 @@ type OptionalYearWithSemesterDuration struct {
 }
 
 type OptionalYearWithSemester struct {
-	Year     optional.Int64
-	Semester optional.Int64
+	Year     optional.Of[int64]
+	Semester optional.Of[int64]
 }
 
 func ConvertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {

@@ -318,7 +318,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		changes["check"] = args.PrPermitted.V
 	}
 	if args.Type.Valid {
-		changes["type"] = args.Type.Int64
+		changes["type"] = args.Type.V
 	}
 
 	if len(changes) == 0 {
@@ -337,7 +337,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 
 		// URLのvalidation
 		if args.Type.Valid && args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.V), args.URL.String) {
 				return repository.ErrInvalidArg
 			}
 		} else if !args.Type.Valid && args.URL.Valid {
@@ -345,7 +345,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 				return repository.ErrInvalidArg
 			}
 		} else if args.Type.Valid && !args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), account.URL) {
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.V), account.URL) {
 				return repository.ErrInvalidArg
 			}
 		}
