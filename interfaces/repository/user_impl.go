@@ -29,9 +29,9 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
 		return nil, repository.ErrInvalidArg
 	} else if iv {
-		eargs.IncludeSuspended = rargs.IncludeSuspended.ValueOrZero()
+		eargs.IncludeSuspended = rargs.IncludeSuspended.V
 	} else if nv {
-		eargs.Name = rargs.Name.String
+		eargs.Name = rargs.Name.V
 	}
 
 	return eargs, nil
@@ -186,7 +186,7 @@ func (r *UserRepository) CreateUser(args *repository.CreateUserArgs) (*domain.Us
 func (r *UserRepository) UpdateUser(userID uuid.UUID, args *repository.UpdateUserArgs) error {
 	changes := map[string]interface{}{}
 	if args.Description.Valid {
-		changes["description"] = args.Description.String
+		changes["description"] = args.Description.V
 	}
 	if args.Check.Valid {
 		changes["check"] = args.Check.V
@@ -309,10 +309,10 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
 	if args.DisplayName.Valid {
-		changes["name"] = args.DisplayName.String
+		changes["name"] = args.DisplayName.V
 	}
 	if args.URL.Valid {
-		changes["url"] = args.URL.String
+		changes["url"] = args.URL.V
 	}
 	if args.PrPermitted.Valid {
 		changes["check"] = args.PrPermitted.V
@@ -337,11 +337,11 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 
 		// URLのvalidation
 		if args.Type.Valid && args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(args.Type.V), args.URL.String) {
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.V), args.URL.V) {
 				return repository.ErrInvalidArg
 			}
 		} else if !args.Type.Valid && args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.String) {
+			if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.V) {
 				return repository.ErrInvalidArg
 			}
 		} else if args.Type.Valid && !args.URL.Valid {

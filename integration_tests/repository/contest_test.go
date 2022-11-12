@@ -73,13 +73,13 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 		Until:       random.OptTime(),
 	}
 	if args.Name.Valid {
-		contest1.Name = args.Name.String
+		contest1.Name = args.Name.V
 	}
 	if args.Description.Valid {
-		contest1.Description = args.Description.String
+		contest1.Description = args.Description.V
 	}
 	if args.Link.Valid {
-		contest1.Link = args.Link.String
+		contest1.Link = args.Link.V
 	}
 	if args.Since.Valid {
 		contest1.TimeStart = args.Since.Time
@@ -241,16 +241,16 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 		Description: random.OptAlphaNumeric(),
 	}
 	if args1.Name.Valid {
-		team1.Name = args1.Name.String
+		team1.Name = args1.Name.V
 	}
 	if args1.Result.Valid {
-		team1.Result = args1.Result.String
+		team1.Result = args1.Result.V
 	}
 	if args1.Link.Valid {
-		team1.Link = args1.Link.String
+		team1.Link = args1.Link.V
 	}
 	if args1.Description.Valid {
-		team1.Description = args1.Description.String
+		team1.Description = args1.Description.V
 	}
 
 	err := repo.UpdateContestTeam(team1.ID, args1)

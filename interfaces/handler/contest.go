@@ -83,7 +83,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 	createReq := repository.CreateContestArgs{
 		Name:        req.Name,
 		Description: req.Description,
-		Link:        optional.StringFrom(req.Link),
+		Link:        optional.FromPtr(req.Link),
 		Since:       req.Duration.Since,
 		Until:       optional.TimeFrom(req.Duration.Until),
 	}
@@ -118,9 +118,9 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 	}
 
 	patchReq := repository.UpdateContestArgs{
-		Name:        optional.StringFrom(req.Name),
-		Description: optional.StringFrom(req.Description),
-		Link:        optional.StringFrom(req.Link),
+		Name:        optional.FromPtr(req.Name),
+		Description: optional.FromPtr(req.Description),
+		Link:        optional.FromPtr(req.Link),
 	}
 	if req.Duration != nil {
 		patchReq.Since = optional.TimeFrom(&req.Duration.Since)
@@ -227,8 +227,8 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 
 	args := repository.CreateContestTeamArgs{
 		Name:        req.Name,
-		Result:      optional.StringFrom(req.Result),
-		Link:        optional.StringFrom(req.Link),
+		Result:      optional.FromPtr(req.Result),
+		Link:        optional.FromPtr(req.Link),
 		Description: req.Description,
 	}
 
@@ -264,10 +264,10 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 	}
 
 	args := repository.UpdateContestTeamArgs{
-		Name:        optional.StringFrom(req.Name),
-		Result:      optional.StringFrom(req.Result),
-		Link:        optional.StringFrom(req.Link),
-		Description: optional.StringFrom(req.Description),
+		Name:        optional.FromPtr(req.Name),
+		Result:      optional.FromPtr(req.Result),
+		Link:        optional.FromPtr(req.Link),
+		Description: optional.FromPtr(req.Description),
 	}
 
 	ctx := c.Request().Context()

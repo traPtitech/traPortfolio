@@ -85,7 +85,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "Name",
 			args: args{args: &urepository.GetUsersArgs{
-				Name: optional.NewString(mockdata.MockTraQUsers[0].Name, true),
+				Name: optional.New(mockdata.MockTraQUsers[0].Name, true),
 			}},
 			expected: []*domain.User{
 				domain.NewUser(
@@ -100,7 +100,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "Invalid arg",
 			args: args{args: &urepository.GetUsersArgs{
-				Name:             optional.NewString(mockdata.MockTraQUsers[0].Name, true),
+				Name:             optional.New(mockdata.MockTraQUsers[0].Name, true),
 				IncludeSuspended: optional.New(true, true),
 			}},
 			expected:  nil,
@@ -278,7 +278,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 	var bio string
 	if args.Description.Valid {
-		bio = args.Description.String
+		bio = args.Description.V
 	} else {
 		bio = user.Description
 	}
@@ -375,13 +375,13 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		PrPermitted: random.OptBool(),
 	}
 	if args.DisplayName.Valid {
-		account1.DisplayName = args.DisplayName.String
+		account1.DisplayName = args.DisplayName.V
 	}
 	if args.Type.Valid {
 		account1.Type = domain.AccountType(args.Type.V)
 	}
 	if args.URL.Valid {
-		account1.URL = args.URL.String
+		account1.URL = args.URL.V
 	}
 	if args.PrPermitted.Valid {
 		account1.PrPermitted = args.PrPermitted.V

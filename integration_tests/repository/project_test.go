@@ -86,13 +86,13 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	}
 
 	if arg1.Name.Valid {
-		project1.Name = arg1.Name.String
+		project1.Name = arg1.Name.V
 	}
 	if arg1.Description.Valid {
-		project1.Description = arg1.Description.String
+		project1.Description = arg1.Description.V
 	}
 	if arg1.Link.Valid {
-		project1.Link = arg1.Link.String
+		project1.Link = arg1.Link.V
 	}
 	if arg1.SinceYear.Valid && arg1.SinceSemester.Valid {
 		project1.Duration.Since.Year = int(arg1.SinceYear.V)

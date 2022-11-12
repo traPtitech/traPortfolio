@@ -93,13 +93,13 @@ func (r *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*
 func (r *ContestRepository) UpdateContest(contestID uuid.UUID, args *repository.UpdateContestArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
-		changes["name"] = args.Name.String
+		changes["name"] = args.Name.V
 	}
 	if args.Description.Valid {
-		changes["description"] = args.Description.String
+		changes["description"] = args.Description.V
 	}
 	if args.Link.Valid {
-		changes["link"] = args.Link.String
+		changes["link"] = args.Link.V
 	}
 	if args.Since.Valid {
 		changes["since"] = args.Since.Time
@@ -248,16 +248,16 @@ func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam 
 func (r *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
-		changes["name"] = args.Name.String
+		changes["name"] = args.Name.V
 	}
 	if args.Description.Valid {
-		changes["description"] = args.Description.String
+		changes["description"] = args.Description.V
 	}
 	if args.Link.Valid {
-		changes["link"] = args.Link.String
+		changes["link"] = args.Link.V
 	}
 	if args.Result.Valid {
-		changes["result"] = args.Result.String
+		changes["result"] = args.Result.V
 	}
 
 	if len(changes) == 0 {

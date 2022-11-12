@@ -378,7 +378,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 					},
 				},
 				Description: successProject.Description,
-				Link:        successProject.Link.String,
+				Link:        successProject.Link.ValueOrZero(),
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				f.h.Mock.ExpectBegin()
@@ -469,7 +469,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.ValueOrZero(), args.args.SinceYear.ValueOrZero(), args.args.UntilSemester.ValueOrZero(), args.args.UntilYear.ValueOrZero(), anyTime{}, args.id).
+					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.SinceSemester.ValueOrZero(), args.args.SinceYear.ValueOrZero(), args.args.UntilSemester.ValueOrZero(), args.args.UntilYear.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -493,7 +493,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `projects` SET `description`=?,`link`=?,`name`=?,`since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `projects`.`id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.SinceSemester.ValueOrZero(), args.args.SinceYear.ValueOrZero(), args.args.UntilSemester.ValueOrZero(), args.args.UntilYear.ValueOrZero(), anyTime{}, args.id).
+					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.SinceSemester.ValueOrZero(), args.args.SinceYear.ValueOrZero(), args.args.UntilSemester.ValueOrZero(), args.args.UntilYear.ValueOrZero(), anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

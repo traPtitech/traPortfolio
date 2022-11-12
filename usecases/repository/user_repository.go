@@ -10,7 +10,7 @@ import (
 
 type GetUsersArgs struct {
 	IncludeSuspended optional.Of[bool]
-	Name             optional.String
+	Name             optional.Of[string]
 }
 
 type CreateUserArgs struct {
@@ -20,7 +20,7 @@ type CreateUserArgs struct {
 }
 
 type UpdateUserArgs struct {
-	Description optional.String
+	Description optional.Of[string]
 	Check       optional.Of[bool]
 }
 
@@ -32,9 +32,9 @@ type CreateAccountArgs struct {
 }
 
 type UpdateAccountArgs struct {
-	DisplayName optional.String // 外部アカウントの表示名
+	DisplayName optional.Of[string] // 外部アカウントの表示名
 	Type        optional.Of[int64]
-	URL         optional.String
+	URL         optional.Of[string]
 	PrPermitted optional.Of[bool]
 }
 

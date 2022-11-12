@@ -128,7 +128,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_WithOpt_Name",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(name, true),
+					Name: optional.From(name),
 				},
 			},
 			want: []*domain.User{
@@ -208,7 +208,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "PortalError_Single",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(name, true),
+					Name: optional.From(name),
 				},
 			},
 			want: nil,
@@ -710,7 +710,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Check.ValueOrZero(), args.args.Description.String, anyTime{}, args.id).
+					WithArgs(args.args.Check.ValueOrZero(), args.args.Description.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -755,7 +755,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Check.ValueOrZero(), args.args.Description.String, anyTime{}, args.id).
+					WithArgs(args.args.Check.ValueOrZero(), args.args.Description.ValueOrZero(), anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -923,7 +923,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.String, args.args.Type.ValueOrZero(), args.args.URL.String, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.ValueOrZero(), args.args.Type.ValueOrZero(), args.args.URL.ValueOrZero(), anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -970,7 +970,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.String, args.args.Type.ValueOrZero(), args.args.URL.String, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.ValueOrZero(), args.args.Type.ValueOrZero(), args.args.URL.ValueOrZero(), anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

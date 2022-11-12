@@ -79,7 +79,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	createReq := repository.CreateProjectArgs{
 		Name:          req.Name,
 		Description:   req.Description,
-		Link:          optional.StringFrom(req.Link),
+		Link:          optional.FromPtr(req.Link),
 		SinceYear:     req.Duration.Since.Year,
 		SinceSemester: int(req.Duration.Since.Semester),
 	}
@@ -117,9 +117,9 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	}
 
 	patchReq := repository.UpdateProjectArgs{
-		Name:        optional.StringFrom(req.Name),
-		Description: optional.StringFrom(req.Description),
-		Link:        optional.StringFrom(req.Link),
+		Name:        optional.FromPtr(req.Name),
+		Description: optional.FromPtr(req.Description),
+		Link:        optional.FromPtr(req.Link),
 	}
 
 	if d := req.Duration; d != nil {

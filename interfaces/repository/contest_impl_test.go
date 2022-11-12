@@ -183,7 +183,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: description,
-					Link:        optional.NewString(link, true),
+					Link:        optional.From(link),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -319,14 +319,14 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
+					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
-							AddRow(args.id, args.args.Name.String, args.args.Description.String, args.args.Link.String, args.args.Since.Time, args.args.Until.Time, time.Time{}, time.Time{}),
+							AddRow(args.id, args.args.Name.ValueOrZero(), args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Since.Time, args.args.Until.Time, time.Time{}, time.Time{}),
 					)
 				f.h.Mock.ExpectCommit()
 			},
@@ -377,7 +377,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `contests` SET `description`=?,`link`=?,`name`=?,`since`=?,`until`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
+					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Since.Time, args.args.Until.Time, anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -687,9 +687,9 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 					// ID: Assertion時にgot.IDと合わせる
 					ContestID: cid,
 					Name:      successArgs.Name,
-					Result:    successArgs.Result.String,
+					Result:    successArgs.Result.ValueOrZero(),
 				},
-				Link:        successArgs.Link.String,
+				Link:        successArgs.Link.ValueOrZero(),
 				Description: successArgs.Description,
 				Members:     nil,
 			},
@@ -781,7 +781,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Result.String, anyTime{}, args.teamID).
+					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Result.ValueOrZero(), anyTime{}, args.teamID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
@@ -837,7 +837,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `contest_teams` SET `description`=?,`link`=?,`name`=?,`result`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Description.String, args.args.Link.String, args.args.Name.String, args.args.Result.String, anyTime{}, args.teamID).
+					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Result.ValueOrZero(), anyTime{}, args.teamID).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

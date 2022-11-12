@@ -106,7 +106,7 @@ func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*
 		UntilSemester: args.UntilSemester,
 	}
 	if args.Link.Valid {
-		p.Link = args.Link.String
+		p.Link = args.Link.V
 	}
 
 	err := r.h.Create(&p).Error()
@@ -130,13 +130,13 @@ func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*
 func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
-		changes["name"] = args.Name.String
+		changes["name"] = args.Name.V
 	}
 	if args.Description.Valid {
-		changes["description"] = args.Description.String
+		changes["description"] = args.Description.V
 	}
 	if args.Link.Valid {
-		changes["link"] = args.Link.String
+		changes["link"] = args.Link.V
 	}
 	if args.SinceYear.Valid && args.SinceSemester.Valid {
 		changes["since_year"] = args.SinceYear.V

@@ -105,7 +105,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				}
 
 				args := repository.GetUsersArgs{
-					Name: optional.NewString(repoUsers[0].Name, true),
+					Name: optional.From(repoUsers[0].Name),
 				}
 
 				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
@@ -283,7 +283,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
+					Description: optional.FromPtr(&userBio),
 					Check:       optional.FromPtr(&userCheck),
 				}
 
@@ -310,7 +310,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
+					Description: optional.FromPtr(&userBio),
 					Check:       optional.FromPtr(&userCheck),
 				}
 
@@ -337,7 +337,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
+					Description: optional.FromPtr(&userBio),
 					Check:       optional.FromPtr(&userCheck),
 				}
 
@@ -364,7 +364,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
+					Description: optional.FromPtr(&userBio),
 					Check:       optional.FromPtr(&userCheck),
 				}
 
@@ -836,9 +836,9 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&argsName),
+					DisplayName: optional.FromPtr(&argsName),
 					Type:        optional.FromPtr(&accountType),
-					URL:         optional.StringFrom(&argsURL),
+					URL:         optional.FromPtr(&argsURL),
 					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
@@ -870,9 +870,9 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&argsName),
+					DisplayName: optional.FromPtr(&argsName),
 					Type:        optional.FromPtr(&accountType),
-					URL:         optional.StringFrom(&argsURL),
+					URL:         optional.FromPtr(&argsURL),
 					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 

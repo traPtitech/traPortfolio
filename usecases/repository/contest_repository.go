@@ -15,31 +15,31 @@ import (
 type CreateContestArgs struct {
 	Name        string
 	Description string
-	Link        optional.String
+	Link        optional.Of[string]
 	Since       time.Time
 	Until       optional.Time
 }
 
 type UpdateContestArgs struct {
-	Name        optional.String
-	Description optional.String
-	Link        optional.String
+	Name        optional.Of[string]
+	Description optional.Of[string]
+	Link        optional.Of[string]
 	Since       optional.Time
 	Until       optional.Time
 }
 
 type CreateContestTeamArgs struct {
 	Name        string
-	Result      optional.String
-	Link        optional.String
+	Result      optional.Of[string]
+	Link        optional.Of[string]
 	Description string
 }
 
 type UpdateContestTeamArgs struct {
-	Name        optional.String
-	Result      optional.String
-	Link        optional.String
-	Description optional.String
+	Name        optional.Of[string]
+	Result      optional.Of[string]
+	Link        optional.Of[string]
+	Description optional.Of[string]
 }
 
 type ContestRepository interface {
