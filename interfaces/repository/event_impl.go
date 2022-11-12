@@ -103,14 +103,15 @@ func (r *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.Up
 		return nil // updateする必要がないのでここでcommitする
 	}
 
+	newLevel := arg.Level.V
 	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := r.getEventLevelByID(eventID); err != nil {
 			return convertError(err)
-		} else if uint8(elv.Level) == arg.Level.Byte {
+		} else if elv.Level == newLevel {
 			return nil // updateする必要がないのでここでcommitする
 		}
 
-		if err := tx.Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
+		if err := tx.Model(&model.EventLevelRelation{ID: eventID}).Update("level", newLevel).Error(); err != nil {
 			return convertError(err)
 		}
 

@@ -221,7 +221,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8(uint8(domain.EventLevelAnonymous), true),
+					Level: optional.From(domain.EventLevelAnonymous),
 				},
 			},
 			setup: func(f fields, args args) {
