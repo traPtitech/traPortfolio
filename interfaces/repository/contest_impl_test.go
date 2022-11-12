@@ -201,7 +201,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero(), anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
@@ -209,7 +209,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WithArgs(anyUUID{}).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
-							AddRow(uuid.Nil, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until),
+							AddRow(uuid.Nil, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero()),
 					)
 			},
 			assertion: assert.NoError,
@@ -230,7 +230,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero(), anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -252,7 +252,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero(), anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
