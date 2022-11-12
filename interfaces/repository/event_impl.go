@@ -99,11 +99,11 @@ func (r *EventRepository) CreateEventLevel(arg *repository.CreateEventLevelArgs)
 }
 
 func (r *EventRepository) UpdateEventLevel(eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
-	if !arg.Level.Valid {
+	newLevel, ok := arg.Level.V()
+	if !ok {
 		return nil // updateする必要がないのでここでcommitする
 	}
 
-	newLevel := arg.Level.V
 	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		if elv, err := r.getEventLevelByID(eventID); err != nil {
 			return convertError(err)

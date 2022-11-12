@@ -68,14 +68,17 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 	}
 
 	d := old.Duration
-	if args.SinceYear.Valid && args.SinceSemester.Valid {
-		d.Since.Year = int(args.SinceYear.V)
-		d.Since.Semester = int(args.SinceSemester.V)
+	if sy, ok := args.SinceYear.V(); ok {
+		if ss, ok := args.SinceSemester.V(); ok {
+			d.Since.Year = int(sy)
+			d.Since.Semester = int(ss)
+		}
 	}
-
-	if args.UntilYear.Valid && args.UntilSemester.Valid {
-		d.Until.Year = int(args.UntilYear.V)
-		d.Until.Semester = int(args.UntilSemester.V)
+	if uy, ok := args.UntilYear.V(); ok {
+		if us, ok := args.UntilSemester.V(); ok {
+			d.Until.Year = int(uy)
+			d.Until.Semester = int(us)
+		}
 	}
 
 	if !d.IsValid() {

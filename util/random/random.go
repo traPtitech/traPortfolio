@@ -225,3 +225,11 @@ func OptURLStringNotNull() optional.Of[string] {
 func OptAccountURLStringNotNull(accountType domain.AccountType) optional.Of[string] {
 	return optional.New(AccountURLString(accountType), true)
 }
+
+func OptAccountType() optional.Of[domain.AccountType] {
+	return optional.New(domain.AccountType(rand.Intn(int(domain.AccountLimit))), Bool())
+}
+
+func OptAccountTypeNotNull() optional.Of[domain.AccountType] {
+	return optional.New(domain.AccountType(rand.Intn(int(domain.AccountLimit))), true)
+}

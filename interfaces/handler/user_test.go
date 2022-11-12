@@ -820,7 +820,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
@@ -854,7 +854,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()

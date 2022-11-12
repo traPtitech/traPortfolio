@@ -105,8 +105,8 @@ func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*
 		UntilYear:     args.UntilYear,
 		UntilSemester: args.UntilSemester,
 	}
-	if args.Link.Valid {
-		p.Link = args.Link.V
+	if v, ok := args.Link.V(); ok {
+		p.Link = v
 	}
 
 	err := r.h.Create(&p).Error()
@@ -129,22 +129,26 @@ func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*
 
 func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
 	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.V
+	if v, ok := args.Name.V(); ok {
+		changes["name"] = v
 	}
-	if args.Description.Valid {
-		changes["description"] = args.Description.V
+	if v, ok := args.Description.V(); ok {
+		changes["description"] = v
 	}
-	if args.Link.Valid {
-		changes["link"] = args.Link.V
+	if v, ok := args.Link.V(); ok {
+		changes["link"] = v
 	}
-	if args.SinceYear.Valid && args.SinceSemester.Valid {
-		changes["since_year"] = args.SinceYear.V
-		changes["since_semester"] = args.SinceSemester.V
+	if sy, ok := args.SinceYear.V(); ok {
+		if ss, ok := args.SinceSemester.V(); ok {
+			changes["since_year"] = sy
+			changes["since_semester"] = ss
+		}
 	}
-	if args.UntilYear.Valid && args.UntilSemester.Valid {
-		changes["until_year"] = args.UntilYear.V
-		changes["until_semester"] = args.UntilSemester.V
+	if uy, ok := args.UntilYear.V(); ok {
+		if us, ok := args.UntilSemester.V(); ok {
+			changes["until_year"] = uy
+			changes["until_semester"] = us
+		}
 	}
 
 	if len(changes) == 0 {

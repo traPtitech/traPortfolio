@@ -185,8 +185,8 @@ func TestProjectService_CreateProject(t *testing.T) {
 				Link:        link,
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.ProjectDetail) {
-				if args.args.Link.Valid {
-					want.Link = args.args.Link.V
+				if v, ok := args.args.Link.V(); ok {
+					want.Link = v
 				}
 				repo.EXPECT().CreateProject(gomock.Any()).Return(want, nil) // TODO: CreateProject内でuuid.NewV4するのでテストができない？
 			},

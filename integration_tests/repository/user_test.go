@@ -277,15 +277,15 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	var bio string
-	if args.Description.Valid {
-		bio = args.Description.V
+	if v, ok := args.Description.V(); ok {
+		bio = v
 	} else {
 		bio = user.Description
 	}
 
 	var check bool
-	if args.Check.Valid {
-		check = args.Check.V
+	if v, ok := args.Check.V(); ok {
+		check = v
 	} else {
 		check = user.Check
 	}
@@ -367,24 +367,24 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	mustMakeAccount(t, repo, user.ID, nil)
 
-	accountType := optional.New(rand.Int63n(int64(domain.AccountLimit)), true)
+	accountType := optional.From(domain.AccountType(rand.Int63n(int64(domain.AccountLimit))))
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
 		Type:        accountType,
-		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType.V)),
+		URL:         random.OptAccountURLStringNotNull(accountType.ValueOrZero()),
 		PrPermitted: random.OptBool(),
 	}
-	if args.DisplayName.Valid {
-		account1.DisplayName = args.DisplayName.V
+	if v, ok := args.DisplayName.V(); ok {
+		account1.DisplayName = v
 	}
-	if args.Type.Valid {
-		account1.Type = domain.AccountType(args.Type.V)
+	if v, ok := args.Type.V(); ok {
+		account1.Type = v
 	}
-	if args.URL.Valid {
-		account1.URL = args.URL.V
+	if v, ok := args.URL.V(); ok {
+		account1.URL = v
 	}
-	if args.PrPermitted.Valid {
-		account1.PrPermitted = args.PrPermitted.V
+	if v, ok := args.PrPermitted.V(); ok {
+		account1.PrPermitted = v
 	}
 	err = repo.UpdateAccount(user.ID, account1.ID, args)
 	assert.NoError(t, err)

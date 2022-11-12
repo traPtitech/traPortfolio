@@ -92,20 +92,20 @@ func (r *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*
 
 func (r *ContestRepository) UpdateContest(contestID uuid.UUID, args *repository.UpdateContestArgs) error {
 	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.V
+	if v, ok := args.Name.V(); ok {
+		changes["name"] = v
 	}
-	if args.Description.Valid {
-		changes["description"] = args.Description.V
+	if v, ok := args.Description.V(); ok {
+		changes["description"] = v
 	}
-	if args.Link.Valid {
-		changes["link"] = args.Link.V
+	if v, ok := args.Link.V(); ok {
+		changes["link"] = v
 	}
-	if args.Since.Valid {
-		changes["since"] = args.Since.V
+	if v, ok := args.Since.V(); ok {
+		changes["since"] = v
 	}
-	if args.Until.Valid {
-		changes["until"] = args.Until.V
+	if v, ok := args.Until.V(); ok {
+		changes["until"] = v
 	}
 
 	if len(changes) == 0 {
@@ -247,17 +247,17 @@ func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam 
 
 func (r *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
 	changes := map[string]interface{}{}
-	if args.Name.Valid {
-		changes["name"] = args.Name.V
+	if v, ok := args.Name.V(); ok {
+		changes["name"] = v
 	}
-	if args.Description.Valid {
-		changes["description"] = args.Description.V
+	if v, ok := args.Description.V(); ok {
+		changes["description"] = v
 	}
-	if args.Link.Valid {
-		changes["link"] = args.Link.V
+	if v, ok := args.Link.V(); ok {
+		changes["link"] = v
 	}
-	if args.Result.Valid {
-		changes["result"] = args.Result.V
+	if v, ok := args.Result.V(); ok {
+		changes["result"] = v
 	}
 
 	if len(changes) == 0 {

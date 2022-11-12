@@ -890,7 +890,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 }
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
-	aType := random.OptInt64nNotNull(int64(domain.AccountLimit))
+	aType := random.OptAccountTypeNotNull()
 
 	t.Parallel()
 	type args struct {
@@ -911,7 +911,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumericNotNull(),
-					URL:         random.OptAccountURLStringNotNull(domain.AccountType(aType.V)),
+					URL:         random.OptAccountURLStringNotNull(aType.ValueOrZero()),
 					PrPermitted: random.OptBoolNotNull(),
 					Type:        aType,
 				},
@@ -938,7 +938,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: random.OptAlphaNumericNotNull(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: random.OptBoolNotNull(),
-					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
+					Type:        random.OptAccountTypeNotNull(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -960,7 +960,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: random.OptAlphaNumericNotNull(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: random.OptBoolNotNull(),
-					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
+					Type:        random.OptAccountTypeNotNull(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
