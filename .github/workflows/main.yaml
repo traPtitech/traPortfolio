@@ -92,13 +92,13 @@ jobs:
         with:
           files: ./coverage_unit.txt
           flags: unit
-          commit_parent: ${{ github.event.pull_request.base.ref }}
+          commit_parent: ${{ github.event.pull_request.base.sha }}
       - name: Upload coverage data (Integration)
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage_integration.txt
           flags: integration
-          commit_parent: ${{ github.event.pull_request.base.ref }}
+          commit_parent: ${{ github.event.pull_request.base.sha }}
   tbls:
     name: TBLS
     runs-on: ubuntu-latest
