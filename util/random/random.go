@@ -88,10 +88,7 @@ func RandURLString() string {
 }
 
 func RandAccountURLString(accountType uint) string {
-	if accountType == 0 || accountType == 1 {
-		return "https://" + AlphaNumeric()
-	}
-	return domain.NumberToAccountURL(accountType) + AlphaNumeric()
+	return "https://" + domain.URLPrefix[accountType] + AlphaNumeric()
 }
 
 func Duration() domain.YearWithSemesterDuration {

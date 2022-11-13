@@ -62,7 +62,7 @@ func (p GetUsersParams) Validate() error {
 
 func (r AddAccountRequest) Validate() error {
 	var vdRuleAccountURLMatch vd.Rule
-	regexpText := fmt.Sprintf("^%s[^/]+$", domain.NumberToAccountURL(uint(r.Type)))
+	regexpText := fmt.Sprintf("^https://%s[^/]+$", domain.URLPrefix[uint(r.Type)])
 	if r.Type == 0 || r.Type == 1 {
 		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
 	} else {
@@ -112,7 +112,7 @@ func (r CreateProjectRequest) Validate() error {
 
 func (r EditUserAccountRequest) Validate() error {
 	var vdRuleAccountURLMatch vd.Rule
-	regexpText := fmt.Sprintf("^%s[^/]+$", domain.NumberToAccountURL(uint(*r.Type)))
+	regexpText := fmt.Sprintf("^https://%s[^/]+$", domain.URLPrefix[uint(*r.Type)])
 	if *r.Type == 0 || *r.Type == 1 {
 		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
 	} else {

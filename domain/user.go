@@ -76,39 +76,19 @@ const (
 	AccountLimit
 )
 
-const (
-	TWITTERURL    = "https://twitter.com/"
-	FACEBOOKURL   = "https://www.facebook.com/"
-	PIXIVURL      = "https://www.pixiv.net/users/"
-	GITHUBURL     = "https://github.com/"
-	QIITAURL      = "https://qiita.com/"
-	ZENNURL       = "https://zenn.dev/"
-	ATCODERURL    = "https://atcoder.jp/users/"
-	SOUNDCLOUDURL = "https://soundcloud.com/"
-	HACKTHEBOXURL = "https://app.hackthebox.com/users/"
-	CTFTIMEURL    = "https://ctftime.org/user/"
-)
-
-func NumberToAccountURL(number uint) string {
-	if number >= AccountLimit {
-		return ""
-	}
-
-	accountURLs := []string{
-		"",
-		"",
-		TWITTERURL,
-		FACEBOOKURL,
-		PIXIVURL,
-		GITHUBURL,
-		QIITAURL,
-		ZENNURL,
-		ATCODERURL,
-		SOUNDCLOUDURL,
-		HACKTHEBOXURL,
-		CTFTIMEURL,
-	}
-	return accountURLs[number]
+var URLPrefix = map[uint]string{
+	HOMEPAGE:   "",
+	BLOG:       "",
+	TWITTER:    "twitter.com/",
+	FACEBOOK:   "www.facebook.com/",
+	PIXIV:      "www.pixiv.net/users/",
+	GITHUB:     "github.com/",
+	QIITA:      "qiita.com/",
+	ZENN:       "zenn.dev/",
+	ATCODER:    "atcoder.jp/users/",
+	SOUNDCLOUD: "soundcloud.com/",
+	HACKTHEBOX: "app.hackthebox.com/users/",
+	CTFTIME:    "ctftime.org/user/",
 }
 
 type TraQState uint8
