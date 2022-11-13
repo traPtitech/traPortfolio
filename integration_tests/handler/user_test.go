@@ -296,11 +296,12 @@ func TestGetUserAccount(t *testing.T) {
 
 // AddUserAccount POST /users/:userID/accounts
 func TestAddUserAccount(t *testing.T) {
+	accountType := uint(rand.Intn(int(domain.AccountLimit)))
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
-		atype       = rand.Intn(int(domain.AccountLimit)) // TODO: openapiでenumを定義する
-		url         = random.RandURLString()
+		atype       = accountType // TODO: openapiでenumを定義する
+		url         = random.RandAccountURLString(accountType)
 	)
 
 	t.Parallel()
@@ -378,11 +379,12 @@ func TestAddUserAccount(t *testing.T) {
 
 // EditUserRequestAccount PATCH /users/:userID/accounts/:accountID
 func TestEditUserRequestAccount(t *testing.T) {
+	accountType := uint(rand.Intn(int(domain.AccountLimit)))
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
-		atype       = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		url         = random.RandURLString()
+		atype       = int64(accountType) // TODO: openapiでenumを定義する
+		url         = random.RandAccountURLString(accountType)
 	)
 
 	t.Parallel()
@@ -456,11 +458,12 @@ func TestEditUserRequestAccount(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Insert & Assert
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 				account := handler.Account{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
-					Url:         random.RandURLString(),
+					Type:        handler.AccountType(accountType),
+					Url:         random.RandAccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,
@@ -545,11 +548,12 @@ func TestDeleteUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 				reqBody := handler.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
-					Url:         random.RandURLString(),
+					Type:        handler.AccountType(accountType),
+					Url:         random.RandAccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
 				testutils.AssertResponse(t, http.StatusCreated, handler.Account{
