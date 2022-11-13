@@ -2,6 +2,8 @@ package handler
 
 import (
 	"errors"
+	"fmt"
+	"regexp"
 
 	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -59,11 +61,19 @@ func (p GetUsersParams) Validate() error {
 // request body structs
 
 func (r AddAccountRequest) Validate() error {
+	var vdRuleAccountURLMatch vd.Rule
+	regexpText := fmt.Sprintf("^%s[^/]+$", domain.NumberToAccountURL(uint(r.Type)))
+	if r.Type == 0 || r.Type == 1 {
+		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
+	} else {
+		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(regexpText))
+	}
+
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
-		vd.Field(&r.Url, vd.Required, is.URL),
+		vd.Field(&r.Url, vd.Required, is.URL, vdRuleAccountURLMatch),
 	)
 }
 
@@ -101,11 +111,19 @@ func (r CreateProjectRequest) Validate() error {
 }
 
 func (r EditUserAccountRequest) Validate() error {
+	var vdRuleAccountURLMatch vd.Rule
+	regexpText := fmt.Sprintf("^%s[^/]+$", domain.NumberToAccountURL(uint(*r.Type)))
+	if *r.Type == 0 || *r.Type == 1 {
+		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
+	} else {
+		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(regexpText))
+	}
+
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
-		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
+		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL, vdRuleAccountURLMatch),
 	)
 }
 

@@ -87,6 +87,13 @@ func RandURLString() string {
 	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
 }
 
+func RandAccountURLString(accountType uint) string {
+	if accountType == 0 || accountType == 1 {
+		return "https://" + AlphaNumeric()
+	}
+	return domain.NumberToAccountURL(accountType) + AlphaNumeric()
+}
+
 func Duration() domain.YearWithSemesterDuration {
 	yss := []domain.YearWithSemester{
 		{

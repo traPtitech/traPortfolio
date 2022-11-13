@@ -76,6 +76,41 @@ const (
 	AccountLimit
 )
 
+const (
+	TWITTERURL    = "https://twitter.com/"
+	FACEBOOKURL   = "https://www.facebook.com/"
+	PIXIVURL      = "https://www.pixiv.net/users/"
+	GITHUBURL     = "https://github.com/"
+	QIITAURL      = "https://qiita.com/"
+	ZENNURL       = "https://zenn.dev/"
+	ATCODERURL    = "https://atcoder.jp/users/"
+	SOUNDCLOUDURL = "https://soundcloud.com/"
+	HACKTHEBOXURL = "https://app.hackthebox.com/users/"
+	CTFTIMEURL    = "https://ctftime.org/user/"
+)
+
+func NumberToAccountURL(number uint) string {
+	if number >= AccountLimit {
+		return ""
+	}
+
+	accountURLs := []string{
+		"",
+		"",
+		TWITTERURL,
+		FACEBOOKURL,
+		PIXIVURL,
+		GITHUBURL,
+		QIITAURL,
+		ZENNURL,
+		ATCODERURL,
+		SOUNDCLOUDURL,
+		HACKTHEBOXURL,
+		CTFTIMEURL,
+	}
+	return accountURLs[number]
+}
+
 type TraQState uint8
 
 const (
