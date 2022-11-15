@@ -232,6 +232,34 @@ func TestEditContest(t *testing.T) {
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},
+		"403": {
+			http.StatusForbidden,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("forbidden: forbidden"),
+		},
+		"404": {
+			http.StatusNotFound,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("not found: not found"),
+		},
 	}
 
 	e := echo.New()
