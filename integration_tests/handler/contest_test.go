@@ -197,11 +197,12 @@ func TestCreateContest(t *testing.T) {
 
 func TestEditContest(t *testing.T) {
 	var (
-		description = mockdata.CloneMockContests()[0].Description
-		since       = mockdata.CloneMockContests()[0].Since
-		until       = mockdata.CloneMockContests()[0].Until
-		link        = mockdata.CloneMockContests()[0].Link
-		name        = mockdata.CloneMockContests()[0].Name
+		contest     = mockdata.CloneMockContests()[0]
+		description = contest.Description
+		since       = contest.Since
+		until       = contest.Until
+		link        = contest.Link
+		name        = contest.Name
 	)
 
 	t.Parallel()
