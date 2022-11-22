@@ -290,7 +290,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 			name: "Success",
 			args: args{uid},
 			want: &domain.UserDetail{
-				User:  *domain.NewUser(uid, random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				User:  *domain.NewUser(uid, random.AlphaNumeric(), random.AlphaNumeric(), true),
 				State: domain.TraqStateActive,
 				Bio:   random.AlphaNumeric(),
 				Accounts: []*domain.Account{
