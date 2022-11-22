@@ -159,7 +159,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range want {
-					rows.AddRow(v.ID, v.Name)
+					rows.AddRow(v.ID, v.Name, v.Check)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT 10")).
@@ -187,9 +187,11 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range want {
-					rows.AddRow(v.ID, v.Name)
+					rows.AddRow(v.ID, v.Name, v.Check)
 				}
-				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %d", args.args.Limit.Int64))).WithArgs(want[0].ID, want[1].ID, want[2].ID).WillReturnRows(rows)
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %d", args.args.Limit.Int64))).
+					WithArgs(want[0].ID, want[1].ID, want[2].ID).
+					WillReturnRows(rows)
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
 			},
 			assertion: assert.NoError,
