@@ -232,6 +232,20 @@ func TestEditContest(t *testing.T) {
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("not found: not found"),
+		},
 	}
 
 	e := echo.New()
@@ -256,6 +270,9 @@ func TestEditContest(t *testing.T) {
 				// Get updated response & Assert
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				testutils.AssertResponse(t, http.StatusOK, contest, res)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContest, tt.contestID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
