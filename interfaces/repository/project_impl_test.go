@@ -115,7 +115,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.UserWithDuration{
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 						Duration: random.Duration(),
 					},
 				},
@@ -169,11 +169,11 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.UserWithDuration{
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 						Duration: random.Duration(),
 					},
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), "", false),
 						Duration: random.Duration(),
 					},
 				},
@@ -534,7 +534,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 			want: []*domain.UserWithDuration{
 				{
-					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {

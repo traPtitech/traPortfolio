@@ -139,7 +139,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 					Link:        random.RandURLString(),
 					Members: []*domain.UserWithDuration{
 						{
-							User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 							Duration: random.Duration(),
 						},
 					},

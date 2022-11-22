@@ -583,8 +583,8 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 					Link:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
 					Members: []*domain.User{
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 					},
 				}
 				members := make([]User, 0, len(repoContestTeamDetail.Members))
@@ -983,7 +983,7 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				users := []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 				}
 				hres := make([]*User, len(users))
 				for i, user := range users {

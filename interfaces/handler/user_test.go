@@ -42,7 +42,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				hresUsers := []*User{}
 
 				for i := 0; i < casenum; i++ {
-					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
+					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true)
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
@@ -69,7 +69,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				hresUsers := []*User{}
 
 				for i := 0; i < casenum; i++ {
-					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
+					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true)
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
@@ -94,7 +94,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			name: "Success_WithOpts_Name",
 			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
 				repoUsers := []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 				}
 				hresUsers := []*User{
 					{
@@ -189,7 +189,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				}
 
 				repoUser := domain.UserDetail{
-					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 					State:    domain.TraQState(random.Uint8n(uint8(domain.TraqStateLimit))),
 					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
 					Accounts: rAccounts,
