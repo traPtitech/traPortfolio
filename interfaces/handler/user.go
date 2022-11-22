@@ -65,7 +65,7 @@ func (handler *UserHandler) GetUser(_c echo.Context) error {
 
 	accounts := make([]Account, len(user.Accounts))
 	for i, v := range user.Accounts {
-		accounts[i] = newAccount(v.ID, v.DisplayName, v.Type, v.URL, v.PrPermitted)
+		accounts[i] = newAccount(v.ID, v.DisplayName, AccountType(v.Type), v.URL, v.PrPermitted)
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
@@ -118,7 +118,7 @@ func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 
 	res := make([]Account, len(accounts))
 	for i, v := range accounts {
-		res[i] = newAccount(v.ID, v.DisplayName, v.Type, v.URL, v.PrPermitted)
+		res[i] = newAccount(v.ID, v.DisplayName, AccountType(v.Type), v.URL, v.PrPermitted)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -143,7 +143,7 @@ func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, account.Type, account.URL, account.PrPermitted))
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, AccountType(account.Type), account.URL, account.PrPermitted))
 }
 
 // AddUserAccount POST /users/:userID/accounts
@@ -163,7 +163,7 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 	ctx := c.Request().Context()
 	args := repository.CreateAccountArgs{
 		DisplayName: req.DisplayName,
-		Type:        uint8(req.Type),
+		Type:        domain.AccountType(req.Type),
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
@@ -172,7 +172,7 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, account.Type, account.URL, account.PrPermitted))
+	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, AccountType(account.Type), account.URL, account.PrPermitted))
 }
 
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
@@ -352,11 +352,11 @@ func newUserDetail(user User, accounts []Account, bio string, state domain.TraQS
 	}
 }
 
-func newAccount(id uuid.UUID, displayName string, atype uint8, url string, prPermitted bool) Account {
+func newAccount(id uuid.UUID, displayName string, atype AccountType, url string, prPermitted bool) Account {
 	return Account{
 		Id:          id,
 		DisplayName: displayName,
-		Type:        AccountType(atype),
+		Type:        atype,
 		Url:         url,
 		PrPermitted: PrPermitted(prPermitted),
 	}

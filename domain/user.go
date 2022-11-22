@@ -25,10 +25,12 @@ type UserWithDuration struct {
 	Duration YearWithSemesterDuration
 }
 
+type AccountType uint8
+
 type Account struct {
 	ID          uuid.UUID
 	DisplayName string
-	Type        uint8
+	Type        AccountType
 	PrPermitted bool
 	URL         string
 }
@@ -61,7 +63,7 @@ type UserGroup struct {
 }
 
 const (
-	HOMEPAGE uint8 = iota
+	HOMEPAGE AccountType = iota
 	BLOG
 	TWITTER
 	FACEBOOK

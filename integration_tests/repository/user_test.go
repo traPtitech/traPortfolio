@@ -173,7 +173,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					{
 						ID:          mockdata.MockAccounts[0].ID,
 						DisplayName: mockdata.MockAccounts[0].Name,
-						Type:        mockdata.MockAccounts[0].Type,
+						Type:        domain.AccountType(mockdata.MockAccounts[0].Type),
 						PrPermitted: mockdata.MockAccounts[0].Check,
 						URL:         mockdata.MockAccounts[0].URL,
 					},
@@ -370,7 +370,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		account1.DisplayName = args.DisplayName.String
 	}
 	if args.Type.Valid {
-		account1.Type = uint8(args.Type.Int64)
+		account1.Type = domain.AccountType(args.Type.Int64)
 	}
 	if args.URL.Valid {
 		account1.URL = args.URL.String

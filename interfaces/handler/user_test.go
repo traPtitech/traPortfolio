@@ -171,7 +171,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 					raccount := domain.Account{
 						ID:          random.UUID(),
 						DisplayName: random.AlphaNumeric(),
-						Type:        random.Uint8n(uint8(domain.AccountLimit)),
+						Type:        domain.AccountType(random.Uint8n(uint8(domain.AccountLimit))),
 						PrPermitted: prRandom,
 						URL:         random.AlphaNumeric(),
 					}
@@ -445,7 +445,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 					raccount := domain.Account{
 						ID:          random.UUID(),
 						DisplayName: random.AlphaNumeric(),
-						Type:        uint8(i),
+						Type:        domain.AccountType(uint8(i)),
 						PrPermitted: prRandom,
 						URL:         random.AlphaNumeric(),
 					}
@@ -538,7 +538,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 				rAccount := domain.Account{
 					ID:          random.UUID(),
 					DisplayName: random.AlphaNumeric(),
-					Type:        uint8(random.Uint8n(uint8(domain.AccountLimit))),
+					Type:        domain.AccountType(uint8(random.Uint8n(uint8(domain.AccountLimit)))),
 					PrPermitted: prRandom,
 					URL:         random.AlphaNumeric(),
 				}
@@ -636,7 +636,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				args := repository.CreateAccountArgs{
 					DisplayName: reqBody.DisplayName,
-					Type:        uint8(reqBody.Type),
+					Type:        domain.AccountType(uint8(reqBody.Type)),
 					URL:         reqBody.Url,
 					PrPermitted: bool(reqBody.PrPermitted),
 				}
@@ -677,7 +677,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				args := repository.CreateAccountArgs{
 					DisplayName: reqBody.DisplayName,
-					Type:        uint8(reqBody.Type),
+					Type:        domain.AccountType(uint8(reqBody.Type)),
 					URL:         reqBody.Url,
 					PrPermitted: bool(reqBody.PrPermitted),
 				}
@@ -776,7 +776,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				args := repository.CreateAccountArgs{
 					DisplayName: reqBody.DisplayName,
-					Type:        uint8(reqBody.Type),
+					Type:        domain.AccountType(uint8(reqBody.Type)),
 					URL:         reqBody.Url,
 					PrPermitted: bool(reqBody.PrPermitted),
 				}

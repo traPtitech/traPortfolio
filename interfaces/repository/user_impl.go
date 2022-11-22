@@ -120,7 +120,7 @@ func (repo *UserRepository) GetUser(userID uuid.UUID) (*domain.UserDetail, error
 		accounts = append(accounts, &domain.Account{
 			ID:          v.ID,
 			DisplayName: v.Name,
-			Type:        v.Type,
+			Type:        domain.AccountType(v.Type),
 			PrPermitted: v.Check,
 			URL:         v.URL,
 		})
@@ -241,7 +241,7 @@ func (repo *UserRepository) GetAccounts(userID uuid.UUID) ([]*domain.Account, er
 	for _, v := range accounts {
 		result = append(result, &domain.Account{
 			ID:          v.ID,
-			Type:        v.Type,
+			Type:        domain.AccountType(v.Type),
 			PrPermitted: v.Check,
 			DisplayName: v.Name,
 			URL:         v.URL,
@@ -262,7 +262,7 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 
 	result := &domain.Account{
 		ID:          account.ID,
-		Type:        account.Type,
+		Type:        domain.AccountType(account.Type),
 		PrPermitted: account.Check,
 		DisplayName: account.Name,
 		URL:         account.URL,
@@ -274,7 +274,7 @@ func (repo *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*
 func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
-		Type:   args.Type,
+		Type:   uint8(args.Type),
 		Name:   args.DisplayName,
 		URL:    args.URL,
 		UserID: userID,
@@ -296,7 +296,7 @@ func (repo *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Cre
 	return &domain.Account{
 		ID:          ver.ID,
 		DisplayName: ver.Name,
-		Type:        ver.Type,
+		Type:        domain.AccountType(ver.Type),
 		PrPermitted: ver.Check,
 		URL:         ver.URL,
 	}, nil

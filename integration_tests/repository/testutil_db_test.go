@@ -95,7 +95,7 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	if args == nil {
 		args = &repository.CreateAccountArgs{
 			DisplayName: random.AlphaNumeric(),
-			Type:        random.Uint8n(uint8(domain.AccountLimit)),
+			Type:        domain.AccountType(random.Uint8n(uint8(domain.AccountLimit))),
 			URL:         random.RandURLString(),
 			PrPermitted: random.Bool(),
 		}
