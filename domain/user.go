@@ -7,7 +7,7 @@ import (
 type User struct {
 	ID       uuid.UUID
 	Name     string
-	realName string // private field
+	realName string
 	Check    bool
 }
 
