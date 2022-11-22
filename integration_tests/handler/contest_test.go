@@ -203,6 +203,9 @@ func TestEditContest(t *testing.T) {
 		until       = contest.Until
 		link        = contest.Link
 		name        = contest.Name
+		//tooLongStringは260文字
+		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
@@ -231,6 +234,76 @@ func TestEditContest(t *testing.T) {
 			mockdata.ContestID1(),
 			handler.EditContestJSONRequestBody{},
 			nil,
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &tooLongString,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &invalidURL,
+				Name: &name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &tooLongString,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 since time is after until time": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: until,
+					Until: &since,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"404": {
 			http.StatusNotFound,
