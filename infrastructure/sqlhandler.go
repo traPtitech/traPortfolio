@@ -128,8 +128,8 @@ func (h *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
-func (handler *SQLHandler) Limit(limit int) database.SQLHandler {
-	db := handler.conn.Limit(limit)
+func (h *SQLHandler) Limit(limit int) database.SQLHandler {
+	db := h.conn.Limit(limit)
 	return &SQLHandler{conn: db}
 }
 
