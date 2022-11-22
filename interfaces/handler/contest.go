@@ -347,7 +347,7 @@ func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	req := MemberIDs{}
+	req := AddContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}
@@ -374,7 +374,7 @@ func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	req := MemberIDs{}
+	req := EditContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
 	}

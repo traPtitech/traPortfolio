@@ -92,13 +92,13 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		eventID    uuid.UUID
-		reqBody    handler.EditEventRequest
+		reqBody    handler.EditEventJSONRequestBody
 		want       interface{} // nil or error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.KnoqEventID1(),
-			handler.EditEventRequest{
+			handler.EditEventJSONRequestBody{
 				EventLevel: &eventLevel,
 			},
 			nil,
@@ -106,7 +106,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.KnoqEventID2(),
-			handler.EditEventRequest{},
+			handler.EditEventJSONRequestBody{},
 			nil,
 		},
 	}

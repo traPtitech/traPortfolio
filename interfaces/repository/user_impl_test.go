@@ -1262,6 +1262,8 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 }
 
 func TestUserRepository_GetContests(t *testing.T) {
+	cid := random.UUID()
+
 	t.Parallel()
 	type args struct {
 		userID uuid.UUID
@@ -1278,10 +1280,18 @@ func TestUserRepository_GetContests(t *testing.T) {
 			args: args{userID: random.UUID()},
 			want: []*domain.UserContest{
 				{
-					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(),
-					Result:      random.AlphaNumeric(),
-					ContestName: random.AlphaNumeric(),
+					ID:        cid,
+					Name:      random.AlphaNumeric(),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
+					Teams: []*domain.ContestTeam{
+						{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+					},
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
@@ -1291,29 +1301,88 @@ func TestUserRepository_GetContests(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
 				rows := sqlmock.NewRows([]string{"team_id"})
 				for _, v := range want {
-					rows.AddRow(v.ID)
+					rows.AddRow(v.Teams[0].ID)
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
 					WillReturnRows(rows)
-				cids := make([]uuid.UUID, len(want))
-				for i, v := range want {
-					cids[i] = random.UUID()
+				for _, v := range want {
 					f.h.Mock.
 						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
-						WithArgs(v.ID).
+						WithArgs(v.Teams[0].ID).
 						WillReturnRows(
-							sqlmock.NewRows([]string{"id", "contest_id", "name", "result", "contest_name"}).
-								AddRow(v.ID, cids[i], v.Name, v.Result, v.ContestName),
+							sqlmock.NewRows([]string{"id", "contest_id", "name", "result"}).
+								AddRow(v.Teams[0].ID, v.ID, v.Teams[0].Name, v.Teams[0].Result),
 						)
 				}
-				for i, v := range want {
+				for _, v := range want {
 					f.h.Mock.
 						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ?")).
-						WithArgs(cids[i]).
+						WithArgs(v.ID).
 						WillReturnRows(
-							sqlmock.NewRows([]string{"id", "name"}).
-								AddRow(cids[i], v.ContestName),
+							sqlmock.NewRows([]string{"id", "name", "since", "until"}).
+								AddRow(v.ID, v.Name, v.TimeStart, v.TimeEnd),
+						)
+				}
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success with multiple teams",
+			args: args{userID: random.UUID()},
+			want: []*domain.UserContest{
+				{
+					ID:        cid,
+					Name:      random.AlphaNumeric(),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
+					Teams: []*domain.ContestTeam{
+						{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+					},
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args, want []*domain.UserContest) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
+					WithArgs(args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
+				rows := sqlmock.NewRows([]string{"team_id"})
+				for _, v := range want {
+					for _, t := range v.Teams {
+						rows.AddRow(t.ID)
+					}
+				}
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
+					WithArgs(args.userID).
+					WillReturnRows(rows)
+				for _, v := range want {
+					rows = sqlmock.NewRows([]string{"id", "contest_id", "name", "result"})
+					for _, t := range v.Teams {
+						rows.AddRow(t.ID, t.ContestID, t.Name, t.Result)
+					}
+					f.h.Mock.
+						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` IN (?,?)")).
+						WithArgs(v.Teams[0].ID, v.Teams[1].ID).
+						WillReturnRows(rows)
+				}
+				for _, v := range want {
+					f.h.Mock.
+						ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ?")).
+						WithArgs(v.ID).
+						WillReturnRows(
+							sqlmock.NewRows([]string{"id", "name", "since", "until"}).
+								AddRow(v.ID, v.Name, v.TimeStart, v.TimeEnd),
 						)
 				}
 			},

@@ -16,7 +16,7 @@ import (
 )
 
 // GetContests GET /contests
-func GetContests(t *testing.T) {
+func TestGetContests(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -43,7 +43,7 @@ func GetContests(t *testing.T) {
 }
 
 // GetContest GET /contests/:contestID
-func GetContest(t *testing.T) {
+func TestGetContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -53,7 +53,7 @@ func GetContest(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.ContestID1(),
-			mockdata.HMockContests[0],
+			mockdata.CloneHandlerMockContestDetails()[0],
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -82,23 +82,26 @@ func GetContest(t *testing.T) {
 }
 
 // CreateContest POST /contests
-func CreateContest(t *testing.T) {
+func TestCreateContest(t *testing.T) {
 	var (
 		name         = random.AlphaNumeric()
 		link         = random.RandURLString()
 		description  = random.AlphaNumeric()
 		since, until = random.SinceAndUntil()
+		//tooLongStringは260文字
+		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		reqbody    handler.CreateContestJSONBody
+		reqbody    handler.CreateContestJSONRequestBody
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
-			handler.CreateContestJSONBody{
+			handler.CreateContestJSONRequestBody{
 				Description: description,
 				Duration: handler.Duration{
 					Since: since,
@@ -118,6 +121,58 @@ func CreateContest(t *testing.T) {
 				Name:  name,
 				Teams: []handler.ContestTeam{},
 			},
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONRequestBody{
+				Description: tooLongString,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONRequestBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &invalidURL,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONRequestBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: tooLongString,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 since time is after until time": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONRequestBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: until,
+					Until: &since,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 	}
 
@@ -140,19 +195,82 @@ func CreateContest(t *testing.T) {
 	}
 }
 
-func EditContest(t *testing.T) {
+func TestEditContest(t *testing.T) {
+	var (
+		contest     = mockdata.CloneMockContests()[0]
+		description = contest.Description
+		since       = contest.Since
+		until       = contest.Until
+		link        = contest.Link
+		name        = contest.Name
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		reqBody    handler.EditContestJSONRequestBody
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			nil,
+		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{},
+			nil,
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			if tt.statusCode == http.StatusNoContent {
+				// Get response before update
+				var contest handler.ContestDetail
+				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
+				assert.Equal(t, http.StatusOK, res.Code)
+				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &contest)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
+
+				// Update & Assert
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContest, tt.contestID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+
+				// Get updated response & Assert
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
+				testutils.AssertResponse(t, http.StatusOK, contest, res)
+			}
+		})
+	}
 }
 
-func DeleteContest(t *testing.T) {
+func TestDeleteContest(t *testing.T) {
 }
 
-func GetContestTeam(t *testing.T) {
+func TestGetContestTeam(t *testing.T) {
 }
 
-func AddContestTeam(t *testing.T) {
+func TestAddContestTeam(t *testing.T) {
 }
 
-func EditContestTeam(t *testing.T) {
+func TestEditContestTeam(t *testing.T) {
 }
 
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
@@ -225,7 +343,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    handler.AddContestTeamMembersJSONBody
+		reqbody    handler.AddContestTeamMembersJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
@@ -317,7 +435,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    handler.EditContestTeamMembersJSONBody
+		reqbody    handler.EditContestTeamMembersJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
