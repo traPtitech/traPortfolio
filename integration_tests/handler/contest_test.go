@@ -232,7 +232,7 @@ func TestEditContest(t *testing.T) {
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},
-		"403": {
+		/*"403": {
 			http.StatusForbidden,
 			mockdata.ContestID1(),
 			handler.EditContestJSONRequestBody{
@@ -245,10 +245,10 @@ func TestEditContest(t *testing.T) {
 				Name: &name,
 			},
 			testutils.HTTPError("forbidden: forbidden"),
-		},
+		},*/
 		"404": {
 			http.StatusNotFound,
-			mockdata.ContestID1(),
+			random.UUID(),
 			handler.EditContestJSONRequestBody{
 				Description: &description,
 				Duration: &handler.Duration{
@@ -284,6 +284,9 @@ func TestEditContest(t *testing.T) {
 				// Get updated response & Assert
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				testutils.AssertResponse(t, http.StatusOK, contest, res)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContest, tt.contestID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
