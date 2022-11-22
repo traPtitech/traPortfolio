@@ -1,13 +1,30 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/gofrs/uuid"
 )
 
 type User struct {
 	ID       uuid.UUID
 	Name     string
-	RealName string
+	RealName string // TODO: 後で消す
+	Check    bool
+}
+
+func NewUser(id uuid.UUID, name string, realName string, check bool) *User {
+	return &User{
+		ID:       id,
+		Name:     name,
+		RealName: realName,
+		Check:    check,
+	}
+}
+
+type UserWithDuration struct {
+	User     User
+	Duration YearWithSemesterDuration
 }
 
 type Account struct {
@@ -33,17 +50,16 @@ type UserProject struct {
 }
 
 type UserContest struct {
-	ID          uuid.UUID // チームID
-	Name        string    // チーム名
-	Result      string
-	ContestName string
+	ID        uuid.UUID // コンテストID
+	Name      string    // コンテスト名
+	TimeStart time.Time
+	TimeEnd   time.Time
+	Teams     []*ContestTeam // ユーザーが所属するチームのリスト
 }
 
-// UserGroup indicates User who belongs to Group
 type UserGroup struct {
-	ID       uuid.UUID // User ID
-	Name     string    // User Name
-	RealName string
+	ID       uuid.UUID // Group ID
+	Name     string    // Group name
 	Duration YearWithSemesterDuration
 }
 
@@ -55,8 +71,11 @@ const (
 	PIXIV
 	GITHUB
 	QIITA
+	ZENN
 	ATCODER
 	SOUNDCLOUD
+	HACKTHEBOX
+	CTFTIME
 	AccountLimit
 )
 

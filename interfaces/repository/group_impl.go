@@ -16,9 +16,9 @@ func NewGroupRepository(sql database.SQLHandler) repository.GroupRepository {
 	return &GroupRepository{h: sql}
 }
 
-func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
+func (r *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	groups := make([]*model.Group, 0)
-	err := repo.h.Find(&groups).Error()
+	err := r.h.Find(&groups).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -33,9 +33,9 @@ func (repo *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	return result, nil
 }
 
-func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
+func (r *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
 	group := &model.Group{}
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.Group{GroupID: groupID}).
 		First(group).
 		Error(); err != nil {
@@ -43,7 +43,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	users := make([]*model.GroupUserBelonging, 0)
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
 		Error(); err != nil {
@@ -51,12 +51,14 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	// Name, RealNameはusecasesでPortalから取得する
-	erMembers := make([]*domain.UserGroup, 0, len(users))
+	erMembers := make([]*domain.UserWithDuration, 0, len(users))
 	for _, v := range users {
-		erMembers = append(erMembers, &domain.UserGroup{
-			ID: v.UserID,
-			// Name:     v.Name,
-			// RealName: v.RealName,
+		erMembers = append(erMembers, &domain.UserWithDuration{
+			User: domain.User{
+				ID: v.UserID,
+				// Name:     v.Name,
+				// RealName: v.RealName,
+			},
 			Duration: domain.YearWithSemesterDuration{
 				Since: domain.YearWithSemester{
 					Year:     v.SinceYear,
@@ -71,7 +73,7 @@ func (repo *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, e
 	}
 
 	admins := make([]*model.GroupUserAdmin, 0)
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
 		Error(); err != nil {

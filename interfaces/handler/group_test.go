@@ -103,11 +103,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 
 				adminLen := rand.Intn(256)
 				for i := 0; i < adminLen; i++ {
-					rgroupAdmin := domain.User{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
-					}
+					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
 					hgroupAdmin := User{
 						Id:       rgroupAdmin.ID,
@@ -115,27 +111,25 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 						RealName: rgroupAdmin.RealName,
 					}
 
-					rgroupAdmins = append(rgroupAdmins, &rgroupAdmin)
+					rgroupAdmins = append(rgroupAdmins, rgroupAdmin)
 					hgroupAdmins = append(hgroupAdmins, hgroupAdmin)
 				}
 
-				rgroupMembers := []*domain.UserGroup{}
+				rgroupMembers := []*domain.UserWithDuration{}
 				hgroupMembers := []GroupMember{}
 
 				groupLen := rand.Intn(256)
 				for i := 0; i < groupLen; i++ {
-					rgroupmember := domain.UserGroup{
-						ID:       random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+					rgroupmember := domain.UserWithDuration{
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					}
 
 					hgroupmember := GroupMember{
 						Duration: ConvertDuration(rgroupmember.Duration),
-						Id:       rgroupmember.ID,
-						Name:     rgroupmember.Name,
-						RealName: rgroupmember.RealName,
+						Id:       rgroupmember.User.ID,
+						Name:     rgroupmember.User.Name,
+						RealName: rgroupmember.User.RealName,
 					}
 
 					rgroupMembers = append(rgroupMembers, &rgroupmember)

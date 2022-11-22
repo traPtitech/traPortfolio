@@ -3,13 +3,14 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"net/http"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -26,6 +27,18 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	api := NewAPI(nil, nil, NewProjectHandler(s), nil, nil, nil)
 
 	return s, api
+}
+
+func makeCreateProjectRequest(description string, since YearWithSemester, until *YearWithSemester, name string, link string) *CreateProjectJSONRequestBody {
+	return &CreateProjectJSONRequestBody{
+		Description: description,
+		Duration: YearWithSemesterDuration{
+			Since: since,
+			Until: until,
+		},
+		Name: name,
+		Link: &link,
+	}
 }
 
 func TestProjectHandler_GetProjects(t *testing.T) {
@@ -123,11 +136,9 @@ func TestProjectHandler_GetProject(t *testing.T) {
 					},
 					Description: random.AlphaNumeric(),
 					Link:        random.RandURLString(),
-					Members: []*domain.ProjectMember{
+					Members: []*domain.UserWithDuration{
 						{
-							UserID:   random.UUID(),
-							Name:     random.AlphaNumeric(),
-							RealName: random.AlphaNumeric(),
+							User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 							Duration: random.Duration(),
 						},
 					},
@@ -146,9 +157,9 @@ func TestProjectHandler_GetProject(t *testing.T) {
 								Semester: Semester(v.Duration.Until.Semester),
 							},
 						},
-						Id:       v.UserID,
-						Name:     v.Name,
-						RealName: v.RealName,
+						Id:       v.User.ID,
+						Name:     v.User.Name,
+						RealName: v.User.RealName,
 					})
 				}
 				reqBody := &ProjectDetail{
@@ -221,6 +232,81 @@ func TestProjectHandler_GetProject(t *testing.T) {
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, expectedHres, hres)
+		})
+	}
+}
+
+func TestProjectHandler_CreateProject(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockProjectService) (reqBody *CreateProjectJSONRequestBody, expectedResBody Project, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockProjectService) (reqBody *CreateProjectJSONRequestBody, expectedResBody Project, path string) {
+				duration := random.Duration()
+				reqBody = makeCreateProjectRequest(
+					random.AlphaNumeric(),
+					ConvertDuration(duration).Since,
+					ConvertDuration(duration).Until,
+					random.AlphaNumeric(),
+					random.RandURLString(),
+				)
+				args := repository.CreateProjectArgs{
+					Name:          reqBody.Name,
+					Description:   reqBody.Description,
+					Link:          optional.StringFrom(reqBody.Link),
+					SinceYear:     reqBody.Duration.Since.Year,
+					SinceSemester: int(reqBody.Duration.Since.Semester),
+					UntilYear:     reqBody.Duration.Until.Year,
+					UntilSemester: int(reqBody.Duration.Until.Semester),
+				}
+				want := domain.ProjectDetail{
+					Project: domain.Project{
+						ID:   random.UUID(),
+						Name: args.Name,
+						Duration: domain.YearWithSemesterDuration{
+							Since: domain.YearWithSemester{
+								Year:     args.SinceYear,
+								Semester: args.SinceSemester,
+							},
+							Until: domain.YearWithSemester{
+								Year:     args.UntilYear,
+								Semester: args.UntilSemester,
+							},
+						},
+					},
+					Description: args.Description,
+					Link:        args.Link.String,
+					Members:     nil,
+				}
+				expectedResBody = Project{
+					Duration: ConvertDuration(want.Duration),
+					Id:       want.ID,
+					Name:     want.Name,
+				}
+				s.EXPECT().CreateProject(anyCtx{}, &args).Return(&want, nil)
+				return reqBody, expectedResBody, "/api/v1/projects"
+			},
+			statusCode: http.StatusCreated,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupProjectMock(t)
+
+			reqBody, res, path := tt.setup(s)
+
+			var resBody Project
+			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, &resBody)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, resBody, res)
 		})
 	}
 }

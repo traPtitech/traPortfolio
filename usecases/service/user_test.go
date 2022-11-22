@@ -13,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
-	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 func TestUserService_GetUsers(t *testing.T) {
@@ -36,11 +35,7 @@ func TestUserService_GetUsers(t *testing.T) {
 				args: &repository.GetUsersArgs{},
 			},
 			want: []*domain.User{
-				{
-					ID:       random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
 				repo.EXPECT().GetUsers(args.args).Return(want, nil)
@@ -99,11 +94,8 @@ func TestUserService_GetUser(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: &domain.UserDetail{
-				User: domain.User{
-					ID:       uuid.Nil, // setupで変更する
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
-				},
+				// IDはsetupで変更する
+				User:  *domain.NewUser(uuid.Nil, random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				State: domain.TraqStateActive,
 				Bio:   random.AlphaNumeric(),
 				Accounts: []*domain.Account{
@@ -171,8 +163,8 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Check:       optional.NewBool(true, true),
+					Description: random.OptAlphaNumeric(),
+					Check:       random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -186,8 +178,8 @@ func TestUserService_Update(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateUserArgs{
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Check:       optional.NewBool(true, true),
+					Description: random.OptAlphaNumeric(),
+					Check:       random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -387,10 +379,10 @@ func TestUserService_EditAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
-					URL:         optional.NewString(random.RandURLString(), true),
-					PrPermitted: optional.NewBool(true, true),
+					DisplayName: random.OptAlphaNumeric(),
+					Type:        random.OptInt64n(int64(domain.AccountLimit)),
+					URL:         random.OptURLString(),
+					PrPermitted: random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -405,10 +397,10 @@ func TestUserService_EditAccount(t *testing.T) {
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
-					DisplayName: optional.NewString(random.AlphaNumeric(), true),
-					Type:        optional.NewInt64(int64(domain.HOMEPAGE), true),
-					URL:         optional.NewString(random.RandURLString(), true),
-					PrPermitted: optional.NewBool(true, true),
+					DisplayName: random.OptAlphaNumeric(),
+					Type:        random.OptInt64n(int64(domain.AccountLimit)),
+					URL:         random.OptURLString(),
+					PrPermitted: random.OptBool(),
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
@@ -562,10 +554,17 @@ func TestUserService_GetUserContests(t *testing.T) {
 			},
 			want: []*domain.UserContest{
 				{
-					ID:          random.UUID(),
-					Name:        random.AlphaNumeric(),
-					Result:      random.AlphaNumeric(),
-					ContestName: random.AlphaNumeric(),
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(),
+					TimeStart: random.Time(),
+					TimeEnd:   random.Time(),
+					Teams: []*domain.ContestTeam{
+						{
+							ID:     random.UUID(),
+							Name:   random.AlphaNumeric(),
+							Result: random.AlphaNumeric(),
+						},
+					},
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
@@ -614,8 +613,8 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.GroupUser
-		setup     func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser)
+		want      []*domain.UserGroup
+		setup     func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -624,14 +623,14 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 				ctx:    context.Background(),
 				userID: random.UUID(),
 			},
-			want: []*domain.GroupUser{
+			want: []*domain.UserGroup{
 				{
 					ID:       random.UUID(),
 					Name:     random.AlphaNumeric(),
 					Duration: random.Duration(),
 				},
 			},
-			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser) {
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup) {
 				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
@@ -643,7 +642,7 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 				userID: random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.GroupUser) {
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup) {
 				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, repository.ErrNotFound)
 			},
 			assertion: assert.Error,

@@ -25,7 +25,7 @@ func TestGetGroups(t *testing.T) {
 			http.StatusOK,
 			[]handler.Group{
 				{
-					Id:   mockdata.HMockGroups[0].Id,
+					Id:   mockdata.GroupID1(),
 					Name: mockdata.HMockGroups[0].Name,
 				},
 			},
@@ -58,7 +58,7 @@ func TestGetGroup(t *testing.T) {
 	}{
 		"200": {
 			statusCode: http.StatusOK,
-			groupID:    mockdata.HMockGroups[0].Id,
+			groupID:    mockdata.GroupID1(),
 			want:       mockdata.HMockGroups[0],
 		},
 		"400 invalid userID": {

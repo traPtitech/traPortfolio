@@ -98,11 +98,9 @@ func TestProjectService_GetProject(t *testing.T) {
 				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
-				Members: []*domain.ProjectMember{
+				Members: []*domain.UserWithDuration{
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					},
 				},
@@ -201,7 +199,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Until.Year,
 					SinceSemester: duration.Until.Semester,
 					UntilYear:     duration.Since.Year,
@@ -220,7 +218,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -273,9 +271,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.AlphaNumeric(), true),
+					Name:          random.OptAlphaNumeric(),
+					Description:   random.OptAlphaNumeric(),
+					Link:          random.OptAlphaNumeric(),
 					SinceYear:     optional.NewInt64(int64(duration.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(duration.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(duration.Until.Year), true),
@@ -311,9 +309,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.AlphaNumeric(), true),
+					Name:          random.OptAlphaNumeric(),
+					Description:   random.OptAlphaNumeric(),
+					Link:          random.OptAlphaNumeric(),
 					SinceYear:     optional.NewInt64(int64(duration.Until.Year), true),
 					SinceSemester: optional.NewInt64(int64(duration.Until.Semester), true),
 					UntilYear:     optional.NewInt64(int64(duration.Since.Year), true),
@@ -336,9 +334,9 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.AlphaNumeric(), true),
+					Name:          random.OptAlphaNumeric(),
+					Description:   random.OptAlphaNumeric(),
+					Link:          random.OptAlphaNumeric(),
 					SinceYear:     optional.NewInt64(int64(duration.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(duration.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(duration.Until.Year), true),
@@ -383,8 +381,8 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.ProjectMember
-		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.ProjectMember)
+		want      []*domain.UserWithDuration
+		setup     func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -393,14 +391,12 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 			},
-			want: []*domain.ProjectMember{
+			want: []*domain.UserWithDuration{
 				{
-					UserID:   random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
+					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 			},
-			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.ProjectMember) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
@@ -412,7 +408,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				id:  random.UUID(),
 			},
 			want: nil,
-			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.ProjectMember) {
+			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {
 				repo.EXPECT().GetProjectMembers(args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,

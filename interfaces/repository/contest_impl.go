@@ -18,9 +18,9 @@ func NewContestRepository(sql database.SQLHandler, portal external.PortalAPI) re
 	return &ContestRepository{h: sql, portal: portal}
 }
 
-func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
+func (r *ContestRepository) GetContests() ([]*domain.Contest, error) {
 	contests := make([]*model.Contest, 10)
-	err := repo.h.Find(&contests).Error()
+	err := r.h.Find(&contests).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -38,14 +38,14 @@ func (repo *ContestRepository) GetContests() ([]*domain.Contest, error) {
 	return result, nil
 }
 
-func (repo *ContestRepository) GetContest(contestID uuid.UUID) (*domain.ContestDetail, error) {
-	return repo.getContest(contestID)
+func (r *ContestRepository) GetContest(contestID uuid.UUID) (*domain.ContestDetail, error) {
+	return r.getContest(contestID)
 }
 
 // Teamsは別途GetContestTeamsで取得するためここではnilのまま返す
-func (repo *ContestRepository) getContest(contestID uuid.UUID) (*domain.ContestDetail, error) {
+func (r *ContestRepository) getContest(contestID uuid.UUID) (*domain.ContestDetail, error) {
 	contest := new(model.Contest)
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.Contest{ID: contestID}).
 		First(contest).
 		Error(); err != nil {
@@ -67,7 +67,7 @@ func (repo *ContestRepository) getContest(contestID uuid.UUID) (*domain.ContestD
 	return res, nil
 }
 
-func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
+func (r *ContestRepository) CreateContest(args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	contest := &model.Contest{
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
@@ -77,12 +77,12 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 		Until:       args.Until.ValueOrZero(),
 	}
 
-	err := repo.h.Create(contest).Error()
+	err := r.h.Create(contest).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	result, err := repo.getContest(contest.ID)
+	result, err := r.getContest(contest.ID)
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -90,7 +90,7 @@ func (repo *ContestRepository) CreateContest(args *repository.CreateContestArgs)
 	return result, nil
 }
 
-func (repo *ContestRepository) UpdateContest(contestID uuid.UUID, args *repository.UpdateContestArgs) error {
+func (r *ContestRepository) UpdateContest(contestID uuid.UUID, args *repository.UpdateContestArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -117,7 +117,7 @@ func (repo *ContestRepository) UpdateContest(contestID uuid.UUID, args *reposito
 		new model.Contest
 	)
 
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
 			Where(&model.Contest{ID: contestID}).
 			First(&old).
@@ -140,8 +140,8 @@ func (repo *ContestRepository) UpdateContest(contestID uuid.UUID, args *reposito
 	return nil
 }
 
-func (repo *ContestRepository) DeleteContest(contestID uuid.UUID) error {
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+func (r *ContestRepository) DeleteContest(contestID uuid.UUID) error {
+	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
 			Where(&model.Contest{ID: contestID}).
 			First(&model.Contest{}).
@@ -165,8 +165,8 @@ func (repo *ContestRepository) DeleteContest(contestID uuid.UUID) error {
 	return nil
 }
 
-func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
-	if err := repo.h.
+func (r *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	if err := r.h.
 		Where(&model.Contest{ID: contestID}).
 		First(&model.Contest{}).
 		Error(); err != nil {
@@ -174,7 +174,7 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 	}
 
 	teams := make([]*model.ContestTeam, 10)
-	err := repo.h.
+	err := r.h.
 		Where(&model.ContestTeam{ContestID: contestID}).
 		Find(&teams).
 		Error()
@@ -194,9 +194,9 @@ func (repo *ContestRepository) GetContestTeams(contestID uuid.UUID) ([]*domain.C
 }
 
 // Membersは別途GetContestTeamMembersで取得するためここではnilのまま返す
-func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
+func (r *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
 	var team model.ContestTeam
-	if err := repo.h.
+	if err := r.h.
 		Where(&model.ContestTeam{ID: teamID, ContestID: contestID}).
 		First(&team).
 		Error(); err != nil {
@@ -217,7 +217,7 @@ func (repo *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.U
 	return res, nil
 }
 
-func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
+func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
 	contestTeam := &model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
 		ContestID:   contestID,
@@ -227,7 +227,7 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 		Link:        _contestTeam.Link.ValueOrZero(),
 	}
 
-	err := repo.h.Create(contestTeam).Error()
+	err := r.h.Create(contestTeam).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -245,7 +245,7 @@ func (repo *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTe
 	return result, nil
 }
 
-func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
+func (r *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -269,7 +269,7 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *reposit
 		new model.ContestTeam
 	)
 
-	err := repo.h.Transaction(func(tx database.SQLHandler) error {
+	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
 			Where(&model.ContestTeam{ID: teamID}).
 			First(&old).
@@ -292,8 +292,8 @@ func (repo *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *reposit
 	return nil
 }
 
-func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uuid.UUID) error {
-	err := repo.h.
+func (r *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uuid.UUID) error {
+	err := r.h.
 		Where(&model.ContestTeam{ID: teamID}).
 		First(&model.ContestTeam{}).
 		Error()
@@ -301,7 +301,7 @@ func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uui
 		return convertError(err)
 	}
 
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+	err = r.h.Transaction(func(tx database.SQLHandler) error {
 		err = tx.
 			Where(&model.ContestTeam{ID: teamID}).
 			Delete(&model.ContestTeam{}).
@@ -319,9 +319,25 @@ func (repo *ContestRepository) DeleteContestTeam(contestID uuid.UUID, teamID uui
 	return nil
 }
 
-func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+func (r *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
+	// 存在チェック
+	err := r.h.
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+	err = r.h.
+		Where(&model.ContestTeam{ID: teamID}).
+		First(&model.ContestTeam{}).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
 	var belongings []*model.ContestTeamUserBelonging
-	err := repo.h.
+	err = r.h.
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).
@@ -330,7 +346,7 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 		return nil, convertError(err)
 	}
 
-	nameMap, err := repo.makeUserNameMap()
+	nameMap, err := r.makeUserNameMap()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -338,27 +354,18 @@ func (repo *ContestRepository) GetContestTeamMembers(contestID uuid.UUID, teamID
 	result := make([]*domain.User, len(belongings))
 	for i, v := range belongings {
 		u := v.User
-		newUser := domain.User{
-			ID:   u.ID,
-			Name: u.Name,
-		}
-
-		if rn, ok := nameMap[u.Name]; ok {
-			newUser.RealName = rn
-		}
-
-		result[i] = &newUser
+		result[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
 	}
 	return result, nil
 }
 
-func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
+func (r *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	if len(members) == 0 {
 		return repository.ErrInvalidArg
 	}
 
 	// 存在チェック
-	err := repo.h.
+	err := r.h.
 		Where(&model.ContestTeam{ID: teamID}).
 		First(&model.ContestTeam{}).
 		Error()
@@ -369,7 +376,7 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 	// 既に所属しているメンバーを検索
 	belongingsMap := make(map[uuid.UUID]struct{}, len(members))
 	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = repo.h.
+	err = r.h.
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&_belongings).
 		Error()
@@ -380,7 +387,7 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 		belongingsMap[v.UserID] = struct{}{}
 	}
 
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+	err = r.h.Transaction(func(tx database.SQLHandler) error {
 		for _, memberID := range members {
 			if _, ok := belongingsMap[memberID]; ok {
 				continue
@@ -399,9 +406,9 @@ func (repo *ContestRepository) AddContestTeamMembers(teamID uuid.UUID, members [
 
 }
 
-func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
+func (r *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members []uuid.UUID) error {
 	// 存在チェック
-	err := repo.h.
+	err := r.h.
 		Where(&model.ContestTeam{ID: teamID}).
 		First(&model.ContestTeam{}).
 		Error()
@@ -411,7 +418,7 @@ func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members 
 
 	belongings := make(map[uuid.UUID]struct{}, len(members))
 	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = repo.h.
+	err = r.h.
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&_belongings).
 		Error()
@@ -427,7 +434,7 @@ func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members 
 		membersMap[v] = struct{}{}
 	}
 
-	err = repo.h.Transaction(func(tx database.SQLHandler) error {
+	err = r.h.Transaction(func(tx database.SQLHandler) error {
 		//チームに所属していなくて渡された配列に入っているメンバーをチームに追加
 		membersToBeAdded := make([]*model.ContestTeamUserBelonging, 0, len(members))
 		for _, memberID := range members {
@@ -467,8 +474,8 @@ func (repo *ContestRepository) EditContestTeamMembers(teamID uuid.UUID, members 
 
 }
 
-func (repo *ContestRepository) makeUserNameMap() (map[string]string, error) {
-	users, err := repo.portal.GetAll()
+func (r *ContestRepository) makeUserNameMap() (map[string]string, error) {
+	users, err := r.portal.GetAll()
 	if err != nil {
 		return nil, convertError(err)
 	}

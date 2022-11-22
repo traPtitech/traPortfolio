@@ -126,10 +126,10 @@ func (mr *MockUserRepositoryMockRecorder) GetContests(userID interface{}) *gomoc
 }
 
 // GetGroupsByUserID mocks base method.
-func (m *MockUserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.GroupUser, error) {
+func (m *MockUserRepository) GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserGroup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetGroupsByUserID", userID)
-	ret0, _ := ret[0].([]*domain.GroupUser)
+	ret0, _ := ret[0].([]*domain.UserGroup)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

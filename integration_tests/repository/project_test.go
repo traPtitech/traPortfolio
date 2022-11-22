@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"math/rand"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -14,7 +13,6 @@ import (
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -23,7 +21,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_projects")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
@@ -43,7 +41,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_project")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
@@ -71,7 +69,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_update_project")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
@@ -81,10 +79,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		Name:          random.OptAlphaNumeric(),
 		Description:   random.OptAlphaNumeric(),
 		Link:          random.OptAlphaNumeric(),
-		SinceYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-		SinceSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
-		UntilYear:     optional.NewInt64(rand.Int63n(2100), random.Bool()),
-		UntilSemester: optional.NewInt64(rand.Int63n(2), random.Bool()),
+		SinceYear:     random.OptInt64n(2100),
+		SinceSemester: random.OptInt64n(2),
+		UntilYear:     random.OptInt64n(2100),
+		UntilSemester: random.OptInt64n(2),
 	}
 
 	if arg1.Name.Valid {
@@ -122,32 +120,32 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_project_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	project2 := mustMakeProjectDetail(t, repo, nil)
-	user1 := &domain.User{
-		ID:       mockdata.MockUsers[0].ID,
-		Name:     mockdata.MockUsers[0].Name,
-		RealName: mockdata.MockPortalUsers[0].RealName,
-	}
-	user2 := &domain.User{
-		ID:       mockdata.MockUsers[1].ID,
-		Name:     mockdata.MockUsers[1].Name,
-		RealName: mockdata.MockPortalUsers[1].RealName,
-	}
+	user1 := domain.NewUser(
+		mockdata.MockUsers[0].ID,
+		mockdata.MockUsers[0].Name,
+		mockdata.MockPortalUsers[0].RealName,
+		mockdata.MockUsers[0].Check,
+	)
+	user2 := domain.NewUser(
+		mockdata.MockUsers[1].ID,
+		mockdata.MockUsers[1].Name,
+		mockdata.MockPortalUsers[1].RealName,
+		mockdata.MockUsers[1].Check,
+	)
 
 	args1 := mustAddProjectMember(t, repo, project1.ID, user1.ID, nil)
 	args2 := mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
 	args3 := mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
 
-	projectMember1 := &domain.ProjectMember{
-		UserID:   user1.ID,
-		Name:     user1.Name,
-		RealName: user1.RealName,
+	projectMember1 := &domain.UserWithDuration{
+		User: *user1,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args1.SinceYear,
@@ -159,10 +157,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	projectMember2 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember2 := &domain.UserWithDuration{
+		User: *user2,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args2.SinceYear,
@@ -174,15 +170,13 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	expected1 := []*domain.ProjectMember{projectMember1, projectMember2}
+	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
-	projectMember3 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember3 := &domain.UserWithDuration{
+		User: *user2,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args3.SinceYear,
@@ -195,7 +189,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		},
 	}
 
-	expected2 := []*domain.ProjectMember{projectMember3}
+	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
@@ -210,32 +204,32 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupDB(t, sqlConf)
+	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	project2 := mustMakeProjectDetail(t, repo, nil)
-	user1 := &domain.User{
-		ID:       mockdata.MockUsers[1].ID,
-		Name:     mockdata.MockUsers[1].Name,
-		RealName: mockdata.MockPortalUsers[1].RealName,
-	}
-	user2 := &domain.User{
-		ID:       mockdata.MockUsers[2].ID,
-		Name:     mockdata.MockUsers[2].Name,
-		RealName: mockdata.MockPortalUsers[2].RealName,
-	}
+	user1 := domain.NewUser(
+		mockdata.MockUsers[1].ID,
+		mockdata.MockUsers[1].Name,
+		mockdata.MockPortalUsers[1].RealName,
+		mockdata.MockUsers[1].Check,
+	)
+	user2 := domain.NewUser(
+		mockdata.MockUsers[2].ID,
+		mockdata.MockUsers[2].Name,
+		mockdata.MockPortalUsers[2].RealName,
+		mockdata.MockUsers[2].Check,
+	)
 
 	args1 := mustAddProjectMember(t, repo, project1.ID, user1.ID, nil)
 	args2 := mustAddProjectMember(t, repo, project1.ID, user2.ID, nil)
 	args3 := mustAddProjectMember(t, repo, project2.ID, user2.ID, nil)
 
-	projectMember1 := &domain.ProjectMember{
-		UserID:   user1.ID,
-		Name:     user1.Name,
-		RealName: user1.RealName,
+	projectMember1 := &domain.UserWithDuration{
+		User: *user1,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args1.SinceYear,
@@ -247,10 +241,8 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	projectMember2 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember2 := &domain.UserWithDuration{
+		User: *user2,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args2.SinceYear,
@@ -262,15 +254,13 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	expected1 := []*domain.ProjectMember{projectMember1, projectMember2}
+	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
-	projectMember3 := &domain.ProjectMember{
-		UserID:   user2.ID,
-		Name:     user2.Name,
-		RealName: user2.RealName,
+	projectMember3 := &domain.UserWithDuration{
+		User: *user2,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
 				Year:     args3.SinceYear,
@@ -282,28 +272,28 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 		},
 	}
-	expected2 := []*domain.ProjectMember{projectMember3}
+	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember1.UserID})
+	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember1.User.ID})
 	assert.NoError(t, err)
-	expected3 := []*domain.ProjectMember{projectMember2}
+	expected3 := []*domain.UserWithDuration{projectMember2}
 	users3, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, users3)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember2.UserID})
+	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember2.User.ID})
 	assert.NoError(t, err)
-	expected4 := []*domain.ProjectMember{}
+	expected4 := []*domain.UserWithDuration{}
 	users4, err := repo.GetProjectMembers(project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
-	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{projectMember3.UserID})
+	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{projectMember3.User.ID})
 	assert.NoError(t, err)
-	expected5 := []*domain.ProjectMember{}
+	expected5 := []*domain.UserWithDuration{}
 	users5, err := repo.GetProjectMembers(project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected5, users5)

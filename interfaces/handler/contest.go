@@ -77,7 +77,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 
 	req := CreateContestJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	createReq := repository.CreateContestArgs{
@@ -114,7 +114,7 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 
 	req := EditContestJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	patchReq := repository.UpdateContestArgs{
@@ -222,7 +222,7 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 
 	req := AddContestTeamJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	args := repository.CreateContestTeamArgs{
@@ -260,7 +260,7 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 
 	req := EditContestTeamJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	args := repository.UpdateContestTeamArgs{
@@ -331,8 +331,8 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// AddContestTeamMember POST /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
+// AddContestTeamMembers POST /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
 	ctx := c.Request().Context()
 
@@ -347,9 +347,9 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	req := MemberIDs{}
+	req := AddContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	err = h.srv.AddContestTeamMembers(ctx, teamID, req.Members)
@@ -359,8 +359,8 @@ func (h *ContestHandler) AddContestTeamMember(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-// EditContestTeamMember PUT /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) EditContestTeamMember(_c echo.Context) error {
+// EditContestTeamMembers PUT /contests/:contestID/teams/:teamID/members
+func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
 	c := _c.(*Context)
 
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
@@ -374,9 +374,9 @@ func (h *ContestHandler) EditContestTeamMember(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	req := MemberIDs{}
+	req := EditContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return convertError(err)
 	}
 
 	ctx := c.Request().Context()

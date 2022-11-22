@@ -3,6 +3,7 @@ package random
 import (
 	"math/rand"
 	"net/url"
+	"sort"
 	"time"
 	"unsafe"
 
@@ -87,25 +88,25 @@ func RandURLString() string {
 }
 
 func Duration() domain.YearWithSemesterDuration {
-	ys1 := domain.YearWithSemester{
-		Year:     Time().Year(),
-		Semester: rand.Intn(2),
-	}
-	ys2 := domain.YearWithSemester{
-		Year:     Time().Year(),
-		Semester: rand.Intn(2),
+	yss := []domain.YearWithSemester{
+		{
+			Year:     Time().Year(),
+			Semester: rand.Intn(2),
+		},
+		{
+			Year:     Time().Year(),
+			Semester: rand.Intn(2),
+		},
 	}
 
-	if ys1.After(ys2) {
-		return domain.YearWithSemesterDuration{
-			Since: ys2,
-			Until: ys1,
-		}
-	}
+	// 時系列昇順に並べる
+	sort.Slice(yss, func(i, j int) bool {
+		return !yss[i].After(yss[j])
+	})
 
 	return domain.YearWithSemesterDuration{
-		Since: ys1,
-		Until: ys2,
+		Since: yss[0],
+		Until: yss[1],
 	}
 }
 
@@ -121,8 +122,20 @@ func OptBool() optional.Bool {
 	return optional.NewBool(Bool(), Bool())
 }
 
+func OptBoolNotNull() optional.Bool {
+	return optional.NewBool(Bool(), true)
+}
+
 func OptInt64() optional.Int64 {
 	return optional.NewInt64(rand.Int63(), Bool())
+}
+
+func OptInt64n(n int64) optional.Int64 {
+	return optional.NewInt64(rand.Int63n(n), Bool())
+}
+
+func OptInt64nNotNull(n int64) optional.Int64 {
+	return optional.NewInt64(rand.Int63n(n), true)
 }
 
 func OptAlphaNumericn(n int) optional.String {
@@ -133,10 +146,18 @@ func OptAlphaNumeric() optional.String {
 	return optional.NewString(AlphaNumeric(), Bool())
 }
 
+func OptAlphaNumericNotNull() optional.String {
+	return optional.NewString(AlphaNumeric(), true)
+}
+
 func OptTime() optional.Time {
 	return optional.NewTime(Time(), Bool())
 }
 
 func OptURLString() optional.String {
 	return optional.NewString(RandURLString(), Bool())
+}
+
+func OptURLStringNotNull() optional.String {
+	return optional.NewString(RandURLString(), true)
 }

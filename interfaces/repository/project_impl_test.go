@@ -113,11 +113,9 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
-				Members: []*domain.ProjectMember{
+				Members: []*domain.UserWithDuration{
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					},
 				},
@@ -138,19 +136,19 @@ func TestProjectRepository_GetProject(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"}).
-							AddRow(wm.UserID, wm.Name, wmd.Since.Year, wmd.Since.Semester, wmd.Until.Year, wmd.Until.Semester),
+							AddRow(wm.User.ID, wm.User.Name, wmd.Since.Year, wmd.Since.Semester, wmd.Until.Year, wmd.Until.Semester),
 					)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
-					WithArgs(wm.UserID).
+					WithArgs(wm.User.ID).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(wm.UserID, wm.Name),
+						sqlmock.NewRows([]string{"id", "name", "check"}).
+							AddRow(wm.User.ID, wm.User.Name, wm.User.Check),
 					)
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
-						TraQID:   wm.Name,
-						RealName: wm.RealName,
+						TraQID:   wm.User.Name,
+						RealName: wm.User.RealName,
 					},
 				}, nil)
 			},
@@ -169,17 +167,13 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				},
 				Description: random.AlphaNumeric(),
 				Link:        random.RandURLString(),
-				Members: []*domain.ProjectMember{
+				Members: []*domain.UserWithDuration{
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					},
 					{
-						UserID:   random.UUID(),
-						Name:     random.AlphaNumeric(),
-						RealName: random.AlphaNumeric(),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					},
 				},
@@ -196,17 +190,17 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				memberRows := sqlmock.NewRows([]string{"user_id", "name", "since_year", "since_semester", "until_year", "until_semester"})
 				for _, v := range want.Members {
 					d := v.Duration
-					memberRows.AddRow(v.UserID, v.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
+					memberRows.AddRow(v.User.ID, v.User.Name, d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
 					WillReturnRows(memberRows)
 				userIDs := make([]driver.Value, len(want.Members))
-				userRows := sqlmock.NewRows([]string{"id", "name"})
+				userRows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for i, v := range want.Members {
-					userIDs[i] = v.UserID
-					userRows.AddRow(v.UserID, v.Name)
+					userIDs[i] = v.User.ID
+					userRows.AddRow(v.User.ID, v.User.Name, v.User.Check)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
@@ -215,8 +209,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				wp := make([]*external.PortalUserResponse, len(want.Members))
 				for i, v := range want.Members {
 					wp[i] = &external.PortalUserResponse{
-						TraQID:   v.Name,
-						RealName: v.RealName,
+						TraQID:   v.User.Name,
+						RealName: v.User.RealName,
 					}
 				}
 				f.portal.EXPECT().GetAll().Return(wp, nil)
@@ -345,7 +339,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(),
 		Description:   random.AlphaNumeric(),
-		Link:          optional.NewString(random.RandURLString(), true),
+		Link:          random.OptURLStringNotNull(),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
 		UntilYear:     duration.Until.Year,
@@ -403,7 +397,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -462,9 +456,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Name:          random.OptAlphaNumericNotNull(),
+					Description:   random.OptAlphaNumericNotNull(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
@@ -486,9 +480,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Name:          random.OptAlphaNumericNotNull(),
+					Description:   random.OptAlphaNumericNotNull(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
@@ -529,8 +523,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []*domain.ProjectMember
-		setup     func(f mockProjectRepositoryFields, args args, want []*domain.ProjectMember)
+		want      []*domain.UserWithDuration
+		setup     func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration)
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
@@ -538,17 +532,15 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 			},
-			want: []*domain.ProjectMember{
+			want: []*domain.UserWithDuration{
 				{
-					UserID:   random.UUID(),
-					Name:     random.AlphaNumeric(),
-					RealName: random.AlphaNumeric(),
+					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.ProjectMember) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				rows := sqlmock.NewRows([]string{"user_id"})
 				for _, pm := range want {
-					rows.AddRow(pm.UserID)
+					rows.AddRow(pm.User.ID)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -556,15 +548,15 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 					WillReturnRows(rows)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
-					WithArgs(want[0].UserID).
+					WithArgs(want[0].User.ID).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "name"}).
-							AddRow(want[0].UserID, want[0].Name),
+						sqlmock.NewRows([]string{"id", "name", "check"}).
+							AddRow(want[0].User.ID, want[0].User.Name, want[0].User.Check),
 					)
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
-						TraQID:   want[0].Name,
-						RealName: want[0].RealName,
+						TraQID:   want[0].User.Name,
+						RealName: want[0].User.RealName,
 					},
 				}, nil)
 			},
@@ -575,21 +567,26 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 			},
-			want: []*domain.ProjectMember{
+			want: []*domain.UserWithDuration{
 				{
-					UserID: random.UUID(),
-					Name:   random.AlphaNumeric(),
-					// RealName:
+					User: domain.User{
+						ID:   random.UUID(),
+						Name: random.AlphaNumeric(),
+						// RealName:
+					},
 				},
 				{
-					UserID: random.UUID(),
-					Name:   random.AlphaNumeric(),
+					User: domain.User{
+						ID:   random.UUID(),
+						Name: random.AlphaNumeric(),
+						// RealName:
+					},
 				},
 			},
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.ProjectMember) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				rows := sqlmock.NewRows([]string{"user_id"})
 				for _, pm := range want {
-					rows.AddRow(pm.UserID)
+					rows.AddRow(pm.User.ID)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -598,8 +595,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				userIDs := make([]driver.Value, len(want))
 				userRows := sqlmock.NewRows([]string{"id", "name"})
 				for i, v := range want {
-					userIDs[i] = v.UserID
-					userRows.AddRow(v.UserID, v.Name)
+					userIDs[i] = v.User.ID
+					userRows.AddRow(v.User.ID, v.User.Name)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
@@ -608,8 +605,8 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				wp := make([]*external.PortalUserResponse, len(want))
 				for i, v := range want {
 					wp[i] = &external.PortalUserResponse{
-						TraQID:   v.Name,
-						RealName: v.RealName,
+						TraQID:   v.User.Name,
+						RealName: v.User.RealName,
 					}
 				}
 				f.portal.EXPECT().GetAll().Return(wp, nil)
@@ -622,7 +619,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.ProjectMember) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.id).
@@ -637,7 +634,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				id: random.UUID(),
 			},
 			want: nil,
-			setup: func(f mockProjectRepositoryFields, args args, want []*domain.ProjectMember) {
+			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
 				uid := random.UUID()
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).

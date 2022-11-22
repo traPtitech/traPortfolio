@@ -141,7 +141,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/userIdInPath'
     get:
-      summary: ユーザーが参加したコンテストチームの取得
+      summary: ユーザーが参加したコンテストの取得
       responses:
         '200':
           description: OK
@@ -150,7 +150,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ContestTeamWithContestName'
+                  $ref: '#/components/schemas/UserContest'
         '404':
           description: Not Found
       operationId: getUserContests
@@ -854,6 +854,9 @@ components:
         - 6
         - 7
         - 8
+        - 9
+        - 10
+        - 11
       x-enum-varnames:
         - homepage
         - blog
@@ -862,8 +865,11 @@ components:
         - pixiv
         - github
         - qiita
+        - zenn
         - atcoder
         - soundcloud
+        - hackthebox
+        - ctftime
       x-enum-descriptions:
         - ホームページ (IDはリンクのURLそのまま)
         - ブログ (IDはリンクのURLそのまま)
@@ -872,8 +878,11 @@ components:
         - Pixiv
         - GitHub (@は含まない)
         - Qiita (@は含まない)
+        - Zenn
         - AtCoder
         - SoundCloud
+        - HackTheBox
+        - CTFtime
       x-go-type: int64
     Project:
       title: Project
@@ -1100,6 +1109,21 @@ components:
         - id
         - name
         - duration
+    UserContest:
+      title: UserContest
+      type: object
+      description: ユーザーが参加したコンテストの情報
+      allOf:
+        - $ref: '#/components/schemas/Contest'
+        - type: object
+          properties:
+            teams:
+              type: array
+              description: コンテストチーム
+              items:
+                $ref: '#/components/schemas/ContestTeam'
+          required:
+            - teams
     ContestDetail:
       title: ContestDetail
       type: object
@@ -1168,19 +1192,6 @@ components:
             - link
             - description
             - members
-    ContestTeamWithContestName:
-      title: ContestTeamWithContestName
-      type: object
-      description: コンテストチーム情報(コンテスト名含む)
-      allOf:
-        - $ref: '#/components/schemas/ContestTeam'
-        - type: object
-          properties:
-            contestName:
-              type: string
-              description: コンテスト名
-          required:
-            - contestName
     PrPermitted:
       title: PrPermitted
       type: boolean

@@ -111,10 +111,10 @@ func (mr *MockUserServiceMockRecorder) GetAccounts(userID interface{}) *gomock.C
 }
 
 // GetGroupsByUserID mocks base method.
-func (m *MockUserService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.GroupUser, error) {
+func (m *MockUserService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetGroupsByUserID", ctx, userID)
-	ret0, _ := ret[0].([]*domain.GroupUser)
+	ret0, _ := ret[0].([]*domain.UserGroup)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

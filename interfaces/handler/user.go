@@ -22,7 +22,7 @@ func NewUserHandler(s service.UserService) *UserHandler {
 }
 
 // GetUsers GET /users
-func (handler *UserHandler) GetUsers(_c echo.Context) error {
+func (h *UserHandler) GetUsers(_c echo.Context) error {
 	c := _c.(*Context)
 	req := GetUsersParams{}
 	if err := c.BindAndValidate(&req); err != nil {
@@ -36,7 +36,7 @@ func (handler *UserHandler) GetUsers(_c echo.Context) error {
 		Limit:            optional.Int64From((*int64)(req.Limit)),
 	}
 
-	users, err := handler.srv.GetUsers(ctx, &args)
+	users, err := h.srv.GetUsers(ctx, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -50,7 +50,7 @@ func (handler *UserHandler) GetUsers(_c echo.Context) error {
 }
 
 // GetUser GET /users/:userID
-func (handler *UserHandler) GetUser(_c echo.Context) error {
+func (h *UserHandler) GetUser(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -59,7 +59,7 @@ func (handler *UserHandler) GetUser(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	user, err := handler.srv.GetUser(ctx, userID)
+	user, err := h.srv.GetUser(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -78,7 +78,7 @@ func (handler *UserHandler) GetUser(_c echo.Context) error {
 }
 
 // UpdateUser PATCH /users/:userID
-func (handler *UserHandler) UpdateUser(_c echo.Context) error {
+func (h *UserHandler) UpdateUser(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -97,14 +97,14 @@ func (handler *UserHandler) UpdateUser(_c echo.Context) error {
 		Check:       optional.BoolFrom(req.Check),
 	}
 
-	if err := handler.srv.Update(ctx, userID, &u); err != nil {
+	if err := h.srv.Update(ctx, userID, &u); err != nil {
 		return convertError(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetUserAccounts GET /users/:userID/accounts
-func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
+func (h *UserHandler) GetUserAccounts(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -112,7 +112,7 @@ func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	accounts, err := handler.srv.GetAccounts(userID)
+	accounts, err := h.srv.GetAccounts(userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -126,7 +126,7 @@ func (handler *UserHandler) GetUserAccounts(_c echo.Context) error {
 }
 
 // GetUserAccount GET /users/:userID/accounts/:accountID
-func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
+func (h *UserHandler) GetUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -139,7 +139,7 @@ func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	account, err := handler.srv.GetAccount(userID, accountID)
+	account, err := h.srv.GetAccount(userID, accountID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -148,7 +148,7 @@ func (handler *UserHandler) GetUserAccount(_c echo.Context) error {
 }
 
 // AddUserAccount POST /users/:userID/accounts
-func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
+func (h *UserHandler) AddUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -168,7 +168,7 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
-	account, err := handler.srv.CreateAccount(ctx, userID, &args)
+	account, err := h.srv.CreateAccount(ctx, userID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -177,7 +177,7 @@ func (handler *UserHandler) AddUserAccount(_c echo.Context) error {
 }
 
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
-func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
+func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -203,7 +203,7 @@ func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
 		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
 	}
 
-	err = handler.srv.EditAccount(ctx, userID, accountID, &args)
+	err = h.srv.EditAccount(ctx, userID, accountID, &args)
 	if err != nil {
 		return convertError(err)
 	}
@@ -212,7 +212,7 @@ func (handler *UserHandler) EditUserAccount(_c echo.Context) error {
 }
 
 // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
-func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
+func (h *UserHandler) DeleteUserAccount(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -226,7 +226,7 @@ func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := handler.srv.DeleteAccount(ctx, userID, accountID); err != nil {
+	if err := h.srv.DeleteAccount(ctx, userID, accountID); err != nil {
 		return convertError(err)
 	}
 
@@ -234,7 +234,7 @@ func (handler *UserHandler) DeleteUserAccount(_c echo.Context) error {
 }
 
 // GetUserProjects GET /users/:userID/projects
-func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
+func (h *UserHandler) GetUserProjects(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -243,7 +243,7 @@ func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	projects, err := handler.srv.GetUserProjects(ctx, userID)
+	projects, err := h.srv.GetUserProjects(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -261,7 +261,7 @@ func (handler *UserHandler) GetUserProjects(_c echo.Context) error {
 }
 
 // GetUserContests GET /users/:userID/contests
-func (handler *UserHandler) GetUserContests(_c echo.Context) error {
+func (h *UserHandler) GetUserContests(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -270,16 +270,20 @@ func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contests, err := handler.srv.GetUserContests(ctx, userID)
+	contests, err := h.srv.GetUserContests(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
 
-	res := make([]ContestTeamWithContestName, len(contests))
-	for i, v := range contests {
-		res[i] = newContestTeamWithContestName(
-			newContestTeam(v.ID, v.Name, v.Result),
-			v.ContestName,
+	res := make([]UserContest, len(contests))
+	for i, c := range contests {
+		teams := make([]ContestTeam, len(c.Teams))
+		for j, ct := range c.Teams {
+			teams[j] = newContestTeam(ct.ID, ct.Name, ct.Result)
+		}
+		res[i] = newUserContest(
+			newContest(c.ID, c.Name, c.TimeStart, c.TimeEnd),
+			teams,
 		)
 	}
 
@@ -287,7 +291,7 @@ func (handler *UserHandler) GetUserContests(_c echo.Context) error {
 }
 
 // GetUserGroups GET /users/:userID/groups
-func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
+func (h *UserHandler) GetUserGroups(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -296,7 +300,7 @@ func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	groups, err := handler.srv.GetGroupsByUserID(ctx, userID)
+	groups, err := h.srv.GetGroupsByUserID(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -312,7 +316,7 @@ func (handler *UserHandler) GetUserGroups(_c echo.Context) error {
 }
 
 // GetUserEvents GET /users/:userID/events
-func (handler *UserHandler) GetUserEvents(_c echo.Context) error {
+func (h *UserHandler) GetUserEvents(_c echo.Context) error {
 	c := _c.(*Context)
 
 	userID, err := c.getID(keyUserID)
@@ -321,7 +325,7 @@ func (handler *UserHandler) GetUserEvents(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	events, err := handler.srv.GetUserEvents(ctx, userID)
+	events, err := h.srv.GetUserEvents(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -372,13 +376,12 @@ func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration
 	}
 }
 
-// TODO: UserContestのほうがいいかも
-func newContestTeamWithContestName(contestTeam ContestTeam, contestName string) ContestTeamWithContestName {
-	return ContestTeamWithContestName{
-		ContestName: contestName,
-		Id:          contestTeam.Id,
-		Name:        contestTeam.Name,
-		Result:      contestTeam.Result,
+func newUserContest(contest Contest, teams []ContestTeam) UserContest {
+	return UserContest{
+		Id:       contest.Id,
+		Name:     contest.Name,
+		Duration: contest.Duration,
+		Teams:    teams,
 	}
 }
 
