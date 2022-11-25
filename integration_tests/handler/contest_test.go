@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -84,12 +85,11 @@ func TestGetContest(t *testing.T) {
 // CreateContest POST /contests
 func TestCreateContest(t *testing.T) {
 	var (
-		name         = random.AlphaNumeric()
-		link         = random.RandURLString()
-		description  = random.AlphaNumeric()
-		since, until = random.SinceAndUntil()
-		//tooLongStringは260文字
-		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		name          = random.AlphaNumeric()
+		link          = random.RandURLString()
+		description   = random.AlphaNumeric()
+		since, until  = random.SinceAndUntil()
+		tooLongString = strings.Repeat("a", 260)
 		invalidURL    = "invalid url"
 	)
 
@@ -197,14 +197,13 @@ func TestCreateContest(t *testing.T) {
 
 func TestEditContest(t *testing.T) {
 	var (
-		contest     = mockdata.CloneMockContests()[0]
-		description = contest.Description
-		since       = contest.Since
-		until       = contest.Until
-		link        = contest.Link
-		name        = contest.Name
-		//tooLongStringは260文字
-		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		contest       = mockdata.CloneMockContests()[0]
+		description   = contest.Description
+		since         = contest.Since
+		until         = contest.Until
+		link          = contest.Link
+		name          = contest.Name
+		tooLongString = strings.Repeat("a", 260)
 		invalidURL    = "invalid url"
 	)
 
