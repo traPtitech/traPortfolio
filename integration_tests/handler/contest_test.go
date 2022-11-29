@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -84,12 +85,11 @@ func TestGetContest(t *testing.T) {
 // CreateContest POST /contests
 func TestCreateContest(t *testing.T) {
 	var (
-		name         = random.AlphaNumeric()
-		link         = random.RandURLString()
-		description  = random.AlphaNumeric()
-		since, until = random.SinceAndUntil()
-		//tooLongStringは260文字
-		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		name          = random.AlphaNumeric()
+		link          = random.RandURLString()
+		description   = random.AlphaNumeric()
+		since, until  = random.SinceAndUntil()
+		tooLongString = strings.Repeat("a", 260)
 		invalidURL    = "invalid url"
 	)
 
@@ -197,12 +197,14 @@ func TestCreateContest(t *testing.T) {
 
 func TestEditContest(t *testing.T) {
 	var (
-		contest     = mockdata.CloneMockContests()[0]
-		description = contest.Description
-		since       = contest.Since
-		until       = contest.Until
-		link        = contest.Link
-		name        = contest.Name
+		contest       = mockdata.CloneMockContests()[0]
+		description   = contest.Description
+		since         = contest.Since
+		until         = contest.Until
+		link          = contest.Link
+		name          = contest.Name
+		tooLongString = strings.Repeat("a", 260)
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
@@ -231,6 +233,47 @@ func TestEditContest(t *testing.T) {
 			mockdata.ContestID1(),
 			handler.EditContestJSONRequestBody{},
 			nil,
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.EditContestJSONRequestBody{},
+			testutils.HTTPError("bad request: nil id"),
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &tooLongString,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Link: &invalidURL,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Name: &tooLongString,
+			},
+			testutils.HTTPError("bad request: validate error"),
+		},
+		"400 since time is after until time": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Duration: &handler.Duration{
+					Since: until,
+					Until: &since,
+				},
+			},
+			testutils.HTTPError("bad request: validate error"),
 		},
 		"404": {
 			http.StatusNotFound,
