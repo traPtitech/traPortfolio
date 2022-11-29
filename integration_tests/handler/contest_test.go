@@ -323,6 +323,7 @@ func TestEditContest(t *testing.T) {
 
 func TestDeleteContest(t *testing.T) {
 	// #460
+	// #https://github.com/traPtitech/traPortfolio/pull/460
 	/*
 		t.Parallel()
 		tests := map[string]struct {
