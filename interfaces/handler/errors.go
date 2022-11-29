@@ -10,10 +10,7 @@ import (
 )
 
 func convertError(err error) error {
-	var (
-		code int
-		msg  string
-	)
+	var code int
 
 	switch {
 	case errors.Is(err, repository.ErrNilID):
@@ -37,13 +34,8 @@ func convertError(err error) error {
 		code = http.StatusNotFound
 
 	default:
-		code = http.StatusInternalServerError
-		msg = http.StatusText(code)
+		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
 
-	if len(msg) == 0 {
-		msg = fmt.Sprintf("%s: %s", http.StatusText(code), err.Error())
-	}
-
-	return echo.NewHTTPError(code, msg).SetInternal(err)
+	return echo.NewHTTPError(code, fmt.Sprintf("%s: %s", http.StatusText(code), err.Error()))
 }
