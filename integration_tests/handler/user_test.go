@@ -376,8 +376,8 @@ func TestAddUserAccount(t *testing.T) {
 	}
 }
 
-// EditUserJSONRequestBodyAccount PATCH /users/:userID/accounts/:accountID
-func TestEditUserJSONRequestBodyAccount(t *testing.T) {
+// EditUserAccount PATCH /users/:userID/accounts/:accountID
+func TestEditUserAccount(t *testing.T) {
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
