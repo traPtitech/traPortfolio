@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -58,12 +59,12 @@ func TestGetContest(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -84,12 +85,11 @@ func TestGetContest(t *testing.T) {
 // CreateContest POST /contests
 func TestCreateContest(t *testing.T) {
 	var (
-		name         = random.AlphaNumeric()
-		link         = random.RandURLString()
-		description  = random.AlphaNumeric()
-		since, until = random.SinceAndUntil()
-		//tooLongStringは260文字
-		tooLongString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		name          = random.AlphaNumeric()
+		link          = random.RandURLString()
+		description   = random.AlphaNumeric()
+		since, until  = random.SinceAndUntil()
+		tooLongString = strings.Repeat("a", 260)
 		invalidURL    = "invalid url"
 	)
 
@@ -133,7 +133,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
@@ -146,7 +146,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &invalidURL,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -159,7 +159,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: tooLongString,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 since time is after until time": {
 			http.StatusBadRequest,
@@ -172,7 +172,7 @@ func TestCreateContest(t *testing.T) {
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: duration: must be a valid date."),
 		},
 	}
 
@@ -197,12 +197,14 @@ func TestCreateContest(t *testing.T) {
 
 func TestEditContest(t *testing.T) {
 	var (
-		contest     = mockdata.CloneMockContests()[0]
-		description = contest.Description
-		since       = contest.Since
-		until       = contest.Until
-		link        = contest.Link
-		name        = contest.Name
+		contest       = mockdata.CloneMockContests()[0]
+		description   = contest.Description
+		since         = contest.Since
+		until         = contest.Until
+		link          = contest.Link
+		name          = contest.Name
+		tooLongString = strings.Repeat("a", 260)
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
@@ -232,6 +234,61 @@ func TestEditContest(t *testing.T) {
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			handler.EditContestJSONRequestBody{},
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Link: &invalidURL,
+			},
+			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Name: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		"400 since time is after until time": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Duration: &handler.Duration{
+					Since: until,
+					Until: &since,
+				},
+			},
+			testutils.HTTPError("Bad Request: validate error: duration: must be a valid date."),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.EditContestJSONRequestBody{
+				Description: &description,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &name,
+			},
+			testutils.HTTPError("Not Found: not found"),
+		},
 	}
 
 	e := echo.New()
@@ -256,6 +313,9 @@ func TestEditContest(t *testing.T) {
 				// Get updated response & Assert
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				testutils.AssertResponse(t, http.StatusOK, contest, res)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContest, tt.contestID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
@@ -300,25 +360,25 @@ func TestGetContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404 contestID not exist": {
 			http.StatusNotFound,
 			random.UUID(),
 			mockdata.ContestTeamID1(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 		"404 teamID not exist": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -366,7 +426,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
@@ -377,7 +437,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
@@ -388,7 +448,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 					uuid.Nil,
 				},
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 invalid member": {
 			http.StatusBadRequest,
@@ -399,7 +459,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 					random.UUID(),
 				},
 			},
-			testutils.HTTPError("bad request: argument error"),
+			testutils.HTTPError("Bad Request: argument error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,
@@ -410,7 +470,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -460,7 +520,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
@@ -472,7 +532,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
@@ -483,7 +543,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 					uuid.Nil,
 				},
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 invalid member": {
 			http.StatusBadRequest,
@@ -494,7 +554,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 					random.UUID(),
 				},
 			},
-			testutils.HTTPError("bad request: argument error"),
+			testutils.HTTPError("Bad Request: argument error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,
@@ -506,7 +566,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 

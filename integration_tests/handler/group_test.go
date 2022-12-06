@@ -64,12 +64,12 @@ func TestGetGroup(t *testing.T) {
 		"400 invalid userID": {
 			statusCode: http.StatusBadRequest,
 			groupID:    uuid.Nil,
-			want:       testutils.HTTPError("bad request: nil id"),
+			want:       testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404": {
 			statusCode: http.StatusNotFound,
 			groupID:    random.UUID(),
-			want:       testutils.HTTPError("not found: not found"),
+			want:       testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
