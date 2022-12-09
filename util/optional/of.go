@@ -18,20 +18,20 @@ import (
 // を実装する型と、一部の型についてこれらのメソッドを使用できます。
 type Of[T any] struct {
 	v     T
-	Valid bool
+	valid bool
 }
 
 func New[T any](v T, valid bool) Of[T] {
 	return Of[T]{
 		v:     v,
-		Valid: valid,
+		valid: valid,
 	}
 }
 
 func From[T any](v T) Of[T] {
 	return Of[T]{
 		v:     v,
-		Valid: true,
+		valid: true,
 	}
 }
 
@@ -42,12 +42,12 @@ func FromPtr[T any](v *T) Of[T] {
 
 	return Of[T]{
 		v:     *v,
-		Valid: true,
+		valid: true,
 	}
 }
 
 func (o Of[T]) ValueOrZero() T {
-	if o.Valid {
+	if o.valid {
 		return o.v
 	}
 	var t T
@@ -55,13 +55,13 @@ func (o Of[T]) ValueOrZero() T {
 }
 
 func (o Of[T]) V() (T, bool) {
-	return o.v, o.Valid
+	return o.v, o.valid
 }
 
 func (o *Of[T]) UnmarshalJSON(data []byte) error {
 	if bytes.Equal(data, []byte("null")) {
 		var t T
-		o.v, o.Valid = t, false
+		o.v, o.valid = t, false
 		return nil
 	}
 
@@ -69,18 +69,18 @@ func (o *Of[T]) UnmarshalJSON(data []byte) error {
 		if err := u.UnmarshalJSON(data); err != nil {
 			return err
 		}
-		o.Valid = true
+		o.valid = true
 		return nil
 	}
 	if err := jsoniter.ConfigFastest.Unmarshal(data, &o.v); err != nil {
 		return err
 	}
-	o.Valid = true
+	o.valid = true
 	return nil
 }
 
 func (o Of[T]) MarshalJSON() ([]byte, error) {
-	if !o.Valid {
+	if !o.valid {
 		return jsoniter.ConfigFastest.Marshal(nil)
 	}
 	if m, ok := any(o.v).(json.Marshaler); ok {
@@ -93,7 +93,7 @@ func (o *Of[T]) UnmarshalText(data []byte) error {
 	if len(data) == 0 || bytes.Equal(data, []byte("null")) {
 		var t T
 		o.v = t
-		o.Valid = false
+		o.valid = false
 		return nil
 	}
 
@@ -112,7 +112,7 @@ func (o *Of[T]) UnmarshalText(data []byte) error {
 		default:
 			return fmt.Errorf("invalid bool value: %s", s)
 		}
-		o.v, o.Valid = any(v).(T), valid
+		o.v, o.valid = any(v).(T), valid
 		return nil
 	case int:
 		var v int
@@ -127,7 +127,7 @@ func (o *Of[T]) UnmarshalText(data []byte) error {
 			}
 			v, valid = n, true
 		}
-		o.v, o.Valid = any(v).(T), valid
+		o.v, o.valid = any(v).(T), valid
 		return nil
 	case string:
 		var v string
@@ -138,7 +138,7 @@ func (o *Of[T]) UnmarshalText(data []byte) error {
 		default:
 			v, valid = s, true
 		}
-		o.v, o.Valid = any(v).(T), valid
+		o.v, o.valid = any(v).(T), valid
 		return nil
 	default:
 		t, ok := any(&o.v).(encoding.TextUnmarshaler)
@@ -148,13 +148,13 @@ func (o *Of[T]) UnmarshalText(data []byte) error {
 		if err := t.UnmarshalText(data); err != nil {
 			return err
 		}
-		o.Valid = true
+		o.valid = true
 		return nil
 	}
 }
 
 func (o Of[T]) MarshalText() ([]byte, error) {
-	if !o.Valid {
+	if !o.valid {
 		return []byte{}, nil
 	}
 
@@ -184,28 +184,28 @@ func (o *Of[T]) Scan(src any) error {
 		if err := b.Scan(src); err != nil {
 			return err
 		}
-		o.v, o.Valid = any(b.Bool).(T), b.Valid
+		o.v, o.valid = any(b.Bool).(T), b.Valid
 		return nil
 	case int:
 		var i sql.NullInt64
 		if err := i.Scan(src); err != nil {
 			return err
 		}
-		o.v, o.Valid = any(int(i.Int64)).(T), i.Valid
+		o.v, o.valid = any(int(i.Int64)).(T), i.Valid
 		return nil
 	case string:
 		var s sql.NullString
 		if err := s.Scan(src); err != nil {
 			return err
 		}
-		o.v, o.Valid = any(s.String).(T), s.Valid
+		o.v, o.valid = any(s.String).(T), s.Valid
 		return nil
 	case time.Time:
 		var t sql.NullTime
 		if err := t.Scan(src); err != nil {
 			return err
 		}
-		o.v, o.Valid = any(t.Time).(T), t.Valid
+		o.v, o.valid = any(t.Time).(T), t.Valid
 		return nil
 	default:
 		s, ok := any(&o.v).(sql.Scanner)
@@ -215,13 +215,13 @@ func (o *Of[T]) Scan(src any) error {
 		if err := s.Scan(src); err != nil {
 			return err
 		}
-		o.Valid = true
+		o.valid = true
 		return nil
 	}
 }
 
 func (o Of[T]) Value() (driver.Value, error) {
-	if !o.Valid {
+	if !o.valid {
 		return nil, nil
 	}
 	switch v := any(o.v).(type) {
