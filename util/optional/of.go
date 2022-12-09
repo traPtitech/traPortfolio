@@ -29,6 +29,10 @@ func New[T any](v T, valid bool) Of[T] {
 }
 
 func From[T any](v T) Of[T] {
+	if fmt.Sprintf("%T", v)[0] == '*' {
+		panic("optional: From[T](v T): T must not be a pointer type, use FromPtr[T](v *T) instead")
+	}
+
 	return Of[T]{
 		v:     v,
 		valid: true,
