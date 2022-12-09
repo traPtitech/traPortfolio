@@ -32,7 +32,7 @@ type (
 	Config struct {
 		IsProduction   bool `mapstructure:"production"`
 		Port           int  `mapstructure:"port"`
-		Migrate        bool `mapstructure:"migrate"`
+		OnlyMigrate    bool `mapstructure:"onlyMigrate"`
 		InsertMockData bool `mapstructure:"insertMockData"`
 
 		DB     SQLConfig    `mapstructure:"db"`
@@ -67,7 +67,7 @@ type (
 func init() {
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", defaultAppPort, "api port")
-	pflag.Bool("migrate", false, "run with migrate mode")
+	pflag.Bool("only-migrate", false, "only migrate db (not start server)")
 	pflag.Bool("insert-mock-data", false, "insert sample mock data(for dev)")
 
 	pflag.String("db-user", "", "db user name")
@@ -94,7 +94,7 @@ func Parse() {
 func ReadFromFile() {
 	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
 	_ = viper.BindPFlag("port", pflag.Lookup("port"))
-	_ = viper.BindPFlag("migration", pflag.Lookup("migration"))
+	_ = viper.BindPFlag("onlyMigrate", pflag.Lookup("only-migrate"))
 	_ = viper.BindPFlag("insertMockData", pflag.Lookup("insert-mock-data"))
 
 	_ = viper.BindPFlag("db.user", pflag.Lookup("db-user"))
@@ -187,8 +187,8 @@ func (c *Config) Addr() string {
 	return fmt.Sprintf(":%d", c.Port)
 }
 
-func (c *Config) IsMigrate() bool {
-	return c.Migrate
+func (c *Config) IsOnlyMigrate() bool {
+	return c.OnlyMigrate
 }
 
 func (c *Config) InsertMock() bool {
