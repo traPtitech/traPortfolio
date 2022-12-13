@@ -323,33 +323,6 @@ func TestEditContest(t *testing.T) {
 
 func TestDeleteContest(t *testing.T) {
 	// https://github.com/traPtitech/traPortfolio/issues/460
-	/*
-		t.Parallel()
-		tests := map[string]struct {
-			statusCode int
-			contestID  uuid.UUID
-			want       interface{}
-		}{
-			"204": {
-				http.StatusNoContent,
-				mockdata.ContestID1(),
-				nil,
-			},
-		}
-
-		e := echo.New()
-		conf := testutils.GetConfigWithDBName("contest_handler_delete_contest")
-		api, err := testutils.SetupRoutes(t, e, conf)
-		assert.NoError(t, err)
-		for name, tt := range tests {
-			tt := tt
-			t.Run(name, func(t *testing.T) {
-				t.Parallel()
-				res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Contest.DeleteContest, tt.contestID), nil)
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-			})
-		}
-	*/
 }
 
 func TestGetContestTeam(t *testing.T) {
