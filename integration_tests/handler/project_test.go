@@ -57,12 +57,12 @@ func TestGetProject(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -118,7 +118,7 @@ func TestCreateProject(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 empty name": {
 			http.StatusBadRequest,
@@ -127,7 +127,7 @@ func TestCreateProject(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: name: cannot be blank."),
 		},
 		"400 empty description": {
 			http.StatusBadRequest,
@@ -136,7 +136,7 @@ func TestCreateProject(t *testing.T) {
 				Link:     &link,
 				Duration: duration,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: description: cannot be blank."),
 		},
 		"400 empty duration": {
 			http.StatusBadRequest,
@@ -145,7 +145,7 @@ func TestCreateProject(t *testing.T) {
 				Link:        &link,
 				Description: description,
 			},
-			testutils.HTTPError("bad request: argument error"),
+			testutils.HTTPError("Bad Request: argument error"),
 		},
 	}
 
@@ -205,13 +205,13 @@ func TestEditProject(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.EditProjectJSONRequestBody{},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
 			handler.EditProjectJSONRequestBody{},
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -264,7 +264,7 @@ func TestGetProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 	}
 
@@ -319,7 +319,7 @@ func TestAddProjectMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.AddProjectMembersJSONRequestBody{},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 	}
 
@@ -363,7 +363,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{userID1},
 			},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
@@ -371,13 +371,13 @@ func TestDeleteProjectMembers(t *testing.T) {
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{uuid.Nil},
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 empty members": {
 			http.StatusBadRequest,
 			random.UUID(),
 			handler.DeleteProjectMembersJSONRequestBody{},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: members: cannot be blank."),
 		},
 		"400 empty memberIDs": {
 			http.StatusBadRequest,
@@ -385,7 +385,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{},
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: members: cannot be blank."),
 		},
 		"404 not found": {
 			http.StatusNotFound,
@@ -393,7 +393,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 			handler.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{userID1},
 			},
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
