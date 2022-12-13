@@ -10,6 +10,8 @@ import (
 )
 
 func convertError(err error) error {
+	var code int
+
 	switch {
 	case errors.Is(err, repository.ErrNilID):
 		fallthrough
@@ -20,18 +22,20 @@ func convertError(err error) error {
 	case errors.Is(err, repository.ErrBind):
 		fallthrough
 	case errors.Is(err, repository.ErrValidate):
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("bad request: %w", err).Error())
+		code = http.StatusBadRequest
 
 	case errors.Is(err, repository.ErrAlreadyExists):
-		return echo.NewHTTPError(http.StatusConflict, fmt.Errorf("conflicts: %w", err).Error())
+		code = http.StatusConflict
 
 	case errors.Is(err, repository.ErrForbidden):
-		return echo.NewHTTPError(http.StatusForbidden, fmt.Errorf("forbideen: %w", err).Error())
+		code = http.StatusForbidden
 
 	case errors.Is(err, repository.ErrNotFound):
-		return echo.NewHTTPError(http.StatusNotFound, fmt.Errorf("not found: %w", err).Error())
+		code = http.StatusNotFound
 
 	default:
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("%w", err).Error())
+		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
+
+	return echo.NewHTTPError(code, fmt.Sprintf("%s: %s", http.StatusText(code), err.Error()))
 }

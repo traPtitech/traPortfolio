@@ -59,12 +59,12 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
