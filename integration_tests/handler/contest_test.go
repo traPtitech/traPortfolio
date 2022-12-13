@@ -322,8 +322,7 @@ func TestEditContest(t *testing.T) {
 }
 
 func TestDeleteContest(t *testing.T) {
-	// #460
-	// #https://github.com/traPtitech/traPortfolio/pull/460
+	// https://github.com/traPtitech/traPortfolio/issues/460
 }
 
 func TestGetContestTeam(t *testing.T) {
