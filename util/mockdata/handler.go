@@ -79,18 +79,11 @@ func CloneHandlerMockContests() []handler.Contest {
 
 func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeam {
 	var (
-		mContestTeams              = CloneMockContestTeams()
-		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
-		hContestTeamsByID          = make(map[uuid.UUID][]handler.ContestTeam)
+		mContestTeams     = CloneMockContestTeams()
+		hContestTeamsByID = make(map[uuid.UUID][]handler.ContestTeam)
 	)
 
 	for _, ct := range mContestTeams {
-		hUsers := make([]handler.User, len(mContestTeamUserBelongings))
-		for _, u := range mContestTeamUserBelongings {
-			if u.TeamID == ct.ID {
-				hUsers = append(hUsers, getUser(u.UserID))
-			}
-		}
 		hContestTeamsByID[ct.ContestID] = append(hContestTeamsByID[ct.ContestID], handler.ContestTeam{
 			Id:     ct.ID,
 			Name:   ct.Name,
