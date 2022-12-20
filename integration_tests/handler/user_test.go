@@ -34,10 +34,7 @@ func TestGetUsers(t *testing.T) {
 			handler.GetUsersParams{},
 			[]handler.User{
 				mockdata.HMockUsers[0],
-				{
-					Id:   mockdata.MockUsers[2].ID,
-					Name: mockdata.MockUsers[2].Name,
-				},
+				mockdata.HMockUsers[2],
 			},
 		},
 		"200 with includeSuspended": {
@@ -48,10 +45,7 @@ func TestGetUsers(t *testing.T) {
 			[]handler.User{
 				mockdata.HMockUsers[0],
 				mockdata.HMockUsers[1],
-				{
-					Id:   mockdata.MockUsers[2].ID,
-					Name: mockdata.MockUsers[2].Name,
-				},
+				mockdata.HMockUsers[2],
 			},
 		},
 		"200 with name": {

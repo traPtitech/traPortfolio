@@ -108,7 +108,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				hHost := []User{}
 
 				for i := 0; i < hostnum; i++ {
-					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true)
+					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					hhost := User{
 						Id:       rhost.ID,
 						Name:     rhost.Name,
