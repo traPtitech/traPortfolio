@@ -326,6 +326,31 @@ func TestDeleteContest(t *testing.T) {
 }
 
 func TestGetContestTeam(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		want       interface{}
+	}{
+		"200": {
+			http.StatusOK,
+			mockdata.ContestID1(),
+			mockdata.CloneHandlerMockContestTeamsByID()[mockdata.ContestID1()],
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_get_contest_team")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeams, tt.contestID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
 }
 
 func TestAddContestTeam(t *testing.T) {
