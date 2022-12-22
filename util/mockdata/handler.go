@@ -6,24 +6,23 @@ import (
 )
 
 var (
-	HMockContestDetails          = CloneHandlerMockContestDetails()
-	HMockContests                = CloneHandlerMockContests()
-	HMockContestTeamsByID        = CloneHandlerMockContestTeamsByID()
-	HMockContestTeamsDetailsByID = CloneHandlerMockContestTeamsDetailsByID()
-	HMockEvents                  = CloneHandlerMockEvents()
-	HMockEventDetails            = CloneHandlerMockEventDetails()
-	HMockGroups                  = CloneHandlerMockGroups()
-	HMockGroupMembersByID        = CloneHandlerMockGroupMembersByID()
-	HMockProjects                = CloneHandlerMockProjects()
-	HMockProjectDetails          = CloneHandlerMockProjectDetails()
-	HMockProjectMembers          = CloneHandlerMockProjectMembers()
-	HMockUsers                   = CloneHandlerMockUsers()
-	HMockUserDetails             = CloneHandlerMockUserDetails()
-	HMockUserAccountsByID        = CloneHandlerMockUserAccountsByID()
-	HMockUserEvents              = CloneHandlerMockUserEvents()
-	HMockUserContestsByID        = CloneHandlerMockUserContestsByID()
-	HMockUserGroupsByID          = CloneHandlerMockUserGroupsByID()
-	HMockUserProjects            = CloneHandlerMockUserProjects()
+	HMockContestDetails   = CloneHandlerMockContestDetails()
+	HMockContests         = CloneHandlerMockContests()
+	HMockContestTeamsByID = CloneHandlerMockContestTeamsByID()
+	HMockEvents           = CloneHandlerMockEvents()
+	HMockEventDetails     = CloneHandlerMockEventDetails()
+	HMockGroups           = CloneHandlerMockGroups()
+	HMockGroupMembersByID = CloneHandlerMockGroupMembersByID()
+	HMockProjects         = CloneHandlerMockProjects()
+	HMockProjectDetails   = CloneHandlerMockProjectDetails()
+	HMockProjectMembers   = CloneHandlerMockProjectMembers()
+	HMockUsers            = CloneHandlerMockUsers()
+	HMockUserDetails      = CloneHandlerMockUserDetails()
+	HMockUserAccountsByID = CloneHandlerMockUserAccountsByID()
+	HMockUserEvents       = CloneHandlerMockUserEvents()
+	HMockUserContestsByID = CloneHandlerMockUserContestsByID()
+	HMockUserGroupsByID   = CloneHandlerMockUserGroupsByID()
+	HMockUserProjects     = CloneHandlerMockUserProjects()
 )
 
 func CloneHandlerMockContestDetails() []handler.ContestDetail {
@@ -91,32 +90,6 @@ func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeam {
 		})
 	}
 	return hContestTeamsByID
-}
-
-func CloneHandlerMockContestTeamsDetailsByID() map[uuid.UUID][]handler.ContestTeamDetail {
-	var (
-		mContestTeams              = CloneMockContestTeams()
-		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
-		hContestTeamDetails        = make(map[uuid.UUID][]handler.ContestTeamDetail)
-	)
-
-	for _, ct := range mContestTeams {
-		hUsers := make([]handler.User, len(mContestTeamUserBelongings))
-		for _, u := range mContestTeamUserBelongings {
-			if u.TeamID == ct.ID {
-				hUsers = append(hUsers, getUser(u.UserID))
-			}
-		}
-		hContestTeamDetails[ct.ContestID] = append(hContestTeamDetails[ct.ContestID], handler.ContestTeamDetail{
-			Description: ct.Description,
-			Id:          ct.ID,
-			Link:        ct.Link,
-			Members:     hUsers,
-			Name:        ct.Name,
-			Result:      ct.Result,
-		})
-	}
-	return hContestTeamDetails
 }
 
 func CloneHandlerMockEvents() []handler.Event {
