@@ -1,6 +1,7 @@
 package random
 
 import (
+	"fmt"
 	"math/rand"
 	"net/url"
 	"sort"
@@ -88,7 +89,10 @@ func RandURLString() string {
 }
 
 func RandAccountURLString(accountType uint) string {
-	return "https://" + domain.URLPrefix[accountType] + AlphaNumeric()
+	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
+		return fmt.Sprintf("https://%s", AlphaNumeric())
+	}
+	return fmt.Sprintf("https://%s/%s", domain.URLPrefix[accountType].URL, AlphaNumeric())
 }
 
 func Duration() domain.YearWithSemesterDuration {

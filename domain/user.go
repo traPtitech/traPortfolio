@@ -60,6 +60,11 @@ type UserGroup struct {
 	Duration YearWithSemesterDuration
 }
 
+type AccountURL struct {
+	URL    string
+	Regexp string
+}
+
 const (
 	HOMEPAGE uint = iota
 	BLOG
@@ -76,19 +81,19 @@ const (
 	AccountLimit
 )
 
-var URLPrefix = map[uint]string{
-	HOMEPAGE:   "",
-	BLOG:       "",
-	TWITTER:    "twitter.com/",
-	FACEBOOK:   "www.facebook.com/",
-	PIXIV:      "www.pixiv.net/users/",
-	GITHUB:     "github.com/",
-	QIITA:      "qiita.com/",
-	ZENN:       "zenn.dev/",
-	ATCODER:    "atcoder.jp/users/",
-	SOUNDCLOUD: "soundcloud.com/",
-	HACKTHEBOX: "app.hackthebox.com/users/",
-	CTFTIME:    "ctftime.org/user/",
+var URLPrefix = map[uint]AccountURL{
+	HOMEPAGE:   {"", ""},
+	BLOG:       {"", ""},
+	TWITTER:    {"twitter.com", "[a-zA-Z0-9_]+"},
+	FACEBOOK:   {"www.facebook.com", "[a-zA-Z0-9.]+"},
+	PIXIV:      {"www.pixiv.net/users", "[0-9]+"},
+	GITHUB:     {"github.com", "[a-zA-Z0-9-]+"},
+	QIITA:      {"qiita.com", "[a-zA-Z0-9-_]+"},
+	ZENN:       {"zenn.dev", "[a-zA-Z0-9.]+"},
+	ATCODER:    {"atcoder.jp/users", "[a-zA-Z0-9_]+"},
+	SOUNDCLOUD: {"soundcloud.com", "[a-z0-9-_]+"},
+	HACKTHEBOX: {"app.hackthebox.com/users", "[a-zA-Z0-9]+"},
+	CTFTIME:    {"ctftime.org/user", "[0-9]+"},
 }
 
 type TraQState uint8

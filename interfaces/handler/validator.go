@@ -62,8 +62,8 @@ func (p GetUsersParams) Validate() error {
 
 func (r AddAccountRequest) Validate() error {
 	var vdRuleAccountURLMatch vd.Rule
-	regexpText := fmt.Sprintf("^https://%s[^/]+$", domain.URLPrefix[uint(r.Type)])
-	if r.Type == 0 || r.Type == 1 {
+	regexpText := fmt.Sprintf("^https://%s/%s$", domain.URLPrefix[uint(r.Type)].URL, domain.URLPrefix[uint(r.Type)].Regexp)
+	if r.Type == AccountType(domain.HOMEPAGE) || r.Type == AccountType(domain.BLOG) {
 		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
 	} else {
 		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(regexpText))
@@ -112,8 +112,8 @@ func (r CreateProjectRequest) Validate() error {
 
 func (r EditUserAccountRequest) Validate() error {
 	var vdRuleAccountURLMatch vd.Rule
-	regexpText := fmt.Sprintf("^https://%s[^/]+$", domain.URLPrefix[uint(*r.Type)])
-	if *r.Type == 0 || *r.Type == 1 {
+	regexpText := fmt.Sprintf("^https://%s/%s$", domain.URLPrefix[uint(*r.Type)].URL, domain.URLPrefix[uint(*r.Type)].Regexp)
+	if *r.Type == AccountType(domain.HOMEPAGE) || *r.Type == AccountType(domain.BLOG) {
 		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
 	} else {
 		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(regexpText))
