@@ -19,7 +19,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if appConf.IsMigrate() {
+	if appConf.IsOnlyMigrate() {
 		log.Println("migration finished")
 		return
 	}

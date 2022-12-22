@@ -339,7 +339,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(),
 		Description:   random.AlphaNumeric(),
-		Link:          optional.NewString(random.RandURLString(), true),
+		Link:          random.OptURLStringNotNull(),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
 		UntilYear:     duration.Until.Year,
@@ -397,7 +397,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -456,9 +456,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Name:          random.OptAlphaNumericNotNull(),
+					Description:   random.OptAlphaNumericNotNull(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
@@ -480,9 +480,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Name:          random.OptAlphaNumericNotNull(),
+					Description:   random.OptAlphaNumericNotNull(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),

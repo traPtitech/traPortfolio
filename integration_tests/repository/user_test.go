@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"math/rand"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -369,7 +368,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
-		Type:        optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), random.Bool()),
+		Type:        random.OptInt64n(int64(domain.AccountLimit)),
 		URL:         random.OptAlphaNumeric(),
 		PrPermitted: random.OptBool(),
 	}
@@ -485,15 +484,15 @@ func TestUserRepository_GetContests(t *testing.T) {
 	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
 	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
-	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, &team1.ContestTeam), newUserContest(&contest2.Contest, &team2.ContestTeam)}
-	projects1, err := userRepo.GetContests(user1.ID)
+	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam}), newUserContest(&contest2.Contest, []*domain.ContestTeam{&team2.ContestTeam})}
+	contests1, err := userRepo.GetContests(user1.ID)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected1, projects1)
+	assert.ElementsMatch(t, expected1, contests1)
 
-	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, &team1.ContestTeam)}
-	projects2, err := userRepo.GetContests(user2.ID)
+	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam})}
+	contests2, err := userRepo.GetContests(user2.ID)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected2, projects2)
+	assert.ElementsMatch(t, expected2, contests2)
 }
 
 // func TestUserRepository_GetGroupsByUserID(t *testing.T) {
@@ -517,11 +516,12 @@ func newUserProject(args *urepository.CreateProjectMemberArgs, project *domain.P
 	}
 }
 
-func newUserContest(contest *domain.Contest, team *domain.ContestTeam) *domain.UserContest {
+func newUserContest(contest *domain.Contest, teams []*domain.ContestTeam) *domain.UserContest {
 	return &domain.UserContest{
-		ID:          team.ID,
-		Name:        team.Name,
-		Result:      team.Result,
-		ContestName: contest.Name,
+		ID:        contest.ID,
+		Name:      contest.Name,
+		TimeStart: contest.TimeStart,
+		TimeEnd:   contest.TimeEnd,
+		Teams:     teams,
 	}
 }

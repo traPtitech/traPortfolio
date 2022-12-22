@@ -201,7 +201,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero(), anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
@@ -209,7 +209,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WithArgs(anyUUID{}).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
-							AddRow(uuid.Nil, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until),
+							AddRow(uuid.Nil, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero()),
 					)
 			},
 			assertion: assert.NoError,
@@ -220,7 +220,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -230,7 +230,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero(), anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -242,7 +242,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       sampleTime,
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -252,7 +252,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contests` (`id`,`name`,`description`,`link`,`since`,`until`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link, args.args.Since, args.args.Until, anyTime{}, anyTime{}).
+					WithArgs(anyUUID{}, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero(), anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
@@ -301,9 +301,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Name:        random.OptAlphaNumericNotNull(),
+					Description: random.OptAlphaNumericNotNull(),
+					Link:        random.OptURLStringNotNull(),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -337,9 +337,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Name:        random.OptAlphaNumericNotNull(),
+					Description: random.OptAlphaNumericNotNull(),
+					Link:        random.OptURLStringNotNull(),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -359,9 +359,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Name:        random.OptAlphaNumericNotNull(),
+					Description: random.OptAlphaNumericNotNull(),
+					Link:        random.OptURLStringNotNull(),
 					Since:       optional.NewTime(sampleTime, true),
 					Until:       optional.NewTime(sampleTime, true),
 				},
@@ -659,8 +659,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      optional.NewString(random.AlphaNumeric(), true),
-		Link:        optional.NewString(random.RandURLString(), true),
+		Result:      random.OptAlphaNumericNotNull(),
+		Link:        random.OptURLStringNotNull(),
 		Description: random.AlphaNumeric(),
 	}
 
@@ -709,8 +709,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Result:      random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -763,10 +763,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumericNotNull(),
+					Description: random.OptAlphaNumericNotNull(),
+					Link:        random.OptURLStringNotNull(),
+					Result:      random.OptAlphaNumericNotNull(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -799,10 +799,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumericNotNull(),
+					Description: random.OptAlphaNumericNotNull(),
+					Link:        random.OptURLStringNotNull(),
+					Result:      random.OptAlphaNumericNotNull(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -820,10 +820,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumericNotNull(),
+					Description: random.OptAlphaNumericNotNull(),
+					Link:        random.OptURLStringNotNull(),
+					Result:      random.OptAlphaNumericNotNull(),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {

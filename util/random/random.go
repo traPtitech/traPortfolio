@@ -130,8 +130,20 @@ func OptBool() optional.Bool {
 	return optional.NewBool(Bool(), Bool())
 }
 
+func OptBoolNotNull() optional.Bool {
+	return optional.NewBool(Bool(), true)
+}
+
 func OptInt64() optional.Int64 {
 	return optional.NewInt64(rand.Int63(), Bool())
+}
+
+func OptInt64n(n int64) optional.Int64 {
+	return optional.NewInt64(rand.Int63n(n), Bool())
+}
+
+func OptInt64nNotNull(n int64) optional.Int64 {
+	return optional.NewInt64(rand.Int63n(n), true)
 }
 
 func OptAlphaNumericn(n int) optional.String {
@@ -142,10 +154,18 @@ func OptAlphaNumeric() optional.String {
 	return optional.NewString(AlphaNumeric(), Bool())
 }
 
+func OptAlphaNumericNotNull() optional.String {
+	return optional.NewString(AlphaNumeric(), true)
+}
+
 func OptTime() optional.Time {
 	return optional.NewTime(Time(), Bool())
 }
 
 func OptURLString() optional.String {
 	return optional.NewString(RandURLString(), Bool())
+}
+
+func OptURLStringNotNull() optional.String {
+	return optional.NewString(RandURLString(), true)
 }
