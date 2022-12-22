@@ -887,14 +887,11 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONRequestBody, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit)))
 
 				argsName := "" // empty but not nil
-				argsType := AccountType(accountType)
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,
-					Type:        &argsType,
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -926,14 +923,11 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONRequestBody, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit)))
 
 				argsURL := random.AlphaNumeric()
-				argsType := AccountType(accountType)
 
 				reqBody := EditUserAccountJSONRequestBody{
-					Url:  &argsURL,
-					Type: &argsType,
+					Url: &argsURL,
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
