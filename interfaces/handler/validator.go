@@ -2,8 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
-	"regexp"
 
 	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -61,13 +59,7 @@ func (p GetUsersParams) Validate() error {
 // request body structs
 
 func (r AddAccountRequest) Validate() error {
-	var vdRuleAccountURLMatch vd.Rule
-	regexpText := fmt.Sprintf("^https://%s/%s$", domain.URLPrefix[uint(r.Type)].URL, domain.URLPrefix[uint(r.Type)].Regexp)
-	if r.Type == AccountType(domain.HOMEPAGE) || r.Type == AccountType(domain.BLOG) {
-		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
-	} else {
-		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(regexpText))
-	}
+	vdRuleAccountURLMatch := domain.AccountType(r.Type).URLValidate()
 
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
@@ -111,13 +103,7 @@ func (r CreateProjectRequest) Validate() error {
 }
 
 func (r EditUserAccountRequest) Validate() error {
-	var vdRuleAccountURLMatch vd.Rule
-	regexpText := fmt.Sprintf("^https://%s/%s$", domain.URLPrefix[uint(*r.Type)].URL, domain.URLPrefix[uint(*r.Type)].Regexp)
-	if *r.Type == AccountType(domain.HOMEPAGE) || *r.Type == AccountType(domain.BLOG) {
-		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(""))
-	} else {
-		vdRuleAccountURLMatch = vd.Match(regexp.MustCompile(regexpText))
-	}
+	vdRuleAccountURLMatch := domain.AccountType(*r.Type).URLValidate()
 
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),

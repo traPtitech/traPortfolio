@@ -1,8 +1,11 @@
 package domain
 
 import (
+	"fmt"
+	"regexp"
 	"time"
 
+	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofrs/uuid"
 )
 
@@ -68,6 +71,17 @@ type AccountURL struct {
 	Regexp string
 }
 
+type AccountType uint8
+
+func (t AccountType) URLValidate() vd.MatchRule {
+	regexpText := fmt.Sprintf("^https?://%s/%s$", URLRegexp[uint(t)].URL, URLRegexp[uint(t)].Regexp)
+	if t == AccountType(HOMEPAGE) || t == AccountType(BLOG) {
+		return vd.Match(regexp.MustCompile("^https?://.+$"))
+	} else {
+		return vd.Match(regexp.MustCompile(regexpText))
+	}
+}
+
 const (
 	HOMEPAGE uint = iota
 	BLOG
@@ -84,7 +98,7 @@ const (
 	AccountLimit
 )
 
-var URLPrefix = map[uint]AccountURL{
+var URLRegexp = map[uint]AccountURL{
 	HOMEPAGE:   {"", ""},
 	BLOG:       {"", ""},
 	TWITTER:    {"twitter.com", "[a-zA-Z0-9_]+"},
