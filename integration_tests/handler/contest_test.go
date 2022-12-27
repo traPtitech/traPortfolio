@@ -337,6 +337,16 @@ func TestGetContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			mockdata.CloneHandlerMockContestTeamsByID()[mockdata.ContestID1()],
 		},
+		"400 invalid userID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			testutils.HTTPError("Not Found: not found"),
+		},
 	}
 
 	e := echo.New()
