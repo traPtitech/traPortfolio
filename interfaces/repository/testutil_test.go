@@ -111,10 +111,10 @@ func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
 	return res
 }
 
-func makePortalUser(user *domain.User) *external.PortalUserResponse {
+func makePortalUser(t *testing.T, user *domain.User) *external.PortalUserResponse {
 	return &external.PortalUserResponse{
 		TraQID:         user.Name,
-		RealName:       user.RealName(),
+		RealName:       user.RealNameForTest(t),
 		AlphabeticName: random.AlphaNumeric(),
 	}
 }
