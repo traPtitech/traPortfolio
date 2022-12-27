@@ -42,7 +42,7 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 
 	res := make([]User, len(users))
 	for i, v := range users {
-		res[i] = newUser(v.ID, v.Name, v.RealName)
+		res[i] = newUser(v.ID, v.Name, v.RealName())
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -69,7 +69,7 @@ func (h *UserHandler) GetUser(_c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
-		newUser(user.ID, user.Name, user.RealName),
+		newUser(user.ID, user.Name, user.RealName()),
 		accounts,
 		user.Bio,
 		user.State,

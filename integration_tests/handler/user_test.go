@@ -175,6 +175,9 @@ func TestUpdateUser(t *testing.T) {
 				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 				// Get updated response & Assert
+				if tt.reqBody.Check != nil && *tt.reqBody.Check == false {
+					user.RealName = ""
+				}
 				if tt.reqBody.Bio != nil {
 					user.Bio = *tt.reqBody.Bio
 				}

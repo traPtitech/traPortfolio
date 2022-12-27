@@ -112,7 +112,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 					hhost := User{
 						Id:       rhost.ID,
 						Name:     rhost.Name,
-						RealName: rhost.RealName,
+						RealName: rhost.RealName(),
 					}
 
 					rHost = append(rHost, rhost)

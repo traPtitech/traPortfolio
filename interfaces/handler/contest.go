@@ -198,7 +198,7 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 
 	members := make([]User, len(contestTeam.Members))
 	for i, v := range contestTeam.Members {
-		members[i] = newUser(v.ID, v.Name, v.RealName)
+		members[i] = newUser(v.ID, v.Name, v.RealName())
 	}
 
 	res := newContestTeamDetail(
@@ -325,7 +325,7 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 		res = append(res, &User{
 			Id:       v.ID,
 			Name:     v.Name,
-			RealName: v.RealName,
+			RealName: v.RealName(),
 		})
 	}
 	return c.JSON(http.StatusOK, res)

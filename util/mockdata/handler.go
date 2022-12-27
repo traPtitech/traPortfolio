@@ -2,6 +2,7 @@ package mockdata
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
@@ -319,10 +320,11 @@ func CloneHandlerMockUsers() []handler.User {
 	)
 
 	for i, u := range mUsers {
+		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.Check)
 		hUsers[i] = handler.User{
-			Id:       u.ID,
-			Name:     u.Name,
-			RealName: portalUsers[i].RealName,
+			Id:       d.ID,
+			Name:     d.Name,
+			RealName: d.RealName(),
 		}
 	}
 

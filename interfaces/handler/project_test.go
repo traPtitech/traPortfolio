@@ -3,10 +3,11 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"net/http"
 	"testing"
+
+	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -159,7 +160,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 						},
 						Id:       v.User.ID,
 						Name:     v.User.Name,
-						RealName: v.User.RealName,
+						RealName: v.User.RealName(),
 					})
 				}
 				reqBody := &ProjectDetail{
