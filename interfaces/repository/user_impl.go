@@ -329,7 +329,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		if !domain.AccountType(args.Type.Int64).IsValid(args.URL.String) {
 			return repository.ErrInvalidArg
 		}
-	} else {
+	} else if !args.Type.Valid && args.URL.Valid {
 		account := &model.Account{}
 		err := r.h.
 			Where(&model.Account{ID: accountID, UserID: userID}).
@@ -339,6 +339,18 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 			return convertError(err)
 		}
 		if !domain.AccountType(account.Type).IsValid(args.URL.String) {
+			return repository.ErrInvalidArg
+		}
+	} else if args.Type.Valid && !args.URL.Valid {
+		account := &model.Account{}
+		err := r.h.
+			Where(&model.Account{ID: accountID, UserID: userID}).
+			First(account).
+			Error()
+		if err != nil {
+			return convertError(err)
+		}
+		if !domain.AccountType(args.Type.Int64).IsValid(account.URL) {
 			return repository.ErrInvalidArg
 		}
 	}
