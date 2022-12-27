@@ -59,13 +59,12 @@ func (p GetUsersParams) Validate() error {
 // request body structs
 
 func (r AddAccountRequest) Validate() error {
-	vdRuleAccountURLMatch := domain.AccountType(r.Type).URLValidate()
 
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
-		vd.Field(&r.Url, vd.Required, is.URL, vdRuleAccountURLMatch),
+		vd.Field(&r.Url, vd.Required, is.URL),
 	)
 }
 
@@ -103,13 +102,12 @@ func (r CreateProjectRequest) Validate() error {
 }
 
 func (r EditUserAccountRequest) Validate() error {
-	vdRuleAccountURLMatch := domain.AccountType(*r.Type).URLValidate()
 
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
-		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL, vdRuleAccountURLMatch),
+		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
 	)
 }
 

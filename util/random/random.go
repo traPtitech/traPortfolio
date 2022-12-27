@@ -92,7 +92,7 @@ func RandAccountURLString(accountType uint) string {
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
 		return fmt.Sprintf("https://%s", AlphaNumeric())
 	}
-	return fmt.Sprintf("https://%s/%s", domain.URLPrefix[accountType].URL, AlphaNumeric())
+	return fmt.Sprintf("https://%s/%s", domain.URLRegexp[accountType].URL, AlphaNumeric())
 }
 
 func Duration() domain.YearWithSemesterDuration {
@@ -168,4 +168,8 @@ func OptURLString() optional.String {
 
 func OptURLStringNotNull() optional.String {
 	return optional.NewString(RandURLString(), true)
+}
+
+func OptAccountURLStringNotNull(accountType uint) optional.String {
+	return optional.NewString(RandAccountURLString(accountType), true)
 }

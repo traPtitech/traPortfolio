@@ -1,6 +1,7 @@
 package repository
 
 import (
+	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -272,6 +273,11 @@ func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*dom
 }
 
 func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
+	err := vd.Validate(args.URL, domain.AccountType(args.Type).URLValidate())
+	if err != nil {
+		return nil, convertError(err)
+	}
+
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
@@ -280,7 +286,7 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 		UserID: userID,
 		Check:  args.PrPermitted,
 	}
-	err := r.h.Create(&account).Error()
+	err = r.h.Create(&account).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -319,6 +325,26 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 
 	if len(changes) == 0 {
 		return nil
+	}
+
+	if args.Type.Valid {
+		err := vd.Validate(args.URL.String, domain.AccountType(args.Type.Int64).URLValidate())
+		if err != nil {
+			return convertError(err)
+		}
+	} else {
+		account := &model.Account{}
+		err := r.h.
+			Where(&model.Account{ID: accountID, UserID: userID}).
+			First(account).
+			Error()
+		if err != nil {
+			return convertError(err)
+		}
+		err = vd.Validate(args.URL.String, domain.AccountType(account.Type).URLValidate())
+		if err != nil {
+			return convertError(err)
+		}
 	}
 
 	err := r.h.Transaction(func(tx database.SQLHandler) error {
