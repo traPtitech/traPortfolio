@@ -77,9 +77,8 @@ func (t AccountType) URLValidate() vd.MatchRule {
 	regexpText := fmt.Sprintf("^https?://%s/%s$", URLRegexp[uint(t)].URL, URLRegexp[uint(t)].Regexp)
 	if t == AccountType(HOMEPAGE) || t == AccountType(BLOG) {
 		return vd.Match(regexp.MustCompile("^https?://.+$"))
-	} else {
-		return vd.Match(regexp.MustCompile(regexpText))
 	}
+	return vd.Match(regexp.MustCompile(regexpText))
 }
 
 const (
