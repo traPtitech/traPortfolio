@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"errors"
-
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -275,7 +273,7 @@ func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*dom
 
 func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
 	if !domain.AccountType(args.Type).IsValid(args.URL) {
-		return nil, errors.New("invalid account url")
+		return nil, repository.ErrInvalidArg
 	}
 
 	account := model.Account{
@@ -329,7 +327,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 
 	if args.Type.Valid && args.URL.Valid {
 		if !domain.AccountType(args.Type.Int64).IsValid(args.URL.String) {
-			return errors.New("invalid account url")
+			return repository.ErrInvalidArg
 		}
 	} else {
 		account := &model.Account{}
@@ -341,7 +339,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 			return convertError(err)
 		}
 		if !domain.AccountType(account.Type).IsValid(args.URL.String) {
-			return errors.New("invalid account url")
+			return repository.ErrInvalidArg
 		}
 	}
 
