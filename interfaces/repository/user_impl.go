@@ -1,7 +1,8 @@
 package repository
 
 import (
-	vd "github.com/go-ozzo/ozzo-validation/v4"
+	"errors"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -273,9 +274,8 @@ func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*dom
 }
 
 func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
-	err := vd.Validate(args.URL, domain.AccountType(args.Type).URLValidate())
-	if err != nil {
-		return nil, convertError(err)
+	if !domain.AccountType(args.Type).IsValid(args.URL) {
+		return nil, errors.New("invalid account type")
 	}
 
 	account := model.Account{
@@ -286,7 +286,7 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 		UserID: userID,
 		Check:  args.PrPermitted,
 	}
-	err = r.h.Create(&account).Error()
+	err := r.h.Create(&account).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -328,9 +328,8 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 	}
 
 	if args.Type.Valid && args.URL.Valid {
-		err := vd.Validate(args.URL.String, domain.AccountType(args.Type.Int64).URLValidate())
-		if err != nil {
-			return convertError(err)
+		if !domain.AccountType(args.Type.Int64).IsValid(args.URL.String) {
+			return errors.New("invalid account type")
 		}
 	} else {
 		account := &model.Account{}
@@ -341,9 +340,8 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		if err != nil {
 			return convertError(err)
 		}
-		err = vd.Validate(args.URL.String, domain.AccountType(account.Type).URLValidate())
-		if err != nil {
-			return convertError(err)
+		if !domain.AccountType(account.Type).IsValid(args.URL.String) {
+			return errors.New("invalid account type")
 		}
 	}
 

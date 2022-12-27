@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"time"
 
-	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofrs/uuid"
 )
 
@@ -73,12 +72,11 @@ type AccountURL struct {
 
 type AccountType uint8
 
-func (t AccountType) URLValidate() vd.MatchRule {
-	regexpText := fmt.Sprintf("^https?://%s/%s$", URLRegexp[uint(t)].URL, URLRegexp[uint(t)].Regexp)
+func (t AccountType) IsValid(URL string) bool {
 	if t == AccountType(HOMEPAGE) || t == AccountType(BLOG) {
-		return vd.Match(regexp.MustCompile("^https?://.+$"))
+		return regexp.MustCompile("^https?://.+$").MatchString(URL)
 	}
-	return vd.Match(regexp.MustCompile(regexpText))
+	return regexp.MustCompile(fmt.Sprintf("^https?://%s/%s$", URLRegexp[uint(t)].URL, URLRegexp[uint(t)].Regexp)).MatchString(URL)
 }
 
 const (
