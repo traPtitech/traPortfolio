@@ -59,7 +59,6 @@ func (p GetUsersParams) Validate() error {
 // request body structs
 
 func (r AddAccountRequest) Validate() error {
-
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
@@ -102,7 +101,6 @@ func (r CreateProjectRequest) Validate() error {
 }
 
 func (r EditUserAccountRequest) Validate() error {
-
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),

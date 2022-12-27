@@ -327,7 +327,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		return nil
 	}
 
-	if args.Type.Valid {
+	if args.Type.Valid && args.URL.Valid {
 		err := vd.Validate(args.URL.String, domain.AccountType(args.Type.Int64).URLValidate())
 		if err != nil {
 			return convertError(err)
