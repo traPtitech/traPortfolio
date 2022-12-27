@@ -82,11 +82,15 @@ func TestGroupService_GetGroup(t *testing.T) {
 				Name: random.AlphaNumeric(),
 				Link: random.AlphaNumeric(),
 				Admin: []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+					{
+						ID: random.UUID(),
+					},
 				},
 				Members: []*domain.UserWithDuration{
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+						User: domain.User{
+							ID: random.UUID(),
+						},
 						Duration: random.Duration(),
 					},
 				},

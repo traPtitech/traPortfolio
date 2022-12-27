@@ -58,8 +58,8 @@ func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain
 	// fill leader info
 	for i, v := range groups.Admin {
 		if u, ok := umap[v.ID]; ok {
-			m := *u
-			groups.Members[i].User = m
+			m := u
+			groups.Admin[i] = m
 		}
 	}
 
