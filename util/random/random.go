@@ -88,11 +88,64 @@ func RandURLString() string {
 	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
 }
 
+var AccountURLIDs = map[uint][]string{
+	domain.TWITTER: {
+		"qi_1WI_nku",
+		"XF1G6_kqEG",
+		"Aer7qyNEUz",
+	},
+	domain.FACEBOOK: {
+		"hYFmBZH21e",
+		"3LwQ.v7uyN",
+		"c6xegdX.hu",
+	},
+	domain.PIXIV: {
+		"2102945291",
+		"4818932326",
+		"1939586271",
+	},
+	domain.GITHUB: {
+		"WeL-rKj-xz",
+		"q7DO-T9GTO",
+		"wexjxusr1B",
+	},
+	domain.QIITA: {
+		"BSpYu_LyYg",
+		"HV6-Ik252Z",
+		"5XcnQ8fyze",
+	},
+	domain.ZENN: {
+		"2Kl1M.I3MO",
+		"we.Xh9Sg2k",
+		"ygZsTx1Pjf",
+	},
+	domain.ATCODER: {
+		"Ib_ucf2TjO",
+		"8d_z3Dm_T1",
+		"yKUfEWAnNB",
+	},
+	domain.SOUNDCLOUD: {
+		"ofb4igxvi8",
+		"r_e-dt6qgn",
+		"zut7-ajedl",
+	},
+	domain.HACKTHEBOX: {
+		"ORIuZ5qoXl",
+		"8WIScK32pB",
+		"IuqV2A1ux1",
+	},
+	domain.CTFTIME: {
+		"1939138413",
+		"4285429253",
+		"8295210365",
+	},
+}
+
 func RandAccountURLString(accountType uint) string {
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
 		return fmt.Sprintf("https://%s", AlphaNumeric())
 	}
-	return fmt.Sprintf("https://%s/%s", domain.URLRegexp[accountType].URL, AlphaNumeric())
+	return fmt.Sprintf("https://%s/%s", domain.URLRegexp[accountType].URL, AccountURLIDs[accountType][rand.Intn(3)])
 }
 
 func Duration() domain.YearWithSemesterDuration {
