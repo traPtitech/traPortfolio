@@ -272,6 +272,10 @@ func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*dom
 }
 
 func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
+	if !domain.IsValidAccountURL(domain.AccountType(args.Type), args.URL) {
+		return nil, repository.ErrInvalidArg
+	}
+
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
@@ -329,6 +333,21 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 			Error()
 		if err != nil {
 			return convertError(err)
+		}
+
+		// URLのvalidation
+		if args.Type.Valid && args.URL.Valid {
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {
+				return repository.ErrInvalidArg
+			}
+		} else if !args.Type.Valid && args.URL.Valid {
+			if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.String) {
+				return repository.ErrInvalidArg
+			}
+		} else if args.Type.Valid && !args.URL.Valid {
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), account.URL) {
+				return repository.ErrInvalidArg
+			}
 		}
 
 		err = tx.Model(account).Updates(changes).Error()

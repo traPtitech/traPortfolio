@@ -301,9 +301,9 @@ func TestGetUserAccount(t *testing.T) {
 func TestAddUserAccount(t *testing.T) {
 	var (
 		displayName = random.AlphaNumeric()
-		prPermitted = random.Bool()
-		atype       = rand.Intn(int(domain.AccountLimit)) // TODO: openapiでenumを定義する
-		url         = random.RandURLString()
+		prPermitted = handler.PrPermitted(random.Bool())
+		accountType = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL  = random.AccountURLString(uint(accountType))
 	)
 
 	t.Parallel()
@@ -318,16 +318,16 @@ func TestAddUserAccount(t *testing.T) {
 			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
-				Url:         url,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
-				Url:         url,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 		},
 		"400 invalid userID": {
@@ -341,8 +341,8 @@ func TestAddUserAccount(t *testing.T) {
 			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
+				PrPermitted: prPermitted,
+				Type:        accountType,
 				Url:         "invalid url",
 			},
 			testutils.HTTPError("Bad Request: validate error: url: must be a valid URL."),
@@ -352,9 +352,9 @@ func TestAddUserAccount(t *testing.T) {
 			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
+				PrPermitted: prPermitted,
 				Type:        handler.AccountType(domain.AccountLimit),
-				Url:         url,
+				Url:         accountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
 		},
@@ -382,10 +382,12 @@ func TestAddUserAccount(t *testing.T) {
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
 func TestEditUserAccount(t *testing.T) {
 	var (
-		displayName = random.AlphaNumeric()
-		prPermitted = random.Bool()
-		atype       = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		url         = random.RandURLString()
+		displayName        = random.AlphaNumeric()
+		prPermitted        = handler.PrPermitted(random.Bool())
+		accountType        = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL         = random.AccountURLString(uint(accountType))
+		invalidAccountType = handler.AccountType(5)
+		invalidAccountURL  = random.RandURLString()
 	)
 
 	t.Parallel()
@@ -402,9 +404,9 @@ func TestEditUserAccount(t *testing.T) {
 			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
-				PrPermitted: (*handler.PrPermitted)(&prPermitted),
-				Type:        (*handler.AccountType)(&atype),
-				Url:         &url,
+				PrPermitted: &prPermitted,
+				Type:        &accountType,
+				Url:         &accountURL,
 			},
 			nil,
 		},
@@ -428,6 +430,24 @@ func TestEditUserAccount(t *testing.T) {
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalud url without accountType": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				Url: &invalidAccountURL,
+			},
+			testutils.HTTPError("Bad Request: argument error"),
+		},
+		"400 invalid url without accountURL": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				Type: &invalidAccountType,
+			},
+			testutils.HTTPError("Bad Request: argument error"),
 		},
 		"404 user not found": {
 			http.StatusNotFound,
@@ -459,11 +479,12 @@ func TestEditUserAccount(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Insert & Assert
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 				account := handler.Account{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
-					Url:         random.RandURLString(),
+					Type:        handler.AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,
@@ -548,11 +569,12 @@ func TestDeleteUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 				reqBody := handler.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
-					Url:         random.RandURLString(),
+					Type:        handler.AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
 				testutils.AssertResponse(t, http.StatusCreated, handler.Account{
