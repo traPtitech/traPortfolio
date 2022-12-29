@@ -325,36 +325,6 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		return nil
 	}
 
-	if args.Type.Valid && args.URL.Valid {
-		if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {
-			return repository.ErrInvalidArg
-		}
-	} else if !args.Type.Valid && args.URL.Valid {
-		account := &model.Account{}
-		err := r.h.
-			Where(&model.Account{ID: accountID, UserID: userID}).
-			First(account).
-			Error()
-		if err != nil {
-			return convertError(err)
-		}
-		if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.String) {
-			return repository.ErrInvalidArg
-		}
-	} else if args.Type.Valid && !args.URL.Valid {
-		account := &model.Account{}
-		err := r.h.
-			Where(&model.Account{ID: accountID, UserID: userID}).
-			First(account).
-			Error()
-		if err != nil {
-			return convertError(err)
-		}
-		if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), account.URL) {
-			return repository.ErrInvalidArg
-		}
-	}
-
 	err := r.h.Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
 		err := tx.
@@ -363,6 +333,37 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 			Error()
 		if err != nil {
 			return convertError(err)
+		}
+
+		// URLのvalidation
+		if args.Type.Valid && args.URL.Valid {
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {
+				return repository.ErrInvalidArg
+			}
+		} else if !args.Type.Valid && args.URL.Valid {
+			account := &model.Account{}
+			err := tx.
+				Where(&model.Account{ID: accountID, UserID: userID}).
+				First(account).
+				Error()
+			if err != nil {
+				return convertError(err)
+			}
+			if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.String) {
+				return repository.ErrInvalidArg
+			}
+		} else if args.Type.Valid && !args.URL.Valid {
+			account := &model.Account{}
+			err := tx.
+				Where(&model.Account{ID: accountID, UserID: userID}).
+				First(account).
+				Error()
+			if err != nil {
+				return convertError(err)
+			}
+			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), account.URL) {
+				return repository.ErrInvalidArg
+			}
 		}
 
 		err = tx.Model(account).Updates(changes).Error()
