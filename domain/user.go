@@ -64,11 +64,6 @@ type UserGroup struct {
 	Duration YearWithSemesterDuration
 }
 
-type AccountURL struct {
-	URL    string
-	Regexp string
-}
-
 type AccountType uint8
 
 func IsValidAccountURL(accountType AccountType, URL string) bool {
