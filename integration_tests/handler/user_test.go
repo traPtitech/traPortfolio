@@ -383,7 +383,7 @@ func TestEditUserAccount(t *testing.T) {
 		prPermitted        = random.Bool()
 		accountType        = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
 		accountURL         = random.AccountURLString(uint(accountType))
-		invalidAccountType = int64(5)
+		invalidAccountType = handler.AccountType(5)
 		invalidAccountURL  = random.RandURLString()
 	)
 
@@ -442,7 +442,7 @@ func TestEditUserAccount(t *testing.T) {
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{
-				Type: (*handler.AccountType)(&invalidAccountType),
+				Type: &invalidAccountType,
 			},
 			testutils.HTTPError("Bad Request: argument error"),
 		},
