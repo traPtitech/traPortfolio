@@ -296,12 +296,11 @@ func TestGetUserAccount(t *testing.T) {
 
 // AddUserAccount POST /users/:userID/accounts
 func TestAddUserAccount(t *testing.T) {
-	accountType := uint(rand.Intn(int(domain.AccountLimit)))
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
-		atype       = accountType // TODO: openapiでenumを定義する
-		url         = random.AccountURLString(accountType)
+		accountType = rand.Intn(int(domain.AccountLimit)) // TODO: openapiでenumを定義する
+		accountURL  = random.AccountURLString(uint(accountType))
 	)
 
 	t.Parallel()
@@ -317,15 +316,15 @@ func TestAddUserAccount(t *testing.T) {
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
-				Url:         url,
+				Type:        handler.AccountType(accountType),
+				Url:         accountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
-				Url:         url,
+				Type:        handler.AccountType(accountType),
+				Url:         accountURL,
 			},
 		},
 		"400 invalid userID": {
@@ -340,7 +339,7 @@ func TestAddUserAccount(t *testing.T) {
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
+				Type:        handler.AccountType(accountType),
 				Url:         "invalid url",
 			},
 			testutils.HTTPError("Bad Request: validate error: url: must be a valid URL."),
@@ -352,7 +351,7 @@ func TestAddUserAccount(t *testing.T) {
 				DisplayName: displayName,
 				PrPermitted: handler.PrPermitted(prPermitted),
 				Type:        handler.AccountType(domain.AccountLimit),
-				Url:         url,
+				Url:         accountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
 		},
@@ -379,12 +378,11 @@ func TestAddUserAccount(t *testing.T) {
 
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
 func TestEditUserAccount(t *testing.T) {
-	accountType := uint(rand.Intn(int(domain.AccountLimit)))
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
-		atype       = int64(accountType) // TODO: openapiでenumを定義する
-		url         = random.AccountURLString(accountType)
+		accountType = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL  = random.AccountURLString(uint(accountType))
 	)
 
 	t.Parallel()
@@ -402,8 +400,8 @@ func TestEditUserAccount(t *testing.T) {
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 				PrPermitted: (*handler.PrPermitted)(&prPermitted),
-				Type:        (*handler.AccountType)(&atype),
-				Url:         &url,
+				Type:        (*handler.AccountType)(&accountType),
+				Url:         &accountURL,
 			},
 			nil,
 		},
