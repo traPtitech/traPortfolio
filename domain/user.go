@@ -72,7 +72,10 @@ type AccountURL struct {
 type AccountType uint8
 
 func IsValidAccountURL(accountType AccountType, URL string) bool {
-	return URLRegexp[uint(accountType)].MatchString(URL)
+	if r, ok := urlRegexp[uint(accountType)]; ok {
+		return r.MatchString(URL)
+	}
+	return false
 }
 
 const (
@@ -91,7 +94,7 @@ const (
 	AccountLimit
 )
 
-var URLRegexp = map[uint]*regexp.Regexp{
+var urlRegexp = map[uint]*regexp.Regexp{
 	HOMEPAGE:   regexp.MustCompile("^https?://.+$"),
 	BLOG:       regexp.MustCompile("^https?://.+$"),
 	TWITTER:    regexp.MustCompile("^https?://twitter.com/[a-zA-Z0-9_]+$"),
