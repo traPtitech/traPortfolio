@@ -379,10 +379,12 @@ func TestAddUserAccount(t *testing.T) {
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
 func TestEditUserAccount(t *testing.T) {
 	var (
-		displayName = random.AlphaNumeric()
-		prPermitted = random.Bool()
-		accountType = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		accountURL  = random.AccountURLString(uint(accountType))
+		displayName        = random.AlphaNumeric()
+		prPermitted        = random.Bool()
+		accountType        = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL         = random.AccountURLString(uint(accountType))
+		invalidAccountType = int64(5)
+		invalidAccountURL  = random.RandURLString()
 	)
 
 	t.Parallel()
@@ -425,6 +427,24 @@ func TestEditUserAccount(t *testing.T) {
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalud url without accountType": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				Url: &invalidAccountURL,
+			},
+			testutils.HTTPError("Bad Request: argument error"),
+		},
+		"400 invalid url without accountURL": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				Type: (*handler.AccountType)(&invalidAccountType),
+			},
+			testutils.HTTPError("Bad Request: argument error"),
 		},
 		"404 user not found": {
 			http.StatusNotFound,
