@@ -632,7 +632,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: PrPermitted(random.Bool()),
 					Type:        AccountType(accountType),
-					Url:         random.RandAccountURLString(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 
 				args := repository.CreateAccountArgs{
@@ -673,7 +673,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: PrPermitted(random.Bool()),
 					Type:        0,
-					Url:         random.RandAccountURLString(0),
+					Url:         random.AccountURLString(0),
 				}
 
 				args := repository.CreateAccountArgs{
@@ -716,7 +716,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: "",
 					PrPermitted: PrPermitted(random.Bool()),
 					Type:        AccountType(accountType),
-					Url:         random.RandAccountURLString(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -774,7 +774,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: PrPermitted(random.Bool()),
 					Type:        AccountType(accountType),
-					Url:         random.RandAccountURLString(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 
 				args := repository.CreateAccountArgs{
@@ -826,7 +826,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsURL := random.RandAccountURLString(uint(accountType))
+				argsURL := random.AccountURLString(uint(accountType))
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,
@@ -860,7 +860,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsURL := random.RandAccountURLString(uint(accountType))
+				argsURL := random.AccountURLString(uint(accountType))
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,

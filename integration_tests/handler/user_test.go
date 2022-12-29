@@ -301,7 +301,7 @@ func TestAddUserAccount(t *testing.T) {
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
 		atype       = accountType // TODO: openapiでenumを定義する
-		url         = random.RandAccountURLString(accountType)
+		url         = random.AccountURLString(accountType)
 	)
 
 	t.Parallel()
@@ -384,7 +384,7 @@ func TestEditUserAccount(t *testing.T) {
 		displayName = random.AlphaNumeric()
 		prPermitted = random.Bool()
 		atype       = int64(accountType) // TODO: openapiでenumを定義する
-		url         = random.RandAccountURLString(accountType)
+		url         = random.AccountURLString(accountType)
 	)
 
 	t.Parallel()
@@ -463,7 +463,7 @@ func TestEditUserAccount(t *testing.T) {
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
 					Type:        handler.AccountType(accountType),
-					Url:         random.RandAccountURLString(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,
@@ -553,7 +553,7 @@ func TestDeleteUserAccount(t *testing.T) {
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
 					Type:        handler.AccountType(accountType),
-					Url:         random.RandAccountURLString(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
 				testutils.AssertResponse(t, http.StatusCreated, handler.Account{

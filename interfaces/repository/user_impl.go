@@ -272,7 +272,7 @@ func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*dom
 }
 
 func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
-	if !domain.AccountType(args.Type).IsValid(args.URL) {
+	if !domain.IsValidAccountURL(domain.AccountType(args.Type), args.URL) {
 		return nil, repository.ErrInvalidArg
 	}
 
@@ -326,7 +326,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 	}
 
 	if args.Type.Valid && args.URL.Valid {
-		if !domain.AccountType(args.Type.Int64).IsValid(args.URL.String) {
+		if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {
 			return repository.ErrInvalidArg
 		}
 	} else if !args.Type.Valid && args.URL.Valid {
@@ -338,7 +338,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		if err != nil {
 			return convertError(err)
 		}
-		if !domain.AccountType(account.Type).IsValid(args.URL.String) {
+		if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.String) {
 			return repository.ErrInvalidArg
 		}
 	} else if args.Type.Valid && !args.URL.Valid {
@@ -350,7 +350,7 @@ func (r *UserRepository) UpdateAccount(userID uuid.UUID, accountID uuid.UUID, ar
 		if err != nil {
 			return convertError(err)
 		}
-		if !domain.AccountType(args.Type.Int64).IsValid(account.URL) {
+		if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), account.URL) {
 			return repository.ErrInvalidArg
 		}
 	}

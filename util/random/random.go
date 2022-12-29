@@ -88,64 +88,63 @@ func RandURLString() string {
 	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
 }
 
-var AccountURLIDs = map[uint][]string{
-	domain.TWITTER: {
-		"qi_1WI_nku",
-		"XF1G6_kqEG",
-		"Aer7qyNEUz",
-	},
-	domain.FACEBOOK: {
-		"hYFmBZH21e",
-		"3LwQ.v7uyN",
-		"c6xegdX.hu",
-	},
-	domain.PIXIV: {
-		"2102945291",
-		"4818932326",
-		"1939586271",
-	},
-	domain.GITHUB: {
-		"WeL-rKj-xz",
-		"q7DO-T9GTO",
-		"wexjxusr1B",
-	},
-	domain.QIITA: {
-		"BSpYu_LyYg",
-		"HV6-Ik252Z",
-		"5XcnQ8fyze",
-	},
-	domain.ZENN: {
-		"2Kl1M.I3MO",
-		"we.Xh9Sg2k",
-		"ygZsTx1Pjf",
-	},
-	domain.ATCODER: {
-		"Ib_ucf2TjO",
-		"8d_z3Dm_T1",
-		"yKUfEWAnNB",
-	},
-	domain.SOUNDCLOUD: {
-		"ofb4igxvi8",
-		"r_e-dt6qgn",
-		"zut7-ajedl",
-	},
-	domain.HACKTHEBOX: {
-		"ORIuZ5qoXl",
-		"8WIScK32pB",
-		"IuqV2A1ux1",
-	},
-	domain.CTFTIME: {
-		"1939138413",
-		"4285429253",
-		"8295210365",
-	},
-}
-
-func RandAccountURLString(accountType uint) string {
+func AccountURLString(accountType uint) string {
+	var AccountURLs = map[uint][]string{
+		domain.TWITTER: {
+			"https://twitter.com/qi_1WI_nku",
+			"https://twitter.com/XF1G6_kqEG",
+			"https://twitter.com/Aer7qyNEUz",
+		},
+		domain.FACEBOOK: {
+			"https://www.facebook.com/hYFmBZH21e",
+			"https://www.facebook.com/3LwQ.v7uyN",
+			"https://www.facebook.com/c6xegdX.hu",
+		},
+		domain.PIXIV: {
+			"https://www.pixiv.net/users/2102945291",
+			"https://www.pixiv.net/users/4818932326",
+			"https://www.pixiv.net/users/1939586271",
+		},
+		domain.GITHUB: {
+			"https://github.com/WeL-rKj-xz",
+			"https://github.com/q7DO-T9GTO",
+			"https://github.com/wexjxusr1B",
+		},
+		domain.QIITA: {
+			"https://qiita.com/BSpYu_LyYg",
+			"https://qiita.com/HV6-Ik252Z",
+			"https://qiita.com/5XcnQ8fyze",
+		},
+		domain.ZENN: {
+			"https://zenn.dev/2Kl1M.I3MO",
+			"https://zenn.dev/we.Xh9Sg2k",
+			"https://zenn.dev/ygZsTx1Pjf",
+		},
+		domain.ATCODER: {
+			"https://atcoder.jp/users/Ib_ucf2TjO",
+			"https://atcoder.jp/users/8d_z3Dm_T1",
+			"https://atcoder.jp/users/yKUfEWAnNB",
+		},
+		domain.SOUNDCLOUD: {
+			"https://soundcloud.com/ofb4igxvi8",
+			"https://soundcloud.com/r_e-dt6qgn",
+			"https://soundcloud.com/zut7-ajedl",
+		},
+		domain.HACKTHEBOX: {
+			"https://app.hackthebox.com/users/ORIuZ5qoXl",
+			"https://app.hackthebox.com/users/8WIScK32pB",
+			"https://app.hackthebox.com/users/IuqV2A1ux1",
+		},
+		domain.CTFTIME: {
+			"https://ctftime.org/user/1939138413",
+			"https://ctftime.org/user/4285429253",
+			"https://ctftime.org/user/8295210365",
+		},
+	}
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
 		return fmt.Sprintf("https://%s", AlphaNumeric())
 	}
-	return fmt.Sprintf("https://%s/%s", domain.URLRegexp[accountType].URL, AccountURLIDs[accountType][rand.Intn(3)])
+	return AccountURLs[accountType][rand.Intn(3)]
 }
 
 func Duration() domain.YearWithSemesterDuration {
@@ -224,5 +223,5 @@ func OptURLStringNotNull() optional.String {
 }
 
 func OptAccountURLStringNotNull(accountType uint) optional.String {
-	return optional.NewString(RandAccountURLString(accountType), true)
+	return optional.NewString(AccountURLString(accountType), true)
 }

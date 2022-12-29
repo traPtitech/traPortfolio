@@ -772,7 +772,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 				args: &repository.CreateAccountArgs{
 					DisplayName: random.AlphaNumeric(),
 					Type:        domain.HOMEPAGE,
-					URL:         random.RandAccountURLString(domain.HOMEPAGE),
+					URL:         random.AccountURLString(domain.HOMEPAGE),
 					PrPermitted: true,
 				},
 			},

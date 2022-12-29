@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"regexp"
 	"time"
 
@@ -72,11 +71,8 @@ type AccountURL struct {
 
 type AccountType uint8
 
-func (t AccountType) IsValid(URL string) bool {
-	if t == AccountType(HOMEPAGE) || t == AccountType(BLOG) {
-		return regexp.MustCompile("^https?://.+$").MatchString(URL)
-	}
-	return regexp.MustCompile(fmt.Sprintf("^https?://%s/%s$", URLRegexp[uint(t)].URL, URLRegexp[uint(t)].Regexp)).MatchString(URL)
+func IsValidAccountURL(accountType AccountType, URL string) bool {
+	return URLRegexp[uint(accountType)].MatchString(URL)
 }
 
 const (
@@ -95,19 +91,19 @@ const (
 	AccountLimit
 )
 
-var URLRegexp = map[uint]AccountURL{
-	HOMEPAGE:   {"", ""},
-	BLOG:       {"", ""},
-	TWITTER:    {"twitter.com", "[a-zA-Z0-9_]+"},
-	FACEBOOK:   {"www.facebook.com", "[a-zA-Z0-9.]+"},
-	PIXIV:      {"www.pixiv.net/users", "[0-9]+"},
-	GITHUB:     {"github.com", "[a-zA-Z0-9-]+"},
-	QIITA:      {"qiita.com", "[a-zA-Z0-9-_]+"},
-	ZENN:       {"zenn.dev", "[a-zA-Z0-9.]+"},
-	ATCODER:    {"atcoder.jp/users", "[a-zA-Z0-9_]+"},
-	SOUNDCLOUD: {"soundcloud.com", "[a-z0-9-_]+"},
-	HACKTHEBOX: {"app.hackthebox.com/users", "[a-zA-Z0-9]+"},
-	CTFTIME:    {"ctftime.org/user", "[0-9]+"},
+var URLRegexp = map[uint]*regexp.Regexp{
+	HOMEPAGE:   regexp.MustCompile("^https?://.+$"),
+	BLOG:       regexp.MustCompile("^https?://.+$"),
+	TWITTER:    regexp.MustCompile("^https?://twitter.com/[a-zA-Z0-9_]+$"),
+	FACEBOOK:   regexp.MustCompile("^https?://www.facebook.com/[a-zA-Z0-9.]+$"),
+	PIXIV:      regexp.MustCompile("^https?://www.pixiv.net/users/[0-9]+"),
+	GITHUB:     regexp.MustCompile("^https?://github.com/[a-zA-Z0-9-]+$"),
+	QIITA:      regexp.MustCompile("^https?://qiita.com/[a-zA-Z0-9-_]+$"),
+	ZENN:       regexp.MustCompile("^https?://zenn.dev/[a-zA-Z0-9.]+$"),
+	ATCODER:    regexp.MustCompile("^https?://atcoder.jp/users/[a-zA-Z0-9_]+$"),
+	SOUNDCLOUD: regexp.MustCompile("^https?://soundcloud.com/[a-z0-9-_]+$"),
+	HACKTHEBOX: regexp.MustCompile("^https?://app.hackthebox.com/users/[a-zA-Z0-9]+$"),
+	CTFTIME:    regexp.MustCompile("^https?://ctftime.org/user/[0-9]+$"),
 }
 
 type TraQState uint8
