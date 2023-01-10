@@ -355,10 +355,12 @@ func TestGetContestTeam(t *testing.T) {
 
 func TestAddContestTeam(t *testing.T) {
 	var (
-		description = random.AlphaNumeric()
-		link        = random.RandURLString()
-		name        = random.AlphaNumeric()
-		result      = random.AlphaNumeric()
+		description   = random.AlphaNumeric()
+		link          = random.RandURLString()
+		name          = random.AlphaNumeric()
+		result        = random.AlphaNumeric()
+		tooLongString = strings.Repeat("a", 260)
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
@@ -383,6 +385,50 @@ func TestAddContestTeam(t *testing.T) {
 				Result: result,
 			},
 		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: tooLongString,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &invalidURL,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        tooLongString,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		/*"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Not Found: not found"),
+		},*/
 	}
 
 	e := echo.New()
