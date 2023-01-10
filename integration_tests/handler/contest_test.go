@@ -378,7 +378,7 @@ func TestAddContestTeam(t *testing.T) {
 				Result:      &result,
 			},
 			handler.ContestTeam{
-				Id:     uuid.Nil,
+				Id:     uuid.Nil, //テスト時にOptSyncIDで同期するため適当
 				Name:   name,
 				Result: result,
 			},
@@ -394,9 +394,9 @@ func TestAddContestTeam(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeam, tt.contestID), &tt.reqbody)
-			switch want := tt.want.(type) {
+			switch tt.want.(type) {
 			case handler.ContestDetail:
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID)
 			case error:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			}
