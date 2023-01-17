@@ -364,6 +364,54 @@ func TestGetContestTeam(t *testing.T) {
 }
 
 func TestAddContestTeam(t *testing.T) {
+	var (
+		description = random.AlphaNumeric()
+		link        = random.RandURLString()
+		name        = random.AlphaNumeric()
+		result      = random.AlphaNumeric()
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		reqbody    handler.AddContestTeamJSONRequestBody
+		want       interface{}
+	}{
+		"201": {
+			http.StatusCreated,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			handler.ContestTeam{
+				Id:     testutils.DummyUUID(), //テスト時にOptSyncIDで同期するため適当
+				Name:   name,
+				Result: result,
+			},
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_add_contest_team")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeam, tt.contestID), &tt.reqbody)
+			switch tt.want.(type) {
+			case handler.ContestDetail:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID)
+			case error:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
+		})
+	}
 }
 
 func TestEditContestTeam(t *testing.T) {
