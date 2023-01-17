@@ -195,9 +195,15 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
+
+	// TODO: UpdateAccountArgs.Typeをoptional.Uint8にしたら消す
+	var typeInt64 int64
+	if req.Type != nil {
+		typeInt64 = int64(*req.Type)
+	}
 	args := repository.UpdateAccountArgs{
 		DisplayName: optional.StringFrom(req.DisplayName),
-		Type:        optional.Int64From(((*int64)(req.Type))),
+		Type:        optional.Int64From(&typeInt64),
 		URL:         optional.StringFrom(req.Url),
 		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
 	}

@@ -303,7 +303,7 @@ func TestAddUserAccount(t *testing.T) {
 		displayName = random.AlphaNumeric()
 		prPermitted = handler.PrPermitted(random.Bool())
 		accountType = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		accountURL  = random.AccountURLString(uint(accountType))
+		accountURL  = random.AccountURLString(domain.AccountType(accountType))
 	)
 
 	t.Parallel()
@@ -385,7 +385,7 @@ func TestEditUserAccount(t *testing.T) {
 		displayName        = random.AlphaNumeric()
 		prPermitted        = handler.PrPermitted(random.Bool())
 		accountType        = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		accountURL         = random.AccountURLString(uint(accountType))
+		accountURL         = random.AccountURLString(domain.AccountType(accountType))
 		invalidAccountType = handler.AccountType(5)
 		invalidAccountURL  = random.RandURLString()
 	)
@@ -479,7 +479,7 @@ func TestEditUserAccount(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Insert & Assert
-				accountType := uint(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 				account := handler.Account{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
@@ -569,7 +569,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
-				accountType := uint(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 				reqBody := handler.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),

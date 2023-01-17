@@ -626,7 +626,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
 
 				userID := random.UUID()
-				accountType := uint(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
 				reqBody := AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
@@ -710,7 +710,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
 
 				userID := random.UUID()
-				accountType := uint(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
 				reqBody := AddUserAccountJSONRequestBody{
 					DisplayName: "",
@@ -768,7 +768,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
 				userID := random.UUID()
-				accountType := uint(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
 				reqBody := AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
@@ -820,13 +820,13 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit)))
+				accountType := int64(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsURL := random.AccountURLString(uint(accountType))
+				argsURL := random.AccountURLString(domain.AccountType(accountType))
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,
@@ -860,7 +860,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsURL := random.AccountURLString(uint(accountType))
+				argsURL := random.AccountURLString(domain.AccountType(accountType))
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,

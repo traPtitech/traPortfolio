@@ -882,7 +882,7 @@ components:
         - SoundCloud
         - HackTheBox
         - CTFtime
-      x-go-type: uint64
+      x-go-type: uint8
     Project:
       title: Project
       type: object
