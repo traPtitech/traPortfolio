@@ -233,6 +233,12 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
+
+	_, err = h.srv.GetContest(ctx, contestID)
+	if err != nil {
+		return convertError(err)
+	}
+
 	contestTeam, err := h.srv.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
 		return convertError(err)
