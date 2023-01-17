@@ -276,6 +276,17 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 		return nil, repository.ErrInvalidArg
 	}
 
+	exist := new(model.Account)
+	if err := r.h.
+		Where(&model.Account{Type: args.Type, UserID: userID}).
+		First(exist).
+		Error(); err != database.ErrNoRows {
+		if err != nil {
+			return nil, convertError(err)
+		}
+		return nil, repository.ErrAlreadyExists
+	}
+
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   args.Type,
