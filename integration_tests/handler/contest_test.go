@@ -197,12 +197,10 @@ func TestCreateContest(t *testing.T) {
 
 func TestEditContest(t *testing.T) {
 	var (
-		contest       = mockdata.CloneMockContests()[0]
-		description   = contest.Description
-		since         = contest.Since
-		until         = contest.Until
-		link          = contest.Link
-		name          = contest.Name
+		description   = random.AlphaNumeric()
+		since, until  = random.SinceAndUntil()
+		link          = random.RandURLString()
+		name          = random.AlphaNumeric()
 		tooLongString = strings.Repeat("a", 260)
 		invalidURL    = "invalid url"
 	)
@@ -311,6 +309,18 @@ func TestEditContest(t *testing.T) {
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert
+				if tt.reqBody.Description != nil {
+					contest.Description = *tt.reqBody.Description
+				}
+				if tt.reqBody.Duration != nil {
+					contest.Duration = *tt.reqBody.Duration
+				}
+				if tt.reqBody.Link != nil {
+					contest.Link = *tt.reqBody.Link
+				}
+				if tt.reqBody.Name != nil {
+					contest.Name = *tt.reqBody.Name
+				}
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				testutils.AssertResponse(t, http.StatusOK, contest, res)
 			} else {
