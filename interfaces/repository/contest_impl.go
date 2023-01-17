@@ -218,6 +218,8 @@ func (r *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID
 }
 
 func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
+	/*contestIDが指すコンテストが存在するかどうか確かめる*/
+
 	contestTeam := &model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
 		ContestID:   contestID,
