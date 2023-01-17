@@ -378,7 +378,7 @@ func TestAddContestTeam(t *testing.T) {
 				Result:      &result,
 			},
 			handler.ContestTeam{
-				Id:     uuid.Nil, //テスト時にOptSyncIDで同期するため適当
+				Id:     testutils.DummyUUID(), //テスト時にOptSyncIDで同期するため適当
 				Name:   name,
 				Result: result,
 			},
