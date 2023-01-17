@@ -592,7 +592,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 					members = append(members, User{
 						Id:       member.ID,
 						Name:     member.Name,
-						RealName: member.RealName,
+						RealName: member.RealName(),
 					})
 				}
 
@@ -990,7 +990,7 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 					hres[i] = &User{
 						Id:       user.ID,
 						Name:     user.Name,
-						RealName: user.RealName,
+						RealName: user.RealName(),
 					}
 				}
 

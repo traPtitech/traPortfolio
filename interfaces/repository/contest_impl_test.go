@@ -879,7 +879,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 				teamID:    random.UUID(),
 			},
 			want: []*domain.User{
-				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				u := want[0]
@@ -922,8 +922,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 				teamID:    random.UUID(),
 			},
 			want: []*domain.User{
-				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				belongingRows := sqlmock.NewRows([]string{"team_id", "user_id"})

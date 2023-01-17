@@ -54,7 +54,7 @@ go-gen:
 	@go generate -x ./...
 
 migrate: ${BINARY} # require test-db
-	@${GO_RUN} --migrate
+	@${GO_RUN} --only-migrate
 
 db-gen-docs: migrate
 	@${RM} -rf ./docs/dbschema

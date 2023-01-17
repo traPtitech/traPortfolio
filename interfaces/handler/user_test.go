@@ -46,7 +46,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
-						RealName: ruser.RealName,
+						RealName: ruser.RealName(),
 					}
 
 					repoUsers = append(repoUsers, ruser)
@@ -73,7 +73,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 					huser := User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
-						RealName: ruser.RealName,
+						RealName: ruser.RealName(),
 					}
 
 					repoUsers = append(repoUsers, ruser)
@@ -100,7 +100,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 					{
 						Id:       repoUsers[0].ID,
 						Name:     repoUsers[0].Name,
-						RealName: repoUsers[0].RealName,
+						RealName: repoUsers[0].RealName(),
 					},
 				}
 
@@ -200,7 +200,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 					Bio:      repoUser.Bio,
 					Id:       repoUser.User.ID,
 					Name:     repoUser.User.Name,
-					RealName: repoUser.User.RealName,
+					RealName: repoUser.User.RealName(),
 					State:    UserAccountState(repoUser.State),
 				}
 
@@ -626,12 +626,13 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
 
 				userID := random.UUID()
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 
 				reqBody := AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: PrPermitted(random.Bool()),
-					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
-					Url:         random.RandURLString(),
+					Type:        AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 
 				args := repository.CreateAccountArgs{
@@ -672,7 +673,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: PrPermitted(random.Bool()),
 					Type:        0,
-					Url:         random.RandURLString(),
+					Url:         random.AccountURLString(0),
 				}
 
 				args := repository.CreateAccountArgs{
@@ -709,12 +710,13 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
 
 				userID := random.UUID()
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 
 				reqBody := AddUserAccountJSONRequestBody{
 					DisplayName: "",
 					PrPermitted: PrPermitted(random.Bool()),
-					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
-					Url:         random.RandURLString(),
+					Type:        AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -766,12 +768,13 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
 				userID := random.UUID()
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 
 				reqBody := AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: PrPermitted(random.Bool()),
-					Type:        AccountType((rand.Intn(int(domain.AccountLimit)))),
-					Url:         random.RandURLString(),
+					Type:        AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 
 				args := repository.CreateAccountArgs{
@@ -823,7 +826,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsURL := random.RandURLString()
+				argsURL := random.AccountURLString(uint(accountType))
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,
@@ -857,7 +860,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsName := random.AlphaNumeric()
 				argsPermit := PrPermitted(accountPermit)
 				argsType := AccountType(accountType)
-				argsURL := random.RandURLString()
+				argsURL := random.AccountURLString(uint(accountType))
 
 				reqBody := EditUserAccountJSONRequestBody{
 					DisplayName: &argsName,

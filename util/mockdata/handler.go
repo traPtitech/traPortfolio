@@ -2,6 +2,7 @@ package mockdata
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
@@ -76,30 +77,20 @@ func CloneHandlerMockContests() []handler.Contest {
 	return hContests
 }
 
-func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeamDetail {
+func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeam {
 	var (
-		mContestTeams              = CloneMockContestTeams()
-		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
-		hContestTeamDetails        = make(map[uuid.UUID][]handler.ContestTeamDetail)
+		mContestTeams     = CloneMockContestTeams()
+		hContestTeamsByID = make(map[uuid.UUID][]handler.ContestTeam)
 	)
 
 	for _, ct := range mContestTeams {
-		hUsers := make([]handler.User, len(mContestTeamUserBelongings))
-		for _, u := range mContestTeamUserBelongings {
-			if u.TeamID == ct.ID {
-				hUsers = append(hUsers, getUser(u.UserID))
-			}
-		}
-		hContestTeamDetails[ct.ContestID] = append(hContestTeamDetails[ct.ContestID], handler.ContestTeamDetail{
-			Description: ct.Description,
-			Id:          ct.ID,
-			Link:        ct.Link,
-			Members:     hUsers,
-			Name:        ct.Name,
-			Result:      ct.Result,
+		hContestTeamsByID[ct.ContestID] = append(hContestTeamsByID[ct.ContestID], handler.ContestTeam{
+			Id:     ct.ID,
+			Name:   ct.Name,
+			Result: ct.Result,
 		})
 	}
-	return hContestTeamDetails
+	return hContestTeamsByID
 }
 
 func CloneHandlerMockEvents() []handler.Event {
@@ -329,10 +320,11 @@ func CloneHandlerMockUsers() []handler.User {
 	)
 
 	for i, u := range mUsers {
+		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.Check)
 		hUsers[i] = handler.User{
-			Id:       u.ID,
-			Name:     u.Name,
-			RealName: portalUsers[i].RealName,
+			Id:       d.ID,
+			Name:     d.Name,
+			RealName: d.RealName(),
 		}
 	}
 

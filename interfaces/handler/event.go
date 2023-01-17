@@ -59,7 +59,7 @@ func (h *EventHandler) GetEvent(_c echo.Context) error {
 
 	hostname := make([]User, len(event.HostName))
 	for i, v := range event.HostName {
-		hostname[i] = newUser(v.ID, v.Name, v.RealName)
+		hostname[i] = newUser(v.ID, v.Name, v.RealName())
 	}
 
 	return c.JSON(http.StatusOK, newEventDetail(
