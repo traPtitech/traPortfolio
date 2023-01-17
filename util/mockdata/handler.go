@@ -2,6 +2,7 @@ package mockdata
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
@@ -28,9 +29,18 @@ var (
 func CloneHandlerMockContestDetails() []handler.ContestDetail {
 	var (
 		mContests       = CloneMockContests()
-		hContestTeams   = CloneHandlerMockContestTeamsByID()
+		hContestTeams   = CloneMockContestTeams()
+		mContestTeams   = make([]handler.ContestTeam, len(hContestTeams))
 		hContestDetails = make([]handler.ContestDetail, len(mContests))
 	)
+
+	for i, c := range hContestTeams {
+		mContestTeams[i] = handler.ContestTeam{
+			Id:     c.ID,
+			Name:   c.Name,
+			Result: c.Result,
+		}
+	}
 
 	for i, c := range mContests {
 		hContestDetails[i] = handler.ContestDetail{
@@ -39,16 +49,10 @@ func CloneHandlerMockContestDetails() []handler.ContestDetail {
 				Since: c.Since,
 				Until: &c.Until,
 			},
-			Id:   c.ID,
-			Link: c.Link,
-			Name: c.Name,
-			Teams: []handler.ContestTeam{
-				{
-					Id:     hContestTeams[c.ID][0].Id,
-					Name:   hContestTeams[c.ID][0].Name,
-					Result: hContestTeams[c.ID][0].Result,
-				},
-			},
+			Id:    c.ID,
+			Link:  c.Link,
+			Name:  c.Name,
+			Teams: mContestTeams,
 		}
 	}
 	return hContestDetails
@@ -73,30 +77,20 @@ func CloneHandlerMockContests() []handler.Contest {
 	return hContests
 }
 
-func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeamDetail {
+func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeam {
 	var (
-		mContestTeams              = CloneMockContestTeams()
-		mContestTeamUserBelongings = CloneMockContestTeamUserBelongings()
-		hContestTeamDetails        = make(map[uuid.UUID][]handler.ContestTeamDetail)
+		mContestTeams     = CloneMockContestTeams()
+		hContestTeamsByID = make(map[uuid.UUID][]handler.ContestTeam)
 	)
 
 	for _, ct := range mContestTeams {
-		hUsers := make([]handler.User, len(mContestTeamUserBelongings))
-		for _, u := range mContestTeamUserBelongings {
-			if u.TeamID == ct.ID {
-				hUsers = append(hUsers, getUser(u.UserID))
-			}
-		}
-		hContestTeamDetails[ct.ContestID] = append(hContestTeamDetails[ct.ContestID], handler.ContestTeamDetail{
-			Description: ct.Description,
-			Id:          ct.ID,
-			Link:        ct.Link,
-			Members:     hUsers,
-			Name:        ct.Name,
-			Result:      ct.Result,
+		hContestTeamsByID[ct.ContestID] = append(hContestTeamsByID[ct.ContestID], handler.ContestTeam{
+			Id:     ct.ID,
+			Name:   ct.Name,
+			Result: ct.Result,
 		})
 	}
-	return hContestTeamDetails
+	return hContestTeamsByID
 }
 
 func CloneHandlerMockEvents() []handler.Event {
@@ -326,10 +320,11 @@ func CloneHandlerMockUsers() []handler.User {
 	)
 
 	for i, u := range mUsers {
+		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.Check)
 		hUsers[i] = handler.User{
-			Id:       u.ID,
-			Name:     u.Name,
-			RealName: portalUsers[i].RealName,
+			Id:       d.ID,
+			Name:     d.Name,
+			RealName: d.RealName(),
 		}
 	}
 
@@ -395,24 +390,30 @@ func CloneHandlerMockUserEvents() []handler.Event {
 	return mUserEvents
 }
 
-func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.ContestTeamWithContestName {
+func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.UserContest {
 	var (
 		uUsers              = CloneMockUsers()
 		hContests           = CloneHandlerMockContests()
 		hContestTeams       = CloneHandlerMockContestTeamsByID()
 		mContestTeamMembers = CloneMockContestTeamUserBelongings()
-		hUserContests       = make(map[uuid.UUID][]handler.ContestTeamWithContestName, len(hContests))
+		hUserContests       = make(map[uuid.UUID][]handler.UserContest, len(hContests))
 	)
 
 	for _, u := range uUsers {
 		for _, c := range hContests {
 			for _, ctm := range mContestTeamMembers {
 				if u.ID == ctm.UserID {
-					hUserContests[u.ID] = append(hUserContests[u.ID], handler.ContestTeamWithContestName{
-						ContestName: c.Name,
-						Id:          hContestTeams[c.Id][0].Id,
-						Name:        hContestTeams[c.Id][0].Name,
-						Result:      hContestTeams[c.Id][0].Result,
+					hUserContests[u.ID] = append(hUserContests[u.ID], handler.UserContest{
+						Id:       c.Id,
+						Name:     c.Name,
+						Duration: c.Duration,
+						Teams: []handler.ContestTeam{
+							{
+								Id:     hContestTeams[c.Id][0].Id,
+								Name:   hContestTeams[c.Id][0].Name,
+								Result: hContestTeams[c.Id][0].Result,
+							},
+						},
 					})
 				}
 			}

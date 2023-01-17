@@ -229,9 +229,9 @@ func TestContestService_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Link:        random.OptURLString(),
 					Since:       time.Now(),
-					Until:       optional.NewTime(time.Now(), true),
+					Until:       random.OptTime(),
 				},
 			},
 			want: &domain.ContestDetail{
@@ -258,9 +258,9 @@ func TestContestService_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        cname,
 					Description: random.AlphaNumeric(),
-					Link:        optional.NewString(random.AlphaNumeric(), true),
+					Link:        random.OptAlphaNumeric(),
 					Since:       time.Now(),
-					Until:       optional.NewTime(time.Now(), true),
+					Until:       random.OptTime(),
 				},
 			},
 			want: nil,
@@ -313,11 +313,11 @@ func TestContestService_UpdateContest(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       optional.NewTime(time.Now(), true),
-					Until:       optional.NewTime(time.Now(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
+					Since:       random.OptTime(),
+					Until:       random.OptTime(),
 				},
 			},
 			setup: func(f fields, args args) {
@@ -332,11 +332,11 @@ func TestContestService_UpdateContest(t *testing.T) {
 				ctx: context.Background(),
 				id:  random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Since:       optional.NewTime(time.Now(), true),
-					Until:       optional.NewTime(time.Now(), true),
+					Name:        random.OptAlphaNumeric(),
+					Description: random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
+					Since:       random.OptTime(),
+					Until:       random.OptTime(),
 				},
 			},
 			setup: func(f fields, args args) {
@@ -681,8 +681,8 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 				contestID: random.UUID(),
 				args: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
+					Result:      random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -736,10 +736,10 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				ctx:    context.Background(),
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Result:      random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
+					Description: random.OptAlphaNumeric(),
 				},
 			},
 			setup: func(f fields, args args) {
@@ -767,10 +767,10 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 				ctx:    context.Background(),
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        optional.NewString(random.AlphaNumeric(), true),
-					Result:      optional.NewString(random.AlphaNumeric(), true),
-					Link:        optional.NewString(random.RandURLString(), true),
-					Description: optional.NewString(random.AlphaNumeric(), true),
+					Name:        random.OptAlphaNumeric(),
+					Result:      random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
+					Description: random.OptAlphaNumeric(),
 				},
 			},
 			setup: func(f fields, args args) {

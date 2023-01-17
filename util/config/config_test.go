@@ -14,7 +14,7 @@ func TestParse(t *testing.T) {
 	expected := Config{
 		IsProduction:   true,
 		Port:           3000,
-		Migrate:        true,
+		OnlyMigrate:    true,
 		InsertMockData: true,
 		DB: SQLConfig{
 			User:    "root",

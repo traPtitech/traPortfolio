@@ -283,12 +283,19 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 		bio = user.Description
 	}
 
+	var check bool
+	if args.Check.Valid {
+		check = args.Check.Bool
+	} else {
+		check = user.Check
+	}
+
 	expected := &domain.UserDetail{
 		User: *domain.NewUser(
 			user.ID,
 			user.Name,
 			portalUser.RealName,
-			user.Check,
+			check,
 		),
 		State:    traqUser.User.State,
 		Bio:      bio,
@@ -360,10 +367,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	mustMakeAccount(t, repo, user.ID, nil)
 
+	accountType := optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), true)
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
-		Type:        optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), random.Bool()),
-		URL:         random.OptAlphaNumeric(),
+		Type:        accountType,
+		URL:         random.OptAccountURLStringNotNull(uint(accountType.Int64)),
 		PrPermitted: random.OptBool(),
 	}
 	if args.DisplayName.Valid {
@@ -478,15 +486,15 @@ func TestUserRepository_GetContests(t *testing.T) {
 	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
 	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
-	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, &team1.ContestTeam), newUserContest(&contest2.Contest, &team2.ContestTeam)}
-	projects1, err := userRepo.GetContests(user1.ID)
+	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam}), newUserContest(&contest2.Contest, []*domain.ContestTeam{&team2.ContestTeam})}
+	contests1, err := userRepo.GetContests(user1.ID)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected1, projects1)
+	assert.ElementsMatch(t, expected1, contests1)
 
-	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, &team1.ContestTeam)}
-	projects2, err := userRepo.GetContests(user2.ID)
+	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam})}
+	contests2, err := userRepo.GetContests(user2.ID)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected2, projects2)
+	assert.ElementsMatch(t, expected2, contests2)
 }
 
 // func TestUserRepository_GetGroupsByUserID(t *testing.T) {
@@ -510,11 +518,12 @@ func newUserProject(args *urepository.CreateProjectMemberArgs, project *domain.P
 	}
 }
 
-func newUserContest(contest *domain.Contest, team *domain.ContestTeam) *domain.UserContest {
+func newUserContest(contest *domain.Contest, teams []*domain.ContestTeam) *domain.UserContest {
 	return &domain.UserContest{
-		ID:          team.ID,
-		Name:        team.Name,
-		Result:      team.Result,
-		ContestName: contest.Name,
+		ID:        contest.ID,
+		Name:      contest.Name,
+		TimeStart: contest.TimeStart,
+		TimeEnd:   contest.TimeEnd,
+		Teams:     teams,
 	}
 }

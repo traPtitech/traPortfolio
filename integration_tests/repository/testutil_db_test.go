@@ -27,16 +27,11 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 	t.Helper()
 
 	if args == nil {
-		var link optional.String
-		if rand.Intn(2) == 1 {
-			link = optional.NewString(random.AlphaNumeric(), true)
-		}
-
 		since, until := random.SinceAndUntil()
 		args = &repository.CreateContestArgs{
 			Name:        random.AlphaNumeric(),
 			Description: random.AlphaNumeric(),
-			Link:        link,
+			Link:        random.OptURLString(),
 			Since:       since,
 			Until:       optional.NewTime(until, random.Bool()),
 		}
@@ -93,10 +88,11 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	t.Helper()
 
 	if args == nil {
+		accountType := uint(rand.Intn(int(domain.AccountLimit)))
 		args = &repository.CreateAccountArgs{
 			DisplayName: random.AlphaNumeric(),
 			Type:        domain.AccountType(random.Uint8n(uint8(domain.AccountLimit))),
-			URL:         random.RandURLString(),
+			URL:         random.AccountURLString(accountType),
 			PrPermitted: random.Bool(),
 		}
 	}

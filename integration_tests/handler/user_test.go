@@ -63,7 +63,7 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: include_suspended and name cannot be specified at the same time"),
 		},
 	}
 
@@ -97,12 +97,12 @@ func TestGetUser(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -131,13 +131,13 @@ func TestUpdateUser(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		reqBody    handler.EditUserRequest
+		reqBody    handler.EditUserJSONRequestBody
 		want       interface{} // nil or error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.UserID1(),
-			handler.EditUserRequest{
+			handler.EditUserJSONRequestBody{
 				Bio:   &bio,
 				Check: &check,
 			},
@@ -146,14 +146,14 @@ func TestUpdateUser(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.UserID2(),
-			handler.EditUserRequest{},
+			handler.EditUserJSONRequestBody{},
 			nil,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.EditUserRequest{},
-			testutils.HTTPError("bad request: nil id"),
+			handler.EditUserJSONRequestBody{},
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 	}
 
@@ -175,6 +175,9 @@ func TestUpdateUser(t *testing.T) {
 				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 				// Get updated response & Assert
+				if tt.reqBody.Check != nil && *tt.reqBody.Check == false {
+					user.RealName = ""
+				}
 				if tt.reqBody.Bio != nil {
 					user.Bio = *tt.reqBody.Bio
 				}
@@ -210,12 +213,12 @@ func TestGetUserAccounts(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -252,31 +255,31 @@ func TestGetUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.AccountID1(),
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			mockdata.AccountID1(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 		"404 accountID not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 		"404 both userID and accountID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -298,9 +301,9 @@ func TestGetUserAccount(t *testing.T) {
 func TestAddUserAccount(t *testing.T) {
 	var (
 		displayName = random.AlphaNumeric()
-		prPermitted = random.Bool()
-		atype       = rand.Intn(int(domain.AccountLimit)) // TODO: openapiでenumを定義する
-		url         = random.RandURLString()
+		prPermitted = handler.PrPermitted(random.Bool())
+		accountType = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL  = random.AccountURLString(uint(accountType))
 	)
 
 	t.Parallel()
@@ -315,45 +318,45 @@ func TestAddUserAccount(t *testing.T) {
 			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
-				Url:         url,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
-				Url:         url,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			handler.AddUserAccountJSONRequestBody{},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
-				Type:        handler.AccountType(atype),
+				PrPermitted: prPermitted,
+				Type:        accountType,
 				Url:         "invalid url",
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: url: must be a valid URL."),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
-				PrPermitted: handler.PrPermitted(prPermitted),
+				PrPermitted: prPermitted,
 				Type:        handler.AccountType(domain.AccountLimit),
-				Url:         url,
+				Url:         accountURL,
 			},
-			testutils.HTTPError("bad request: validate error"),
+			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
 		},
 	}
 
@@ -376,13 +379,15 @@ func TestAddUserAccount(t *testing.T) {
 	}
 }
 
-// EditUserRequestAccount PATCH /users/:userID/accounts/:accountID
-func TestEditUserRequestAccount(t *testing.T) {
+// EditUserAccount PATCH /users/:userID/accounts/:accountID
+func TestEditUserAccount(t *testing.T) {
 	var (
-		displayName = random.AlphaNumeric()
-		prPermitted = random.Bool()
-		atype       = int64(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		url         = random.RandURLString()
+		displayName        = random.AlphaNumeric()
+		prPermitted        = handler.PrPermitted(random.Bool())
+		accountType        = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL         = random.AccountURLString(uint(accountType))
+		invalidAccountType = handler.AccountType(5)
+		invalidAccountURL  = random.RandURLString()
 	)
 
 	t.Parallel()
@@ -399,9 +404,9 @@ func TestEditUserRequestAccount(t *testing.T) {
 			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
-				PrPermitted: (*handler.PrPermitted)(&prPermitted),
-				Type:        (*handler.AccountType)(&atype),
-				Url:         &url,
+				PrPermitted: &prPermitted,
+				Type:        &accountType,
+				Url:         &accountURL,
 			},
 			nil,
 		},
@@ -417,14 +422,32 @@ func TestEditUserRequestAccount(t *testing.T) {
 			uuid.Nil,
 			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalud url without accountType": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				Url: &invalidAccountURL,
+			},
+			testutils.HTTPError("Bad Request: argument error"),
+		},
+		"400 invalid url without accountURL": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				Type: &invalidAccountType,
+			},
+			testutils.HTTPError("Bad Request: argument error"),
 		},
 		"404 user not found": {
 			http.StatusNotFound,
@@ -433,7 +456,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 		"404 account not found": {
 			http.StatusNotFound,
@@ -442,7 +465,7 @@ func TestEditUserRequestAccount(t *testing.T) {
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -456,11 +479,12 @@ func TestEditUserRequestAccount(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Insert & Assert
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 				account := handler.Account{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
-					Url:         random.RandURLString(),
+					Type:        handler.AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,
@@ -517,21 +541,21 @@ func TestDeleteUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			random.UUID(),
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 			false,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 			false,
 		},
 	}
@@ -545,11 +569,12 @@ func TestDeleteUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
+				accountType := uint(rand.Intn(int(domain.AccountLimit)))
 				reqBody := handler.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(rand.Intn(int(domain.AccountLimit))),
-					Url:         random.RandURLString(),
+					Type:        handler.AccountType(accountType),
+					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
 				testutils.AssertResponse(t, http.StatusCreated, handler.Account{
@@ -586,12 +611,12 @@ func TestGetUserProjects(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -630,12 +655,12 @@ func TestGetUserContests(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -674,12 +699,12 @@ func TestGetUserGroups(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("not found: not found"),
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
@@ -725,7 +750,7 @@ func TestGetUserEvents(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("bad request: nil id"),
+			testutils.HTTPError("Bad Request: nil id"),
 		},
 	}
 

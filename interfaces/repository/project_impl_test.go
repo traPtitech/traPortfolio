@@ -115,7 +115,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.UserWithDuration{
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 						Duration: random.Duration(),
 					},
 				},
@@ -148,7 +148,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
 						TraQID:   wm.User.Name,
-						RealName: wm.User.RealName,
+						RealName: wm.User.RealName(),
 					},
 				}, nil)
 			},
@@ -169,11 +169,11 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				Link:        random.RandURLString(),
 				Members: []*domain.UserWithDuration{
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 						Duration: random.Duration(),
 					},
 					{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), "", false),
 						Duration: random.Duration(),
 					},
 				},
@@ -210,7 +210,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 				for i, v := range want.Members {
 					wp[i] = &external.PortalUserResponse{
 						TraQID:   v.User.Name,
-						RealName: v.User.RealName,
+						RealName: v.User.RealName(),
 					}
 				}
 				f.portal.EXPECT().GetAll().Return(wp, nil)
@@ -339,7 +339,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(),
 		Description:   random.AlphaNumeric(),
-		Link:          optional.NewString(random.RandURLString(), true),
+		Link:          random.OptURLStringNotNull(),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
 		UntilYear:     duration.Until.Year,
@@ -397,7 +397,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Link:          random.OptURLString(),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -456,9 +456,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Name:          random.OptAlphaNumericNotNull(),
+					Description:   random.OptAlphaNumericNotNull(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
@@ -480,9 +480,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          optional.NewString(random.AlphaNumeric(), true),
-					Description:   optional.NewString(random.AlphaNumeric(), true),
-					Link:          optional.NewString(random.RandURLString(), true),
+					Name:          random.OptAlphaNumericNotNull(),
+					Description:   random.OptAlphaNumericNotNull(),
+					Link:          random.OptURLStringNotNull(),
 					SinceYear:     optional.NewInt64(int64(d.Since.Year), true),
 					SinceSemester: optional.NewInt64(int64(d.Since.Semester), true),
 					UntilYear:     optional.NewInt64(int64(d.Until.Year), true),
@@ -534,7 +534,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			},
 			want: []*domain.UserWithDuration{
 				{
-					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					User: *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 				},
 			},
 			setup: func(f mockProjectRepositoryFields, args args, want []*domain.UserWithDuration) {
@@ -556,7 +556,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				f.portal.EXPECT().GetAll().Return([]*external.PortalUserResponse{
 					{
 						TraQID:   want[0].User.Name,
-						RealName: want[0].User.RealName,
+						RealName: want[0].User.RealName(),
 					},
 				}, nil)
 			},
@@ -606,7 +606,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 				for i, v := range want {
 					wp[i] = &external.PortalUserResponse{
 						TraQID:   v.User.Name,
-						RealName: v.User.RealName,
+						RealName: v.User.RealName(),
 					}
 				}
 				f.portal.EXPECT().GetAll().Return(wp, nil)

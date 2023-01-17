@@ -120,7 +120,7 @@ jobs:
         run: |
           source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio
-          ./traPortfolio --migrate --db-user=root --db-pass=password --db-name=portfolio --db-port=3307
+          ./traPortfolio --only-migrate --db-user=root --db-pass=password --db-name=portfolio --db-port=3307
           tbls lint
         env:
           TBLS_DSN: mariadb://root:password@127.0.0.1:3307/portfolio
