@@ -1561,6 +1561,7 @@ components:
       in: query
       schema:
         type: integer
+        minimum: 1
         format: int64
       required: false
       description: 取得数の上限
