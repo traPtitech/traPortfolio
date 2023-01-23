@@ -272,7 +272,7 @@ func (r *UserRepository) GetAccount(userID uuid.UUID, accountID uuid.UUID) (*dom
 }
 
 func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.CreateAccountArgs) (*domain.Account, error) {
-	if !domain.IsValidAccountURL(domain.AccountType(args.Type), args.URL) {
+	if !domain.IsValidAccountURL(args.Type, args.URL) {
 		return nil, repository.ErrInvalidArg
 	}
 
