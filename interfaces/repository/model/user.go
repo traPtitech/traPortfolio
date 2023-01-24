@@ -23,7 +23,7 @@ func (*User) TableName() string {
 
 type Account struct {
 	ID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Type      uint      `gorm:"type:tinyint(1);not null"`
+	Type      uint8     `gorm:"type:tinyint(1);not null"`
 	Name      string    `gorm:"type:varchar(32)"`
 	URL       string    `gorm:"type:text"`
 	UserID    uuid.UUID `gorm:"type:char(36);not null"`

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"math/rand"
 	"net/http"
 	"testing"
 
@@ -85,7 +84,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 // EditEvent PATCH /events/:eventID
 func TestEventHandler_EditEvent(t *testing.T) {
 	var (
-		eventLevel = handler.EventLevel(rand.Intn(domain.EventLevelLimit))
+		eventLevel = handler.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 	)
 
 	t.Parallel()

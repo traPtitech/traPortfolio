@@ -88,8 +88,8 @@ func RandURLString() string {
 	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
 }
 
-func AccountURLString(accountType uint) string {
-	var AccountURLs = map[uint][]string{
+func AccountURLString(accountType domain.AccountType) string {
+	var AccountURLs = map[domain.AccountType][]string{
 		domain.TWITTER: {
 			"https://twitter.com/qi_1WI_nku",
 			"https://twitter.com/XF1G6_kqEG",
@@ -222,6 +222,6 @@ func OptURLStringNotNull() optional.String {
 	return optional.NewString(RandURLString(), true)
 }
 
-func OptAccountURLStringNotNull(accountType uint) optional.String {
+func OptAccountURLStringNotNull(accountType domain.AccountType) optional.String {
 	return optional.NewString(AccountURLString(accountType), true)
 }
