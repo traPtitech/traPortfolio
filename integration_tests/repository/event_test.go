@@ -115,7 +115,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 
 	got, err = repo.GetEvent(selected.EventID)
 	assert.NoError(t, err)
-	assert.Equal(t, updatedLevel, uint8(got.Level))
+	assert.Equal(t, updatedLevel, got.Level)
 }
 
 func TestEventRepository_GetUserEvents(t *testing.T) {
