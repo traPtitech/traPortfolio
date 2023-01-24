@@ -197,12 +197,10 @@ func TestCreateContest(t *testing.T) {
 
 func TestEditContest(t *testing.T) {
 	var (
-		contest       = mockdata.CloneMockContests()[0]
-		description   = contest.Description
-		since         = contest.Since
-		until         = contest.Until
-		link          = contest.Link
-		name          = contest.Name
+		description   = random.AlphaNumeric()
+		since, until  = random.SinceAndUntil()
+		link          = random.RandURLString()
+		name          = random.AlphaNumeric()
 		tooLongString = strings.Repeat("a", 260)
 		invalidURL    = "invalid url"
 	)
@@ -311,6 +309,18 @@ func TestEditContest(t *testing.T) {
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert
+				if tt.reqBody.Description != nil {
+					contest.Description = *tt.reqBody.Description
+				}
+				if tt.reqBody.Duration != nil {
+					contest.Duration = *tt.reqBody.Duration
+				}
+				if tt.reqBody.Link != nil {
+					contest.Link = *tt.reqBody.Link
+				}
+				if tt.reqBody.Name != nil {
+					contest.Name = *tt.reqBody.Name
+				}
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				testutils.AssertResponse(t, http.StatusOK, contest, res)
 			} else {
@@ -364,9 +374,172 @@ func TestGetContestTeam(t *testing.T) {
 }
 
 func TestAddContestTeam(t *testing.T) {
+	var (
+		description   = random.AlphaNumeric()
+		link          = random.RandURLString()
+		name          = random.AlphaNumeric()
+		result        = random.AlphaNumeric()
+		tooLongString = strings.Repeat("a", 260)
+		invalidURL    = "invalid url"
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		reqbody    handler.AddContestTeamJSONRequestBody
+		want       interface{}
+	}{
+		"201": {
+			http.StatusCreated,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			handler.ContestTeam{
+				Id:     testutils.DummyUUID(), //テスト時にOptSyncIDで同期するため適当
+				Name:   name,
+				Result: result,
+			},
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: tooLongString,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &invalidURL,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        tooLongString,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_add_contest_team")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeam, tt.contestID), &tt.reqbody)
+			switch tt.want.(type) {
+			case handler.ContestDetail:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID)
+			case error:
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
+		})
+	}
 }
 
 func TestEditContestTeam(t *testing.T) {
+	var (
+		description = random.AlphaNumeric()
+		link        = random.RandURLString()
+		name        = random.AlphaNumeric()
+		result      = random.AlphaNumeric()
+		//tooLongString = strings.Repeat("a", 260)
+		invalidURL = "invalid url"
+	)
+
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		teamID     uuid.UUID
+		reqBody    handler.EditContestTeamJSONRequestBody
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Description: &description,
+				Link:        &link,
+				Name:        &name,
+				Result:      &result,
+			},
+			nil,
+		},
+		"400 invalid Link": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Link: &invalidURL,
+			},
+			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest_team")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			if tt.statusCode == http.StatusNoContent {
+				// Get response before update
+				var contestTeam handler.ContestTeamDetail
+				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeam, tt.contestID, tt.teamID), nil)
+				assert.Equal(t, http.StatusOK, res.Code)
+				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &contestTeam)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
+
+				// Update & Assert
+				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContestTeam, tt.contestID, tt.teamID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+
+				// Get updated response & Assert
+				if tt.reqBody.Description != nil {
+					contestTeam.Description = *tt.reqBody.Description
+				}
+				if tt.reqBody.Link != nil {
+					contestTeam.Link = *tt.reqBody.Link
+				}
+				if tt.reqBody.Name != nil {
+					contestTeam.Name = *tt.reqBody.Name
+				}
+				if tt.reqBody.Result != nil {
+					contestTeam.Result = *tt.reqBody.Result
+				}
+				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeam, tt.contestID, tt.teamID), nil)
+				testutils.AssertResponse(t, http.StatusOK, contestTeam, res)
+			} else {
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContestTeam, tt.contestID, tt.teamID), &tt.reqBody)
+				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			}
+		})
+	}
 }
 
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members

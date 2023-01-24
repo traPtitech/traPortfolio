@@ -39,7 +39,7 @@ type UserWithDuration struct {
 type Account struct {
 	ID          uuid.UUID
 	DisplayName string
-	Type        uint
+	Type        AccountType
 	PrPermitted bool
 	URL         string
 }
@@ -75,7 +75,7 @@ type UserGroup struct {
 type AccountType uint8
 
 func IsValidAccountURL(accountType AccountType, URL string) bool {
-	var urlRegexp = map[uint]*regexp.Regexp{
+	var urlRegexp = map[AccountType]*regexp.Regexp{
 		HOMEPAGE:   regexp.MustCompile("^https?://.+$"),
 		BLOG:       regexp.MustCompile("^https?://.+$"),
 		TWITTER:    regexp.MustCompile("^https://twitter.com/[a-zA-Z0-9_]+$"),
@@ -90,14 +90,15 @@ func IsValidAccountURL(accountType AccountType, URL string) bool {
 		CTFTIME:    regexp.MustCompile("^https://ctftime.org/user/[0-9]+$"),
 	}
 
-	if r, ok := urlRegexp[uint(accountType)]; ok {
+	if r, ok := urlRegexp[accountType]; ok {
 		return r.MatchString(URL)
 	}
+
 	return false
 }
 
 const (
-	HOMEPAGE uint = iota
+	HOMEPAGE AccountType = iota
 	BLOG
 	TWITTER
 	FACEBOOK

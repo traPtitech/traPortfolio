@@ -38,8 +38,7 @@ var (
 	vdRuleDisplayNameLength = vd.Length(1, 256) // 外部アカウントのアカウント名文字数上限
 	vdRuleDescriptionLength = vd.Length(1, 256)
 	vdRuleResultLength      = vd.Length(0, 32)
-	vdRuleAccountTypeMin    = vd.Min(0) // TODO: handler.AccountTypeをuint型にしたら消す
-	vdRuleAccountTypeMax    = vd.Max(int(domain.AccountLimit) - 1)
+	vdRuleAccountTypeMax    = vd.Max(domain.AccountLimit - 1)
 	vdRuleEventLevelMax     = vd.Max(uint8(domain.EventLevelLimit) - 1)
 )
 
@@ -62,7 +61,7 @@ func (r AddAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
-		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
+		vd.Field(&r.Type, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.Required, is.URL),
 	)
 }
@@ -104,7 +103,7 @@ func (r EditUserAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
 		vd.Field(&r.PrPermitted),
-		vd.Field(&r.Type, vdRuleAccountTypeMin, vdRuleAccountTypeMax),
+		vd.Field(&r.Type, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
 	)
 }

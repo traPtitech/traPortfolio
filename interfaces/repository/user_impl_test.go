@@ -946,7 +946,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumericNotNull(),
-					URL:         random.OptAccountURLStringNotNull(uint(aType.Int64)),
+					URL:         random.OptAccountURLStringNotNull(domain.AccountType(aType.Int64)),
 					PrPermitted: random.OptBoolNotNull(),
 					Type:        aType,
 				},

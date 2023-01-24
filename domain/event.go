@@ -24,11 +24,11 @@ type EventDetail struct {
 	RoomID      uuid.UUID
 }
 
-type EventLevel uint
+type EventLevel uint8
 
 const (
-	EventLevelAnonymous = iota // 匿名で公開
-	EventLevelPublic           // 全て公開
-	EventLevelPrivate          // 外部に非公開
+	EventLevelAnonymous EventLevel = iota // 匿名で公開
+	EventLevelPublic                      // 全て公開
+	EventLevelPrivate                     // 外部に非公開
 	EventLevelLimit
 )
