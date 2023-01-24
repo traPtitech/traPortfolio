@@ -183,7 +183,7 @@ func OptBool() optional.Of[bool] {
 }
 
 func OptBoolNotNull() optional.Of[bool] {
-	return optional.New(Bool(), true)
+	return optional.From(Bool())
 }
 
 func OptInt64() optional.Of[int64] {
@@ -195,7 +195,7 @@ func OptInt64n(n int64) optional.Of[int64] {
 }
 
 func OptInt64nNotNull(n int64) optional.Of[int64] {
-	return optional.New(rand.Int63n(n), true)
+	return optional.From(rand.Int63n(n))
 }
 
 func OptAlphaNumericn(n int) optional.Of[string] {
@@ -207,7 +207,7 @@ func OptAlphaNumeric() optional.Of[string] {
 }
 
 func OptAlphaNumericNotNull() optional.Of[string] {
-	return optional.New(AlphaNumeric(), true)
+	return optional.From(AlphaNumeric())
 }
 
 func OptTime() optional.Of[time.Time] {
@@ -219,11 +219,11 @@ func OptURLString() optional.Of[string] {
 }
 
 func OptURLStringNotNull() optional.Of[string] {
-	return optional.New(RandURLString(), true)
+	return optional.From(RandURLString())
 }
 
 func OptAccountURLStringNotNull(accountType domain.AccountType) optional.Of[string] {
-	return optional.New(AccountURLString(accountType), true)
+	return optional.From(AccountURLString(accountType))
 }
 
 func OptAccountType() optional.Of[domain.AccountType] {
@@ -231,5 +231,5 @@ func OptAccountType() optional.Of[domain.AccountType] {
 }
 
 func OptAccountTypeNotNull() optional.Of[domain.AccountType] {
-	return optional.New(domain.AccountType(rand.Intn(int(domain.AccountLimit))), true)
+	return optional.From(domain.AccountType(rand.Intn(int(domain.AccountLimit))))
 }

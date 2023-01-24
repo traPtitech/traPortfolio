@@ -58,7 +58,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "All IncludeSuspended",
 			args: args{args: &urepository.GetUsersArgs{
-				IncludeSuspended: optional.New(true, true),
+				IncludeSuspended: optional.From(true),
 			}},
 			expected: []*domain.User{
 				domain.NewUser(
@@ -85,7 +85,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "Name",
 			args: args{args: &urepository.GetUsersArgs{
-				Name: optional.New(mockdata.MockTraQUsers[0].Name, true),
+				Name: optional.From(mockdata.MockTraQUsers[0].Name),
 			}},
 			expected: []*domain.User{
 				domain.NewUser(
@@ -100,8 +100,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "Invalid arg",
 			args: args{args: &urepository.GetUsersArgs{
-				Name:             optional.New(mockdata.MockTraQUsers[0].Name, true),
-				IncludeSuspended: optional.New(true, true),
+				Name:             optional.From(mockdata.MockTraQUsers[0].Name),
+				IncludeSuspended: optional.From(true),
 			}},
 			expected:  nil,
 			assertion: assert.Error,

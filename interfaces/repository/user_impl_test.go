@@ -101,7 +101,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_WithOpt_IncludeSuspended",
 			args: args{
 				&repository.GetUsersArgs{
-					IncludeSuspended: optional.New(true, true),
+					IncludeSuspended: optional.From(true),
 				},
 			},
 			want: []*domain.User{
@@ -696,7 +696,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.New(true, true),
+					Check:       optional.From(true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -722,7 +722,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.New(true, true),
+					Check:       optional.From(true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -741,7 +741,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.New(true, true),
+					Check:       optional.From(true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {

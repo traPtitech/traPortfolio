@@ -82,7 +82,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 
 				includeSuspened := random.Bool()
 				args := repository.GetUsersArgs{
-					IncludeSuspended: optional.New(includeSuspened, true),
+					IncludeSuspended: optional.From(includeSuspened),
 				}
 
 				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
