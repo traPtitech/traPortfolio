@@ -278,7 +278,7 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 
 	exist := new(model.Account)
 	if err := r.h.
-		Where(&model.Account{Type: args.Type, UserID: userID}).
+		Where(&model.Account{Type: uint8(args.Type), UserID: userID}).
 		First(exist).
 		Error(); err != database.ErrNoRows {
 		if err != nil {
