@@ -809,7 +809,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(anyUUID{}).
+					WithArgs(args.id).
 					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
