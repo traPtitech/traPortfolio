@@ -248,7 +248,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.From((eventLevel)),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -269,7 +269,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.From((eventLevel)),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -290,7 +290,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.From((eventLevel)),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
