@@ -39,6 +39,13 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 
 func (r *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
+
+	limit := -1
+
+	if args.Limit.Valid {
+		limit = int(args.Limit.Int64)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -56,6 +63,7 @@ func (r *UserRepository) GetUsers(args *repository.GetUsersArgs) ([]*domain.User
 	users := make([]*model.User, 0)
 	if err := r.h.
 		Where("`users`.`id` IN (?)", traqUserIDs).
+		Limit(limit).
 		Find(&users).
 		Error(); err != nil {
 		return nil, convertError(err)

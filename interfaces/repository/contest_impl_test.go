@@ -911,7 +911,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name", "check"}).
 							AddRow(u.ID, u.Name, u.Check),
 					)
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -958,7 +958,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(want), nil)
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},

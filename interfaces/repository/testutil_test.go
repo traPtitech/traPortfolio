@@ -102,19 +102,19 @@ func makeTraqUsers(t *testing.T, users []*domain.User) []*external.TraQUserRespo
 	return res
 }
 
-func makePortalUsers(users []*domain.User) []*external.PortalUserResponse {
+func makePortalUsers(t *testing.T, users []*domain.User) []*external.PortalUserResponse {
 	res := make([]*external.PortalUserResponse, len(users))
 	for i, u := range users {
-		res[i] = makePortalUser(u)
+		res[i] = makePortalUser(t, u)
 	}
 
 	return res
 }
 
-func makePortalUser(user *domain.User) *external.PortalUserResponse {
+func makePortalUser(t *testing.T, user *domain.User) *external.PortalUserResponse {
 	return &external.PortalUserResponse{
 		TraQID:         user.Name,
-		RealName:       user.RealName(),
+		RealName:       user.RealNameForTest(t),
 		AlphabeticName: random.AlphaNumeric(),
 	}
 }

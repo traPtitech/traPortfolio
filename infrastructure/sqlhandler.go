@@ -128,6 +128,11 @@ func (h *SQLHandler) Ping() error {
 	return db.Ping()
 }
 
+func (h *SQLHandler) Limit(limit int) database.SQLHandler {
+	db := h.conn.Limit(limit)
+	return &SQLHandler{conn: db}
+}
+
 const (
 	ErrCodeInvalidConstraint = 1452
 )

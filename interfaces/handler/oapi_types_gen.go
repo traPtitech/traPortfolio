@@ -560,6 +560,9 @@ type GroupIdInPath = uuid.UUID
 // IncludeSuspendedInQuery defines model for includeSuspendedInQuery.
 type IncludeSuspendedInQuery = bool
 
+// LimitInQuery defines model for limitInQuery.
+type LimitInQuery = int64
+
 // NameInQuery defines model for nameInQuery.
 type NameInQuery = string
 
@@ -579,6 +582,9 @@ type GetUsersParams struct {
 
 	// Name 指定した文字列がtraP IDに含まれているかどうか
 	Name *NameInQuery `form:"name,omitempty" json:"name,omitempty" query:"name"`
+
+	// Limit 取得数の上限
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
 }
 
 // CreateContestJSONRequestBody defines body for CreateContest for application/json ContentType.
