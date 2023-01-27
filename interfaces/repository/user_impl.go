@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -276,15 +278,15 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 		return nil, repository.ErrInvalidArg
 	}
 
-	exist := new(model.Account)
 	if err := r.h.
 		Where(&model.Account{Type: uint8(args.Type), UserID: userID}).
-		First(exist).
-		Error(); err != database.ErrNoRows {
-		if err != nil {
+		First(&model.Account{}).
+		Error(); err == nil {
+		return nil, repository.ErrAlreadyExists
+	} else {
+		if !errors.Is(err, database.ErrNoRows) {
 			return nil, convertError(err)
 		}
-		return nil, repository.ErrAlreadyExists
 	}
 
 	account := model.Account{
