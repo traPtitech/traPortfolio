@@ -111,7 +111,7 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 			return nil // updateする必要がないのでここでcommitする
 		}
 
-		if err :=tx.WithContext(ctx).Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
+		if err := tx.WithContext(ctx).Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
 			return convertError(err)
 		}
 
@@ -145,7 +145,8 @@ func (r *EventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) (
 
 func (r *EventRepository) getEventLevelByID(ctx context.Context, eventID uuid.UUID) (*model.EventLevelRelation, error) {
 	elv := &model.EventLevelRelation{}
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Where(&model.EventLevelRelation{ID: eventID}).
 		First(elv).
 		Error()

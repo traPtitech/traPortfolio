@@ -31,7 +31,7 @@ func NewProjectService(projectRepository repository.ProjectRepository) ProjectSe
 }
 
 func (s *projectService) GetProjects(ctx context.Context) ([]*domain.Project, error) {
-	res, err := s.repo.GetProjects(ctx, )
+	res, err := s.repo.GetProjects(ctx)
 	if err != nil {
 		return nil, err
 	}

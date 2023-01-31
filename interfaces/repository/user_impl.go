@@ -63,7 +63,8 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 	}
 
 	users := make([]*model.User, 0)
-	if err := r.h.WithContext(ctx).
+	if err := r.h.
+		WithContext(ctx).
 		Where("`users`.`id` IN (?)", traqUserIDs).
 		Limit(limit).
 		Find(&users).
@@ -116,7 +117,8 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 
 func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
 	user := new(model.User)
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Preload("Accounts").
 		Where(&model.User{ID: userID}).
 		First(user).
@@ -208,15 +210,15 @@ func (r *UserRepository) UpdateUser(ctx context.Context, userID uuid.UUID, args 
 
 	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		user := new(model.User)
-		err :=tx.WithContext(ctx).
-			Where(&model.User{ID: userID}).
+		err := tx.
+			WithContext(ctx).Where(&model.User{ID: userID}).
 			First(user).
 			Error()
 		if err != nil {
 			return convertError(err)
 		}
 
-		err =tx.WithContext(ctx).Model(user).Updates(changes).Error()
+		err = tx.WithContext(ctx).Model(user).Updates(changes).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -230,7 +232,8 @@ func (r *UserRepository) UpdateUser(ctx context.Context, userID uuid.UUID, args 
 }
 
 func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*domain.Account, error) {
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -239,7 +242,8 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 	}
 
 	accounts := make([]*model.Account, 0)
-	err = r.h.WithContext(ctx).
+	err = r.h.
+		WithContext(ctx).
 		Where(&model.Account{UserID: userID}).
 		Find(&accounts).
 		Error()
@@ -262,7 +266,8 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 
 func (r *UserRepository) GetAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
 	account := &model.Account{}
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Where(&model.Account{ID: accountID, UserID: userID}).
 		First(account).
 		Error()
@@ -300,7 +305,8 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 	}
 
 	ver := new(model.Account)
-	if err := r.h.WithContext(ctx).
+	if err := r.h.
+		WithContext(ctx).
 		Where(&model.Account{ID: account.ID}).
 		First(ver).
 		Error(); err != nil {
@@ -337,8 +343,8 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 
 	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		account := new(model.Account)
-		err :=tx.WithContext(ctx).
-			Where(&model.Account{ID: accountID, UserID: userID}).
+		err := tx.
+			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			First(account).
 			Error()
 		if err != nil {
@@ -360,7 +366,7 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 			}
 		}
 
-		err =tx.WithContext(ctx).Model(account).Updates(changes).Error()
+		err = tx.WithContext(ctx).Model(account).Updates(changes).Error()
 		if err != nil {
 			return convertError(err)
 		}
@@ -371,15 +377,15 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 
 func (r *UserRepository) DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error {
 	if err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
-		if err :=tx.WithContext(ctx).
-			Where(&model.Account{ID: accountID, UserID: userID}).
+		if err := tx.
+			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			First(&model.Account{}).
 			Error(); err != nil {
 			return convertError(err)
 		}
 
-		if err :=tx.WithContext(ctx).
-			Where(&model.Account{ID: accountID, UserID: userID}).
+		if err := tx.
+			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			Delete(&model.Account{}).
 			Error(); err != nil {
 			return convertError(err)
@@ -394,7 +400,8 @@ func (r *UserRepository) DeleteAccount(ctx context.Context, userID uuid.UUID, ac
 }
 
 func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -403,7 +410,8 @@ func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*
 	}
 
 	projects := make([]*model.ProjectMember, 0)
-	err = r.h.WithContext(ctx).
+	err = r.h.
+		WithContext(ctx).
 		Preload("Project").
 		Where(&model.ProjectMember{UserID: userID}).
 		Find(&projects).
@@ -426,7 +434,8 @@ func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*
 }
 
 func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error) {
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -435,7 +444,8 @@ func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID
 	}
 
 	groups := make([]*model.GroupUserBelonging, 0)
-	err = r.h.WithContext(ctx).
+	err = r.h.
+		WithContext(ctx).
 		Preload("Group").
 		Where(&model.GroupUserBelonging{UserID: userID}).
 		Find(&groups).
@@ -466,7 +476,8 @@ func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID
 }
 
 func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error) {
-	err := r.h.WithContext(ctx).
+	err := r.h.
+		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
 		Error()
@@ -475,7 +486,8 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 	}
 
 	contestTeamUserBelongings := make([]*model.ContestTeamUserBelonging, 0)
-	err = r.h.WithContext(ctx).
+	err = r.h.
+		WithContext(ctx).
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
 		Find(&contestTeamUserBelongings).

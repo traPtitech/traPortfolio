@@ -37,7 +37,8 @@ func (r *GroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, er
 
 func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
 	group := &model.Group{}
-	if err := r.h.WithContext(ctx).
+	if err := r.h.
+		WithContext(ctx).
 		Where(&model.Group{GroupID: groupID}).
 		First(group).
 		Error(); err != nil {
@@ -45,7 +46,8 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 	}
 
 	users := make([]*model.GroupUserBelonging, 0)
-	if err := r.h.WithContext(ctx).
+	if err := r.h.
+		WithContext(ctx).
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
 		Error(); err != nil {
@@ -75,7 +77,8 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 	}
 
 	admins := make([]*model.GroupUserAdmin, 0)
-	if err := r.h.WithContext(ctx).
+	if err := r.h.
+		WithContext(ctx).
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
 		Error(); err != nil {
