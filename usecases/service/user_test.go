@@ -38,7 +38,7 @@ func TestUserService_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
-				repo.EXPECT().GetUsers(args.args).Return(want, nil)
+				repo.EXPECT().GetUsers(args.ctx, args.args).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -50,7 +50,7 @@ func TestUserService_GetUsers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.User) {
-				repo.EXPECT().GetUsers(args.args).Return(want, repository.ErrForbidden)
+				repo.EXPECT().GetUsers(args.ctx, args.args).Return(want, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
@@ -108,7 +108,7 @@ func TestUserService_GetUser(t *testing.T) {
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.UserDetail) {
 				want.ID = args.id
-				repo.EXPECT().GetUser(args.id).Return(want, nil)
+				repo.EXPECT().GetUser(args.ctx, args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -120,7 +120,7 @@ func TestUserService_GetUser(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.UserDetail) {
-				repo.EXPECT().GetUser(args.id).Return(nil, repository.ErrForbidden)
+				repo.EXPECT().GetUser(args.ctx, args.id).Return(nil, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
@@ -168,7 +168,7 @@ func TestUserService_Update(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateUser(args.id, args.args).Return(nil)
+				repo.EXPECT().UpdateUser(args.ctx, args.id, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -183,7 +183,7 @@ func TestUserService_Update(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateUser(args.id, args.args).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateUser(args.ctx, args.id, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -208,6 +208,7 @@ func TestUserService_Update(t *testing.T) {
 func TestUserService_GetAccount(t *testing.T) {
 	t.Parallel()
 	type args struct {
+		ctx       context.Context
 		userID    uuid.UUID
 		accountID uuid.UUID
 	}
@@ -221,6 +222,7 @@ func TestUserService_GetAccount(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
+				ctx:       context.Background(),
 				userID:    random.UUID(),
 				accountID: random.UUID(),
 			},
@@ -231,7 +233,7 @@ func TestUserService_GetAccount(t *testing.T) {
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.Account) {
 				want.ID = args.accountID
-				repo.EXPECT().GetAccount(args.userID, args.accountID).Return(want, nil)
+				repo.EXPECT().GetAccount(args.ctx, args.userID, args.accountID).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -248,7 +250,7 @@ func TestUserService_GetAccount(t *testing.T) {
 			tt.setup(repo, event, tt.args, tt.want)
 
 			s := NewUserService(repo, event)
-			got, err := s.GetAccount(tt.args.userID, tt.args.accountID)
+			got, err := s.GetAccount(tt.args.ctx, tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -258,6 +260,7 @@ func TestUserService_GetAccount(t *testing.T) {
 func TestUserService_GetAccounts(t *testing.T) {
 	t.Parallel()
 	type args struct {
+		ctx    context.Context
 		userID uuid.UUID
 	}
 	tests := []struct {
@@ -269,7 +272,10 @@ func TestUserService_GetAccounts(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			args: args{userID: random.UUID()},
+			args: args{
+				ctx:    context.Background(),
+				userID: random.UUID(),
+			},
 			want: []*domain.Account{
 				{
 					ID:          random.UUID(),
@@ -278,7 +284,7 @@ func TestUserService_GetAccounts(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.Account) {
-				repo.EXPECT().GetAccounts(args.userID).Return(want, nil)
+				repo.EXPECT().GetAccounts(args.ctx, args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -295,7 +301,7 @@ func TestUserService_GetAccounts(t *testing.T) {
 			tt.setup(repo, event, tt.args, tt.want)
 
 			s := NewUserService(repo, event)
-			got, err := s.GetAccounts(tt.args.userID)
+			got, err := s.GetAccounts(tt.args.ctx, tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -334,7 +340,7 @@ func TestUserService_CreateAccount(t *testing.T) {
 				PrPermitted: true,
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want *domain.Account) {
-				repo.EXPECT().CreateAccount(args.id, args.account).Return(want, nil)
+				repo.EXPECT().CreateAccount(args.ctx, args.id, args.account).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -386,7 +392,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(nil)
+				repo.EXPECT().UpdateAccount(args.ctx, args.userID, args.accountID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -404,7 +410,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().UpdateAccount(args.userID, args.accountID, args.args).Return(repository.ErrNotFound)
+				repo.EXPECT().UpdateAccount(args.ctx, args.userID, args.accountID, args.args).Return(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -447,7 +453,7 @@ func TestUserService_DeleteAccount(t *testing.T) {
 				accountID: random.UUID(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
-				repo.EXPECT().DeleteAccount(args.userID, args.accountID).Return(nil)
+				repo.EXPECT().DeleteAccount(args.ctx, args.userID, args.accountID).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -497,7 +503,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserProject) {
-				repo.EXPECT().GetProjects(args.userID).Return(want, nil)
+				repo.EXPECT().GetProjects(args.ctx, args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -509,7 +515,7 @@ func TestUserService_GetUserProjects(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserProject) {
-				repo.EXPECT().GetProjects(args.userID).Return(want, repository.ErrNotFound)
+				repo.EXPECT().GetProjects(args.ctx, args.userID).Return(want, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -568,7 +574,7 @@ func TestUserService_GetUserContests(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
-				repo.EXPECT().GetContests(args.userID).Return(want, nil)
+				repo.EXPECT().GetContests(args.ctx, args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -580,7 +586,7 @@ func TestUserService_GetUserContests(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserContest) {
-				repo.EXPECT().GetContests(args.userID).Return(want, repository.ErrNotFound)
+				repo.EXPECT().GetContests(args.ctx, args.userID).Return(want, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -631,7 +637,7 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup) {
-				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, nil)
+				repo.EXPECT().GetGroupsByUserID(args.ctx, args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -643,7 +649,7 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.UserGroup) {
-				repo.EXPECT().GetGroupsByUserID(args.userID).Return(want, repository.ErrNotFound)
+				repo.EXPECT().GetGroupsByUserID(args.ctx, args.userID).Return(want, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -694,7 +700,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.Event) {
-				event.EXPECT().GetUserEvents(args.userID).Return(want, nil)
+				event.EXPECT().GetUserEvents(args.ctx, args.userID).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -706,7 +712,7 @@ func TestUserService_GetUserEvents(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args, want []*domain.Event) {
-				event.EXPECT().GetUserEvents(args.userID).Return(want, repository.ErrNotFound)
+				event.EXPECT().GetUserEvents(args.ctx, args.userID).Return(want, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},

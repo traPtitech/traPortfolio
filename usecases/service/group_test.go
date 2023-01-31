@@ -36,7 +36,7 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 				},
 			},
 			setup: func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want []*domain.Group) {
-				group.EXPECT().GetAllGroups().Return(want, nil)
+				group.EXPECT().GetAllGroups(args.ctx).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -97,7 +97,7 @@ func TestGroupService_GetGroup(t *testing.T) {
 				Description: random.AlphaNumeric(),
 			},
 			setup: func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want *domain.GroupDetail) {
-				group.EXPECT().GetGroup(groupID).Return(&domain.GroupDetail{
+				group.EXPECT().GetGroup(args.ctx, groupID).Return(&domain.GroupDetail{
 					ID:   groupID,
 					Name: want.Name,
 					Link: want.Link,
@@ -116,7 +116,7 @@ func TestGroupService_GetGroup(t *testing.T) {
 					},
 					Description: want.Description,
 				}, nil)
-				user.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return([]*domain.User{
+				user.EXPECT().GetUsers(args.ctx, &repository.GetUsersArgs{}).Return([]*domain.User{
 					want.Admin[0],
 					&want.Members[0].User,
 				}, nil)

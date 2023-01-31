@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql/driver"
 	"testing"
 	"time"
@@ -80,7 +81,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			tt.setup(f, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetContests()
+			got, err := repo.GetContests(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -154,7 +155,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetContest(tt.args.id)
+			got, err := repo.GetContest(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -273,7 +274,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.CreateContest(tt.args.args)
+			got, err := repo.CreateContest(context.Background(), tt.args.args)
 			if tt.want != nil && got != nil {
 				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
 			}
@@ -394,7 +395,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateContest(tt.args.id, tt.args.args))
+			tt.assertion(t, repo.UpdateContest(context.Background(), tt.args.id, tt.args.args))
 		})
 	}
 }
@@ -480,7 +481,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.DeleteContest(tt.args.id))
+			tt.assertion(t, repo.DeleteContest(context.Background(), tt.args.id))
 		})
 	}
 }
@@ -571,7 +572,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetContestTeams(tt.args.contestID)
+			got, err := repo.GetContestTeams(context.Background(), tt.args.contestID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -648,7 +649,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetContestTeam(tt.args.contestID, tt.args.teamID)
+			got, err := repo.GetContestTeam(context.Background(), tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -736,7 +737,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.CreateContestTeam(tt.args.contestID, tt.args._contestTeam)
+			got, err := repo.CreateContestTeam(context.Background(), tt.args.contestID, tt.args._contestTeam)
 			if tt.want != nil && got != nil {
 				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
 			}
@@ -854,7 +855,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateContestTeam(tt.args.teamID, tt.args.args))
+			tt.assertion(t, repo.UpdateContestTeam(context.Background(), tt.args.teamID, tt.args.args))
 		})
 	}
 }
@@ -1080,7 +1081,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetContestTeamMembers(tt.args.contestID, tt.args.teamID)
+			got, err := repo.GetContestTeamMembers(context.Background(), tt.args.contestID, tt.args.teamID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -1225,7 +1226,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.AddContestTeamMembers(tt.args.teamID, tt.args.members))
+			tt.assertion(t, repo.AddContestTeamMembers(context.Background(), tt.args.teamID, tt.args.members))
 		})
 	}
 }
@@ -1407,7 +1408,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.EditContestTeamMembers(tt.args.teamID, tt.args.members))
+			tt.assertion(t, repo.EditContestTeamMembers(context.Background(), tt.args.teamID, tt.args.members))
 		})
 	}
 }

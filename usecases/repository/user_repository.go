@@ -3,6 +3,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -40,16 +42,16 @@ type UpdateAccountArgs struct {
 }
 
 type UserRepository interface {
-	GetUsers(args *GetUsersArgs) ([]*domain.User, error)
-	GetUser(userID uuid.UUID) (*domain.UserDetail, error)
-	CreateUser(args *CreateUserArgs) (*domain.UserDetail, error)
-	UpdateUser(userID uuid.UUID, args *UpdateUserArgs) error
-	GetAccounts(userID uuid.UUID) ([]*domain.Account, error)
-	GetAccount(userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
-	CreateAccount(userID uuid.UUID, args *CreateAccountArgs) (*domain.Account, error)
-	UpdateAccount(userID uuid.UUID, accountID uuid.UUID, args *UpdateAccountArgs) error
-	DeleteAccount(userID uuid.UUID, accountID uuid.UUID) error
-	GetProjects(userID uuid.UUID) ([]*domain.UserProject, error)
-	GetContests(userID uuid.UUID) ([]*domain.UserContest, error)
-	GetGroupsByUserID(userID uuid.UUID) ([]*domain.UserGroup, error)
+	GetUsers(ctx context.Context, args *GetUsersArgs) ([]*domain.User, error)
+	GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error)
+	CreateUser(ctx context.Context, args *CreateUserArgs) (*domain.UserDetail, error)
+	UpdateUser(ctx context.Context, userID uuid.UUID, args *UpdateUserArgs) error
+	GetAccounts(ctx context.Context, userID uuid.UUID) ([]*domain.Account, error)
+	GetAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
+	CreateAccount(ctx context.Context, userID uuid.UUID, args *CreateAccountArgs) (*domain.Account, error)
+	UpdateAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *UpdateAccountArgs) error
+	DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error
+	GetProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error)
+	GetContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error)
+	GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error)
 }

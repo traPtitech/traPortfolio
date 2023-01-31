@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -19,9 +21,9 @@ func NewProjectRepository(h database.SQLHandler, portal external.PortalAPI) repo
 	return &ProjectRepository{h, portal}
 }
 
-func (r *ProjectRepository) GetProjects() ([]*domain.Project, error) {
+func (r *ProjectRepository) GetProjects(ctx context.Context) ([]*domain.Project, error) {
 	projects := make([]*model.Project, 0)
-	err := r.h.Find(&projects).Error()
+	err := r.h.WithContext(ctx).Find(&projects).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -37,9 +39,9 @@ func (r *ProjectRepository) GetProjects() ([]*domain.Project, error) {
 	return res, nil
 }
 
-func (r *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error) {
+func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error) {
 	project := new(model.Project)
-	if err := r.h.
+	if err := r.h.WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
 		First(project).
 		Error(); err != nil {
@@ -47,7 +49,7 @@ func (r *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDeta
 	}
 
 	members := make([]*model.ProjectMember, 0)
-	err := r.h.
+	err := r.h.WithContext(ctx).
 		Preload("User").
 		Where(model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
@@ -95,7 +97,7 @@ func (r *ProjectRepository) GetProject(projectID uuid.UUID) (*domain.ProjectDeta
 	return res, nil
 }
 
-func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
+func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	p := model.Project{
 		ID:            random.UUID(),
 		Name:          args.Name,
@@ -109,7 +111,7 @@ func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*
 		p.Link = args.Link.String
 	}
 
-	err := r.h.Create(&p).Error()
+	err := r.h.WithContext(ctx).Create(&p).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -127,7 +129,7 @@ func (r *ProjectRepository) CreateProject(args *repository.CreateProjectArgs) (*
 	return res, nil
 }
 
-func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
+func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
 	changes := map[string]interface{}{}
 	if args.Name.Valid {
 		changes["name"] = args.Name.String
@@ -151,7 +153,7 @@ func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.
 		return nil
 	}
 
-	err := r.h.
+	err := r.h.WithContext(ctx).
 		Model(&model.Project{}).
 		Where(&model.Project{ID: projectID}).
 		Updates(changes).
@@ -163,9 +165,9 @@ func (r *ProjectRepository) UpdateProject(projectID uuid.UUID, args *repository.
 	return nil
 }
 
-func (r *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
+func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	members := make([]*model.ProjectMember, 0)
-	err := r.h.
+	err := r.h.WithContext(ctx).
 		Preload("User").
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
@@ -203,7 +205,7 @@ func (r *ProjectRepository) GetProjectMembers(projectID uuid.UUID) ([]*domain.Us
 	return res, nil
 }
 
-func (r *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
+func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
 	if len(projectMembers) == 0 {
 		return repository.ErrInvalidArg
 	}
@@ -218,7 +220,7 @@ func (r *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMember
 	}
 
 	// プロジェクトの存在チェック
-	err := r.h.
+	err := r.h.WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
 		First(&model.Project{}).
 		Error()
@@ -228,7 +230,7 @@ func (r *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMember
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
 	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
-	err = r.h.
+	err = r.h.WithContext(ctx).
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&_mmbs).
 		Error()
@@ -254,12 +256,12 @@ func (r *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMember
 		members = append(members, m)
 	}
 
-	err = r.h.Transaction(func(tx database.SQLHandler) error {
+	err = r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		for _, v := range members {
 			if _, ok := mmbsMp[v.UserID]; ok {
 				continue
 			}
-			err = tx.Create(v).Error()
+			err =tx.WithContext(ctx).Create(v).Error()
 			if err != nil {
 				return convertError(err)
 			}
@@ -273,13 +275,13 @@ func (r *ProjectRepository) AddProjectMembers(projectID uuid.UUID, projectMember
 	return nil
 }
 
-func (r *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []uuid.UUID) error {
+func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, members []uuid.UUID) error {
 	if len(members) == 0 {
 		return repository.ErrInvalidArg
 	}
 
 	// プロジェクトの存在チェック
-	err := r.h.
+	err := r.h.WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
 		First(&model.Project{}).
 		Error()
@@ -287,7 +289,7 @@ func (r *ProjectRepository) DeleteProjectMembers(projectID uuid.UUID, members []
 		return convertError(err)
 	}
 
-	err = r.h.
+	err = r.h.WithContext(ctx).
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Where("`project_members`.`user_id` IN (?)", members).
 		Delete(&model.ProjectMember{}).
