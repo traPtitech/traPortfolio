@@ -283,10 +283,8 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 		First(&model.Account{}).
 		Error(); err == nil {
 		return nil, repository.ErrAlreadyExists
-	} else {
-		if !errors.Is(err, database.ErrNoRows) {
-			return nil, convertError(err)
-		}
+	} else if !errors.Is(err, database.ErrNoRows) {
+		return nil, convertError(err)
 	}
 
 	account := model.Account{
@@ -297,6 +295,7 @@ func (r *UserRepository) CreateAccount(userID uuid.UUID, args *repository.Create
 		UserID: userID,
 		Check:  args.PrPermitted,
 	}
+
 	err := r.h.Create(&account).Error()
 	if err != nil {
 		return nil, convertError(err)
