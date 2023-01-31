@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"context"
 	"errors"
 
 	sqldriver "github.com/go-sql-driver/mysql"
@@ -50,6 +51,11 @@ func initDB(db *gorm.DB) error {
 		return err
 	}
 	return nil
+}
+
+func (h *SQLHandler) WithContext(ctx context.Context) database.SQLHandler {
+	db := h.conn.WithContext(ctx)
+	return &SQLHandler{conn: db}
 }
 
 func (h *SQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
