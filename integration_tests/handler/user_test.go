@@ -315,7 +315,7 @@ func TestAddUserAccount(t *testing.T) {
 	}{
 		"201": {
 			http.StatusCreated,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -338,7 +338,7 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -349,7 +349,7 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -357,6 +357,17 @@ func TestAddUserAccount(t *testing.T) {
 				Url:         accountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
+		},
+		"409 conflict already exists": {
+			http.StatusConflict,
+			mockdata.UserID1(),
+			handler.AddUserAccountJSONRequestBody{
+				DisplayName: displayName,
+				PrPermitted: prPermitted,
+				Type:        2,
+				Url:         random.AccountURLString(domain.AccountType(2)),
+			},
+			testutils.HTTPError("Conflict: already exists"),
 		},
 	}
 
