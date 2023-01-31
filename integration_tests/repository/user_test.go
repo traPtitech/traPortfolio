@@ -319,8 +319,20 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	account2 := mustMakeAccount(t, repo, user.ID, nil)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
+	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	account2 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 	expected := []*domain.Account{account1, account2}
 
 	got, err := repo.GetAccounts(user.ID)
@@ -341,8 +353,20 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	mustMakeAccount(t, repo, user.ID, nil)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
+	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 
 	got, err := repo.GetAccount(user.ID, account1.ID)
 	assert.NoError(t, err)
@@ -364,8 +388,20 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	mustMakeAccount(t, repo, user.ID, nil)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
+	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 
 	accountType := optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), true)
 	args := &urepository.UpdateAccountArgs{
@@ -406,8 +442,20 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	account2 := mustMakeAccount(t, repo, user.ID, nil)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
+	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	account2 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 
 	err = repo.DeleteAccount(user.ID, account1.ID)
 	assert.NoError(t, err)
