@@ -218,7 +218,13 @@ func (r *ContestRepository) GetContestTeam(contestID uuid.UUID, teamID uuid.UUID
 }
 
 func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
-	/*contestIDが指すコンテストが存在するかどうか確かめる*/
+
+	if err := r.h.
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error(); err != nil {
+		return nil, convertError(err)
+	}
 
 	contestTeam := &model.ContestTeam{
 		ID:          uuid.Must(uuid.NewV4()),
@@ -233,6 +239,7 @@ func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam 
 	if err != nil {
 		return nil, convertError(err)
 	}
+
 	result := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
 			ID:        contestTeam.ID,
@@ -245,6 +252,7 @@ func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam 
 		Members:     nil,
 	}
 	return result, nil
+
 }
 
 func (r *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
