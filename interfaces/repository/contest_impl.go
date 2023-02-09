@@ -252,7 +252,6 @@ func (r *ContestRepository) CreateContestTeam(contestID uuid.UUID, _contestTeam 
 		Members:     nil,
 	}
 	return result, nil
-
 }
 
 func (r *ContestRepository) UpdateContestTeam(teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
