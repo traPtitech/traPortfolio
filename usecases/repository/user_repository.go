@@ -11,6 +11,7 @@ import (
 type GetUsersArgs struct {
 	IncludeSuspended optional.Bool
 	Name             optional.String
+	Limit            optional.Int64
 }
 
 type CreateUserArgs struct {
@@ -26,7 +27,7 @@ type UpdateUserArgs struct {
 
 type CreateAccountArgs struct {
 	DisplayName string // 外部アカウントの表示名
-	Type        uint
+	Type        domain.AccountType
 	URL         string
 	PrPermitted bool
 }

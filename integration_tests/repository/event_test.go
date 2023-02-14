@@ -107,7 +107,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
-	updatedLevel := random.Uint8n(domain.EventLevelLimit)
+	updatedLevel := random.Uint8n(uint8(domain.EventLevelLimit))
 	err = repo.UpdateEventLevel(selected.EventID, &urepository.UpdateEventLevelArgs{
 		Level: optional.NewUint8(updatedLevel, true),
 	})
@@ -150,7 +150,7 @@ func createRandomEventLevels(t *testing.T, repo urepository.EventRepository) map
 		if idx == 0 || random.Bool() {
 			args := &urepository.CreateEventLevelArgs{
 				EventID: e.ID,
-				Level:   domain.EventLevel(rand.Intn(domain.EventLevelLimit)),
+				Level:   domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
 			}
 
 			mustMakeEventLevel(t, repo, args)
