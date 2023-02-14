@@ -694,6 +694,11 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				Members:     nil,
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(args.contestID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `contest_teams` (`id`,`contest_id`,`name`,`description`,`result`,`link`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)")).
@@ -702,6 +707,26 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
+		},
+		{
+			name: "ContestNotFound",
+			args: args{
+				contestID: cid,
+				_contestTeam: &repository.CreateContestTeamArgs{
+					Name:        random.AlphaNumeric(),
+					Result:      random.OptAlphaNumeric(),
+					Link:        random.OptURLString(),
+					Description: random.AlphaNumeric(),
+				},
+			},
+			want: nil,
+			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
+					WithArgs(args.contestID).
+					WillReturnError(database.ErrNoRows)
+			},
+			assertion: assert.Error,
 		},
 		{
 			name: "UnexpectedError",
