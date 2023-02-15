@@ -438,6 +438,17 @@ func TestAddContestTeam(t *testing.T) {
 			},
 			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Not Found: not found"),
+		},
 	}
 
 	e := echo.New()
