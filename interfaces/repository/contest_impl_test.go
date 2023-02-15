@@ -694,7 +694,6 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				Members:     nil,
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
-
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.contestID).
