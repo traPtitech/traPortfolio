@@ -728,7 +728,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "UnexpectedError",
+			name: "CreateContestFailed",
 			args: args{
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
