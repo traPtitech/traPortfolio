@@ -68,6 +68,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?)")).
+					WithArgs(want[0].ID, want[1].ID, want[2].ID).
 					WillReturnRows(rows)
 
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
@@ -93,6 +94,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?)")).
+					WithArgs(want[0].ID, want[1].ID, want[2].ID).
 					WillReturnRows(rows)
 
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
@@ -120,6 +122,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?)")).
+					WithArgs(want[0].ID, want[1].ID, want[2].ID).
 					WillReturnRows(rows)
 
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
@@ -164,6 +167,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
+					WithArgs().
 					WillReturnRows(sqlmock.NewRows([]string{"id", "name"}))
 			},
 			assertion: assert.NoError,
@@ -304,6 +308,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?)")).
+					WithArgs(users[0].ID, users[1].ID, users[2].ID).
 					WillReturnRows(rows)
 
 				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
