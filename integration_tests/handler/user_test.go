@@ -411,7 +411,7 @@ func TestEditUserAccount(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
@@ -423,7 +423,7 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			testutils.DummyUUID(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
@@ -437,7 +437,7 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
@@ -471,7 +471,7 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"404 account not found": {
 			http.StatusNotFound,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			random.UUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
@@ -543,7 +543,7 @@ func TestDeleteUserAccount(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			testutils.DummyUUID(),
 			nil,
 			true,
@@ -564,7 +564,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		},
 		"404 account not found": {
 			http.StatusNotFound,
-			mockdata.UserID1(),
+			mockdata.UserID2(),
 			random.UUID(),
 			testutils.HTTPError("Not Found: not found"),
 			false,
