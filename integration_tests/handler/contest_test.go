@@ -195,6 +195,7 @@ func TestCreateContest(t *testing.T) {
 	}
 }
 
+// EditContest PATCH /contests/:contestID
 func TestEditContest(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
@@ -331,10 +332,12 @@ func TestEditContest(t *testing.T) {
 	}
 }
 
+// DeleteContest DELETE /contests/:contestID
 func TestDeleteContest(t *testing.T) {
 	// https://github.com/traPtitech/traPortfolio/issues/460
 }
 
+// GetContestTeams GET /contests/:contestID/teams
 func TestGetContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
@@ -373,6 +376,7 @@ func TestGetContestTeam(t *testing.T) {
 	}
 }
 
+// GetContestTeams GET /contests/:contestID/teams/:teamID
 func TestAddContestTeam(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
@@ -470,6 +474,7 @@ func TestAddContestTeam(t *testing.T) {
 	}
 }
 
+// AddContestTeam POST /contests/:contestID/teams
 func TestEditContestTeam(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
