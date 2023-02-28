@@ -319,8 +319,8 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
-	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -353,8 +353,8 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
-	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -388,8 +388,8 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
-	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -442,8 +442,8 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit) / 2))
-	accountType2 := domain.AccountType(rand.Intn(int(domain.AccountLimit)/2) + int(domain.AccountLimit)/2)
+	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
