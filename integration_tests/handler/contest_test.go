@@ -376,7 +376,7 @@ func TestGetContestTeam(t *testing.T) {
 	}
 }
 
-// GetContestTeams GET /contests/:contestID/teams/:teamID
+// AddContestTeam POST /contests/:contestID/teams
 func TestAddContestTeam(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
@@ -474,7 +474,7 @@ func TestAddContestTeam(t *testing.T) {
 	}
 }
 
-// AddContestTeam POST /contests/:contestID/teams
+// EditContestTeam PATCH /contests/:contestID/teams/:teamID
 func TestEditContestTeam(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
