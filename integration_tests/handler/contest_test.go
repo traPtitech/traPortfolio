@@ -508,7 +508,7 @@ func TestEditContestTeam(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
-			mockdata.ContestTeamID1(),
+			mockdata.ContestTeamID2(),
 			handler.EditContestTeamJSONRequestBody{},
 			nil,
 		},
