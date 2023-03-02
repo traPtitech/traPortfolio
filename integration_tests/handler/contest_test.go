@@ -195,6 +195,7 @@ func TestCreateContest(t *testing.T) {
 	}
 }
 
+// EditContest PATCH /contests/:contestID
 func TestEditContest(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
@@ -331,11 +332,13 @@ func TestEditContest(t *testing.T) {
 	}
 }
 
+// DeleteContest DELETE /contests/:contestID
 func TestDeleteContest(t *testing.T) {
 	// https://github.com/traPtitech/traPortfolio/issues/460
 }
 
-func TestGetContestTeam(t *testing.T) {
+// GetContestTeams GET /contests/:contestID/teams
+func TestGetContestTeams(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
@@ -373,6 +376,7 @@ func TestGetContestTeam(t *testing.T) {
 	}
 }
 
+// AddContestTeam POST /contests/:contestID/teams
 func TestAddContestTeam(t *testing.T) {
 	var (
 		description   = random.AlphaNumeric()
@@ -470,14 +474,15 @@ func TestAddContestTeam(t *testing.T) {
 	}
 }
 
+// EditContestTeam PATCH /contests/:contestID/teams/:teamID
 func TestEditContestTeam(t *testing.T) {
 	var (
-		description = random.AlphaNumeric()
-		link        = random.RandURLString()
-		name        = random.AlphaNumeric()
-		result      = random.AlphaNumeric()
-		//tooLongString = strings.Repeat("a", 260)
-		invalidURL = "invalid url"
+		description   = random.AlphaNumeric()
+		link          = random.RandURLString()
+		name          = random.AlphaNumeric()
+		result        = random.AlphaNumeric()
+		tooLongString = strings.Repeat("a", 260)
+		invalidURL    = "invalid url"
 	)
 
 	t.Parallel()
@@ -500,6 +505,36 @@ func TestEditContestTeam(t *testing.T) {
 			},
 			nil,
 		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID2(),
+			handler.EditContestTeamJSONRequestBody{},
+			nil,
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{},
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalid contestTeamID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			uuid.Nil,
+			handler.EditContestTeamJSONRequestBody{},
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalid description": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Description: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
@@ -508,6 +543,36 @@ func TestEditContestTeam(t *testing.T) {
 				Link: &invalidURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Name: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		"400 invalid Result": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Result: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			random.UUID(),
+			handler.EditContestTeamJSONRequestBody{
+				Description: &description,
+				Link:        &link,
+				Name:        &name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Not Found: not found"),
 		},
 	}
 
