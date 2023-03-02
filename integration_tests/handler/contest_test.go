@@ -338,7 +338,7 @@ func TestDeleteContest(t *testing.T) {
 }
 
 // GetContestTeams GET /contests/:contestID/teams
-func TestGetContestTeam(t *testing.T) {
+func TestGetContestTeams(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
