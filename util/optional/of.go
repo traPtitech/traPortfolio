@@ -69,13 +69,6 @@ func (o *Of[T]) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	if u, ok := any(&o.v).(json.Unmarshaler); ok {
-		if err := u.UnmarshalJSON(data); err != nil {
-			return err
-		}
-		o.valid = true
-		return nil
-	}
 	if err := jsoniter.ConfigFastest.Unmarshal(data, &o.v); err != nil {
 		return err
 	}
@@ -87,9 +80,7 @@ func (o Of[T]) MarshalJSON() ([]byte, error) {
 	if !o.valid {
 		return jsoniter.ConfigFastest.Marshal(nil)
 	}
-	if m, ok := any(o.v).(json.Marshaler); ok {
-		return m.MarshalJSON()
-	}
+
 	return jsoniter.ConfigFastest.Marshal(o.v)
 }
 
