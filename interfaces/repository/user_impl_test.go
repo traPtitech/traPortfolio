@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -175,7 +176,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_With_Limit10",
 			args: args{
 				&repository.GetUsersArgs{
-					Limit: optional.NewInt64(10, true),
+					Limit: optional.From(10),
 				},
 			},
 			want: []*domain.User{
@@ -203,7 +204,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_With_Random_Limit",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(random.AlphaNumeric(), true), Limit: optional.NewInt64(random.OptInt64().Int64, true),
+					Name:  optional.From(random.AlphaNumeric()),
+					Limit: optional.From(rand.Intn(200)),
 				},
 			},
 			want: []*domain.User{
@@ -218,7 +220,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				for _, v := range want {
 					rows.AddRow(v.ID, v.Name, v.Check)
 				}
-				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %d", args.args.Limit.Int64))).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %d", args.args.Limit.ValueOrZero()))).
 					WithArgs(want[0].ID, want[1].ID, want[2].ID).
 					WillReturnRows(rows)
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
