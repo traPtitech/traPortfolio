@@ -229,7 +229,7 @@ func TestEditContest(t *testing.T) {
 		},
 		"204 without change": {
 			http.StatusNoContent,
-			mockdata.ContestID1(),
+			mockdata.ContestID2(),
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},

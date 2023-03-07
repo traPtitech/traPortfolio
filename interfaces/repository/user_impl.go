@@ -485,28 +485,26 @@ func (r *UserRepository) GetContests(userID uuid.UUID) ([]*domain.UserContest, e
 	contestsMap := make(map[uuid.UUID]*domain.UserContest)
 	for _, v := range contestTeamUserBelongings {
 		ct := v.ContestTeam
-		if c, ok := contestsMap[ct.ContestID]; ok {
-			c.Teams = append(c.Teams, &domain.ContestTeam{
+		if _, ok := contestsMap[ct.ContestID]; !ok {
+			contestsMap[ct.ContestID] = &domain.UserContest{
+				ID:        ct.Contest.ID,
+				Name:      ct.Contest.Name,
+				TimeStart: ct.Contest.Since,
+				TimeEnd:   ct.Contest.Until,
+				Teams:     []*domain.ContestTeam{},
+			}
+		}
+	}
+
+	for _, v := range contestTeamUserBelongings {
+		if userID == v.UserID {
+			ct := v.ContestTeam
+			contestsMap[ct.ContestID].Teams = append(contestsMap[ct.ContestID].Teams, &domain.ContestTeam{
 				ID:        ct.ID,
 				ContestID: ct.ContestID,
 				Name:      ct.Name,
 				Result:    ct.Result,
 			})
-		} else {
-			contestsMap[v.ContestTeam.ContestID] = &domain.UserContest{
-				ID:        ct.Contest.ID,
-				Name:      ct.Contest.Name,
-				TimeStart: ct.Contest.Since,
-				TimeEnd:   ct.Contest.Until,
-				Teams: []*domain.ContestTeam{
-					{
-						ID:        ct.ID,
-						ContestID: ct.ContestID,
-						Name:      ct.Name,
-						Result:    ct.Result,
-					},
-				},
-			}
 		}
 	}
 
