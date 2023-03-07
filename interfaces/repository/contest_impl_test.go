@@ -689,10 +689,10 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 					ContestID: cid,
 					Name:      successArgs.Name,
 					Result:    successArgs.Result.String,
+					Members:   nil,
 				},
 				Link:        successArgs.Link.String,
 				Description: successArgs.Description,
-				Members:     nil,
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
 				f.h.Mock.

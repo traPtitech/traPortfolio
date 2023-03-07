@@ -527,12 +527,12 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 					ContestID: cid,
 					Name:      random.AlphaNumeric(),
 					Result:    random.AlphaNumeric(),
+					Members: []*domain.User{
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					},
 				},
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(),
-				Members: []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-				},
 			},
 			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -653,10 +653,10 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 					ContestID: cid,
 					Name:      name,
 					Result:    result,
+					Members:   nil,
 				},
 				Link:        link,
 				Description: description,
-				Members:     nil,
 			},
 			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -666,10 +666,10 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 						ContestID: args.contestID,
 						Name:      args.args.Name,
 						Result:    args.args.Result.String,
+						Members:   nil,
 					},
 					Link:        args.args.Link.String,
 					Description: args.args.Description,
-					Members:     nil,
 				}, nil)
 			},
 			assertion: assert.NoError,

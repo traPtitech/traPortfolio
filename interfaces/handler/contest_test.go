@@ -579,13 +579,13 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 						ContestID: contestID,
 						Name:      random.AlphaNumeric(),
 						Result:    random.AlphaNumeric(),
+						Members: []*domain.User{
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						},
 					},
 					Link:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Members: []*domain.User{
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-					},
 				}
 				members := make([]User, 0, len(repoContestTeamDetail.Members))
 				for _, member := range repoContestTeamDetail.Members {
@@ -683,10 +683,10 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 						ContestID: contestID,
 						Name:      args.Name,
 						Result:    args.Result.String,
+						Members:   nil,
 					},
 					Link:        args.Link.String,
 					Description: args.Description,
-					Members:     nil,
 				}
 				expectedResBody := ContestTeam{
 					Id:     teamID,
