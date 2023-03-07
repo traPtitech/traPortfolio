@@ -256,10 +256,10 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 			ContestID: contestTeam.ContestID,
 			Name:      contestTeam.Name,
 			Result:    contestTeam.Result,
+			Members:   nil,
 		},
 		Link:        contestTeam.Link,
 		Description: contestTeam.Description,
-		Members:     nil,
 	}
 	return result, nil
 }

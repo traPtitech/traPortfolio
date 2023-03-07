@@ -288,7 +288,11 @@ func (h *UserHandler) GetUserContests(_c echo.Context) error {
 	for i, c := range contests {
 		teams := make([]ContestTeam, len(c.Teams))
 		for j, ct := range c.Teams {
-			teams[j] = newContestTeam(ct.ID, ct.Name, ct.Result)
+			members := make([]User, len(ct.Members))
+			for k, ctt := range ct.Members {
+				members[k] = newUser(ctt.ID, ctt.Name, ctt.RealName())
+			}
+			teams[j] = newContestTeam(ct.ID, ct.Name, ct.Result, members)
 		}
 		res[i] = newUserContest(
 			newContest(c.ID, c.Name, c.TimeStart, c.TimeEnd),

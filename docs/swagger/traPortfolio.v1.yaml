@@ -1164,10 +1164,16 @@ components:
         result:
           type: string
           description: 順位などの結果
+        members:
+          type: array
+          description: チームメンバーのUUID
+          items:
+            $ref: '#/components/schemas/User'
       required:
         - id
         - name
         - result
+        - members
     ContestTeamDetail:
       title: ContestTeamDetail
       type: object
@@ -1183,15 +1189,9 @@ components:
             description:
               type: string
               description: チーム情報
-            members:
-              type: array
-              description: チームメンバーのUUID
-              items:
-                $ref: '#/components/schemas/User'
           required:
             - link
             - description
-            - members
     PrPermitted:
       title: PrPermitted
       type: boolean

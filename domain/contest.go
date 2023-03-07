@@ -25,11 +25,11 @@ type ContestTeam struct {
 	ContestID uuid.UUID
 	Name      string
 	Result    string
+	Members   []*User
 }
 
 type ContestTeamDetail struct {
 	ContestTeam
 	Link        string
 	Description string
-	Members     []*User
 }

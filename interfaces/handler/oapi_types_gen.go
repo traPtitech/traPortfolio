@@ -116,6 +116,9 @@ type ContestTeam struct {
 	// Id コンテストチームuuid
 	Id uuid.UUID `json:"id"`
 
+	// Members チームメンバーのUUID
+	Members []User `json:"members"`
+
 	// Name チーム名
 	Name string `json:"name"`
 

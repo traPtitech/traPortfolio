@@ -58,7 +58,11 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 
 	teams := make([]ContestTeam, len(contest.ContestTeams))
 	for i, v := range contest.ContestTeams {
-		teams[i] = newContestTeam(v.ID, v.Name, v.Result)
+		members := make([]User, len(v.Members))
+		for j, ct := range v.Members {
+			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+		}
+		teams[i] = newContestTeam(v.ID, v.Name, v.Result, members)
 	}
 
 	res := newContestDetail(
@@ -96,7 +100,11 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 
 	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
 	for _, team := range contest.ContestTeams {
-		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
+		members := make([]User, len(team.Members))
+		for i, ct := range team.Members {
+			members[i] = newUser(ct.ID, ct.Name, ct.RealName())
+		}
+		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, members))
 	}
 	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
 
@@ -170,7 +178,11 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 
 	res := make([]ContestTeam, len(contestTeams))
 	for i, v := range contestTeams {
-		res[i] = newContestTeam(v.ID, v.Name, v.Result)
+		members := make([]User, len(v.Members))
+		for j, ct := range v.Members {
+			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+		}
+		res[i] = newContestTeam(v.ID, v.Name, v.Result, members)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -202,10 +214,9 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 	}
 
 	res := newContestTeamDetail(
-		newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result),
+		newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, members),
 		contestTeam.Link,
 		contestTeam.Description,
-		members,
 	)
 
 	return c.JSON(http.StatusOK, res)
@@ -238,7 +249,12 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result)
+	members := make([]User, len(contestTeam.Members))
+	for j, ct := range contestTeam.Members {
+		members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+	}
+
+	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, members)
 
 	return c.JSON(http.StatusCreated, res)
 }
@@ -408,20 +424,20 @@ func newContestDetail(contest Contest, link string, description string, teams []
 	}
 }
 
-func newContestTeam(id uuid.UUID, name string, result string) ContestTeam {
+func newContestTeam(id uuid.UUID, name string, result string, members []User) ContestTeam {
 	return ContestTeam{
-		Id:     id,
-		Name:   name,
-		Result: result,
+		Id:      id,
+		Name:    name,
+		Result:  result,
+		Members: members,
 	}
 }
 
-func newContestTeamDetail(team ContestTeam, link string, description string, members []User) ContestTeamDetail {
+func newContestTeamDetail(team ContestTeam, link string, description string) ContestTeamDetail {
 	return ContestTeamDetail{
 		Description: description,
 		Id:          team.Id,
 		Link:        link,
-		Members:     members,
 		Name:        team.Name,
 		Result:      team.Result,
 	}
