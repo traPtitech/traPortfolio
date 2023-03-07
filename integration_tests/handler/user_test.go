@@ -397,6 +397,7 @@ func TestEditUserAccount(t *testing.T) {
 		prPermitted        = handler.PrPermitted(random.Bool())
 		accountType        = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
 		accountURL         = random.AccountURLString(domain.AccountType(accountType))
+		initialAccountType = domain.AccountType((int(accountType) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 		invalidAccountType = handler.AccountType(5)
 		invalidAccountURL  = random.RandURLString()
 	)
@@ -490,12 +491,11 @@ func TestEditUserAccount(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Insert & Assert
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 				account := handler.Account{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(accountType),
-					Url:         random.AccountURLString(accountType),
+					Type:        handler.AccountType(initialAccountType),
+					Url:         random.AccountURLString(initialAccountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,

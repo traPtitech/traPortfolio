@@ -362,7 +362,7 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 		}
 
 		// 同タイプ生成回避
-		if args.Type.Valid {
+		if args.Type.Valid && args.Type.Int64 != int64(account.Type) {
 			if err := tx.
 				WithContext(ctx).
 				Where(&model.Account{Type: uint8(args.Type.Int64), UserID: userID}).
