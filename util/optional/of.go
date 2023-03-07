@@ -173,59 +173,94 @@ func (o Of[T]) MarshalText() ([]byte, error) {
 }
 
 func (o *Of[T]) Scan(src any) error {
-	switch any(o.v).(type) {
-	case bool:
-		var b sql.NullBool
-		if err := b.Scan(src); err != nil {
-			return err
-		}
-		o.v, o.valid = any(b.Bool).(T), b.Valid
-		return nil
-	case int:
-		var i sql.NullInt64
-		if err := i.Scan(src); err != nil {
-			return err
-		}
-		o.v, o.valid = any(int(i.Int64)).(T), i.Valid
-		return nil
-	case string:
-		var s sql.NullString
-		if err := s.Scan(src); err != nil {
-			return err
-		}
-		o.v, o.valid = any(s.String).(T), s.Valid
-		return nil
-	case time.Time:
-		var t sql.NullTime
-		if err := t.Scan(src); err != nil {
-			return err
-		}
-		o.v, o.valid = any(t.Time).(T), t.Valid
-		return nil
-	default:
-		s, ok := any(&o.v).(sql.Scanner)
-		if !ok {
-			return fmt.Errorf("unsupported type for Scan: %T", o.v)
-		}
-		if err := s.Scan(src); err != nil {
-			return err
-		}
-		o.valid = true
+	if src == nil {
+		var t T
+		o.v, o.valid = t, false
 		return nil
 	}
+
+	var scanner sql.Scanner
+	switch v := any(o.v).(type) {
+	case sql.Scanner:
+		scanner = v
+	case string:
+		scanner = &sql.NullString{}
+	case int64:
+		scanner = &sql.NullInt64{}
+	case int32:
+		scanner = &sql.NullInt32{}
+	case int16:
+		scanner = &sql.NullInt16{}
+	case byte:
+		scanner = &sql.NullByte{}
+	case float64:
+		scanner = &sql.NullFloat64{}
+	case bool:
+		scanner = &sql.NullBool{}
+	case time.Time:
+		scanner = &sql.NullTime{}
+	default:
+		return fmt.Errorf("unsupported type for Scan: %T", v)
+	}
+
+	if err := scanner.Scan(src); err != nil {
+		return err
+	}
+
+	switch v := scanner.(type) {
+	case *sql.NullString:
+		o.v, o.valid = any(v.String).(T), v.Valid
+	case *sql.NullInt64:
+		o.v, o.valid = any(v.Int64).(T), v.Valid
+	case *sql.NullInt32:
+		o.v, o.valid = any(v.Int32).(T), v.Valid
+	case *sql.NullInt16:
+		o.v, o.valid = any(v.Int16).(T), v.Valid
+	case *sql.NullByte:
+		o.v, o.valid = any(v.Byte).(T), v.Valid
+	case *sql.NullFloat64:
+		o.v, o.valid = any(v.Float64).(T), v.Valid
+	case *sql.NullBool:
+		o.v, o.valid = any(v.Bool).(T), v.Valid
+	case *sql.NullTime:
+		o.v, o.valid = any(v.Time).(T), v.Valid
+	default:
+		o.valid = true
+	}
+
+	return nil
 }
 
 func (o Of[T]) Value() (driver.Value, error) {
 	if !o.valid {
 		return nil, nil
 	}
+
+	var valuer driver.Valuer
 	switch v := any(o.v).(type) {
-	case int:
-		return int64(v), nil
 	case driver.Valuer:
-		return v.Value()
+		valuer = v
+	case string:
+		valuer = sql.NullString{String: v, Valid: true}
+	case int64:
+		valuer = sql.NullInt64{Int64: v, Valid: true}
+	case int32:
+		valuer = sql.NullInt32{Int32: v, Valid: true}
+	case int16:
+		valuer = sql.NullInt16{Int16: v, Valid: true}
+	case byte:
+		valuer = sql.NullByte{Byte: v, Valid: true}
+	case float64:
+		valuer = sql.NullFloat64{Float64: v, Valid: true}
+	case bool:
+		valuer = sql.NullBool{Bool: v, Valid: true}
+	case time.Time:
+		valuer = sql.NullTime{Time: v, Valid: true}
+	default:
+		return nil, fmt.Errorf("unsupported type for Value: %T", v)
 	}
-	return o.v, nil
+
+	return valuer.Value()
 }
 
 // interface guards
