@@ -3,6 +3,7 @@
 package repository
 
 import (
+	"context"
 	"time"
 
 	"github.com/traPtitech/traPortfolio/domain"
@@ -43,17 +44,17 @@ type UpdateContestTeamArgs struct {
 }
 
 type ContestRepository interface {
-	GetContests() ([]*domain.Contest, error)
-	GetContest(contestID uuid.UUID) (*domain.ContestDetail, error)
-	CreateContest(args *CreateContestArgs) (*domain.ContestDetail, error)
-	UpdateContest(contestID uuid.UUID, args *UpdateContestArgs) error
-	DeleteContest(contestID uuid.UUID) error
-	GetContestTeams(contestID uuid.UUID) ([]*domain.ContestTeam, error)
-	GetContestTeam(contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error)
-	CreateContestTeam(contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
-	UpdateContestTeam(teamID uuid.UUID, args *UpdateContestTeamArgs) error
-	DeleteContestTeam(contestID uuid.UUID, teamID uuid.UUID) error
-	GetContestTeamMembers(contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)
-	AddContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error
-	EditContestTeamMembers(teamID uuid.UUID, memberIDs []uuid.UUID) error
+	GetContests(ctx context.Context) ([]*domain.Contest, error)
+	GetContest(ctx context.Context, contestID uuid.UUID) (*domain.ContestDetail, error)
+	CreateContest(ctx context.Context, args *CreateContestArgs) (*domain.ContestDetail, error)
+	UpdateContest(ctx context.Context, contestID uuid.UUID, args *UpdateContestArgs) error
+	DeleteContest(ctx context.Context, contestID uuid.UUID) error
+	GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error)
+	GetContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error)
+	CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *CreateContestTeamArgs) (*domain.ContestTeamDetail, error)
+	UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *UpdateContestTeamArgs) error
+	DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error
+	GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)
+	AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
+	EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
 }

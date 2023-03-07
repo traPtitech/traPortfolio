@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql/driver"
 	"testing"
 
@@ -79,7 +80,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 			tt.setup(f, tt.want)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetProjects()
+			got, err := repo.GetProjects(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -327,7 +328,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetProject(tt.args.id)
+			got, err := repo.GetProject(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -427,7 +428,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.CreateProject(tt.args.project)
+			got, err := repo.CreateProject(context.Background(), tt.args.project)
 			if tt.want != nil && got != nil {
 				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
 			}
@@ -510,7 +511,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.UpdateProject(tt.args.id, tt.args.args))
+			tt.assertion(t, repo.UpdateProject(context.Background(), tt.args.id, tt.args.args))
 		})
 	}
 }
@@ -666,7 +667,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			got, err := repo.GetProjectMembers(tt.args.id)
+			got, err := repo.GetProjectMembers(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -910,7 +911,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.AddProjectMembers(tt.args.projectID, tt.args.projectMembers))
+			tt.assertion(t, repo.AddProjectMembers(context.Background(), tt.args.projectID, tt.args.projectMembers))
 		})
 	}
 }
@@ -1016,7 +1017,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h, f.portal)
 			// Assertion
-			tt.assertion(t, repo.DeleteProjectMembers(tt.args.projectID, tt.args.members))
+			tt.assertion(t, repo.DeleteProjectMembers(context.Background(), tt.args.projectID, tt.args.members))
 		})
 	}
 }

@@ -3,6 +3,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -37,11 +39,11 @@ type CreateProjectMemberArgs struct {
 }
 
 type ProjectRepository interface {
-	GetProjects() ([]*domain.Project, error)
-	GetProject(projectID uuid.UUID) (*domain.ProjectDetail, error)
-	CreateProject(args *CreateProjectArgs) (*domain.ProjectDetail, error)
-	UpdateProject(projectID uuid.UUID, args *UpdateProjectArgs) error
-	GetProjectMembers(projectID uuid.UUID) ([]*domain.UserWithDuration, error)
-	AddProjectMembers(projectID uuid.UUID, args []*CreateProjectMemberArgs) error
-	DeleteProjectMembers(projectID uuid.UUID, memberIDs []uuid.UUID) error
+	GetProjects(ctx context.Context) ([]*domain.Project, error)
+	GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error)
+	CreateProject(ctx context.Context, args *CreateProjectArgs) (*domain.ProjectDetail, error)
+	UpdateProject(ctx context.Context, projectID uuid.UUID, args *UpdateProjectArgs) error
+	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error)
+	AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*CreateProjectMemberArgs) error
+	DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error
 }

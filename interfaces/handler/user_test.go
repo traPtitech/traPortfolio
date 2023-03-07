@@ -463,7 +463,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 
 				}
 
-				s.EXPECT().GetAccounts(userID).Return(rAccounts, nil)
+				s.EXPECT().GetAccounts(anyCtx{}, userID).Return(rAccounts, nil)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return hAccounts, path
 			},
@@ -474,7 +474,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
-				s.EXPECT().GetAccounts(userID).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetAccounts(anyCtx{}, userID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -485,7 +485,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
 
 				userID := random.UUID()
-				s.EXPECT().GetAccounts(userID).Return(nil, repository.ErrValidate)
+				s.EXPECT().GetAccounts(anyCtx{}, userID).Return(nil, repository.ErrValidate)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -550,7 +550,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 					Url:         rAccount.URL,
 				}
 
-				s.EXPECT().GetAccount(userID, rAccount.ID).Return(&rAccount, nil)
+				s.EXPECT().GetAccount(anyCtx{}, userID, rAccount.ID).Return(&rAccount, nil)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, rAccount.ID)
 				return &hAccount, path
 
@@ -564,7 +564,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
-				s.EXPECT().GetAccount(userID, accountID).Return(nil, errors.New("Internal Server Error"))
+				s.EXPECT().GetAccount(anyCtx{}, userID, accountID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
 

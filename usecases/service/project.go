@@ -31,7 +31,7 @@ func NewProjectService(projectRepository repository.ProjectRepository) ProjectSe
 }
 
 func (s *projectService) GetProjects(ctx context.Context) ([]*domain.Project, error) {
-	res, err := s.repo.GetProjects()
+	res, err := s.repo.GetProjects(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (s *projectService) GetProjects(ctx context.Context) ([]*domain.Project, er
 }
 
 func (s *projectService) GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error) {
-	project, err := s.repo.GetProject(projectID)
+	project, err := s.repo.GetProject(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *projectService) CreateProject(ctx context.Context, args *repository.Cre
 		return nil, repository.ErrInvalidArg
 	}
 
-	res, err := s.repo.CreateProject(args)
+	res, err := s.repo.CreateProject(ctx, args)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (s *projectService) CreateProject(ctx context.Context, args *repository.Cre
 }
 
 func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
-	old, err := s.repo.GetProject(projectID)
+	old, err := s.repo.GetProject(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 		return repository.ErrInvalidArg
 	}
 
-	if err := s.repo.UpdateProject(projectID, args); err != nil {
+	if err := s.repo.UpdateProject(ctx, projectID, args); err != nil {
 		return err
 	}
 
@@ -93,7 +93,7 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 }
 
 func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
-	members, err := s.repo.GetProjectMembers(projectID)
+	members, err := s.repo.GetProjectMembers(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *projectService) AddProjectMembers(ctx context.Context, projectID uuid.U
 		}
 	}
 
-	err := s.repo.AddProjectMembers(projectID, args)
+	err := s.repo.AddProjectMembers(ctx, projectID, args)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (s *projectService) AddProjectMembers(ctx context.Context, projectID uuid.U
 }
 
 func (s *projectService) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
-	err := s.repo.DeleteProjectMembers(projectID, memberIDs)
+	err := s.repo.DeleteProjectMembers(ctx, projectID, memberIDs)
 	if err != nil {
 		return err
 	}

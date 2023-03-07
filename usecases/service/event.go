@@ -26,17 +26,17 @@ func NewEventService(event repository.EventRepository, user repository.UserRepos
 }
 
 func (s *eventService) GetEvents(ctx context.Context) ([]*domain.Event, error) {
-	return s.event.GetEvents()
+	return s.event.GetEvents(ctx)
 }
 
 func (s *eventService) GetEventByID(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error) {
-	event, err := s.event.GetEvent(eventID)
+	event, err := s.event.GetEvent(ctx, eventID)
 	if err != nil {
 		return nil, err
 	}
 
 	// hostnameの詳細を取得
-	users, err := s.user.GetUsers(&repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
+	users, err := s.user.GetUsers(ctx, &repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (s *eventService) GetEventByID(ctx context.Context, eventID uuid.UUID) (*do
 }
 
 func (s *eventService) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
-	return s.event.UpdateEventLevel(eventID, arg)
+	return s.event.UpdateEventLevel(ctx, eventID, arg)
 }
 
 // Interface guards

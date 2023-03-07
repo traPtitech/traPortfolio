@@ -3,6 +3,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -18,9 +20,9 @@ type UpdateEventLevelArgs struct {
 }
 
 type EventRepository interface {
-	GetEvents() ([]*domain.Event, error)
-	GetEvent(eventID uuid.UUID) (*domain.EventDetail, error)
-	CreateEventLevel(args *CreateEventLevelArgs) error
-	UpdateEventLevel(eventID uuid.UUID, args *UpdateEventLevelArgs) error
-	GetUserEvents(userID uuid.UUID) ([]*domain.Event, error)
+	GetEvents(ctx context.Context) ([]*domain.Event, error)
+	GetEvent(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error)
+	CreateEventLevel(ctx context.Context, args *CreateEventLevelArgs) error
+	UpdateEventLevel(ctx context.Context, eventID uuid.UUID, args *UpdateEventLevelArgs) error
+	GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error)
 }

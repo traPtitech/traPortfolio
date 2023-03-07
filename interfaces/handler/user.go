@@ -112,7 +112,8 @@ func (h *UserHandler) GetUserAccounts(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	accounts, err := h.srv.GetAccounts(userID)
+	ctx := c.Request().Context()
+	accounts, err := h.srv.GetAccounts(ctx, userID)
 	if err != nil {
 		return convertError(err)
 	}
@@ -139,7 +140,8 @@ func (h *UserHandler) GetUserAccount(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	account, err := h.srv.GetAccount(userID, accountID)
+	ctx := c.Request().Context()
+	account, err := h.srv.GetAccount(ctx, userID, accountID)
 	if err != nil {
 		return convertError(err)
 	}

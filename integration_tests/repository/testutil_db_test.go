@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"math/rand"
 	"testing"
 
@@ -37,7 +38,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 		}
 	}
 
-	contest, err := repo.CreateContest(args)
+	contest, err := repo.CreateContest(context.Background(), args)
 	assert.NoError(t, err)
 	return contest
 }
@@ -58,9 +59,9 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	var contestTeamDetail *domain.ContestTeamDetail
 	if contestID == uuid.Nil {
 		contest := mustMakeContest(t, nil, nil)
-		contestTeamDetail, err = repo.CreateContestTeam(contest.ID, args)
+		contestTeamDetail, err = repo.CreateContestTeam(context.Background(), contest.ID, args)
 	} else {
-		contestTeamDetail, err = repo.CreateContestTeam(contestID, args)
+		contestTeamDetail, err = repo.CreateContestTeam(context.Background(), contestID, args)
 	}
 
 	assert.NoError(t, err)
@@ -78,7 +79,7 @@ func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *rep
 		}
 	}
 
-	err := repo.CreateEventLevel(args)
+	err := repo.CreateEventLevel(context.Background(), args)
 	assert.NoError(t, err)
 
 	return args
@@ -100,7 +101,7 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	if userID == uuid.Nil {
 		t.Fatal("userID must not be empty")
 	}
-	account, err := repo.CreateAccount(userID, args)
+	account, err := repo.CreateAccount(context.Background(), userID, args)
 	assert.NoError(t, err)
 
 	return account
@@ -129,7 +130,7 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 		}
 	}
 
-	project, err := repo.CreateProject(args)
+	project, err := repo.CreateProject(context.Background(), args)
 	assert.NoError(t, err)
 
 	return project
@@ -152,7 +153,7 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 		}
 	}
 
-	err := repo.AddProjectMembers(projectID, []*repository.CreateProjectMemberArgs{args})
+	err := repo.AddProjectMembers(context.Background(), projectID, []*repository.CreateProjectMemberArgs{args})
 	assert.NoError(t, err)
 
 	return args
@@ -171,6 +172,6 @@ func mustAddContestTeamMembers(t *testing.T, repo repository.ContestRepository, 
 		t.Fatal("projectID must not be empty")
 	}
 
-	err := repo.AddContestTeamMembers(teamID, userIDs)
+	err := repo.AddContestTeamMembers(context.Background(), teamID, userIDs)
 	assert.NoError(t, err)
 }

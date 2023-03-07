@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"math/rand"
 	"testing"
 
@@ -110,7 +111,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			users, err := repo.GetUsers(tc.args.args)
+			users, err := repo.GetUsers(context.Background(), tc.args.args)
 			tc.assertion(t, err)
 			assert.ElementsMatch(t, tc.expected, users)
 		})
@@ -193,7 +194,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			users, err := repo.GetUser(tc.args.userID)
+			users, err := repo.GetUser(context.Background(), tc.args.userID)
 			tc.assertion(t, err)
 			assert.Equal(t, tc.expected, users)
 		})
@@ -246,7 +247,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			user, err := repo.CreateUser(tc.args.args)
+			user, err := repo.CreateUser(context.Background(), tc.args.args)
 			tc.expected.ID = user.ID
 			tc.assertion(t, err)
 			assert.Equal(t, tc.expected, user)
@@ -273,7 +274,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 		Check:       random.OptBool(),
 	}
 
-	err = repo.UpdateUser(user.ID, args)
+	err = repo.UpdateUser(context.Background(), user.ID, args)
 	assert.NoError(t, err)
 
 	var bio string
@@ -301,7 +302,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 		Bio:      bio,
 		Accounts: []*domain.Account{},
 	}
-	got, err := repo.GetUser(user.ID)
+	got, err := repo.GetUser(context.Background(), user.ID)
 	assert.NoError(t, err)
 
 	assert.Equal(t, expected, got)
@@ -323,7 +324,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 	account2 := mustMakeAccount(t, repo, user.ID, nil)
 	expected := []*domain.Account{account1, account2}
 
-	got, err := repo.GetAccounts(user.ID)
+	got, err := repo.GetAccounts(context.Background(), user.ID)
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, expected, got)
@@ -344,7 +345,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	mustMakeAccount(t, repo, user.ID, nil)
 
-	got, err := repo.GetAccount(user.ID, account1.ID)
+	got, err := repo.GetAccount(context.Background(), user.ID, account1.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, account1, got)
 }
@@ -386,10 +387,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	if v, ok := args.PrPermitted.V(); ok {
 		account1.PrPermitted = v
 	}
-	err = repo.UpdateAccount(user.ID, account1.ID, args)
+	err = repo.UpdateAccount(context.Background(), user.ID, account1.ID, args)
 	assert.NoError(t, err)
 
-	got, err := repo.GetAccount(user.ID, account1.ID)
+	got, err := repo.GetAccount(context.Background(), user.ID, account1.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, account1, got)
 }
@@ -409,12 +410,12 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	account2 := mustMakeAccount(t, repo, user.ID, nil)
 
-	err = repo.DeleteAccount(user.ID, account1.ID)
+	err = repo.DeleteAccount(context.Background(), user.ID, account1.ID)
 	assert.NoError(t, err)
 
 	expected := []*domain.Account{account2}
 
-	got, err := repo.GetAccounts(user.ID)
+	got, err := repo.GetAccounts(context.Background(), user.ID)
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, expected, got)
@@ -437,9 +438,9 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 
 	expected1 := []*domain.UserWithDuration{}
 	expected2 := []*domain.UserWithDuration{}
-	users1, err := projectRepo.GetProjectMembers(project1.ID)
+	users1, err := projectRepo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
-	users2, err := projectRepo.GetProjectMembers(project2.ID)
+	users2, err := projectRepo.GetProjectMembers(context.Background(), project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 	assert.ElementsMatch(t, expected2, users2)
@@ -448,7 +449,7 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	args2 := mustAddProjectMember(t, projectRepo, project2.ID, user1.ID, nil)
 
 	expected3 := []*domain.UserProject{newUserProject(args1, project1), newUserProject(args2, project2)}
-	projects1, err := userRepo.GetProjects(user1.ID)
+	projects1, err := userRepo.GetProjects(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, projects1)
 }
@@ -487,12 +488,12 @@ func TestUserRepository_GetContests(t *testing.T) {
 	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
 	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam}), newUserContest(&contest2.Contest, []*domain.ContestTeam{&team2.ContestTeam})}
-	contests1, err := userRepo.GetContests(user1.ID)
+	contests1, err := userRepo.GetContests(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, contests1)
 
 	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam})}
-	contests2, err := userRepo.GetContests(user2.ID)
+	contests2, err := userRepo.GetContests(context.Background(), user2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, contests2)
 }

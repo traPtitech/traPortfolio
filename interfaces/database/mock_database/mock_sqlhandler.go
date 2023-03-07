@@ -1,6 +1,7 @@
 package mock_database //nolint:revive
 
 import (
+	"context"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -33,6 +34,11 @@ func NewMockSQLHandler() *MockSQLHandler {
 	}
 
 	return &MockSQLHandler{engine, mock}
+}
+
+func (h *MockSQLHandler) WithContext(ctx context.Context) database.SQLHandler {
+	db := h.Conn.WithContext(ctx)
+	return &MockSQLHandler{Conn: db}
 }
 
 func (h *MockSQLHandler) Find(out interface{}, where ...interface{}) database.SQLHandler {
