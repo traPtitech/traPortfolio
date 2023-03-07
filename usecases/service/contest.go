@@ -40,7 +40,7 @@ func NewContestService(repo repository.ContestRepository) ContestService {
 }
 
 func (s *contestService) GetContests(ctx context.Context) ([]*domain.Contest, error) {
-	contest, err := s.repo.GetContests()
+	contest, err := s.repo.GetContests(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -49,12 +49,12 @@ func (s *contestService) GetContests(ctx context.Context) ([]*domain.Contest, er
 }
 
 func (s *contestService) GetContest(ctx context.Context, contestID uuid.UUID) (*domain.ContestDetail, error) {
-	contest, err := s.repo.GetContest(contestID)
+	contest, err := s.repo.GetContest(ctx, contestID)
 	if err != nil {
 		return nil, err
 	}
 
-	teams, err := s.repo.GetContestTeams(contestID)
+	teams, err := s.repo.GetContestTeams(ctx, contestID)
 	if err != nil && !errors.Is(err, repository.ErrNotFound) {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *contestService) GetContest(ctx context.Context, contestID uuid.UUID) (*
 }
 
 func (s *contestService) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
-	contest, err := s.repo.CreateContest(args)
+	contest, err := s.repo.CreateContest(ctx, args)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (s *contestService) CreateContest(ctx context.Context, args *repository.Cre
 }
 
 func (s *contestService) UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error {
-	err := s.repo.UpdateContest(contestID, args)
+	err := s.repo.UpdateContest(ctx, contestID, args)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (s *contestService) UpdateContest(ctx context.Context, contestID uuid.UUID,
 }
 
 func (s *contestService) DeleteContest(ctx context.Context, contestID uuid.UUID) error {
-	if err := s.repo.DeleteContest(contestID); err != nil {
+	if err := s.repo.DeleteContest(ctx, contestID); err != nil {
 		return err
 	}
 
@@ -90,7 +90,7 @@ func (s *contestService) DeleteContest(ctx context.Context, contestID uuid.UUID)
 }
 
 func (s *contestService) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
-	contestTeams, err := s.repo.GetContestTeams(contestID)
+	contestTeams, err := s.repo.GetContestTeams(ctx, contestID)
 	if err != nil {
 		return nil, err
 	}
@@ -98,12 +98,12 @@ func (s *contestService) GetContestTeams(ctx context.Context, contestID uuid.UUI
 }
 
 func (s *contestService) GetContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) (*domain.ContestTeamDetail, error) {
-	contestTeam, err := s.repo.GetContestTeam(contestID, teamID)
+	contestTeam, err := s.repo.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
 		return nil, err
 	}
 
-	members, err := s.repo.GetContestTeamMembers(contestID, teamID)
+	members, err := s.repo.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (s *contestService) GetContestTeam(ctx context.Context, contestID uuid.UUID
 }
 
 func (s *contestService) CreateContestTeam(ctx context.Context, contestID uuid.UUID, args *repository.CreateContestTeamArgs) (*domain.ContestTeamDetail, error) {
-	contestTeam, err := s.repo.CreateContestTeam(contestID, args)
+	contestTeam, err := s.repo.CreateContestTeam(ctx, contestID, args)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (s *contestService) CreateContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
-	if err := s.repo.UpdateContestTeam(teamID, args); err != nil {
+	if err := s.repo.UpdateContestTeam(ctx, teamID, args); err != nil {
 		return err
 	}
 
@@ -130,7 +130,7 @@ func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID
 }
 
 func (s *contestService) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
-	if err := s.repo.DeleteContestTeam(contestID, teamID); err != nil {
+	if err := s.repo.DeleteContestTeam(ctx, contestID, teamID); err != nil {
 		return err
 	}
 
@@ -138,7 +138,7 @@ func (s *contestService) DeleteContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
-	members, err := s.repo.GetContestTeamMembers(contestID, teamID)
+	members, err := s.repo.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uu
 }
 
 func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	if err := s.repo.AddContestTeamMembers(teamID, memberIDs); err != nil {
+	if err := s.repo.AddContestTeamMembers(ctx, teamID, memberIDs); err != nil {
 		return err
 	}
 
@@ -155,7 +155,7 @@ func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.
 }
 
 func (s *contestService) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	if err := s.repo.EditContestTeamMembers(teamID, memberIDs); err != nil {
+	if err := s.repo.EditContestTeamMembers(ctx, teamID, memberIDs); err != nil {
 		return err
 	}
 

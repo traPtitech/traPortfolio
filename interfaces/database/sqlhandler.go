@@ -1,6 +1,9 @@
 package database
 
+import "context"
+
 type SQLHandler interface {
+	WithContext(ctx context.Context) SQLHandler
 	Find(out interface{}, where ...interface{}) SQLHandler
 	First(out interface{}, where ...interface{}) SQLHandler
 	Create(value interface{}) SQLHandler

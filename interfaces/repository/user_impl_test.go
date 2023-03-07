@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -325,7 +326,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			tt.setup(t, f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetUsers(tt.args.args)
+			got, err := repo.GetUsers(context.Background(), tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -469,7 +470,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetUser(tt.args.id)
+			got, err := repo.GetUser(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -574,7 +575,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.CreateUser(tt.args.args)
+			got, err := repo.CreateUser(context.Background(), tt.args.args)
 			if tt.want != nil && got != nil {
 				tt.want.ID = got.ID // 関数内でIDを生成するためここで合わせる
 			}
@@ -661,7 +662,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetAccounts(tt.args.userID)
+			got, err := repo.GetAccounts(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -731,7 +732,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetAccount(tt.args.userID, tt.args.accountID)
+			got, err := repo.GetAccount(context.Background(), tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -832,7 +833,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.UpdateUser(tt.args.id, tt.args.args))
+			tt.assertion(t, repo.UpdateUser(context.Background(), tt.args.id, tt.args.args))
 		})
 	}
 }
@@ -997,7 +998,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.CreateAccount(tt.args.id, tt.args.args)
+			got, err := repo.CreateAccount(context.Background(), tt.args.id, tt.args.args)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -1102,7 +1103,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.UpdateAccount(tt.args.userID, tt.args.accountID, tt.args.args))
+			tt.assertion(t, repo.UpdateAccount(context.Background(), tt.args.userID, tt.args.accountID, tt.args.args))
 		})
 	}
 }
@@ -1185,7 +1186,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			tt.assertion(t, repo.DeleteAccount(tt.args.userID, tt.args.accountID))
+			tt.assertion(t, repo.DeleteAccount(context.Background(), tt.args.userID, tt.args.accountID))
 		})
 	}
 }
@@ -1278,7 +1279,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetProjects(tt.args.userID)
+			got, err := repo.GetProjects(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -1371,7 +1372,7 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetGroupsByUserID(tt.args.userID)
+			got, err := repo.GetGroupsByUserID(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -1416,9 +1417,9 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
-				rows := sqlmock.NewRows([]string{"team_id"})
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
 				for _, v := range want {
-					rows.AddRow(v.Teams[0].ID)
+					rows.AddRow(v.Teams[0].ID, args.userID)
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
@@ -1474,10 +1475,10 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
-				rows := sqlmock.NewRows([]string{"team_id"})
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
 				for _, v := range want {
 					for _, t := range v.Teams {
-						rows.AddRow(t.ID)
+						rows.AddRow(t.ID, args.userID)
 					}
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
@@ -1543,7 +1544,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewUserRepository(f.h, f.portal, f.traq)
 			// Assertion
-			got, err := repo.GetContests(tt.args.userID)
+			got, err := repo.GetContests(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

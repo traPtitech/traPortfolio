@@ -48,7 +48,7 @@ func TestEventService_GetEvents(t *testing.T) {
 			},
 			setup: func(f fields, args args, want []*domain.Event) {
 				e := f.event.(*mock_repository.MockEventRepository)
-				e.EXPECT().GetEvents().Return(want, nil)
+				e.EXPECT().GetEvents(args.ctx).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -117,7 +117,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 				want.ID = args.id
 				e := f.event.(*mock_repository.MockEventRepository)
 				u := f.user.(*mock_repository.MockUserRepository)
-				e.EXPECT().GetEvent(args.id).Return(&domain.EventDetail{
+				e.EXPECT().GetEvent(args.ctx, args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
 						ID:        args.id,
 						Name:      want.Name,
@@ -131,7 +131,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 					GroupID:     want.GroupID,
 					RoomID:      want.RoomID,
 				}, nil)
-				u.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return(want.HostName, nil)
+				u.EXPECT().GetUsers(args.ctx, &repository.GetUsersArgs{}).Return(want.HostName, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -144,7 +144,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 			want: nil,
 			setup: func(f fields, args args, want *domain.EventDetail) {
 				e := f.event.(*mock_repository.MockEventRepository)
-				e.EXPECT().GetEvent(args.id).Return(nil, repository.ErrForbidden)
+				e.EXPECT().GetEvent(args.ctx, args.id).Return(nil, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
@@ -158,7 +158,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 			setup: func(f fields, args args, want *domain.EventDetail) {
 				e := f.event.(*mock_repository.MockEventRepository)
 				u := f.user.(*mock_repository.MockUserRepository)
-				e.EXPECT().GetEvent(args.id).Return(&domain.EventDetail{
+				e.EXPECT().GetEvent(args.ctx, args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
 						ID:        args.id,
 						Name:      random.AlphaNumeric(),
@@ -172,7 +172,7 @@ func TestEventService_GetEventByID(t *testing.T) {
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}, nil)
-				u.EXPECT().GetUsers(&repository.GetUsersArgs{}).Return(nil, repository.ErrForbidden)
+				u.EXPECT().GetUsers(args.ctx, &repository.GetUsersArgs{}).Return(nil, repository.ErrForbidden)
 			},
 			assertion: assert.Error,
 		},
@@ -226,7 +226,7 @@ func TestEventService_UpdateEvent(t *testing.T) {
 			},
 			setup: func(f fields, args args) {
 				e := f.event.(*mock_repository.MockEventRepository)
-				e.EXPECT().UpdateEventLevel(args.id, args.arg).Return(nil)
+				e.EXPECT().UpdateEventLevel(args.ctx, args.id, args.arg).Return(nil)
 			},
 			assertion: assert.NoError,
 		},

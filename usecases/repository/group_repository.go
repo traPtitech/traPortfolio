@@ -3,11 +3,13 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 )
 
 type GroupRepository interface {
-	GetAllGroups() ([]*domain.Group, error)
-	GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error)
+	GetAllGroups(ctx context.Context) ([]*domain.Group, error)
+	GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error)
 }

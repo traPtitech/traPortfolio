@@ -5,6 +5,7 @@
 package mock_repository
 
 import (
+	context "context"
 	reflect "reflect"
 
 	uuid "github.com/gofrs/uuid"
@@ -36,31 +37,31 @@ func (m *MockGroupRepository) EXPECT() *MockGroupRepositoryMockRecorder {
 }
 
 // GetAllGroups mocks base method.
-func (m *MockGroupRepository) GetAllGroups() ([]*domain.Group, error) {
+func (m *MockGroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllGroups")
+	ret := m.ctrl.Call(m, "GetAllGroups", ctx)
 	ret0, _ := ret[0].([]*domain.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllGroups indicates an expected call of GetAllGroups.
-func (mr *MockGroupRepositoryMockRecorder) GetAllGroups() *gomock.Call {
+func (mr *MockGroupRepositoryMockRecorder) GetAllGroups(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllGroups", reflect.TypeOf((*MockGroupRepository)(nil).GetAllGroups))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllGroups", reflect.TypeOf((*MockGroupRepository)(nil).GetAllGroups), ctx)
 }
 
 // GetGroup mocks base method.
-func (m *MockGroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
+func (m *MockGroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGroup", groupID)
+	ret := m.ctrl.Call(m, "GetGroup", ctx, groupID)
 	ret0, _ := ret[0].(*domain.GroupDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetGroup indicates an expected call of GetGroup.
-func (mr *MockGroupRepositoryMockRecorder) GetGroup(groupID interface{}) *gomock.Call {
+func (mr *MockGroupRepositoryMockRecorder) GetGroup(ctx, groupID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockGroupRepository)(nil).GetGroup), groupID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockGroupRepository)(nil).GetGroup), ctx, groupID)
 }

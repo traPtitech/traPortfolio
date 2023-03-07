@@ -5,6 +5,7 @@
 package mock_repository
 
 import (
+	context "context"
 	reflect "reflect"
 
 	uuid "github.com/gofrs/uuid"
@@ -37,74 +38,74 @@ func (m *MockEventRepository) EXPECT() *MockEventRepositoryMockRecorder {
 }
 
 // CreateEventLevel mocks base method.
-func (m *MockEventRepository) CreateEventLevel(args *repository.CreateEventLevelArgs) error {
+func (m *MockEventRepository) CreateEventLevel(ctx context.Context, args *repository.CreateEventLevelArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateEventLevel", args)
+	ret := m.ctrl.Call(m, "CreateEventLevel", ctx, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateEventLevel indicates an expected call of CreateEventLevel.
-func (mr *MockEventRepositoryMockRecorder) CreateEventLevel(args interface{}) *gomock.Call {
+func (mr *MockEventRepositoryMockRecorder) CreateEventLevel(ctx, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).CreateEventLevel), args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).CreateEventLevel), ctx, args)
 }
 
 // GetEvent mocks base method.
-func (m *MockEventRepository) GetEvent(eventID uuid.UUID) (*domain.EventDetail, error) {
+func (m *MockEventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEvent", eventID)
+	ret := m.ctrl.Call(m, "GetEvent", ctx, eventID)
 	ret0, _ := ret[0].(*domain.EventDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetEvent indicates an expected call of GetEvent.
-func (mr *MockEventRepositoryMockRecorder) GetEvent(eventID interface{}) *gomock.Call {
+func (mr *MockEventRepositoryMockRecorder) GetEvent(ctx, eventID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvent", reflect.TypeOf((*MockEventRepository)(nil).GetEvent), eventID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvent", reflect.TypeOf((*MockEventRepository)(nil).GetEvent), ctx, eventID)
 }
 
 // GetEvents mocks base method.
-func (m *MockEventRepository) GetEvents() ([]*domain.Event, error) {
+func (m *MockEventRepository) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEvents")
+	ret := m.ctrl.Call(m, "GetEvents", ctx)
 	ret0, _ := ret[0].([]*domain.Event)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetEvents indicates an expected call of GetEvents.
-func (mr *MockEventRepositoryMockRecorder) GetEvents() *gomock.Call {
+func (mr *MockEventRepositoryMockRecorder) GetEvents(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvents", reflect.TypeOf((*MockEventRepository)(nil).GetEvents))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvents", reflect.TypeOf((*MockEventRepository)(nil).GetEvents), ctx)
 }
 
 // GetUserEvents mocks base method.
-func (m *MockEventRepository) GetUserEvents(userID uuid.UUID) ([]*domain.Event, error) {
+func (m *MockEventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserEvents", userID)
+	ret := m.ctrl.Call(m, "GetUserEvents", ctx, userID)
 	ret0, _ := ret[0].([]*domain.Event)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUserEvents indicates an expected call of GetUserEvents.
-func (mr *MockEventRepositoryMockRecorder) GetUserEvents(userID interface{}) *gomock.Call {
+func (mr *MockEventRepositoryMockRecorder) GetUserEvents(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserEvents", reflect.TypeOf((*MockEventRepository)(nil).GetUserEvents), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserEvents", reflect.TypeOf((*MockEventRepository)(nil).GetUserEvents), ctx, userID)
 }
 
 // UpdateEventLevel mocks base method.
-func (m *MockEventRepository) UpdateEventLevel(eventID uuid.UUID, args *repository.UpdateEventLevelArgs) error {
+func (m *MockEventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, args *repository.UpdateEventLevelArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateEventLevel", eventID, args)
+	ret := m.ctrl.Call(m, "UpdateEventLevel", ctx, eventID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateEventLevel indicates an expected call of UpdateEventLevel.
-func (mr *MockEventRepositoryMockRecorder) UpdateEventLevel(eventID, args interface{}) *gomock.Call {
+func (mr *MockEventRepositoryMockRecorder) UpdateEventLevel(ctx, eventID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).UpdateEventLevel), eventID, args)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventLevel", reflect.TypeOf((*MockEventRepository)(nil).UpdateEventLevel), ctx, eventID, args)
 }
