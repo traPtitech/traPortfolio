@@ -100,11 +100,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 
 	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
 	for _, team := range contest.ContestTeams {
-		members := make([]User, len(team.Members))
-		for i, ct := range team.Members {
-			members[i] = newUser(ct.ID, ct.Name, ct.RealName())
-		}
-		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, members))
+		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, []User{}))
 	}
 	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
 
@@ -249,12 +245,7 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	members := make([]User, len(contestTeam.Members))
-	for j, ct := range contestTeam.Members {
-		members[j] = newUser(ct.ID, ct.Name, ct.RealName())
-	}
-
-	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, members)
+	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, []User{})
 
 	return c.JSON(http.StatusCreated, res)
 }
