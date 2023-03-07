@@ -68,6 +68,14 @@ func CloneMockContests() []model.Contest {
 			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
 			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
 		},
+		{
+			ID:          ContestID2(),
+			Name:        "sample_contest_name2",
+			Description: "sample_contest_description2",
+			Link:        "https://sample.contests.com",
+			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+		},
 	}
 }
 

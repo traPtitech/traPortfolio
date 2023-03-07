@@ -1362,9 +1362,9 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
-				rows := sqlmock.NewRows([]string{"team_id"})
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
 				for _, v := range want {
-					rows.AddRow(v.Teams[0].ID)
+					rows.AddRow(v.Teams[0].ID, args.userID)
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
 					WithArgs(args.userID).
@@ -1420,10 +1420,10 @@ func TestUserRepository_GetContests(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT 1")).
 					WithArgs(args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.userID))
-				rows := sqlmock.NewRows([]string{"team_id"})
+				rows := sqlmock.NewRows([]string{"team_id", "user_id"})
 				for _, v := range want {
 					for _, t := range v.Teams {
-						rows.AddRow(t.ID)
+						rows.AddRow(t.ID, args.userID)
 					}
 				}
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`user_id` = ?")).
