@@ -1,11 +1,8 @@
 package repository
 
 import (
-<<<<<<< HEAD
-	"errors"
-=======
 	"context"
->>>>>>> origin
+	"errors"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
