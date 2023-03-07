@@ -39,7 +39,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.Project) {
-				repo.EXPECT().GetProjects().Return(want, nil)
+				repo.EXPECT().GetProjects(args.ctx).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -48,7 +48,7 @@ func TestProjectService_GetProjects(t *testing.T) {
 			args: args{ctx: context.Background()},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.Project) {
-				repo.EXPECT().GetProjects().Return(nil, gorm.ErrInvalidDB)
+				repo.EXPECT().GetProjects(args.ctx).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -106,7 +106,7 @@ func TestProjectService_GetProject(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.ProjectDetail) {
-				repo.EXPECT().GetProject(args.id).Return(want, nil)
+				repo.EXPECT().GetProject(args.ctx, args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -118,7 +118,7 @@ func TestProjectService_GetProject(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.ProjectDetail) {
-				repo.EXPECT().GetProject(args.id).Return(nil, gorm.ErrInvalidDB)
+				repo.EXPECT().GetProject(args.ctx, args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -188,7 +188,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				if args.args.Link.Valid {
 					want.Link = args.args.Link.String
 				}
-				repo.EXPECT().CreateProject(gomock.Any()).Return(want, nil) // TODO: CreateProject内でuuid.NewV4するのでテストができない？
+				repo.EXPECT().CreateProject(args.ctx, gomock.Any()).Return(want, nil) // TODO: CreateProject内でuuid.NewV4するのでテストができない？
 			},
 			assertion: assert.NoError,
 		},
@@ -227,7 +227,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.ProjectDetail) {
-				repo.EXPECT().CreateProject(args.args).Return(nil, gorm.ErrInvalidDB)
+				repo.EXPECT().CreateProject(args.ctx, args.args).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -281,13 +281,13 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().GetProject(args.id).Return(&domain.ProjectDetail{
+				repo.EXPECT().GetProject(args.ctx, args.id).Return(&domain.ProjectDetail{
 					Project: domain.Project{
 						ID:       args.id,
 						Duration: duration,
 					},
 				}, nil)
-				repo.EXPECT().UpdateProject(args.id, args.args).Return(nil)
+				repo.EXPECT().UpdateProject(args.ctx, args.id, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -299,7 +299,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				args: nil,
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().GetProject(args.id).Return(nil, repository.ErrNotFound)
+				repo.EXPECT().GetProject(args.ctx, args.id).Return(nil, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -319,7 +319,7 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().GetProject(args.id).Return(&domain.ProjectDetail{
+				repo.EXPECT().GetProject(args.ctx, args.id).Return(&domain.ProjectDetail{
 					Project: domain.Project{
 						ID:       args.id,
 						Duration: duration,
@@ -344,13 +344,13 @@ func TestProjectService_UpdateProject(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().GetProject(args.id).Return(&domain.ProjectDetail{
+				repo.EXPECT().GetProject(args.ctx, args.id).Return(&domain.ProjectDetail{
 					Project: domain.Project{
 						ID:       args.id,
 						Duration: duration,
 					},
 				}, nil)
-				repo.EXPECT().UpdateProject(args.id, args.args).Return(gorm.ErrInvalidDB)
+				repo.EXPECT().UpdateProject(args.ctx, args.id, args.args).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -397,7 +397,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {
-				repo.EXPECT().GetProjectMembers(args.id).Return(want, nil)
+				repo.EXPECT().GetProjectMembers(args.ctx, args.id).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -409,7 +409,7 @@ func TestProjectService_GetProjectMembers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want []*domain.UserWithDuration) {
-				repo.EXPECT().GetProjectMembers(args.id).Return(nil, gorm.ErrInvalidDB)
+				repo.EXPECT().GetProjectMembers(args.ctx, args.id).Return(nil, gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -463,7 +463,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().AddProjectMembers(args.projectID, args.args).Return(nil)
+				repo.EXPECT().AddProjectMembers(args.ctx, args.projectID, args.args).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -502,7 +502,7 @@ func TestProjectService_AddProjectMembers(t *testing.T) {
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().AddProjectMembers(args.projectID, args.args).Return(gorm.ErrInvalidDB)
+				repo.EXPECT().AddProjectMembers(args.ctx, args.projectID, args.args).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},
@@ -545,7 +545,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 				memberIDs: []uuid.UUID{random.UUID()},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(nil)
+				repo.EXPECT().DeleteProjectMembers(args.ctx, args.projectID, args.memberIDs).Return(nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -557,7 +557,7 @@ func TestProjectService_DeleteProjectMembers(t *testing.T) {
 				memberIDs: []uuid.UUID{random.UUID()},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
-				repo.EXPECT().DeleteProjectMembers(args.projectID, args.memberIDs).Return(gorm.ErrInvalidDB)
+				repo.EXPECT().DeleteProjectMembers(args.ctx, args.projectID, args.memberIDs).Return(gorm.ErrInvalidDB)
 			},
 			assertion: assert.Error,
 		},

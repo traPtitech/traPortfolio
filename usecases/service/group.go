@@ -27,17 +27,17 @@ func NewGroupService(group repository.GroupRepository, user repository.UserRepos
 }
 
 func (s *groupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
-	return s.group.GetAllGroups()
+	return s.group.GetAllGroups(ctx)
 }
 
 func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
-	groups, err := s.group.GetGroup(groupID)
+	groups, err := s.group.GetGroup(ctx, groupID)
 	if err != nil {
 		return nil, err
 	}
 
 	// pick all users info
-	users, err := s.user.GetUsers(&repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
+	users, err := s.user.GetUsers(ctx, &repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
 	if err != nil {
 		return nil, err
 	}

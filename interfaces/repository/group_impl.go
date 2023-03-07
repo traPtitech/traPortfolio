@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
@@ -16,9 +18,9 @@ func NewGroupRepository(sql database.SQLHandler) repository.GroupRepository {
 	return &GroupRepository{h: sql}
 }
 
-func (r *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
+func (r *GroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
 	groups := make([]*model.Group, 0)
-	err := r.h.Find(&groups).Error()
+	err := r.h.WithContext(ctx).Find(&groups).Error()
 	if err != nil {
 		return nil, convertError(err)
 	}
@@ -33,9 +35,10 @@ func (r *GroupRepository) GetAllGroups() ([]*domain.Group, error) {
 	return result, nil
 }
 
-func (r *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, error) {
+func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
 	group := &model.Group{}
 	if err := r.h.
+		WithContext(ctx).
 		Where(&model.Group{GroupID: groupID}).
 		First(group).
 		Error(); err != nil {
@@ -44,6 +47,7 @@ func (r *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, erro
 
 	users := make([]*model.GroupUserBelonging, 0)
 	if err := r.h.
+		WithContext(ctx).
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
 		Error(); err != nil {
@@ -74,6 +78,7 @@ func (r *GroupRepository) GetGroup(groupID uuid.UUID) (*domain.GroupDetail, erro
 
 	admins := make([]*model.GroupUserAdmin, 0)
 	if err := r.h.
+		WithContext(ctx).
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
 		Error(); err != nil {

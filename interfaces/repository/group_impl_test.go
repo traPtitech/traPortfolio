@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -66,7 +67,7 @@ func TestGroupRepository_GetAllGroups(t *testing.T) {
 			f := newMockGroupRepositoryFields()
 			tt.setup(f, tt.want)
 			repo := NewGroupRepository(f.h)
-			got, err := repo.GetAllGroups()
+			got, err := repo.GetAllGroups(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -234,7 +235,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 			f := newMockGroupRepositoryFields()
 			tt.setup(f, tt.args, tt.want)
 			repo := NewGroupRepository(f.h)
-			got, err := repo.GetGroup(tt.args.id)
+			got, err := repo.GetGroup(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

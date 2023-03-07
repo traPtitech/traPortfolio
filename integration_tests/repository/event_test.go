@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"math/rand"
 	"testing"
 
@@ -34,7 +35,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 		})
 	}
 
-	got, err := repo.GetEvents()
+	got, err := repo.GetEvents(context.Background())
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, expected, got)
@@ -76,7 +77,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		RoomID:      selected.RoomID,
 	}
 
-	got, err := repo.GetEvent(selected.ID)
+	got, err := repo.GetEvent(context.Background(), selected.ID)
 	assert.NoError(t, err)
 
 	assert.Equal(t, expected, got)
@@ -103,17 +104,17 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		break
 	}
 
-	got, err := repo.GetEvent(selected.EventID)
+	got, err := repo.GetEvent(context.Background(), selected.EventID)
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
 	updatedLevel := random.Uint8n(uint8(domain.EventLevelLimit))
-	err = repo.UpdateEventLevel(selected.EventID, &urepository.UpdateEventLevelArgs{
+	err = repo.UpdateEventLevel(context.Background(), selected.EventID, &urepository.UpdateEventLevelArgs{
 		Level: optional.NewUint8(updatedLevel, true),
 	})
 	assert.NoError(t, err)
 
-	got, err = repo.GetEvent(selected.EventID)
+	got, err = repo.GetEvent(context.Background(), selected.EventID)
 	assert.NoError(t, err)
 	assert.Equal(t, updatedLevel, uint8(got.Level))
 }
@@ -136,7 +137,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 		})
 	}
 
-	got, err := repo.GetEvents()
+	got, err := repo.GetEvents(context.Background())
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, expected, got)

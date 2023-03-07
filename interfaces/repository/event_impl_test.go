@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"math/rand"
 	"testing"
 
@@ -84,7 +85,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			tt.setup(f, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
-			got, err := repo.GetEvents()
+			got, err := repo.GetEvents(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -212,7 +213,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
-			got, err := repo.GetEvent(tt.args.id)
+			got, err := repo.GetEvent(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -315,7 +316,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
-			err := repo.CreateEventLevel(tt.args.args)
+			err := repo.CreateEventLevel(context.Background(), tt.args.args)
 			tt.assertion(t, err)
 		})
 	}
@@ -427,7 +428,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
-			tt.assertion(t, repo.UpdateEventLevel(tt.args.id, tt.args.arg))
+			tt.assertion(t, repo.UpdateEventLevel(context.Background(), tt.args.id, tt.args.arg))
 		})
 	}
 }
@@ -492,7 +493,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
-			got, err := repo.GetUserEvents(tt.args.userID)
+			got, err := repo.GetUserEvents(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

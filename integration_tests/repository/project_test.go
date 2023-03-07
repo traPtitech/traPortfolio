@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -30,7 +31,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 		projects = append(projects, mustMakeProject(t, repo, nil))
 	}
 
-	got, err := repo.GetProjects()
+	got, err := repo.GetProjects(context.Background())
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, projects, got)
@@ -52,7 +53,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 
 	opt := cmpopts.EquateEmpty()
 	for _, p := range projects {
-		got, err := repo.GetProject(p.ID)
+		got, err := repo.GetProject(context.Background(), p.ID)
 		assert.NoError(t, err)
 
 		if diff := cmp.Diff(p, got, opt); diff != "" {
@@ -103,10 +104,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		project1.Duration.Until.Semester = int(arg1.UntilSemester.Int64)
 	}
 
-	err := repo.UpdateProject(project1.ID, &arg1)
+	err := repo.UpdateProject(context.Background(), project1.ID, &arg1)
 	assert.NoError(t, err)
 
-	got, err := repo.GetProject(project1.ID)
+	got, err := repo.GetProject(context.Background(), project1.ID)
 	assert.NoError(t, err)
 
 	opt := cmpopts.EquateEmpty()
@@ -171,7 +172,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		},
 	}
 	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
-	users1, err := repo.GetProjectMembers(project1.ID)
+	users1, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
@@ -190,7 +191,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	}
 
 	expected2 := []*domain.UserWithDuration{projectMember3}
-	users2, err := repo.GetProjectMembers(project2.ID)
+	users2, err := repo.GetProjectMembers(context.Background(), project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
 }
@@ -255,7 +256,7 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		},
 	}
 	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
-	users1, err := repo.GetProjectMembers(project1.ID)
+	users1, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, users1)
 
@@ -273,28 +274,28 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		},
 	}
 	expected2 := []*domain.UserWithDuration{projectMember3}
-	users2, err := repo.GetProjectMembers(project2.ID)
+	users2, err := repo.GetProjectMembers(context.Background(), project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember1.User.ID})
+	err = repo.DeleteProjectMembers(context.Background(), project1.ID, []uuid.UUID{projectMember1.User.ID})
 	assert.NoError(t, err)
 	expected3 := []*domain.UserWithDuration{projectMember2}
-	users3, err := repo.GetProjectMembers(project1.ID)
+	users3, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, users3)
 
-	err = repo.DeleteProjectMembers(project1.ID, []uuid.UUID{projectMember2.User.ID})
+	err = repo.DeleteProjectMembers(context.Background(), project1.ID, []uuid.UUID{projectMember2.User.ID})
 	assert.NoError(t, err)
 	expected4 := []*domain.UserWithDuration{}
-	users4, err := repo.GetProjectMembers(project1.ID)
+	users4, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected4, users4)
 
-	err = repo.DeleteProjectMembers(project2.ID, []uuid.UUID{projectMember3.User.ID})
+	err = repo.DeleteProjectMembers(context.Background(), project2.ID, []uuid.UUID{projectMember3.User.ID})
 	assert.NoError(t, err)
 	expected5 := []*domain.UserWithDuration{}
-	users5, err := repo.GetProjectMembers(project2.ID)
+	users5, err := repo.GetProjectMembers(context.Background(), project2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected5, users5)
 }

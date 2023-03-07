@@ -81,33 +81,33 @@ func (mr *MockUserServiceMockRecorder) EditAccount(ctx, userID, accountID, args 
 }
 
 // GetAccount mocks base method.
-func (m *MockUserService) GetAccount(userID, accountID uuid.UUID) (*domain.Account, error) {
+func (m *MockUserService) GetAccount(ctx context.Context, userID, accountID uuid.UUID) (*domain.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccount", userID, accountID)
+	ret := m.ctrl.Call(m, "GetAccount", ctx, userID, accountID)
 	ret0, _ := ret[0].(*domain.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAccount indicates an expected call of GetAccount.
-func (mr *MockUserServiceMockRecorder) GetAccount(userID, accountID interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) GetAccount(ctx, userID, accountID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockUserService)(nil).GetAccount), userID, accountID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockUserService)(nil).GetAccount), ctx, userID, accountID)
 }
 
 // GetAccounts mocks base method.
-func (m *MockUserService) GetAccounts(userID uuid.UUID) ([]*domain.Account, error) {
+func (m *MockUserService) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*domain.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccounts", userID)
+	ret := m.ctrl.Call(m, "GetAccounts", ctx, userID)
 	ret0, _ := ret[0].([]*domain.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAccounts indicates an expected call of GetAccounts.
-func (mr *MockUserServiceMockRecorder) GetAccounts(userID interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) GetAccounts(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccounts", reflect.TypeOf((*MockUserService)(nil).GetAccounts), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccounts", reflect.TypeOf((*MockUserService)(nil).GetAccounts), ctx, userID)
 }
 
 // GetGroupsByUserID mocks base method.
