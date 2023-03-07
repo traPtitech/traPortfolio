@@ -390,35 +390,58 @@ func CloneHandlerMockUserEvents() []handler.Event {
 	return mUserEvents
 }
 
+// userが所属するteamが参加したcontestの一覧を返す
+
 func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.UserContest {
 	var (
-		uUsers              = CloneMockUsers()
+		mUsers              = CloneMockUsers()
 		hContests           = CloneHandlerMockContests()
-		hContestTeams       = CloneHandlerMockContestTeamsByID()
+		mContestTeams       = CloneMockContestTeams()
 		mContestTeamMembers = CloneMockContestTeamUserBelongings()
 		hUserContests       = make(map[uuid.UUID][]handler.UserContest, len(hContests))
 	)
 
-	for _, u := range uUsers {
+	// userContestTeams[userID][contestID] = []ContestTeam
+	userContestTeams := make(map[uuid.UUID]map[uuid.UUID][]handler.ContestTeam, len(mUsers))
+	for _, u := range mUsers {
+		userContestTeams[u.ID] = make(map[uuid.UUID][]handler.ContestTeam, len(hContests))
 		for _, c := range hContests {
-			for _, ctm := range mContestTeamMembers {
-				if u.ID == ctm.UserID {
-					hUserContests[u.ID] = append(hUserContests[u.ID], handler.UserContest{
-						Id:       c.Id,
-						Name:     c.Name,
-						Duration: c.Duration,
-						Teams: []handler.ContestTeam{
-							{
-								Id:     hContestTeams[c.Id][0].Id,
-								Name:   hContestTeams[c.Id][0].Name,
-								Result: hContestTeams[c.Id][0].Result,
-							},
-						},
+			userContestTeams[u.ID][c.Id] = []handler.ContestTeam{}
+			for _, ct := range mContestTeams {
+				if ct.ContestID != c.Id {
+					continue
+				}
+
+				for _, ctm := range mContestTeamMembers {
+					if ctm.TeamID != ct.ID || ctm.UserID != u.ID {
+						continue
+					}
+
+					userContestTeams[u.ID][c.Id] = append(userContestTeams[u.ID][c.Id], handler.ContestTeam{
+						Id:     ct.ID,
+						Name:   ct.Name,
+						Result: ct.Result,
 					})
 				}
 			}
 		}
 	}
+
+	for _, u := range mUsers {
+		for _, c := range hContests {
+			if len(userContestTeams[u.ID][c.Id]) == 0 {
+				continue
+			}
+
+			hUserContests[u.ID] = append(hUserContests[u.ID], handler.UserContest{
+				Duration: c.Duration,
+				Id:       c.Id,
+				Name:     c.Name,
+				Teams:    userContestTeams[u.ID][c.Id],
+			})
+		}
+	}
+
 	return hUserContests
 }
 

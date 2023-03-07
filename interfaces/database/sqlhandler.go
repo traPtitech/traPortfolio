@@ -15,6 +15,6 @@ type SQLHandler interface {
 	Rollback() SQLHandler
 	Transaction(fc func(handler SQLHandler) error) error
 	Ping() error
-
+	Limit(limit int) SQLHandler
 	Error() error
 }
