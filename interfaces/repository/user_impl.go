@@ -361,6 +361,19 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 			return convertError(err)
 		}
 
+		// 同タイプ生成回避
+		if args.Type.Valid {
+			if err := tx.
+				WithContext(ctx).
+				Where(&model.Account{Type: uint8(args.Type.Int64), UserID: userID}).
+				First(&model.Account{}).
+				Error(); err == nil {
+				return repository.ErrAlreadyExists
+			} else if !errors.Is(err, database.ErrNoRows) {
+				return convertError(err)
+			}
+		}
+
 		// URLのvalidation
 		if args.Type.Valid && args.URL.Valid {
 			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {

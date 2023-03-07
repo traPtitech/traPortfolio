@@ -1038,6 +1038,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`type` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.args.Type, args.userID).
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -1068,6 +1072,58 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
+			name: "AlreadyExists_FindSameTypeAccount",
+			args: args{
+				userID:    random.UUID(),
+				accountID: random.UUID(),
+				args: &repository.UpdateAccountArgs{
+					DisplayName: random.OptAlphaNumericNotNull(),
+					URL:         random.OptURLStringNotNull(),
+					PrPermitted: random.OptBoolNotNull(),
+					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(anyUUID{}, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`type` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.args.Type, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"type"}).AddRow(args.args.Type))
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_FindSameTypeAccount",
+			args: args{
+				userID:    random.UUID(),
+				accountID: random.UUID(),
+				args: &repository.UpdateAccountArgs{
+					DisplayName: random.OptAlphaNumericNotNull(),
+					URL:         random.OptURLStringNotNull(),
+					PrPermitted: random.OptBoolNotNull(),
+					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
+				},
+			},
+			setup: func(f mockUserRepositoryFields, args args) {
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(anyUUID{}, args.userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`type` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.args.Type, args.userID).
+					WillReturnError(errUnexpected)
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
 			name: "UnexpectedError_Update",
 			args: args{
 				userID:    random.UUID(),
@@ -1085,6 +1141,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`type` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
+					WithArgs(args.args.Type, args.userID).
+					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
