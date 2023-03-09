@@ -4,15 +4,14 @@ services:
   backend:
     build: ./
     restart: always
-    entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
-    command: ./traPortfolio -c /opt/portfolio/config.yaml
     expose:
       - "80"
       - "6060"
     ports:
       - "1323:1323"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - ./dev/config_docker.yaml:/opt/portfolio/config.yaml
 
@@ -28,6 +27,12 @@ services:
       - "3306"
     ports:
       - "3306:3306"
+    healthcheck:
+      test: mysqladmin ping -h localhost -u root -ppassword
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   adminer:
     image: adminer
