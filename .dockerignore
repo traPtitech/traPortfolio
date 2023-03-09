@@ -3,7 +3,8 @@
 .gitmodules
 .dockerignore
 .DS_Store
-.tbls.yaml
 .golangci.yml
+.oapi.types.yml
+.tbls.yaml
 Makefile
 README.md

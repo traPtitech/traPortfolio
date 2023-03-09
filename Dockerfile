@@ -1,18 +1,26 @@
-FROM golang:1.20.2-alpine AS build
-WORKDIR /go/src/github.com/traPtitech/traPortfolio
-COPY ./go.* ./
-RUN go mod download
-COPY . .
-RUN go build -o /traPortfolio .
+# syntax=docker/dockerfile:1
 
-FROM alpine:3.17.2
+##
+## Build stage
+##
+FROM golang:1.20.2-alpine AS build
+
 WORKDIR /app
 
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+COPY ./go.mod ./go.sum ./
+RUN go mod download
 
-COPY --from=build /traPortfolio ./
+COPY ./ ./
+RUN go build -o /traPortfolio .
 
-ENTRYPOINT ./traPortfolio
+##
+## Deployment stage
+##
+FROM alpine:3.17.2 AS deploy
+
+WORKDIR /
+
+COPY --from=build /traPortfolio /traPortfolio
+COPY dev/config_docker.yaml /opt/traPortfolio/config.yaml
+
+ENTRYPOINT /traPortfolio -c /opt/traPortfolio/config.yaml
