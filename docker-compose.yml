@@ -27,10 +27,10 @@ services:
       retries: 10
 
   adminer:
-    image: adminer
+    image: adminer:standalone
     restart: always
     environment:
       ADMINER_DEFAULT_SERVER: mysql
-      ADMINER_DESIGN: nette
+      ADMINER_DESIGN: pepa-linha
     ports:
       - "3001:8080"
