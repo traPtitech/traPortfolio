@@ -5,7 +5,7 @@ RUN go mod download
 COPY . .
 RUN go build -o /traPortfolio .
 
-FROM alpine:3.12.0
+FROM alpine:3.17.2
 WORKDIR /app
 
 ENV DOCKERIZE_VERSION v0.6.1
