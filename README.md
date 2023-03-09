@@ -22,7 +22,7 @@ If you want to contribute to traPortfolio, then follow these pages.
 - make
 - Docker
 - Docker Compose
-- Go 1.17
+- Go
 - MySQL
 
 ### Start docker container (with Docker Compose)
@@ -35,8 +35,8 @@ Tips: You can change the configuration by rewriting [./dev/config_docker.yaml](.
 
 Now you can access to
 
-- `http://localhost:1323` for backend server.
-- `http://localhost:3001` for adminer
+- <http://localhost:1323> for backend server.
+- <http://localhost:3001> for adminer
   - username: `root`
   - password: `password`
   - database: `portfolio`
