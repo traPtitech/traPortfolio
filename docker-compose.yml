@@ -12,8 +12,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    volumes:
-      - ./dev/config_docker.yaml:/opt/portfolio/config.yaml
 
   mysql:
     image: mariadb:10.6.4
@@ -32,7 +30,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s
 
   adminer:
     image: adminer
