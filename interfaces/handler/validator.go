@@ -34,10 +34,10 @@ func (v *validator) Validate(i interface{}) error {
 }
 
 var (
-	vdRuleNameLength        = vd.Length(1, 32)
-	vdRuleDisplayNameLength = vd.Length(1, 256) // 外部アカウントのアカウント名文字数上限
-	vdRuleDescriptionLength = vd.Length(1, 256)
-	vdRuleResultLength      = vd.Length(0, 32)
+	vdRuleNameLength        = vd.RuneLength(1, 32)
+	vdRuleDisplayNameLength = vd.RuneLength(1, 256) // 外部アカウントのアカウント名文字数上限
+	vdRuleDescriptionLength = vd.RuneLength(1, 256)
+	vdRuleResultLength      = vd.RuneLength(0, 32)
 	vdRuleAccountTypeMax    = vd.Max(domain.AccountLimit - 1)
 	vdRuleEventLevelMax     = vd.Max(uint8(domain.EventLevelLimit) - 1)
 )
