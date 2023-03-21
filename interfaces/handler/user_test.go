@@ -1184,19 +1184,15 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 						ContestID: random.UUID(),
 						Name:      random.AlphaNumeric(),
 						Result:    random.AlphaNumeric(),
+						Members:   make([]*domain.User, 0),
 					},
 				},
-			}
-
-			members := make([]User, len(rcontest.Teams[0].Members))
-			for i, c := range rcontest.Teams[0].Members {
-				members[i] = newUser(c.ID, c.Name, c.RealName())
 			}
 
 			hcontest := newUserContest(
 				newContest(rcontest.ID, rcontest.Name, rcontest.TimeStart, rcontest.TimeEnd),
 				[]ContestTeam{
-					newContestTeam(rcontest.Teams[0].ID, rcontest.Teams[0].Name, rcontest.Teams[0].Result, members),
+					newContestTeam(rcontest.Teams[0].ID, rcontest.Teams[0].Name, rcontest.Teams[0].Result, make([]User, 0)),
 				},
 			)
 
