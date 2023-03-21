@@ -309,8 +309,12 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 }
 
 func TestUserRepository_GetAccounts(t *testing.T) {
-	t.Parallel()
+	var (
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
 
+	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -320,8 +324,6 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
-	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -343,8 +345,12 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 }
 
 func TestUserRepository_GetAccount(t *testing.T) {
-	t.Parallel()
+	var (
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
 
+	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_get_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -354,8 +360,6 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
-	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -378,8 +382,12 @@ func TestUserRepository_GetAccount(t *testing.T) {
 // }
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
-	t.Parallel()
+	var (
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
 
+	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_update_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -389,8 +397,6 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
-	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -432,8 +438,12 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 }
 
 func TestUserRepository_DeleteAccount(t *testing.T) {
-	t.Parallel()
+	var (
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
 
+	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_delete_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -443,8 +453,6 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 
 	idx := 1
 	user := mockdata.MockUsers[idx]
-	accountType1 := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
-	accountType2 := domain.AccountType((int(accountType1) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
