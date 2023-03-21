@@ -49,7 +49,7 @@ func CloneMockAccounts() []model.Account {
 	return []model.Account{
 		{
 			ID:     AccountID1(),
-			Type:   2,
+			Type:   AccountTypeOfAccountID1(),
 			Name:   "sample_account_display_name",
 			URL:    "https://twitter.com/sample_account",
 			UserID: UserID1(),

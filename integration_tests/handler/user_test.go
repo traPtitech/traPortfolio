@@ -302,7 +302,7 @@ func TestAddUserAccount(t *testing.T) {
 	var (
 		displayName = random.AlphaNumeric()
 		prPermitted = handler.PrPermitted(random.Bool())
-		accountType = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountType = handler.AccountType(mockdata.AccountTypeUser1DoesntHave())
 		accountURL  = random.AccountURLString(domain.AccountType(accountType))
 	)
 
@@ -315,7 +315,7 @@ func TestAddUserAccount(t *testing.T) {
 	}{
 		"201": {
 			http.StatusCreated,
-			mockdata.UserID2(),
+			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -338,7 +338,7 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
-			mockdata.UserID2(),
+			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -349,7 +349,7 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
-			mockdata.UserID2(),
+			mockdata.UserID1(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -395,9 +395,9 @@ func TestEditUserAccount(t *testing.T) {
 	var (
 		displayName        = random.AlphaNumeric()
 		prPermitted        = handler.PrPermitted(random.Bool())
-		accountType        = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountType        = handler.AccountType(int(mockdata.AccountTypeOfAccountID1()))
 		accountURL         = random.AccountURLString(domain.AccountType(accountType))
-		initialAccountType = domain.AccountType((int(accountType) + 1 + rand.Intn(int(domain.AccountLimit)-1)) % int(domain.AccountLimit))
+		initialAccountType = domain.AccountType(mockdata.AccountTypeOfAccountID1())
 		invalidAccountType = handler.AccountType(5)
 		invalidAccountURL  = random.RandURLString()
 	)
@@ -412,8 +412,8 @@ func TestEditUserAccount(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.UserID2(),
-			testutils.DummyUUID(),
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 				PrPermitted: &prPermitted,
@@ -424,8 +424,8 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
-			mockdata.UserID2(),
-			testutils.DummyUUID(),
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
 		},
@@ -438,7 +438,7 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
-			mockdata.UserID2(),
+			mockdata.UserID1(),
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
@@ -472,12 +472,24 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"404 account not found": {
 			http.StatusNotFound,
-			mockdata.UserID2(),
+			mockdata.UserID1(),
 			random.UUID(),
 			handler.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
 			testutils.HTTPError("Not Found: not found"),
+		},
+		"404 account type conflicted by update": { // TODO: statusCode != NoContentで新しいAccountを生成してからそれに変更をしてType conflictするテストを書く
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
+			handler.EditUserAccountJSONRequestBody{
+				DisplayName: &displayName,
+				PrPermitted: &prPermitted,
+				Type:        &accountType,
+				Url:         &accountURL,
+			},
+			testutils.HTTPError("Bad Request: already exists"),
 		},
 	}
 
@@ -490,23 +502,36 @@ func TestEditUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
-				// Insert & Assert
-				account := handler.Account{
-					DisplayName: random.AlphaNumeric(),
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(initialAccountType),
-					Url:         random.AccountURLString(initialAccountType),
+				account := handler.Account{}
+				if tt.accountID == mockdata.AccountID1() {
+					// Get initial account data
+					mockAccount := mockdata.CloneMockAccounts()[0]
+					account = handler.Account{
+						Id:          mockAccount.ID,
+						DisplayName: mockAccount.Name,
+						PrPermitted: mockAccount.Check,
+						Type:        mockAccount.Type,
+						Url:         mockAccount.URL,
+					}
+				} else {
+					// Insert & Assert
+					account = handler.Account{
+						DisplayName: random.AlphaNumeric(),
+						PrPermitted: handler.PrPermitted(random.Bool()),
+						Type:        handler.AccountType(initialAccountType),
+						Url:         random.AccountURLString(initialAccountType),
+					}
+					res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
+						DisplayName: account.DisplayName,
+						PrPermitted: account.PrPermitted,
+						Type:        account.Type,
+						Url:         account.Url,
+					})
+					testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
+					account.Id = tt.accountID
 				}
-				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
-					DisplayName: account.DisplayName,
-					PrPermitted: account.PrPermitted,
-					Type:        account.Type,
-					Url:         account.Url,
-				})
-				testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
-				account.Id = tt.accountID
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
+				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 				// Get updated response & Assert
 				if tt.reqBody.DisplayName != nil {
@@ -543,10 +568,10 @@ func TestDeleteUserAccount(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.UserID2(),
-			testutils.DummyUUID(),
+			mockdata.UserID1(),
+			mockdata.AccountID1(),
 			nil,
-			true,
+			false,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -564,7 +589,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		},
 		"404 account not found": {
 			http.StatusNotFound,
-			mockdata.UserID2(),
+			mockdata.UserID1(),
 			random.UUID(),
 			testutils.HTTPError("Not Found: not found"),
 			false,
