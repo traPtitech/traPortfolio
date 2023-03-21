@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -83,11 +84,15 @@ func TestGetProject(t *testing.T) {
 // CreateProject POST /projects
 func TestCreateProject(t *testing.T) {
 	var (
-		name        = random.AlphaNumeric()
-		link        = random.RandURLString()
-		invalidLink = "invalid link"
-		description = random.AlphaNumeric()
-		duration    = handler.ConvertDuration(random.Duration())
+		name                    = random.AlphaNumeric()
+		link                    = random.RandURLString()
+		invalidLink             = "invalid link"
+		description             = random.AlphaNumeric()
+		justCountName           = strings.Repeat("亜", 32)
+		justCountDescription    = strings.Repeat("亜", 256)
+		tooLongName             = strings.Repeat("亜", 33)
+		tooLongDescriptionKanji = strings.Repeat("亜", 257)
+		duration                = handler.ConvertDuration(random.Duration())
 	)
 
 	t.Parallel()
@@ -110,6 +115,20 @@ func TestCreateProject(t *testing.T) {
 				Duration: duration,
 			},
 		},
+		"201 with kanji": {
+			http.StatusCreated,
+			handler.CreateProjectJSONRequestBody{
+				Name:        justCountName,
+				Link:        &link,
+				Description: justCountDescription,
+				Duration:    duration,
+			},
+			handler.Project{
+				Id:       uuid.Nil,
+				Name:     justCountName,
+				Duration: duration,
+			},
+		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
 			handler.CreateProjectJSONRequestBody{
@@ -119,6 +138,26 @@ func TestCreateProject(t *testing.T) {
 				Duration:    duration,
 			},
 			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+		},
+		"400 too long description": {
+			http.StatusBadRequest,
+			handler.CreateProjectJSONRequestBody{
+				Name:        name,
+				Link:        &link,
+				Description: tooLongDescriptionKanji,
+				Duration:    duration,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: must be less than or equal to 256 characters."),
+		},
+		"400 too long name": {
+			http.StatusBadRequest,
+			handler.CreateProjectJSONRequestBody{
+				Name:        tooLongName,
+				Link:        &link,
+				Description: description,
+				Duration:    duration,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: must be less than or equal to 32 characters."),
 		},
 		"400 empty name": {
 			http.StatusBadRequest,
@@ -174,6 +213,10 @@ func TestEditProject(t *testing.T) {
 		name        = random.AlphaNumeric()
 		link        = random.RandURLString()
 		description = random.AlphaNumeric()
+		justCountName           = strings.Repeat("亜", 32)
+		justCountDescription    = strings.Repeat("亜", 256)
+		tooLongName             = strings.Repeat("亜", 33)
+		tooLongDescriptionKanji = strings.Repeat("亜", 257)
 		duration    = handler.ConvertDuration(random.Duration())
 	)
 
@@ -195,6 +238,17 @@ func TestEditProject(t *testing.T) {
 			},
 			nil,
 		},
+		"204 with kanji": {
+			http.StatusNoContent,
+			mockdata.ProjectID1(),
+			handler.EditProjectJSONRequestBody{
+				Name:        &justCountName,
+				Link:        &link,
+				Description: &justCountDescription,
+				Duration:    &duration,
+			},
+			nil,
+		},
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.ProjectID2(),
@@ -206,6 +260,22 @@ func TestEditProject(t *testing.T) {
 			uuid.Nil,
 			handler.EditProjectJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400 invalid Name": {
+			http.StatusBadRequest,
+			mockdata.ProjectID1(),
+			handler.EditProjectJSONRequestBody{
+				Name: &tooLongName,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: must be less than or equal to 32 characters."),
+		},
+		"400 invalid Description": {
+			http.StatusBadRequest,
+			mockdata.ProjectID1(),
+			handler.EditProjectJSONRequestBody{
+				Description: &tooLongDescriptionKanji,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: must be less than or equal to 256 characters."),
 		},
 		"404": {
 			http.StatusNotFound,
