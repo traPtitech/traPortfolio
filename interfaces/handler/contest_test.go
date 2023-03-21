@@ -127,12 +127,14 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 				ContestID: getContestID[0],
 				Name:      random.AlphaNumeric(),
 				Result:    random.AlphaNumeric(),
+				Members:   make([]*domain.User, 0),
 			},
 			{
 				ID:        getContestID[2],
 				ContestID: getContestID[0],
 				Name:      random.AlphaNumeric(),
 				Result:    random.AlphaNumeric(),
+				Members:   make([]*domain.User, 0),
 			},
 		},
 	}
@@ -140,9 +142,10 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 	teams := make([]ContestTeam, len(d.ContestTeams))
 	for i, v := range d.ContestTeams {
 		teams[i] = ContestTeam{
-			Id:     v.ID,
-			Name:   v.Name,
-			Result: v.Result,
+			Id:      v.ID,
+			Members: make([]User, 0),
+			Name:    v.Name,
+			Result:  v.Result,
 		}
 	}
 
@@ -510,24 +513,28 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 						ContestID: contestID,
 						Name:      random.AlphaNumeric(),
 						Result:    random.AlphaNumeric(),
+						Members:   make([]*domain.User, 0),
 					},
 					{
 						ID:        random.UUID(),
 						ContestID: contestID,
 						Name:      random.AlphaNumeric(),
 						Result:    random.AlphaNumeric(),
+						Members:   make([]*domain.User, 0),
 					},
 				}
 				hres = []*ContestTeam{
 					{
-						Id:     repoContestTeams[0].ID,
-						Name:   repoContestTeams[0].Name,
-						Result: repoContestTeams[0].Result,
+						Id:      repoContestTeams[0].ID,
+						Members: make([]User, 0),
+						Name:    repoContestTeams[0].Name,
+						Result:  repoContestTeams[0].Result,
 					},
 					{
-						Id:     repoContestTeams[1].ID,
-						Name:   repoContestTeams[1].Name,
-						Result: repoContestTeams[1].Result,
+						Id:      repoContestTeams[1].ID,
+						Members: make([]User, 0),
+						Name:    repoContestTeams[1].Name,
+						Result:  repoContestTeams[1].Result,
 					},
 				}
 				s.EXPECT().GetContestTeams(anyCtx{}, contestID).Return(repoContestTeams, nil)
@@ -683,15 +690,16 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 						ContestID: contestID,
 						Name:      args.Name,
 						Result:    args.Result.String,
-						Members:   nil,
+						Members:   make([]*domain.User, 0),
 					},
 					Link:        args.Link.String,
 					Description: args.Description,
 				}
 				expectedResBody := ContestTeam{
-					Id:     teamID,
-					Name:   want.Name,
-					Result: want.Result,
+					Id:      teamID,
+					Members: make([]User, 0),
+					Name:    want.Name,
+					Result:  want.Result,
 				}
 				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(&want, nil)
 				return reqBody, expectedResBody, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)

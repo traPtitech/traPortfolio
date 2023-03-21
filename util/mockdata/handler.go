@@ -36,9 +36,10 @@ func CloneHandlerMockContestDetails() []handler.ContestDetail {
 
 	for i, c := range hContestTeams {
 		mContestTeams[i] = handler.ContestTeam{
-			Id:     c.ID,
-			Name:   c.Name,
-			Result: c.Result,
+			Id:      c.ID,
+			Members: make([]handler.User, 0),
+			Name:    c.Name,
+			Result:  c.Result,
 		}
 	}
 
@@ -85,9 +86,10 @@ func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeam {
 
 	for _, ct := range mContestTeams {
 		hContestTeamsByID[ct.ContestID] = append(hContestTeamsByID[ct.ContestID], handler.ContestTeam{
-			Id:     ct.ID,
-			Name:   ct.Name,
-			Result: ct.Result,
+			Id:      ct.ID,
+			Members: make([]handler.User, 0),
+			Name:    ct.Name,
+			Result:  ct.Result,
 		})
 	}
 	return hContestTeamsByID
@@ -418,9 +420,10 @@ func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.UserContest {
 					}
 
 					userContestTeams[u.ID][c.Id] = append(userContestTeams[u.ID][c.Id], handler.ContestTeam{
-						Id:     ct.ID,
-						Name:   ct.Name,
-						Result: ct.Result,
+						Id:      ct.ID,
+						Members: make([]handler.User, 0),
+						Name:    ct.Name,
+						Result:  ct.Result,
 					})
 				}
 			}

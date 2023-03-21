@@ -429,6 +429,7 @@ func newContestTeamDetail(team ContestTeam, link string, description string) Con
 		Description: description,
 		Id:          team.Id,
 		Link:        link,
+		Members:     team.Members,
 		Name:        team.Name,
 		Result:      team.Result,
 	}
