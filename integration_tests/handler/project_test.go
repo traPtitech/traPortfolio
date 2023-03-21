@@ -147,7 +147,7 @@ func TestCreateProject(t *testing.T) {
 				Description: tooLongDescriptionKanji,
 				Duration:    duration,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: must be less than or equal to 256 characters."),
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 too long name": {
 			http.StatusBadRequest,
@@ -157,7 +157,7 @@ func TestCreateProject(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: must be less than or equal to 32 characters."),
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 empty name": {
 			http.StatusBadRequest,
@@ -267,7 +267,7 @@ func TestEditProject(t *testing.T) {
 			handler.EditProjectJSONRequestBody{
 				Name: &tooLongName,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: must be less than or equal to 32 characters."),
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Description": {
 			http.StatusBadRequest,
@@ -275,7 +275,7 @@ func TestEditProject(t *testing.T) {
 			handler.EditProjectJSONRequestBody{
 				Description: &tooLongDescriptionKanji,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: must be less than or equal to 256 characters."),
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"404": {
 			http.StatusNotFound,

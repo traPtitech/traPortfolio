@@ -387,7 +387,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        accountType,
 				Url:         accountURL,
 			},
-			testutils.HTTPError("Bad Request: validate error: displayName: must be no greater than 255."),
+			testutils.HTTPError("Bad Request: validate error: displayName: the length must be between 1 and 256."),
 		},
 	}
 
