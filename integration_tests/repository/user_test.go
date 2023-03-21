@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -383,8 +382,9 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
 	var (
-		accountType1 = domain.AccountType(3)
-		accountType2 = domain.AccountType(4)
+		accountType1      = domain.AccountType(3)
+		accountType2      = domain.AccountType(4)
+		accountType3Int64 = int64(6)
 	)
 
 	t.Parallel()
@@ -410,11 +410,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		PrPermitted: random.Bool(),
 	})
 
-	accountType := optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), true)
+	accountType := optional.NewInt64(accountType3Int64, true)
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
 		Type:        accountType,
-		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType.Int64)),
+		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType3Int64)),
 		PrPermitted: random.OptBool(),
 	}
 	if args.DisplayName.Valid {
