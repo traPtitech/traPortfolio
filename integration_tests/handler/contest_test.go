@@ -421,7 +421,7 @@ func TestEditContest(t *testing.T) {
 
 // DeleteContest DELETE /contests/:contestID
 // func TestDeleteContest(t *testing.T) {
-	// https://github.com/traPtitech/traPortfolio/issues/460
+// https://github.com/traPtitech/traPortfolio/issues/460
 // }
 
 // GetContestTeams GET /contests/:contestID/teams

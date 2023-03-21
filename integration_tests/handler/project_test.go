@@ -210,14 +210,14 @@ func TestCreateProject(t *testing.T) {
 // EditProject PATCH /projects/:projectID
 func TestEditProject(t *testing.T) {
 	var (
-		name        = random.AlphaNumeric()
-		link        = random.RandURLString()
-		description = random.AlphaNumeric()
+		name                    = random.AlphaNumeric()
+		link                    = random.RandURLString()
+		description             = random.AlphaNumeric()
 		justCountName           = strings.Repeat("亜", 32)
 		justCountDescription    = strings.Repeat("亜", 256)
 		tooLongName             = strings.Repeat("亜", 33)
 		tooLongDescriptionKanji = strings.Repeat("亜", 257)
-		duration    = handler.ConvertDuration(random.Duration())
+		duration                = handler.ConvertDuration(random.Duration())
 	)
 
 	t.Parallel()
