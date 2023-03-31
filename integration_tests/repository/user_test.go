@@ -59,7 +59,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "All IncludeSuspended",
 			args: args{args: &urepository.GetUsersArgs{
-				IncludeSuspended: optional.NewBool(true, true),
+				IncludeSuspended: optional.From(true),
 			}},
 			expected: []*domain.User{
 				domain.NewUser(
@@ -86,7 +86,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "Name",
 			args: args{args: &urepository.GetUsersArgs{
-				Name: optional.NewString(mockdata.MockTraQUsers[0].Name, true),
+				Name: optional.From(mockdata.MockTraQUsers[0].Name),
 			}},
 			expected: []*domain.User{
 				domain.NewUser(
@@ -101,8 +101,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		{
 			name: "Invalid arg",
 			args: args{args: &urepository.GetUsersArgs{
-				Name:             optional.NewString(mockdata.MockTraQUsers[0].Name, true),
-				IncludeSuspended: optional.NewBool(true, true),
+				Name:             optional.From(mockdata.MockTraQUsers[0].Name),
+				IncludeSuspended: optional.From(true),
 			}},
 			expected:  nil,
 			assertion: assert.Error,
@@ -278,15 +278,15 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	var bio string
-	if args.Description.Valid {
-		bio = args.Description.String
+	if v, ok := args.Description.V(); ok {
+		bio = v
 	} else {
 		bio = user.Description
 	}
 
 	var check bool
-	if args.Check.Valid {
-		check = args.Check.Bool
+	if v, ok := args.Check.V(); ok {
+		check = v
 	} else {
 		check = user.Check
 	}
@@ -368,24 +368,24 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	account1 := mustMakeAccount(t, repo, user.ID, nil)
 	mustMakeAccount(t, repo, user.ID, nil)
 
-	accountType := optional.NewInt64(rand.Int63n(int64(domain.AccountLimit)), true)
+	accountType := optional.From(domain.AccountType(rand.Int63n(int64(domain.AccountLimit))))
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
 		Type:        accountType,
-		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType.Int64)),
+		URL:         random.OptAccountURLStringNotNull(accountType.ValueOrZero()),
 		PrPermitted: random.OptBool(),
 	}
-	if args.DisplayName.Valid {
-		account1.DisplayName = args.DisplayName.String
+	if v, ok := args.DisplayName.V(); ok {
+		account1.DisplayName = v
 	}
-	if args.Type.Valid {
-		account1.Type = domain.AccountType(args.Type.Int64)
+	if v, ok := args.Type.V(); ok {
+		account1.Type = v
 	}
-	if args.URL.Valid {
-		account1.URL = args.URL.String
+	if v, ok := args.URL.V(); ok {
+		account1.URL = v
 	}
-	if args.PrPermitted.Valid {
-		account1.PrPermitted = args.PrPermitted.Bool
+	if v, ok := args.PrPermitted.V(); ok {
+		account1.PrPermitted = v
 	}
 	err = repo.UpdateAccount(context.Background(), user.ID, account1.ID, args)
 	assert.NoError(t, err)

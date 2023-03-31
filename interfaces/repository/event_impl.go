@@ -100,18 +100,23 @@ func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.
 }
 
 func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUID, arg *repository.UpdateEventLevelArgs) error {
-	if !arg.Level.Valid {
+	newLevel, ok := arg.Level.V()
+	if !ok {
 		return nil // updateする必要がないのでここでcommitする
 	}
 
 	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		if elv, err := r.getEventLevelByID(ctx, eventID); err != nil {
 			return convertError(err)
-		} else if uint8(elv.Level) == arg.Level.Byte {
+		} else if elv.Level == newLevel {
 			return nil // updateする必要がないのでここでcommitする
 		}
 
-		if err := tx.WithContext(ctx).Model(&model.EventLevelRelation{ID: eventID}).Update("level", arg.Level).Error(); err != nil {
+		if err := tx.
+			WithContext(ctx).
+			Model(&model.EventLevelRelation{ID: eventID}).
+			Update("level", newLevel).
+			Error(); err != nil {
 			return convertError(err)
 		}
 

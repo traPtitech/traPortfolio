@@ -3,13 +3,15 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 type OptionalDuration struct {
-	Since optional.Time `json:"since"`
-	Until optional.Time `json:"until"`
+	Since optional.Of[time.Time] `json:"since"`
+	Until optional.Of[time.Time] `json:"until"`
 }
 
 type OptionalYearWithSemesterDuration struct {
@@ -18,8 +20,8 @@ type OptionalYearWithSemesterDuration struct {
 }
 
 type OptionalYearWithSemester struct {
-	Year     optional.Int64
-	Semester optional.Int64
+	Year     optional.Of[int64]
+	Semester optional.Of[int64]
 }
 
 func ConvertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {

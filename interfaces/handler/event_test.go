@@ -198,7 +198,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 }
 
 func TestEventHandler_EditEvent(t *testing.T) {
-	hLevel := func(l uint8) *EventLevel {
+	hLevel := func(l domain.EventLevel) *EventLevel {
 		r := EventLevel(l)
 		return &r
 	}
@@ -213,14 +213,14 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
+				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &EditEventJSONRequestBody{
-					EventLevel: hLevel(eventLevelUint8),
+					EventLevel: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8((eventLevelUint8), true),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -241,14 +241,14 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
+				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &EditEventJSONRequestBody{
-					EventLevel: hLevel(eventLevelUint8),
+					EventLevel: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8((eventLevelUint8), true),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -262,14 +262,14 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
+				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &EditEventJSONRequestBody{
-					EventLevel: hLevel(eventLevelUint8),
+					EventLevel: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8((eventLevelUint8), true),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
@@ -283,14 +283,14 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
 
 				eventID := random.UUID()
-				eventLevelUint8 := random.Uint8n(uint8(domain.EventLevelLimit))
+				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &EditEventJSONRequestBody{
-					EventLevel: hLevel(eventLevelUint8),
+					EventLevel: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8((eventLevelUint8), true),
+					Level: optional.From(eventLevel),
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)
