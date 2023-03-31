@@ -47,7 +47,12 @@ func (e *EventLevel) Scan(src interface{}) error {
 	}
 
 	if s.Valid {
-		*e = EventLevel(s.Byte)
+		newEL := EventLevel(s.Byte)
+		if newEL >= EventLevelLimit {
+			return ErrTooLargeEnum
+		}
+
+		*e = newEL
 	}
 
 	return nil

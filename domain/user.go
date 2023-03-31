@@ -104,7 +104,12 @@ func (a *AccountType) Scan(src interface{}) error {
 	}
 
 	if s.Valid {
-		*a = AccountType(s.Byte)
+		newAT := AccountType(s.Byte)
+		if newAT >= AccountLimit {
+			return ErrTooLargeEnum
+		}
+
+		*a = newAT
 	}
 
 	return nil
