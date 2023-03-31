@@ -178,58 +178,10 @@ func Bool() bool {
 	return rand.Int()%2 == 0
 }
 
-func OptBool() optional.Of[bool] {
-	return optional.New(Bool(), Bool())
+func Iotan[T ~uint8](n T) T {
+	return T(rand.Intn(int(n)))
 }
 
-func OptBoolNotNull() optional.Of[bool] {
-	return optional.From(Bool())
-}
-
-func OptInt64() optional.Of[int64] {
-	return optional.New(rand.Int63(), Bool())
-}
-
-func OptInt64n(n int64) optional.Of[int64] {
-	return optional.New(rand.Int63n(n), Bool())
-}
-
-func OptInt64nNotNull(n int64) optional.Of[int64] {
-	return optional.From(rand.Int63n(n))
-}
-
-func OptAlphaNumericn(n int) optional.Of[string] {
-	return optional.New(AlphaNumericn(n), Bool())
-}
-
-func OptAlphaNumeric() optional.Of[string] {
-	return optional.New(AlphaNumeric(), Bool())
-}
-
-func OptAlphaNumericNotNull() optional.Of[string] {
-	return optional.From(AlphaNumeric())
-}
-
-func OptTime() optional.Of[time.Time] {
-	return optional.New(Time(), Bool())
-}
-
-func OptURLString() optional.Of[string] {
-	return optional.New(RandURLString(), Bool())
-}
-
-func OptURLStringNotNull() optional.Of[string] {
-	return optional.From(RandURLString())
-}
-
-func OptAccountURLStringNotNull(accountType domain.AccountType) optional.Of[string] {
-	return optional.From(AccountURLString(accountType))
-}
-
-func OptAccountType() optional.Of[domain.AccountType] {
-	return optional.New(domain.AccountType(rand.Intn(int(domain.AccountLimit))), Bool())
-}
-
-func OptAccountTypeNotNull() optional.Of[domain.AccountType] {
-	return optional.From(domain.AccountType(rand.Intn(int(domain.AccountLimit))))
+func Optional[T any](t T) optional.Of[T] {
+	return optional.New(t, Bool())
 }
