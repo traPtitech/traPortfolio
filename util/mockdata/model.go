@@ -274,9 +274,5 @@ func InsertSampleDataToDB(h database.SQLHandler) error {
 	}
 
 	mockProjectMembers := CloneMockProjectMembers()
-	if err := h.Create(&mockProjectMembers).Error(); err != nil {
-		return err
-	}
-
-	return nil
+	return h.Create(&mockProjectMembers).Error()
 }
