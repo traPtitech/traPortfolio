@@ -51,7 +51,7 @@ func (p GetUsersParams) Validate() error {
 
 	return vd.ValidateStruct(&p,
 		vd.Field(&p.IncludeSuspended),
-		vd.Field(&p.Name, vd.NilOrNotEmpty, vdRuleNameLength), 
+		vd.Field(&p.Name, vd.NilOrNotEmpty),
 	)
 }
 
