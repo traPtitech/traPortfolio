@@ -115,33 +115,38 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 		return nil
 	}
 
-	var (
-		old model.Contest
-		new model.Contest
-	)
-
+	var c model.Contest
 	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
-			First(&old).
+			First(&model.Contest{}).
 			Error(); err != nil {
 			return convertError(err)
 		}
-		if err := tx.WithContext(ctx).Model(&old).Updates(changes).Error(); err != nil {
+
+		if err := tx.
+			WithContext(ctx).
+			Model(&model.Contest{ID: contestID}).
+			Updates(changes).
+			Error(); err != nil {
 			return convertError(err)
 		}
-		err := tx.
+
+		if err := tx.
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
-			First(&new).
-			Error()
+			First(&c).
+			Error(); err != nil {
+			return convertError(err)
+		}
 
-		return convertError(err)
+		return nil
 	})
 	if err != nil {
 		return convertError(err)
 	}
+
 	return nil
 }
 
@@ -283,29 +288,33 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 		return nil
 	}
 
-	var (
-		old model.ContestTeam
-		new model.ContestTeam
-	)
-
+	var ct model.ContestTeam
 	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		if err := tx.
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
-			First(&old).
+			First(&model.ContestTeam{}).
 			Error(); err != nil {
 			return convertError(err)
 		}
-		if err := tx.WithContext(ctx).Model(&old).Updates(changes).Error(); err != nil {
+
+		if err := tx.
+			WithContext(ctx).
+			Model(&model.ContestTeam{ID: teamID}).
+			Updates(changes).
+			Error(); err != nil {
 			return convertError(err)
 		}
-		err := tx.
+
+		if err := tx.
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
-			First(&new).
-			Error()
+			First(&ct).
+			Error(); err != nil {
+			return convertError(err)
+		}
 
-		return convertError(err)
+		return nil
 	})
 	if err != nil {
 		return convertError(err)
@@ -313,7 +322,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 	return nil
 }
 
-func (r *ContestRepository) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
+func (r *ContestRepository) DeleteContestTeam(ctx context.Context, _ uuid.UUID, teamID uuid.UUID) error {
 	err := r.h.
 		WithContext(ctx).
 		Where(&model.ContestTeam{ID: teamID}).

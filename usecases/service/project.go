@@ -85,11 +85,7 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 		return repository.ErrInvalidArg
 	}
 
-	if err := s.repo.UpdateProject(ctx, projectID, args); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateProject(ctx, projectID, args)
 }
 
 func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
