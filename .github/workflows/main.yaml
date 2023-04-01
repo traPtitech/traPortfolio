@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
-          cache: true
       - name: Download go modules
         run: go mod download
       - name: Compile go packages
@@ -43,7 +42,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
-          cache: true
       - name: Run tests
         run: go test $(go list ./... | grep -v "integration_tests") -coverprofile=coverage_unit.txt -race -vet=off
       - uses: actions/upload-artifact@v3
@@ -69,7 +67,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
-          cache: true
       - name: Run tests
         run: go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off
       - uses: actions/upload-artifact@v3
