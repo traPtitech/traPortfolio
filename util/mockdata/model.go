@@ -76,6 +76,14 @@ func CloneMockContests() []model.Contest {
 			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
 			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
 		},
+		{
+			ID:          ContestID3(),
+			Name:        "sample_contest_name3",
+			Description: "sample_contest_description3",
+			Link:        "https://sample.contests.com",
+			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+		},
 	}
 }
 
@@ -95,6 +103,14 @@ func CloneMockContestTeams() []model.ContestTeam {
 			Name:        "sample_contest_team_name2",
 			Description: "sample_contest_team_description2",
 			Result:      "sample_contest_team_result2",
+			Link:        "https://sample.contest_teams.com",
+		},
+		{
+			ID:          ContestTeamID3(),
+			ContestID:   ContestID1(),
+			Name:        "sample_contest_team_name3",
+			Description: "sample_contest_team_description3",
+			Result:      "sample_contest_team_result3",
 			Link:        "https://sample.contest_teams.com",
 		},
 	}
