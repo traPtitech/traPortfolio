@@ -286,7 +286,7 @@ func TestEditContest(t *testing.T) {
 		},
 		"204 with kanji": {
 			http.StatusNoContent,
-			mockdata.ContestID1(),
+			mockdata.ContestID2(),
 			handler.EditContestJSONRequestBody{
 				Description: &justCountDescription,
 				Duration: &handler.Duration{
@@ -300,7 +300,7 @@ func TestEditContest(t *testing.T) {
 		},
 		"204 without change": {
 			http.StatusNoContent,
-			mockdata.ContestID2(),
+			mockdata.ContestID3(),
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},
@@ -655,7 +655,7 @@ func TestEditContestTeam(t *testing.T) {
 		"204 with kanji": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
-			mockdata.ContestTeamID1(),
+			mockdata.ContestTeamID2(),
 			handler.EditContestTeamJSONRequestBody{
 				Description: &justCountDescription,
 				Link:        &link,
@@ -667,7 +667,7 @@ func TestEditContestTeam(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
-			mockdata.ContestTeamID2(),
+			mockdata.ContestTeamID3(),
 			handler.EditContestTeamJSONRequestBody{},
 			nil,
 		},

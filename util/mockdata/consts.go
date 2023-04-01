@@ -35,12 +35,20 @@ func ContestID2() uuid.UUID {
 	return uuid.FromStringOrNil("08eec963-0f29-48d1-929f-004cb67d8ce7")
 }
 
+func ContestID3() uuid.UUID {
+	return uuid.FromStringOrNil("08eec963-0f29-48d1-929f-004cb67d8ce8")
+}
+
 func ContestTeamID1() uuid.UUID {
 	return uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750d")
 }
 
 func ContestTeamID2() uuid.UUID {
 	return uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750e")
+}
+
+func ContestTeamID3() uuid.UUID {
+	return uuid.FromStringOrNil("a9d07124-ffee-412f-adfc-02d3db0b750f")
 }
 
 func GroupID1() uuid.UUID {
