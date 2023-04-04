@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"database/sql"
+	"database/sql/driver"
 	"regexp"
 	"time"
 
@@ -74,6 +76,49 @@ type UserGroup struct {
 
 type AccountType uint8
 
+var (
+	_ sql.Scanner   = (*AccountType)(nil)
+	_ driver.Valuer = AccountType(0)
+)
+
+const (
+	HOMEPAGE AccountType = iota
+	BLOG
+	TWITTER
+	FACEBOOK
+	PIXIV
+	GITHUB
+	QIITA
+	ZENN
+	ATCODER
+	SOUNDCLOUD
+	HACKTHEBOX
+	CTFTIME
+	AccountLimit
+)
+
+func (a *AccountType) Scan(src interface{}) error {
+	s := sql.NullByte{}
+	if err := s.Scan(src); err != nil {
+		return err
+	}
+
+	if s.Valid {
+		newAT := AccountType(s.Byte)
+		if newAT >= AccountLimit {
+			return ErrTooLargeEnum
+		}
+
+		*a = newAT
+	}
+
+	return nil
+}
+
+func (a AccountType) Value() (driver.Value, error) {
+	return sql.NullByte{Byte: byte(a), Valid: true}.Value()
+}
+
 func IsValidAccountURL(accountType AccountType, URL string) bool {
 	var urlRegexp = map[AccountType]*regexp.Regexp{
 		HOMEPAGE:   regexp.MustCompile("^https?://.+$"),
@@ -96,22 +141,6 @@ func IsValidAccountURL(accountType AccountType, URL string) bool {
 
 	return false
 }
-
-const (
-	HOMEPAGE AccountType = iota
-	BLOG
-	TWITTER
-	FACEBOOK
-	PIXIV
-	GITHUB
-	QIITA
-	ZENN
-	ATCODER
-	SOUNDCLOUD
-	HACKTHEBOX
-	CTFTIME
-	AccountLimit
-)
 
 type TraQState uint8
 

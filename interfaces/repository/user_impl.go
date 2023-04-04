@@ -28,13 +28,15 @@ func NewUserRepository(h database.SQLHandler, portalAPI external.PortalAPI, traQ
 
 func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
 	eargs := new(external.TraQGetAllArgs)
-	if iv, nv := rargs.IncludeSuspended.Valid, rargs.Name.Valid; iv && nv {
+	includeSuspended, iok := rargs.IncludeSuspended.V()
+	name, nok := rargs.Name.V()
+	if iok && nok {
 		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
 		return nil, repository.ErrInvalidArg
-	} else if iv {
-		eargs.IncludeSuspended = rargs.IncludeSuspended.Bool
-	} else if nv {
-		eargs.Name = rargs.Name.String
+	} else if iok {
+		eargs.IncludeSuspended = includeSuspended
+	} else if nok {
+		eargs.Name = name
 	}
 
 	return eargs, nil
@@ -45,8 +47,8 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 
 	limit := -1
 
-	if args.Limit.Valid {
-		limit = int(args.Limit.Int64)
+	if v, ok := args.Limit.V(); ok {
+		limit = v
 	}
 
 	if err != nil {
@@ -198,11 +200,11 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 
 func (r *UserRepository) UpdateUser(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error {
 	changes := map[string]interface{}{}
-	if args.Description.Valid {
-		changes["description"] = args.Description.String
+	if v, ok := args.Description.V(); ok {
+		changes["description"] = v
 	}
-	if args.Check.Valid {
-		changes["check"] = args.Check.Bool
+	if v, ok := args.Check.V(); ok {
+		changes["check"] = v
 	}
 
 	if len(changes) == 0 {
@@ -334,17 +336,17 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 
 func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	changes := map[string]interface{}{}
-	if args.DisplayName.Valid {
-		changes["name"] = args.DisplayName.String
+	if v, ok := args.DisplayName.V(); ok {
+		changes["name"] = v
 	}
-	if args.URL.Valid {
-		changes["url"] = args.URL.String
+	if v, ok := args.URL.V(); ok {
+		changes["url"] = v
 	}
-	if args.PrPermitted.Valid {
-		changes["check"] = args.PrPermitted.Bool
+	if v, ok := args.PrPermitted.V(); ok {
+		changes["check"] = v
 	}
-	if args.Type.Valid {
-		changes["type"] = args.Type.Int64
+	if v, ok := args.Type.V(); ok {
+		changes["type"] = v
 	}
 
 	if len(changes) == 0 {
@@ -375,16 +377,18 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 		}
 
 		// URLのvalidation
-		if args.Type.Valid && args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), args.URL.String) {
+		tv, tok := args.Type.V()
+		uv, uok := args.URL.V()
+		if tok && uok {
+			if !domain.IsValidAccountURL(domain.AccountType(tv), uv) {
 				return repository.ErrInvalidArg
 			}
-		} else if !args.Type.Valid && args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(account.Type), args.URL.String) {
+		} else if !tok && uok {
+			if !domain.IsValidAccountURL(domain.AccountType(account.Type), uv) {
 				return repository.ErrInvalidArg
 			}
-		} else if args.Type.Valid && !args.URL.Valid {
-			if !domain.IsValidAccountURL(domain.AccountType(args.Type.Int64), account.URL) {
+		} else if tok && !uok {
+			if !domain.IsValidAccountURL(tv, account.URL) {
 				return repository.ErrInvalidArg
 			}
 		}

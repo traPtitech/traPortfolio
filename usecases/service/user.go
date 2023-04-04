@@ -51,11 +51,7 @@ func (s *userService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.Us
 }
 
 func (s *userService) Update(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error {
-	if err := s.repo.UpdateUser(ctx, userID, args); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateUser(ctx, userID, args)
 }
 
 func (s *userService) GetAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
@@ -71,22 +67,14 @@ func (s *userService) CreateAccount(ctx context.Context, userID uuid.UUID, accou
 }
 
 func (s *userService) EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
-	if err := s.repo.UpdateAccount(ctx, userID, accountID, args); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateAccount(ctx, userID, accountID, args)
 }
 
 func (s *userService) DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error {
-
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
 
-	err := s.repo.DeleteAccount(ctx, userID, accountID)
-
-	return err
-
+	return s.repo.DeleteAccount(ctx, userID, accountID)
 }
 
 func (s *userService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {

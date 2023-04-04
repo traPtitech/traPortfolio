@@ -168,7 +168,7 @@ func TestProjectService_CreateProject(t *testing.T) {
 				args: &repository.CreateProjectArgs{
 					Name:          name,
 					Description:   description,
-					Link:          optional.NewString(link, true),
+					Link:          optional.From(link),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -185,8 +185,8 @@ func TestProjectService_CreateProject(t *testing.T) {
 				Link:        link,
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args, want *domain.ProjectDetail) {
-				if args.args.Link.Valid {
-					want.Link = args.args.Link.String
+				if v, ok := args.args.Link.V(); ok {
+					want.Link = v
 				}
 				repo.EXPECT().CreateProject(args.ctx, gomock.Any()).Return(want, nil) // TODO: CreateProject内でuuid.NewV4するのでテストができない？
 			},
@@ -274,10 +274,10 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
 					Link:          random.OptAlphaNumeric(),
-					SinceYear:     optional.NewInt64(int64(duration.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(duration.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(duration.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(duration.Until.Semester), true),
+					SinceYear:     optional.From(int64(duration.Since.Year)),
+					SinceSemester: optional.From(int64(duration.Since.Semester)),
+					UntilYear:     optional.From(int64(duration.Until.Year)),
+					UntilSemester: optional.From(int64(duration.Until.Semester)),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
@@ -312,10 +312,10 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
 					Link:          random.OptAlphaNumeric(),
-					SinceYear:     optional.NewInt64(int64(duration.Until.Year), true),
-					SinceSemester: optional.NewInt64(int64(duration.Until.Semester), true),
-					UntilYear:     optional.NewInt64(int64(duration.Since.Year), true),
-					UntilSemester: optional.NewInt64(int64(duration.Since.Semester), true),
+					SinceYear:     optional.From(int64(duration.Until.Year)),
+					SinceSemester: optional.From(int64(duration.Until.Semester)),
+					UntilYear:     optional.From(int64(duration.Since.Year)),
+					UntilSemester: optional.From(int64(duration.Since.Semester)),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {
@@ -337,10 +337,10 @@ func TestProjectService_UpdateProject(t *testing.T) {
 					Name:          random.OptAlphaNumeric(),
 					Description:   random.OptAlphaNumeric(),
 					Link:          random.OptAlphaNumeric(),
-					SinceYear:     optional.NewInt64(int64(duration.Since.Year), true),
-					SinceSemester: optional.NewInt64(int64(duration.Since.Semester), true),
-					UntilYear:     optional.NewInt64(int64(duration.Until.Year), true),
-					UntilSemester: optional.NewInt64(int64(duration.Until.Semester), true),
+					SinceYear:     optional.From(int64(duration.Since.Year)),
+					SinceSemester: optional.From(int64(duration.Since.Semester)),
+					UntilYear:     optional.From(int64(duration.Until.Year)),
+					UntilSemester: optional.From(int64(duration.Until.Semester)),
 				},
 			},
 			setup: func(repo *mock_repository.MockProjectRepository, args args) {

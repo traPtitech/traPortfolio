@@ -86,22 +86,26 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		UntilSemester: random.OptInt64n(2),
 	}
 
-	if arg1.Name.Valid {
-		project1.Name = arg1.Name.String
+	if v, ok := arg1.Name.V(); ok {
+		project1.Name = v
 	}
-	if arg1.Description.Valid {
-		project1.Description = arg1.Description.String
+	if v, ok := arg1.Description.V(); ok {
+		project1.Description = v
 	}
-	if arg1.Link.Valid {
-		project1.Link = arg1.Link.String
+	if v, ok := arg1.Link.V(); ok {
+		project1.Link = v
 	}
-	if arg1.SinceYear.Valid && arg1.SinceSemester.Valid {
-		project1.Duration.Since.Year = int(arg1.SinceYear.Int64)
-		project1.Duration.Since.Semester = int(arg1.SinceSemester.Int64)
+	if sy, ok := arg1.SinceYear.V(); ok {
+		if ss, ok := arg1.SinceSemester.V(); ok {
+			project1.Duration.Since.Year = int(sy)
+			project1.Duration.Since.Semester = int(ss)
+		}
 	}
-	if arg1.UntilYear.Valid && arg1.UntilSemester.Valid {
-		project1.Duration.Until.Year = int(arg1.UntilYear.Int64)
-		project1.Duration.Until.Semester = int(arg1.UntilSemester.Int64)
+	if uy, ok := arg1.UntilYear.V(); ok {
+		if us, ok := arg1.UntilSemester.V(); ok {
+			project1.Duration.Until.Year = int(uy)
+			project1.Duration.Until.Semester = int(us)
+		}
 	}
 
 	err := repo.UpdateProject(context.Background(), project1.ID, &arg1)

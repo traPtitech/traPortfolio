@@ -259,7 +259,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 				args := repository.CreateProjectArgs{
 					Name:          reqBody.Name,
 					Description:   reqBody.Description,
-					Link:          optional.StringFrom(reqBody.Link),
+					Link:          optional.FromPtr(reqBody.Link),
 					SinceYear:     reqBody.Duration.Since.Year,
 					SinceSemester: int(reqBody.Duration.Since.Semester),
 					UntilYear:     reqBody.Duration.Until.Year,
@@ -281,7 +281,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 						},
 					},
 					Description: args.Description,
-					Link:        args.Link.String,
+					Link:        args.Link.ValueOrZero(),
 					Members:     nil,
 				}
 				expectedResBody = Project{

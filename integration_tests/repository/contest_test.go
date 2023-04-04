@@ -73,20 +73,20 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 		Since:       random.OptTime(),
 		Until:       random.OptTime(),
 	}
-	if args.Name.Valid {
-		contest1.Name = args.Name.String
+	if v, ok := args.Name.V(); ok {
+		contest1.Name = v
 	}
-	if args.Description.Valid {
-		contest1.Description = args.Description.String
+	if v, ok := args.Description.V(); ok {
+		contest1.Description = v
 	}
-	if args.Link.Valid {
-		contest1.Link = args.Link.String
+	if v, ok := args.Link.V(); ok {
+		contest1.Link = v
 	}
-	if args.Since.Valid {
-		contest1.TimeStart = args.Since.Time
+	if v, ok := args.Since.V(); ok {
+		contest1.TimeStart = v
 	}
-	if args.Until.Valid {
-		contest1.TimeEnd = args.Until.Time
+	if v, ok := args.Until.V(); ok {
+		contest1.TimeEnd = v
 	}
 
 	err := repo.UpdateContest(context.Background(), contest1.ID, &args)
@@ -241,17 +241,17 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 		Link:        random.OptURLString(),
 		Description: random.OptAlphaNumeric(),
 	}
-	if args1.Name.Valid {
-		team1.Name = args1.Name.String
+	if v, ok := args1.Name.V(); ok {
+		team1.Name = v
 	}
-	if args1.Result.Valid {
-		team1.Result = args1.Result.String
+	if v, ok := args1.Result.V(); ok {
+		team1.Result = v
 	}
-	if args1.Link.Valid {
-		team1.Link = args1.Link.String
+	if v, ok := args1.Link.V(); ok {
+		team1.Link = v
 	}
-	if args1.Description.Valid {
-		team1.Description = args1.Description.String
+	if v, ok := args1.Description.V(); ok {
+		team1.Description = v
 	}
 
 	err := repo.UpdateContestTeam(context.Background(), team1.ID, args1)

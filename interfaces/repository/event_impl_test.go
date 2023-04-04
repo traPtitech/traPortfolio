@@ -339,7 +339,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8(uint8(domain.EventLevelPublic), true),
+					Level: optional.From(domain.EventLevelPublic),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -351,7 +351,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 							AddRow(args.id, domain.EventLevelAnonymous),
 					)
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `event_level_relations` SET `level`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.arg.Level, anyTime{}, args.id).
+					WithArgs(args.arg.Level.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -362,7 +362,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8(uint8(domain.EventLevelPublic), true),
+					Level: optional.From(domain.EventLevelPublic),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -379,7 +379,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8(uint8(domain.EventLevelPublic), true),
+					Level: optional.From(domain.EventLevelPublic),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -399,7 +399,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				arg: &repository.UpdateEventLevelArgs{
-					Level: optional.NewUint8(uint8(domain.EventLevelPublic), true),
+					Level: optional.From(domain.EventLevelPublic),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {

@@ -31,9 +31,9 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.GetUsersArgs{
-		IncludeSuspended: optional.BoolFrom((*bool)(req.IncludeSuspended)),
-		Name:             optional.StringFrom((*string)(req.Name)),
-		Limit:            optional.Int64From((*int64)(req.Limit)),
+		IncludeSuspended: optional.FromPtr((*bool)(req.IncludeSuspended)),
+		Name:             optional.FromPtr((*string)(req.Name)),
+		Limit:            optional.FromPtr((*int)(req.Limit)),
 	}
 
 	users, err := h.srv.GetUsers(ctx, &args)
@@ -93,8 +93,8 @@ func (h *UserHandler) UpdateUser(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	u := repository.UpdateUserArgs{
-		Description: optional.StringFrom(req.Bio),
-		Check:       optional.BoolFrom(req.Check),
+		Description: optional.FromPtr(req.Bio),
+		Check:       optional.FromPtr(req.Check),
 	}
 
 	if err := h.srv.Update(ctx, userID, &u); err != nil {
@@ -199,17 +199,11 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	// TODO: UpdateAccountArgs.Typeをoptional.Uint8にしたら消す
-	var typeInt64 *int64
-	if req.Type != nil {
-		t := int64(*req.Type)
-		typeInt64 = &t
-	}
 	args := repository.UpdateAccountArgs{
-		DisplayName: optional.StringFrom(req.DisplayName),
-		Type:        optional.Int64From(typeInt64),
-		URL:         optional.StringFrom(req.Url),
-		PrPermitted: optional.BoolFrom((*bool)(req.PrPermitted)),
+		DisplayName: optional.FromPtr(req.DisplayName),
+		Type:        optional.FromPtr((*domain.AccountType)(req.Type)),
+		URL:         optional.FromPtr(req.Url),
+		PrPermitted: optional.FromPtr(req.PrPermitted),
 	}
 
 	err = h.srv.EditAccount(ctx, userID, accountID, &args)
