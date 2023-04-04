@@ -499,3 +499,37 @@ func getUser(userID uuid.UUID) handler.User {
 
 	return handler.User{}
 }
+
+func AccountTypeMockUserHas(userId uuid.UUID) []handler.AccountType {
+	var (
+		mAccounts = CloneMockAccounts()
+	)
+
+	holdAccounts := []handler.AccountType{}
+	for _, account := range mAccounts {
+		if account.UserID == userId {
+			holdAccounts = append(holdAccounts, handler.AccountType(account.Type))
+		}
+	}
+
+	return holdAccounts
+}
+
+func AccountTypeMockUserDoesntHave(userId uuid.UUID) handler.AccountType {
+
+	holdAccounts := AccountTypeMockUserHas(userId)
+
+	checkAccount := 0
+	// for ;slices.Contains(holdAccounts, handler.AccountType(checkAccount)); checkAccount++ {}
+	for check := false; check; checkAccount++ {
+		check = true
+		for _, account := range holdAccounts {
+			if account == handler.AccountType(checkAccount) {
+				check = false
+				break
+			}
+		}
+	}
+
+	return handler.AccountType(checkAccount)
+}

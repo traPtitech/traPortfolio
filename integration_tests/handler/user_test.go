@@ -305,8 +305,10 @@ func TestAddUserAccount(t *testing.T) {
 		justCountDisplayName = strings.Repeat("亜", 256)
 		tooLongDisplayName   = strings.Repeat("亜", 257)
 		prPermitted          = handler.PrPermitted(random.Bool())
-		accountType          = handler.AccountType(mockdata.AccountTypeUser1DoesntHave())
-		accountURL           = random.AccountURLString(domain.AccountType(accountType))
+		testUserId           = mockdata.UserID1()
+		testAccountType      = handler.AccountType(mockdata.AccountTypeMockUserDoesntHave(testUserId))
+		testConflictType     = handler.AccountType(mockdata.AccountTypeMockUserHas(testUserId)[0])
+		testAccountURL       = random.AccountURLString(domain.AccountType(testAccountType))
 	)
 
 	t.Parallel()
@@ -318,36 +320,36 @@ func TestAddUserAccount(t *testing.T) {
 	}{
 		"201": {
 			http.StatusCreated,
-			mockdata.UserID1(),
+			testUserId,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        testAccountType,
+				Url:         testAccountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        testAccountType,
+				Url:         testAccountURL,
 			},
 		},
 		"201 with kanji": {
 			http.StatusCreated,
-			mockdata.UserID1(),
+			testUserId,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        testAccountType,
+				Url:         testAccountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        testAccountType,
+				Url:         testAccountURL,
 			},
 		},
 		"400 invalid userID": {
@@ -358,45 +360,45 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
-			mockdata.UserID1(),
+			testUserId,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
+				Type:        testAccountType,
 				Url:         "invalid url",
 			},
 			testutils.HTTPError("Bad Request: validate error: url: must be a valid URL."),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
-			mockdata.UserID1(),
+			testUserId,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        handler.AccountType(domain.AccountLimit),
-				Url:         accountURL,
+				Url:         testAccountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
 		},
 		"409 conflict already exists": {
 			http.StatusConflict,
-			mockdata.UserID1(),
+			testUserId,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        2,
-				Url:         random.AccountURLString(domain.AccountType(2)),
+				Type:        testConflictType,
+				Url:         random.AccountURLString(domain.AccountType(testConflictType)),
 			},
 			testutils.HTTPError("Conflict: already exists"),
 		},
 		"400 too long display name": {
 			http.StatusBadRequest,
-			mockdata.UserID1(),
+			testUserId,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: tooLongDisplayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        testAccountType,
+				Url:         testAccountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: displayName: the length must be between 1 and 256."),
 		},
@@ -426,9 +428,10 @@ func TestEditUserAccount(t *testing.T) {
 	var (
 		displayName        = random.AlphaNumeric()
 		prPermitted        = handler.PrPermitted(random.Bool())
+		testAccount        = mockdata.UserID1()
 		accountType        = handler.AccountType(int(mockdata.AccountTypeOfAccountID1()))
 		accountURL         = random.AccountURLString(domain.AccountType(accountType))
-		initialAccountType = domain.AccountType(mockdata.AccountTypeUser1DoesntHave())
+		initialAccountType = domain.AccountType(mockdata.AccountTypeMockUserDoesntHave(testAccount))
 		invalidAccountType = handler.AccountType(5)
 		invalidAccountURL  = random.RandURLString()
 	)
