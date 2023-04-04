@@ -252,18 +252,18 @@ func TestContestHandler_CreateContest(t *testing.T) {
 				args := repository.CreateContestArgs{
 					Name:        reqBody.Name,
 					Description: reqBody.Description,
-					Link:        optional.StringFrom(reqBody.Link),
+					Link:        optional.FromPtr(reqBody.Link),
 					Since:       reqBody.Duration.Since,
-					Until:       optional.TimeFrom(reqBody.Duration.Until),
+					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
 				want := domain.ContestDetail{
 					Contest: domain.Contest{
 						ID:        random.UUID(),
 						Name:      args.Name,
 						TimeStart: args.Since,
-						TimeEnd:   args.Until.Time,
+						TimeEnd:   args.Until.ValueOrZero(),
 					},
-					Link:         args.Link.String,
+					Link:         args.Link.ValueOrZero(),
 					Description:  args.Description,
 					ContestTeams: []*domain.ContestTeam{},
 				}
@@ -311,9 +311,9 @@ func TestContestHandler_CreateContest(t *testing.T) {
 				args := repository.CreateContestArgs{
 					Name:        reqBody.Name,
 					Description: reqBody.Description,
-					Link:        optional.StringFrom(reqBody.Link),
+					Link:        optional.FromPtr(reqBody.Link),
 					Since:       reqBody.Duration.Since,
-					Until:       optional.TimeFrom(reqBody.Duration.Until),
+					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
 				s.EXPECT().CreateContest(anyCtx{}, &args).Return(nil, repository.ErrAlreadyExists)
 				return reqBody, nil, nil, "/api/v1/contests"
@@ -363,11 +363,11 @@ func TestContestHandler_PatchContest(t *testing.T) {
 					},
 				}
 				args := repository.UpdateContestArgs{
-					Name:        optional.StringFrom(reqBody.Name),
-					Description: optional.StringFrom(reqBody.Description),
-					Link:        optional.StringFrom(reqBody.Link),
-					Since:       optional.TimeFrom(&reqBody.Duration.Since),
-					Until:       optional.TimeFrom(reqBody.Duration.Until),
+					Name:        optional.FromPtr(reqBody.Name),
+					Description: optional.FromPtr(reqBody.Description),
+					Link:        optional.FromPtr(reqBody.Link),
+					Since:       optional.FromPtr(&reqBody.Duration.Since),
+					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
 				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
 				s.EXPECT().UpdateContest(anyCtx{}, contestID, &args).Return(nil)
@@ -680,8 +680,8 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
-					Result:      optional.StringFrom(reqBody.Result),
-					Link:        optional.StringFrom(reqBody.Link),
+					Result:      optional.FromPtr(reqBody.Result),
+					Link:        optional.FromPtr(reqBody.Link),
 					Description: reqBody.Description,
 				}
 				want := domain.ContestTeamDetail{
@@ -689,10 +689,10 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 						ID:        teamID,
 						ContestID: contestID,
 						Name:      args.Name,
-						Result:    args.Result.String,
+						Result:    args.Result.ValueOrZero(),
 						Members:   make([]*domain.User, 0),
 					},
-					Link:        args.Link.String,
+					Link:        args.Link.ValueOrZero(),
 					Description: args.Description,
 				}
 				expectedResBody := ContestTeam{
@@ -801,8 +801,8 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
-					Result:      optional.StringFrom(reqBody.Result),
-					Link:        optional.StringFrom(reqBody.Link),
+					Result:      optional.FromPtr(reqBody.Result),
+					Link:        optional.FromPtr(reqBody.Link),
 					Description: reqBody.Description,
 				}
 				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(nil, repository.ErrNotFound)
@@ -822,8 +822,8 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
-					Result:      optional.StringFrom(reqBody.Result),
-					Link:        optional.StringFrom(reqBody.Link),
+					Result:      optional.FromPtr(reqBody.Result),
+					Link:        optional.FromPtr(reqBody.Link),
 					Description: reqBody.Description,
 				}
 				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(nil, repository.ErrAlreadyExists)
@@ -869,10 +869,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Description: ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.UpdateContestTeamArgs{
-					Name:        optional.StringFrom(reqBody.Name),
-					Link:        optional.StringFrom(reqBody.Link),
-					Result:      optional.StringFrom(reqBody.Result),
-					Description: optional.StringFrom(reqBody.Description),
+					Name:        optional.FromPtr(reqBody.Name),
+					Link:        optional.FromPtr(reqBody.Link),
+					Result:      optional.FromPtr(reqBody.Result),
+					Description: optional.FromPtr(reqBody.Description),
 				}
 				s.EXPECT().UpdateContestTeam(anyCtx{}, teamID, &args).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)
@@ -951,10 +951,10 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 					Description: ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.UpdateContestTeamArgs{
-					Name:        optional.StringFrom(reqBody.Name),
-					Link:        optional.StringFrom(reqBody.Link),
-					Result:      optional.StringFrom(reqBody.Result),
-					Description: optional.StringFrom(reqBody.Description),
+					Name:        optional.FromPtr(reqBody.Name),
+					Link:        optional.FromPtr(reqBody.Link),
+					Result:      optional.FromPtr(reqBody.Result),
+					Description: optional.FromPtr(reqBody.Description),
 				}
 				s.EXPECT().UpdateContestTeam(anyCtx{}, teamID, &args).Return(repository.ErrNotFound)
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", contestID, teamID)

@@ -16,7 +16,12 @@ If you want to contribute to traPortfolio, then follow these pages.
 - [API schema](./docs/swagger/traPortfolio.v1.yaml)
 - [DB schema](./docs/dbschema)
 
-### Requirements
+### Quick start with DevContainer (Recommended)
+
+If you use VSCode, you can use [DevContainer](https://code.visualstudio.com/docs/remote/containers) to develop traPortfolio.
+See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
+
+### Requirements (for local development)
 
 - Bash
 - make

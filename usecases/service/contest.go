@@ -73,20 +73,11 @@ func (s *contestService) CreateContest(ctx context.Context, args *repository.Cre
 }
 
 func (s *contestService) UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error {
-	err := s.repo.UpdateContest(ctx, contestID, args)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateContest(ctx, contestID, args)
 }
 
 func (s *contestService) DeleteContest(ctx context.Context, contestID uuid.UUID) error {
-	if err := s.repo.DeleteContest(ctx, contestID); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.DeleteContest(ctx, contestID)
 }
 
 func (s *contestService) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
@@ -122,19 +113,11 @@ func (s *contestService) CreateContestTeam(ctx context.Context, contestID uuid.U
 }
 
 func (s *contestService) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
-	if err := s.repo.UpdateContestTeam(ctx, teamID, args); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateContestTeam(ctx, teamID, args)
 }
 
 func (s *contestService) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
-	if err := s.repo.DeleteContestTeam(ctx, contestID, teamID); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.DeleteContestTeam(ctx, contestID, teamID)
 }
 
 func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error) {
@@ -147,19 +130,11 @@ func (s *contestService) GetContestTeamMembers(ctx context.Context, contestID uu
 }
 
 func (s *contestService) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	if err := s.repo.AddContestTeamMembers(ctx, teamID, memberIDs); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.AddContestTeamMembers(ctx, teamID, memberIDs)
 }
 
 func (s *contestService) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	if err := s.repo.EditContestTeamMembers(ctx, teamID, memberIDs); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.EditContestTeamMembers(ctx, teamID, memberIDs)
 }
 
 // Interface guards

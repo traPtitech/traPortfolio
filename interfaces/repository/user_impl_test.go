@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -105,7 +106,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_WithOpt_IncludeSuspended",
 			args: args{
 				&repository.GetUsersArgs{
-					IncludeSuspended: optional.NewBool(true, true),
+					IncludeSuspended: optional.From(true),
 				},
 			},
 			want: []*domain.User{
@@ -133,7 +134,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_WithOpt_Name",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(name, true),
+					Name: optional.From(name),
 				},
 			},
 			want: []*domain.User{
@@ -176,7 +177,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_With_Limit10",
 			args: args{
 				&repository.GetUsersArgs{
-					Limit: optional.NewInt64(10, true),
+					Limit: optional.From(10),
 				},
 			},
 			want: []*domain.User{
@@ -204,7 +205,8 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "Success_With_Random_Limit",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(random.AlphaNumeric(), true), Limit: optional.NewInt64(random.OptInt64().Int64, true),
+					Name:  optional.From(random.AlphaNumeric()),
+					Limit: optional.From(rand.Intn(200)),
 				},
 			},
 			want: []*domain.User{
@@ -219,7 +221,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				for _, v := range want {
 					rows.AddRow(v.ID, v.Name, v.Check)
 				}
-				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %d", args.args.Limit.Int64))).
+				f.h.Mock.ExpectQuery(makeSQLQueryRegexp(fmt.Sprintf("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?) LIMIT %d", args.args.Limit.ValueOrZero()))).
 					WithArgs(want[0].ID, want[1].ID, want[2].ID).
 					WillReturnRows(rows)
 				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
@@ -268,7 +270,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			name: "PortalError_Single",
 			args: args{
 				&repository.GetUsersArgs{
-					Name: optional.NewString(name, true),
+					Name: optional.From(name),
 				},
 			},
 			want: nil,
@@ -757,7 +759,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.NewBool(true, true),
+					Check:       optional.From(true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -771,7 +773,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
+					WithArgs(args.args.Check.ValueOrZero(), args.args.Description.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -783,7 +785,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.NewBool(true, true),
+					Check:       optional.From(true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -802,7 +804,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 				id: random.UUID(),
 				args: &repository.UpdateUserArgs{
 					Description: random.OptAlphaNumericNotNull(),
-					Check:       optional.NewBool(true, true),
+					Check:       optional.From(true),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -816,7 +818,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("UPDATE `users` SET `check`=?,`description`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.Check.Bool, args.args.Description.String, anyTime{}, args.id).
+					WithArgs(args.args.Check.ValueOrZero(), args.args.Description.ValueOrZero(), anyTime{}, args.id).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -951,7 +953,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 }
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
-	aType := random.OptInt64nNotNull(int64(domain.AccountLimit))
+	aType := random.OptAccountTypeNotNull()
 
 	t.Parallel()
 	type args struct {
@@ -972,7 +974,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				accountID: random.UUID(),
 				args: &repository.UpdateAccountArgs{
 					DisplayName: random.OptAlphaNumericNotNull(),
-					URL:         random.OptAccountURLStringNotNull(domain.AccountType(aType.Int64)),
+					URL:         random.OptAccountURLStringNotNull(aType.ValueOrZero()),
 					PrPermitted: random.OptBoolNotNull(),
 					Type:        aType,
 				},
@@ -984,7 +986,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.ValueOrZero(), args.args.Type.ValueOrZero(), args.args.URL.ValueOrZero(), anyTime{}, args.accountID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -999,7 +1001,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: random.OptAlphaNumericNotNull(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: random.OptBoolNotNull(),
-					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
+					Type:        random.OptAccountTypeNotNull(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1021,7 +1023,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: random.OptAlphaNumericNotNull(),
 					URL:         random.OptURLStringNotNull(),
 					PrPermitted: random.OptBoolNotNull(),
-					Type:        random.OptInt64nNotNull(int64(domain.AccountLimit)),
+					Type:        random.OptAccountTypeNotNull(),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1031,7 +1033,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WithArgs(anyUUID{}, args.userID).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(args.args.PrPermitted.Bool, args.args.DisplayName.String, args.args.Type.Int64, args.args.URL.String, anyTime{}, args.accountID).
+					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.ValueOrZero(), args.args.Type.ValueOrZero(), args.args.URL.ValueOrZero(), anyTime{}, args.accountID).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

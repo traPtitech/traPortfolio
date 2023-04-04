@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -300,10 +301,12 @@ func TestGetUserAccount(t *testing.T) {
 // AddUserAccount POST /users/:userID/accounts
 func TestAddUserAccount(t *testing.T) {
 	var (
-		displayName = random.AlphaNumeric()
-		prPermitted = handler.PrPermitted(random.Bool())
-		accountType = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
-		accountURL  = random.AccountURLString(domain.AccountType(accountType))
+		displayName          = random.AlphaNumeric()
+		justCountDisplayName = strings.Repeat("亜", 256)
+		tooLongDisplayName   = strings.Repeat("亜", 257)
+		prPermitted          = handler.PrPermitted(random.Bool())
+		accountType          = handler.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: openapiでenumを定義する
+		accountURL           = random.AccountURLString(domain.AccountType(accountType))
 	)
 
 	t.Parallel()
@@ -325,6 +328,23 @@ func TestAddUserAccount(t *testing.T) {
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
+			},
+		},
+		"201 with kanji": {
+			http.StatusCreated,
+			mockdata.UserID1(),
+			handler.AddUserAccountJSONRequestBody{
+				DisplayName: justCountDisplayName,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
+			},
+			handler.Account{
+				Id:          uuid.Nil,
+				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         accountURL,
@@ -357,6 +377,17 @@ func TestAddUserAccount(t *testing.T) {
 				Url:         accountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
+		},
+		"400 too long display name": {
+			http.StatusBadRequest,
+			mockdata.UserID1(),
+			handler.AddUserAccountJSONRequestBody{
+				DisplayName: tooLongDisplayName,
+				PrPermitted: prPermitted,
+				Type:        accountType,
+				Url:         accountURL,
+			},
+			testutils.HTTPError("Bad Request: validate error: displayName: the length must be between 1 and 256."),
 		},
 	}
 

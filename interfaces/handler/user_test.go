@@ -82,7 +82,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 
 				includeSuspened := random.Bool()
 				args := repository.GetUsersArgs{
-					IncludeSuspended: optional.NewBool(includeSuspened, true),
+					IncludeSuspended: optional.From(includeSuspened),
 				}
 
 				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
@@ -105,7 +105,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				}
 
 				args := repository.GetUsersArgs{
-					Name: optional.NewString(repoUsers[0].Name, true),
+					Name: optional.From(repoUsers[0].Name),
 				}
 
 				s.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
@@ -283,8 +283,8 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Description: optional.FromPtr(&userBio),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -310,8 +310,8 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Description: optional.FromPtr(&userBio),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -337,8 +337,8 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Description: optional.FromPtr(&userBio),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -364,8 +364,8 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				}
 
 				args := repository.UpdateUserArgs{
-					Description: optional.StringFrom(&userBio),
-					Check:       optional.BoolFrom(&userCheck),
+					Description: optional.FromPtr(&userBio),
+					Check:       optional.FromPtr(&userCheck),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s", userID)
@@ -820,7 +820,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
@@ -836,10 +836,10 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&argsName),
-					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&argsURL),
-					PrPermitted: optional.BoolFrom(&accountPermit),
+					DisplayName: optional.FromPtr(&argsName),
+					Type:        optional.FromPtr(&accountType),
+					URL:         optional.FromPtr(&argsURL),
+					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -854,7 +854,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := int64(rand.Intn(int(domain.AccountLimit)))
+				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
@@ -870,10 +870,10 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				}
 
 				args := repository.UpdateAccountArgs{
-					DisplayName: optional.StringFrom(&argsName),
-					Type:        optional.Int64From(&accountType),
-					URL:         optional.StringFrom(&argsURL),
-					PrPermitted: optional.BoolFrom(&accountPermit),
+					DisplayName: optional.FromPtr(&argsName),
+					Type:        optional.FromPtr(&accountType),
+					URL:         optional.FromPtr(&argsURL),
+					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)

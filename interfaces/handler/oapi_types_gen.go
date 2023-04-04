@@ -564,7 +564,7 @@ type GroupIdInPath = uuid.UUID
 type IncludeSuspendedInQuery = bool
 
 // LimitInQuery defines model for limitInQuery.
-type LimitInQuery = int64
+type LimitInQuery = int
 
 // NameInQuery defines model for nameInQuery.
 type NameInQuery = string

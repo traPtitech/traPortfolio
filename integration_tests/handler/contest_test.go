@@ -85,12 +85,16 @@ func TestGetContest(t *testing.T) {
 // CreateContest POST /contests
 func TestCreateContest(t *testing.T) {
 	var (
-		name          = random.AlphaNumeric()
-		link          = random.RandURLString()
-		description   = random.AlphaNumeric()
-		since, until  = random.SinceAndUntil()
-		tooLongString = strings.Repeat("a", 260)
-		invalidURL    = "invalid url"
+		name                    = random.AlphaNumeric()
+		link                    = random.RandURLString()
+		description             = random.AlphaNumeric()
+		since, until            = random.SinceAndUntil()
+		tooLongString           = strings.Repeat("a", 260)
+		justCountDescription    = strings.Repeat("亜", 256)
+		justCountName           = strings.Repeat("亜", 32)
+		tooLongName             = strings.Repeat("亜", 33)
+		tooLongDescriptionKanji = strings.Repeat("亜", 257)
+		invalidURL              = "invalid url"
 	)
 
 	t.Parallel()
@@ -122,10 +126,46 @@ func TestCreateContest(t *testing.T) {
 				Teams: []handler.ContestTeam{},
 			},
 		},
+		"201 with Kanji": {
+			http.StatusCreated,
+			handler.CreateContestJSONRequestBody{
+				Description: justCountDescription,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: justCountName,
+			},
+			handler.ContestDetail{
+				Description: justCountDescription,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Id:    uuid.Nil,
+				Link:  link,
+				Name:  justCountName,
+				Teams: []handler.ContestTeam{},
+			},
+		},
 		"400 invalid description": {
 			http.StatusBadRequest,
 			handler.CreateContestJSONRequestBody{
 				Description: tooLongString,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: name,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
+		"400 invalid description with Kanji": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONRequestBody{
+				Description: tooLongDescriptionKanji,
 				Duration: handler.Duration{
 					Since: since,
 					Until: &until,
@@ -158,6 +198,19 @@ func TestCreateContest(t *testing.T) {
 				},
 				Link: &link,
 				Name: tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		"400 invalid Name with Kanji": {
+			http.StatusBadRequest,
+			handler.CreateContestJSONRequestBody{
+				Description: description,
+				Duration: handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: tooLongName,
 			},
 			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
@@ -198,12 +251,16 @@ func TestCreateContest(t *testing.T) {
 // EditContest PATCH /contests/:contestID
 func TestEditContest(t *testing.T) {
 	var (
-		description   = random.AlphaNumeric()
-		since, until  = random.SinceAndUntil()
-		link          = random.RandURLString()
-		name          = random.AlphaNumeric()
-		tooLongString = strings.Repeat("a", 260)
-		invalidURL    = "invalid url"
+		description             = random.AlphaNumeric()
+		since, until            = random.SinceAndUntil()
+		link                    = random.RandURLString()
+		name                    = random.AlphaNumeric()
+		tooLongString           = strings.Repeat("a", 260)
+		justCountDescription    = strings.Repeat("亜", 256)
+		justCountName           = strings.Repeat("亜", 32)
+		tooLongName             = strings.Repeat("亜", 33)
+		tooLongDescriptionKanji = strings.Repeat("亜", 257)
+		invalidURL              = "invalid url"
 	)
 
 	t.Parallel()
@@ -227,9 +284,23 @@ func TestEditContest(t *testing.T) {
 			},
 			nil,
 		},
-		"204 without change": {
+		"204 with kanji": {
 			http.StatusNoContent,
 			mockdata.ContestID2(),
+			handler.EditContestJSONRequestBody{
+				Description: &justCountDescription,
+				Duration: &handler.Duration{
+					Since: since,
+					Until: &until,
+				},
+				Link: &link,
+				Name: &justCountName,
+			},
+			nil,
+		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.ContestID3(),
 			handler.EditContestJSONRequestBody{},
 			nil,
 		},
@@ -247,6 +318,14 @@ func TestEditContest(t *testing.T) {
 			},
 			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
+		"400 invalid description with kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Description: &tooLongDescriptionKanji,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
@@ -260,6 +339,14 @@ func TestEditContest(t *testing.T) {
 			mockdata.ContestID1(),
 			handler.EditContestJSONRequestBody{
 				Name: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		"400 invalid Name with kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.EditContestJSONRequestBody{
+				Name: &tooLongName,
 			},
 			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
@@ -333,9 +420,9 @@ func TestEditContest(t *testing.T) {
 }
 
 // DeleteContest DELETE /contests/:contestID
-func TestDeleteContest(t *testing.T) {
-	// https://github.com/traPtitech/traPortfolio/issues/460
-}
+// func TestDeleteContest(t *testing.T) {
+// https://github.com/traPtitech/traPortfolio/issues/460
+// }
 
 // GetContestTeams GET /contests/:contestID/teams
 func TestGetContestTeams(t *testing.T) {
@@ -379,12 +466,18 @@ func TestGetContestTeams(t *testing.T) {
 // AddContestTeam POST /contests/:contestID/teams
 func TestAddContestTeam(t *testing.T) {
 	var (
-		description   = random.AlphaNumeric()
-		link          = random.RandURLString()
-		name          = random.AlphaNumeric()
-		result        = random.AlphaNumeric()
-		tooLongString = strings.Repeat("a", 260)
-		invalidURL    = "invalid url"
+		description             = random.AlphaNumeric()
+		link                    = random.RandURLString()
+		name                    = random.AlphaNumeric()
+		result                  = random.AlphaNumeric()
+		tooLongString           = strings.Repeat("a", 260)
+		justCountDescription    = strings.Repeat("亜", 256)
+		justCountName           = strings.Repeat("亜", 32)
+		justCountResult         = strings.Repeat("亜", 32)
+		tooLongName             = strings.Repeat("亜", 33)
+		tooLongDescriptionKanji = strings.Repeat("亜", 257)
+		tooLongResultKanji      = strings.Repeat("亜", 33)
+		invalidURL              = "invalid url"
 	)
 
 	t.Parallel()
@@ -409,11 +502,37 @@ func TestAddContestTeam(t *testing.T) {
 				Result: result,
 			},
 		},
+		"201 with kanji": {
+			http.StatusCreated,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: justCountDescription,
+				Link:        &link,
+				Name:        justCountName,
+				Result:      &justCountResult,
+			},
+			handler.ContestTeam{
+				Id:     testutils.DummyUUID(),
+				Name:   justCountName,
+				Result: justCountResult,
+			},
+		},
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			handler.AddContestTeamJSONRequestBody{
 				Description: tooLongString,
+				Link:        &link,
+				Name:        name,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
+		"400 invalid description kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: tooLongDescriptionKanji,
 				Link:        &link,
 				Name:        name,
 				Result:      &result,
@@ -441,6 +560,28 @@ func TestAddContestTeam(t *testing.T) {
 				Result:      &result,
 			},
 			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		"400 invalid Name kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        tooLongName,
+				Result:      &result,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
+		"400 invalid Result": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			handler.AddContestTeamJSONRequestBody{
+				Description: description,
+				Link:        &link,
+				Name:        name,
+				Result:      &tooLongResultKanji,
+			},
+			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
 		},
 		"404": {
 			http.StatusNotFound,
@@ -477,12 +618,18 @@ func TestAddContestTeam(t *testing.T) {
 // EditContestTeam PATCH /contests/:contestID/teams/:teamID
 func TestEditContestTeam(t *testing.T) {
 	var (
-		description   = random.AlphaNumeric()
-		link          = random.RandURLString()
-		name          = random.AlphaNumeric()
-		result        = random.AlphaNumeric()
-		tooLongString = strings.Repeat("a", 260)
-		invalidURL    = "invalid url"
+		description             = random.AlphaNumeric()
+		link                    = random.RandURLString()
+		name                    = random.AlphaNumeric()
+		result                  = random.AlphaNumeric()
+		tooLongString           = strings.Repeat("a", 260)
+		justCountDescription    = strings.Repeat("亜", 256)
+		justCountName           = strings.Repeat("亜", 32)
+		justCountResult         = strings.Repeat("亜", 32)
+		tooLongName             = strings.Repeat("亜", 33)
+		tooLongDescriptionKanji = strings.Repeat("亜", 257)
+		tooLongResultKanji      = strings.Repeat("亜", 33)
+		invalidURL              = "invalid url"
 	)
 
 	t.Parallel()
@@ -505,10 +652,22 @@ func TestEditContestTeam(t *testing.T) {
 			},
 			nil,
 		},
-		"204 without change": {
+		"204 with kanji": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID2(),
+			handler.EditContestTeamJSONRequestBody{
+				Description: &justCountDescription,
+				Link:        &link,
+				Name:        &justCountName,
+				Result:      &justCountResult,
+			},
+			nil,
+		},
+		"204 without change": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID3(),
 			handler.EditContestTeamJSONRequestBody{},
 			nil,
 		},
@@ -535,6 +694,15 @@ func TestEditContestTeam(t *testing.T) {
 			},
 			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
+		"400 invalid description with kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Description: &tooLongDescriptionKanji,
+			},
+			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
@@ -553,12 +721,30 @@ func TestEditContestTeam(t *testing.T) {
 			},
 			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
+		"400 invalid Name with kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Name: &tooLongName,
+			},
+			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+		},
 		"400 invalid Result": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			handler.EditContestTeamJSONRequestBody{
 				Result: &tooLongString,
+			},
+			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
+		},
+		"400 invalid Result with kanji": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			handler.EditContestTeamJSONRequestBody{
+				Result: &tooLongResultKanji,
 			},
 			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
 		},

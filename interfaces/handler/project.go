@@ -79,7 +79,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	createReq := repository.CreateProjectArgs{
 		Name:          req.Name,
 		Description:   req.Description,
-		Link:          optional.StringFrom(req.Link),
+		Link:          optional.FromPtr(req.Link),
 		SinceYear:     req.Duration.Since.Year,
 		SinceSemester: int(req.Duration.Since.Semester),
 	}
@@ -117,22 +117,22 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	}
 
 	patchReq := repository.UpdateProjectArgs{
-		Name:        optional.StringFrom(req.Name),
-		Description: optional.StringFrom(req.Description),
-		Link:        optional.StringFrom(req.Link),
+		Name:        optional.FromPtr(req.Name),
+		Description: optional.FromPtr(req.Description),
+		Link:        optional.FromPtr(req.Link),
 	}
 
 	if d := req.Duration; d != nil {
 		sinceYear := int64(d.Since.Year)
 		sinceSemester := int64(d.Since.Semester)
-		patchReq.SinceYear = optional.Int64From(&sinceYear)
-		patchReq.SinceSemester = optional.Int64From(&sinceSemester)
+		patchReq.SinceYear = optional.FromPtr(&sinceYear)
+		patchReq.SinceSemester = optional.FromPtr(&sinceSemester)
 
 		if d.Until != nil {
 			untilYear := int64(d.Until.Year)
 			untilSemester := int64(d.Until.Semester)
-			patchReq.UntilYear = optional.Int64From(&untilYear)
-			patchReq.UntilSemester = optional.Int64From(&untilSemester)
+			patchReq.UntilYear = optional.FromPtr(&untilYear)
+			patchReq.UntilSemester = optional.FromPtr(&untilSemester)
 		}
 	}
 

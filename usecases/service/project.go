@@ -68,25 +68,24 @@ func (s *projectService) UpdateProject(ctx context.Context, projectID uuid.UUID,
 	}
 
 	d := old.Duration
-	if args.SinceYear.Valid && args.SinceSemester.Valid {
-		d.Since.Year = int(args.SinceYear.Int64)
-		d.Since.Semester = int(args.SinceSemester.Int64)
+	if sy, ok := args.SinceYear.V(); ok {
+		if ss, ok := args.SinceSemester.V(); ok {
+			d.Since.Year = int(sy)
+			d.Since.Semester = int(ss)
+		}
 	}
-
-	if args.UntilYear.Valid && args.UntilSemester.Valid {
-		d.Until.Year = int(args.UntilYear.Int64)
-		d.Until.Semester = int(args.UntilSemester.Int64)
+	if uy, ok := args.UntilYear.V(); ok {
+		if us, ok := args.UntilSemester.V(); ok {
+			d.Until.Year = int(uy)
+			d.Until.Semester = int(us)
+		}
 	}
 
 	if !d.IsValid() {
 		return repository.ErrInvalidArg
 	}
 
-	if err := s.repo.UpdateProject(ctx, projectID, args); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.UpdateProject(ctx, projectID, args)
 }
 
 func (s *projectService) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {

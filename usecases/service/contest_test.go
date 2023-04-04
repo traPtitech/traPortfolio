@@ -642,8 +642,8 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				args: &repository.CreateContestTeamArgs{
 					Name:        name,
-					Result:      optional.NewString(result, true),
-					Link:        optional.NewString(link, true),
+					Result:      optional.From(result),
+					Link:        optional.From(link),
 					Description: description,
 				},
 			},
@@ -665,10 +665,10 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 						ID:        tid,
 						ContestID: args.contestID,
 						Name:      args.args.Name,
-						Result:    args.args.Result.String,
+						Result:    args.args.Result.ValueOrZero(),
 						Members:   nil,
 					},
-					Link:        args.args.Link.String,
+					Link:        args.args.Link.ValueOrZero(),
 					Description: args.args.Description,
 				}, nil)
 			},
