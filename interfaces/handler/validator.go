@@ -52,7 +52,7 @@ func (p GetUsersParams) Validate() error {
 	return vd.ValidateStruct(&p,
 		vd.Field(&p.IncludeSuspended),
 		vd.Field(&p.Name, vd.NilOrNotEmpty),
-		vd.Field(&p.Limit, vd.Min(1), is.Digit),
+		vd.Field(&p.Limit, vd.Min(1)),
 	)
 }
 
