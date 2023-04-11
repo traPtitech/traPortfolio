@@ -305,10 +305,10 @@ func TestAddUserAccount(t *testing.T) {
 		justCountDisplayName = strings.Repeat("亜", 256)
 		tooLongDisplayName   = strings.Repeat("亜", 257)
 		prPermitted          = handler.PrPermitted(random.Bool())
-		testUserId           = mockdata.UserID1()
-		testAccountType      = handler.AccountType(mockdata.AccountTypeMockUserDoesntHave(testUserId))
-		testConflictType     = handler.AccountType(mockdata.AccountTypeMockUserHas(testUserId)[0])
-		testAccountURL       = random.AccountURLString(domain.AccountType(testAccountType))
+		testUserID           = mockdata.UserID1()
+		accountType          = handler.AccountType(mockdata.AccountTypeMockUserDoesntHave(testUserID))
+		accountURL           = random.AccountURLString(domain.AccountType(accountType))
+		conflictType         = handler.AccountType(mockdata.AccountTypeMockUserHas(testUserID)[0])
 	)
 
 	t.Parallel()
@@ -320,36 +320,36 @@ func TestAddUserAccount(t *testing.T) {
 	}{
 		"201": {
 			http.StatusCreated,
-			testUserId,
+			testUserID,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        testAccountType,
-				Url:         testAccountURL,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        testAccountType,
-				Url:         testAccountURL,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 		},
 		"201 with kanji": {
 			http.StatusCreated,
-			testUserId,
+			testUserID,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
-				Type:        testAccountType,
-				Url:         testAccountURL,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
-				Type:        testAccountType,
-				Url:         testAccountURL,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 		},
 		"400 invalid userID": {
@@ -360,45 +360,45 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
-			testUserId,
+			testUserID,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        testAccountType,
+				Type:        accountType,
 				Url:         "invalid url",
 			},
 			testutils.HTTPError("Bad Request: validate error: url: must be a valid URL."),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
-			testUserId,
+			testUserID,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        handler.AccountType(domain.AccountLimit),
-				Url:         testAccountURL,
+				Url:         accountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
 		},
 		"409 conflict already exists": {
 			http.StatusConflict,
-			testUserId,
+			testUserID,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        testConflictType,
-				Url:         random.AccountURLString(domain.AccountType(testConflictType)),
+				Type:        conflictType,
+				Url:         random.AccountURLString(domain.AccountType(conflictType)),
 			},
 			testutils.HTTPError("Conflict: already exists"),
 		},
 		"400 too long display name": {
 			http.StatusBadRequest,
-			testUserId,
+			testUserID,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: tooLongDisplayName,
 				PrPermitted: prPermitted,
-				Type:        testAccountType,
-				Url:         testAccountURL,
+				Type:        accountType,
+				Url:         accountURL,
 			},
 			testutils.HTTPError("Bad Request: validate error: displayName: the length must be between 1 and 256."),
 		},
