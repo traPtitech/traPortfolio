@@ -102,11 +102,3 @@ func KnoqEventRoomID1() uuid.UUID {
 func KnoqEventRoomID2() uuid.UUID {
 	return uuid.FromStringOrNil("cbd48b1f-6b20-41c8-b122-a9826bd968ed")
 }
-
-func AccountTypeUser1DoesntHave() uint8 {
-	return 3
-}
-
-func AccountTypeOfAccountID1() uint8 {
-	return 2
-}

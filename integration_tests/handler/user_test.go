@@ -429,10 +429,10 @@ func TestEditUserAccount(t *testing.T) {
 		displayName        = random.AlphaNumeric()
 		prPermitted        = handler.PrPermitted(random.Bool())
 		testAccount        = mockdata.UserID1()
-		accountType        = handler.AccountType(int(mockdata.AccountTypeOfAccountID1()))
+		accountType        = handler.AccountType(mockdata.AccountTypeMockUserHas(testAccount)[0])
 		accountURL         = random.AccountURLString(domain.AccountType(accountType))
 		initialAccountType = domain.AccountType(mockdata.AccountTypeMockUserDoesntHave(testAccount))
-		invalidAccountType = handler.AccountType(5)
+		invalidAccountType = handler.AccountType(domain.GITHUB)
 		invalidAccountURL  = random.RandURLString()
 	)
 
