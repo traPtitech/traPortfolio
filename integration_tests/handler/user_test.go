@@ -337,7 +337,7 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"201 with kanji": {
 			http.StatusCreated,
-			testUserID,
+			mockdata.UserID2(),
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
