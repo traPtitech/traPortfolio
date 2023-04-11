@@ -35,9 +35,18 @@ func CloneHandlerMockContestDetails() []handler.ContestDetail {
 	)
 
 	for i, c := range hContestTeams {
+		mockMembers := CloneMockUsers()
+		members := make([]handler.User, len(mockMembers))
+		for j, ct := range mockMembers {
+			members[j] = handler.User{
+				Id:   ct.ID,
+				Name: ct.Name,
+			}
+		}
+
 		mContestTeams[i] = handler.ContestTeam{
 			Id:      c.ID,
-			Members: make([]handler.User, 0),
+			Members: members,
 			Name:    c.Name,
 			Result:  c.Result,
 		}
