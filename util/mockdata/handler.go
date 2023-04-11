@@ -29,19 +29,18 @@ var (
 
 func CloneHandlerMockContestDetails() []handler.ContestDetail {
 	var (
-		mContests       = CloneMockContests()
-		hContestTeams   = CloneMockContestTeams()
-		mContestTeams   = make([]handler.ContestTeam, len(hContestTeams))
-		hContestDetails = make([]handler.ContestDetail, len(mContests))
+		mContests        = CloneMockContests()
+		hContestTeams    = CloneMockContestTeams()
+		hTeamMembersByID = CloneHandlerMockContestTeamMembersByID()
+		mContestTeams    = make([]handler.ContestTeam, len(hContestTeams))
+		hContestDetails  = make([]handler.ContestDetail, len(mContests))
 	)
-
-	teamMembersByID := CloneHandlerMockContestTeamMembersByID()
 
 	for i, c := range hContestTeams {
 
 		mContestTeams[i] = handler.ContestTeam{
 			Id:      c.ID,
-			Members: teamMembersByID[c.ID],
+			Members: hTeamMembersByID[c.ID],
 			Name:    c.Name,
 			Result:  c.Result,
 		}
@@ -85,13 +84,14 @@ func CloneHandlerMockContests() []handler.Contest {
 func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]handler.ContestTeam {
 	var (
 		mContestTeams     = CloneMockContestTeams()
+		hTeamMembersByID  = CloneHandlerMockContestTeamMembersByID()
 		hContestTeamsByID = make(map[uuid.UUID][]handler.ContestTeam)
 	)
 
 	for _, ct := range mContestTeams {
 		hContestTeamsByID[ct.ContestID] = append(hContestTeamsByID[ct.ContestID], handler.ContestTeam{
 			Id:      ct.ID,
-			Members: make([]handler.User, 0),
+			Members: hTeamMembersByID[ct.ID],
 			Name:    ct.Name,
 			Result:  ct.Result,
 		})
@@ -433,6 +433,7 @@ func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.UserContest {
 		hContests           = CloneHandlerMockContests()
 		mContestTeams       = CloneMockContestTeams()
 		mContestTeamMembers = CloneMockContestTeamUserBelongings()
+		hTeamMembersByID    = CloneHandlerMockContestTeamMembersByID()
 		hUserContests       = make(map[uuid.UUID][]handler.UserContest, len(hContests))
 	)
 
@@ -454,7 +455,7 @@ func CloneHandlerMockUserContestsByID() map[uuid.UUID][]handler.UserContest {
 
 					userContestTeams[u.ID][c.Id] = append(userContestTeams[u.ID][c.Id], handler.ContestTeam{
 						Id:      ct.ID,
-						Members: make([]handler.User, 0),
+						Members: hTeamMembersByID[ct.ID],
 						Name:    ct.Name,
 						Result:  ct.Result,
 					})
