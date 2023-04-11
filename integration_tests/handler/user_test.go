@@ -438,11 +438,12 @@ func TestEditUserAccount(t *testing.T) {
 
 	t.Parallel()
 	tests := map[string]struct {
-		statusCode int
-		userID     uuid.UUID
-		accountID  uuid.UUID
-		reqBody    handler.EditUserAccountJSONRequestBody
-		want       interface{} // nil | error
+		statusCode    int
+		userID        uuid.UUID
+		accountID     uuid.UUID
+		reqBody       handler.EditUserAccountJSONRequestBody
+		want          interface{} // nil | error
+		needInsertion bool
 	}{
 		"204": {
 			http.StatusNoContent,
@@ -455,6 +456,7 @@ func TestEditUserAccount(t *testing.T) {
 				Url:         &accountURL,
 			},
 			nil,
+			false,
 		},
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
@@ -462,6 +464,7 @@ func TestEditUserAccount(t *testing.T) {
 			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
+			false,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -469,6 +472,7 @@ func TestEditUserAccount(t *testing.T) {
 			mockdata.AccountID1(),
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
+			true,
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
@@ -476,6 +480,7 @@ func TestEditUserAccount(t *testing.T) {
 			uuid.Nil,
 			handler.EditUserAccountJSONRequestBody{},
 			testutils.HTTPError("Bad Request: nil id"),
+			false,
 		},
 		"400 invalud url without accountType": {
 			http.StatusBadRequest,
@@ -485,6 +490,7 @@ func TestEditUserAccount(t *testing.T) {
 				Url: &invalidAccountURL,
 			},
 			testutils.HTTPError("Bad Request: argument error"),
+			false,
 		},
 		"400 invalid url without accountURL": {
 			http.StatusBadRequest,
@@ -494,6 +500,7 @@ func TestEditUserAccount(t *testing.T) {
 				Type: &invalidAccountType,
 			},
 			testutils.HTTPError("Bad Request: argument error"),
+			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
@@ -503,6 +510,7 @@ func TestEditUserAccount(t *testing.T) {
 				DisplayName: &displayName,
 			},
 			testutils.HTTPError("Not Found: not found"),
+			true,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
@@ -512,6 +520,7 @@ func TestEditUserAccount(t *testing.T) {
 				DisplayName: &displayName,
 			},
 			testutils.HTTPError("Not Found: not found"),
+			false,
 		},
 		"404 account type conflicted by update": {
 			http.StatusConflict,
@@ -524,6 +533,7 @@ func TestEditUserAccount(t *testing.T) {
 				Url:         &accountURL,
 			},
 			testutils.HTTPError("Conflict: already exists"),
+			false,
 		},
 	}
 
@@ -537,17 +547,7 @@ func TestEditUserAccount(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				account := handler.Account{}
-				if tt.accountID == mockdata.AccountID1() {
-					// Get initial account data
-					mockAccount := mockdata.CloneMockAccounts()[0]
-					account = handler.Account{
-						Id:          mockAccount.ID,
-						DisplayName: mockAccount.Name,
-						PrPermitted: mockAccount.Check,
-						Type:        mockAccount.Type,
-						Url:         mockAccount.URL,
-					}
-				} else {
+				if tt.needInsertion {
 					// Insert & Assert
 					account = handler.Account{
 						DisplayName: random.AlphaNumeric(),
@@ -563,6 +563,16 @@ func TestEditUserAccount(t *testing.T) {
 					})
 					testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
 					account.Id = tt.accountID
+				} else {
+					// Get initial account data
+					mockAccount := mockdata.CloneMockAccounts()[0]
+					account = handler.Account{
+						Id:          mockAccount.ID,
+						DisplayName: mockAccount.Name,
+						PrPermitted: mockAccount.Check,
+						Type:        mockAccount.Type,
+						Url:         mockAccount.URL,
+					}
 				}
 				// Update & Assert
 				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
