@@ -309,6 +309,9 @@ func TestAddUserAccount(t *testing.T) {
 		accountType          = handler.AccountType(mockdata.AccountTypeMockUserDoesntHave(testUserID))
 		accountURL           = random.AccountURLString(domain.AccountType(accountType))
 		conflictType         = handler.AccountType(mockdata.AccountTypeMockUserHas(testUserID)[0])
+		testUserID2          = mockdata.UserID2()
+		accountType2         = handler.AccountType(mockdata.AccountTypeMockUserDoesntHave(testUserID2))
+		accountURL2          = random.AccountURLString(domain.AccountType(accountType2))
 	)
 
 	t.Parallel()
@@ -337,19 +340,19 @@ func TestAddUserAccount(t *testing.T) {
 		},
 		"201 with kanji": {
 			http.StatusCreated,
-			mockdata.UserID2(),
+			testUserID2,
 			handler.AddUserAccountJSONRequestBody{
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        accountType2,
+				Url:         accountURL2,
 			},
 			handler.Account{
 				Id:          uuid.Nil,
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
-				Type:        accountType,
-				Url:         accountURL,
+				Type:        accountType2,
+				Url:         accountURL2,
 			},
 		},
 		"400 invalid userID": {

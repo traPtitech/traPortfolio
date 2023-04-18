@@ -308,11 +308,6 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 }
 
 func TestUserRepository_GetAccounts(t *testing.T) {
-	var (
-		accountType1 = domain.AccountType(3)
-		accountType2 = domain.AccountType(4)
-	)
-
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
@@ -321,8 +316,13 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
+
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -344,11 +344,6 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 }
 
 func TestUserRepository_GetAccount(t *testing.T) {
-	var (
-		accountType1 = domain.AccountType(3)
-		accountType2 = domain.AccountType(4)
-	)
-
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_get_account")
 	sqlConf := conf.SQLConf()
@@ -357,8 +352,13 @@ func TestUserRepository_GetAccount(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
+
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -381,12 +381,6 @@ func TestUserRepository_GetAccount(t *testing.T) {
 // }
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
-	var (
-		accountType1      = domain.AccountType(3)
-		accountType2      = domain.AccountType(4)
-		accountType3Int64 = int64(6)
-	)
-
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_update_account")
 	sqlConf := conf.SQLConf()
@@ -395,8 +389,14 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
+	var (
+		idx               = 1
+		user              = mockdata.MockUsers[idx]
+		accountType1      = domain.AccountType(3)
+		accountType2      = domain.AccountType(4)
+		accountType3Int64 = int64(6)
+	)
+
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
@@ -438,11 +438,6 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 }
 
 func TestUserRepository_DeleteAccount(t *testing.T) {
-	var (
-		accountType1 = domain.AccountType(3)
-		accountType2 = domain.AccountType(4)
-	)
-
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName("user_repository_delete_account")
 	sqlConf := conf.SQLConf()
@@ -451,8 +446,13 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
+
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
