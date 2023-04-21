@@ -420,9 +420,43 @@ func TestEditContest(t *testing.T) {
 }
 
 // DeleteContest DELETE /contests/:contestID
-// func TestDeleteContest(t *testing.T) {
-// https://github.com/traPtitech/traPortfolio/issues/460
-// }
+func TestDeleteContest(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			nil,
+		},
+		"400 invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"404": {
+			http.StatusNotFound,
+			random.UUID(),
+			testutils.HTTPError("Not Found: not found"),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_delete_contest")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Contest.DeleteContest, tt.contestID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
 
 // GetContestTeams GET /contests/:contestID/teams
 func TestGetContestTeams(t *testing.T) {
