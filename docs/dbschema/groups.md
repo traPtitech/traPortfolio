@@ -12,7 +12,7 @@ CREATE TABLE `groups` (
   `group_id` char(36) NOT NULL,
   `name` varchar(32) DEFAULT NULL,
   `link` text DEFAULT NULL,
-  `leader` char(36) NOT NULL,
+  `description` text DEFAULT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`group_id`)
@@ -25,10 +25,10 @@ CREATE TABLE `groups` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| group_id | char(36) |  | false | [group_user_belongings](group_user_belongings.md) |  | グループUUID |
+| group_id | char(36) |  | false | [group_user_admins](group_user_admins.md) [group_user_belongings](group_user_belongings.md) |  | グループUUID |
 | name | varchar(32) | NULL | true |  |  | グループ名 |
 | link | text | NULL | true |  |  | グループのリンク |
-| leader | char(36) |  | false |  |  | グループリーダーのユーザーUUID |
+| description | text | NULL | true |  |  | グループの説明文 |
 | created_at | datetime(6) | NULL | true |  |  | グループ作成日時 |
 | updated_at | datetime(6) | NULL | true |  |  | グループ更新日時 |
 
