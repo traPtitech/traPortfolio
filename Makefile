@@ -1,20 +1,13 @@
-TEST_DB_USER := root
-TEST_DB_PASS := password
-TEST_DB_HOST := 127.0.0.1
-TEST_DB_PORT := 3307
-TEST_DB_NAME := portfolio
-TEST_MARIADB_DSN := mariadb://${TEST_DB_USER}:${TEST_DB_PASS}@${TEST_DB_HOST}:${TEST_DB_PORT}/${TEST_DB_NAME}
-
 GOFILES=$(wildcard *.go **/*.go)
 BINARY=./bin/traPortfolio
-GO_RUN := ${BINARY} --db-user ${TEST_DB_USER} --db-pass ${TEST_DB_PASS} --db-host ${TEST_DB_HOST} --db-port ${TEST_DB_PORT} --db-name ${TEST_DB_NAME}
+GO_RUN := ${BINARY} -c ./dev/config.yaml
 GOTEST_FLAGS := -v -cover -race
 
 GOLANGCI_LINT_VERSION := latest
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
 
 TBLS_VERSION := latest
-TBLS := TBLS_DSN=${TEST_MARIADB_DSN} go run github.com/k1LoW/tbls@${TBLS_VERSION}
+TBLS := go run github.com/k1LoW/tbls@${TBLS_VERSION}
 
 SPECTRAL_VERSION := latest
 SPECTRAL := docker run --rm -it -w /tmp -v $$PWD:/tmp stoplight/spectral:${SPECTRAL_VERSION}
@@ -53,7 +46,7 @@ lint:
 go-gen:
 	@go generate -x ./...
 
-migrate: ${BINARY} # require test-db
+migrate: ${BINARY}
 	@${GO_RUN} --only-migrate
 
 db-gen-docs: migrate
