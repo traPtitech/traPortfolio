@@ -47,6 +47,19 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
+### Run locally
+
+Make sure MySQL is running.
+
+```bash
+go run main.go -c ./dev/config.yaml
+```
+
+Tips: You can change the configuration by
+
+- Specifying it with flags (Run `go run main.go --help`)
+- Rewriting [./dev/config.yaml](dev/config.yaml)
+
 ### Generate DB docs
 
 Make sure MySQL is running.
