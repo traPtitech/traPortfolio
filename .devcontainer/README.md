@@ -17,7 +17,7 @@
 アプリケーションの起動には以下のコマンドを使用してください
 
 ```bash
-go run main.go -c ./dev/config_docker.yaml
+go run main.go -c ./dev/config.yaml
 ```
 
 ## Notes

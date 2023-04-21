@@ -1,3 +1,4 @@
+dsn: mariadb://root:password@localhost:3306/portfolio?parseTime=true
 docPath: docs/dbschema
 er:
   format: svg
