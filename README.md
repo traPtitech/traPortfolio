@@ -49,9 +49,10 @@ Now you can access to
 
 ### Run locally
 
-Make sure MySQL is running.
+**NOTE**: Make sure `backend` container is stopped because of port conflicts
 
 ```bash
+make up-db-container
 go run main.go -c ./dev/config.yaml
 ```
 
@@ -62,8 +63,6 @@ Tips: You can change the configuration by
 
 ### Generate DB docs
 
-Make sure MySQL is running.
-
 ```bash
 make db-gen-docs
 ```
@@ -72,15 +71,11 @@ make db-gen-docs
 
 #### DB linter (tbls)
 
-Make sure MySQL is running.
-
 ```bash
 make db-lint
 ```
 
 #### OpenAPI linter (spectral)
-
-Make sure MySQL is running.
 
 ```bash
 make openapi-lint
@@ -101,8 +96,6 @@ make test
 ```
 
 #### Integration tests
-
-Make sure MySQL is running.
 
 ```bash
 make test-integration
