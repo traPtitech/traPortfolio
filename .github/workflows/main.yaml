@@ -55,7 +55,8 @@ jobs:
       - build
     steps:
       - uses: actions/checkout@v3
-      - run: docker compose up mysql -d
+      - name: Setup MySQL container
+        run: make up-db-container
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
@@ -96,12 +97,12 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: traPortfolio
-      - run: docker compose up mysql -d
+      - name: Setup MySQL container
+        run: make up-db-container
       - name: Run database linter
         run: |
           source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio
-          while ! docker compose ps mysql | grep -q healthy; do sleep 1; done
           ./traPortfolio -c ./dev/config.yaml --only-migrate
           tbls lint
   spectral:

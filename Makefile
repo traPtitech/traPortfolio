@@ -26,6 +26,10 @@ mod:
 build: ${GOFILES}
 	@go build -o ${BINARY}
 
+up-db-container:
+	@docker compose up -d mysql
+	@while ! docker compose ps mysql | grep -q healthy; do sleep 1; done
+
 check: all lint test-all db-lint openapi-lint
 
 # `test` is an alias for `test-unit`
@@ -34,10 +38,10 @@ test: ${GOFILES} test-unit
 test-unit: ${GOFILES}
 	go test ${GOTEST_FLAGS} $$(go list ./... | grep -v "integration_tests")
 
-test-integration: ${GOFILES}
+test-integration: ${GOFILES} up-db-container
 	go test ${GOTEST_FLAGS} ./integration_tests/...
 
-test-all: ${GOFILES}
+test-all: ${GOFILES} up-db-container
 	go test ${GOTEST_FLAGS} ./...
 
 lint:
@@ -46,7 +50,7 @@ lint:
 go-gen:
 	@go generate -x ./...
 
-migrate: ${BINARY}
+migrate: ${BINARY} up-db-container
 	@${GO_RUN} --only-migrate
 
 db-gen-docs: migrate
