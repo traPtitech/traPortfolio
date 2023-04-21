@@ -34,8 +34,8 @@ type ProjectMember struct {
 	CreatedAt     time.Time `gorm:"precision:6"`
 	UpdatedAt     time.Time `gorm:"precision:6"`
 
-	Project Project `gorm:"foreignKey:ProjectID"`
-	User    User    `gorm:"foreignKey:UserID"`
+	Project Project `gorm:"foreignKey:ProjectID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User    User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (*ProjectMember) TableName() string {

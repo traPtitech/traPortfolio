@@ -31,7 +31,7 @@ type ContestTeam struct {
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
 
-	Contest Contest `gorm:"foreignKey:ContestID"`
+	Contest Contest `gorm:"foreignKey:ContestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (*ContestTeam) TableName() string {
@@ -44,8 +44,8 @@ type ContestTeamUserBelonging struct {
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
 
-	ContestTeam ContestTeam `gorm:"foreignKey:TeamID"`
-	User        User        `gorm:"foreignKey:UserID"`
+	ContestTeam ContestTeam `gorm:"foreignKey:TeamID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User        User        `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (*ContestTeamUserBelonging) TableName() string {
