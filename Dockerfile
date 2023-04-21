@@ -21,6 +21,6 @@ FROM alpine:3.17.3 AS deploy
 WORKDIR /
 
 COPY --from=build /traPortfolio /traPortfolio
-COPY dev/config_docker.yaml /opt/traPortfolio/config.yaml
+COPY dev/config.yaml /opt/traPortfolio/config.yaml
 
-ENTRYPOINT /traPortfolio -c /opt/traPortfolio/config.yaml
+ENTRYPOINT /traPortfolio -c /opt/traPortfolio/config.yaml --db-host mysql

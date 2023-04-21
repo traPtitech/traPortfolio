@@ -36,7 +36,7 @@ See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
 docker compose up
 ```
 
-Tips: You can change the configuration by rewriting [./dev/config_docker.yaml](./dev/config_docker.yaml)
+Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
 
 Now you can access to
 
@@ -52,13 +52,13 @@ Now you can access to
 Make sure MySQL is running.
 
 ```bash
-go run main.go -c ./dev/config_local.yaml
+go run main.go -c ./dev/config.yaml
 ```
 
 Tips: You can change the configuration by
 
 - Specifying it with flags (Run `go run main.go --help`)
-- Rewriting [./dev/config_local.yaml](./dev/config_local.yaml)
+- Rewriting [./dev/config.yaml](dev/config.yaml)
 
 ### Generate DB docs
 

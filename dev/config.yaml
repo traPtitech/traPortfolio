@@ -5,4 +5,4 @@ db:
   pass: 'password'
   host: 'localhost'
   name: 'portfolio'
-  port: 3307
+  port: 3306
