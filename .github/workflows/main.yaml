@@ -101,6 +101,7 @@ jobs:
         run: |
           source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio
+          while ! docker compose ps mysql | grep -q healthy; do sleep 1; done
           ./traPortfolio -c ./dev/config.yaml --only-migrate
           tbls lint
   spectral:
