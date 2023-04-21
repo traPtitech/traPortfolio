@@ -63,11 +63,5 @@ db-gen-docs: migrate
 db-lint: migrate
 	@${TBLS} lint
 
-up-test-db:
-	@TEST_DB_PORT=${TEST_DB_PORT} ./dev/bin/up-test-db.sh
-
-rm-test-db:
-	@./dev/bin/down-test-db.sh
-
 openapi-lint:
 	@${SPECTRAL} lint ./docs/swagger/traPortfolio.v1.yaml

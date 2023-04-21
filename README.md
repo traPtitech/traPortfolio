@@ -47,18 +47,6 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-### Set Up test DB (with Docker, port:3307)
-
-```bash
-make up-test-db
-```
-
-### Remove test DB
-
-```bash
-make rm-test-db
-```
-
 ### Run locally
 
 Make sure MySQL is running.
