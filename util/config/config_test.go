@@ -9,7 +9,7 @@ import (
 
 func TestParse(t *testing.T) {
 	viper.AddConfigPath("./testdata")
-	Parse()
+	assert.NoError(t, Parse())
 
 	expected := Config{
 		IsProduction:   true,
