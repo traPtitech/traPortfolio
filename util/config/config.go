@@ -103,8 +103,9 @@ func ReadFromFile() error {
 	if len(configPath) > 0 {
 		viper.SetConfigFile(configPath)
 	} else {
-		viper.SetConfigName("config") // name of config file (without extension)
-		viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
+		// default path is ./config.yaml
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
 		viper.AddConfigPath(".")
 	}
 
