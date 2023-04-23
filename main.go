@@ -11,7 +11,9 @@ import (
 )
 
 func main() {
-	config.Parse()
+	if err := config.Parse(); err != nil {
+		log.Fatal(err)
+	}
 
 	appConf := config.GetConfig()
 	db, err := infrastructure.NewGormDB(appConf.SQLConf())

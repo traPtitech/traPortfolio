@@ -80,18 +80,25 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 }
 
-func Parse() {
+func Parse() error {
 	pflag.Parse()
-	ReadFromFile()
+	if err := ReadFromFile(); err != nil {
+		return fmt.Errorf("read config from file: %w", err)
+	}
+
+	return nil
 }
 
-func ReadFromFile() {
-	_ = viper.BindPFlags(pflag.CommandLine)
+func ReadFromFile() error {
+	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
+		return fmt.Errorf("bind pflags: %w", err)
+	}
 
 	configPath, err := pflag.CommandLine.GetString("config")
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("get config flag: %w", err)
 	}
+
 	if len(configPath) > 0 {
 		viper.SetConfigFile(configPath)
 	} else {
@@ -102,27 +109,25 @@ func ReadFromFile() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error if desired
-
-			// exit if configPath is explicitly specified and fails to load.
 			if len(configPath) > 0 {
-				log.Fatal("cannot load config from ", configPath)
+				return fmt.Errorf("read config from %s: %w", configPath, err)
 			}
 
 			log.Printf("config file does not found: %v", err)
 		} else {
-			// Config file was found but another error was produced
-			log.Fatalf("cannot load config: %v", err)
+			return fmt.Errorf("read config: %w", err)
 		}
 	} else {
 		log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
-		panic(err)
+		return fmt.Errorf("unmarshal config: %w", err)
 	}
 
 	setParsed(true)
+
+	return nil
 }
 
 func setParsed(b bool) {

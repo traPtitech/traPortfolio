@@ -7,7 +7,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	testutils.ParseConfig("../testdata")
+	if err := testutils.ParseConfig("../testdata"); err != nil {
+		panic(err)
+	}
 
 	m.Run()
 }

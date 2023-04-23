@@ -5,9 +5,9 @@ import (
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
-func ParseConfig(path string) {
+func ParseConfig(path string) error {
 	viper.AddConfigPath(path)
-	config.ReadFromFile()
+	return config.ReadFromFile()
 }
 
 func GetConfig() *config.Config {
