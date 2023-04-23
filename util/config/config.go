@@ -15,12 +15,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const (
-	defaultAppPort = 1323
-	defaultDBPort  = 3306
-	defaultDBHost  = "127.0.0.1"
-)
-
 var (
 	config Config
 	parsed bool
@@ -66,15 +60,15 @@ type (
 
 func init() {
 	pflag.Bool("production", false, "whether production or development")
-	pflag.Int("port", defaultAppPort, "api port")
+	pflag.Int("port", 1323, "api port")
 	pflag.Bool("only-migrate", false, "only migrate db (not start server)")
 	pflag.Bool("insert-mock-data", false, "insert sample mock data(for dev)")
 
 	pflag.String("db-user", "", "db user name")
 	pflag.String("db-pass", "", "db password")
-	pflag.String("db-host", defaultDBHost, "db host")
+	pflag.String("db-host", "127.0.0.1", "db host")
 	pflag.String("db-name", "", "db name")
-	pflag.Int("db-port", defaultDBPort, "db port")
+	pflag.Int("db-port", 3306, "db port")
 	pflag.Bool("db-verbose", false, "db verbose mode")
 	pflag.String("traq-cookie", "", "traq cookie")
 	pflag.String("traq-api-endpoint", "", "traq api endpoint")
