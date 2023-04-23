@@ -132,16 +132,16 @@ func ReadFromFile() error {
 	return nil
 }
 
-func GetConfig() *Config {
+func Load(editFuncs ...EditFunc) *Config {
 	if !parsed.Load() {
 		panic("config does not parsed")
 	}
-	return &config
-}
 
-func GetModified(editFunc EditFunc) *Config {
 	cloned := config.clone()
-	editFunc(cloned)
+	for _, f := range editFuncs {
+		f(cloned)
+	}
+
 	return cloned
 }
 

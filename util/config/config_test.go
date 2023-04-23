@@ -38,5 +38,5 @@ func TestParse(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, &expected, GetConfig())
+	assert.Equal(t, &expected, Load())
 }

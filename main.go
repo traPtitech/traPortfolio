@@ -15,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	appConf := config.GetConfig()
+	appConf := config.Load()
 	db, err := infrastructure.NewGormDB(appConf.SQLConf())
 	if err != nil {
 		log.Fatal(err)

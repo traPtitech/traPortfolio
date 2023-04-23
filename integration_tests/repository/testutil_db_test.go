@@ -10,6 +10,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -19,7 +20,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	appConf := testutils.GetConfig()
+	appConf := config.Load()
 	sqlConf := appConf.SQLConf()
 	<-testutils.WaitTestDBConnection(sqlConf)
 
