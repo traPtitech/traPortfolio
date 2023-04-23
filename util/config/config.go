@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	goflag "flag"
@@ -17,8 +17,7 @@ import (
 
 var (
 	config Config
-	parsed bool
-	rmu    sync.RWMutex
+	parsed atomic.Bool
 )
 
 type (
@@ -59,6 +58,8 @@ type (
 )
 
 func init() {
+	parsed.Store(false)
+
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", 1323, "api port")
 	pflag.Bool("only-migrate", false, "only migrate db (not start server)")
@@ -125,28 +126,16 @@ func ReadFromFile() error {
 		return fmt.Errorf("unmarshal config: %w", err)
 	}
 
-	setParsed(true)
+	parsed.Store(true)
 
 	return nil
 }
 
-func setParsed(b bool) {
-	rmu.Lock()
-	defer rmu.Unlock()
-	parsed = b
-}
-
 func GetConfig() *Config {
-	if !isParsed() {
+	if !parsed.Load() {
 		panic("config does not parsed")
 	}
 	return &config
-}
-
-func isParsed() bool {
-	rmu.RLock()
-	defer rmu.RUnlock()
-	return parsed
 }
 
 func GetModified(editFunc EditFunc) *Config {
