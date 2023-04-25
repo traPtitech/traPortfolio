@@ -872,7 +872,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.args.Type, args.id).
+					WithArgs(args.id, args.args.Type).
 					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
@@ -905,7 +905,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(domain.HOMEPAGE, anyUUID{}).
+					WithArgs(anyUUID{}, domain.HOMEPAGE).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"type", "check"}).
 							AddRow(args.args.Type, args.args.PrPermitted),
@@ -928,7 +928,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(domain.HOMEPAGE, anyUUID{}).
+					WithArgs(anyUUID{}, domain.HOMEPAGE).
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
@@ -948,7 +948,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(domain.HOMEPAGE, anyUUID{}).
+					WithArgs(anyUUID{}, domain.HOMEPAGE).
 					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
@@ -974,7 +974,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			setup: func(f mockUserRepositoryFields, args args, want *domain.Account) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(domain.HOMEPAGE, anyUUID{}).
+					WithArgs(anyUUID{}, domain.HOMEPAGE).
 					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
@@ -1042,7 +1042,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.args.Type, args.userID).
+					WithArgs(args.userID, args.args.Type).
 					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.ValueOrZero(), args.args.Type.ValueOrZero(), args.args.URL.ValueOrZero(), anyTime{}, args.accountID).
@@ -1093,7 +1093,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.args.Type, args.userID).
+					WithArgs(args.userID, args.args.Type).
 					WillReturnRows(sqlmock.NewRows([]string{"type"}).AddRow(args.args.Type))
 				f.h.Mock.ExpectRollback()
 			},
@@ -1119,7 +1119,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.args.Type, args.userID).
+					WithArgs(args.userID, args.args.Type).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -1145,7 +1145,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
-					WithArgs(args.args.Type, args.userID).
+					WithArgs(args.userID, args.args.Type).
 					WillReturnError(database.ErrNoRows)
 				f.h.Mock.ExpectExec(makeSQLQueryRegexp("UPDATE `accounts` SET `check`=?,`name`=?,`type`=?,`url`=?,`updated_at`=? WHERE `id` = ?")).
 					WithArgs(args.args.PrPermitted.ValueOrZero(), args.args.DisplayName.ValueOrZero(), args.args.Type.ValueOrZero(), args.args.URL.ValueOrZero(), anyTime{}, args.accountID).
