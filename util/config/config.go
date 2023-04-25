@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	config Config
-	parsed atomic.Bool
+	config   Config
+	isParsed atomic.Bool
 )
 
 type (
@@ -58,7 +58,7 @@ type (
 )
 
 func init() {
-	parsed.Store(false)
+	isParsed.Store(false)
 
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", 1323, "api port")
@@ -127,13 +127,13 @@ func ReadFromFile() error {
 		return fmt.Errorf("unmarshal config: %w", err)
 	}
 
-	parsed.Store(true)
+	isParsed.Store(true)
 
 	return nil
 }
 
 func Load(editFuncs ...EditFunc) *Config {
-	if !parsed.Load() {
+	if !isParsed.Load() {
 		panic("config does not parsed")
 	}
 
