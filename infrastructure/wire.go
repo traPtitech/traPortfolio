@@ -65,7 +65,7 @@ var confSet = wire.NewSet(
 	providePortalConf,
 )
 
-func provideIsDevelopMent(c *config.Config) bool              { return c.IsDevelopment() }
+func provideIsDevelopMent(c *config.Config) bool              { return !c.IsProduction }
 func provideTraqConf(c *config.Config) *config.TraqConfig     { return c.TraqConf() }
 func provideKnoqConf(c *config.Config) *config.KnoqConfig     { return c.KnoqConf() }
 func providePortalConf(c *config.Config) *config.PortalConfig { return c.PortalConf() }
