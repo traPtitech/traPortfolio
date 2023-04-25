@@ -90,9 +90,25 @@ func Parse() error {
 }
 
 func ReadFromFile() error {
-	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		return fmt.Errorf("bind pflags: %w", err)
-	}
+	_ = viper.BindPFlag("production", pflag.Lookup("isProduction"))
+	_ = viper.BindPFlag("port", pflag.Lookup("port"))
+	_ = viper.BindPFlag("onlyMigrate", pflag.Lookup("only-migrate"))
+	_ = viper.BindPFlag("insertMockData", pflag.Lookup("insert-mock-data"))
+
+	_ = viper.BindPFlag("db.user", pflag.Lookup("db-user"))
+	_ = viper.BindPFlag("db.pass", pflag.Lookup("db-pass"))
+	_ = viper.BindPFlag("db.host", pflag.Lookup("db-host"))
+	_ = viper.BindPFlag("db.name", pflag.Lookup("db-name"))
+	_ = viper.BindPFlag("db.port", pflag.Lookup("db-port"))
+	_ = viper.BindPFlag("db.verbose", pflag.Lookup("db-verbose"))
+	_ = viper.BindPFlag("traq.cookie", pflag.Lookup("traq-cookie"))
+	_ = viper.BindPFlag("traq.apiEndpoint", pflag.Lookup("traq-api-endpoint"))
+	_ = viper.BindPFlag("knoq.cookie", pflag.Lookup("knoq-cookie"))
+	_ = viper.BindPFlag("knoq.apiEndpoint", pflag.Lookup("knoq-api-endpoint"))
+	_ = viper.BindPFlag("portal.cookie", pflag.Lookup("portal-cookie"))
+	_ = viper.BindPFlag("portal.apiEndpoint", pflag.Lookup("portal-api-endpoint"))
+
+	_ = viper.BindPFlags(pflag.CommandLine)
 
 	configPath, err := pflag.CommandLine.GetString("config")
 	if err != nil {
