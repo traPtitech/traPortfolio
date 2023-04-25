@@ -149,20 +149,8 @@ func (c *Config) clone() *Config {
 	return &cloned
 }
 
-func (c *Config) IsDevelopment() bool {
-	return !c.IsProduction
-}
-
 func (c *Config) Addr() string {
 	return fmt.Sprintf(":%d", c.Port)
-}
-
-func (c *Config) IsOnlyMigrate() bool {
-	return c.OnlyMigrate
-}
-
-func (c *Config) InsertMock() bool {
-	return c.InsertMockData
 }
 
 func (c *Config) SQLConf() *SQLConfig {
@@ -199,10 +187,6 @@ func (c *SQLConfig) Dsn() string {
 
 func (c *SQLConfig) DsnWithoutName() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port)
-}
-
-func (c *SQLConfig) DBName() string {
-	return c.Name
 }
 
 func (c *SQLConfig) GormConfig() *gorm.Config {

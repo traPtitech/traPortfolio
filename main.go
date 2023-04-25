@@ -21,13 +21,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if appConf.IsOnlyMigrate() {
+	if appConf.OnlyMigrate {
 		log.Println("migration finished")
 		return
 	}
 
-	if appConf.InsertMock() {
-		if !appConf.IsDevelopment() {
+	if appConf.InsertMockData {
+		if appConf.IsProduction {
 			log.Fatal("cannot specify both `production` and `insert-mock-data`")
 		}
 
