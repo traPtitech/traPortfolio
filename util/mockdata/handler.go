@@ -516,20 +516,18 @@ func AccountTypeMockUserHas(userID uuid.UUID) []handler.AccountType {
 }
 
 func AccountTypeMockUserDoesntHave(userID uuid.UUID) handler.AccountType {
-
 	holdAccounts := AccountTypeMockUserHas(userID)
 
-	checkAccount := 0
-	// for ;slices.Contains(holdAccounts, handler.AccountType(checkAccount)); checkAccount++ {}
-	for check := false; check; checkAccount++ {
-		check = true
-		for _, account := range holdAccounts {
-			if account == handler.AccountType(checkAccount) {
-				check = false
-				break
-			}
+	holdAccountsMap := make(map[handler.AccountType]struct{})
+	for _, account := range holdAccounts {
+		holdAccountsMap[account] = struct{}{}
+	}
+
+	for i := uint8(0); i < handler.AccountType(domain.AccountLimit); i++ {
+		if _, ok := holdAccountsMap[i]; !ok {
+			return i
 		}
 	}
 
-	return handler.AccountType(checkAccount)
+	return handler.AccountType(0)
 }

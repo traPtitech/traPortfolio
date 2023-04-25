@@ -295,7 +295,7 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 	}
 
 	if err := r.h.
-		Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", uint8(args.Type), userID).
+		Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", userID, uint8(args.Type)).
 		First(&model.Account{}).
 		Error(); err == nil {
 		return nil, repository.ErrAlreadyExists
@@ -368,7 +368,7 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 		if aok && av != domain.AccountType(account.Type) {
 			if err := tx.
 				WithContext(ctx).
-				Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", uint8(av), userID).
+				Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", userID, uint8(av)).
 				First(&model.Account{}).
 				Error(); err == nil {
 				return repository.ErrAlreadyExists
