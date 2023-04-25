@@ -48,7 +48,7 @@ func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB
 	conn, err := sql.Open("mysql", dbDsn)
 	assert.NoError(t, err)
 	defer conn.Close()
-	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.DBName()))
+	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 	assert.NoError(t, err)
 
 	dsn := sqlConf.Dsn()
