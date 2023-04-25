@@ -83,10 +83,10 @@ func OptRetrieveAccount(acPtr *handler.Account) Option {
 
 		m := struct {
 			DisplayName string    `json:"displayName"`
-			Id          uuid.UUID `json:"id"`
+			ID          uuid.UUID `json:"id"`
 			PrPermitted bool      `json:"prPermitted"`
 			Type        uint8     `json:"type"`
-			Url         string    `json:"url"`
+			URL         string    `json:"url"`
 		}{}
 
 		if err := json.Unmarshal(res.Body.Bytes(), &m); err != nil {
@@ -95,10 +95,10 @@ func OptRetrieveAccount(acPtr *handler.Account) Option {
 
 		*acPtr = handler.Account{
 			DisplayName: m.DisplayName,
-			Id:          m.Id,
+			Id:          m.ID,
 			PrPermitted: m.PrPermitted,
 			Type:        handler.AccountType(m.Type),
-			Url:         m.Url,
+			Url:         m.URL,
 		}
 
 		return nil
