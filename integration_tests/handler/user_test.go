@@ -463,11 +463,11 @@ func TestEditUserAccount(t *testing.T) {
 		},
 		"204 without changes": { // TODO: https://github.com/traPtitech/traPortfolio/issues/292
 			http.StatusNoContent,
-			mockdata.UserID1(),
-			mockdata.AccountID1(),
+			mockdata.UserID2(),
+			random.UUID(),
 			handler.EditUserAccountJSONRequestBody{},
 			nil,
-			false,
+			true,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
@@ -513,7 +513,7 @@ func TestEditUserAccount(t *testing.T) {
 				DisplayName: &displayName,
 			},
 			testutils.HTTPError("Not Found: not found"),
-			true,
+			false,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
@@ -536,7 +536,7 @@ func TestEditUserAccount(t *testing.T) {
 				Url:         &accountURL,
 			},
 			testutils.HTTPError("Conflict: already exists"),
-			false,
+			true,
 		},
 	}
 
@@ -548,7 +548,7 @@ func TestEditUserAccount(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			if tt.statusCode == http.StatusNoContent {
+			if tt.statusCode == http.StatusNoContent || tt.statusCode == http.StatusConflict {
 				account := handler.Account{}
 				if tt.needInsertion {
 					// Insert & Assert
@@ -567,53 +567,30 @@ func TestEditUserAccount(t *testing.T) {
 					testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
 					account.Id = tt.accountID
 				} else {
-					// Get initial account data
-					mockAccount := mockdata.CloneMockAccounts()[0]
-					account = handler.Account{
-						Id:          mockAccount.ID,
-						DisplayName: mockAccount.Name,
-						PrPermitted: mockAccount.Check,
-						Type:        mockAccount.Type,
-						Url:         mockAccount.URL,
-					}
+					// Get account data
+					res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+					testutils.OptRetrieveAccount(&account)(t, account, res)
 				}
 				// Update & Assert
 				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
-				// Get updated response & Assert
-				if tt.reqBody.DisplayName != nil {
-					account.DisplayName = *tt.reqBody.DisplayName
+				if tt.statusCode == http.StatusNoContent {
+					// Get updated response & Assert
+					if tt.reqBody.DisplayName != nil {
+						account.DisplayName = *tt.reqBody.DisplayName
+					}
+					if tt.reqBody.PrPermitted != nil {
+						account.PrPermitted = *tt.reqBody.PrPermitted
+					}
+					if tt.reqBody.Type != nil {
+						account.Type = *tt.reqBody.Type
+					}
+					if tt.reqBody.Url != nil {
+						account.Url = *tt.reqBody.Url
+					}
+					res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+					testutils.AssertResponse(t, http.StatusOK, account, res)
 				}
-				if tt.reqBody.PrPermitted != nil {
-					account.PrPermitted = *tt.reqBody.PrPermitted
-				}
-				if tt.reqBody.Type != nil {
-					account.Type = *tt.reqBody.Type
-				}
-				if tt.reqBody.Url != nil {
-					account.Url = *tt.reqBody.Url
-				}
-				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
-				testutils.AssertResponse(t, http.StatusOK, account, res)
-			} else if tt.statusCode == http.StatusConflict {
-				// Insert & Assert
-				account := handler.Account{
-					DisplayName: random.AlphaNumeric(),
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(initialAccountType),
-					Url:         random.AccountURLString(initialAccountType),
-				}
-				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
-					DisplayName: account.DisplayName,
-					PrPermitted: account.PrPermitted,
-					Type:        account.Type,
-					Url:         account.Url,
-				})
-				testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
-				account.Id = tt.accountID
-				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
 			} else {
 				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
