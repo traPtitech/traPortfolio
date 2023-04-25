@@ -838,6 +838,62 @@ func TestEditContestTeam(t *testing.T) {
 	}
 }
 
+// DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
+func TestDeleteContestTeam(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		contestID  uuid.UUID
+		teamID     uuid.UUID
+		want       interface{}
+	}{
+		"204": {
+			http.StatusNoContent,
+			mockdata.ContestID1(),
+			mockdata.ContestTeamID1(),
+			nil,
+		},
+		"400: invalid contestID": {
+			http.StatusBadRequest,
+			uuid.Nil,
+			mockdata.ContestTeamID1(),
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		"400: invalid teamID": {
+			http.StatusBadRequest,
+			mockdata.ContestID1(),
+			uuid.Nil,
+			testutils.HTTPError("Bad Request: nil id"),
+		},
+		// TODO:
+		// "404: contest not found": {
+		// 	http.StatusNotFound,
+		// 	random.UUID(),
+		// 	mockdata.ContestTeamID1(),
+		// 	testutils.HTTPError("Not Found: not found"),
+		// },
+		"404: team not found": {
+			http.StatusNotFound,
+			mockdata.ContestID1(),
+			random.UUID(),
+			testutils.HTTPError("Not Found: not found"),
+		},
+	}
+
+	e := echo.New()
+	conf := testutils.GetConfigWithDBName("contest_handler_delete_contest_team")
+	api, err := testutils.SetupRoutes(t, e, conf)
+	assert.NoError(t, err)
+	for name, tt := range tests {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Contest.DeleteContestTeam, tt.contestID, tt.teamID), nil)
+			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
+
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
 func TestGetContestTeamMembers(t *testing.T) {
 	t.Parallel()
