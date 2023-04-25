@@ -1,13 +1,12 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"sync/atomic"
 	"time"
-
-	goflag "flag"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -78,7 +77,7 @@ func init() {
 	pflag.String("portal-cookie", "", "portal cookie")
 	pflag.String("portal-api-endpoint", "", "portal api endpoint")
 	pflag.StringP("config", "c", "", "config file path")
-	pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 }
 
 func Parse() error {
