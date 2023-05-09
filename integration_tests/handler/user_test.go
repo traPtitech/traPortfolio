@@ -569,7 +569,7 @@ func TestEditUserAccount(t *testing.T) {
 				} else {
 					// Get account data
 					res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
-					err := testutils.OptRetrieveAccount(&account)(t, account, res)
+					err := json.Unmarshal(res.Body.Bytes(), &account)
 					if (err != nil) != (tt.want != nil) {
 						t.Fatal(err)
 					}

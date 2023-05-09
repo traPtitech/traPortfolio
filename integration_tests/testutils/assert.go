@@ -8,7 +8,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
 )
 
 func AssertResponse(t *testing.T, expectedStatusCode int, expectedBody interface{}, res *httptest.ResponseRecorder, opts ...Option) {
@@ -72,34 +71,6 @@ func OptRetrieveID(idPtr *uuid.UUID) Option {
 		}
 
 		*idPtr = m.ID
-
-		return nil
-	}
-}
-
-func OptRetrieveAccount(acPtr *handler.Account) Option {
-	return func(t *testing.T, expectedBodyPtr interface{}, res *httptest.ResponseRecorder) error {
-		t.Helper()
-
-		m := struct {
-			DisplayName string    `json:"displayName"`
-			ID          uuid.UUID `json:"id"`
-			PrPermitted bool      `json:"prPermitted"`
-			Type        uint8     `json:"type"`
-			URL         string    `json:"url"`
-		}{}
-
-		if err := json.Unmarshal(res.Body.Bytes(), &m); err != nil {
-			return err
-		}
-
-		*acPtr = handler.Account{
-			DisplayName: m.DisplayName,
-			Id:          m.ID,
-			PrPermitted: m.PrPermitted,
-			Type:        handler.AccountType(m.Type),
-			Url:         m.URL,
-		}
 
 		return nil
 	}
