@@ -22,6 +22,8 @@ func TestGetUsers(t *testing.T) {
 	var (
 		includeSuspended = handler.IncludeSuspendedInQuery(true)
 		name             = handler.NameInQuery(mockdata.MockUsers[0].Name)
+		limitBlank            = handler.LimitInQuery(0)
+		limitLessThan1        = handler.LimitInQuery(-1)
 	)
 
 	t.Parallel()
@@ -65,6 +67,20 @@ func TestGetUsers(t *testing.T) {
 				Name:             &name,
 			},
 			testutils.HTTPError("Bad Request: validate error: include_suspended and name cannot be specified at the same time"),
+		},
+		"400 invalid limit with 0": {
+			http.StatusBadRequest,
+			handler.GetUsersParams{
+				Limit: &limitBlank,
+			},
+			testutils.HTTPError("Bad Request: validate error: limit: cannot be blank."),
+		},
+		"400 invalid limit less than 1": {
+			http.StatusBadRequest,
+			handler.GetUsersParams{
+				Limit: &limitLessThan1,
+			},
+			testutils.HTTPError("Bad Request: validate error: limit: must be no less than 1."),
 		},
 	}
 
