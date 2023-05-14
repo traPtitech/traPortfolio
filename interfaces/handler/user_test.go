@@ -130,6 +130,20 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			},
 			statusCode: http.StatusInternalServerError,
 		},
+		{
+			name: "invalid limit with 0",
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
+				return nil, fmt.Sprintf("/api/v1/users?limit=%d", 0)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "invalid limit less than 1",
+			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
+				return nil, fmt.Sprintf("/api/v1/users?limit=%d", -1)
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
