@@ -22,8 +22,8 @@ func TestGetUsers(t *testing.T) {
 	var (
 		includeSuspended = handler.IncludeSuspendedInQuery(true)
 		name             = handler.NameInQuery(mockdata.MockUsers[0].Name)
-		limitBlank            = handler.LimitInQuery(0)
-		limitLessThan1        = handler.LimitInQuery(-1)
+		limitBlank       = handler.LimitInQuery(0)
+		limitLessThan1   = handler.LimitInQuery(-1)
 	)
 
 	t.Parallel()
@@ -584,10 +584,7 @@ func TestEditUserAccount(t *testing.T) {
 			} else {
 				// Get account data
 				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
-				err := json.Unmarshal(res.Body.Bytes(), &account)
-				if (err != nil) && (tt.want == nil) {
-					t.Fatal(err)
-				}
+				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &account))
 			}
 			// Update & Assert
 			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
@@ -626,9 +623,9 @@ func TestDeleteUserAccount(t *testing.T) {
 		"204": {
 			http.StatusNoContent,
 			mockdata.UserID1(),
-			mockdata.AccountID1(),
+			testutils.DummyUUID(),
 			nil,
-			false,
+			true,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
