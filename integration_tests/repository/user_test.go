@@ -390,11 +390,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
-		idx               = 1
-		user              = mockdata.MockUsers[idx]
-		accountType1      = domain.AccountType(3)
-		accountType2      = domain.AccountType(4)
-		accountType3Int64 = int64(6)
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+		accountType3 = domain.AccountType(6)
 	)
 
 	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
@@ -410,11 +410,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		PrPermitted: random.Bool(),
 	})
 
-	accountType := optional.From(domain.AccountType(accountType3Int64))
+	accountType := optional.From(accountType3)
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.OptAlphaNumeric(),
 		Type:        accountType,
-		URL:         random.OptAccountURLStringNotNull(domain.AccountType(accountType3Int64)),
+		URL:         random.OptAccountURLStringNotNull(accountType3),
 		PrPermitted: random.OptBool(),
 	}
 	if v, ok := args.DisplayName.V(); ok {
