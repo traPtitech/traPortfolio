@@ -11,7 +11,7 @@ Twitterなどのアカウントテーブル
 CREATE TABLE `accounts` (
   `id` char(36) NOT NULL,
   `type` tinyint(1) NOT NULL,
-  `name` varchar(32) DEFAULT NULL,
+  `name` varchar(256) DEFAULT NULL,
   `url` text DEFAULT NULL,
   `user_id` char(36) NOT NULL,
   `check` tinyint(1) NOT NULL DEFAULT 0,
@@ -31,7 +31,7 @@ CREATE TABLE `accounts` (
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false |  |  | アカウントUUID |
 | type | tinyint(1) |  | false |  |  | アカウントのハードコードID |
-| name | varchar(32) | NULL | true |  |  | アカウント名 |
+| name | varchar(256) | NULL | true |  |  | アカウント名 |
 | url | text | NULL | true |  |  | アカウントのURL |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
 | check | tinyint(1) | 0 | false |  |  | 公開可能かどうか |

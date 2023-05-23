@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -310,7 +309,6 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
-
 	conf := testutils.GetConfigWithDBName("user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -318,10 +316,25 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	account2 := mustMakeAccount(t, repo, user.ID, nil)
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
+
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	account2 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 	expected := []*domain.Account{account1, account2}
 
 	got, err := repo.GetAccounts(context.Background(), user.ID)
@@ -332,7 +345,6 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 func TestUserRepository_GetAccount(t *testing.T) {
 	t.Parallel()
-
 	conf := testutils.GetConfigWithDBName("user_repository_get_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -340,10 +352,25 @@ func TestUserRepository_GetAccount(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	mustMakeAccount(t, repo, user.ID, nil)
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
+
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 
 	got, err := repo.GetAccount(context.Background(), user.ID, account1.ID)
 	assert.NoError(t, err)
@@ -355,7 +382,6 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
 	t.Parallel()
-
 	conf := testutils.GetConfigWithDBName("user_repository_update_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -363,16 +389,32 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	mustMakeAccount(t, repo, user.ID, nil)
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+		accountType3 = domain.AccountType(6)
+	)
 
-	accountType := optional.From(domain.AccountType(rand.Int63n(int64(domain.AccountLimit))))
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
+
+	accountType := optional.From(accountType3)
 	args := &urepository.UpdateAccountArgs{
 		DisplayName: random.Optional(random.AlphaNumeric()),
 		Type:        accountType,
-		URL:         optional.From(random.AccountURLString(accountType.ValueOrZero())),
+		URL:         optional.From(random.AccountURLString(accountType3)),
 		PrPermitted: random.Optional(random.Bool()),
 	}
 	if v, ok := args.DisplayName.V(); ok {
@@ -397,7 +439,6 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
-
 	conf := testutils.GetConfigWithDBName("user_repository_delete_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -405,10 +446,25 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
-	account1 := mustMakeAccount(t, repo, user.ID, nil)
-	account2 := mustMakeAccount(t, repo, user.ID, nil)
+	var (
+		idx          = 1
+		user         = mockdata.MockUsers[idx]
+		accountType1 = domain.AccountType(3)
+		accountType2 = domain.AccountType(4)
+	)
+
+	account1 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType1,
+		URL:         random.AccountURLString(accountType1),
+		PrPermitted: random.Bool(),
+	})
+	account2 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
+		DisplayName: random.AlphaNumeric(),
+		Type:        accountType2,
+		URL:         random.AccountURLString(accountType2),
+		PrPermitted: random.Bool(),
+	})
 
 	err = repo.DeleteAccount(context.Background(), user.ID, account1.ID)
 	assert.NoError(t, err)

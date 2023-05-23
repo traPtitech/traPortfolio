@@ -16,7 +16,12 @@ If you want to contribute to traPortfolio, then follow these pages.
 - [API schema](./docs/swagger/traPortfolio.v1.yaml)
 - [DB schema](./docs/dbschema)
 
-### Requirements
+### Quick start with DevContainer (Recommended)
+
+If you use VSCode, you can use [DevContainer](https://code.visualstudio.com/docs/remote/containers) to develop traPortfolio.
+See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
+
+### Requirements (for local development)
 
 - Bash
 - make
@@ -31,7 +36,7 @@ If you want to contribute to traPortfolio, then follow these pages.
 docker compose up
 ```
 
-Tips: You can change the configuration by rewriting [./dev/config_docker.yaml](./dev/config_docker.yaml)
+Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
 
 Now you can access to
 
@@ -42,34 +47,21 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-### Set Up test DB (with Docker, port:3307)
-
-```bash
-make up-test-db
-```
-
-### Remove test DB
-
-```bash
-make rm-test-db
-```
-
 ### Run locally
 
-Make sure MySQL is running.
+**NOTE**: Make sure `backend` container is stopped because of port conflicts
 
 ```bash
-go run main.go -c ./dev/config_local.yaml
+make up-db-container
+go run main.go -c ./dev/config.yaml
 ```
 
 Tips: You can change the configuration by
 
 - Specifying it with flags (Run `go run main.go --help`)
-- Rewriting [./dev/config_local.yaml](./dev/config_local.yaml)
+- Rewriting [./dev/config.yaml](dev/config.yaml)
 
 ### Generate DB docs
-
-Make sure MySQL is running.
 
 ```bash
 make db-gen-docs
@@ -79,15 +71,11 @@ make db-gen-docs
 
 #### DB linter (tbls)
 
-Make sure MySQL is running.
-
 ```bash
 make db-lint
 ```
 
 #### OpenAPI linter (spectral)
-
-Make sure MySQL is running.
 
 ```bash
 make openapi-lint
@@ -108,8 +96,6 @@ make test
 ```
 
 #### Integration tests
-
-Make sure MySQL is running.
 
 ```bash
 make test-integration

@@ -11,21 +11,23 @@ import (
 )
 
 func main() {
-	config.Parse()
+	if err := config.Parse(); err != nil {
+		log.Fatal(err)
+	}
 
-	appConf := config.GetConfig()
+	appConf := config.Load()
 	db, err := infrastructure.NewGormDB(appConf.SQLConf())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if appConf.IsOnlyMigrate() {
+	if appConf.OnlyMigrate {
 		log.Println("migration finished")
 		return
 	}
 
-	if appConf.InsertMock() {
-		if !appConf.IsDevelopment() {
+	if appConf.InsertMockData {
+		if appConf.IsProduction {
 			log.Fatal("cannot specify both `production` and `insert-mock-data`")
 		}
 

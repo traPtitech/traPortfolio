@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -293,6 +294,15 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		return nil, repository.ErrInvalidArg
 	}
 
+	if err := r.h.
+		Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", userID, uint8(args.Type)).
+		First(&model.Account{}).
+		Error(); err == nil {
+		return nil, repository.ErrAlreadyExists
+	} else if !errors.Is(err, database.ErrNoRows) {
+		return nil, convertError(err)
+	}
+
 	account := model.Account{
 		ID:     uuid.Must(uuid.NewV4()),
 		Type:   uint8(args.Type),
@@ -351,6 +361,20 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 			Error()
 		if err != nil {
 			return convertError(err)
+		}
+
+		// 同タイプ生成回避
+		av, aok := args.Type.V()
+		if aok && av != domain.AccountType(account.Type) {
+			if err := tx.
+				WithContext(ctx).
+				Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", userID, uint8(av)).
+				First(&model.Account{}).
+				Error(); err == nil {
+				return repository.ErrAlreadyExists
+			} else if !errors.Is(err, database.ErrNoRows) {
+				return convertError(err)
+			}
 		}
 
 		// URLのvalidation
