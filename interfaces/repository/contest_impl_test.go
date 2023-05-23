@@ -972,10 +972,19 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 				teamID:    random.UUID(),
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID, args.contestID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, args.contestID),
+					)
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("DELETE FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
 					WithArgs(args.teamID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
+				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
 		},
