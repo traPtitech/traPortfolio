@@ -221,7 +221,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        random.OptURLString(),
+					Link:        random.Optional(random.RandURLString()),
 					Since:       sampleTime,
 					Until:       optional.From(sampleTime),
 				},
@@ -243,7 +243,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        random.OptURLString(),
+					Link:        random.Optional(random.RandURLString()),
 					Since:       sampleTime,
 					Until:       optional.From(sampleTime),
 				},
@@ -302,9 +302,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -338,9 +338,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -360,9 +360,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -389,9 +389,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -693,8 +693,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumericNotNull(),
-		Link:        random.OptURLStringNotNull(),
+		Result:      optional.From(random.AlphaNumeric()),
+		Link:        optional.From(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	}
 
@@ -747,8 +747,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      random.OptAlphaNumeric(),
-					Link:        random.OptURLString(),
+					Result:      random.Optional(random.AlphaNumeric()),
+					Link:        random.Optional(random.RandURLString()),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -767,8 +767,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      random.OptAlphaNumeric(),
-					Link:        random.OptURLString(),
+					Result:      random.Optional(random.AlphaNumeric()),
+					Link:        random.Optional(random.RandURLString()),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -825,10 +825,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -861,10 +861,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -882,10 +882,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -910,10 +910,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
