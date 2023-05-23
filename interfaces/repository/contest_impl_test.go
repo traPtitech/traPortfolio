@@ -953,6 +953,48 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	}
 }
 
+func TestContestRepository_DeleteContestTeam(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		contestID uuid.UUID
+		teamID    uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		setup     func(f mockContestRepositoryFields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				f.h.Mock.
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			assertion: assert.NoError,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
+			tt.setup(f, tt.args)
+			repo := NewContestRepository(f.h, f.portal)
+			// Assertion
+			tt.assertion(t, repo.DeleteContestTeam(context.Background(), tt.args.contestID, tt.args.teamID))
+		})
+	}
+}
+
 func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	type args struct {
