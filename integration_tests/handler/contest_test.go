@@ -865,13 +865,12 @@ func TestDeleteContestTeam(t *testing.T) {
 			uuid.Nil,
 			testutils.HTTPError("Bad Request: nil id"),
 		},
-		// TODO:
-		// "404: contest not found": {
-		// 	http.StatusNotFound,
-		// 	random.UUID(),
-		// 	mockdata.ContestTeamID1(),
-		// 	testutils.HTTPError("Not Found: not found"),
-		// },
+		"404: contest not found": {
+			http.StatusNotFound,
+			random.UUID(),
+			mockdata.ContestTeamID1(),
+			testutils.HTTPError("Not Found: not found"),
+		},
 		"404: team not found": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
