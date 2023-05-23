@@ -269,8 +269,8 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	portalUser := mockdata.MockPortalUsers[idx]
 	traqUser := mockdata.MockTraQUsers[idx]
 	args := &urepository.UpdateUserArgs{
-		Description: random.OptAlphaNumeric(),
-		Check:       random.OptBool(),
+		Description: random.Optional(random.AlphaNumeric()),
+		Check:       random.Optional(random.Bool()),
 	}
 
 	err = repo.UpdateUser(context.Background(), user.ID, args)
@@ -412,10 +412,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 	accountType := optional.From(accountType3)
 	args := &urepository.UpdateAccountArgs{
-		DisplayName: random.OptAlphaNumeric(),
+		DisplayName: random.Optional(random.AlphaNumeric()),
 		Type:        accountType,
-		URL:         random.OptAccountURLStringNotNull(accountType3),
-		PrPermitted: random.OptBool(),
+		URL:         optional.From(random.AccountURLString(accountType3)),
+		PrPermitted: random.Optional(random.Bool()),
 	}
 	if v, ok := args.DisplayName.V(); ok {
 		account1.DisplayName = v

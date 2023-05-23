@@ -35,7 +35,7 @@ func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repo
 		args = &repository.CreateContestArgs{
 			Name:        random.AlphaNumeric(),
 			Description: random.AlphaNumeric(),
-			Link:        random.OptURLString(),
+			Link:        random.Optional(random.RandURLString()),
 			Since:       since,
 			Until:       optional.New(until, random.Bool()),
 		}
@@ -52,8 +52,8 @@ func mustMakeContestTeam(t *testing.T, repo repository.ContestRepository, contes
 	if args == nil {
 		args = &repository.CreateContestTeamArgs{
 			Name:        random.AlphaNumeric(),
-			Result:      random.OptAlphaNumeric(),
-			Link:        random.OptURLString(),
+			Result:      random.Optional(random.AlphaNumeric()),
+			Link:        random.Optional(random.RandURLString()),
 			Description: random.AlphaNumeric(),
 		}
 	}
@@ -125,7 +125,7 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 		args = &repository.CreateProjectArgs{
 			Name:          random.AlphaNumeric(),
 			Description:   random.AlphaNumeric(),
-			Link:          random.OptURLString(),
+			Link:          random.Optional(random.RandURLString()),
 			SinceYear:     rand.Intn(2100),
 			SinceSemester: rand.Intn(2),
 			UntilYear:     rand.Intn(2100),

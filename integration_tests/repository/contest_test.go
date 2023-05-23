@@ -67,11 +67,11 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 	contest2 := mustMakeContest(t, repo, nil)
 
 	args := urepository.UpdateContestArgs{
-		Name:        random.OptAlphaNumeric(),
-		Description: random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
-		Since:       random.OptTime(),
-		Until:       random.OptTime(),
+		Name:        random.Optional(random.AlphaNumeric()),
+		Description: random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
+		Since:       random.Optional(random.Time()),
+		Until:       random.Optional(random.Time()),
 	}
 	if v, ok := args.Name.V(); ok {
 		contest1.Name = v
@@ -155,14 +155,14 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 	contest2 := mustMakeContest(t, repo, nil)
 	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team2 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 
@@ -189,14 +189,14 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 	contest2 := mustMakeContest(t, repo, nil)
 	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team2 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 
@@ -224,22 +224,22 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	mustMakeContest(t, repo, nil)
 	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 
 	args1 := &urepository.UpdateContestTeamArgs{
-		Name:        random.OptAlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
-		Description: random.OptAlphaNumeric(),
+		Name:        random.Optional(random.AlphaNumeric()),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
+		Description: random.Optional(random.AlphaNumeric()),
 	}
 	if v, ok := args1.Name.V(); ok {
 		team1.Name = v
@@ -275,14 +275,14 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	contest2 := mustMakeContest(t, repo, nil)
 	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team2 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 
@@ -325,20 +325,20 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	contest2 := mustMakeContest(t, repo, nil)
 	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team2 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team3 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	user1 := mockdata.MockUsers[1]
@@ -388,20 +388,20 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	contest2 := mustMakeContest(t, repo, nil)
 	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team2 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	team3 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumeric(),
-		Link:        random.OptURLString(),
+		Result:      random.Optional(random.AlphaNumeric()),
+		Link:        random.Optional(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	})
 	user1 := mockdata.MockUsers[1]
