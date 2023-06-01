@@ -16,7 +16,7 @@ RUN go build -o /traPortfolio .
 ##
 ## Deployment stage
 ##
-FROM alpine:3.17.3 AS deploy
+FROM alpine:3.18.0 AS deploy
 
 WORKDIR /
 
