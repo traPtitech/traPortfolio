@@ -99,9 +99,9 @@ jobs:
           name: traPortfolio
       - name: Setup MySQL container
         run: make up-db-container
+      - uses: k1low/setup-tbls@v1
       - name: Run database linter
         run: |
-          source <(curl -sL https://git.io/use-tbls)
           chmod +x ./traPortfolio
           ./traPortfolio -c ./dev/config.yaml --only-migrate
           tbls lint
