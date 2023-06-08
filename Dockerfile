@@ -3,7 +3,7 @@
 ##
 ## Build stage
 ##
-FROM golang:1.20.5-alpine AS build
+FROM golang:1.20-alpine AS build
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN go build -o /traPortfolio .
 ##
 ## Deployment stage
 ##
-FROM alpine:3.18.0 AS deploy
+FROM alpine:3 AS deploy
 
 WORKDIR /
 
