@@ -322,29 +322,27 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 	return nil
 }
 
-func (r *ContestRepository) DeleteContestTeam(ctx context.Context, _ uuid.UUID, teamID uuid.UUID) error {
-	err := r.h.
-		WithContext(ctx).
-		Where(&model.ContestTeam{ID: teamID}).
-		First(&model.ContestTeam{}).
-		Error()
-	if err != nil {
-		return convertError(err)
-	}
+func (r *ContestRepository) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
+	if err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+		// 存在確認
+		if err := tx.
+			WithContext(ctx).
+			Where(&model.ContestTeam{ID: teamID, ContestID: contestID}).
+			First(&model.ContestTeam{}).
+			Error(); err != nil {
+			return convertError(err)
+		}
 
-	err = r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
-		err = tx.
+		if err := tx.
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
 			Delete(&model.ContestTeam{}).
-			Error()
-		if err != nil {
+			Error(); err != nil {
 			return convertError(err)
 		}
-		return nil
-	})
 
-	if err != nil {
+		return nil
+	}); err != nil {
 		return convertError(err)
 	}
 
