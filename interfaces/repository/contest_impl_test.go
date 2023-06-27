@@ -221,7 +221,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        random.OptURLString(),
+					Link:        random.Optional(random.RandURLString()),
 					Since:       sampleTime,
 					Until:       optional.From(sampleTime),
 				},
@@ -243,7 +243,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 				args: &repository.CreateContestArgs{
 					Name:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Link:        random.OptURLString(),
+					Link:        random.Optional(random.RandURLString()),
 					Since:       sampleTime,
 					Until:       optional.From(sampleTime),
 				},
@@ -302,9 +302,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -338,9 +338,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -360,9 +360,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -389,9 +389,9 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateContestArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
 					Since:       optional.From(sampleTime),
 					Until:       optional.From(sampleTime),
 				},
@@ -693,8 +693,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 	cid := random.UUID() // Successで使うcontestID
 	successArgs := repository.CreateContestTeamArgs{
 		Name:        random.AlphaNumeric(),
-		Result:      random.OptAlphaNumericNotNull(),
-		Link:        random.OptURLStringNotNull(),
+		Result:      optional.From(random.AlphaNumeric()),
+		Link:        optional.From(random.RandURLString()),
 		Description: random.AlphaNumeric(),
 	}
 
@@ -747,8 +747,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      random.OptAlphaNumeric(),
-					Link:        random.OptURLString(),
+					Result:      random.Optional(random.AlphaNumeric()),
+					Link:        random.Optional(random.RandURLString()),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -767,8 +767,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				contestID: cid,
 				_contestTeam: &repository.CreateContestTeamArgs{
 					Name:        random.AlphaNumeric(),
-					Result:      random.OptAlphaNumeric(),
-					Link:        random.OptURLString(),
+					Result:      random.Optional(random.AlphaNumeric()),
+					Link:        random.Optional(random.RandURLString()),
 					Description: random.AlphaNumeric(),
 				},
 			},
@@ -825,10 +825,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -861,10 +861,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -882,10 +882,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -910,10 +910,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			args: args{
 				teamID: random.UUID(),
 				args: &repository.UpdateContestTeamArgs{
-					Name:        random.OptAlphaNumericNotNull(),
-					Description: random.OptAlphaNumericNotNull(),
-					Link:        random.OptURLStringNotNull(),
-					Result:      random.OptAlphaNumericNotNull(),
+					Name:        optional.From(random.AlphaNumeric()),
+					Description: optional.From(random.AlphaNumeric()),
+					Link:        optional.From(random.RandURLString()),
+					Result:      optional.From(random.AlphaNumeric()),
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
@@ -949,6 +949,57 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
 			tt.assertion(t, repo.UpdateContestTeam(context.Background(), tt.args.teamID, tt.args.args))
+		})
+	}
+}
+
+func TestContestRepository_DeleteContestTeam(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		contestID uuid.UUID
+		teamID    uuid.UUID
+	}
+	tests := []struct {
+		name      string
+		args      args
+		setup     func(f mockContestRepositoryFields, args args)
+		assertion assert.ErrorAssertionFunc
+	}{
+		{
+			name: "Success",
+			args: args{
+				contestID: random.UUID(),
+				teamID:    random.UUID(),
+			},
+			setup: func(f mockContestRepositoryFields, args args) {
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
+					WithArgs(args.teamID, args.contestID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "contest_id"}).
+							AddRow(args.teamID, args.contestID),
+					)
+				f.h.Mock.
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `contest_teams` WHERE `contest_teams`.`id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				f.h.Mock.ExpectCommit()
+			},
+			assertion: assert.NoError,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			ctrl := gomock.NewController(t)
+			f := newMockContestRepositoryFields(ctrl)
+			tt.setup(f, tt.args)
+			repo := NewContestRepository(f.h, f.portal)
+			// Assertion
+			tt.assertion(t, repo.DeleteContestTeam(context.Background(), tt.args.contestID, tt.args.teamID))
 		})
 	}
 }

@@ -5,16 +5,6 @@
 
 version: 2
 updates:
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    reviewers: ["ras0q"]
-  - package-ecosystem: "docker"
-    directory: "/.devcontainer"
-    schedule:
-      interval: "monthly"
-    reviewers: ["ras0q"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

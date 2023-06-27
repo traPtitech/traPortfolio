@@ -77,13 +77,13 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	mustMakeProjectDetail(t, repo, nil)
 
 	arg1 := urepository.UpdateProjectArgs{
-		Name:          random.OptAlphaNumeric(),
-		Description:   random.OptAlphaNumeric(),
-		Link:          random.OptAlphaNumeric(),
-		SinceYear:     random.OptInt64n(2100),
-		SinceSemester: random.OptInt64n(2),
-		UntilYear:     random.OptInt64n(2100),
-		UntilSemester: random.OptInt64n(2),
+		Name:          random.Optional(random.AlphaNumeric()),
+		Description:   random.Optional(random.AlphaNumeric()),
+		Link:          random.Optional(random.AlphaNumeric()),
+		SinceYear:     random.Optional(int64(2100)), // TODO: intでよさそう
+		SinceSemester: random.Optional(int64(2)),
+		UntilYear:     random.Optional(int64(2100)),
+		UntilSemester: random.Optional(int64(2)),
 	}
 
 	if v, ok := arg1.Name.V(); ok {

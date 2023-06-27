@@ -29,8 +29,8 @@ type GroupUserBelonging struct {
 	CreatedAt     time.Time `gorm:"precision:6"`
 	UpdatedAt     time.Time `gorm:"precision:6"`
 
-	Group Group `gorm:"foreignKey:GroupID"`
-	User  User  `gorm:"foreignKey:UserID"`
+	Group Group `gorm:"foreignKey:GroupID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User  User  `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (*GroupUserBelonging) TableName() string {
@@ -43,7 +43,7 @@ type GroupUserAdmin struct {
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
 
-	Group Group `gorm:"foreignKey:GroupID"`
+	Group Group `gorm:"foreignKey:GroupID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (*GroupUserAdmin) TableName() string {

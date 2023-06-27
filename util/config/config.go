@@ -17,6 +17,25 @@ import (
 var (
 	config   Config
 	isParsed atomic.Bool
+
+	flagKeys = []struct{ path, flag string }{
+		{"production", "production"},
+		{"port", "port"},
+		{"onlyMigrate", "only-migrate"},
+		{"insertMockData", "insert-mock-data"},
+		{"db.user", "db-user"},
+		{"db.pass", "db-pass"},
+		{"db.host", "db-host"},
+		{"db.name", "db-name"},
+		{"db.port", "db-port"},
+		{"db.verbose", "db-verbose"},
+		{"traq.cookie", "traq-cookie"},
+		{"traq.apiEndpoint", "traq-api-endpoint"},
+		{"knoq.cookie", "knoq-cookie"},
+		{"knoq.apiEndpoint", "knoq-api-endpoint"},
+		{"portal.cookie", "portal-cookie"},
+		{"portal.apiEndpoint", "portal-api-endpoint"},
+	}
 )
 
 type (
@@ -90,8 +109,14 @@ func Parse() error {
 }
 
 func ReadFromFile() error {
+	for _, key := range flagKeys {
+		if err := viper.BindPFlag(key.path, pflag.Lookup(key.flag)); err != nil {
+			return fmt.Errorf("bind flag %s: %w", key.flag, err)
+		}
+	}
+
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		return fmt.Errorf("bind pflags: %w", err)
+		return fmt.Errorf("bind flags: %w", err)
 	}
 
 	configPath, err := pflag.CommandLine.GetString("config")

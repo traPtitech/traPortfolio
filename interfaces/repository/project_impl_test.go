@@ -340,7 +340,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 	successProject := &repository.CreateProjectArgs{
 		Name:          random.AlphaNumeric(),
 		Description:   random.AlphaNumeric(),
-		Link:          random.OptURLStringNotNull(),
+		Link:          optional.From(random.RandURLString()),
 		SinceYear:     duration.Since.Year,
 		SinceSemester: duration.Since.Semester,
 		UntilYear:     duration.Until.Year,
@@ -398,7 +398,7 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 				project: &repository.CreateProjectArgs{
 					Name:          random.AlphaNumeric(),
 					Description:   random.AlphaNumeric(),
-					Link:          random.OptURLString(),
+					Link:          random.Optional(random.RandURLString()),
 					SinceYear:     duration.Since.Year,
 					SinceSemester: duration.Since.Semester,
 					UntilYear:     duration.Until.Year,
@@ -457,9 +457,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          random.OptAlphaNumericNotNull(),
-					Description:   random.OptAlphaNumericNotNull(),
-					Link:          random.OptURLStringNotNull(),
+					Name:          optional.From(random.AlphaNumeric()),
+					Description:   optional.From(random.AlphaNumeric()),
+					Link:          optional.From(random.RandURLString()),
 					SinceYear:     optional.From(int64(d.Since.Year)),
 					SinceSemester: optional.From(int64(d.Since.Semester)),
 					UntilYear:     optional.From(int64(d.Until.Year)),
@@ -481,9 +481,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: args{
 				id: random.UUID(),
 				args: &repository.UpdateProjectArgs{
-					Name:          random.OptAlphaNumericNotNull(),
-					Description:   random.OptAlphaNumericNotNull(),
-					Link:          random.OptURLStringNotNull(),
+					Name:          optional.From(random.AlphaNumeric()),
+					Description:   optional.From(random.AlphaNumeric()),
+					Link:          optional.From(random.RandURLString()),
 					SinceYear:     optional.From(int64(d.Since.Year)),
 					SinceSemester: optional.From(int64(d.Since.Semester)),
 					UntilYear:     optional.From(int64(d.Until.Year)),

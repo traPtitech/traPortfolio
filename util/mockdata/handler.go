@@ -543,3 +543,34 @@ func getUser(userID uuid.UUID) handler.User {
 
 	return handler.User{}
 }
+
+func AccountTypesMockUserHas(userID uuid.UUID) []handler.AccountType {
+	var (
+		mAccounts = CloneHandlerMockUserAccountsByID()[userID]
+	)
+
+	holdAccounts := []handler.AccountType{}
+	for _, account := range mAccounts {
+		holdAccounts = append(holdAccounts, handler.AccountType(account.Type))
+	}
+
+	return holdAccounts
+}
+
+func AccountTypesMockUserDoesntHave(userID uuid.UUID) []handler.AccountType {
+	holdAccounts := AccountTypesMockUserHas(userID)
+	vacantAccounts := []handler.AccountType{}
+
+	holdAccountsMap := make(map[handler.AccountType]struct{})
+	for _, account := range holdAccounts {
+		holdAccountsMap[account] = struct{}{}
+	}
+
+	for i := uint8(0); i < handler.AccountType(domain.AccountLimit); i++ {
+		if _, ok := holdAccountsMap[i]; !ok {
+			vacantAccounts = append(vacantAccounts, i)
+		}
+	}
+
+	return vacantAccounts
+}
