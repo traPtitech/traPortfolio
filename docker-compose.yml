@@ -14,7 +14,6 @@ services:
     image: mariadb:10.6.4
     restart: always
     environment:
-      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: portfolio
     # conohaのDBのデフォルトCharsetはutf8
@@ -24,7 +23,7 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: mysql --user=$$MYSQL_USER --password=$$MYSQL_ROOT_PASSWORD --execute "SHOW DATABASES;"
+      test: mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute "SHOW DATABASES;"
       interval: 5s
       timeout: 5s
       retries: 10
