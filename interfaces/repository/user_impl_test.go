@@ -215,7 +215,6 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-
 				f.traq.EXPECT().GetAll(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {

@@ -36,7 +36,6 @@ func TestUserHandler_GetUsers(t *testing.T) {
 		{
 			name: "Success_NoOpts",
 			setup: func(s *mock_service.MockUserService) (hres []*User, path string) {
-
 				casenum := 2
 				repoUsers := []*domain.User{}
 				hresUsers := []*User{}
@@ -51,7 +50,6 @@ func TestUserHandler_GetUsers(t *testing.T) {
 
 					repoUsers = append(repoUsers, ruser)
 					hresUsers = append(hresUsers, &huser)
-
 				}
 
 				args := repository.GetUsersArgs{}
@@ -171,7 +169,6 @@ func TestUserHandler_GetUser(t *testing.T) {
 		{
 			name: "success random",
 			setup: func(s *mock_service.MockUserService) (hres *UserDetail, userpath string) {
-
 				const accountNum int = 9
 				rAccounts := []*domain.Account{}
 				hAccounts := []Account{}
@@ -269,7 +266,6 @@ func TestUserHandler_GetUser(t *testing.T) {
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, hresUsers, resBody)
-
 		})
 	}
 }
@@ -283,7 +279,6 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
-
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
@@ -310,7 +305,6 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		{
 			name: "Success with description args(len=256)",
 			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
-
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 256)
 				userCheck := false
@@ -337,7 +331,6 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		{
 			name: "Conflict",
 			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
-
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
@@ -364,7 +357,6 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (*EditUserJSONRequestBody, string) {
-
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
@@ -436,7 +428,6 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		{
 			name: "success",
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
-
 				userID := random.UUID()
 				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
 				//AccountLimit種類のうち、テストに使うものだけbitが立っている
@@ -474,7 +465,6 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 
 					rAccounts = append(rAccounts, &raccount)
 					hAccounts = append(hAccounts, &haccount)
-
 				}
 
 				s.EXPECT().GetAccounts(anyCtx{}, userID).Return(rAccounts, nil)
@@ -486,7 +476,6 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
-
 				userID := random.UUID()
 				s.EXPECT().GetAccounts(anyCtx{}, userID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -497,7 +486,6 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		{
 			name: "Bad Request: validate error: UUID",
 			setup: func(s *mock_service.MockUserService) (hres []*Account, path string) {
-
 				userID := random.UUID()
 				s.EXPECT().GetAccounts(anyCtx{}, userID).Return(nil, repository.ErrValidate)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -508,7 +496,6 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (hres []*Account, path string) {
-
 				userID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
@@ -542,7 +529,6 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		{
 			name: "success",
 			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
-
 				userID := random.UUID()
 				prRandom := false
 				if rand.Intn(2) == 1 {
@@ -567,47 +553,40 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 				s.EXPECT().GetAccount(anyCtx{}, userID, rAccount.ID).Return(&rAccount, nil)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, rAccount.ID)
 				return &hAccount, path
-
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres *Account, path string) {
-
 				userID := random.UUID()
 				accountID := random.UUID()
 
 				s.EXPECT().GetAccount(anyCtx{}, userID, accountID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
-
 			},
 			statusCode: http.StatusInternalServerError,
 		},
 		{
 			name: "Bad Request: validate error: invalid userID",
 			setup: func(_ *mock_service.MockUserService) (hres *Account, path string) {
-
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
-
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (hres *Account, path string) {
-
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
-
 			},
 			statusCode: http.StatusBadRequest,
 		},
@@ -638,7 +617,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
-
 				userID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
@@ -722,7 +700,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: DisplayName is empty",
 			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
-
 				userID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
@@ -741,7 +718,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: Account Type is invalid",
 			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
-
 				userID := random.UUID()
 
 				reqBody := AddUserAccountJSONRequestBody{
@@ -759,7 +735,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: UUID",
 			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
-
 				userID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -770,7 +745,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (*AddUserAccountJSONRequestBody, Account, string) {
-
 				userID := random.AlphaNumericn(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -831,7 +805,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONRequestBody, string) {
-
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
@@ -865,7 +838,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (*EditUserAccountJSONRequestBody, string) {
-
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
@@ -953,7 +925,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: nonUUID1",
 			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONRequestBody, string) {
-
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
@@ -965,7 +936,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: nonUUID2",
 			setup: func(_ *mock_service.MockUserService) (*EditUserAccountJSONRequestBody, string) {
-
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
 
@@ -999,7 +969,6 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockUserService) string {
-
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -1012,7 +981,6 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		{
 			name: "Forbidden",
 			setup: func(s *mock_service.MockUserService) string {
-
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -1025,7 +993,6 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) string {
-
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -1038,7 +1005,6 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: nonUUID1",
 			setup: func(_ *mock_service.MockUserService) string {
-
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
@@ -1050,7 +1016,6 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: nonUUID2",
 			setup: func(_ *mock_service.MockUserService) string {
-
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
 
@@ -1076,7 +1041,6 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_GetUserProjects(t *testing.T) {
-
 	makeProjects := func(s *mock_service.MockUserService, projectsLen int) (hres []*UserProject, path string) {
 		userID := random.UUID()
 
@@ -1084,7 +1048,6 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		hresProjects := []*UserProject{}
 
 		for i := 0; i < projectsLen; i++ {
-
 			//TODO: DurationはUserDurationを包含しているべき
 			rproject := domain.UserProject{
 				ID:           random.UUID(),
@@ -1102,7 +1065,6 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 			repoProjects = append(repoProjects, &rproject)
 			hresProjects = append(hresProjects, &hproject)
-
 		}
 
 		s.EXPECT().GetUserProjects(anyCtx{}, userID).Return(repoProjects, nil)
@@ -1139,7 +1101,6 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (hres []*UserProject, path string) {
-
 				userID := random.UUID()
 
 				s.EXPECT().GetUserProjects(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1151,7 +1112,6 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(_ *mock_service.MockUserService) (hres []*UserProject, path string) {
-
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
@@ -1172,13 +1132,11 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, hresUsers, resBody)
-
 		})
 	}
 }
 
 func TestUserHandler_GetUserContests(t *testing.T) {
-
 	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*UserContest, path string) {
 		userID := random.UUID()
 
@@ -1186,7 +1144,6 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		hresContests := []*UserContest{}
 
 		for i := 0; i < contestsLen; i++ {
-
 			rcontest := domain.UserContest{
 				ID:        random.UUID(),
 				Name:      random.AlphaNumeric(),
@@ -1211,13 +1168,11 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 			repoContests = append(repoContests, &rcontest)
 			hresContests = append(hresContests, &hcontest)
-
 		}
 
 		s.EXPECT().GetUserContests(anyCtx{}, userID).Return(repoContests, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
 		return hresContests, path
-
 	}
 
 	tests := []struct {
@@ -1249,7 +1204,6 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (hres []*UserContest, path string) {
-
 				userID := random.UUID()
 
 				s.EXPECT().GetUserContests(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1261,7 +1215,6 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(_ *mock_service.MockUserService) (hres []*UserContest, path string) {
-
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
@@ -1287,7 +1240,6 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 }
 
 func TestUserHandler_GetUserGroups(t *testing.T) {
-
 	makeGroups := func(s *mock_service.MockUserService, groupsLen int) (hres []*UserGroup, path string) {
 		userID := random.UUID()
 
@@ -1295,7 +1247,6 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		hresGroups := []*UserGroup{}
 
 		for i := 0; i < groupsLen; i++ {
-
 			rgroup := domain.UserGroup{
 				ID:       random.UUID(),
 				Name:     random.AlphaNumeric(),
@@ -1310,13 +1261,11 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 
 			repoGroups = append(repoGroups, &rgroup)
 			hresGroups = append(hresGroups, &hgroup)
-
 		}
 
 		s.EXPECT().GetGroupsByUserID(anyCtx{}, userID).Return(repoGroups, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
 		return hresGroups, path
-
 	}
 
 	tests := []struct {
@@ -1355,7 +1304,6 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (hres []*UserGroup, path string) {
-
 				userID := random.UUID()
 
 				s.EXPECT().GetGroupsByUserID(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1367,7 +1315,6 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(_ *mock_service.MockUserService) (hres []*UserGroup, path string) {
-
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
@@ -1393,7 +1340,6 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 }
 
 func TestUserHandler_GetUserEvents(t *testing.T) {
-
 	makeEvents := func(s *mock_service.MockUserService, eventsLen int) (hres []*Event, path string) {
 		userID := random.UUID()
 
@@ -1401,7 +1347,6 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		hresEvents := []*Event{}
 
 		for i := 0; i < eventsLen; i++ {
-
 			timeStart, timeEnd := random.SinceAndUntil()
 
 			revent := domain.Event{
@@ -1422,13 +1367,11 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 
 			repoEvents = append(repoEvents, &revent)
 			hresEvents = append(hresEvents, &hevent)
-
 		}
 
 		s.EXPECT().GetUserEvents(anyCtx{}, userID).Return(repoEvents, nil)
 		path = fmt.Sprintf("/api/v1/users/%s/events", userID)
 		return hresEvents, path
-
 	}
 
 	tests := []struct {
@@ -1467,7 +1410,6 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockUserService) (hres []*Event, path string) {
-
 				userID := random.UUID()
 
 				s.EXPECT().GetUserEvents(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1479,7 +1421,6 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(_ *mock_service.MockUserService) (hres []*Event, path string) {
-
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/events", userID)

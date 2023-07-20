@@ -438,7 +438,6 @@ func (r *ContestRepository) AddContestTeamMembers(ctx context.Context, teamID uu
 		return convertError(err)
 	}
 	return nil
-
 }
 
 func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, members []uuid.UUID) error {
@@ -509,7 +508,6 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		return convertError(err)
 	}
 	return nil
-
 }
 
 func (r *ContestRepository) makeUserNameMap() (map[string]string, error) {
