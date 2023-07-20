@@ -34,13 +34,11 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		{
 			name: "success",
 			setup: func(s *mock_service.MockGroupService) (hres []*Group, path string) {
-
 				casenum := 2
 				repoGroups := []*domain.Group{}
 				hresGroups := []*Group{}
 
 				for i := 0; i < casenum; i++ {
-
 					rgroup := domain.Group{
 						ID:   random.UUID(),
 						Name: random.AlphaNumeric(),
@@ -53,7 +51,6 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 
 					repoGroups = append(repoGroups, &rgroup)
 					hresGroups = append(hresGroups, &hgroup)
-
 				}
 
 				s.EXPECT().GetAllGroups(anyCtx{}).Return(repoGroups, nil)
@@ -64,7 +61,6 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockGroupService) (hres []*Group, path string) {
-
 				s.EXPECT().GetAllGroups(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/groups"
 			},
@@ -97,7 +93,6 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		{
 			name: "success",
 			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
-
 				rgroupAdmins := []*domain.User{}
 				hgroupAdmins := []User{}
 

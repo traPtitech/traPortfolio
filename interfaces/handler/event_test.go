@@ -26,7 +26,6 @@ func setupEventMock(t *testing.T) (*mock_service.MockEventService, API) {
 }
 
 func TestEventHandler_GetEvents(t *testing.T) {
-
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockEventService) (hres []*Event, path string)
@@ -35,7 +34,6 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		{
 			name: "success",
 			setup: func(s *mock_service.MockEventService) (hres []*Event, path string) {
-
 				casenum := 2
 				repoEvents := []*domain.Event{}
 				hresEvents := []*Event{}
@@ -59,7 +57,6 @@ func TestEventHandler_GetEvents(t *testing.T) {
 
 					repoEvents = append(repoEvents, &revent)
 					hresEvents = append(hresEvents, &hevent)
-
 				}
 
 				s.EXPECT().GetEvents(anyCtx{}).Return(repoEvents, nil)
@@ -102,7 +99,6 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		{
 			name: "success random",
 			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
-
 				rHost := []*domain.User{}
 				hHost := []User{}
 
@@ -116,7 +112,6 @@ func TestEventHandler_GetEvent(t *testing.T) {
 
 					rHost = append(rHost, rhost)
 					hHost = append(hHost, hhost)
-
 				}
 
 				since, until := random.SinceAndUntil()
@@ -211,7 +206,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		{
 			name: "Success",
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
@@ -239,7 +233,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		{
 			name: "Conflict",
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
@@ -260,7 +253,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		{
 			name: "Not Found",
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
@@ -281,7 +273,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		{
 			name: "Bad Request: bind error",
 			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
