@@ -198,10 +198,12 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 	result := make([]*domain.ContestTeam, 0, len(teams))
 	for _, v := range teams {
 		result = append(result, &domain.ContestTeam{
-			ID:        v.ID,
-			ContestID: v.ContestID,
-			Name:      v.Name,
-			Result:    v.Result,
+			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+				ID:        v.ID,
+				ContestID: v.ContestID,
+				Name:      v.Name,
+				Result:    v.Result,
+			},
 		})
 	}
 	return result, nil
@@ -220,10 +222,12 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 
 	res := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
-			ID:        team.ID,
-			ContestID: team.ContestID,
-			Name:      team.Name,
-			Result:    team.Result,
+			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+				ID:        team.ID,
+				ContestID: team.ContestID,
+				Name:      team.Name,
+				Result:    team.Result,
+			},
 		},
 		Link:        team.Link,
 		Description: team.Description,
@@ -257,11 +261,13 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 
 	result := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
-			ID:        contestTeam.ID,
-			ContestID: contestTeam.ContestID,
-			Name:      contestTeam.Name,
-			Result:    contestTeam.Result,
-			Members:   nil,
+			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+				ID:        contestTeam.ID,
+				ContestID: contestTeam.ContestID,
+				Name:      contestTeam.Name,
+				Result:    contestTeam.Result,
+			},
+			Members: nil,
 		},
 		Link:        contestTeam.Link,
 		Description: contestTeam.Description,

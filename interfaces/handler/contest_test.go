@@ -123,18 +123,22 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *ContestDetail) {
 		Description: random.AlphaNumeric(),
 		ContestTeams: []*domain.ContestTeam{
 			{
-				ID:        getContestID[1],
-				ContestID: getContestID[0],
-				Name:      random.AlphaNumeric(),
-				Result:    random.AlphaNumeric(),
-				Members:   make([]*domain.User, 0),
+				ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+					ID:        getContestID[1],
+					ContestID: getContestID[0],
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
+				},
+				Members: make([]*domain.User, 0),
 			},
 			{
-				ID:        getContestID[2],
-				ContestID: getContestID[0],
-				Name:      random.AlphaNumeric(),
-				Result:    random.AlphaNumeric(),
-				Members:   make([]*domain.User, 0),
+				ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+					ID:        getContestID[2],
+					ContestID: getContestID[0],
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
+				},
+				Members: make([]*domain.User, 0),
 			},
 		},
 	}
@@ -509,18 +513,22 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 				contestID := random.UUID()
 				repoContestTeams := []*domain.ContestTeam{
 					{
-						ID:        random.UUID(),
-						ContestID: contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
-						Members:   make([]*domain.User, 0),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        random.UUID(),
+							ContestID: contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						Members: make([]*domain.User, 0),
 					},
 					{
-						ID:        random.UUID(),
-						ContestID: contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
-						Members:   make([]*domain.User, 0),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        random.UUID(),
+							ContestID: contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						Members: make([]*domain.User, 0),
 					},
 				}
 				hres = []*ContestTeam{
@@ -582,10 +590,12 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				repoContestTeamDetail := domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        teamID,
-						ContestID: contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        teamID,
+							ContestID: contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
 						Members: []*domain.User{
 							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
@@ -686,11 +696,13 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				}
 				want := domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        teamID,
-						ContestID: contestID,
-						Name:      args.Name,
-						Result:    args.Result.ValueOrZero(),
-						Members:   make([]*domain.User, 0),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        teamID,
+							ContestID: contestID,
+							Name:      args.Name,
+							Result:    args.Result.ValueOrZero(),
+						},
+						Members: make([]*domain.User, 0),
 					},
 					Link:        args.Link.ValueOrZero(),
 					Description: args.Description,

@@ -424,6 +424,14 @@ func newContestTeam(id uuid.UUID, name string, result string, members []User) Co
 	}
 }
 
+func newContestTeamWithoutMembers(id uuid.UUID, name string, result string) ContestTeamWithoutMembers {
+	return ContestTeamWithoutMembers{
+		Id:     id,
+		Name:   name,
+		Result: result,
+	}
+}
+
 func newContestTeamDetail(team ContestTeam, link string, description string) ContestTeamDetail {
 	return ContestTeamDetail{
 		Description: description,

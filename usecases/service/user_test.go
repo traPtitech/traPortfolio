@@ -565,7 +565,7 @@ func TestUserService_GetUserContests(t *testing.T) {
 					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
-					Teams: []*domain.ContestTeam{
+					Teams: []*domain.ContestTeamWithoutMembers{
 						{
 							ID:     random.UUID(),
 							Name:   random.AlphaNumeric(),

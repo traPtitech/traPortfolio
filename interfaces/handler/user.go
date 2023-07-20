@@ -280,13 +280,9 @@ func (h *UserHandler) GetUserContests(_c echo.Context) error {
 
 	res := make([]UserContest, len(contests))
 	for i, c := range contests {
-		teams := make([]ContestTeam, len(c.Teams))
+		teams := make([]ContestTeamWithoutMembers, len(c.Teams))
 		for j, ct := range c.Teams {
-			members := make([]User, len(ct.Members))
-			for k, ctt := range ct.Members {
-				members[k] = newUser(ctt.ID, ctt.Name, ctt.RealName())
-			}
-			teams[j] = newContestTeam(ct.ID, ct.Name, ct.Result, members)
+			teams[j] = newContestTeamWithoutMembers(ct.ID, ct.Name, ct.Result)
 		}
 		res[i] = newUserContest(
 			newContest(c.ID, c.Name, c.TimeStart, c.TimeEnd),
@@ -383,7 +379,7 @@ func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration
 	}
 }
 
-func newUserContest(contest Contest, teams []ContestTeam) UserContest {
+func newUserContest(contest Contest, teams []ContestTeamWithoutMembers) UserContest {
 	return UserContest{
 		Id:       contest.Id,
 		Name:     contest.Name,

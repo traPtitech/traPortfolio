@@ -533,7 +533,7 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 				Name:      ct.Contest.Name,
 				TimeStart: ct.Contest.Since,
 				TimeEnd:   ct.Contest.Until,
-				Teams:     []*domain.ContestTeam{},
+				Teams:     []*domain.ContestTeamWithoutMembers{},
 			}
 		}
 	}
@@ -541,7 +541,7 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 	for _, v := range contestTeamUserBelongings {
 		if userID == v.UserID {
 			ct := v.ContestTeam
-			contestsMap[ct.ContestID].Teams = append(contestsMap[ct.ContestID].Teams, &domain.ContestTeam{
+			contestsMap[ct.ContestID].Teams = append(contestsMap[ct.ContestID].Teams, &domain.ContestTeamWithoutMembers{
 				ID:        ct.ID,
 				ContestID: ct.ContestID,
 				Name:      ct.Name,

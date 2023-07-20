@@ -540,10 +540,12 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			},
 			want: []*domain.ContestTeam{
 				{
-					ID:        random.UUID(),
-					ContestID: cid,
-					Name:      random.AlphaNumeric(),
-					Result:    random.AlphaNumeric(),
+					ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+						ID:        random.UUID(),
+						ContestID: cid,
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
+					},
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
@@ -636,10 +638,12 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			},
 			want: &domain.ContestTeamDetail{
 				ContestTeam: domain.ContestTeam{
-					ID:        tid,
-					ContestID: cid,
-					Name:      random.AlphaNumeric(),
-					Result:    random.AlphaNumeric(),
+					ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+						ID:        tid,
+						ContestID: cid,
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
+					},
 				},
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(),
@@ -718,11 +722,13 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			},
 			want: &domain.ContestTeamDetail{
 				ContestTeam: domain.ContestTeam{
-					// ID: Assertion時にgot.IDと合わせる
-					ContestID: cid,
-					Name:      successArgs.Name,
-					Result:    successArgs.Result.ValueOrZero(),
-					Members:   nil,
+					ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+						// ID: Assertion時にgot.IDと合わせる
+						ContestID: cid,
+						Name:      successArgs.Name,
+						Result:    successArgs.Result.ValueOrZero(),
+					},
+					Members: nil,
 				},
 				Link:        successArgs.Link.ValueOrZero(),
 				Description: successArgs.Description,

@@ -126,6 +126,18 @@ type ContestTeam struct {
 	Result string `json:"result"`
 }
 
+// ContestTeam コンテストチーム情報
+type ContestTeamWithoutMembers struct {
+	// Id コンテストチームuuid
+	Id uuid.UUID `json:"id"`
+
+	// Name チーム名
+	Name string `json:"name"`
+
+	// Result 順位などの結果
+	Result string `json:"result"`
+}
+
 // ContestTeamDetail defines model for ContestTeamDetail.
 type ContestTeamDetail struct {
 	// Description チーム情報
@@ -469,7 +481,7 @@ type UserContest struct {
 	Name string `json:"name"`
 
 	// Teams コンテストチーム
-	Teams []ContestTeam `json:"teams"`
+	Teams []ContestTeamWithoutMembers `json:"teams"`
 }
 
 // UserDetail defines model for UserDetail.
