@@ -35,5 +35,5 @@ func (d YearWithSemesterDuration) IsValid() bool {
 }
 
 func (out YearWithSemesterDuration) IsIncludes(in YearWithSemesterDuration) bool {
-	return in.Since.After(out.Since) && out.Until.After(in.Until)
+	return !out.Since.After(in.Since) || in.Until.After(out.Until)
 }
