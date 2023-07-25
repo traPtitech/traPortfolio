@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -180,9 +181,35 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 		return convertError(err)
 	}
 
+	project, err := h.service.GetProject(c.Request().Context(), projectID)
+	if err != nil {
+		return convertError(err)
+	}
+
 	req := AddProjectMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return convertError(err)
+	}
+
+	joinReq := make([]*domain.UserWithDuration, 0, len(req.Members))
+	for _, v := range req.Members {
+		joinReq = append(joinReq, &domain.UserWithDuration{
+			User: domain.User{ID: v.UserId},
+			Duration: domain.YearWithSemesterDuration{
+				Since: domain.YearWithSemester{
+					Year:     int(v.Duration.Since.Year),
+					Semester: int(v.Duration.Since.Semester),
+				},
+				Until: domain.YearWithSemester{
+					Year:     int(v.Duration.Until.Year),
+					Semester: int(v.Duration.Until.Semester),
+				},
+			},
+		})
+	}
+
+	if !project.CanJoinMembers(joinReq) {
+		return c.JSON(http.StatusBadRequest, "bad duration user exists")
 	}
 
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
@@ -207,7 +234,7 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 		return convertError(err)
 	}
 
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteProjectMembers DELETE /projects/:projectID/members

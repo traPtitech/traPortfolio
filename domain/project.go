@@ -16,3 +16,13 @@ type ProjectDetail struct {
 	Link        string
 	Members     []*UserWithDuration
 }
+
+func (p ProjectDetail) CanJoinMembers(users []*UserWithDuration) bool {
+	for _, user := range users {
+		if !p.Duration.IsIncludes(user.Duration) {
+			return false
+		}
+	}
+
+	return true
+}
