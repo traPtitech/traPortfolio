@@ -1038,7 +1038,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`id` = ? AND `accounts`.`user_id` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(anyUUID{}, args.userID).
-					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.accountID))
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "type", "name", "url", "check"}).
+							AddRow(args.accountID, (args.args.Type.ValueOrZero()+1)%domain.AccountLimit, args.args.DisplayName.ValueOrZero(), args.args.URL.ValueOrZero(), args.args.PrPermitted.ValueOrZero()),
+					)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ? AND `accounts`.`type` = ? ORDER BY `accounts`.`id` LIMIT 1")).
 					WithArgs(args.userID, args.args.Type).
