@@ -543,12 +543,17 @@ func TestUserRepository_GetContests(t *testing.T) {
 	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
 	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
-	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}), newUserContest(&contest2.Contest, []*domain.ContestTeamWithoutMembers{&team2.ContestTeam.ContestTeamWithoutMembers})}
+	expected1 := []*domain.UserContest{
+		newUserContest(&contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}),
+		newUserContest(&contest2.Contest, []*domain.ContestTeamWithoutMembers{&team2.ContestTeam.ContestTeamWithoutMembers}),
+	}
 	contests1, err := userRepo.GetContests(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, contests1)
 
-	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers})}
+	expected2 := []*domain.UserContest{
+		newUserContest(&contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}),
+	}
 	contests2, err := userRepo.GetContests(context.Background(), user2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, contests2)

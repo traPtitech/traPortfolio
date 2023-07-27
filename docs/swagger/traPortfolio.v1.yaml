@@ -1166,7 +1166,7 @@ components:
           description: 順位などの結果
         members:
           type: array
-          description: チームメンバーのUUID
+          description: チームメンバーのユーザー情報
           items:
             $ref: '#/components/schemas/User'
       required:
