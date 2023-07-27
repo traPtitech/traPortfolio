@@ -1148,10 +1148,10 @@ components:
             - link
             - description
             - teams
-    ContestTeam:
-      title: ContestTeam
+    ContestTeamWithoutMembers:
+      title: ContestTeamWithoutMembers
       type: object
-      description: コンテストチーム情報
+      description: コンテストチーム情報(チームメンバーなし)
       properties:
         id:
           type: string
@@ -1164,16 +1164,25 @@ components:
         result:
           type: string
           description: 順位などの結果
-        members:
-          type: array
-          description: チームメンバーのユーザー情報
-          items:
-            $ref: '#/components/schemas/User'
       required:
         - id
         - name
         - result
-        - members
+    ContestTeam:
+      title: ContestTeam
+      type: object
+      description: コンテストチーム情報
+      allOf:
+        - $ref: "#/components/schemas/ContestTeamWithoutMembers"
+        - type: object
+          properties:
+            members:
+              type: array
+              description: チームメンバーのユーザー情報
+              items:
+                $ref: '#/components/schemas/User'
+          required:
+            - members
     ContestTeamDetail:
       title: ContestTeamDetail
       type: object
