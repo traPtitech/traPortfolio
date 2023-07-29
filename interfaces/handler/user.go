@@ -26,7 +26,7 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 	c := _c.(*Context)
 	req := GetUsersParams{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -38,7 +38,7 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 
 	users, err := h.srv.GetUsers(ctx, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]User, len(users))
@@ -55,13 +55,13 @@ func (h *UserHandler) GetUser(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	user, err := h.srv.GetUser(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	accounts := make([]Account, len(user.Accounts))
@@ -83,12 +83,12 @@ func (h *UserHandler) UpdateUser(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := EditUserJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -98,7 +98,7 @@ func (h *UserHandler) UpdateUser(_c echo.Context) error {
 	}
 
 	if err := h.srv.Update(ctx, userID, &u); err != nil {
-		return convertError(err)
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -109,13 +109,13 @@ func (h *UserHandler) GetUserAccounts(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	accounts, err := h.srv.GetAccounts(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]Account, len(accounts))
@@ -132,18 +132,18 @@ func (h *UserHandler) GetUserAccount(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	accountID, err := c.getID(keyUserAccountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	account, err := h.srv.GetAccount(ctx, userID, accountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, AccountType(account.Type), account.URL, account.PrPermitted))
@@ -155,12 +155,12 @@ func (h *UserHandler) AddUserAccount(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := AddUserAccountJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -172,7 +172,7 @@ func (h *UserHandler) AddUserAccount(_c echo.Context) error {
 	}
 	account, err := h.srv.CreateAccount(ctx, userID, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, AccountType(account.Type), account.URL, account.PrPermitted))
@@ -184,17 +184,17 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	accountID, err := c.getID(keyUserAccountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := EditUserAccountJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -208,7 +208,7 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 
 	err = h.srv.EditAccount(ctx, userID, accountID, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -220,17 +220,17 @@ func (h *UserHandler) DeleteUserAccount(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	accountID, err := c.getID(keyUserAccountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err := h.srv.DeleteAccount(ctx, userID, accountID); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -242,13 +242,13 @@ func (h *UserHandler) GetUserProjects(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	projects, err := h.srv.GetUserProjects(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 	res := make([]UserProject, len(projects))
 	for i, v := range projects {
@@ -269,13 +269,13 @@ func (h *UserHandler) GetUserContests(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetUserContests(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]UserContest, len(contests))
@@ -299,13 +299,13 @@ func (h *UserHandler) GetUserGroups(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetGroupsByUserID(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]UserGroup, len(groups))
@@ -324,13 +324,13 @@ func (h *UserHandler) GetUserEvents(_c echo.Context) error {
 
 	userID, err := c.getID(keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	events, err := h.srv.GetUserEvents(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]Event, len(events))

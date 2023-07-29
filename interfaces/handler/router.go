@@ -1,12 +1,18 @@
 package handler
 
 import (
+	"errors"
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 func Setup(e *echo.Echo, api API) error {
 	e.Validator = newValidator(e.Logger)
+	e.HTTPErrorHandler = newHTTPErrorHandler(e)
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -20,6 +26,51 @@ func Setup(e *echo.Echo, api API) error {
 	setupV1API(apiGroup, api)
 
 	return nil
+}
+
+func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
+	return func(err error, c echo.Context) {
+		var (
+			code int
+			herr *echo.HTTPError
+		)
+
+		switch {
+		case errors.Is(err, repository.ErrNilID):
+			fallthrough
+		case errors.Is(err, repository.ErrInvalidID):
+			fallthrough
+		case errors.Is(err, repository.ErrInvalidArg):
+			fallthrough
+		case errors.Is(err, repository.ErrBind):
+			fallthrough
+		case errors.Is(err, repository.ErrValidate):
+			code = http.StatusBadRequest
+
+		case errors.Is(err, repository.ErrAlreadyExists):
+			code = http.StatusConflict
+
+		case errors.Is(err, repository.ErrForbidden):
+			code = http.StatusForbidden
+
+		case errors.Is(err, repository.ErrNotFound):
+			code = http.StatusNotFound
+
+		default:
+			e.Logger.Error(err)
+			code = http.StatusInternalServerError
+			herr = echo.NewHTTPError(code, http.StatusText(code)).SetInternal(err)
+		}
+
+		if herr == nil {
+			herr = echo.NewHTTPError(
+				code,
+				fmt.Sprintf("%s: %s", http.StatusText(code), err.Error()),
+			).SetInternal(err)
+		}
+
+		e.DefaultHTTPErrorHandler(herr, c)
+	}
 }
 
 func setupV1API(g *echo.Group, api API) {

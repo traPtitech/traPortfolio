@@ -30,7 +30,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetContests(ctx)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]Contest, len(contests))
@@ -47,13 +47,13 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contest, err := h.srv.GetContest(ctx, contestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teams := make([]ContestTeam, len(contest.ContestTeams))
@@ -77,7 +77,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 
 	req := CreateContestJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	createReq := repository.CreateContestArgs{
@@ -91,7 +91,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 	ctx := c.Request().Context()
 	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
@@ -109,12 +109,12 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := EditContestJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	patchReq := repository.UpdateContestArgs{
@@ -130,7 +130,7 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 	ctx := c.Request().Context()
 	err = h.srv.UpdateContest(ctx, contestID, &patchReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -142,12 +142,12 @@ func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err := h.srv.DeleteContest(ctx, contestID); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -159,13 +159,13 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contestTeams, err := h.srv.GetContestTeams(ctx, contestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]ContestTeam, len(contestTeams))
@@ -182,18 +182,18 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teamID, err := c.getID(keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contestTeam, err := h.srv.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	members := make([]User, len(contestTeam.Members))
@@ -217,12 +217,12 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := AddContestTeamJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	args := repository.CreateContestTeamArgs{
@@ -235,7 +235,7 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 	ctx := c.Request().Context()
 	contestTeam, err := h.srv.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result)
@@ -250,17 +250,17 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 	// TODO: contestIDをUpdateContestTeamの引数に含める
 	_, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teamID, err := c.getID(keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := EditContestTeamJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	args := repository.UpdateContestTeamArgs{
@@ -272,7 +272,7 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	if err = h.srv.UpdateContestTeam(ctx, teamID, &args); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -284,17 +284,17 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teamID, err := c.getID(keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err = h.srv.DeleteContestTeam(ctx, contestID, teamID); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -306,18 +306,18 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 
 	contestID, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teamID, err := c.getID(keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	users, err := h.srv.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]*User, 0, len(users))
@@ -339,22 +339,22 @@ func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
 	// TODO: contestIDをAddContestTeamMembersの引数に含める
 	_, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teamID, err := c.getID(keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := AddContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	err = h.srv.AddContestTeamMembers(ctx, teamID, req.Members)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -366,22 +366,22 @@ func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
 	_, err := c.getID(keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	teamID, err := c.getID(keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := EditContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err = h.srv.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
-		return convertError(err)
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
