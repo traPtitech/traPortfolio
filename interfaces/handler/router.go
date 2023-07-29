@@ -37,6 +37,10 @@ func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 		case errors.Is(err, repository.ErrInvalidID):
 			fallthrough
 		case errors.Is(err, repository.ErrInvalidArg):
+			fallthrough
+		case errors.Is(err, repository.ErrBind):
+			fallthrough
+		case errors.Is(err, repository.ErrValidate):
 			code = http.StatusBadRequest
 
 		case errors.Is(err, repository.ErrAlreadyExists):
@@ -71,7 +75,7 @@ var _ echo.Binder = (*binderWithValidation)(nil)
 
 func (b *binderWithValidation) Bind(i interface{}, c echo.Context) error {
 	if err := (&echo.DefaultBinder{}).Bind(i, c); err != nil {
-		return err
+		return fmt.Errorf("%w: %w", repository.ErrBind, err)
 	}
 
 	if vld, ok := i.(vd.Validatable); ok {
@@ -80,7 +84,7 @@ func (b *binderWithValidation) Bind(i interface{}, c echo.Context) error {
 				c.Logger().Fatalf("ozzo-validation internal error: %s", ie.Error())
 			}
 
-			return err
+			return fmt.Errorf("%w: %w", repository.ErrValidate, err)
 		}
 	} else {
 		c.Logger().Errorf("%T is not validatable", i)
