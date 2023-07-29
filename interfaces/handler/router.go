@@ -7,11 +7,12 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 func Setup(e *echo.Echo, api API) error {
-	e.Validator = newValidator(e.Logger)
+	e.Validator = schema.NewValidator(e.Logger)
 	e.HTTPErrorHandler = newHTTPErrorHandler(e)
 
 	e.Use(middleware.Logger())

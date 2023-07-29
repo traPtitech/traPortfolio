@@ -10,6 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -28,15 +29,15 @@ func setupGroupMock(t *testing.T) (*mock_service.MockGroupService, API) {
 func TestGroupHandler_GetGroups(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockGroupService) (hres []*Group, path string)
+		setup      func(s *mock_service.MockGroupService) (hres []*schema.Group, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockGroupService) (hres []*Group, path string) {
+			setup: func(s *mock_service.MockGroupService) (hres []*schema.Group, path string) {
 				casenum := 2
 				repoGroups := []*domain.Group{}
-				hresGroups := []*Group{}
+				hresGroups := []*schema.Group{}
 
 				for i := 0; i < casenum; i++ {
 					rgroup := domain.Group{
@@ -44,7 +45,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 						Name: random.AlphaNumeric(),
 					}
 
-					hgroup := Group{
+					hgroup := schema.Group{
 						Id:   rgroup.ID,
 						Name: rgroup.Name,
 					}
@@ -60,7 +61,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockGroupService) (hres []*Group, path string) {
+			setup: func(s *mock_service.MockGroupService) (hres []*schema.Group, path string) {
 				s.EXPECT().GetAllGroups(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/groups"
 			},
@@ -74,7 +75,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 
 			hresGroups, path := tt.setup(s)
 
-			var resBody []*Group
+			var resBody []*schema.Group
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -87,20 +88,20 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 func TestGroupHandler_GetGroup(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockGroupService) (hres *GroupDetail, path string)
+		setup      func(s *mock_service.MockGroupService) (hres *schema.GroupDetail, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(s *mock_service.MockGroupService) (hres *schema.GroupDetail, path string) {
 				rgroupAdmins := []*domain.User{}
-				hgroupAdmins := []User{}
+				hgroupAdmins := []schema.User{}
 
 				adminLen := rand.Intn(256)
 				for i := 0; i < adminLen; i++ {
 					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
-					hgroupAdmin := User{
+					hgroupAdmin := schema.User{
 						Id:       rgroupAdmin.ID,
 						Name:     rgroupAdmin.Name,
 						RealName: rgroupAdmin.RealName(),
@@ -111,7 +112,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				}
 
 				rgroupMembers := []*domain.UserWithDuration{}
-				hgroupMembers := []GroupMember{}
+				hgroupMembers := []schema.GroupMember{}
 
 				groupLen := rand.Intn(256)
 				for i := 0; i < groupLen; i++ {
@@ -120,8 +121,8 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 						Duration: random.Duration(),
 					}
 
-					hgroupmember := GroupMember{
-						Duration: ConvertDuration(rgroupmember.Duration),
+					hgroupmember := schema.GroupMember{
+						Duration: schema.ConvertDuration(rgroupmember.Duration),
 						Id:       rgroupmember.User.ID,
 						Name:     rgroupmember.User.Name,
 						RealName: rgroupmember.User.RealName(),
@@ -140,7 +141,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					Description: random.AlphaNumeric(),
 				}
 
-				hgroup := GroupDetail{
+				hgroup := schema.GroupDetail{
 					Description: rgroup.Description,
 					Id:          rgroup.ID,
 					Admin:       hgroupAdmins,
@@ -157,7 +158,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(s *mock_service.MockGroupService) (hres *schema.GroupDetail, path string) {
 				groupID := random.UUID()
 				s.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
@@ -167,7 +168,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "forbidden",
-			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(s *mock_service.MockGroupService) (hres *schema.GroupDetail, path string) {
 				groupID := random.UUID()
 				s.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, repository.ErrForbidden)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
@@ -177,7 +178,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "not found",
-			setup: func(s *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(s *mock_service.MockGroupService) (hres *schema.GroupDetail, path string) {
 				groupID := random.UUID()
 				s.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
@@ -187,7 +188,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ *mock_service.MockGroupService) (hres *GroupDetail, path string) {
+			setup: func(_ *mock_service.MockGroupService) (hres *schema.GroupDetail, path string) {
 				groupID := random.AlphaNumericn(36)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path
@@ -202,7 +203,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 
 			hresGroups, path := tt.setup(s)
 
-			var resBody *GroupDetail
+			var resBody *schema.GroupDetail
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion

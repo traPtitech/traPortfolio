@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
@@ -34,7 +35,7 @@ func (h *EventHandler) GetEvents(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]Event, len(events))
+	res := make([]schema.Event, len(events))
 	for i, v := range events {
 		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
@@ -57,7 +58,7 @@ func (h *EventHandler) GetEvent(_c echo.Context) error {
 		return err
 	}
 
-	hostname := make([]User, len(event.HostName))
+	hostname := make([]schema.User, len(event.HostName))
 	for i, v := range event.HostName {
 		hostname[i] = newUser(v.ID, v.Name, v.RealName())
 	}
@@ -80,7 +81,7 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 		return err
 	}
 
-	req := EditEventJSONRequestBody{}
+	req := schema.EditEventJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -97,25 +98,25 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) Event {
-	return Event{
+func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) schema.Event {
+	return schema.Event{
 		Id:   id,
 		Name: name,
-		Duration: Duration{
+		Duration: schema.Duration{
 			Since: since,
 			Until: &until,
 		},
 	}
 }
 
-func newEventDetail(event Event, description string, eventLevel domain.EventLevel, hostname []User, place string) EventDetail {
-	return EventDetail{
+func newEventDetail(event schema.Event, description string, eventLevel domain.EventLevel, hostname []schema.User, place string) schema.EventDetail {
+	return schema.EventDetail{
 		Description: description,
-		Duration: Duration{
+		Duration: schema.Duration{
 			Since: event.Duration.Since,
 			Until: event.Duration.Until,
 		},
-		EventLevel: EventLevel(eventLevel),
+		EventLevel: schema.EventLevel(eventLevel),
 		Hostname:   hostname,
 		Id:         event.Id,
 		Name:       event.Name,
