@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
 	"github.com/gofrs/uuid"
@@ -33,7 +34,7 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]Contest, len(contests))
+	res := make([]schema.Contest, len(contests))
 	for i, v := range contests {
 		res[i] = newContest(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
@@ -56,7 +57,7 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 		return err
 	}
 
-	teams := make([]ContestTeam, len(contest.ContestTeams))
+	teams := make([]schema.ContestTeam, len(contest.ContestTeams))
 	for i, v := range contest.ContestTeams {
 		teams[i] = newContestTeam(v.ID, v.Name, v.Result)
 	}
@@ -75,7 +76,7 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 func (h *ContestHandler) CreateContest(_c echo.Context) error {
 	c := _c.(*Context)
 
-	req := CreateContestJSONRequestBody{}
+	req := schema.CreateContestJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -94,7 +95,7 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 		return err
 	}
 
-	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
+	contestTeams := make([]schema.ContestTeam, 0, len(contest.ContestTeams))
 	for _, team := range contest.ContestTeams {
 		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
 	}
@@ -112,7 +113,7 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 		return err
 	}
 
-	req := EditContestJSONRequestBody{}
+	req := schema.EditContestJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -168,7 +169,7 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]ContestTeam, len(contestTeams))
+	res := make([]schema.ContestTeam, len(contestTeams))
 	for i, v := range contestTeams {
 		res[i] = newContestTeam(v.ID, v.Name, v.Result)
 	}
@@ -196,7 +197,7 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 		return err
 	}
 
-	members := make([]User, len(contestTeam.Members))
+	members := make([]schema.User, len(contestTeam.Members))
 	for i, v := range contestTeam.Members {
 		members[i] = newUser(v.ID, v.Name, v.RealName())
 	}
@@ -220,7 +221,7 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 		return err
 	}
 
-	req := AddContestTeamJSONRequestBody{}
+	req := schema.AddContestTeamJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -258,7 +259,7 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 		return err
 	}
 
-	req := EditContestTeamJSONRequestBody{}
+	req := schema.EditContestTeamJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -320,9 +321,9 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]*User, 0, len(users))
+	res := make([]*schema.User, 0, len(users))
 	for _, v := range users {
-		res = append(res, &User{
+		res = append(res, &schema.User{
 			Id:       v.ID,
 			Name:     v.Name,
 			RealName: v.RealName(),
@@ -347,7 +348,7 @@ func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
 		return err
 	}
 
-	req := AddContestTeamMembersJSONRequestBody{}
+	req := schema.AddContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -374,7 +375,7 @@ func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
 		return err
 	}
 
-	req := EditContestTeamMembersJSONRequestBody{}
+	req := schema.EditContestTeamMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -386,19 +387,19 @@ func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newContest(id uuid.UUID, name string, since time.Time, until time.Time) Contest {
-	return Contest{
+func newContest(id uuid.UUID, name string, since time.Time, until time.Time) schema.Contest {
+	return schema.Contest{
 		Id:   id,
 		Name: name,
-		Duration: Duration{
+		Duration: schema.Duration{
 			Since: since,
 			Until: &until,
 		},
 	}
 }
 
-func newContestDetail(contest Contest, link string, description string, teams []ContestTeam) ContestDetail {
-	return ContestDetail{
+func newContestDetail(contest schema.Contest, link string, description string, teams []schema.ContestTeam) schema.ContestDetail {
+	return schema.ContestDetail{
 		Description: description,
 		Duration:    contest.Duration,
 		Id:          contest.Id,
@@ -408,16 +409,16 @@ func newContestDetail(contest Contest, link string, description string, teams []
 	}
 }
 
-func newContestTeam(id uuid.UUID, name string, result string) ContestTeam {
-	return ContestTeam{
+func newContestTeam(id uuid.UUID, name string, result string) schema.ContestTeam {
+	return schema.ContestTeam{
 		Id:     id,
 		Name:   name,
 		Result: result,
 	}
 }
 
-func newContestTeamDetail(team ContestTeam, link string, description string, members []User) ContestTeamDetail {
-	return ContestTeamDetail{
+func newContestTeamDetail(team schema.ContestTeam, link string, description string, members []schema.User) schema.ContestTeamDetail {
+	return schema.ContestTeamDetail{
 		Description: description,
 		Id:          team.Id,
 		Link:        link,

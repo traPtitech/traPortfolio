@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
 	"github.com/traPtitech/traPortfolio/domain"
@@ -29,7 +30,7 @@ func (h *GroupHandler) GetGroups(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]Group, len(groups))
+	res := make([]schema.Group, len(groups))
 	for i, group := range groups {
 		res[i] = newGroup(group.ID, group.Name)
 	}
@@ -55,15 +56,15 @@ func (h *GroupHandler) GetGroup(_c echo.Context) error {
 	return c.JSON(http.StatusOK, formatGetGroup(group))
 }
 
-func formatGetGroup(group *domain.GroupDetail) GroupDetail {
-	groupRes := make([]GroupMember, len(group.Members))
+func formatGetGroup(group *domain.GroupDetail) schema.GroupDetail {
+	groupRes := make([]schema.GroupMember, len(group.Members))
 	for i, v := range group.Members {
 		groupRes[i] = newGroupMember(
 			newUser(v.User.ID, v.User.Name, v.User.RealName()),
-			ConvertDuration(v.Duration),
+			schema.ConvertDuration(v.Duration),
 		)
 	}
-	adminRes := make([]User, len(group.Admin))
+	adminRes := make([]schema.User, len(group.Admin))
 	for i, v := range group.Admin {
 		adminRes[i] = newUser(v.ID, v.Name, v.RealName())
 	}
@@ -79,8 +80,8 @@ func formatGetGroup(group *domain.GroupDetail) GroupDetail {
 	return res
 }
 
-func newGroupMember(user User, Duration YearWithSemesterDuration) GroupMember {
-	return GroupMember{
+func newGroupMember(user schema.User, Duration schema.YearWithSemesterDuration) schema.GroupMember {
+	return schema.GroupMember{
 		Duration: Duration,
 		Id:       user.Id,
 		Name:     user.Name,
@@ -88,8 +89,8 @@ func newGroupMember(user User, Duration YearWithSemesterDuration) GroupMember {
 	}
 }
 
-func newGroupDetail(group Group, desc string, admin []User, link string, members []GroupMember) GroupDetail {
-	return GroupDetail{
+func newGroupDetail(group schema.Group, desc string, admin []schema.User, link string, members []schema.GroupMember) schema.GroupDetail {
+	return schema.GroupDetail{
 		Description: desc,
 		Id:          group.Id,
 		Admin:       admin,

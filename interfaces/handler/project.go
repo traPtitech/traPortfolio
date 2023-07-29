@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -28,9 +29,9 @@ func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]Project, len(projects))
+	res := make([]schema.Project, len(projects))
 	for i, v := range projects {
-		res[i] = newProject(v.ID, v.Name, ConvertDuration(v.Duration))
+		res[i] = newProject(v.ID, v.Name, schema.ConvertDuration(v.Duration))
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -51,16 +52,16 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 		return err
 	}
 
-	members := make([]ProjectMember, len(project.Members))
+	members := make([]schema.ProjectMember, len(project.Members))
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
 			newUser(v.User.ID, v.User.Name, v.User.RealName()),
-			ConvertDuration(v.Duration),
+			schema.ConvertDuration(v.Duration),
 		)
 	}
 
 	return c.JSON(http.StatusOK, newProjectDetail(
-		newProject(project.ID, project.Name, ConvertDuration(project.Duration)),
+		newProject(project.ID, project.Name, schema.ConvertDuration(project.Duration)),
 		project.Description,
 		project.Link,
 		members,
@@ -71,7 +72,7 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	c := _c.(*Context)
 
-	req := CreateProjectJSONRequestBody{}
+	req := schema.CreateProjectJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -98,7 +99,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	return c.JSON(http.StatusCreated, newProject(
 		project.ID,
 		project.Name,
-		ConvertDuration(project.Duration),
+		schema.ConvertDuration(project.Duration),
 	))
 }
 
@@ -111,7 +112,7 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 		return err
 	}
 
-	req := EditProjectJSONRequestBody{}
+	req := schema.EditProjectJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -160,11 +161,11 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 		return err
 	}
 
-	res := make([]ProjectMember, len(members))
+	res := make([]schema.ProjectMember, len(members))
 	for i, v := range members {
 		res[i] = newProjectMember(
 			newUser(v.User.ID, v.User.Name, v.User.RealName()),
-			ConvertDuration(v.Duration),
+			schema.ConvertDuration(v.Duration),
 		)
 	}
 
@@ -180,7 +181,7 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 		return err
 	}
 
-	req := AddProjectMembersJSONRequestBody{}
+	req := schema.AddProjectMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -219,7 +220,7 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 		return err
 	}
 
-	req := DeleteProjectMembersJSONRequestBody{}
+	req := schema.DeleteProjectMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
 		return err
 	}
@@ -233,16 +234,16 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newProject(id uuid.UUID, name string, duration YearWithSemesterDuration) Project {
-	return Project{
+func newProject(id uuid.UUID, name string, duration schema.YearWithSemesterDuration) schema.Project {
+	return schema.Project{
 		Id:       id,
 		Name:     name,
 		Duration: duration,
 	}
 }
 
-func newProjectDetail(project Project, description string, link string, members []ProjectMember) ProjectDetail {
-	return ProjectDetail{
+func newProjectDetail(project schema.Project, description string, link string, members []schema.ProjectMember) schema.ProjectDetail {
+	return schema.ProjectDetail{
 		Description: description,
 		Duration:    project.Duration,
 		Link:        link,
@@ -252,8 +253,8 @@ func newProjectDetail(project Project, description string, link string, members 
 	}
 }
 
-func newProjectMember(user User, duration YearWithSemesterDuration) ProjectMember {
-	return ProjectMember{
+func newProjectMember(user schema.User, duration schema.YearWithSemesterDuration) schema.ProjectMember {
+	return schema.ProjectMember{
 		Duration: duration,
 		Id:       user.Id,
 		Name:     user.Name,

@@ -1,4 +1,4 @@
-package handler
+package schema
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ type validator struct {
 	logger echo.Logger
 }
 
-func newValidator(logger echo.Logger) echo.Validator {
+func NewValidator(logger echo.Logger) echo.Validator {
 	return &validator{logger}
 }
 
