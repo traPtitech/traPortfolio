@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -84,20 +84,20 @@ func TestEventHandler_GetEvent(t *testing.T) {
 // EditEvent PATCH /events/:eventID
 func TestEventHandler_EditEvent(t *testing.T) {
 	var (
-		eventLevel = handler.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+		eventLevel = schema.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 	)
 
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
 		eventID    uuid.UUID
-		reqBody    handler.EditEventJSONRequestBody
+		reqBody    schema.EditEventJSONRequestBody
 		want       interface{} // nil or error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.KnoqEventID1(),
-			handler.EditEventJSONRequestBody{
+			schema.EditEventJSONRequestBody{
 				EventLevel: &eventLevel,
 			},
 			nil,
@@ -105,7 +105,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.KnoqEventID2(),
-			handler.EditEventJSONRequestBody{},
+			schema.EditEventJSONRequestBody{},
 			nil,
 		},
 	}
@@ -120,7 +120,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
-				var event handler.EventDetail
+				var event schema.EventDetail
 				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &event)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない

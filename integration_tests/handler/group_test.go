@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -23,7 +23,7 @@ func TestGetGroups(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			[]handler.Group{
+			[]schema.Group{
 				{
 					Id:   mockdata.GroupID1(),
 					Name: mockdata.HMockGroups[0].Name,
