@@ -41,7 +41,7 @@ func (a *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserRes
 
 	var usersResponse []*external.TraQUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&usersResponse); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
+		return nil, fmt.Errorf("decode failed: %w", err)
 	}
 	return usersResponse, nil
 }
