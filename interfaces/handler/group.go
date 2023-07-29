@@ -26,7 +26,7 @@ func (h *GroupHandler) GetGroups(_c echo.Context) error {
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]Group, len(groups))
@@ -43,13 +43,13 @@ func (h *GroupHandler) GetGroup(_c echo.Context) error {
 
 	groupID, err := c.getID(keyGroupID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	group, err := h.srv.GetGroup(ctx, groupID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, formatGetGroup(group))

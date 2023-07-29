@@ -25,7 +25,7 @@ func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]Project, len(projects))
@@ -42,13 +42,13 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 
 	projectID, err := c.getID(keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	project, err := h.service.GetProject(ctx, projectID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	members := make([]ProjectMember, len(project.Members))
@@ -73,7 +73,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 
 	req := CreateProjectJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	createReq := repository.CreateProjectArgs{
@@ -92,7 +92,7 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	ctx := c.Request().Context()
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.JSON(http.StatusCreated, newProject(
@@ -108,12 +108,12 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 
 	projectID, err := c.getID(keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := EditProjectJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	patchReq := repository.UpdateProjectArgs{
@@ -139,7 +139,7 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	ctx := c.Request().Context()
 	err = h.service.UpdateProject(ctx, projectID, &patchReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -151,13 +151,13 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 
 	projectID, err := c.getID(keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	members, err := h.service.GetProjectMembers(ctx, projectID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := make([]ProjectMember, len(members))
@@ -177,12 +177,12 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 
 	projectID, err := c.getID(keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := AddProjectMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
@@ -204,7 +204,7 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	ctx := c.Request().Context()
 	err = h.service.AddProjectMembers(ctx, projectID, createReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -216,18 +216,18 @@ func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
 
 	projectID, err := c.getID(keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	req := DeleteProjectMembersJSONRequestBody{}
 	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	err = h.service.DeleteProjectMembers(ctx, projectID, req.Members)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
