@@ -63,45 +63,66 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
-	contest1 := mustMakeContest(t, repo, nil)
-	contest2 := mustMakeContest(t, repo, nil)
-
-	args := random.UpdateContestArgs()
-	if v, ok := args.Name.V(); ok {
-		contest1.Name = v
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateContestArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateContestArgs(),
+		},
+		{
+			name: "partial fields",
+			ctx:  context.Background(),
+			args: random.UpdateContestArgs(),
+		},
 	}
-	if v, ok := args.Description.V(); ok {
-		contest1.Description = v
-	}
-	if v, ok := args.Link.V(); ok {
-		contest1.Link = v
-	}
-	if v, ok := args.Since.V(); ok {
-		contest1.TimeStart = v
-	}
-	if v, ok := args.Until.V(); ok {
-		contest1.TimeEnd = v
-	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			contest1 := mustMakeContest(t, repo, nil)
+			contest2 := mustMakeContest(t, repo, nil)
 
-	err := repo.UpdateContest(context.Background(), contest1.ID, args)
-	assert.NoError(t, err)
+			args := tt.args
+			if v, ok := args.Name.V(); ok {
+				contest1.Name = v
+			}
+			if v, ok := args.Description.V(); ok {
+				contest1.Description = v
+			}
+			if v, ok := args.Link.V(); ok {
+				contest1.Link = v
+			}
+			if v, ok := args.Since.V(); ok {
+				contest1.TimeStart = v
+			}
+			if v, ok := args.Until.V(); ok {
+				contest1.TimeEnd = v
+			}
 
-	gotContest1, err := repo.GetContest(context.Background(), contest1.ID)
-	assert.NoError(t, err)
-	gotContest2, err := repo.GetContest(context.Background(), contest2.ID)
-	assert.NoError(t, err)
+			err := repo.UpdateContest(context.Background(), contest1.ID, args)
+			assert.NoError(t, err)
 
-	expected := []*domain.ContestDetail{contest1, contest2}
-	gots := []*domain.ContestDetail{gotContest1, gotContest2}
+			gotContest1, err := repo.GetContest(context.Background(), contest1.ID)
+			assert.NoError(t, err)
+			gotContest2, err := repo.GetContest(context.Background(), contest2.ID)
+			assert.NoError(t, err)
 
-	for i := range expected {
-		assert.True(t, expected[i].TimeStart.Equal(gots[i].TimeStart))
-		assert.True(t, expected[i].TimeEnd.Equal(gots[i].TimeEnd))
-		expected[i].TimeStart = time.Time{}
-		expected[i].TimeEnd = time.Time{}
-		gots[i].TimeStart = time.Time{}
-		gots[i].TimeEnd = time.Time{}
-		assert.Equal(t, expected[i], gots[i])
+			expected := []*domain.ContestDetail{contest1, contest2}
+			gots := []*domain.ContestDetail{gotContest1, gotContest2}
+
+			for i := range expected {
+				assert.True(t, expected[i].TimeStart.Equal(gots[i].TimeStart))
+				assert.True(t, expected[i].TimeEnd.Equal(gots[i].TimeEnd))
+				expected[i].TimeStart = time.Time{}
+				expected[i].TimeEnd = time.Time{}
+				gots[i].TimeStart = time.Time{}
+				gots[i].TimeEnd = time.Time{}
+				assert.Equal(t, expected[i], gots[i])
+			}
+		})
 	}
 }
 
@@ -214,41 +235,55 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	contest1 := mustMakeContest(t, repo, nil)
-	mustMakeContest(t, repo, nil)
-	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
-		Name:        random.AlphaNumeric(),
-		Result:      random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Description: random.AlphaNumeric(),
-	})
-	mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
-		Name:        random.AlphaNumeric(),
-		Result:      random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Description: random.AlphaNumeric(),
-	})
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateContestTeamArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateContestTeamArgs(),
+		},
+		{
+			name: "partial fields",
+			ctx:  context.Background(),
+			args: random.OptUpdateContestTeamArgs(),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			contest := mustMakeContest(t, repo, nil)
+			team := mustMakeContestTeam(t, repo, contest.ID, &urepository.CreateContestTeamArgs{
+				Name:        random.AlphaNumeric(),
+				Result:      random.Optional(random.AlphaNumeric()),
+				Link:        random.Optional(random.RandURLString()),
+				Description: random.AlphaNumeric(),
+			})
 
-	args1 := random.UpdateContestTeamArgs()
-	if v, ok := args1.Name.V(); ok {
-		team1.Name = v
-	}
-	if v, ok := args1.Result.V(); ok {
-		team1.Result = v
-	}
-	if v, ok := args1.Link.V(); ok {
-		team1.Link = v
-	}
-	if v, ok := args1.Description.V(); ok {
-		team1.Description = v
-	}
+			args := tt.args
+			if v, ok := args.Name.V(); ok {
+				team.Name = v
+			}
+			if v, ok := args.Result.V(); ok {
+				team.Result = v
+			}
+			if v, ok := args.Link.V(); ok {
+				team.Link = v
+			}
+			if v, ok := args.Description.V(); ok {
+				team.Description = v
+			}
 
-	err := repo.UpdateContestTeam(context.Background(), team1.ID, args1)
-	assert.NoError(t, err)
+			err := repo.UpdateContestTeam(tt.ctx, team.ID, args)
+			assert.NoError(t, err)
 
-	got, err := repo.GetContestTeam(context.Background(), contest1.ID, team1.ID)
-	assert.NoError(t, err)
-	assert.Equal(t, team1, got)
+			got, err := repo.GetContestTeam(tt.ctx, contest.ID, team.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, team, got)
+		})
+	}
 }
 
 func TestContestRepository_DeleteContestTeam(t *testing.T) {

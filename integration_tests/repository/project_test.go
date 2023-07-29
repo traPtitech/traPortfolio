@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -72,42 +73,63 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProjectDetail(t, repo, nil)
-	mustMakeProjectDetail(t, repo, nil)
-
-	arg1 := random.OptUpdateProjectArgs()
-
-	if v, ok := arg1.Name.V(); ok {
-		project1.Name = v
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateProjectArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateProjectArgs(),
+		},
+		{
+			name: "no fields",
+			ctx:  context.Background(),
+			args: random.OptUpdateProjectArgs(),
+		},
 	}
-	if v, ok := arg1.Description.V(); ok {
-		project1.Description = v
-	}
-	if v, ok := arg1.Link.V(); ok {
-		project1.Link = v
-	}
-	if sy, ok := arg1.SinceYear.V(); ok {
-		if ss, ok := arg1.SinceSemester.V(); ok {
-			project1.Duration.Since.Year = int(sy)
-			project1.Duration.Since.Semester = int(ss)
-		}
-	}
-	if uy, ok := arg1.UntilYear.V(); ok {
-		if us, ok := arg1.UntilSemester.V(); ok {
-			project1.Duration.Until.Year = int(uy)
-			project1.Duration.Until.Semester = int(us)
-		}
-	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			project1 := mustMakeProjectDetail(t, repo, nil)
+			mustMakeProjectDetail(t, repo, nil)
 
-	err := repo.UpdateProject(context.Background(), project1.ID, arg1)
-	assert.NoError(t, err)
+			arg1 := tt.args
 
-	got, err := repo.GetProject(context.Background(), project1.ID)
-	assert.NoError(t, err)
+			if v, ok := arg1.Name.V(); ok {
+				project1.Name = v
+			}
+			if v, ok := arg1.Description.V(); ok {
+				project1.Description = v
+			}
+			if v, ok := arg1.Link.V(); ok {
+				project1.Link = v
+			}
+			if sy, ok := arg1.SinceYear.V(); ok {
+				if ss, ok := arg1.SinceSemester.V(); ok {
+					project1.Duration.Since.Year = int(sy)
+					project1.Duration.Since.Semester = int(ss)
+				}
+			}
+			if uy, ok := arg1.UntilYear.V(); ok {
+				if us, ok := arg1.UntilSemester.V(); ok {
+					project1.Duration.Until.Year = int(uy)
+					project1.Duration.Until.Semester = int(us)
+				}
+			}
 
-	opt := cmpopts.EquateEmpty()
-	if diff := cmp.Diff(project1, got, opt); diff != "" {
-		t.Error(diff)
+			err := repo.UpdateProject(tt.ctx, project1.ID, arg1)
+			assert.NoError(t, err)
+
+			got, err := repo.GetProject(tt.ctx, project1.ID)
+			assert.NoError(t, err)
+
+			opt := cmpopts.EquateEmpty()
+			if diff := cmp.Diff(project1, got, opt); diff != "" {
+				t.Error(diff)
+			}
+		})
 	}
 }
 

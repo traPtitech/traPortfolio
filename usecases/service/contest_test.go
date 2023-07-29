@@ -308,7 +308,20 @@ func TestContestService_UpdateContest(t *testing.T) {
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
+			name: "Success/AllFields",
+			args: args{
+				ctx:  context.Background(),
+				id:   random.UUID(),
+				args: random.UpdateContestArgs(),
+			},
+			setup: func(f fields, args args) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().UpdateContest(args.ctx, args.id, args.args).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success/PartialFields",
 			args: args{
 				ctx:  context.Background(),
 				id:   random.UUID(),
@@ -719,7 +732,20 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
+			name: "Success/AllFields",
+			args: args{
+				ctx:    context.Background(),
+				teamID: random.UUID(),
+				args:   random.UpdateContestTeamArgs(),
+			},
+			setup: func(f fields, args args) {
+				repo := f.repo.(*mock_repository.MockContestRepository)
+				repo.EXPECT().UpdateContestTeam(args.ctx, args.teamID, args.args).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success/PartialFields",
 			args: args{
 				ctx:    context.Background(),
 				teamID: random.UUID(),

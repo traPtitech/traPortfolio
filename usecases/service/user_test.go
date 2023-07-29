@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 
 	"github.com/gofrs/uuid"
@@ -159,7 +158,19 @@ func TestUserService_Update(t *testing.T) {
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
+			name: "Success/AllFields",
+			args: args{
+				ctx:  context.Background(),
+				id:   random.UUID(),
+				args: random.UpdateUserArgs(),
+			},
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
+				repo.EXPECT().UpdateUser(args.ctx, args.id, args.args).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success/PartialFields",
 			args: args{
 				ctx:  context.Background(),
 				id:   random.UUID(),
@@ -175,7 +186,7 @@ func TestUserService_Update(t *testing.T) {
 			args: args{
 				ctx:  context.Background(),
 				id:   random.UUID(),
-				args: random.UpdateUserArgs(),
+				args: random.OptUpdateUserArgs(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				repo.EXPECT().UpdateUser(args.ctx, args.id, args.args).Return(repository.ErrNotFound)
@@ -374,17 +385,25 @@ func TestUserService_EditAccount(t *testing.T) {
 		assertion assert.ErrorAssertionFunc
 	}{
 		{
-			name: "Success",
+			name: "Success/AllFields",
 			args: args{
 				ctx:       context.Background(),
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				args: &repository.UpdateAccountArgs{
-					DisplayName: random.Optional(random.AlphaNumeric()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
-					URL:         random.Optional(random.RandURLString()),
-					PrPermitted: random.Optional(random.Bool()),
-				},
+				args:      random.UpdateAccountArgs(),
+			},
+			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
+				repo.EXPECT().UpdateAccount(args.ctx, args.userID, args.accountID, args.args).Return(nil)
+			},
+			assertion: assert.NoError,
+		},
+		{
+			name: "Success/PartialFields",
+			args: args{
+				ctx:       context.Background(),
+				userID:    random.UUID(),
+				accountID: random.UUID(),
+				args:      random.OptUpdateAccountArgs(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				repo.EXPECT().UpdateAccount(args.ctx, args.userID, args.accountID, args.args).Return(nil)
