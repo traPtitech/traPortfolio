@@ -25,9 +25,7 @@ func NewContestHandler(service service.ContestService) *ContestHandler {
 }
 
 // GetContests GET /contests
-func (h *ContestHandler) GetContests(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) GetContests(c echo.Context) error {
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetContests(ctx)
 	if err != nil {
@@ -43,10 +41,8 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 }
 
 // GetContest GET /contests/:contestID
-func (h *ContestHandler) GetContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContest(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
@@ -73,11 +69,9 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 }
 
 // CreateContest POST /contests
-func (h *ContestHandler) CreateContest(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) CreateContest(c echo.Context) error {
 	req := schema.CreateContestJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -105,16 +99,14 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 }
 
 // EditContest PATCH /contests/:contestID
-func (h *ContestHandler) EditContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) EditContest(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditContestJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -138,10 +130,8 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 }
 
 // DeleteContest DELETE /contests/:contestID
-func (h *ContestHandler) DeleteContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) DeleteContest(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
@@ -155,10 +145,8 @@ func (h *ContestHandler) DeleteContest(_c echo.Context) error {
 }
 
 // GetContestTeams GET /contests/:contestID/teams
-func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContestTeams(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
@@ -178,15 +166,13 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 }
 
 // GetContestTeams GET /contests/:contestID/teams/:teamID
-func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContestTeam(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
 		return err
 	}
@@ -213,16 +199,14 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 }
 
 // AddContestTeam POST /contests/:contestID/teams
-func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) AddContestTeam(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.AddContestTeamJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -245,22 +229,20 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 }
 
 // EditContestTeam PATCH /contests/:contestID/teams/:teamID
-func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 	// TODO: contestIDをUpdateContestTeamの引数に含める
-	_, err := c.getID(keyContestID)
+	_, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditContestTeamJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -280,15 +262,13 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 }
 
 // DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
-func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) DeleteContestTeam(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
 		return err
 	}
@@ -302,15 +282,13 @@ func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
 }
 
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
 		return err
 	}
@@ -333,23 +311,22 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 }
 
 // AddContestTeamMembers POST /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
-	c := _c.(*Context)
+func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	// TODO: contestIDをAddContestTeamMembersの引数に含める
-	_, err := c.getID(keyContestID)
+	_, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.AddContestTeamMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -361,22 +338,20 @@ func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
 }
 
 // EditContestTeamMembers PUT /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
-	_, err := c.getID(keyContestID)
+	_, err := getID(c, keyContestID)
 	if err != nil {
 		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditContestTeamMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 

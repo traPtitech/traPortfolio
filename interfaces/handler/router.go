@@ -5,23 +5,18 @@ import (
 	"fmt"
 	"net/http"
 
+	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 func Setup(e *echo.Echo, api API) error {
-	e.Validator = schema.NewValidator(e.Logger)
 	e.HTTPErrorHandler = newHTTPErrorHandler(e)
+	e.Binder = &binderWithValidation{}
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			return h(&Context{Context: c})
-		}
-	})
 
 	apiGroup := e.Group("/api")
 	setupV1API(apiGroup, api)
@@ -42,10 +37,6 @@ func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 		case errors.Is(err, repository.ErrInvalidID):
 			fallthrough
 		case errors.Is(err, repository.ErrInvalidArg):
-			fallthrough
-		case errors.Is(err, repository.ErrBind):
-			fallthrough
-		case errors.Is(err, repository.ErrValidate):
 			code = http.StatusBadRequest
 
 		case errors.Is(err, repository.ErrAlreadyExists):
@@ -72,6 +63,30 @@ func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 
 		e.DefaultHTTPErrorHandler(herr, c)
 	}
+}
+
+type binderWithValidation struct{}
+
+var _ echo.Binder = (*binderWithValidation)(nil)
+
+func (b *binderWithValidation) Bind(i interface{}, c echo.Context) error {
+	if err := (&echo.DefaultBinder{}).Bind(i, c); err != nil {
+		return err
+	}
+
+	if vld, ok := i.(vd.Validatable); ok {
+		if err := vld.Validate(); err != nil {
+			if ie, ok := err.(vd.InternalError); ok {
+				c.Logger().Fatalf("ozzo-validation internal error: %s", ie.Error())
+			}
+
+			return err
+		}
+	} else {
+		c.Logger().Errorf("%T is not validatable", i)
+	}
+
+	return nil
 }
 
 func setupV1API(g *echo.Group, api API) {
