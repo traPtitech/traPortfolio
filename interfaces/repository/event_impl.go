@@ -24,7 +24,7 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) reposito
 func (r *EventRepository) GetEvents(_ context.Context) ([]*domain.Event, error) {
 	events, err := r.knoq.GetAll()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := make([]*domain.Event, 0, len(events))
@@ -44,7 +44,7 @@ func (r *EventRepository) GetEvents(_ context.Context) ([]*domain.Event, error) 
 func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error) {
 	er, err := r.knoq.GetByEventID(eventID)
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	// IDのリストだけ取得、Name,RealNameはPortalから取得する
@@ -74,7 +74,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 	} else if errors.Is(err, repository.ErrNotFound) {
 		result.Level = domain.EventLevelAnonymous
 	} else {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	return result, nil
@@ -83,7 +83,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.CreateEventLevelArgs) error {
 	_, err := r.knoq.GetByEventID(arg.EventID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	relation := model.EventLevelRelation{
@@ -93,7 +93,7 @@ func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.
 
 	err = r.h.WithContext(ctx).Create(&relation).Error()
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -107,7 +107,7 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 
 	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
 		if elv, err := r.getEventLevelByID(ctx, eventID); err != nil {
-			return convertError(err)
+			return err
 		} else if elv.Level == newLevel {
 			return nil // updateする必要がないのでここでcommitする
 		}
@@ -117,13 +117,13 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 			Model(&model.EventLevelRelation{ID: eventID}).
 			Update("level", newLevel).
 			Error(); err != nil {
-			return convertError(err)
+			return err
 		}
 
 		return nil
 	})
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -132,7 +132,7 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 func (r *EventRepository) GetUserEvents(_ context.Context, userID uuid.UUID) ([]*domain.Event, error) {
 	events, err := r.knoq.GetByUserID(userID)
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := make([]*domain.Event, 0, len(events))
@@ -156,7 +156,7 @@ func (r *EventRepository) getEventLevelByID(ctx context.Context, eventID uuid.UU
 		First(elv).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 	return elv, nil
 }
