@@ -6,10 +6,8 @@ import (
 )
 
 func Setup(e *echo.Echo, api API) error {
-	// Setup validator
 	e.Validator = newValidator(e.Logger)
 
-	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
@@ -18,127 +16,74 @@ func Setup(e *echo.Echo, api API) error {
 		}
 	})
 
-	echoAPI := e.Group("/api")
-	{
-		v1 := echoAPI.Group("/v1")
-
-		{
-			apiUsers := v1.Group("/users")
-
-			apiUsers.GET("", api.User.GetUsers)
-			{
-				apiUsersUID := apiUsers.Group("/:userID")
-
-				apiUsersUID.GET("", api.User.GetUser)
-				apiUsersUID.PATCH("", api.User.UpdateUser)
-				{
-					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
-
-					apiUsersUIDAccounts.GET("", api.User.GetUserAccounts)
-					apiUsersUIDAccounts.POST("", api.User.AddUserAccount)
-					{
-						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
-
-						apiUsersUIDAccountsAID.GET("", api.User.GetUserAccount)
-						apiUsersUIDAccountsAID.PATCH("", api.User.EditUserAccount)
-						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteUserAccount)
-					}
-
-					apiUsersUIDProjects := apiUsersUID.Group("/projects")
-
-					apiUsersUIDProjects.GET("", api.User.GetUserProjects)
-
-					apiUsersUIDContests := apiUsersUID.Group("/contests")
-
-					apiUsersUIDContests.GET("", api.User.GetUserContests)
-
-					apiUsersUIDGroups := apiUsersUID.Group("/groups")
-
-					apiUsersUIDGroups.GET("", api.User.GetUserGroups)
-
-					apiUsersUIDEvents := apiUsersUID.Group("/events")
-
-					apiUsersUIDEvents.GET("", api.User.GetUserEvents)
-				}
-			}
-		}
-		{
-			apiProjects := v1.Group("/projects")
-
-			apiProjects.GET("", api.Project.GetProjects)
-			apiProjects.POST("", api.Project.CreateProject)
-
-			{
-				apiProjectsPID := apiProjects.Group("/:projectID")
-
-				apiProjectsPID.GET("", api.Project.GetProject)
-				apiProjectsPID.PATCH("", api.Project.EditProject)
-
-				apiProjectsPIDMembers := apiProjectsPID.Group("/members")
-
-				apiProjectsPIDMembers.GET("", api.Project.GetProjectMembers)
-				apiProjectsPIDMembers.POST("", api.Project.AddProjectMembers)
-				apiProjectsPIDMembers.DELETE("", api.Project.DeleteProjectMembers)
-			}
-		}
-
-		{
-			apiEvents := v1.Group("/events")
-
-			apiEvents.GET("", api.Event.GetEvents)
-
-			apiEventsEID := apiEvents.Group("/:eventID")
-
-			apiEventsEID.GET("", api.Event.GetEvent)
-			apiEventsEID.PATCH("", api.Event.EditEvent)
-		}
-
-		{
-			apiGroups := v1.Group("/groups")
-
-			apiGroups.GET("", api.Group.GetGroups)
-			apiGroups.GET("/:groupID", api.Group.GetGroup)
-		}
-		{
-			apiContests := v1.Group("/contests")
-
-			apiContests.GET("", api.Contest.GetContests)
-			apiContests.POST("", api.Contest.CreateContest)
-			{
-				apiContestsCID := apiContests.Group("/:contestID")
-
-				apiContestsCID.GET("", api.Contest.GetContest)
-				apiContestsCID.PATCH("", api.Contest.EditContest)
-				apiContestsCID.DELETE("", api.Contest.DeleteContest)
-				{
-					apiContestsCIDTeams := apiContestsCID.Group("/teams")
-
-					apiContestsCIDTeams.GET("", api.Contest.GetContestTeams)
-					apiContestsCIDTeams.POST("", api.Contest.AddContestTeam)
-					{
-						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")
-
-						apiContestsCIDTeamsTID.GET("", api.Contest.GetContestTeam)
-						apiContestsCIDTeamsTID.PATCH("", api.Contest.EditContestTeam)
-						apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
-						{
-							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
-
-							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMembers)
-							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMembers)
-							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.EditContestTeamMembers)
-						}
-					}
-				}
-			}
-		}
-
-		{
-			apiPing := v1.Group("/ping")
-
-			apiPing.GET("", api.Ping.Ping)
-		}
-	}
+	apiGroup := e.Group("/api")
+	setupV1API(apiGroup, api)
 
 	return nil
+}
+
+func setupV1API(g *echo.Group, api API) {
+	v1 := g.Group("/v1")
+	// user API
+	userAPI := v1.Group("/users")
+	{
+		userAPI.GET("", api.User.GetUsers)
+		userAPI.GET("/:userID", api.User.GetUser)
+		userAPI.PATCH("/:userID", api.User.UpdateUser)
+		userAPI.GET("/:userID/accounts", api.User.GetUserAccounts)
+		userAPI.POST("/:userID/accounts", api.User.AddUserAccount)
+		userAPI.GET("/:userID/accounts/:accountID", api.User.GetUserAccount)
+		userAPI.PATCH("/:userID/accounts/:accountID", api.User.EditUserAccount)
+		userAPI.DELETE("/:userID/accounts/:accountID", api.User.DeleteUserAccount)
+		userAPI.GET("/:userID/projects", api.User.GetUserProjects)
+		userAPI.GET("/:userID/contests", api.User.GetUserContests)
+		userAPI.GET("/:userID/groups", api.User.GetUserGroups)
+		userAPI.GET("/:userID/events", api.User.GetUserEvents)
+	}
+	// project API
+	projectAPI := v1.Group("/projects")
+	{
+		projectAPI.GET("", api.Project.GetProjects)
+		projectAPI.POST("", api.Project.CreateProject)
+		projectAPI.GET("/:projectID", api.Project.GetProject)
+		projectAPI.PATCH("/:projectID", api.Project.EditProject)
+		projectAPI.GET("/:projectID/members", api.Project.GetProjectMembers)
+		projectAPI.POST("/:projectID/members", api.Project.AddProjectMembers)
+		projectAPI.DELETE("/:projectID/members", api.Project.DeleteProjectMembers)
+	}
+	// event API
+	eventAPI := v1.Group("/events")
+	{
+		eventAPI.GET("", api.Event.GetEvents)
+		eventAPI.GET("/:eventID", api.Event.GetEvent)
+		eventAPI.PATCH("/:eventID", api.Event.EditEvent)
+	}
+	// group API
+	groupAPI := v1.Group("/groups")
+	{
+		groupAPI.GET("", api.Group.GetGroups)
+		groupAPI.GET("/:groupID", api.Group.GetGroup)
+	}
+	// contest API
+	contestAPI := v1.Group("/contests")
+	{
+		contestAPI.GET("", api.Contest.GetContests)
+		contestAPI.POST("", api.Contest.CreateContest)
+		contestAPI.GET("/:contestID", api.Contest.GetContest)
+		contestAPI.PATCH("/:contestID", api.Contest.EditContest)
+		contestAPI.DELETE("/:contestID", api.Contest.DeleteContest)
+		contestAPI.GET("/:contestID/teams", api.Contest.GetContestTeams)
+		contestAPI.POST("/:contestID/teams", api.Contest.AddContestTeam)
+		contestAPI.GET("/:contestID/teams/:teamID", api.Contest.GetContestTeam)
+		contestAPI.PATCH("/:contestID/teams/:teamID", api.Contest.EditContestTeam)
+		contestAPI.DELETE("/:contestID/teams/:teamID", api.Contest.DeleteContestTeam)
+		contestAPI.GET("/:contestID/teams/:teamID/members", api.Contest.GetContestTeamMembers)
+		contestAPI.POST("/:contestID/teams/:teamID/members", api.Contest.AddContestTeamMembers)
+		contestAPI.PUT("/:contestID/teams/:teamID/members", api.Contest.EditContestTeamMembers)
+	}
+	// ping API
+	apiPing := v1.Group("/ping")
+	{
+		apiPing.GET("", api.Ping.Ping)
+	}
 }
