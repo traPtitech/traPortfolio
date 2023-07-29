@@ -3,40 +3,18 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
-type OptionalDuration struct {
-	Since optional.Of[time.Time] `json:"since"`
-	Until optional.Of[time.Time] `json:"until"`
-}
-
-type OptionalYearWithSemesterDuration struct {
-	Since OptionalYearWithSemester
-	Until OptionalYearWithSemester
-}
-
-type OptionalYearWithSemester struct {
-	Year     optional.Of[int64]
-	Semester optional.Of[int64]
-}
-
 func ConvertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {
-	return newYearWithSemesterDuration(d.Since.Year, d.Since.Semester, d.Until.Year, d.Until.Semester)
-}
-
-func newYearWithSemesterDuration(sinceYear, sinceSemester, untilYear, untilSemester int) YearWithSemesterDuration {
 	return YearWithSemesterDuration{
 		Since: YearWithSemester{
-			Year:     sinceYear,
-			Semester: Semester(sinceSemester),
+			Year:     d.Since.Year,
+			Semester: Semester(d.Since.Semester),
 		},
 		Until: &YearWithSemester{
-			Year:     untilYear,
-			Semester: Semester(untilSemester),
+			Year:     d.Until.Year,
+			Semester: Semester(d.Until.Semester),
 		},
 	}
 }
