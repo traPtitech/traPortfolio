@@ -58,10 +58,6 @@ func (o Of[T]) ValueOrZero() T {
 	return t
 }
 
-func (o Of[T]) Valid() bool {
-	return o.valid
-}
-
 func (o Of[T]) V() (T, bool) {
 	return o.v, o.valid
 }
