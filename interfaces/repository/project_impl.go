@@ -25,7 +25,7 @@ func (r *ProjectRepository) GetProjects(ctx context.Context) ([]*domain.Project,
 	projects := make([]*model.Project, 0)
 	err := r.h.WithContext(ctx).Find(&projects).Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 	res := make([]*domain.Project, 0, len(projects))
 	for _, v := range projects {
@@ -46,7 +46,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 		Where(&model.Project{ID: projectID}).
 		First(project).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	members := make([]*model.ProjectMember, 0)
@@ -57,7 +57,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 		Find(&members).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	portalUsers, err := r.portal.GetAll()
@@ -115,7 +115,7 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 
 	err := r.h.WithContext(ctx).Create(&p).Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	res := &domain.ProjectDetail{
@@ -166,7 +166,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		Updates(changes).
 		Error()
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -181,7 +181,7 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 		Find(&members).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	portalUsers, err := r.portal.GetAll()
@@ -234,7 +234,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		First(&model.Project{}).
 		Error()
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
@@ -245,7 +245,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		Find(&_mmbs).
 		Error()
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 	for _, v := range _mmbs {
 		mmbsMp[v.UserID] = struct{}{}
@@ -273,13 +273,13 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 			}
 			err = tx.WithContext(ctx).Create(v).Error()
 			if err != nil {
-				return convertError(err)
+				return err
 			}
 		}
 		return nil
 	})
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -297,7 +297,7 @@ func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID 
 		First(&model.Project{}).
 		Error()
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	err = r.h.
@@ -307,7 +307,7 @@ func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID 
 		Delete(&model.ProjectMember{}).
 		Error()
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil

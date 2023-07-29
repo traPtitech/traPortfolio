@@ -22,7 +22,7 @@ func (r *GroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, er
 	groups := make([]*model.Group, 0)
 	err := r.h.WithContext(ctx).Find(&groups).Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := make([]*domain.Group, 0, len(groups))
@@ -42,7 +42,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		Where(&model.Group{GroupID: groupID}).
 		First(group).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	users := make([]*model.GroupUserBelonging, 0)
@@ -51,7 +51,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	// Name, RealNameはusecasesでPortalから取得する
@@ -82,7 +82,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	erAdmin := make([]*domain.User, 0, len(admins))

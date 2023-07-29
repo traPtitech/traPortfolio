@@ -10,6 +10,7 @@ import (
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
@@ -146,13 +147,13 @@ const (
 func (h *SQLHandler) Error() error {
 	err := h.conn.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return database.ErrNoRows
+		return repository.ErrNotFound
 	}
 
 	// 外部キー制約エラーの変換
 	var mysqlErr *sqldriver.MySQLError
 	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
-		return database.ErrInvalidArgument
+		return repository.ErrInvalidArg
 	}
 
 	return err

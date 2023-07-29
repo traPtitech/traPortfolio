@@ -3,6 +3,7 @@ package domain
 import (
 	"database/sql"
 	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -49,7 +50,7 @@ func (e *EventLevel) Scan(src interface{}) error {
 	if s.Valid {
 		newEL := EventLevel(s.Byte)
 		if newEL >= EventLevelLimit {
-			return ErrTooLargeEnum
+			return fmt.Errorf("%w: EventLevel(%d) must be less than %d", ErrTooLargeEnum, newEL, EventLevelLimit)
 		}
 
 		*e = newEL

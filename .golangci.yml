@@ -3,3 +3,10 @@ linters:
     - gofmt
     - revive
     - whitespace
+
+# TODO: 多分次のgolangciのリリースでいらなくなる
+linters-settings:
+  revive:
+    rules:
+      - name: if-return
+        disabled: true
