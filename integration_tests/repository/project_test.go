@@ -84,7 +84,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			args: random.UpdateProjectArgs(),
 		},
 		{
-			name: "no fields",
+			name: "partial fields",
 			ctx:  context.Background(),
 			args: random.OptUpdateProjectArgs(),
 		},
