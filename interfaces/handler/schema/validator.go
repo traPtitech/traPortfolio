@@ -5,33 +5,8 @@ import (
 
 	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/domain"
 )
-
-type validator struct {
-	logger echo.Logger
-}
-
-func NewValidator(logger echo.Logger) echo.Validator {
-	return &validator{logger}
-}
-
-func (v *validator) Validate(i interface{}) error {
-	if vld, ok := i.(vd.Validatable); ok {
-		if err := vld.Validate(); err != nil {
-			if ie, ok := err.(vd.InternalError); ok {
-				v.logger.Fatalf("ozzo-validation internal error: %s", ie.Error())
-			}
-
-			return err
-		}
-	} else {
-		v.logger.Errorf("%T is not validatable", i)
-	}
-
-	return nil
-}
 
 var (
 	vdRuleNameLength        = vd.RuneLength(1, 32)
