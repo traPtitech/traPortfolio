@@ -23,10 +23,9 @@ func NewUserHandler(s service.UserService) *UserHandler {
 }
 
 // GetUsers GET /users
-func (h *UserHandler) GetUsers(_c echo.Context) error {
-	c := _c.(*Context)
+func (h *UserHandler) GetUsers(c echo.Context) error {
 	req := schema.GetUsersParams{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -51,10 +50,8 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 }
 
 // GetUser GET /users/:userID
-func (h *UserHandler) GetUser(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUser(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
@@ -79,16 +76,14 @@ func (h *UserHandler) GetUser(_c echo.Context) error {
 }
 
 // UpdateUser PATCH /users/:userID
-func (h *UserHandler) UpdateUser(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) UpdateUser(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditUserJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -105,10 +100,8 @@ func (h *UserHandler) UpdateUser(_c echo.Context) error {
 }
 
 // GetUserAccounts GET /users/:userID/accounts
-func (h *UserHandler) GetUserAccounts(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserAccounts(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
@@ -128,15 +121,13 @@ func (h *UserHandler) GetUserAccounts(_c echo.Context) error {
 }
 
 // GetUserAccount GET /users/:userID/accounts/:accountID
-func (h *UserHandler) GetUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
 
-	accountID, err := c.getID(keyUserAccountID)
+	accountID, err := getID(c, keyUserAccountID)
 	if err != nil {
 		return err
 	}
@@ -151,16 +142,14 @@ func (h *UserHandler) GetUserAccount(_c echo.Context) error {
 }
 
 // AddUserAccount POST /users/:userID/accounts
-func (h *UserHandler) AddUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) AddUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.AddUserAccountJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -180,21 +169,19 @@ func (h *UserHandler) AddUserAccount(_c echo.Context) error {
 }
 
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
-func (h *UserHandler) EditUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) EditUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
 
-	accountID, err := c.getID(keyUserAccountID)
+	accountID, err := getID(c, keyUserAccountID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditUserAccountJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -216,15 +203,13 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 }
 
 // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
-func (h *UserHandler) DeleteUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) DeleteUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
 
-	accountID, err := c.getID(keyUserAccountID)
+	accountID, err := getID(c, keyUserAccountID)
 	if err != nil {
 		return err
 	}
@@ -238,10 +223,8 @@ func (h *UserHandler) DeleteUserAccount(_c echo.Context) error {
 }
 
 // GetUserProjects GET /users/:userID/projects
-func (h *UserHandler) GetUserProjects(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserProjects(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
@@ -265,10 +248,8 @@ func (h *UserHandler) GetUserProjects(_c echo.Context) error {
 }
 
 // GetUserContests GET /users/:userID/contests
-func (h *UserHandler) GetUserContests(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserContests(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
@@ -295,10 +276,8 @@ func (h *UserHandler) GetUserContests(_c echo.Context) error {
 }
 
 // GetUserGroups GET /users/:userID/groups
-func (h *UserHandler) GetUserGroups(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserGroups(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}
@@ -320,10 +299,8 @@ func (h *UserHandler) GetUserGroups(_c echo.Context) error {
 }
 
 // GetUserEvents GET /users/:userID/events
-func (h *UserHandler) GetUserEvents(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserEvents(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
 		return err
 	}

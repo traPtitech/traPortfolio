@@ -26,9 +26,7 @@ func NewEventHandler(service service.EventService) *EventHandler {
 }
 
 // GetEvents GET /events
-func (h *EventHandler) GetEvents(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *EventHandler) GetEvents(c echo.Context) error {
 	ctx := c.Request().Context()
 	events, err := h.srv.GetEvents(ctx)
 	if err != nil {
@@ -44,10 +42,8 @@ func (h *EventHandler) GetEvents(_c echo.Context) error {
 }
 
 // GetEvent GET /events/:eventID
-func (h *EventHandler) GetEvent(_c echo.Context) error {
-	c := _c.(*Context)
-
-	eventID, err := c.getID(keyEventID)
+func (h *EventHandler) GetEvent(c echo.Context) error {
+	eventID, err := getID(c, keyEventID)
 	if err != nil {
 		return err
 	}
@@ -73,16 +69,14 @@ func (h *EventHandler) GetEvent(_c echo.Context) error {
 }
 
 // EditEvent PATCH /events/:eventID
-func (h *EventHandler) EditEvent(_c echo.Context) error {
-	c := _c.(*Context)
-
-	eventID, err := c.getID(keyEventID)
+func (h *EventHandler) EditEvent(c echo.Context) error {
+	eventID, err := getID(c, keyEventID)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditEventJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 

@@ -21,9 +21,7 @@ func NewGroupHandler(service service.GroupService) *GroupHandler {
 }
 
 // GetGroups GET /groups
-func (h *GroupHandler) GetGroups(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *GroupHandler) GetGroups(c echo.Context) error {
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetAllGroups(ctx)
 	if err != nil {
@@ -39,10 +37,8 @@ func (h *GroupHandler) GetGroups(_c echo.Context) error {
 }
 
 // GetGroup GET /groups/:groupID
-func (h *GroupHandler) GetGroup(_c echo.Context) error {
-	c := _c.(*Context)
-
-	groupID, err := c.getID(keyGroupID)
+func (h *GroupHandler) GetGroup(c echo.Context) error {
+	groupID, err := getID(c, keyGroupID)
 	if err != nil {
 		return err
 	}

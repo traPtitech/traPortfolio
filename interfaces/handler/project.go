@@ -20,9 +20,7 @@ func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 }
 
 // GetProjects GET /projects
-func (h *ProjectHandler) GetProjects(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ProjectHandler) GetProjects(c echo.Context) error {
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
@@ -38,10 +36,8 @@ func (h *ProjectHandler) GetProjects(_c echo.Context) error {
 }
 
 // GetProject GET /projects/:projectID
-func (h *ProjectHandler) GetProject(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) GetProject(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
@@ -69,11 +65,9 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 }
 
 // CreateProject POST /projects
-func (h *ProjectHandler) CreateProject(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	req := schema.CreateProjectJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -104,16 +98,14 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 }
 
 // EditProject PATCH /projects/:projectID
-func (h *ProjectHandler) EditProject(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) EditProject(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
 
 	req := schema.EditProjectJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -147,10 +139,8 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 }
 
 // GetProjectMembers GET /projects/:projectID/members
-func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
@@ -173,16 +163,14 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 }
 
 // AddProjectMembers POST /projects/:projectID/members
-func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
 
 	req := schema.AddProjectMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
@@ -212,16 +200,14 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 }
 
 // DeleteProjectMembers DELETE /projects/:projectID/members
-func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
 
 	req := schema.DeleteProjectMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
