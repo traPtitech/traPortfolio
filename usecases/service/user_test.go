@@ -161,12 +161,9 @@ func TestUserService_Update(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-				args: &repository.UpdateUserArgs{
-					Description: random.Optional(random.AlphaNumeric()),
-					Check:       random.Optional(random.Bool()),
-				},
+				ctx:  context.Background(),
+				id:   random.UUID(),
+				args: random.OptUpdateUserArgs(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				repo.EXPECT().UpdateUser(args.ctx, args.id, args.args).Return(nil)
@@ -176,12 +173,9 @@ func TestUserService_Update(t *testing.T) {
 		{
 			name: "Notfound",
 			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-				args: &repository.UpdateUserArgs{
-					Description: random.Optional(random.AlphaNumeric()),
-					Check:       random.Optional(random.Bool()),
-				},
+				ctx:  context.Background(),
+				id:   random.UUID(),
+				args: random.UpdateUserArgs(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				repo.EXPECT().UpdateUser(args.ctx, args.id, args.args).Return(repository.ErrNotFound)
@@ -403,12 +397,7 @@ func TestUserService_EditAccount(t *testing.T) {
 				ctx:       context.Background(),
 				userID:    random.UUID(),
 				accountID: random.UUID(),
-				args: &repository.UpdateAccountArgs{
-					DisplayName: random.Optional(random.AlphaNumeric()),
-					Type:        random.Optional(random.Iotan(domain.AccountLimit)),
-					URL:         random.Optional(random.RandURLString()),
-					PrPermitted: random.Optional(random.Bool()),
-				},
+				args:      random.OptUpdateAccountArgs(),
 			},
 			setup: func(repo *mock_repository.MockUserRepository, event *mock_repository.MockEventRepository, args args) {
 				repo.EXPECT().UpdateAccount(args.ctx, args.userID, args.accountID, args.args).Return(repository.ErrNotFound)

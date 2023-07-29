@@ -268,10 +268,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	user := mockdata.MockUsers[idx]
 	portalUser := mockdata.MockPortalUsers[idx]
 	traqUser := mockdata.MockTraQUsers[idx]
-	args := &urepository.UpdateUserArgs{
-		Description: random.Optional(random.AlphaNumeric()),
-		Check:       random.Optional(random.Bool()),
-	}
+	args := random.OptUpdateUserArgs()
 
 	err = repo.UpdateUser(context.Background(), user.ID, args)
 	assert.NoError(t, err)

@@ -12,7 +12,6 @@ import (
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
-	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -76,15 +75,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	mustMakeProjectDetail(t, repo, nil)
 
-	arg1 := urepository.UpdateProjectArgs{
-		Name:          random.Optional(random.AlphaNumeric()),
-		Description:   random.Optional(random.AlphaNumeric()),
-		Link:          random.Optional(random.AlphaNumeric()),
-		SinceYear:     random.Optional(int64(2100)), // TODO: intでよさそう
-		SinceSemester: random.Optional(int64(2)),
-		UntilYear:     random.Optional(int64(2100)),
-		UntilSemester: random.Optional(int64(2)),
-	}
+	arg1 := random.OptUpdateProjectArgs()
 
 	if v, ok := arg1.Name.V(); ok {
 		project1.Name = v
@@ -108,7 +99,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		}
 	}
 
-	err := repo.UpdateProject(context.Background(), project1.ID, &arg1)
+	err := repo.UpdateProject(context.Background(), project1.ID, arg1)
 	assert.NoError(t, err)
 
 	got, err := repo.GetProject(context.Background(), project1.ID)

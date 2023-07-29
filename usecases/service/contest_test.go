@@ -310,15 +310,9 @@ func TestContestService_UpdateContest(t *testing.T) {
 		{
 			name: "Success",
 			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-				args: &repository.UpdateContestArgs{
-					Name:        random.Optional(random.AlphaNumeric()),
-					Description: random.Optional(random.AlphaNumeric()),
-					Link:        random.Optional(random.RandURLString()),
-					Since:       random.Optional(random.Time()),
-					Until:       random.Optional(random.Time()),
-				},
+				ctx:  context.Background(),
+				id:   random.UUID(),
+				args: random.OptUpdateContestArgs(),
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -329,15 +323,9 @@ func TestContestService_UpdateContest(t *testing.T) {
 		{
 			name: "ErrUpdate",
 			args: args{
-				ctx: context.Background(),
-				id:  random.UUID(),
-				args: &repository.UpdateContestArgs{
-					Name:        random.Optional(random.AlphaNumeric()),
-					Description: random.Optional(random.AlphaNumeric()),
-					Link:        random.Optional(random.RandURLString()),
-					Since:       random.Optional(random.Time()),
-					Until:       random.Optional(random.Time()),
-				},
+				ctx:  context.Background(),
+				id:   random.UUID(),
+				args: random.OptUpdateContestArgs(),
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -735,12 +723,7 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				teamID: random.UUID(),
-				args: &repository.UpdateContestTeamArgs{
-					Name:        random.Optional(random.AlphaNumeric()),
-					Result:      random.Optional(random.AlphaNumeric()),
-					Link:        random.Optional(random.RandURLString()),
-					Description: random.Optional(random.AlphaNumeric()),
-				},
+				args:   random.OptUpdateContestTeamArgs(),
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
@@ -766,12 +749,7 @@ func TestContestService_UpdateContestTeam(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				teamID: random.UUID(),
-				args: &repository.UpdateContestTeamArgs{
-					Name:        random.Optional(random.AlphaNumeric()),
-					Result:      random.Optional(random.AlphaNumeric()),
-					Link:        random.Optional(random.RandURLString()),
-					Description: random.Optional(random.AlphaNumeric()),
-				},
+				args:   random.OptUpdateContestTeamArgs(),
 			},
 			setup: func(f fields, args args) {
 				repo := f.repo.(*mock_repository.MockContestRepository)

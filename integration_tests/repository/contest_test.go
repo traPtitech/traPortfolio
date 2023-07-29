@@ -66,13 +66,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
 
-	args := urepository.UpdateContestArgs{
-		Name:        random.Optional(random.AlphaNumeric()),
-		Description: random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Since:       random.Optional(random.Time()),
-		Until:       random.Optional(random.Time()),
-	}
+	args := random.UpdateContestArgs()
 	if v, ok := args.Name.V(); ok {
 		contest1.Name = v
 	}
@@ -89,7 +83,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 		contest1.TimeEnd = v
 	}
 
-	err := repo.UpdateContest(context.Background(), contest1.ID, &args)
+	err := repo.UpdateContest(context.Background(), contest1.ID, args)
 	assert.NoError(t, err)
 
 	gotContest1, err := repo.GetContest(context.Background(), contest1.ID)
@@ -235,12 +229,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 		Description: random.AlphaNumeric(),
 	})
 
-	args1 := &urepository.UpdateContestTeamArgs{
-		Name:        random.Optional(random.AlphaNumeric()),
-		Result:      random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Description: random.Optional(random.AlphaNumeric()),
-	}
+	args1 := random.UpdateContestTeamArgs()
 	if v, ok := args1.Name.V(); ok {
 		team1.Name = v
 	}
