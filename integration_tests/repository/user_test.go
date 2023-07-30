@@ -264,47 +264,62 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	assert.NoError(t, err)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
-	idx := 1
-	user := mockdata.MockUsers[idx]
-	portalUser := mockdata.MockPortalUsers[idx]
-	traqUser := mockdata.MockTraQUsers[idx]
-	args := &urepository.UpdateUserArgs{
-		Description: random.Optional(random.AlphaNumeric()),
-		Check:       random.Optional(random.Bool()),
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateUserArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateUserArgs(),
+		},
+		{
+			name: "partial fields",
+			ctx:  context.Background(),
+			args: random.OptUpdateUserArgs(),
+		},
 	}
+	for i, tt := range tests {
+		// FIXME: i=0の時はAccountが存在するため失敗する
+		i := i + 1
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			user := mockdata.MockUsers[i]
+			portalUser := mockdata.MockPortalUsers[i]
+			traqUser := mockdata.MockTraQUsers[i]
+			args := tt.args
 
-	err = repo.UpdateUser(context.Background(), user.ID, args)
-	assert.NoError(t, err)
+			err := repo.UpdateUser(tt.ctx, user.ID, args)
+			assert.NoError(t, err)
 
-	var bio string
-	if v, ok := args.Description.V(); ok {
-		bio = v
-	} else {
-		bio = user.Description
+			bio := user.Description
+			if v, ok := args.Description.V(); ok {
+				bio = v
+			}
+			check := user.Check
+			if v, ok := args.Check.V(); ok {
+				check = v
+			}
+
+			expected := &domain.UserDetail{
+				User: *domain.NewUser(
+					user.ID,
+					user.Name,
+					portalUser.RealName,
+					check,
+				),
+				State:    traqUser.User.State,
+				Bio:      bio,
+				Accounts: []*domain.Account{},
+			}
+			got, err := repo.GetUser(tt.ctx, user.ID)
+			assert.NoError(t, err)
+
+			assert.Equal(t, expected, got)
+		})
 	}
-
-	var check bool
-	if v, ok := args.Check.V(); ok {
-		check = v
-	} else {
-		check = user.Check
-	}
-
-	expected := &domain.UserDetail{
-		User: *domain.NewUser(
-			user.ID,
-			user.Name,
-			portalUser.RealName,
-			check,
-		),
-		State:    traqUser.User.State,
-		Bio:      bio,
-		Accounts: []*domain.Account{},
-	}
-	got, err := repo.GetUser(context.Background(), user.ID)
-	assert.NoError(t, err)
-
-	assert.Equal(t, expected, got)
 }
 
 func TestUserRepository_GetAccounts(t *testing.T) {
