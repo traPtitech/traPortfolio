@@ -50,12 +50,16 @@ func FromPtr[T any](v *T) Of[T] {
 	}
 }
 
-func (o Of[T]) ValueOrZero() T {
+func (o Of[T]) ValueOr(v T) T {
 	if o.valid {
 		return o.v
 	}
-	var t T
-	return t
+	return v
+}
+
+func (o Of[T]) ValueOrZero() T {
+	var zero T
+	return o.ValueOr(zero)
 }
 
 func (o Of[T]) V() (T, bool) {
