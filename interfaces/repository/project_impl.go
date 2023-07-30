@@ -109,9 +109,7 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 		UntilYear:     args.UntilYear,
 		UntilSemester: args.UntilSemester,
 	}
-	if v, ok := args.Link.V(); ok {
-		p.Link = v
-	}
+	p.Link = args.Link.ValueOr(p.Link)
 
 	err := r.h.WithContext(ctx).Create(&p).Error()
 	if err != nil {

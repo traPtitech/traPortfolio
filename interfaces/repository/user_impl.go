@@ -45,11 +45,7 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 
-	limit := -1
-
-	if v, ok := args.Limit.V(); ok {
-		limit = v
-	}
+	limit := args.Limit.ValueOr(-1)
 
 	if err != nil {
 		return nil, err

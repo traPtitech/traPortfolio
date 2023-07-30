@@ -294,14 +294,8 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			err := repo.UpdateUser(tt.ctx, user.ID, args)
 			assert.NoError(t, err)
 
-			bio := user.Description
-			if v, ok := args.Description.V(); ok {
-				bio = v
-			}
-			check := user.Check
-			if v, ok := args.Check.V(); ok {
-				check = v
-			}
+			bio := args.Description.ValueOr(user.Description)
+			check := args.Check.ValueOr(user.Check)
 
 			expected := &domain.UserDetail{
 				User: *domain.NewUser(
@@ -432,18 +426,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		URL:         optional.From(random.AccountURLString(accountType3)),
 		PrPermitted: random.Optional(random.Bool()),
 	}
-	if v, ok := args.DisplayName.V(); ok {
-		account1.DisplayName = v
-	}
-	if v, ok := args.Type.V(); ok {
-		account1.Type = v
-	}
-	if v, ok := args.URL.V(); ok {
-		account1.URL = v
-	}
-	if v, ok := args.PrPermitted.V(); ok {
-		account1.PrPermitted = v
-	}
+	account1.DisplayName = args.DisplayName.ValueOr(account1.DisplayName)
+	account1.Type = args.Type.ValueOr(account1.Type)
+	account1.URL = args.URL.ValueOr(account1.URL)
+	account1.PrPermitted = args.PrPermitted.ValueOr(account1.PrPermitted)
 	err = repo.UpdateAccount(context.Background(), user.ID, account1.ID, args)
 	assert.NoError(t, err)
 
