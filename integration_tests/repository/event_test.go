@@ -22,8 +22,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("event_repository_get_events")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
 	for _, e := range mockdata.MockKnoqEvents {
@@ -46,8 +46,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("event_repository_get_event")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
 	selected := mockdata.MockKnoqEvents[rand.Intn(len(mockdata.MockKnoqEvents)-1)]
@@ -92,8 +92,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("event_repository_update_event_level")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
 
@@ -124,8 +124,8 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("event_repository_get_user_events")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
 	for _, e := range mockdata.MockKnoqEvents {

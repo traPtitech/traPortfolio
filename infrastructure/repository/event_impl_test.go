@@ -10,7 +10,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -20,13 +19,13 @@ import (
 )
 
 type mockEventRepositoryFields struct {
-	h    *mock_database.MockSQLHandler
+	h    *MockSQLHandler
 	knoq *mock_external.MockKnoqAPI
 }
 
 func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFields {
 	return mockEventRepositoryFields{
-		h:    mock_database.NewMockSQLHandler(),
+		h:    NewMockSQLHandler(),
 		knoq: mock_external.NewMockKnoqAPI(ctrl),
 	}
 }
@@ -82,7 +81,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.want)
-			repo := NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h.Conn, f.knoq)
 			// Assertion
 			got, err := repo.GetEvents(context.Background())
 			tt.assertion(t, err)
@@ -210,7 +209,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h.Conn, f.knoq)
 			// Assertion
 			got, err := repo.GetEvent(context.Background(), tt.args.id)
 			tt.assertion(t, err)
@@ -313,7 +312,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h.Conn, f.knoq)
 			// Assertion
 			err := repo.CreateEventLevel(context.Background(), tt.args.args)
 			tt.assertion(t, err)
@@ -425,7 +424,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h.Conn, f.knoq)
 			// Assertion
 			tt.assertion(t, repo.UpdateEventLevel(context.Background(), tt.args.id, tt.args.arg))
 		})
@@ -490,7 +489,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockEventRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewEventRepository(f.h, f.knoq)
+			repo := NewEventRepository(f.h.Conn, f.knoq)
 			// Assertion
 			got, err := repo.GetUserEvents(context.Background(), tt.args.userID)
 			tt.assertion(t, err)

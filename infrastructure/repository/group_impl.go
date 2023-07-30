@@ -6,21 +6,21 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"gorm.io/gorm"
 )
 
 type GroupRepository struct {
-	h database.SQLHandler
+	h *gorm.DB
 }
 
-func NewGroupRepository(sql database.SQLHandler) repository.GroupRepository {
+func NewGroupRepository(sql *gorm.DB) repository.GroupRepository {
 	return &GroupRepository{h: sql}
 }
 
 func (r *GroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
 	groups := make([]*model.Group, 0)
-	err := r.h.WithContext(ctx).Find(&groups).Error()
+	err := r.h.WithContext(ctx).Find(&groups).Error
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		WithContext(ctx).
 		Where(&model.Group{GroupID: groupID}).
 		First(group).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		WithContext(ctx).
 		Where(&model.GroupUserBelonging{GroupID: groupID}).
 		Find(&users).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -81,7 +81,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		WithContext(ctx).
 		Where(&model.GroupUserAdmin{GroupID: groupID}).
 		Find(&admins).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 

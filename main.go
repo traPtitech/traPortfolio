@@ -31,7 +31,7 @@ func main() {
 			log.Fatal("cannot specify both `production` and `insert-mock-data`")
 		}
 
-		if err := mockdata.InsertSampleDataToDB(infrastructure.NewSQLHandler(db)); err != nil {
+		if err := mockdata.InsertSampleDataToDB(db); err != nil {
 			log.Fatal(err)
 		}
 	}

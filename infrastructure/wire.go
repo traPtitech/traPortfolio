@@ -46,10 +46,6 @@ var contestSet = wire.NewSet(
 	handler.NewContestHandler,
 )
 
-var sqlSet = wire.NewSet(
-	NewSQLHandler,
-)
-
 var externalSet = wire.NewSet(
 	NewKnoqAPI,
 	NewPortalAPI,
@@ -78,7 +74,6 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 		eventSet,
 		groupSet,
 		contestSet,
-		sqlSet,
 		externalSet,
 		apiSet,
 		confSet,

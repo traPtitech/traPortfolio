@@ -15,21 +15,20 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type mockUserRepositoryFields struct {
-	h      *mock_database.MockSQLHandler
+	h      *MockSQLHandler
 	portal *mock_external.MockPortalAPI
 	traq   *mock_external.MockTraQAPI
 }
 
 func newMockUserRepositoryFields(ctrl *gomock.Controller) mockUserRepositoryFields {
 	return mockUserRepositoryFields{
-		h:      mock_database.NewMockSQLHandler(),
+		h:      NewMockSQLHandler(),
 		portal: mock_external.NewMockPortalAPI(ctrl),
 		traq:   mock_external.NewMockTraQAPI(ctrl),
 	}
@@ -324,7 +323,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(t, f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUsers(context.Background(), tt.args.args)
 			tt.assertion(t, err)
@@ -468,7 +467,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetUser(context.Background(), tt.args.id)
 			tt.assertion(t, err)
@@ -573,7 +572,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.CreateUser(context.Background(), tt.args.args)
 			if tt.want != nil && got != nil {
@@ -660,7 +659,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccounts(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
@@ -730,7 +729,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetAccount(context.Background(), tt.args.userID, tt.args.accountID)
 			tt.assertion(t, err)
@@ -831,7 +830,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.UpdateUser(context.Background(), tt.args.id, tt.args.args))
 		})
@@ -996,7 +995,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.CreateAccount(context.Background(), tt.args.id, tt.args.args)
 			tt.assertion(t, err)
@@ -1164,7 +1163,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.UpdateAccount(context.Background(), tt.args.userID, tt.args.accountID, tt.args.args))
 		})
@@ -1247,7 +1246,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			tt.assertion(t, repo.DeleteAccount(context.Background(), tt.args.userID, tt.args.accountID))
 		})
@@ -1340,7 +1339,7 @@ func TestUserRepository_GetProjects(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetProjects(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
@@ -1433,7 +1432,7 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetGroupsByUserID(context.Background(), tt.args.userID)
 			tt.assertion(t, err)
@@ -1605,7 +1604,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			f := newMockUserRepositoryFields(ctrl)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewUserRepository(f.h, f.portal, f.traq)
+			repo := NewUserRepository(f.h.Conn, f.portal, f.traq)
 			// Assertion
 			got, err := repo.GetContests(context.Background(), tt.args.userID)
 			tt.assertion(t, err)

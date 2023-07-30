@@ -22,8 +22,8 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_projects")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
 	var projects []*domain.Project
@@ -42,8 +42,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_project")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
 	var projects []*domain.ProjectDetail
@@ -70,8 +70,8 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_update_project")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	mustMakeProjectDetail(t, repo, nil)
@@ -125,10 +125,10 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_get_project_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	project2 := mustMakeProjectDetail(t, repo, nil)
@@ -209,10 +209,10 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	project2 := mustMakeProjectDetail(t, repo, nil)

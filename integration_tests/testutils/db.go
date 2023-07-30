@@ -8,9 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -30,15 +28,6 @@ func SetupGormDB(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	assert.NoError(t, err)
 
 	return db
-}
-
-func SetupSQLHandler(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandler {
-	t.Helper()
-
-	db := SetupGormDB(t, sqlConf)
-
-	h := infrastructure.NewSQLHandler(db)
-	return h
 }
 
 func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {

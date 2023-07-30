@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"log"
 	"regexp"
 	"testing"
 	"time"
@@ -14,6 +15,9 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -21,6 +25,30 @@ var (
 
 	errUnexpected = errors.New("unexpected error")
 )
+
+type MockSQLHandler struct {
+	Conn *gorm.DB
+	Mock sqlmock.Sqlmock
+}
+
+func NewMockSQLHandler() *MockSQLHandler {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conf := mysql.Config{SkipInitializeWithVersion: true}
+	conf.Conn = db
+
+	engine, err := gorm.Open(mysql.New(conf), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &MockSQLHandler{engine, mock}
+}
 
 type anyTime struct{}
 

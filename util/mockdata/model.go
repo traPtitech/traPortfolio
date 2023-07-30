@@ -5,7 +5,7 @@ import (
 
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"gorm.io/gorm"
 )
 
 var (
@@ -238,57 +238,57 @@ func CloneMockProjectMembers() []*model.ProjectMember {
 	}
 }
 
-func InsertSampleDataToDB(h database.SQLHandler) error {
+func InsertSampleDataToDB(h *gorm.DB) error {
 	mockUsers := CloneMockUsers()
-	if err := h.Create(&mockUsers).Error(); err != nil {
+	if err := h.Create(&mockUsers).Error; err != nil {
 		return err
 	}
 
 	mockAccounts := CloneMockAccounts()
-	if err := h.Create(&mockAccounts).Error(); err != nil {
+	if err := h.Create(&mockAccounts).Error; err != nil {
 		return err
 	}
 
 	mockContests := CloneMockContests()
-	if err := h.Create(&mockContests).Error(); err != nil {
+	if err := h.Create(&mockContests).Error; err != nil {
 		return err
 	}
 
 	mockContestTeams := CloneMockContestTeams()
-	if err := h.Create(&mockContestTeams).Error(); err != nil {
+	if err := h.Create(&mockContestTeams).Error; err != nil {
 		return err
 	}
 
 	mockContestTeamUserBelongings := CloneMockContestTeamUserBelongings()
-	if err := h.Create(&mockContestTeamUserBelongings).Error(); err != nil {
+	if err := h.Create(&mockContestTeamUserBelongings).Error; err != nil {
 		return err
 	}
 
 	mockEventLevelRelations := CloneMockEventLevelRelations()
-	if err := h.Create(&mockEventLevelRelations).Error(); err != nil {
+	if err := h.Create(&mockEventLevelRelations).Error; err != nil {
 		return err
 	}
 
 	mockGroups := CloneMockGroups()
-	if err := h.Create(&mockGroups).Error(); err != nil {
+	if err := h.Create(&mockGroups).Error; err != nil {
 		return err
 	}
 
 	mockGroupUserBelongings := CloneMockGroupUserBelongings()
-	if err := h.Create(&mockGroupUserBelongings).Error(); err != nil {
+	if err := h.Create(&mockGroupUserBelongings).Error; err != nil {
 		return err
 	}
 
 	mockProjects := CloneMockProjects()
-	if err := h.Create(&mockProjects).Error(); err != nil {
+	if err := h.Create(&mockProjects).Error; err != nil {
 		return err
 	}
 
 	mockGroupUserAdmins := CloneMockGroupUserAdmins()
-	if err := h.Create(&mockGroupUserAdmins).Error(); err != nil {
+	if err := h.Create(&mockGroupUserAdmins).Error; err != nil {
 		return err
 	}
 
 	mockProjectMembers := CloneMockProjectMembers()
-	return h.Create(&mockProjectMembers).Error()
+	return h.Create(&mockProjectMembers).Error
 }

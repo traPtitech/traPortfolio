@@ -7,17 +7,17 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"gorm.io/gorm"
 )
 
 type EventRepository struct {
-	h    database.SQLHandler
+	h    *gorm.DB
 	knoq external.KnoqAPI
 }
 
-func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) repository.EventRepository {
+func NewEventRepository(sql *gorm.DB, knoq external.KnoqAPI) repository.EventRepository {
 	return &EventRepository{h: sql, knoq: knoq}
 }
 
@@ -91,7 +91,7 @@ func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.
 		Level: arg.Level,
 	}
 
-	err = r.h.WithContext(ctx).Create(&relation).Error()
+	err = r.h.WithContext(ctx).Create(&relation).Error
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 		return nil // updateする必要がないのでここでcommitする
 	}
 
-	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if elv, err := r.getEventLevelByID(ctx, eventID); err != nil {
 			return err
 		} else if elv.Level == newLevel {
@@ -116,7 +116,7 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 			WithContext(ctx).
 			Model(&model.EventLevelRelation{ID: eventID}).
 			Update("level", newLevel).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -154,7 +154,7 @@ func (r *EventRepository) getEventLevelByID(ctx context.Context, eventID uuid.UU
 		WithContext(ctx).
 		Where(&model.EventLevelRelation{ID: eventID}).
 		First(elv).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
