@@ -1,18 +1,47 @@
 package repository
 
 import (
+	"errors"
+
+	mysqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
+const (
+	ErrCodeInvalidConstraint = 1452
+)
+
+type dialector struct {
+	gorm.Dialector
+}
+
+// override Translate(err error) error
+func (d dialector) Translate(err error) error {
+	if translater, ok := d.Dialector.(gorm.ErrorTranslator); ok {
+		err = translater.Translate(err)
+	}
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return repository.ErrNotFound
+	}
+
+	// 外部キー制約エラーの変換
+	var mysqlErr *mysqldriver.MySQLError
+	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
+		return repository.ErrInvalidArg
+	}
+
+	return err
+}
+
 func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
-	engine, err := gorm.Open(
-		mysql.New(mysql.Config{DSN: conf.Dsn()}),
-		conf.GormConfig(),
-	)
+	dialector := dialector{mysql.New(mysql.Config{DSN: conf.Dsn()})}
+	engine, err := gorm.Open(dialector, conf.GormConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -39,22 +68,3 @@ func initDB(db *gorm.DB) error {
 	}
 	return nil
 }
-
-const (
-	ErrCodeInvalidConstraint = 1452
-)
-
-// func (h *SQLHandler) Error() error {
-// 	err := h.conn.Error
-// 	if errors.Is(err, gorm.ErrRecordNotFound) {
-// 		return repository.ErrNotFound
-// 	}
-
-// 	// 外部キー制約エラーの変換
-// 	var mysqlErr *sqldriver.MySQLError
-// 	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
-// 		return repository.ErrInvalidArg
-// 	}
-
-// 	return err
-// }

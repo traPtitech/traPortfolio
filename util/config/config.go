@@ -238,5 +238,6 @@ func (c *SQLConfig) GormConfig() *gorm.Config {
 		NowFunc: func() time.Time {
 			return time.Now().Truncate(time.Microsecond)
 		},
+		TranslateError: true,
 	}
 }

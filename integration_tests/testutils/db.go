@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -40,8 +40,7 @@ func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB
 	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 	assert.NoError(t, err)
 
-	dsn := sqlConf.Dsn()
-	db, err := gorm.Open(mysql.Open(dsn), sqlConf.GormConfig())
+	db, err := repository.NewGormDB(sqlConf)
 	assert.NoError(t, err)
 
 	return db
