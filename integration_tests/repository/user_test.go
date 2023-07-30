@@ -285,6 +285,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 		i := i + 1
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			user := mockdata.MockUsers[i]
 			portalUser := mockdata.MockPortalUsers[i]
 			traqUser := mockdata.MockTraQUsers[i]
