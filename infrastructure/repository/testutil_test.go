@@ -40,7 +40,8 @@ func NewMockSQLHandler() *MockSQLHandler {
 	conf := mysql.Config{SkipInitializeWithVersion: true}
 	conf.Conn = db
 
-	engine, err := gorm.Open(mysql.New(conf), &gorm.Config{
+	d := dialector{mysql.New(conf)}
+	engine, err := gorm.Open(d, &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {

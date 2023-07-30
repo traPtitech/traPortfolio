@@ -40,8 +40,8 @@ func (d dialector) Translate(err error) error {
 }
 
 func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
-	dialector := dialector{mysql.New(mysql.Config{DSN: conf.Dsn()})}
-	engine, err := gorm.Open(dialector, conf.GormConfig())
+	d := dialector{mysql.New(mysql.Config{DSN: conf.Dsn()})}
+	engine, err := gorm.Open(d, conf.GormConfig())
 	if err != nil {
 		return nil, err
 	}
