@@ -2,7 +2,7 @@ package migration
 
 import (
 	"github.com/go-gormigrate/gormigrate/v2"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 )
 
 // Migrations is all db migrations

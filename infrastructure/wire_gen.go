@@ -9,7 +9,7 @@ package infrastructure
 import (
 	"github.com/google/wire"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/interfaces/repository"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/gorm"
