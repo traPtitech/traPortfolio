@@ -53,18 +53,10 @@ func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 
 	db.SetMaxIdleConns(2)
 	db.SetMaxOpenConns(16)
-	if err := initDB(engine); err != nil {
+
+	if _, err := migration.Migrate(engine, migration.AllTables()); err != nil {
 		return nil, err
 	}
 
 	return engine, nil
-}
-
-// initDB データベースのスキーマを更新
-func initDB(db *gorm.DB) error {
-	_, err := migration.Migrate(db, migration.AllTables())
-	if err != nil {
-		return err
-	}
-	return nil
 }
