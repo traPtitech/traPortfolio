@@ -86,21 +86,11 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			contest2 := mustMakeContest(t, repo, nil)
 
 			args := tt.args
-			if v, ok := args.Name.V(); ok {
-				contest1.Name = v
-			}
-			if v, ok := args.Description.V(); ok {
-				contest1.Description = v
-			}
-			if v, ok := args.Link.V(); ok {
-				contest1.Link = v
-			}
-			if v, ok := args.Since.V(); ok {
-				contest1.TimeStart = v
-			}
-			if v, ok := args.Until.V(); ok {
-				contest1.TimeEnd = v
-			}
+			contest1.Name = args.Name.ValueOr(contest1.Name)
+			contest1.Description = args.Description.ValueOr(contest1.Description)
+			contest1.Link = args.Link.ValueOr(contest1.Link)
+			contest1.TimeStart = args.Since.ValueOr(contest1.TimeStart)
+			contest1.TimeEnd = args.Until.ValueOr(contest1.TimeEnd)
 
 			err := repo.UpdateContest(context.Background(), contest1.ID, args)
 			assert.NoError(t, err)
@@ -264,18 +254,10 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			})
 
 			args := tt.args
-			if v, ok := args.Name.V(); ok {
-				team.Name = v
-			}
-			if v, ok := args.Result.V(); ok {
-				team.Result = v
-			}
-			if v, ok := args.Link.V(); ok {
-				team.Link = v
-			}
-			if v, ok := args.Description.V(); ok {
-				team.Description = v
-			}
+			team.Name = args.Name.ValueOr(team.Name)
+			team.Result = args.Result.ValueOr(team.Result)
+			team.Link = args.Link.ValueOr(team.Link)
+			team.Description = args.Description.ValueOr(team.Description)
 
 			err := repo.UpdateContestTeam(tt.ctx, team.ID, args)
 			assert.NoError(t, err)

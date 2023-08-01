@@ -97,15 +97,9 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 
 			arg1 := tt.args
 
-			if v, ok := arg1.Name.V(); ok {
-				project1.Name = v
-			}
-			if v, ok := arg1.Description.V(); ok {
-				project1.Description = v
-			}
-			if v, ok := arg1.Link.V(); ok {
-				project1.Link = v
-			}
+			project1.Name = arg1.Name.ValueOr(project1.Name)
+			project1.Description = arg1.Description.ValueOr(project1.Description)
+			project1.Link = arg1.Link.ValueOr(project1.Link)
 			if sy, ok := arg1.SinceYear.V(); ok {
 				if ss, ok := arg1.SinceSemester.V(); ok {
 					project1.Duration.Since.Year = int(sy)
