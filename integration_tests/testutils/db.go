@@ -44,15 +44,14 @@ func SetupSQLHandler(t *testing.T, sqlConf *config.SQLConfig) database.SQLHandle
 func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	t.Helper()
 
-	dbDsn := sqlConf.DsnWithoutName()
+	dbDsn := sqlConf.DsnConfigWithoutName().FormatDSN()
 	conn, err := sql.Open("mysql", dbDsn)
 	assert.NoError(t, err)
 	defer conn.Close()
 	_, err = conn.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 	assert.NoError(t, err)
 
-	dsn := sqlConf.Dsn()
-	db, err := gorm.Open(mysql.Open(dsn), sqlConf.GormConfig())
+	db, err := gorm.Open(mysql.New(mysql.Config{DSNConfig: sqlConf.DsnConfig()}), sqlConf.GormConfig())
 	assert.NoError(t, err)
 
 	return db
@@ -69,7 +68,7 @@ func WaitTestDBConnection(conf *config.SQLConfig) <-chan struct{} {
 }
 
 func waitTestDBConnection(conf *config.SQLConfig) {
-	dbDsn := conf.Dsn()
+	dbDsn := conf.DsnConfig().FormatDSN()
 	conn, err := sql.Open("mysql", dbDsn)
 	if err != nil {
 		panic(err)
