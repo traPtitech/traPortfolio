@@ -20,7 +20,7 @@ import (
 func TestProjectRepository_GetProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_get_projects")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_get_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -40,7 +40,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 func TestProjectRepository_GetProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_get_project")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -68,7 +68,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_update_project")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_update_project")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -130,7 +130,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_get_project_members")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -214,7 +214,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_delete_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)

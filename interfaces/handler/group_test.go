@@ -27,6 +27,8 @@ func setupGroupMock(t *testing.T) (*mock_service.MockGroupService, API) {
 }
 
 func TestGroupHandler_GetGroups(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockGroupService) (hres []*schema.Group, path string)
@@ -69,7 +71,9 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupGroupMock(t)
 
@@ -86,6 +90,8 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 }
 
 func TestGroupHandler_GetGroup(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockGroupService) (hres *schema.GroupDetail, path string)
@@ -197,7 +203,9 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupGroupMock(t)
 

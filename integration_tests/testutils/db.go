@@ -22,10 +22,6 @@ func SetupGormDB(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	dropAll(t, db)
 	init, err := migration.Migrate(db, migration.AllTables())
 	assert.True(t, init)
-
-	if err != nil {
-		panic(err)
-	}
 	assert.NoError(t, err)
 
 	return db
@@ -46,13 +42,9 @@ func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB
 	{
 		// テスト用DBが存在しない場合は作成する
 		db, err := gorm.Open(mysql.New(mysql.Config{DSNConfig: sqlConf.DsnConfigWithoutName()}), sqlConf.GormConfig())
-		if err != nil {
-			panic(err)
-		}
+		assert.NoError(t, err)
 		sqlDB, err := db.DB()
-		if err != nil {
-			panic(err)
-		}
+		assert.NoError(t, err)
 		defer sqlDB.Close()
 		_, err = sqlDB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 		assert.NoError(t, err)
