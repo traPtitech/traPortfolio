@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"regexp"
 	"testing"
 	"time"
@@ -82,9 +83,7 @@ func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *exter
 	t.Helper()
 
 	eargs, err := makeTraqGetAllArgs(rargs)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 
 	return eargs
 }
