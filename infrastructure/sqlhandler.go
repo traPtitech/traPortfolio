@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	sqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -147,13 +148,13 @@ const (
 func (h *SQLHandler) Error() error {
 	err := h.conn.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return repository.ErrNotFound
+		return fmt.Errorf("%w: %w", repository.ErrNotFound, err)
 	}
 
 	// 外部キー制約エラーの変換
 	var mysqlErr *sqldriver.MySQLError
 	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
-		return repository.ErrInvalidArg
+		return fmt.Errorf("%w: %w", repository.ErrInvalidArg, err)
 	}
 
 	return err
