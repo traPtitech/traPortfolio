@@ -24,7 +24,8 @@ type mockEventRepositoryFields struct {
 	knoq *mock_external.MockKnoqAPI
 }
 
-func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFields {
+func newMockEventRepositoryFields(t *testing.T, ctrl *gomock.Controller) mockEventRepositoryFields {
+	t.Helper()
 	return mockEventRepositoryFields{
 		h:    mock_database.NewMockSQLHandler(),
 		knoq: mock_external.NewMockKnoqAPI(ctrl),
@@ -61,7 +62,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
-				f.knoq.EXPECT().GetAll().Return(makeKnoqEvents(want), nil)
+				f.knoq.EXPECT().GetAll().Return(makeKnoqEvents(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -80,7 +81,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -125,7 +126,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(t, want), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
@@ -166,7 +167,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(t, want), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(repository.ErrNotFound)
@@ -194,7 +195,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}
-				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(&ed), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(t, &ed), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(errUnexpected)
@@ -208,7 +209,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -311,7 +312,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -423,7 +424,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -466,7 +467,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
-				f.knoq.EXPECT().GetByUserID(args.userID).Return(makeKnoqEvents(want), nil)
+				f.knoq.EXPECT().GetByUserID(args.userID).Return(makeKnoqEvents(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -488,7 +489,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion

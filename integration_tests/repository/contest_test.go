@@ -20,7 +20,7 @@ import (
 func TestContestRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contests")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contests")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -38,7 +38,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 func TestContestRepository_GetContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -58,7 +58,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 func TestContestRepository_UpdateContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_update_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_update_contest")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -119,7 +119,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 func TestContestRepository_DeleteContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_delete_contest")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -150,7 +150,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 func TestContestRepository_GetContestTeams(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_teams")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_teams")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -185,7 +185,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 func TestContestRepository_GetContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_team")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -220,7 +220,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_update_contest_teams")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_update_contest_teams")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -272,7 +272,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest_teams")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_delete_contest_teams")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -321,7 +321,7 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team_members")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_team_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -384,7 +384,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_edit_contest_team_members")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_edit_contest_team_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)

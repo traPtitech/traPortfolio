@@ -29,6 +29,8 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, API) {
 }
 
 func TestUserHandler_GetUsers(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*schema.User, path string)
@@ -145,7 +147,9 @@ func TestUserHandler_GetUsers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -162,6 +166,8 @@ func TestUserHandler_GetUsers(t *testing.T) {
 }
 
 func TestUserHandler_GetUser(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *schema.UserDetail, userpath string)
@@ -222,7 +228,6 @@ func TestUserHandler_GetUser(t *testing.T) {
 			},
 			statusCode: http.StatusOK,
 		},
-
 		{
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (hres *schema.UserDetail, userpath string) {
@@ -254,7 +259,9 @@ func TestUserHandler_GetUser(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -272,6 +279,8 @@ func TestUserHandler_GetUser(t *testing.T) {
 }
 
 func TestUserHandler_UpdateUser(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserJSONRequestBody, path string)
@@ -406,7 +415,9 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -421,6 +432,8 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 }
 
 func TestUserHandler_GetUserAccounts(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*schema.Account, path string)
@@ -505,7 +518,9 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -522,6 +537,8 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 }
 
 func TestUserHandler_GetUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *schema.Account, path string)
@@ -593,7 +610,9 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -610,6 +629,8 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_AddUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *schema.AddUserAccountJSONRequestBody, expectedResBody schema.Account, path string)
@@ -781,7 +802,9 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -798,6 +821,8 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_EditUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserAccountJSONRequestBody, path string)
@@ -947,7 +972,9 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -962,6 +989,8 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_DeleteUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (path string)
@@ -1027,7 +1056,9 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -1042,7 +1073,9 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_GetUserProjects(t *testing.T) {
-	makeProjects := func(s *mock_service.MockUserService, projectsLen int) (hres []*schema.UserProject, path string) {
+	makeProjects := func(t *testing.T, s *mock_service.MockUserService, projectsLen int) (hres []*schema.UserProject, path string) {
+		t.Helper()
+
 		userID := random.UUID()
 
 		repoProjects := []*domain.UserProject{}
@@ -1073,35 +1106,37 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		return hresProjects, path
 	}
 
+	t.Parallel()
+
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string)
+		setup      func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				return makeProjects(s, 1)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+				return makeProjects(t, s, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				return makeProjects(s, 2)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+				return makeProjects(t, s, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				return makeProjects(s, 32)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+				return makeProjects(t, s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
 				userID := random.UUID()
 
 				s.EXPECT().GetUserProjects(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1112,7 +1147,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, _ *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
@@ -1122,11 +1157,13 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			hresUsers, path := tt.setup(s)
+			hresUsers, path := tt.setup(t, s)
 			var resBody []*schema.UserProject
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
@@ -1138,7 +1175,9 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 }
 
 func TestUserHandler_GetUserContests(t *testing.T) {
-	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*schema.UserContest, path string) {
+	makeContests := func(t *testing.T, s *mock_service.MockUserService, contestsLen int) (hres []*schema.UserContest, path string) {
+		t.Helper()
+
 		userID := random.UUID()
 
 		repoContests := []*domain.UserContest{}
@@ -1176,35 +1215,37 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		return hresContests, path
 	}
 
+	t.Parallel()
+
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string)
+		setup      func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				return makeContests(s, 1)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+				return makeContests(t, s, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				return makeContests(s, 2)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+				return makeContests(t, s, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				return makeContests(s, 32)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+				return makeContests(t, s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
 				userID := random.UUID()
 
 				s.EXPECT().GetUserContests(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1215,7 +1256,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, _ *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
@@ -1225,11 +1266,13 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			hresUsers, path := tt.setup(s)
+			hresUsers, path := tt.setup(t, s)
 			var resBody []*schema.UserContest
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
@@ -1268,6 +1311,8 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
 		return hresGroups, path
 	}
+
+	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -1325,7 +1370,9 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -1374,6 +1421,8 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		path = fmt.Sprintf("/api/v1/users/%s/events", userID)
 		return hresEvents, path
 	}
+
+	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -1431,7 +1480,9 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
