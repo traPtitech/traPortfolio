@@ -24,7 +24,7 @@ func NewSQLHandler(db *gorm.DB) database.SQLHandler {
 
 func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	engine, err := gorm.Open(
-		mysql.New(mysql.Config{DSN: conf.Dsn()}),
+		mysql.New(mysql.Config{DSNConfig: conf.DsnConfig()}),
 		conf.GormConfig(),
 	)
 	if err != nil {
