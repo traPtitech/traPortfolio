@@ -29,6 +29,8 @@ func setupUserMock(t *testing.T) (*mock_service.MockUserService, API) {
 }
 
 func TestUserHandler_GetUsers(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*schema.User, path string)
@@ -146,6 +148,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -162,6 +165,8 @@ func TestUserHandler_GetUsers(t *testing.T) {
 }
 
 func TestUserHandler_GetUser(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *schema.UserDetail, userpath string)
@@ -255,6 +260,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -272,6 +278,8 @@ func TestUserHandler_GetUser(t *testing.T) {
 }
 
 func TestUserHandler_UpdateUser(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserJSONRequestBody, path string)
@@ -407,6 +415,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -421,6 +430,8 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 }
 
 func TestUserHandler_GetUserAccounts(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres []*schema.Account, path string)
@@ -506,6 +517,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -522,6 +534,8 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 }
 
 func TestUserHandler_GetUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (hres *schema.Account, path string)
@@ -594,6 +608,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -610,6 +625,8 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_AddUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *schema.AddUserAccountJSONRequestBody, expectedResBody schema.Account, path string)
@@ -782,6 +799,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -798,6 +816,8 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_EditUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserAccountJSONRequestBody, path string)
@@ -948,6 +968,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -962,6 +983,8 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_DeleteUserAccount(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockUserService) (path string)
@@ -1028,6 +1051,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -1074,6 +1098,8 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
 		return hresProjects, path
 	}
+
+	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -1125,6 +1151,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -1180,6 +1207,8 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		return hresContests, path
 	}
 
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string)
@@ -1230,6 +1259,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -1272,6 +1302,8 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
 		return hresGroups, path
 	}
+
+	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -1330,6 +1362,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 
@@ -1378,6 +1411,8 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		path = fmt.Sprintf("/api/v1/users/%s/events", userID)
 		return hresEvents, path
 	}
+
+	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -1436,6 +1471,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupUserMock(t)
 

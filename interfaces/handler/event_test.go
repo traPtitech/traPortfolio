@@ -27,6 +27,8 @@ func setupEventMock(t *testing.T) (*mock_service.MockEventService, API) {
 }
 
 func TestEventHandler_GetEvents(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		setup      func(s *mock_service.MockEventService) (hres []*schema.Event, path string)
@@ -76,6 +78,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupEventMock(t)
 
