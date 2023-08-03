@@ -29,7 +29,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("event_handler_get_events")
+	conf := testutils.GetConfigWithDBName(t, "event_handler_get_events")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -58,17 +58,17 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("event_handler_get_event")
+	conf := testutils.GetConfigWithDBName(t, "event_handler_get_event")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -111,7 +111,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("event_handler_edit_event")
+	conf := testutils.GetConfigWithDBName(t, "event_handler_edit_event")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {

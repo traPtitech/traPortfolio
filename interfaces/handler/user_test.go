@@ -1042,7 +1042,9 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_GetUserProjects(t *testing.T) {
-	makeProjects := func(s *mock_service.MockUserService, projectsLen int) (hres []*schema.UserProject, path string) {
+	makeProjects := func(t *testing.T, s *mock_service.MockUserService, projectsLen int) (hres []*schema.UserProject, path string) {
+		t.Helper()
+
 		userID := random.UUID()
 
 		repoProjects := []*domain.UserProject{}
@@ -1075,33 +1077,33 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string)
+		setup      func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				return makeProjects(s, 1)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+				return makeProjects(t, s, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				return makeProjects(s, 2)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+				return makeProjects(t, s, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				return makeProjects(s, 32)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+				return makeProjects(t, s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
 				userID := random.UUID()
 
 				s.EXPECT().GetUserProjects(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1112,7 +1114,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, _ *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
@@ -1126,7 +1128,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			hresUsers, path := tt.setup(s)
+			hresUsers, path := tt.setup(t, s)
 			var resBody []*schema.UserProject
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
@@ -1138,7 +1140,9 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 }
 
 func TestUserHandler_GetUserContests(t *testing.T) {
-	makeContests := func(s *mock_service.MockUserService, contestsLen int) (hres []*schema.UserContest, path string) {
+	makeContests := func(t *testing.T, s *mock_service.MockUserService, contestsLen int) (hres []*schema.UserContest, path string) {
+		t.Helper()
+
 		userID := random.UUID()
 
 		repoContests := []*domain.UserContest{}
@@ -1178,33 +1182,33 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string)
+		setup      func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				return makeContests(s, 1)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+				return makeContests(t, s, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				return makeContests(s, 2)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+				return makeContests(t, s, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				return makeContests(s, 32)
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+				return makeContests(t, s, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, s *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
 				userID := random.UUID()
 
 				s.EXPECT().GetUserContests(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1215,7 +1219,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, _ *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
 				userID := random.AlphaNumericn(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
@@ -1229,7 +1233,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 			// Setup mock
 			s, api := setupUserMock(t)
 
-			hresUsers, path := tt.setup(s)
+			hresUsers, path := tt.setup(t, s)
 			var resBody []*schema.UserContest
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 

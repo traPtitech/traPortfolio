@@ -20,7 +20,7 @@ import (
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("user_repository_get_users")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_get_users")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -120,7 +120,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 func TestUserRepository_GetUser(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("user_repository_get_user")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_get_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -203,7 +203,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 func TestUserRepository_CreateUser(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("user_repository_create_user")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_create_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
@@ -257,7 +257,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("user_repository_update_user")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_update_user")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -318,7 +318,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
-	conf := testutils.GetConfigWithDBName("user_repository_get_accounts")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -354,7 +354,7 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 func TestUserRepository_GetAccount(t *testing.T) {
 	t.Parallel()
-	conf := testutils.GetConfigWithDBName("user_repository_get_account")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_get_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -391,7 +391,7 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
 	t.Parallel()
-	conf := testutils.GetConfigWithDBName("user_repository_update_account")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_update_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -440,7 +440,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
-	conf := testutils.GetConfigWithDBName("user_repository_delete_account")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_delete_account")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -481,7 +481,7 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 func TestUserRepository_GetUserProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("user_repository_get_user_projects")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_get_user_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -505,7 +505,7 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	args1 := mustAddProjectMember(t, projectRepo, project1.ID, user1.ID, nil)
 	args2 := mustAddProjectMember(t, projectRepo, project2.ID, user1.ID, nil)
 
-	expected3 := []*domain.UserProject{newUserProject(args1, project1), newUserProject(args2, project2)}
+	expected3 := []*domain.UserProject{newUserProject(t, args1, project1), newUserProject(t, args2, project2)}
 	projects1, err := userRepo.GetProjects(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, projects1)
@@ -514,7 +514,7 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 func TestUserRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("user_repository_get_contests")
+	conf := testutils.GetConfigWithDBName(t, "user_repository_get_contests")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -544,12 +544,15 @@ func TestUserRepository_GetContests(t *testing.T) {
 	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
 	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
-	expected1 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam}), newUserContest(&contest2.Contest, []*domain.ContestTeam{&team2.ContestTeam})}
+	expected1 := []*domain.UserContest{
+		newUserContest(t, &contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam}),
+		newUserContest(t, &contest2.Contest, []*domain.ContestTeam{&team2.ContestTeam}),
+	}
 	contests1, err := userRepo.GetContests(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, contests1)
 
-	expected2 := []*domain.UserContest{newUserContest(&contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam})}
+	expected2 := []*domain.UserContest{newUserContest(t, &contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam})}
 	contests2, err := userRepo.GetContests(context.Background(), user2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, contests2)
@@ -558,7 +561,8 @@ func TestUserRepository_GetContests(t *testing.T) {
 // func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 // }
 
-func newUserProject(args *urepository.CreateProjectMemberArgs, project *domain.Project) *domain.UserProject {
+func newUserProject(t *testing.T, args *urepository.CreateProjectMemberArgs, project *domain.Project) *domain.UserProject {
+	t.Helper()
 	return &domain.UserProject{
 		ID:       project.ID,
 		Name:     project.Name,
@@ -576,7 +580,8 @@ func newUserProject(args *urepository.CreateProjectMemberArgs, project *domain.P
 	}
 }
 
-func newUserContest(contest *domain.Contest, teams []*domain.ContestTeam) *domain.UserContest {
+func newUserContest(t *testing.T, contest *domain.Contest, teams []*domain.ContestTeam) *domain.UserContest {
+	t.Helper()
 	return &domain.UserContest{
 		ID:        contest.ID,
 		Name:      contest.Name,

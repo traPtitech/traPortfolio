@@ -34,6 +34,8 @@ func setupContestMock(t *testing.T) (*mock_service.MockContestService, API) {
 }
 
 func mustParseTime(t *testing.T, layout, value string) time.Time {
+	t.Helper()
+
 	tm, err := time.Parse(layout, value)
 	assert.NoError(t, err)
 	return tm
@@ -215,7 +217,8 @@ func TestContestHandler_GetContest(t *testing.T) {
 	}
 }
 
-func makeCreateContestRequest(description string, since time.Time, until time.Time, name string, link string) *schema.CreateContestJSONRequestBody {
+func makeCreateContestRequest(t *testing.T, description string, since time.Time, until time.Time, name string, link string) *schema.CreateContestJSONRequestBody {
+	t.Helper()
 	return &schema.CreateContestJSONRequestBody{
 		Description: description,
 		Duration: schema.Duration{
@@ -239,6 +242,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 			setup: func(s *mock_service.MockContestService) (reqBody *schema.CreateContestJSONRequestBody, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
+					t,
 					random.AlphaNumeric(),
 					since,
 					until,
@@ -282,6 +286,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 			setup: func(_ *mock_service.MockContestService) (reqBody *schema.CreateContestJSONRequestBody, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
+					t,
 					random.AlphaNumeric(),
 					since,
 					until,
@@ -298,6 +303,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 			setup: func(s *mock_service.MockContestService) (reqBody *schema.CreateContestJSONRequestBody, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
+					t,
 					random.AlphaNumeric(),
 					since,
 					until,
