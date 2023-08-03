@@ -52,6 +52,8 @@ func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 		case errors.Is(err, repository.ErrNotFound):
 			code = http.StatusNotFound
 
+		case errors.Is(err, repository.ErrDBInternal):
+			fallthrough
 		default:
 			e.Logger.Error(err)
 			code = http.StatusInternalServerError
