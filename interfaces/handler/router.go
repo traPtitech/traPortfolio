@@ -102,7 +102,7 @@ func (b *binderWithValidation) Bind(i interface{}, c echo.Context) error {
 	return nil
 }
 
-func WithLogger() Option {
+func WithRequestLogger() Option {
 	return func(e *echo.Echo) error {
 		e.Use(middleware.Logger())
 		return nil
