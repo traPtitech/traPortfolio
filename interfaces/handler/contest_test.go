@@ -33,16 +33,14 @@ func setupContestMock(t *testing.T) (*mock_service.MockContestService, API) {
 	return s, api
 }
 
-func mustParseTime(layout, value string) time.Time {
-	t, err := time.Parse(layout, value)
-	if err != nil {
-		panic(err)
-	}
-	return t
+func mustParseTime(t *testing.T, layout, value string) time.Time {
+	tm, err := time.Parse(layout, value)
+	assert.NoError(t, err)
+	return tm
 }
 
 func TestContestHandler_GetContests(t *testing.T) {
-	until := mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00")
+	until := mustParseTime(t, time.RFC3339, "2006-01-02T15:04:05+09:00")
 
 	t.Parallel()
 	tests := []struct {
@@ -63,15 +61,15 @@ func TestContestHandler_GetContests(t *testing.T) {
 				{
 					ID:        uuid.Nil,
 					Name:      "test1",
-					TimeStart: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
-					TimeEnd:   mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
+					TimeStart: mustParseTime(t, time.RFC3339, "2006-01-02T15:04:05+09:00"),
+					TimeEnd:   mustParseTime(t, time.RFC3339, "2006-01-02T15:04:05+09:00"),
 				},
 			},
 			hresContests: []*schema.Contest{
 				{
 					Name: "test1",
 					Duration: schema.Duration{
-						Since: mustParseTime(time.RFC3339, "2006-01-02T15:04:05+09:00"),
+						Since: mustParseTime(t, time.RFC3339, "2006-01-02T15:04:05+09:00"),
 						Until: &until,
 					},
 				},
