@@ -77,6 +77,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -176,6 +177,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupEventMock(t)
@@ -201,6 +203,8 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		r := schema.EventLevel(l)
 		return &r
 	}
+
+	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -312,7 +316,9 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupEventMock(t)
 
