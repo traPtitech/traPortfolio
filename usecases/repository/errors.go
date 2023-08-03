@@ -17,6 +17,8 @@ var (
 	ErrAlreadyExists = errors.New("already exists")
 	// ErrInvalidArg argument error
 	ErrInvalidArg = errors.New("argument error")
+	// ErrDBInternal database internal error
+	ErrDBInternal = errors.New("database internal error")
 	// ErrBind failed to bind request
 	ErrBind = errors.New("bind error")
 	// ErrValidate failed to validate request

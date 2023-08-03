@@ -146,6 +146,13 @@ const (
 
 func (h *SQLHandler) Error() error {
 	err := h.conn.Error
+	if err == nil {
+		return nil
+	}
+
+	// TODO: use correct context
+	h.conn.Logger.Error(context.TODO(), err.Error())
+
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return repository.ErrNotFound
 	}
@@ -156,7 +163,7 @@ func (h *SQLHandler) Error() error {
 		return repository.ErrInvalidArg
 	}
 
-	return err
+	return repository.ErrDBInternal
 }
 
 // Interface guards
