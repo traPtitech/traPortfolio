@@ -42,7 +42,7 @@ func main() {
 	}
 
 	e := echo.New()
-	if err := handler.Setup(e, api); err != nil {
+	if err := handler.Setup(e, api, handler.EnableLogger); err != nil {
 		log.Fatal(err)
 	}
 
