@@ -384,7 +384,7 @@ func newUserContest(contest Contest, teams []ContestTeamWithoutMembers) UserCont
 		Id:       contest.Id,
 		Name:     contest.Name,
 		Duration: contest.Duration,
-		Teams:    make([]ContestTeam, 0),
+		Teams:    teams,
 	}
 }
 

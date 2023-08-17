@@ -546,6 +546,20 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 						Name:      random.AlphaNumeric(),
 						Result:    random.AlphaNumeric(),
 					},
+					Members: []*domain.User{
+						{
+							ID:   random.UUID(),
+							Name: random.AlphaNumeric(),
+							//realName: random.AlphaNumeric(),
+							Check: random.Bool(),
+						},
+						{
+							ID:   random.UUID(),
+							Name: random.AlphaNumeric(),
+							//realName: random.AlphaNumeric(),
+							Check: random.Bool(),
+						},
+					},
 				},
 			},
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {

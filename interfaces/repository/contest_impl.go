@@ -197,6 +197,29 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 	}
 	result := make([]*domain.ContestTeam, 0, len(teams))
 	for _, v := range teams {
+
+		var belongings []*model.ContestTeamUserBelonging
+		err = r.h.
+			WithContext(ctx).
+			Preload("User").
+			Where(&model.ContestTeamUserBelonging{TeamID: v.ID}).
+			Find(&belongings).
+			Error()
+		if err != nil {
+			return nil, convertError(err)
+		}
+
+		members := make([]*domain.User, len(belongings))
+		for i, w := range belongings {
+			u := w.User
+			members[i] = &domain.User{
+				ID:   u.ID,
+				Name: u.Name,
+				//realName:
+				Check: u.Check,
+			}
+		}
+
 		result = append(result, &domain.ContestTeam{
 			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
 				ID:        v.ID,
@@ -204,6 +227,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 				Name:      v.Name,
 				Result:    v.Result,
 			},
+			Members: members,
 		})
 	}
 	return result, nil
@@ -220,6 +244,28 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		return nil, convertError(err)
 	}
 
+	var belongings []*model.ContestTeamUserBelonging
+	err := r.h.
+		WithContext(ctx).
+		Preload("User").
+		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+		Find(&belongings).
+		Error()
+	if err != nil {
+		return nil, convertError(err)
+	}
+
+	members := make([]*domain.User, len(belongings))
+	for i, w := range belongings {
+		u := w.User
+		members[i] = &domain.User{
+			ID:   u.ID,
+			Name: u.Name,
+			//realName:
+			Check: u.Check,
+		}
+	}
+
 	res := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
 			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
@@ -228,10 +274,10 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 				Name:      team.Name,
 				Result:    team.Result,
 			},
+			Members: members,
 		},
 		Link:        team.Link,
 		Description: team.Description,
-		// Members:
 	}
 	return res, nil
 }
