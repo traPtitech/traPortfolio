@@ -10,7 +10,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
@@ -25,7 +24,8 @@ type mockEventRepositoryFields struct {
 	knoq *mock_external.MockKnoqAPI
 }
 
-func newMockEventRepositoryFields(ctrl *gomock.Controller) mockEventRepositoryFields {
+func newMockEventRepositoryFields(t *testing.T, ctrl *gomock.Controller) mockEventRepositoryFields {
+	t.Helper()
 	return mockEventRepositoryFields{
 		h:    mock_database.NewMockSQLHandler(),
 		knoq: mock_external.NewMockKnoqAPI(ctrl),
@@ -62,7 +62,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
-				f.knoq.EXPECT().GetAll().Return(makeKnoqEvents(want), nil)
+				f.knoq.EXPECT().GetAll().Return(makeKnoqEvents(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -81,7 +81,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -126,7 +126,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(t, want), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnRows(
@@ -143,7 +143,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			want: nil,
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByEventID(args.id).Return(nil, database.ErrNoRows)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(nil, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -167,10 +167,10 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				RoomID:      random.UUID(),
 			},
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
-				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(want), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(t, want), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.NoError,
 		},
@@ -195,7 +195,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
 				}
-				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(&ed), nil)
+				f.knoq.EXPECT().GetByEventID(args.id).Return(makeKnoqEvent(t, &ed), nil)
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
 					WillReturnError(errUnexpected)
@@ -209,7 +209,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -271,7 +271,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
-				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(nil, database.ErrNoRows)
+				f.knoq.EXPECT().GetByEventID(args.args.EventID).Return(nil, repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -312,7 +312,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -369,7 +369,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE `event_level_relations`.`id` = ? ORDER BY `event_level_relations`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -424,7 +424,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion
@@ -467,7 +467,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
-				f.knoq.EXPECT().GetByUserID(args.userID).Return(makeKnoqEvents(want), nil)
+				f.knoq.EXPECT().GetByUserID(args.userID).Return(makeKnoqEvents(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -489,7 +489,7 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockEventRepositoryFields(ctrl)
+			f := newMockEventRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewEventRepository(f.h, f.knoq)
 			// Assertion

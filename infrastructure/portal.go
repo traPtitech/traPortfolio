@@ -54,7 +54,7 @@ func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	}
 	var userResponses []*external.PortalUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&userResponses); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
+		return nil, fmt.Errorf("decode failed: %w", err)
 	}
 	a.cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
@@ -77,7 +77,7 @@ func (a *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, er
 
 	var userResponse external.PortalUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
+		return nil, fmt.Errorf("decode failed: %w", err)
 	}
 	return &userResponse, nil
 }

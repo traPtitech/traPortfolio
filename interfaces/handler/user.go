@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/traPtitech/traPortfolio/usecases/service"
@@ -22,11 +23,10 @@ func NewUserHandler(s service.UserService) *UserHandler {
 }
 
 // GetUsers GET /users
-func (h *UserHandler) GetUsers(_c echo.Context) error {
-	c := _c.(*Context)
-	req := GetUsersParams{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+func (h *UserHandler) GetUsers(c echo.Context) error {
+	req := schema.GetUsersParams{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -38,10 +38,10 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 
 	users, err := h.srv.GetUsers(ctx, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]User, len(users))
+	res := make([]schema.User, len(users))
 	for i, v := range users {
 		res[i] = newUser(v.ID, v.Name, v.RealName())
 	}
@@ -50,23 +50,21 @@ func (h *UserHandler) GetUsers(_c echo.Context) error {
 }
 
 // GetUser GET /users/:userID
-func (h *UserHandler) GetUser(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUser(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	user, err := h.srv.GetUser(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	accounts := make([]Account, len(user.Accounts))
+	accounts := make([]schema.Account, len(user.Accounts))
 	for i, v := range user.Accounts {
-		accounts[i] = newAccount(v.ID, v.DisplayName, AccountType(v.Type), v.URL, v.PrPermitted)
+		accounts[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL, v.PrPermitted)
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
@@ -78,17 +76,15 @@ func (h *UserHandler) GetUser(_c echo.Context) error {
 }
 
 // UpdateUser PATCH /users/:userID
-func (h *UserHandler) UpdateUser(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) UpdateUser(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditUserJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditUserJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -98,69 +94,63 @@ func (h *UserHandler) UpdateUser(_c echo.Context) error {
 	}
 
 	if err := h.srv.Update(ctx, userID, &u); err != nil {
-		return convertError(err)
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetUserAccounts GET /users/:userID/accounts
-func (h *UserHandler) GetUserAccounts(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserAccounts(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	accounts, err := h.srv.GetAccounts(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]Account, len(accounts))
+	res := make([]schema.Account, len(accounts))
 	for i, v := range accounts {
-		res[i] = newAccount(v.ID, v.DisplayName, AccountType(v.Type), v.URL, v.PrPermitted)
+		res[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL, v.PrPermitted)
 	}
 
 	return c.JSON(http.StatusOK, res)
 }
 
 // GetUserAccount GET /users/:userID/accounts/:accountID
-func (h *UserHandler) GetUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	accountID, err := c.getID(keyUserAccountID)
+	accountID, err := getID(c, keyUserAccountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	account, err := h.srv.GetAccount(ctx, userID, accountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, AccountType(account.Type), account.URL, account.PrPermitted))
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, schema.AccountType(account.Type), account.URL, account.PrPermitted))
 }
 
 // AddUserAccount POST /users/:userID/accounts
-func (h *UserHandler) AddUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) AddUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := AddUserAccountJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.AddUserAccountJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -172,29 +162,27 @@ func (h *UserHandler) AddUserAccount(_c echo.Context) error {
 	}
 	account, err := h.srv.CreateAccount(ctx, userID, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, AccountType(account.Type), account.URL, account.PrPermitted))
+	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, schema.AccountType(account.Type), account.URL, account.PrPermitted))
 }
 
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
-func (h *UserHandler) EditUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) EditUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	accountID, err := c.getID(keyUserAccountID)
+	accountID, err := getID(c, keyUserAccountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditUserAccountJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditUserAccountJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -208,55 +196,51 @@ func (h *UserHandler) EditUserAccount(_c echo.Context) error {
 
 	err = h.srv.EditAccount(ctx, userID, accountID, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteUserAccount DELETE /users/:userID/accounts/:accountID
-func (h *UserHandler) DeleteUserAccount(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) DeleteUserAccount(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	accountID, err := c.getID(keyUserAccountID)
+	accountID, err := getID(c, keyUserAccountID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err := h.srv.DeleteAccount(ctx, userID, accountID); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetUserProjects GET /users/:userID/projects
-func (h *UserHandler) GetUserProjects(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserProjects(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	projects, err := h.srv.GetUserProjects(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
-	res := make([]UserProject, len(projects))
+	res := make([]schema.UserProject, len(projects))
 	for i, v := range projects {
 		res[i] = newUserProject(
 			v.ID,
 			v.Name,
-			ConvertDuration(v.Duration),
-			ConvertDuration(v.UserDuration),
+			schema.ConvertDuration(v.Duration),
+			schema.ConvertDuration(v.UserDuration),
 		)
 	}
 
@@ -264,23 +248,21 @@ func (h *UserHandler) GetUserProjects(_c echo.Context) error {
 }
 
 // GetUserContests GET /users/:userID/contests
-func (h *UserHandler) GetUserContests(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserContests(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetUserContests(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]UserContest, len(contests))
+	res := make([]schema.UserContest, len(contests))
 	for i, c := range contests {
-		teams := make([]ContestTeamWithoutMembers, len(c.Teams))
+		teams := make([]schema.ContestTeamWithoutMembers, len(c.Teams))
 		for j, ct := range c.Teams {
 			teams[j] = newContestTeamWithoutMembers(ct.ID, ct.Name, ct.Result)
 		}
@@ -294,46 +276,42 @@ func (h *UserHandler) GetUserContests(_c echo.Context) error {
 }
 
 // GetUserGroups GET /users/:userID/groups
-func (h *UserHandler) GetUserGroups(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserGroups(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	groups, err := h.srv.GetGroupsByUserID(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]UserGroup, len(groups))
+	res := make([]schema.UserGroup, len(groups))
 	for i, group := range groups {
 		res[i] = newUserGroup(
 			newGroup(group.ID, group.Name),
-			ConvertDuration(group.Duration),
+			schema.ConvertDuration(group.Duration),
 		)
 	}
 	return c.JSON(http.StatusOK, res)
 }
 
 // GetUserEvents GET /users/:userID/events
-func (h *UserHandler) GetUserEvents(_c echo.Context) error {
-	c := _c.(*Context)
-
-	userID, err := c.getID(keyUserID)
+func (h *UserHandler) GetUserEvents(c echo.Context) error {
+	userID, err := getID(c, keyUserID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	events, err := h.srv.GetUserEvents(ctx, userID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]Event, len(events))
+	res := make([]schema.Event, len(events))
 	for i, v := range events {
 		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
@@ -341,37 +319,37 @@ func (h *UserHandler) GetUserEvents(_c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func newUser(id uuid.UUID, name string, realName string) User {
-	return User{
+func newUser(id uuid.UUID, name string, realName string) schema.User {
+	return schema.User{
 		Id:       id,
 		Name:     name,
 		RealName: realName,
 	}
 }
 
-func newUserDetail(user User, accounts []Account, bio string, state domain.TraQState) UserDetail {
-	return UserDetail{
+func newUserDetail(user schema.User, accounts []schema.Account, bio string, state domain.TraQState) schema.UserDetail {
+	return schema.UserDetail{
 		Accounts: accounts,
 		Bio:      bio,
 		Id:       user.Id,
 		Name:     user.Name,
 		RealName: user.RealName,
-		State:    UserAccountState(state),
+		State:    schema.UserAccountState(state),
 	}
 }
 
-func newAccount(id uuid.UUID, displayName string, atype AccountType, url string, prPermitted bool) Account {
-	return Account{
+func newAccount(id uuid.UUID, displayName string, atype schema.AccountType, url string, prPermitted bool) schema.Account {
+	return schema.Account{
 		Id:          id,
 		DisplayName: displayName,
 		Type:        atype,
 		Url:         url,
-		PrPermitted: PrPermitted(prPermitted),
+		PrPermitted: schema.PrPermitted(prPermitted),
 	}
 }
 
-func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration, userDuration YearWithSemesterDuration) UserProject {
-	return UserProject{
+func newUserProject(id uuid.UUID, name string, duration schema.YearWithSemesterDuration, userDuration schema.YearWithSemesterDuration) schema.UserProject {
+	return schema.UserProject{
 		Duration:     duration,
 		Id:           id,
 		Name:         name,
@@ -379,8 +357,8 @@ func newUserProject(id uuid.UUID, name string, duration YearWithSemesterDuration
 	}
 }
 
-func newUserContest(contest Contest, teams []ContestTeamWithoutMembers) UserContest {
-	return UserContest{
+func newUserContest(contest schema.Contest, teams []schema.ContestTeamWithoutMembers) schema.UserContest {
+	return schema.UserContest{
 		Id:       contest.Id,
 		Name:     contest.Name,
 		Duration: contest.Duration,
@@ -388,15 +366,15 @@ func newUserContest(contest Contest, teams []ContestTeamWithoutMembers) UserCont
 	}
 }
 
-func newGroup(id uuid.UUID, name string) Group {
-	return Group{
+func newGroup(id uuid.UUID, name string) schema.Group {
+	return schema.Group{
 		Id:   id,
 		Name: name,
 	}
 }
 
-func newUserGroup(group Group, Duration YearWithSemesterDuration) UserGroup {
-	return UserGroup{
+func newUserGroup(group schema.Group, Duration schema.YearWithSemesterDuration) schema.UserGroup {
+	return schema.UserGroup{
 		Duration: Duration,
 		Id:       group.Id,
 		Name:     group.Name,

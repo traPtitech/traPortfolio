@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 
 	"github.com/gofrs/uuid"
@@ -24,16 +25,14 @@ func NewContestHandler(service service.ContestService) *ContestHandler {
 }
 
 // GetContests GET /contests
-func (h *ContestHandler) GetContests(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) GetContests(c echo.Context) error {
 	ctx := c.Request().Context()
 	contests, err := h.srv.GetContests(ctx)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]Contest, len(contests))
+	res := make([]schema.Contest, len(contests))
 	for i, v := range contests {
 		res[i] = newContest(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
@@ -42,21 +41,19 @@ func (h *ContestHandler) GetContests(_c echo.Context) error {
 }
 
 // GetContest GET /contests/:contestID
-func (h *ContestHandler) GetContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContest(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contest, err := h.srv.GetContest(ctx, contestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teams := make([]ContestTeam, len(contest.ContestTeams))
+	teams := make([]schema.ContestTeam, len(contest.ContestTeams))
 	for i, v := range contest.ContestTeams {
 		members := make([]User, len(v.Members))
 		for j, ct := range v.Members {
@@ -76,12 +73,10 @@ func (h *ContestHandler) GetContest(_c echo.Context) error {
 }
 
 // CreateContest POST /contests
-func (h *ContestHandler) CreateContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	req := CreateContestJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+func (h *ContestHandler) CreateContest(c echo.Context) error {
+	req := schema.CreateContestJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	createReq := repository.CreateContestArgs{
@@ -95,10 +90,10 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 	ctx := c.Request().Context()
 	contest, err := h.srv.CreateContest(ctx, &createReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	contestTeams := make([]ContestTeam, 0, len(contest.ContestTeams))
+	contestTeams := make([]schema.ContestTeam, 0, len(contest.ContestTeams))
 	for _, team := range contest.ContestTeams {
 		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, []User{}))
 	}
@@ -108,17 +103,15 @@ func (h *ContestHandler) CreateContest(_c echo.Context) error {
 }
 
 // EditContest PATCH /contests/:contestID
-func (h *ContestHandler) EditContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) EditContest(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditContestJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditContestJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	patchReq := repository.UpdateContestArgs{
@@ -134,45 +127,41 @@ func (h *ContestHandler) EditContest(_c echo.Context) error {
 	ctx := c.Request().Context()
 	err = h.srv.UpdateContest(ctx, contestID, &patchReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteContest DELETE /contests/:contestID
-func (h *ContestHandler) DeleteContest(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) DeleteContest(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err := h.srv.DeleteContest(ctx, contestID); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetContestTeams GET /contests/:contestID/teams
-func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContestTeams(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contestTeams, err := h.srv.GetContestTeams(ctx, contestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]ContestTeam, len(contestTeams))
+	res := make([]schema.ContestTeam, len(contestTeams))
 	for i, v := range contestTeams {
 		members := make([]User, len(v.Members))
 		for j, ct := range v.Members {
@@ -185,26 +174,24 @@ func (h *ContestHandler) GetContestTeams(_c echo.Context) error {
 }
 
 // GetContestTeams GET /contests/:contestID/teams/:teamID
-func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContestTeam(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	contestTeam, err := h.srv.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	members := make([]User, len(contestTeam.Members))
+	members := make([]schema.User, len(contestTeam.Members))
 	for i, v := range contestTeam.Members {
 		members[i] = newUser(v.ID, v.Name, v.RealName())
 	}
@@ -219,17 +206,15 @@ func (h *ContestHandler) GetContestTeam(_c echo.Context) error {
 }
 
 // AddContestTeam POST /contests/:contestID/teams
-func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) AddContestTeam(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := AddContestTeamJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.AddContestTeamJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	args := repository.CreateContestTeamArgs{
@@ -242,7 +227,7 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 	ctx := c.Request().Context()
 	contestTeam, err := h.srv.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, []User{})
@@ -251,23 +236,21 @@ func (h *ContestHandler) AddContestTeam(_c echo.Context) error {
 }
 
 // EditContestTeam PATCH /contests/:contestID/teams/:teamID
-func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 	// TODO: contestIDをUpdateContestTeamの引数に含める
-	_, err := c.getID(keyContestID)
+	_, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditContestTeamJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditContestTeamJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	args := repository.UpdateContestTeamArgs{
@@ -279,57 +262,53 @@ func (h *ContestHandler) EditContestTeam(_c echo.Context) error {
 
 	ctx := c.Request().Context()
 	if err = h.srv.UpdateContestTeam(ctx, teamID, &args); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteContestTeam DELETE /contests/:contestID/teams/:teamID
-func (h *ContestHandler) DeleteContestTeam(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) DeleteContestTeam(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err = h.srv.DeleteContestTeam(ctx, contestID, teamID); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetContestTeamMembers GET /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	contestID, err := c.getID(keyContestID)
+func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
+	contestID, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	users, err := h.srv.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]*User, 0, len(users))
+	res := make([]*schema.User, 0, len(users))
 	for _, v := range users {
-		res = append(res, &User{
+		res = append(res, &schema.User{
 			Id:       v.ID,
 			Name:     v.Name,
 			RealName: v.RealName(),
@@ -339,73 +318,70 @@ func (h *ContestHandler) GetContestTeamMembers(_c echo.Context) error {
 }
 
 // AddContestTeamMembers POST /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) AddContestTeamMembers(_c echo.Context) error {
-	c := _c.(*Context)
+func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	// TODO: contestIDをAddContestTeamMembersの引数に含める
-	_, err := c.getID(keyContestID)
+	_, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := AddContestTeamMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.AddContestTeamMembersJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	err = h.srv.AddContestTeamMembers(ctx, teamID, req.Members)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
 // EditContestTeamMembers PUT /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) EditContestTeamMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
-	_, err := c.getID(keyContestID)
+	_, err := getID(c, keyContestID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	teamID, err := c.getID(keyContestTeamID)
+	teamID, err := getID(c, keyContestTeamID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditContestTeamMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditContestTeamMembersJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
 	if err = h.srv.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
-		return convertError(err)
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newContest(id uuid.UUID, name string, since time.Time, until time.Time) Contest {
-	return Contest{
+func newContest(id uuid.UUID, name string, since time.Time, until time.Time) schema.Contest {
+	return schema.Contest{
 		Id:   id,
 		Name: name,
-		Duration: Duration{
+		Duration: schema.Duration{
 			Since: since,
 			Until: &until,
 		},
 	}
 }
 
-func newContestDetail(contest Contest, link string, description string, teams []ContestTeam) ContestDetail {
-	return ContestDetail{
+func newContestDetail(contest schema.Contest, link string, description string, teams []schema.ContestTeam) schema.ContestDetail {
+	return schema.ContestDetail{
 		Description: description,
 		Duration:    contest.Duration,
 		Id:          contest.Id,
@@ -415,8 +391,8 @@ func newContestDetail(contest Contest, link string, description string, teams []
 	}
 }
 
-func newContestTeam(id uuid.UUID, name string, result string, members []User) ContestTeam {
-	return ContestTeam{
+func newContestTeam(id uuid.UUID, name string, result string, members []User) schema.ContestTeam {
+	return schema.ContestTeam{
 		Id:      id,
 		Name:    name,
 		Result:  result,
@@ -424,16 +400,16 @@ func newContestTeam(id uuid.UUID, name string, result string, members []User) Co
 	}
 }
 
-func newContestTeamWithoutMembers(id uuid.UUID, name string, result string) ContestTeamWithoutMembers {
-	return ContestTeamWithoutMembers{
+func newContestTeamWithoutMembers(id uuid.UUID, name string, result string) schema.ContestTeamWithoutMembers {
+	return schema.ContestTeamWithoutMembers{
 		Id:     id,
 		Name:   name,
 		Result: result,
 	}
 }
 
-func newContestTeamDetail(team ContestTeam, link string, description string) ContestTeamDetail {
-	return ContestTeamDetail{
+func newContestTeamDetail(team schema.ContestTeam, link string, description string) schema.ContestTeamDetail {
+	return schema.ContestTeamDetail{
 		Description: description,
 		Id:          team.Id,
 		Link:        link,

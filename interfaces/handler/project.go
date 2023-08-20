@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -19,48 +20,44 @@ func NewProjectHandler(s service.ProjectService) *ProjectHandler {
 }
 
 // GetProjects GET /projects
-func (h *ProjectHandler) GetProjects(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *ProjectHandler) GetProjects(c echo.Context) error {
 	ctx := c.Request().Context()
 	projects, err := h.service.GetProjects(ctx)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]Project, len(projects))
+	res := make([]schema.Project, len(projects))
 	for i, v := range projects {
-		res[i] = newProject(v.ID, v.Name, ConvertDuration(v.Duration))
+		res[i] = newProject(v.ID, v.Name, schema.ConvertDuration(v.Duration))
 	}
 
 	return c.JSON(http.StatusOK, res)
 }
 
 // GetProject GET /projects/:projectID
-func (h *ProjectHandler) GetProject(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) GetProject(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	project, err := h.service.GetProject(ctx, projectID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	members := make([]ProjectMember, len(project.Members))
+	members := make([]schema.ProjectMember, len(project.Members))
 	for i, v := range project.Members {
 		members[i] = newProjectMember(
 			newUser(v.User.ID, v.User.Name, v.User.RealName()),
-			ConvertDuration(v.Duration),
+			schema.ConvertDuration(v.Duration),
 		)
 	}
 
 	return c.JSON(http.StatusOK, newProjectDetail(
-		newProject(project.ID, project.Name, ConvertDuration(project.Duration)),
+		newProject(project.ID, project.Name, schema.ConvertDuration(project.Duration)),
 		project.Description,
 		project.Link,
 		members,
@@ -68,12 +65,10 @@ func (h *ProjectHandler) GetProject(_c echo.Context) error {
 }
 
 // CreateProject POST /projects
-func (h *ProjectHandler) CreateProject(_c echo.Context) error {
-	c := _c.(*Context)
-
-	req := CreateProjectJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+func (h *ProjectHandler) CreateProject(c echo.Context) error {
+	req := schema.CreateProjectJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	createReq := repository.CreateProjectArgs{
@@ -92,28 +87,26 @@ func (h *ProjectHandler) CreateProject(_c echo.Context) error {
 	ctx := c.Request().Context()
 	project, err := h.service.CreateProject(ctx, &createReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.JSON(http.StatusCreated, newProject(
 		project.ID,
 		project.Name,
-		ConvertDuration(project.Duration),
+		schema.ConvertDuration(project.Duration),
 	))
 }
 
 // EditProject PATCH /projects/:projectID
-func (h *ProjectHandler) EditProject(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) EditProject(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditProjectJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditProjectJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	patchReq := repository.UpdateProjectArgs{
@@ -139,32 +132,30 @@ func (h *ProjectHandler) EditProject(_c echo.Context) error {
 	ctx := c.Request().Context()
 	err = h.service.UpdateProject(ctx, projectID, &patchReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
 // GetProjectMembers GET /projects/:projectID/members
-func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
 	members, err := h.service.GetProjectMembers(ctx, projectID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]ProjectMember, len(members))
+	res := make([]schema.ProjectMember, len(members))
 	for i, v := range members {
 		res[i] = newProjectMember(
 			newUser(v.User.ID, v.User.Name, v.User.RealName()),
-			ConvertDuration(v.Duration),
+			schema.ConvertDuration(v.Duration),
 		)
 	}
 
@@ -172,17 +163,15 @@ func (h *ProjectHandler) GetProjectMembers(_c echo.Context) error {
 }
 
 // AddProjectMembers POST /projects/:projectID/members
-func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := AddProjectMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.AddProjectMembersJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
@@ -204,45 +193,43 @@ func (h *ProjectHandler) AddProjectMembers(_c echo.Context) error {
 	ctx := c.Request().Context()
 	err = h.service.AddProjectMembers(ctx, projectID, createReq)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
 }
 
 // DeleteProjectMembers DELETE /projects/:projectID/members
-func (h *ProjectHandler) DeleteProjectMembers(_c echo.Context) error {
-	c := _c.(*Context)
-
-	projectID, err := c.getID(keyProject)
+func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := DeleteProjectMembersJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.DeleteProjectMembersJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
 	err = h.service.DeleteProjectMembers(ctx, projectID, req.Members)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newProject(id uuid.UUID, name string, duration YearWithSemesterDuration) Project {
-	return Project{
+func newProject(id uuid.UUID, name string, duration schema.YearWithSemesterDuration) schema.Project {
+	return schema.Project{
 		Id:       id,
 		Name:     name,
 		Duration: duration,
 	}
 }
 
-func newProjectDetail(project Project, description string, link string, members []ProjectMember) ProjectDetail {
-	return ProjectDetail{
+func newProjectDetail(project schema.Project, description string, link string, members []schema.ProjectMember) schema.ProjectDetail {
+	return schema.ProjectDetail{
 		Description: description,
 		Duration:    project.Duration,
 		Link:        link,
@@ -252,8 +239,8 @@ func newProjectDetail(project Project, description string, link string, members 
 	}
 }
 
-func newProjectMember(user User, duration YearWithSemesterDuration) ProjectMember {
-	return ProjectMember{
+func newProjectMember(user schema.User, duration schema.YearWithSemesterDuration) schema.ProjectMember {
+	return schema.ProjectMember{
 		Duration: duration,
 		Id:       user.Id,
 		Name:     user.Name,

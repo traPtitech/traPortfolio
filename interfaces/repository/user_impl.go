@@ -45,11 +45,7 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 
-	limit := -1
-
-	if v, ok := args.Limit.V(); ok {
-		limit = v
-	}
+	limit := args.Limit.ValueOr(-1)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +53,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 
 	traqUsers, err := r.traQ.GetAll(eargs)
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	traqUserIDs := make([]uuid.UUID, len(traqUsers))
@@ -72,7 +68,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 		Limit(limit).
 		Find(&users).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	if l := len(users); l == 0 {
@@ -80,7 +76,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 	} else if l == 1 {
 		portalUser, err := r.portal.GetByTraqID(users[0].Name)
 		if err != nil {
-			return nil, convertError(err)
+			return nil, err
 		}
 
 		return []*domain.User{
@@ -99,7 +95,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 
 		portalUsers, err := r.portal.GetAll()
 		if err != nil {
-			return nil, convertError(err)
+			return nil, err
 		}
 
 		result := make([]*domain.User, 0, l)
@@ -127,7 +123,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		First(user).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	accounts := make([]*domain.Account, 0, len(user.Accounts))
@@ -143,12 +139,12 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 
 	portalUser, err := r.portal.GetByTraqID(user.Name)
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	traQUser, err := r.traQ.GetByUserID(userID)
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := domain.UserDetail{
@@ -181,7 +177,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 
 	err = r.h.WithContext(ctx).Create(&user).Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := &domain.UserDetail{
@@ -218,17 +214,17 @@ func (r *UserRepository) UpdateUser(ctx context.Context, userID uuid.UUID, args 
 			First(user).
 			Error()
 		if err != nil {
-			return convertError(err)
+			return err
 		}
 
 		err = tx.WithContext(ctx).Model(user).Updates(changes).Error()
 		if err != nil {
-			return convertError(err)
+			return err
 		}
 		return nil
 	})
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -241,7 +237,7 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 		First(&model.User{}).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	accounts := make([]*model.Account, 0)
@@ -251,7 +247,7 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 		Find(&accounts).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := make([]*domain.Account, 0, len(accounts))
@@ -275,7 +271,7 @@ func (r *UserRepository) GetAccount(ctx context.Context, userID uuid.UUID, accou
 		First(account).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	result := &domain.Account{
@@ -299,8 +295,8 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		First(&model.Account{}).
 		Error(); err == nil {
 		return nil, repository.ErrAlreadyExists
-	} else if !errors.Is(err, database.ErrNoRows) {
-		return nil, convertError(err)
+	} else if !errors.Is(err, repository.ErrNotFound) {
+		return nil, err
 	}
 
 	account := model.Account{
@@ -313,7 +309,7 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 	}
 	err := r.h.WithContext(ctx).Create(&account).Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	ver := new(model.Account)
@@ -322,7 +318,7 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		Where(&model.Account{ID: account.ID}).
 		First(ver).
 		Error(); err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	return &domain.Account{
@@ -360,7 +356,7 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 			First(account).
 			Error()
 		if err != nil {
-			return convertError(err)
+			return err
 		}
 
 		// 同タイプ生成回避
@@ -372,8 +368,8 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 				First(&model.Account{}).
 				Error(); err == nil {
 				return repository.ErrAlreadyExists
-			} else if !errors.Is(err, database.ErrNoRows) {
-				return convertError(err)
+			} else if !errors.Is(err, repository.ErrNotFound) {
+				return err
 			}
 		}
 
@@ -396,11 +392,11 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 
 		err = tx.WithContext(ctx).Model(account).Updates(changes).Error()
 		if err != nil {
-			return convertError(err)
+			return err
 		}
 		return nil
 	})
-	return convertError(err)
+	return err
 }
 
 func (r *UserRepository) DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error {
@@ -409,19 +405,19 @@ func (r *UserRepository) DeleteAccount(ctx context.Context, userID uuid.UUID, ac
 			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			First(&model.Account{}).
 			Error(); err != nil {
-			return convertError(err)
+			return err
 		}
 
 		if err := tx.
 			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			Delete(&model.Account{}).
 			Error(); err != nil {
-			return convertError(err)
+			return err
 		}
 
 		return nil
 	}); err != nil {
-		return convertError(err)
+		return err
 	}
 
 	return nil
@@ -434,7 +430,7 @@ func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*
 		First(&model.User{}).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	projects := make([]*model.ProjectMember, 0)
@@ -445,7 +441,7 @@ func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*
 		Find(&projects).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	res := make([]*domain.UserProject, 0, len(projects))
@@ -468,7 +464,7 @@ func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID
 		First(&model.User{}).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	groups := make([]*model.GroupUserBelonging, 0)
@@ -510,7 +506,7 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 		First(&model.User{}).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	contestTeamUserBelongings := make([]*model.ContestTeamUserBelonging, 0)
@@ -521,7 +517,7 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 		Find(&contestTeamUserBelongings).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	contestsMap := make(map[uuid.UUID]*domain.UserContest)

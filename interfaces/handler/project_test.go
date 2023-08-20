@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
@@ -30,10 +31,11 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-func makeCreateProjectRequest(description string, since YearWithSemester, until *YearWithSemester, name string, link string) *CreateProjectJSONRequestBody {
-	return &CreateProjectJSONRequestBody{
+func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, link string) *schema.CreateProjectJSONRequestBody {
+	t.Helper()
+	return &schema.CreateProjectJSONRequestBody{
 		Description: description,
-		Duration: YearWithSemesterDuration{
+		Duration: schema.YearWithSemesterDuration{
 			Since: since,
 			Until: until,
 		},
@@ -47,12 +49,12 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) ([]*Project, string)
+		setup      func(s *mock_service.MockProjectService) ([]*schema.Project, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
+			setup: func(s *mock_service.MockProjectService) ([]*schema.Project, string) {
 				duration := random.Duration()
 				repo := []*domain.Project{
 					{
@@ -67,17 +69,17 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 					},
 				}
 
-				var reqBody []*Project
+				var reqBody []*schema.Project
 				for _, v := range repo {
-					reqBody = append(reqBody, &Project{
-						Duration: YearWithSemesterDuration{
-							Since: YearWithSemester{
+					reqBody = append(reqBody, &schema.Project{
+						Duration: schema.YearWithSemesterDuration{
+							Since: schema.YearWithSemester{
 								Year:     v.Duration.Since.Year,
-								Semester: Semester(v.Duration.Since.Semester),
+								Semester: schema.Semester(v.Duration.Since.Semester),
 							},
-							Until: &YearWithSemester{
+							Until: &schema.YearWithSemester{
 								Year:     v.Duration.Until.Year,
-								Semester: Semester(v.Duration.Until.Semester),
+								Semester: schema.Semester(v.Duration.Until.Semester),
 							},
 						},
 						Id:   v.ID,
@@ -92,7 +94,7 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) ([]*Project, string) {
+			setup: func(s *mock_service.MockProjectService) ([]*schema.Project, string) {
 				s.EXPECT().GetProjects(anyCtx{}).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
@@ -106,7 +108,7 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			hres := []*Project(nil)
+			hres := []*schema.Project(nil)
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
@@ -121,12 +123,12 @@ func TestProjectHandler_GetProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (*ProjectDetail, string)
+		setup      func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string) {
 				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.ProjectDetail{
@@ -145,17 +147,17 @@ func TestProjectHandler_GetProject(t *testing.T) {
 					},
 				}
 
-				var members []ProjectMember
+				var members []schema.ProjectMember
 				for _, v := range repo.Members {
-					members = append(members, ProjectMember{
-						Duration: YearWithSemesterDuration{
-							Since: YearWithSemester{
+					members = append(members, schema.ProjectMember{
+						Duration: schema.YearWithSemesterDuration{
+							Since: schema.YearWithSemester{
 								Year:     v.Duration.Since.Year,
-								Semester: Semester(v.Duration.Since.Semester),
+								Semester: schema.Semester(v.Duration.Since.Semester),
 							},
-							Until: &YearWithSemester{
+							Until: &schema.YearWithSemester{
 								Year:     v.Duration.Until.Year,
-								Semester: Semester(v.Duration.Until.Semester),
+								Semester: schema.Semester(v.Duration.Until.Semester),
 							},
 						},
 						Id:       v.User.ID,
@@ -163,15 +165,15 @@ func TestProjectHandler_GetProject(t *testing.T) {
 						RealName: v.User.RealName(),
 					})
 				}
-				reqBody := &ProjectDetail{
+				reqBody := &schema.ProjectDetail{
 					Description: repo.Description,
-					Duration: YearWithSemesterDuration{
-						Since: YearWithSemester{
-							Semester: Semester(repo.Duration.Since.Semester),
+					Duration: schema.YearWithSemesterDuration{
+						Since: schema.YearWithSemester{
+							Semester: schema.Semester(repo.Duration.Since.Semester),
 							Year:     repo.Duration.Since.Year,
 						},
-						Until: &YearWithSemester{
-							Semester: Semester(repo.Duration.Until.Semester),
+						Until: &schema.YearWithSemester{
+							Semester: schema.Semester(repo.Duration.Until.Semester),
 							Year:     repo.Duration.Until.Year,
 						},
 					},
@@ -188,14 +190,14 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Bad Request: Validate error: invalid projectID",
-			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string) {
 				return nil, fmt.Sprintf("/api/v1/projects/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Internal Error",
-			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, errInternal)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
@@ -204,7 +206,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Validation Error",
-			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string) {
 				projectID := random.AlphaNumericn(36)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
@@ -212,7 +214,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Not Found Error",
-			setup: func(s *mock_service.MockProjectService) (*ProjectDetail, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string) {
 				projectID := random.UUID()
 				s.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, repository.ErrNotFound)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
@@ -227,7 +229,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 
 			expectedHres, path := tt.setup(s)
 
-			var hres *ProjectDetail
+			var hres *schema.ProjectDetail
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &hres)
 
 			// Assertion
@@ -242,17 +244,18 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (reqBody *CreateProjectJSONRequestBody, expectedResBody Project, path string)
+		setup      func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectJSONRequestBody, expectedResBody schema.Project, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (reqBody *CreateProjectJSONRequestBody, expectedResBody Project, path string) {
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectJSONRequestBody, expectedResBody schema.Project, path string) {
 				duration := random.Duration()
 				reqBody = makeCreateProjectRequest(
+					t,
 					random.AlphaNumeric(),
-					ConvertDuration(duration).Since,
-					ConvertDuration(duration).Until,
+					schema.ConvertDuration(duration).Since,
+					schema.ConvertDuration(duration).Until,
 					random.AlphaNumeric(),
 					random.RandURLString(),
 				)
@@ -284,8 +287,8 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 					Link:        args.Link.ValueOrZero(),
 					Members:     nil,
 				}
-				expectedResBody = Project{
-					Duration: ConvertDuration(want.Duration),
+				expectedResBody = schema.Project{
+					Duration: schema.ConvertDuration(want.Duration),
 					Id:       want.ID,
 					Name:     want.Name,
 				}
@@ -302,7 +305,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 			reqBody, res, path := tt.setup(s)
 
-			var resBody Project
+			var resBody schema.Project
 			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, &resBody)
 
 			// Assertion

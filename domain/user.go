@@ -3,6 +3,7 @@ package domain
 import (
 	"database/sql"
 	"database/sql/driver"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -106,7 +107,7 @@ func (a *AccountType) Scan(src interface{}) error {
 	if s.Valid {
 		newAT := AccountType(s.Byte)
 		if newAT >= AccountLimit {
-			return ErrTooLargeEnum
+			return fmt.Errorf("%w: AccountType(%d) must be less than %d", ErrTooLargeEnum, newAT, AccountLimit)
 		}
 
 		*a = newAT

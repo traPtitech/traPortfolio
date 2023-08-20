@@ -1,143 +1,95 @@
 package handler
 
 import (
+	"errors"
+	"fmt"
+	"net/http"
+
+	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 func Setup(e *echo.Echo, api API) error {
-	// Setup validator
-	e.Validator = newValidator(e.Logger)
+	e.HTTPErrorHandler = newHTTPErrorHandler(e)
+	e.Binder = &binderWithValidation{}
 
-	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			return h(&Context{Context: c})
+
+	apiGroup := e.Group("/api")
+	setupV1API(apiGroup, api)
+
+	return nil
+}
+
+func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
+	return func(err error, c echo.Context) {
+		var (
+			code int
+			herr *echo.HTTPError
+		)
+
+		switch {
+		case errors.Is(err, repository.ErrNilID):
+			fallthrough
+		case errors.Is(err, repository.ErrInvalidID):
+			fallthrough
+		case errors.Is(err, repository.ErrInvalidArg):
+			fallthrough
+		case errors.Is(err, repository.ErrBind):
+			fallthrough
+		case errors.Is(err, repository.ErrValidate):
+			code = http.StatusBadRequest
+
+		case errors.Is(err, repository.ErrAlreadyExists):
+			code = http.StatusConflict
+
+		case errors.Is(err, repository.ErrForbidden):
+			code = http.StatusForbidden
+
+		case errors.Is(err, repository.ErrNotFound):
+			code = http.StatusNotFound
+
+		case errors.Is(err, repository.ErrDBInternal):
+			fallthrough
+		default:
+			e.Logger.Error(err)
+			code = http.StatusInternalServerError
+			herr = echo.NewHTTPError(code, http.StatusText(code)).SetInternal(err)
 		}
-	})
 
-	echoAPI := e.Group("/api")
-	{
-		v1 := echoAPI.Group("/v1")
+		if herr == nil {
+			herr = echo.NewHTTPError(
+				code,
+				fmt.Sprintf("%s: %s", http.StatusText(code), err.Error()),
+			).SetInternal(err)
+		}
 
-		{
-			apiUsers := v1.Group("/users")
+		e.DefaultHTTPErrorHandler(herr, c)
+	}
+}
 
-			apiUsers.GET("", api.User.GetUsers)
-			{
-				apiUsersUID := apiUsers.Group("/:userID")
+type binderWithValidation struct{}
 
-				apiUsersUID.GET("", api.User.GetUser)
-				apiUsersUID.PATCH("", api.User.UpdateUser)
-				{
-					apiUsersUIDAccounts := apiUsersUID.Group("/accounts")
+var _ echo.Binder = (*binderWithValidation)(nil)
 
-					apiUsersUIDAccounts.GET("", api.User.GetUserAccounts)
-					apiUsersUIDAccounts.POST("", api.User.AddUserAccount)
-					{
-						apiUsersUIDAccountsAID := apiUsersUIDAccounts.Group("/:accountID")
+func (b *binderWithValidation) Bind(i interface{}, c echo.Context) error {
+	if err := (&echo.DefaultBinder{}).Bind(i, c); err != nil {
+		return fmt.Errorf("%w: %w", repository.ErrBind, err)
+	}
 
-						apiUsersUIDAccountsAID.GET("", api.User.GetUserAccount)
-						apiUsersUIDAccountsAID.PATCH("", api.User.EditUserAccount)
-						apiUsersUIDAccountsAID.DELETE("", api.User.DeleteUserAccount)
-					}
-
-					apiUsersUIDProjects := apiUsersUID.Group("/projects")
-
-					apiUsersUIDProjects.GET("", api.User.GetUserProjects)
-
-					apiUsersUIDContests := apiUsersUID.Group("/contests")
-
-					apiUsersUIDContests.GET("", api.User.GetUserContests)
-
-					apiUsersUIDGroups := apiUsersUID.Group("/groups")
-
-					apiUsersUIDGroups.GET("", api.User.GetUserGroups)
-
-					apiUsersUIDEvents := apiUsersUID.Group("/events")
-
-					apiUsersUIDEvents.GET("", api.User.GetUserEvents)
-				}
+	if vld, ok := i.(vd.Validatable); ok {
+		if err := vld.Validate(); err != nil {
+			if ie, ok := err.(vd.InternalError); ok {
+				c.Logger().Fatalf("ozzo-validation internal error: %s", ie.Error())
 			}
+
+			return fmt.Errorf("%w: %w", repository.ErrValidate, err)
 		}
-		{
-			apiProjects := v1.Group("/projects")
-
-			apiProjects.GET("", api.Project.GetProjects)
-			apiProjects.POST("", api.Project.CreateProject)
-
-			{
-				apiProjectsPID := apiProjects.Group("/:projectID")
-
-				apiProjectsPID.GET("", api.Project.GetProject)
-				apiProjectsPID.PATCH("", api.Project.EditProject)
-
-				apiProjectsPIDMembers := apiProjectsPID.Group("/members")
-
-				apiProjectsPIDMembers.GET("", api.Project.GetProjectMembers)
-				apiProjectsPIDMembers.POST("", api.Project.AddProjectMembers)
-				apiProjectsPIDMembers.DELETE("", api.Project.DeleteProjectMembers)
-			}
-		}
-
-		{
-			apiEvents := v1.Group("/events")
-
-			apiEvents.GET("", api.Event.GetEvents)
-
-			apiEventsEID := apiEvents.Group("/:eventID")
-
-			apiEventsEID.GET("", api.Event.GetEvent)
-			apiEventsEID.PATCH("", api.Event.EditEvent)
-		}
-
-		{
-			apiGroups := v1.Group("/groups")
-
-			apiGroups.GET("", api.Group.GetGroups)
-			apiGroups.GET("/:groupID", api.Group.GetGroup)
-		}
-		{
-			apiContests := v1.Group("/contests")
-
-			apiContests.GET("", api.Contest.GetContests)
-			apiContests.POST("", api.Contest.CreateContest)
-			{
-				apiContestsCID := apiContests.Group("/:contestID")
-
-				apiContestsCID.GET("", api.Contest.GetContest)
-				apiContestsCID.PATCH("", api.Contest.EditContest)
-				apiContestsCID.DELETE("", api.Contest.DeleteContest)
-				{
-					apiContestsCIDTeams := apiContestsCID.Group("/teams")
-
-					apiContestsCIDTeams.GET("", api.Contest.GetContestTeams)
-					apiContestsCIDTeams.POST("", api.Contest.AddContestTeam)
-					{
-						apiContestsCIDTeamsTID := apiContestsCIDTeams.Group("/:teamID")
-
-						apiContestsCIDTeamsTID.GET("", api.Contest.GetContestTeam)
-						apiContestsCIDTeamsTID.PATCH("", api.Contest.EditContestTeam)
-						apiContestsCIDTeamsTID.DELETE("", api.Contest.DeleteContestTeam)
-						{
-							apiContestsCIDTeamsTIDMembers := apiContestsCIDTeamsTID.Group("/members")
-
-							apiContestsCIDTeamsTIDMembers.GET("", api.Contest.GetContestTeamMembers)
-							apiContestsCIDTeamsTIDMembers.POST("", api.Contest.AddContestTeamMembers)
-							apiContestsCIDTeamsTIDMembers.PUT("", api.Contest.EditContestTeamMembers)
-						}
-					}
-				}
-			}
-		}
-
-		{
-			apiPing := v1.Group("/ping")
-
-			apiPing.GET("", api.Ping.Ping)
-		}
+	} else {
+		c.Logger().Errorf("%T is not validatable", i)
 	}
 
 	return nil
