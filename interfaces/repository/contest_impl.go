@@ -195,6 +195,12 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 	if err != nil {
 		return nil, err
 	}
+
+	nameMap, err := r.makeUserNameMap()
+	if err != nil {
+		return nil, err
+	}
+
 	result := make([]*domain.ContestTeam, 0, len(teams))
 	for _, v := range teams {
 
@@ -212,12 +218,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		members := make([]*domain.User, len(belongings))
 		for i, w := range belongings {
 			u := w.User
-			members[i] = &domain.User{
-				ID:   u.ID,
-				Name: u.Name,
-				//realName:
-				Check: u.Check,
-			}
+			members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
 		}
 
 		result = append(result, &domain.ContestTeam{
@@ -255,15 +256,15 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		return nil, err
 	}
 
+	nameMap, err := r.makeUserNameMap()
+	if err != nil {
+		return nil, err
+	}
+
 	members := make([]*domain.User, len(belongings))
 	for i, w := range belongings {
 		u := w.User
-		members[i] = &domain.User{
-			ID:   u.ID,
-			Name: u.Name,
-			//realName:
-			Check: u.Check,
-		}
+		members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
 	}
 
 	res := &domain.ContestTeamDetail{
@@ -313,7 +314,7 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 				Name:      contestTeam.Name,
 				Result:    contestTeam.Result,
 			},
-			Members: nil,
+			Members: make([]*domain.User, 0),
 		},
 		Link:        contestTeam.Link,
 		Description: contestTeam.Description,
