@@ -1121,7 +1121,7 @@ components:
               type: array
               description: コンテストチーム
               items:
-                $ref: "#/components/schemas/ContestTeam"
+                $ref: "#/components/schemas/ContestTeamWithoutMembers"
           required:
             - teams
     ContestDetail:

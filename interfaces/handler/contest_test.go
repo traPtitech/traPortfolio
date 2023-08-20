@@ -148,7 +148,7 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 	for i, v := range d.ContestTeams {
 		teams[i] = schema.ContestTeam{
 			Id:      v.ID,
-			Members: make([]User, 0),
+			Members: make([]schema.User, 0),
 			Name:    v.Name,
 			Result:  v.Result,
 		}
@@ -539,13 +539,13 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 				hres = []*schema.ContestTeam{
 					{
 						Id:      repoContestTeams[0].ID,
-						Members: make([]User, 0),
+						Members: make([]schema.User, 0),
 						Name:    repoContestTeams[0].Name,
 						Result:  repoContestTeams[0].Result,
 					},
 					{
 						Id:      repoContestTeams[1].ID,
-						Members: make([]User, 0),
+						Members: make([]schema.User, 0),
 						Name:    repoContestTeams[1].Name,
 						Result:  repoContestTeams[1].Result,
 					},
@@ -714,7 +714,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				}
 				expectedResBody := schema.ContestTeam{
 					Id:      teamID,
-					Members: make([]User, 0),
+					Members: make([]schema.User, 0),
 					Name:    want.Name,
 					Result:  want.Result,
 				}

@@ -206,7 +206,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 			Find(&belongings).
 			Error()
 		if err != nil {
-			return nil, convertError(err)
+			return nil, err
 		}
 
 		members := make([]*domain.User, len(belongings))
@@ -252,7 +252,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		Find(&belongings).
 		Error()
 	if err != nil {
-		return nil, convertError(err)
+		return nil, err
 	}
 
 	members := make([]*domain.User, len(belongings))

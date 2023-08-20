@@ -55,7 +55,7 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 
 	teams := make([]schema.ContestTeam, len(contest.ContestTeams))
 	for i, v := range contest.ContestTeams {
-		members := make([]User, len(v.Members))
+		members := make([]schema.User, len(v.Members))
 		for j, ct := range v.Members {
 			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
 		}
@@ -95,7 +95,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 
 	contestTeams := make([]schema.ContestTeam, 0, len(contest.ContestTeams))
 	for _, team := range contest.ContestTeams {
-		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, []User{}))
+		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, []schema.User{}))
 	}
 	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
 
@@ -163,7 +163,7 @@ func (h *ContestHandler) GetContestTeams(c echo.Context) error {
 
 	res := make([]schema.ContestTeam, len(contestTeams))
 	for i, v := range contestTeams {
-		members := make([]User, len(v.Members))
+		members := make([]schema.User, len(v.Members))
 		for j, ct := range v.Members {
 			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
 		}
@@ -230,7 +230,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 		return err
 	}
 
-	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, []User{})
+	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, []schema.User{})
 
 	return c.JSON(http.StatusCreated, res)
 }
@@ -391,7 +391,7 @@ func newContestDetail(contest schema.Contest, link string, description string, t
 	}
 }
 
-func newContestTeam(id uuid.UUID, name string, result string, members []User) schema.ContestTeam {
+func newContestTeam(id uuid.UUID, name string, result string, members []schema.User) schema.ContestTeam {
 	return schema.ContestTeam{
 		Id:      id,
 		Name:    name,

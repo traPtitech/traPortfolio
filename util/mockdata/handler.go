@@ -129,35 +129,6 @@ func CloneHandlerMockContestTeamMembersByID() map[uuid.UUID][]schema.User {
 	return hContestMembers
 }
 
-func CloneHandlerMockContestTeamMembersByID() map[uuid.UUID][]schema.User {
-
-	var (
-		hContestTeams         = CloneMockContestTeams()
-		mockMembersBelongings = CloneMockContestTeamUserBelongings()
-		mockMembers           = CloneMockUsers()
-		hContestMembers       = make(map[uuid.UUID][]schema.User, len(hContestTeams))
-	)
-
-	for _, c := range hContestTeams {
-		for _, ct := range mockMembersBelongings {
-			if c.ID == ct.TeamID {
-
-				for _, cm := range mockMembers {
-					if ct.UserID == cm.ID {
-						hContestMembers[ct.TeamID] = append(hContestMembers[c.ID], schema.User{
-							Id:   cm.ID,
-							Name: cm.Name,
-						})
-					}
-				}
-
-			}
-		}
-	}
-
-	return hContestMembers
-}
-
 func CloneHandlerMockEvents() []schema.Event {
 	var (
 		knoqEvents = CloneMockKnoqEvents()
