@@ -23,7 +23,7 @@ func NewGroupHandler(s service.GroupService) *GroupHandler {
 // GetGroups GET /groups
 func (h *GroupHandler) GetGroups(c echo.Context) error {
 	ctx := c.Request().Context()
-	groups, err := h.s.GetAllGroups(ctx)
+	groups, err := h.s.GetGroups(ctx)
 	if err != nil {
 		return err
 	}
