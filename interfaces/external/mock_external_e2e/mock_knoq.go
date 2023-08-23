@@ -13,7 +13,7 @@ func NewMockKnoqAPI() *MockKnoqAPI {
 	return &MockKnoqAPI{}
 }
 
-func (m *MockKnoqAPI) GetAll() ([]*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetKnoqEvents() ([]*external.EventResponse, error) {
 	return mockdata.MockKnoqEvents, nil
 }
 

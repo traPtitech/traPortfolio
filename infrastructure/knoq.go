@@ -30,7 +30,7 @@ func NewKnoqAPI(conf *config.KnoqConfig, isDevelopment bool) (external.KnoqAPI, 
 	return &KnoqAPI{newAPIClient(jar, conf.API())}, nil
 }
 
-func (a *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
+func (a *KnoqAPI) GetKnoqEvents() ([]*external.EventResponse, error) {
 	res, err := a.apiGet("/events")
 	if err != nil {
 		return nil, err

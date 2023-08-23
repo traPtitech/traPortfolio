@@ -18,6 +18,6 @@ type TraQGetAllArgs struct {
 }
 
 type TraQAPI interface {
-	GetAll(args *TraQGetAllArgs) ([]*TraQUserResponse, error)
+	GetTraqUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error)
 	GetByUserID(userID uuid.UUID) (*TraQUserResponse, error)
 }

@@ -37,7 +37,7 @@ func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.Porta
 	}, nil
 }
 
-func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
+func (a *PortalAPI) GetPortalUsers() ([]*external.PortalUserResponse, error) {
 	portalUsers, found := a.cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil

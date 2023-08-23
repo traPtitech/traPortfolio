@@ -62,7 +62,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 				},
 			},
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
-				f.knoq.EXPECT().GetAll().Return(makeKnoqEvents(t, want), nil)
+				f.knoq.EXPECT().GetKnoqEvents().Return(makeKnoqEvents(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -70,7 +70,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			name: "KnoqError",
 			want: nil,
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
-				f.knoq.EXPECT().GetAll().Return(nil, errUnexpected)
+				f.knoq.EXPECT().GetKnoqEvents().Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},

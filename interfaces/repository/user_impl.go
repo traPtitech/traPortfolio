@@ -51,7 +51,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 		return nil, err
 	}
 
-	traqUsers, err := r.traQ.GetAll(eargs)
+	traqUsers, err := r.traQ.GetTraqUsers(eargs)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 			userMap[v.Name] = v
 		}
 
-		portalUsers, err := r.portal.GetAll()
+		portalUsers, err := r.portal.GetPortalUsers()
 		if err != nil {
 			return nil, err
 		}

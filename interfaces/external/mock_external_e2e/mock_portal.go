@@ -13,7 +13,7 @@ func NewMockPortalAPI() *MockPortalAPI {
 	return &MockPortalAPI{}
 }
 
-func (m *MockPortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
+func (m *MockPortalAPI) GetPortalUsers() ([]*external.PortalUserResponse, error) {
 	return mockdata.MockPortalUsers, nil
 }
 

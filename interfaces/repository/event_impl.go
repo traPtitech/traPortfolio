@@ -22,7 +22,7 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) reposito
 }
 
 func (r *EventRepository) GetEvents(_ context.Context) ([]*domain.Event, error) {
-	events, err := r.knoq.GetAll()
+	events, err := r.knoq.GetKnoqEvents()
 	if err != nil {
 		return nil, err
 	}

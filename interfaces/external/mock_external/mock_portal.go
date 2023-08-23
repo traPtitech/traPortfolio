@@ -34,21 +34,6 @@ func (m *MockPortalAPI) EXPECT() *MockPortalAPIMockRecorder {
 	return m.recorder
 }
 
-// GetAll mocks base method.
-func (m *MockPortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]*external.PortalUserResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAll indicates an expected call of GetAll.
-func (mr *MockPortalAPIMockRecorder) GetAll() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPortalAPI)(nil).GetAll))
-}
-
 // GetByTraqID mocks base method.
 func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	m.ctrl.T.Helper()
@@ -62,4 +47,19 @@ func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse
 func (mr *MockPortalAPIMockRecorder) GetByTraqID(traQID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTraqID", reflect.TypeOf((*MockPortalAPI)(nil).GetByTraqID), traQID)
+}
+
+// GetPortalUsers mocks base method.
+func (m *MockPortalAPI) GetPortalUsers() ([]*external.PortalUserResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPortalUsers")
+	ret0, _ := ret[0].([]*external.PortalUserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPortalUsers indicates an expected call of GetPortalUsers.
+func (mr *MockPortalAPIMockRecorder) GetPortalUsers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPortalUsers", reflect.TypeOf((*MockPortalAPI)(nil).GetPortalUsers))
 }
