@@ -15,11 +15,11 @@ import (
 )
 
 type UserHandler struct {
-	srv service.UserService
+	s service.UserService
 }
 
 func NewUserHandler(s service.UserService) *UserHandler {
-	return &UserHandler{srv: s}
+	return &UserHandler{s: s}
 }
 
 // GetUsers GET /users
@@ -36,7 +36,7 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 		Limit:            optional.FromPtr((*int)(req.Limit)),
 	}
 
-	users, err := h.srv.GetUsers(ctx, &args)
+	users, err := h.s.GetUsers(ctx, &args)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (h *UserHandler) GetUser(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	user, err := h.srv.GetUser(ctx, userID)
+	user, err := h.s.GetUser(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 		Check:       optional.FromPtr(req.Check),
 	}
 
-	if err := h.srv.Update(ctx, userID, &u); err != nil {
+	if err := h.s.Update(ctx, userID, &u); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -107,7 +107,7 @@ func (h *UserHandler) GetUserAccounts(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	accounts, err := h.srv.GetAccounts(ctx, userID)
+	accounts, err := h.s.GetAccounts(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (h *UserHandler) GetUserAccount(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	account, err := h.srv.GetAccount(ctx, userID, accountID)
+	account, err := h.s.GetAccount(ctx, userID, accountID)
 	if err != nil {
 		return err
 	}
@@ -160,7 +160,7 @@ func (h *UserHandler) AddUserAccount(c echo.Context) error {
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
-	account, err := h.srv.CreateAccount(ctx, userID, &args)
+	account, err := h.s.CreateAccount(ctx, userID, &args)
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func (h *UserHandler) EditUserAccount(c echo.Context) error {
 		PrPermitted: optional.FromPtr(req.PrPermitted),
 	}
 
-	err = h.srv.EditAccount(ctx, userID, accountID, &args)
+	err = h.s.EditAccount(ctx, userID, accountID, &args)
 	if err != nil {
 		return err
 	}
@@ -215,7 +215,7 @@ func (h *UserHandler) DeleteUserAccount(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := h.srv.DeleteAccount(ctx, userID, accountID); err != nil {
+	if err := h.s.DeleteAccount(ctx, userID, accountID); err != nil {
 		return err
 	}
 
@@ -230,7 +230,7 @@ func (h *UserHandler) GetUserProjects(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	projects, err := h.srv.GetUserProjects(ctx, userID)
+	projects, err := h.s.GetUserProjects(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -255,7 +255,7 @@ func (h *UserHandler) GetUserContests(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contests, err := h.srv.GetUserContests(ctx, userID)
+	contests, err := h.s.GetUserContests(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -283,7 +283,7 @@ func (h *UserHandler) GetUserGroups(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	groups, err := h.srv.GetGroupsByUserID(ctx, userID)
+	groups, err := h.s.GetGroupsByUserID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -306,7 +306,7 @@ func (h *UserHandler) GetUserEvents(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	events, err := h.srv.GetUserEvents(ctx, userID)
+	events, err := h.s.GetUserEvents(ctx, userID)
 	if err != nil {
 		return err
 	}

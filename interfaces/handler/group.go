@@ -12,18 +12,18 @@ import (
 )
 
 type GroupHandler struct {
-	srv service.GroupService
+	s service.GroupService
 }
 
 // NewGroupHandler creates a GroupHandler
-func NewGroupHandler(service service.GroupService) *GroupHandler {
-	return &GroupHandler{service}
+func NewGroupHandler(s service.GroupService) *GroupHandler {
+	return &GroupHandler{s}
 }
 
 // GetGroups GET /groups
 func (h *GroupHandler) GetGroups(c echo.Context) error {
 	ctx := c.Request().Context()
-	groups, err := h.srv.GetAllGroups(ctx)
+	groups, err := h.s.GetAllGroups(ctx)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (h *GroupHandler) GetGroup(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	group, err := h.srv.GetGroup(ctx, groupID)
+	group, err := h.s.GetGroup(ctx, groupID)
 	if err != nil {
 		return err
 	}
