@@ -61,7 +61,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {
@@ -87,7 +87,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), "", false),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {
@@ -115,7 +115,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {
@@ -143,7 +143,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
 				u := want[0]
 
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
@@ -164,7 +164,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			want: []*domain.User{},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
@@ -186,7 +186,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {
@@ -215,7 +215,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 			},
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 				rows := sqlmock.NewRows([]string{"id", "name", "check"})
 				for _, v := range want {
 					rows.AddRow(v.ID, v.Name, v.Check)
@@ -246,7 +246,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(nil, errUnexpected)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -257,7 +257,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			},
 			want: nil,
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, want), nil)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?,?)")).
@@ -276,7 +276,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			setup: func(t *testing.T, f mockUserRepositoryFields, args args, want []*domain.User) {
 				id := random.UUID()
 
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return([]*external.TraQUserResponse{{ID: id}}, nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return([]*external.TraQUserResponse{{ID: id}}, nil)
 
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?)")).
@@ -302,7 +302,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				}
 
-				f.traq.EXPECT().GetTraqUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, users), nil)
+				f.traq.EXPECT().GetUsers(mustMakeTraqGetAllArgs(t, args.args)).Return(makeTraqUsers(t, users), nil)
 				rows := sqlmock.NewRows([]string{"id", "name"})
 				for _, v := range users {
 					rows.AddRow(v.ID, v.Name)
@@ -381,7 +381,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(rows)
 				f.portal.EXPECT().GetByTraqID(want.User.Name).Return(makePortalUser(t, &want.User), nil)
-				f.traq.EXPECT().GetByUserID(args.id).Return(makeTraqUser(t, want), nil)
+				f.traq.EXPECT().GetUserByUserID(args.id).Return(makeTraqUser(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -456,7 +456,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 							AddRow(random.UUID(), args.id, 0, 0),
 					)
 				f.portal.EXPECT().GetByTraqID(name).Return(makePortalUser(t, &domain.User{Name: name}), nil)
-				f.traq.EXPECT().GetByUserID(args.id).Return(nil, errUnexpected)
+				f.traq.EXPECT().GetUserByUserID(args.id).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
