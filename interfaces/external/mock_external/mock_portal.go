@@ -34,32 +34,32 @@ func (m *MockPortalAPI) EXPECT() *MockPortalAPIMockRecorder {
 	return m.recorder
 }
 
-// GetByTraqID mocks base method.
-func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
+// GetUserByTraqID mocks base method.
+func (m *MockPortalAPI) GetUserByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByTraqID", traQID)
+	ret := m.ctrl.Call(m, "GetUserByTraqID", traQID)
 	ret0, _ := ret[0].(*external.PortalUserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetByTraqID indicates an expected call of GetByTraqID.
-func (mr *MockPortalAPIMockRecorder) GetByTraqID(traQID interface{}) *gomock.Call {
+// GetUserByTraqID indicates an expected call of GetUserByTraqID.
+func (mr *MockPortalAPIMockRecorder) GetUserByTraqID(traQID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTraqID", reflect.TypeOf((*MockPortalAPI)(nil).GetByTraqID), traQID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByTraqID", reflect.TypeOf((*MockPortalAPI)(nil).GetUserByTraqID), traQID)
 }
 
-// GetPortalUsers mocks base method.
-func (m *MockPortalAPI) GetPortalUsers() ([]*external.PortalUserResponse, error) {
+// GetUsers mocks base method.
+func (m *MockPortalAPI) GetUsers() ([]*external.PortalUserResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPortalUsers")
+	ret := m.ctrl.Call(m, "GetUsers")
 	ret0, _ := ret[0].([]*external.PortalUserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPortalUsers indicates an expected call of GetPortalUsers.
-func (mr *MockPortalAPIMockRecorder) GetPortalUsers() *gomock.Call {
+// GetUsers indicates an expected call of GetUsers.
+func (mr *MockPortalAPIMockRecorder) GetUsers() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPortalUsers", reflect.TypeOf((*MockPortalAPI)(nil).GetPortalUsers))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockPortalAPI)(nil).GetUsers))
 }

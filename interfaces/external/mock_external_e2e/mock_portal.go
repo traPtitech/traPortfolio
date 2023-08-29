@@ -13,11 +13,11 @@ func NewMockPortalAPI() *MockPortalAPI {
 	return &MockPortalAPI{}
 }
 
-func (m *MockPortalAPI) GetPortalUsers() ([]*external.PortalUserResponse, error) {
+func (m *MockPortalAPI) GetUsers() ([]*external.PortalUserResponse, error) {
 	return mockdata.MockPortalUsers, nil
 }
 
-func (m *MockPortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
+func (m *MockPortalAPI) GetUserByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	for _, v := range mockdata.MockPortalUsers {
 		if v.TraQID == traQID {
 			return v, nil
