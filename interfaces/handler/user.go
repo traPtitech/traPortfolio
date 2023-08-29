@@ -19,7 +19,7 @@ type UserHandler struct {
 }
 
 func NewUserHandler(s service.UserService) *UserHandler {
-	return &UserHandler{s: s}
+	return &UserHandler{s}
 }
 
 // GetUsers GET /users

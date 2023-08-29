@@ -16,7 +16,7 @@ type ProjectHandler struct {
 }
 
 func NewProjectHandler(s service.ProjectService) *ProjectHandler {
-	return &ProjectHandler{s: s}
+	return &ProjectHandler{s}
 }
 
 // GetProjects GET /projects
