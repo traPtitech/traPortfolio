@@ -22,7 +22,7 @@ type EventResponse struct {
 }
 
 type KnoqAPI interface {
-	GetKnoqEvents() ([]*EventResponse, error)
-	GetByEventID(eventID uuid.UUID) (*EventResponse, error)
-	GetByUserID(userID uuid.UUID) ([]*EventResponse, error)
+	GetEvents() ([]*EventResponse, error)
+	GetEvent(eventID uuid.UUID) (*EventResponse, error)
+	GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, error)
 }

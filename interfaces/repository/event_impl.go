@@ -22,7 +22,7 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) reposito
 }
 
 func (r *EventRepository) GetEvents(_ context.Context) ([]*domain.Event, error) {
-	events, err := r.knoq.GetKnoqEvents()
+	events, err := r.knoq.GetEvents()
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (r *EventRepository) GetEvents(_ context.Context) ([]*domain.Event, error) 
 }
 
 func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*domain.EventDetail, error) {
-	er, err := r.knoq.GetByEventID(eventID)
+	er, err := r.knoq.GetEvent(eventID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 }
 
 func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.CreateEventLevelArgs) error {
-	_, err := r.knoq.GetByEventID(arg.EventID)
+	_, err := r.knoq.GetEvent(arg.EventID)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 }
 
 func (r *EventRepository) GetUserEvents(_ context.Context, userID uuid.UUID) ([]*domain.Event, error) {
-	events, err := r.knoq.GetByUserID(userID)
+	events, err := r.knoq.GetEventsByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
