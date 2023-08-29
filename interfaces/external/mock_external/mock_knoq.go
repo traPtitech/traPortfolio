@@ -50,21 +50,6 @@ func (mr *MockKnoqAPIMockRecorder) GetEvent(eventID interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvent", reflect.TypeOf((*MockKnoqAPI)(nil).GetEvent), eventID)
 }
 
-// GetEventsByUserID mocks base method.
-func (m *MockKnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEventsByUserID", userID)
-	ret0, _ := ret[0].([]*external.EventResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEventsByUserID indicates an expected call of GetEventsByUserID.
-func (mr *MockKnoqAPIMockRecorder) GetEventsByUserID(userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventsByUserID", reflect.TypeOf((*MockKnoqAPI)(nil).GetEventsByUserID), userID)
-}
-
 // GetEvents mocks base method.
 func (m *MockKnoqAPI) GetEvents() ([]*external.EventResponse, error) {
 	m.ctrl.T.Helper()
@@ -78,4 +63,19 @@ func (m *MockKnoqAPI) GetEvents() ([]*external.EventResponse, error) {
 func (mr *MockKnoqAPIMockRecorder) GetEvents() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvents", reflect.TypeOf((*MockKnoqAPI)(nil).GetEvents))
+}
+
+// GetEventsByUserID mocks base method.
+func (m *MockKnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEventsByUserID", userID)
+	ret0, _ := ret[0].([]*external.EventResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEventsByUserID indicates an expected call of GetEventsByUserID.
+func (mr *MockKnoqAPIMockRecorder) GetEventsByUserID(userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventsByUserID", reflect.TypeOf((*MockKnoqAPI)(nil).GetEventsByUserID), userID)
 }
