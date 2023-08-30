@@ -32,7 +32,7 @@ func (m *MockTraQAPI) GetUsers(args *external.TraQGetAllArgs) ([]*external.TraQU
 	return users, nil
 }
 
-func (m *MockTraQAPI) GetUserByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+func (m *MockTraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	for _, u := range mockdata.MockTraQUsers {
 		if u.User.ID == userID {
 			return u.User, nil

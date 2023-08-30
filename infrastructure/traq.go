@@ -46,7 +46,7 @@ func (a *TraQAPI) GetUsers(args *external.TraQGetAllArgs) ([]*external.TraQUserR
 	return usersResponse, nil
 }
 
-func (a *TraQAPI) GetUserByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+func (a *TraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/users/%v", userID))
 	if err != nil {
 		return nil, err

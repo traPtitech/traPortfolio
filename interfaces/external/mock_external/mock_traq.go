@@ -35,19 +35,19 @@ func (m *MockTraQAPI) EXPECT() *MockTraQAPIMockRecorder {
 	return m.recorder
 }
 
-// GetUserByUserID mocks base method.
-func (m *MockTraQAPI) GetUserByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+// GetUser mocks base method.
+func (m *MockTraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserByUserID", userID)
+	ret := m.ctrl.Call(m, "GetUser", userID)
 	ret0, _ := ret[0].(*external.TraQUserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserByUserID indicates an expected call of GetUserByUserID.
-func (mr *MockTraQAPIMockRecorder) GetUserByUserID(userID interface{}) *gomock.Call {
+// GetUser indicates an expected call of GetUser.
+func (mr *MockTraQAPIMockRecorder) GetUser(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUserID", reflect.TypeOf((*MockTraQAPI)(nil).GetUserByUserID), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockTraQAPI)(nil).GetUser), userID)
 }
 
 // GetUsers mocks base method.

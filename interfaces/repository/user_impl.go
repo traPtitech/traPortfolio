@@ -142,7 +142,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		return nil, err
 	}
 
-	traQUser, err := r.traQ.GetUserByUserID(userID)
+	traQUser, err := r.traQ.GetUser(userID)
 	if err != nil {
 		return nil, err
 	}
