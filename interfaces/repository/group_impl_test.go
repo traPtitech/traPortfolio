@@ -68,7 +68,7 @@ func TestGroupRepository_GetAllGroups(t *testing.T) {
 			f := newMockGroupRepositoryFields(t)
 			tt.setup(f, tt.want)
 			repo := NewGroupRepository(f.h)
-			got, err := repo.GetAllGroups(context.Background())
+			got, err := repo.GetGroups(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

@@ -17,18 +17,18 @@ import (
 )
 
 type EventHandler struct {
-	srv service.EventService
+	s service.EventService
 }
 
 // NewEventHandler creates a EventHandler
-func NewEventHandler(service service.EventService) *EventHandler {
-	return &EventHandler{service}
+func NewEventHandler(s service.EventService) *EventHandler {
+	return &EventHandler{s}
 }
 
 // GetEvents GET /events
 func (h *EventHandler) GetEvents(c echo.Context) error {
 	ctx := c.Request().Context()
-	events, err := h.srv.GetEvents(ctx)
+	events, err := h.s.GetEvents(ctx)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (h *EventHandler) GetEvent(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	event, err := h.srv.GetEventByID(ctx, eventID)
+	event, err := h.s.GetEventByID(ctx, eventID)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 		Level: optional.FromPtr((*domain.EventLevel)(req.EventLevel)),
 	}
 
-	if err := h.srv.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
+	if err := h.s.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)

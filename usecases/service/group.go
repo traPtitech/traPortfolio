@@ -11,7 +11,7 @@ import (
 )
 
 type GroupService interface {
-	GetAllGroups(ctx context.Context) ([]*domain.Group, error)
+	GetGroups(ctx context.Context) ([]*domain.Group, error)
 	GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error)
 }
 
@@ -26,8 +26,8 @@ func NewGroupService(group repository.GroupRepository, user repository.UserRepos
 	}
 }
 
-func (s *groupService) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
-	return s.group.GetAllGroups(ctx)
+func (s *groupService) GetGroups(ctx context.Context) ([]*domain.Group, error) {
+	return s.group.GetGroups(ctx)
 }
 
 func (s *groupService) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {

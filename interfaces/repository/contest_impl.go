@@ -511,7 +511,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 }
 
 func (r *ContestRepository) makeUserNameMap() (map[string]string, error) {
-	users, err := r.portal.GetAll()
+	users, err := r.portal.GetUsers()
 	if err != nil {
 		return nil, err
 	}
