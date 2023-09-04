@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -20,32 +20,32 @@ import (
 // GetUsers GET /users
 func TestGetUsers(t *testing.T) {
 	var (
-		includeSuspended = handler.IncludeSuspendedInQuery(true)
-		name             = handler.NameInQuery(mockdata.MockUsers[0].Name)
-		limitBlank       = handler.LimitInQuery(0)
-		limitLessThan1   = handler.LimitInQuery(-1)
+		includeSuspended = schema.IncludeSuspendedInQuery(true)
+		name             = schema.NameInQuery(mockdata.MockUsers[0].Name)
+		limitBlank       = schema.LimitInQuery(0)
+		limitLessThan1   = schema.LimitInQuery(-1)
 	)
 
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		reqBody    handler.GetUsersParams
-		want       interface{} // []handler.User | echo.HTTPError
+		reqBody    schema.GetUsersParams
+		want       interface{} // []schema.User | echo.HTTPError
 	}{
 		"200": {
 			http.StatusOK,
-			handler.GetUsersParams{},
-			[]handler.User{
+			schema.GetUsersParams{},
+			[]schema.User{
 				mockdata.HMockUsers[0],
 				mockdata.HMockUsers[2],
 			},
 		},
 		"200 with includeSuspended": {
 			http.StatusOK,
-			handler.GetUsersParams{
+			schema.GetUsersParams{
 				IncludeSuspended: &includeSuspended,
 			},
-			[]handler.User{
+			[]schema.User{
 				mockdata.HMockUsers[0],
 				mockdata.HMockUsers[1],
 				mockdata.HMockUsers[2],
@@ -53,39 +53,39 @@ func TestGetUsers(t *testing.T) {
 		},
 		"200 with name": {
 			http.StatusOK,
-			handler.GetUsersParams{
+			schema.GetUsersParams{
 				Name: &name,
 			},
-			[]handler.User{
+			[]schema.User{
 				mockdata.HMockUsers[0],
 			},
 		},
 		"400 multiple params": {
 			http.StatusBadRequest,
-			handler.GetUsersParams{
+			schema.GetUsersParams{
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			testutils.HTTPError("Bad Request: validate error: include_suspended and name cannot be specified at the same time"),
+			testutils.HTTPError(t, "Bad Request: validate error: include_suspended and name cannot be specified at the same time"),
 		},
 		"400 invalid limit with 0": {
 			http.StatusBadRequest,
-			handler.GetUsersParams{
+			schema.GetUsersParams{
 				Limit: &limitBlank,
 			},
-			testutils.HTTPError("Bad Request: validate error: limit: cannot be blank."),
+			testutils.HTTPError(t, "Bad Request: validate error: limit: cannot be blank."),
 		},
 		"400 invalid limit less than 1": {
 			http.StatusBadRequest,
-			handler.GetUsersParams{
+			schema.GetUsersParams{
 				Limit: &limitLessThan1,
 			},
-			testutils.HTTPError("Bad Request: validate error: limit: must be no less than 1."),
+			testutils.HTTPError(t, "Bad Request: validate error: limit: must be no less than 1."),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_users")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_users")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -104,7 +104,7 @@ func TestGetUser(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		want       interface{} // handler.UserDetail | echo.HTTPError
+		want       interface{} // schema.UserDetail | echo.HTTPError
 	}{
 		"200": {
 			http.StatusOK,
@@ -114,17 +114,17 @@ func TestGetUser(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -148,13 +148,13 @@ func TestUpdateUser(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		reqBody    handler.EditUserJSONRequestBody
+		reqBody    schema.EditUserJSONRequestBody
 		want       interface{} // nil or error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.UserID1(),
-			handler.EditUserJSONRequestBody{
+			schema.EditUserJSONRequestBody{
 				Bio:   &bio,
 				Check: &check,
 			},
@@ -163,19 +163,19 @@ func TestUpdateUser(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.UserID2(),
-			handler.EditUserJSONRequestBody{},
+			schema.EditUserJSONRequestBody{},
 			nil,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.EditUserJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.EditUserJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_update_user")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_update_user")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -184,7 +184,7 @@ func TestUpdateUser(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
-				var user handler.UserDetail
+				var user schema.UserDetail
 				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &user)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
@@ -225,22 +225,22 @@ func TestGetUserAccounts(t *testing.T) {
 		"200 no accounts with existing userID": {
 			http.StatusOK,
 			mockdata.UserID2(),
-			[]handler.Account{},
+			[]schema.Account{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user_accounts")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_accounts")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -272,36 +272,36 @@ func TestGetUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.AccountID1(),
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			mockdata.AccountID1(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 		"404 accountID not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 		"404 both userID and accountID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user_account")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_account")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -320,13 +320,13 @@ func TestAddUserAccount(t *testing.T) {
 		displayName          = random.AlphaNumeric()
 		justCountDisplayName = strings.Repeat("亜", 256)
 		tooLongDisplayName   = strings.Repeat("亜", 257)
-		prPermitted          = handler.PrPermitted(random.Bool())
+		prPermitted          = schema.PrPermitted(random.Bool())
 		testUserID           = mockdata.UserID1()
-		accountType          = handler.AccountType(mockdata.AccountTypesMockUserDoesntHave(testUserID)[0])
+		accountType          = schema.AccountType(mockdata.AccountTypesMockUserDoesntHave(testUserID)[0])
 		accountURL           = random.AccountURLString(domain.AccountType(accountType))
-		conflictType         = handler.AccountType(mockdata.AccountTypesMockUserHas(testUserID)[0])
+		conflictType         = schema.AccountType(mockdata.AccountTypesMockUserHas(testUserID)[0])
 		testUserID2          = mockdata.UserID2()
-		accountType2         = handler.AccountType(mockdata.AccountTypesMockUserDoesntHave(testUserID2)[0])
+		accountType2         = schema.AccountType(mockdata.AccountTypesMockUserDoesntHave(testUserID2)[0])
 		accountURL2          = random.AccountURLString(domain.AccountType(accountType2))
 	)
 
@@ -334,19 +334,19 @@ func TestAddUserAccount(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		reqBody    handler.AddUserAccountJSONRequestBody
+		reqBody    schema.AddUserAccountJSONRequestBody
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
 			testUserID,
-			handler.AddUserAccountJSONRequestBody{
+			schema.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         accountURL,
 			},
-			handler.Account{
+			schema.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
@@ -357,13 +357,13 @@ func TestAddUserAccount(t *testing.T) {
 		"201 with kanji": {
 			http.StatusCreated,
 			testUserID2,
-			handler.AddUserAccountJSONRequestBody{
+			schema.AddUserAccountJSONRequestBody{
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
 				Type:        accountType2,
 				Url:         accountURL2,
 			},
-			handler.Account{
+			schema.Account{
 				Id:          uuid.Nil,
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
@@ -374,57 +374,57 @@ func TestAddUserAccount(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.AddUserAccountJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.AddUserAccountJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
 			testUserID,
-			handler.AddUserAccountJSONRequestBody{
+			schema.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         "invalid url",
 			},
-			testutils.HTTPError("Bad Request: validate error: url: must be a valid URL."),
+			testutils.HTTPError(t, "Bad Request: validate error: url: must be a valid URL."),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
 			testUserID,
-			handler.AddUserAccountJSONRequestBody{
+			schema.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
-				Type:        handler.AccountType(domain.AccountLimit),
+				Type:        schema.AccountType(domain.AccountLimit),
 				Url:         accountURL,
 			},
-			testutils.HTTPError("Bad Request: validate error: type: must be no greater than 11."),
+			testutils.HTTPError(t, "Bad Request: validate error: type: must be no greater than 11."),
 		},
 		"409 conflict already exists": {
 			http.StatusConflict,
 			testUserID,
-			handler.AddUserAccountJSONRequestBody{
+			schema.AddUserAccountJSONRequestBody{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        conflictType,
 				Url:         random.AccountURLString(domain.AccountType(conflictType)),
 			},
-			testutils.HTTPError("Conflict: already exists"),
+			testutils.HTTPError(t, "Conflict: already exists"),
 		},
 		"400 too long display name": {
 			http.StatusBadRequest,
 			testUserID,
-			handler.AddUserAccountJSONRequestBody{
+			schema.AddUserAccountJSONRequestBody{
 				DisplayName: tooLongDisplayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         accountURL,
 			},
-			testutils.HTTPError("Bad Request: validate error: displayName: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: displayName: the length must be between 1 and 256."),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_add_user_account")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_add_user_account")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -433,7 +433,7 @@ func TestAddUserAccount(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
 			switch want := tt.want.(type) {
-			case handler.Account:
+			case schema.Account:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
 			case error:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
@@ -446,12 +446,12 @@ func TestAddUserAccount(t *testing.T) {
 func TestEditUserAccount(t *testing.T) {
 	var (
 		displayName        = random.AlphaNumeric()
-		prPermitted        = handler.PrPermitted(random.Bool())
+		prPermitted        = schema.PrPermitted(random.Bool())
 		testAccount        = mockdata.UserID1()
-		accountType        = handler.AccountType(mockdata.AccountTypesMockUserHas(testAccount)[0])
+		accountType        = schema.AccountType(mockdata.AccountTypesMockUserHas(testAccount)[0])
 		accountURL         = random.AccountURLString(domain.AccountType(accountType))
 		initialAccountType = domain.AccountType(mockdata.AccountTypesMockUserDoesntHave(testAccount)[0])
-		invalidAccountType = handler.AccountType(domain.GITHUB)
+		invalidAccountType = schema.AccountType(domain.GITHUB)
 		invalidAccountURL  = random.RandURLString()
 	)
 
@@ -460,7 +460,7 @@ func TestEditUserAccount(t *testing.T) {
 		statusCode    int
 		userID        uuid.UUID
 		accountID     uuid.UUID
-		reqBody       handler.EditUserAccountJSONRequestBody
+		reqBody       schema.EditUserAccountJSONRequestBody
 		want          interface{} // nil | error
 		needInsertion bool
 	}{
@@ -468,7 +468,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			handler.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 				PrPermitted: &prPermitted,
 				Type:        &accountType,
@@ -481,7 +481,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.UserID2(),
 			random.UUID(),
-			handler.EditUserAccountJSONRequestBody{},
+			schema.EditUserAccountJSONRequestBody{},
 			nil,
 			true,
 		},
@@ -489,91 +489,91 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.AccountID1(),
-			handler.EditUserAccountJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.EditUserAccountJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 			false,
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			uuid.Nil,
-			handler.EditUserAccountJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.EditUserAccountJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 			false,
 		},
 		"400 invalud url without accountType": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			handler.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountJSONRequestBody{
 				Url: &invalidAccountURL,
 			},
-			testutils.HTTPError("Bad Request: argument error"),
+			testutils.HTTPError(t, "Bad Request: argument error"),
 			false,
 		},
 		"400 invalid url without accountURL": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			handler.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountJSONRequestBody{
 				Type: &invalidAccountType,
 			},
-			testutils.HTTPError("Bad Request: argument error"),
+			testutils.HTTPError(t, "Bad Request: argument error"),
 			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			handler.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 			false,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			handler.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 			false,
 		},
 		"404 account type conflicted by update": {
 			http.StatusConflict,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			handler.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 				PrPermitted: &prPermitted,
 				Type:        &accountType,
 				Url:         &accountURL,
 			},
-			testutils.HTTPError("Conflict: already exists"),
+			testutils.HTTPError(t, "Conflict: already exists"),
 			true,
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_edit_user_account")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_edit_user_account")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			account := handler.Account{}
+			account := schema.Account{}
 			if tt.needInsertion {
 				// Insert & Assert
-				account = handler.Account{
+				account = schema.Account{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(initialAccountType),
+					PrPermitted: schema.PrPermitted(random.Bool()),
+					Type:        schema.AccountType(initialAccountType),
 					Url:         random.AccountURLString(initialAccountType),
 				}
-				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), handler.AddUserAccountJSONRequestBody{
+				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), schema.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,
 					PrPermitted: account.PrPermitted,
 					Type:        account.Type,
@@ -623,7 +623,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		"204": {
 			http.StatusNoContent,
 			mockdata.UserID1(),
-			testutils.DummyUUID(),
+			testutils.DummyUUID(t),
 			nil,
 			true,
 		},
@@ -631,27 +631,27 @@ func TestDeleteUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			random.UUID(),
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 			false,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 			false,
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_delete_user_account")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_delete_user_account")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -660,14 +660,14 @@ func TestDeleteUserAccount(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
-				reqBody := handler.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: handler.PrPermitted(random.Bool()),
-					Type:        handler.AccountType(accountType),
+					PrPermitted: schema.PrPermitted(random.Bool()),
+					Type:        schema.AccountType(accountType),
 					Url:         random.AccountURLString(accountType),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
-				testutils.AssertResponse(t, http.StatusCreated, handler.Account{
+				testutils.AssertResponse(t, http.StatusCreated, schema.Account{
 					DisplayName: reqBody.DisplayName,
 					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
@@ -691,27 +691,27 @@ func TestGetUserProjects(t *testing.T) {
 		"200": {
 			http.StatusOK,
 			mockdata.UserID1(),
-			[]handler.UserProject{mockdata.HMockUserProjects[0]},
+			[]schema.UserProject{mockdata.HMockUserProjects[0]},
 		},
 		"200 no projects with existing userID": {
 			http.StatusOK,
 			mockdata.UserID3(),
-			[]handler.Project{},
+			[]schema.Project{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user_projects")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_projects")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -740,22 +740,22 @@ func TestGetUserContests(t *testing.T) {
 		"200 no contests with existing userID": {
 			http.StatusOK,
 			mockdata.UserID2(),
-			[]handler.Contest{},
+			[]schema.Contest{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user_contests")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_contests")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -784,22 +784,22 @@ func TestGetUserGroups(t *testing.T) {
 		"200 no groups with existing userID": {
 			http.StatusOK,
 			mockdata.UserID2(),
-			[]handler.Group{},
+			[]schema.Group{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user_groups")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_groups")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -828,24 +828,24 @@ func TestGetUserEvents(t *testing.T) {
 		"200 no events with existing userID": {
 			http.StatusOK,
 			mockdata.UserID2(),
-			[]handler.Event{
+			[]schema.Event{
 				mockdata.HMockUserEvents[1],
 			},
 		},
 		"200 no events with non-existing userID": {
 			http.StatusOK,
 			random.UUID(),
-			[]handler.Event{},
+			[]schema.Event{},
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("user_handler_get_user_events")
+	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_events")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {

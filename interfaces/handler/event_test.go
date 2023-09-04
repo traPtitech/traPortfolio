@@ -9,6 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service/mock_service"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -26,19 +27,19 @@ func setupEventMock(t *testing.T) (*mock_service.MockEventService, API) {
 }
 
 func TestEventHandler_GetEvents(t *testing.T) {
+	t.Parallel()
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService) (hres []*Event, path string)
+		setup      func(s *mock_service.MockEventService) (hres []*schema.Event, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(s *mock_service.MockEventService) (hres []*Event, path string) {
-
+			setup: func(s *mock_service.MockEventService) (hres []*schema.Event, path string) {
 				casenum := 2
 				repoEvents := []*domain.Event{}
-				hresEvents := []*Event{}
+				hresEvents := []*schema.Event{}
 
 				for i := 0; i < casenum; i++ {
 					since, until := random.SinceAndUntil()
@@ -48,10 +49,10 @@ func TestEventHandler_GetEvents(t *testing.T) {
 						TimeStart: since,
 						TimeEnd:   until,
 					}
-					hevent := Event{
+					hevent := schema.Event{
 						Id:   revent.ID,
 						Name: revent.Name,
-						Duration: Duration{
+						Duration: schema.Duration{
 							Since: revent.TimeStart,
 							Until: &revent.TimeEnd,
 						},
@@ -59,7 +60,6 @@ func TestEventHandler_GetEvents(t *testing.T) {
 
 					repoEvents = append(repoEvents, &revent)
 					hresEvents = append(hresEvents, &hevent)
-
 				}
 
 				s.EXPECT().GetEvents(anyCtx{}).Return(repoEvents, nil)
@@ -69,7 +69,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockEventService) (hres []*Event, path string) {
+			setup: func(s *mock_service.MockEventService) (hres []*schema.Event, path string) {
 				s.EXPECT().GetEvents(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
@@ -77,13 +77,15 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupEventMock(t)
 
 			hresEvents, path := tt.setup(s)
 
-			var resBody []*Event
+			var resBody []*schema.Event
 			statusCode, _ := doRequest(t, api, http.MethodGet, path, nil, &resBody)
 
 			// Assertion
@@ -96,19 +98,18 @@ func TestEventHandler_GetEvents(t *testing.T) {
 func TestEventHandler_GetEvent(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string)
+		setup      func(s *mock_service.MockEventService, hostnum int) (hres *schema.EventDetail, eventpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
-
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *schema.EventDetail, eventpath string) {
 				rHost := []*domain.User{}
-				hHost := []User{}
+				hHost := []schema.User{}
 
 				for i := 0; i < hostnum; i++ {
 					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
-					hhost := User{
+					hhost := schema.User{
 						Id:       rhost.ID,
 						Name:     rhost.Name,
 						RealName: rhost.RealName(),
@@ -116,7 +117,6 @@ func TestEventHandler_GetEvent(t *testing.T) {
 
 					rHost = append(rHost, rhost)
 					hHost = append(hHost, hhost)
-
 				}
 
 				since, until := random.SinceAndUntil()
@@ -136,13 +136,13 @@ func TestEventHandler_GetEvent(t *testing.T) {
 					RoomID:      random.UUID(),
 				}
 
-				hevent := EventDetail{
+				hevent := schema.EventDetail{
 					Description: revent.Description,
-					Duration: Duration{
+					Duration: schema.Duration{
 						Since: revent.Event.TimeStart,
 						Until: &revent.Event.TimeEnd,
 					},
-					EventLevel: EventLevel(revent.Level),
+					EventLevel: schema.EventLevel(revent.Level),
 					Hostname:   hHost,
 					Id:         revent.Event.ID,
 					Name:       revent.Event.Name,
@@ -160,14 +160,14 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid event ID",
-			setup: func(s *mock_service.MockEventService, hostnum int) (hres *EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, hostnum int) (hres *schema.EventDetail, eventpath string) {
 				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockEventService, _ int) (hres *EventDetail, eventpath string) {
+			setup: func(s *mock_service.MockEventService, _ int) (hres *schema.EventDetail, eventpath string) {
 				id := random.UUID()
 				s.EXPECT().GetEventByID(anyCtx{}, id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
@@ -177,12 +177,13 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupEventMock(t)
 
 			casenum := []int{1, 2, 32}
-			var resBody *EventDetail
+			var resBody *schema.EventDetail
 
 			for _, testcase := range casenum {
 				hresEvent, eventpath := tt.setup(s, testcase)
@@ -198,24 +199,25 @@ func TestEventHandler_GetEvent(t *testing.T) {
 }
 
 func TestEventHandler_EditEvent(t *testing.T) {
-	hLevel := func(l domain.EventLevel) *EventLevel {
-		r := EventLevel(l)
+	hLevel := func(l domain.EventLevel) *schema.EventLevel {
+		r := schema.EventLevel(l)
 		return &r
 	}
 
+	t.Parallel()
+
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService) (reqBody *EditEventJSONRequestBody, path string)
+		setup      func(s *mock_service.MockEventService) (reqBody *schema.EditEventJSONRequestBody, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &EditEventJSONRequestBody{
+				reqBody := &schema.EditEventJSONRequestBody{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -231,19 +233,18 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid event ID",
-			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
 				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &EditEventJSONRequestBody{
+				reqBody := &schema.EditEventJSONRequestBody{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -259,12 +260,11 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &EditEventJSONRequestBody{
+				reqBody := &schema.EditEventJSONRequestBody{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -280,12 +280,11 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: bind error",
-			setup: func(s *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
-
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &EditEventJSONRequestBody{
+				reqBody := &schema.EditEventJSONRequestBody{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -301,11 +300,11 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large level",
-			setup: func(_ *mock_service.MockEventService) (*EditEventJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
 				eventID := random.UUID()
-				eventLevel := EventLevel(domain.EventLevelLimit)
+				eventLevel := schema.EventLevel(domain.EventLevelLimit)
 
-				reqBody := &EditEventJSONRequestBody{
+				reqBody := &schema.EditEventJSONRequestBody{
 					EventLevel: &eventLevel,
 				}
 
@@ -317,7 +316,9 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Setup mock
 			s, api := setupEventMock(t)
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
@@ -23,7 +24,7 @@ func NewSQLHandler(db *gorm.DB) database.SQLHandler {
 
 func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
 	engine, err := gorm.Open(
-		mysql.New(mysql.Config{DSN: conf.Dsn()}),
+		mysql.New(mysql.Config{DSNConfig: conf.DsnConfig()}),
 		conf.GormConfig(),
 	)
 	if err != nil {
@@ -145,17 +146,24 @@ const (
 
 func (h *SQLHandler) Error() error {
 	err := h.conn.Error
+	if err == nil {
+		return nil
+	}
+
+	// TODO: use correct context
+	h.conn.Logger.Error(context.TODO(), err.Error())
+
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return database.ErrNoRows
+		return repository.ErrNotFound
 	}
 
 	// 外部キー制約エラーの変換
 	var mysqlErr *sqldriver.MySQLError
 	if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeInvalidConstraint {
-		return database.ErrInvalidArgument
+		return repository.ErrInvalidArg
 	}
 
-	return err
+	return repository.ErrDBInternal
 }
 
 // Interface guards

@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -23,7 +23,7 @@ func TestGetGroups(t *testing.T) {
 	}{
 		"200": {
 			http.StatusOK,
-			[]handler.Group{
+			[]schema.Group{
 				{
 					Id:   mockdata.GroupID1(),
 					Name: mockdata.HMockGroups[0].Name,
@@ -33,7 +33,7 @@ func TestGetGroups(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("group_handler_get_groups")
+	conf := testutils.GetConfigWithDBName(t, "group_handler_get_groups")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 
@@ -64,17 +64,17 @@ func TestGetGroup(t *testing.T) {
 		"400 invalid userID": {
 			statusCode: http.StatusBadRequest,
 			groupID:    uuid.Nil,
-			want:       testutils.HTTPError("Bad Request: nil id"),
+			want:       testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			statusCode: http.StatusNotFound,
 			groupID:    random.UUID(),
-			want:       testutils.HTTPError("Not Found: not found"),
+			want:       testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("group_handler_get_group")
+	conf := testutils.GetConfigWithDBName(t, "group_handler_get_group")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 

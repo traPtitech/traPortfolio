@@ -16,7 +16,8 @@ type mockGroupRepositoryFields struct {
 	h *mock_database.MockSQLHandler
 }
 
-func newMockGroupRepositoryFields() mockGroupRepositoryFields {
+func newMockGroupRepositoryFields(t *testing.T) mockGroupRepositoryFields {
+	t.Helper()
 	return mockGroupRepositoryFields{
 		h: mock_database.NewMockSQLHandler(),
 	}
@@ -64,10 +65,10 @@ func TestGroupRepository_GetAllGroups(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			f := newMockGroupRepositoryFields()
+			f := newMockGroupRepositoryFields(t)
 			tt.setup(f, tt.want)
 			repo := NewGroupRepository(f.h)
-			got, err := repo.GetAllGroups(context.Background())
+			got, err := repo.GetGroups(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -232,7 +233,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			f := newMockGroupRepositoryFields()
+			f := newMockGroupRepositoryFields(t)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewGroupRepository(f.h)
 			got, err := repo.GetGroup(context.Background(), tt.args.id)

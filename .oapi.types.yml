@@ -1,4 +1,0 @@
-output: oapi_types_gen.go
-generate:
-  models: true
-package: handler

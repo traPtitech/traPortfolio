@@ -15,7 +15,7 @@ func NewMockTraQAPI() *MockTraQAPI {
 	return &MockTraQAPI{}
 }
 
-func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
+func (m *MockTraQAPI) GetUsers(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
 	users := make([]*external.TraQUserResponse, 0, len(mockdata.MockTraQUsers))
 	for _, u := range mockdata.MockTraQUsers {
 		if args.Name == u.Name {
@@ -32,7 +32,7 @@ func (m *MockTraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUse
 	return users, nil
 }
 
-func (m *MockTraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+func (m *MockTraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	for _, u := range mockdata.MockTraQUsers {
 		if u.User.ID == userID {
 			return u.User, nil

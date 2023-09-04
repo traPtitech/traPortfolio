@@ -20,7 +20,7 @@ import (
 func TestContestRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contests")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contests")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -38,7 +38,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 func TestContestRepository_GetContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -58,63 +58,68 @@ func TestContestRepository_GetContest(t *testing.T) {
 func TestContestRepository_UpdateContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_update_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_update_contest")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
-	contest1 := mustMakeContest(t, repo, nil)
-	contest2 := mustMakeContest(t, repo, nil)
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateContestArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateContestArgs(),
+		},
+		{
+			name: "partial fields",
+			ctx:  context.Background(),
+			args: random.UpdateContestArgs(),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			contest1 := mustMakeContest(t, repo, nil)
+			contest2 := mustMakeContest(t, repo, nil)
 
-	args := urepository.UpdateContestArgs{
-		Name:        random.Optional(random.AlphaNumeric()),
-		Description: random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Since:       random.Optional(random.Time()),
-		Until:       random.Optional(random.Time()),
-	}
-	if v, ok := args.Name.V(); ok {
-		contest1.Name = v
-	}
-	if v, ok := args.Description.V(); ok {
-		contest1.Description = v
-	}
-	if v, ok := args.Link.V(); ok {
-		contest1.Link = v
-	}
-	if v, ok := args.Since.V(); ok {
-		contest1.TimeStart = v
-	}
-	if v, ok := args.Until.V(); ok {
-		contest1.TimeEnd = v
-	}
+			args := tt.args
+			contest1.Name = args.Name.ValueOr(contest1.Name)
+			contest1.Description = args.Description.ValueOr(contest1.Description)
+			contest1.Link = args.Link.ValueOr(contest1.Link)
+			contest1.TimeStart = args.Since.ValueOr(contest1.TimeStart)
+			contest1.TimeEnd = args.Until.ValueOr(contest1.TimeEnd)
 
-	err := repo.UpdateContest(context.Background(), contest1.ID, &args)
-	assert.NoError(t, err)
+			err := repo.UpdateContest(context.Background(), contest1.ID, args)
+			assert.NoError(t, err)
 
-	gotContest1, err := repo.GetContest(context.Background(), contest1.ID)
-	assert.NoError(t, err)
-	gotContest2, err := repo.GetContest(context.Background(), contest2.ID)
-	assert.NoError(t, err)
+			gotContest1, err := repo.GetContest(context.Background(), contest1.ID)
+			assert.NoError(t, err)
+			gotContest2, err := repo.GetContest(context.Background(), contest2.ID)
+			assert.NoError(t, err)
 
-	expected := []*domain.ContestDetail{contest1, contest2}
-	gots := []*domain.ContestDetail{gotContest1, gotContest2}
+			expected := []*domain.ContestDetail{contest1, contest2}
+			gots := []*domain.ContestDetail{gotContest1, gotContest2}
 
-	for i := range expected {
-		assert.True(t, expected[i].TimeStart.Equal(gots[i].TimeStart))
-		assert.True(t, expected[i].TimeEnd.Equal(gots[i].TimeEnd))
-		expected[i].TimeStart = time.Time{}
-		expected[i].TimeEnd = time.Time{}
-		gots[i].TimeStart = time.Time{}
-		gots[i].TimeEnd = time.Time{}
-		assert.Equal(t, expected[i], gots[i])
+			for i := range expected {
+				assert.True(t, expected[i].TimeStart.Equal(gots[i].TimeStart))
+				assert.True(t, expected[i].TimeEnd.Equal(gots[i].TimeEnd))
+				expected[i].TimeStart = time.Time{}
+				expected[i].TimeEnd = time.Time{}
+				gots[i].TimeStart = time.Time{}
+				gots[i].TimeEnd = time.Time{}
+				assert.Equal(t, expected[i], gots[i])
+			}
+		})
 	}
 }
 
 func TestContestRepository_DeleteContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_delete_contest")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -145,7 +150,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 func TestContestRepository_GetContestTeams(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_teams")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_teams")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -180,7 +185,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 func TestContestRepository_GetContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_team")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -215,57 +220,59 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_update_contest_teams")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_update_contest_teams")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	contest1 := mustMakeContest(t, repo, nil)
-	mustMakeContest(t, repo, nil)
-	team1 := mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
-		Name:        random.AlphaNumeric(),
-		Result:      random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Description: random.AlphaNumeric(),
-	})
-	mustMakeContestTeam(t, repo, contest1.ID, &urepository.CreateContestTeamArgs{
-		Name:        random.AlphaNumeric(),
-		Result:      random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Description: random.AlphaNumeric(),
-	})
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateContestTeamArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateContestTeamArgs(),
+		},
+		{
+			name: "partial fields",
+			ctx:  context.Background(),
+			args: random.OptUpdateContestTeamArgs(),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			contest := mustMakeContest(t, repo, nil)
+			team := mustMakeContestTeam(t, repo, contest.ID, &urepository.CreateContestTeamArgs{
+				Name:        random.AlphaNumeric(),
+				Result:      random.Optional(random.AlphaNumeric()),
+				Link:        random.Optional(random.RandURLString()),
+				Description: random.AlphaNumeric(),
+			})
 
-	args1 := &urepository.UpdateContestTeamArgs{
-		Name:        random.Optional(random.AlphaNumeric()),
-		Result:      random.Optional(random.AlphaNumeric()),
-		Link:        random.Optional(random.RandURLString()),
-		Description: random.Optional(random.AlphaNumeric()),
-	}
-	if v, ok := args1.Name.V(); ok {
-		team1.Name = v
-	}
-	if v, ok := args1.Result.V(); ok {
-		team1.Result = v
-	}
-	if v, ok := args1.Link.V(); ok {
-		team1.Link = v
-	}
-	if v, ok := args1.Description.V(); ok {
-		team1.Description = v
-	}
+			args := tt.args
+			team.Name = args.Name.ValueOr(team.Name)
+			team.Result = args.Result.ValueOr(team.Result)
+			team.Link = args.Link.ValueOr(team.Link)
+			team.Description = args.Description.ValueOr(team.Description)
 
-	err := repo.UpdateContestTeam(context.Background(), team1.ID, args1)
-	assert.NoError(t, err)
+			err := repo.UpdateContestTeam(tt.ctx, team.ID, args)
+			assert.NoError(t, err)
 
-	got, err := repo.GetContestTeam(context.Background(), contest1.ID, team1.ID)
-	assert.NoError(t, err)
-	assert.Equal(t, team1, got)
+			got, err := repo.GetContestTeam(tt.ctx, contest.ID, team.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, team, got)
+		})
+	}
 }
 
 func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_delete_contest_teams")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_delete_contest_teams")
 	sqlConf := conf.SQLConf()
 
 	h := testutils.SetupSQLHandler(t, sqlConf)
@@ -314,7 +321,7 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_get_contest_team_members")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_team_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -377,7 +384,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("contest_repository_edit_contest_team_members")
+	conf := testutils.GetConfigWithDBName(t, "contest_repository_edit_contest_team_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)

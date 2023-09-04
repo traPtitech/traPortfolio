@@ -36,21 +36,6 @@ func (m *MockGroupRepository) EXPECT() *MockGroupRepositoryMockRecorder {
 	return m.recorder
 }
 
-// GetAllGroups mocks base method.
-func (m *MockGroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllGroups", ctx)
-	ret0, _ := ret[0].([]*domain.Group)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAllGroups indicates an expected call of GetAllGroups.
-func (mr *MockGroupRepositoryMockRecorder) GetAllGroups(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllGroups", reflect.TypeOf((*MockGroupRepository)(nil).GetAllGroups), ctx)
-}
-
 // GetGroup mocks base method.
 func (m *MockGroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
 	m.ctrl.T.Helper()
@@ -64,4 +49,19 @@ func (m *MockGroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (
 func (mr *MockGroupRepositoryMockRecorder) GetGroup(ctx, groupID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockGroupRepository)(nil).GetGroup), ctx, groupID)
+}
+
+// GetGroups mocks base method.
+func (m *MockGroupRepository) GetGroups(ctx context.Context) ([]*domain.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroups", ctx)
+	ret0, _ := ret[0].([]*domain.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGroups indicates an expected call of GetGroups.
+func (mr *MockGroupRepositoryMockRecorder) GetGroups(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroups", reflect.TypeOf((*MockGroupRepository)(nil).GetGroups), ctx)
 }

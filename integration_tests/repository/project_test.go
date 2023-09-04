@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -12,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
 	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
-	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -20,7 +20,7 @@ import (
 func TestProjectRepository_GetProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_get_projects")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_get_projects")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -40,7 +40,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 func TestProjectRepository_GetProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_get_project")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
@@ -68,62 +68,69 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_update_project")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_update_project")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
 
-	project1 := mustMakeProjectDetail(t, repo, nil)
-	mustMakeProjectDetail(t, repo, nil)
+	tests := []struct {
+		name string
+		ctx  context.Context
+		args *urepository.UpdateProjectArgs
+	}{
+		{
+			name: "all fields",
+			ctx:  context.Background(),
+			args: random.UpdateProjectArgs(),
+		},
+		{
+			name: "partial fields",
+			ctx:  context.Background(),
+			args: random.OptUpdateProjectArgs(),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			project1 := mustMakeProjectDetail(t, repo, nil)
+			mustMakeProjectDetail(t, repo, nil)
 
-	arg1 := urepository.UpdateProjectArgs{
-		Name:          random.Optional(random.AlphaNumeric()),
-		Description:   random.Optional(random.AlphaNumeric()),
-		Link:          random.Optional(random.AlphaNumeric()),
-		SinceYear:     random.Optional(int64(2100)), // TODO: intでよさそう
-		SinceSemester: random.Optional(int64(2)),
-		UntilYear:     random.Optional(int64(2100)),
-		UntilSemester: random.Optional(int64(2)),
-	}
+			arg1 := tt.args
 
-	if v, ok := arg1.Name.V(); ok {
-		project1.Name = v
-	}
-	if v, ok := arg1.Description.V(); ok {
-		project1.Description = v
-	}
-	if v, ok := arg1.Link.V(); ok {
-		project1.Link = v
-	}
-	if sy, ok := arg1.SinceYear.V(); ok {
-		if ss, ok := arg1.SinceSemester.V(); ok {
-			project1.Duration.Since.Year = int(sy)
-			project1.Duration.Since.Semester = int(ss)
-		}
-	}
-	if uy, ok := arg1.UntilYear.V(); ok {
-		if us, ok := arg1.UntilSemester.V(); ok {
-			project1.Duration.Until.Year = int(uy)
-			project1.Duration.Until.Semester = int(us)
-		}
-	}
+			project1.Name = arg1.Name.ValueOr(project1.Name)
+			project1.Description = arg1.Description.ValueOr(project1.Description)
+			project1.Link = arg1.Link.ValueOr(project1.Link)
+			if sy, ok := arg1.SinceYear.V(); ok {
+				if ss, ok := arg1.SinceSemester.V(); ok {
+					project1.Duration.Since.Year = int(sy)
+					project1.Duration.Since.Semester = int(ss)
+				}
+			}
+			if uy, ok := arg1.UntilYear.V(); ok {
+				if us, ok := arg1.UntilSemester.V(); ok {
+					project1.Duration.Until.Year = int(uy)
+					project1.Duration.Until.Semester = int(us)
+				}
+			}
 
-	err := repo.UpdateProject(context.Background(), project1.ID, &arg1)
-	assert.NoError(t, err)
+			err := repo.UpdateProject(tt.ctx, project1.ID, arg1)
+			assert.NoError(t, err)
 
-	got, err := repo.GetProject(context.Background(), project1.ID)
-	assert.NoError(t, err)
+			got, err := repo.GetProject(tt.ctx, project1.ID)
+			assert.NoError(t, err)
 
-	opt := cmpopts.EquateEmpty()
-	if diff := cmp.Diff(project1, got, opt); diff != "" {
-		t.Error(diff)
+			opt := cmpopts.EquateEmpty()
+			if diff := cmp.Diff(project1, got, opt); diff != "" {
+				t.Error(diff)
+			}
+		})
 	}
 }
 
 func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_get_project_members")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)
@@ -207,7 +214,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("project_repository_delete_project_members")
+	conf := testutils.GetConfigWithDBName(t, "project_repository_delete_project_members")
 	sqlConf := conf.SQLConf()
 	h := testutils.SetupSQLHandler(t, sqlConf)
 	err := mockdata.InsertSampleDataToDB(h)

@@ -37,7 +37,7 @@ func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.Porta
 	}, nil
 }
 
-func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
+func (a *PortalAPI) GetUsers() ([]*external.PortalUserResponse, error) {
 	portalUsers, found := a.cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil
@@ -54,13 +54,13 @@ func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	}
 	var userResponses []*external.PortalUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&userResponses); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
+		return nil, fmt.Errorf("decode failed: %w", err)
 	}
 	a.cache.Set(cacheKey, userResponses, cache.DefaultExpiration)
 	return userResponses, nil
 }
 
-func (a *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
+func (a *PortalAPI) GetUserByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	if traQID == "" {
 		return nil, fmt.Errorf("invalid traQID")
 	}
@@ -77,7 +77,7 @@ func (a *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, er
 
 	var userResponse external.PortalUserResponse
 	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
+		return nil, fmt.Errorf("decode failed: %w", err)
 	}
 	return &userResponse, nil
 }

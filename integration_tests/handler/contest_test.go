@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -30,7 +30,7 @@ func TestGetContests(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_get_contests")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_get_contests")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -59,17 +59,17 @@ func TestGetContest(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_get_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_get_contest")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -100,137 +100,137 @@ func TestCreateContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		reqbody    handler.CreateContestJSONRequestBody
+		reqbody    schema.CreateContestJSONRequestBody
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: description,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: name,
 			},
-			handler.ContestDetail{
+			schema.ContestDetail{
 				Description: description,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Id:    uuid.Nil,
 				Link:  link,
 				Name:  name,
-				Teams: []handler.ContestTeam{},
+				Teams: []schema.ContestTeam{},
 			},
 		},
 		"201 with Kanji": {
 			http.StatusCreated,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: justCountDescription,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: justCountName,
 			},
-			handler.ContestDetail{
+			schema.ContestDetail{
 				Description: justCountDescription,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Id:    uuid.Nil,
 				Link:  link,
 				Name:  justCountName,
-				Teams: []handler.ContestTeam{},
+				Teams: []schema.ContestTeam{},
 			},
 		},
 		"400 invalid description": {
 			http.StatusBadRequest,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: tooLongString,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid description with Kanji": {
 			http.StatusBadRequest,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: tooLongDescriptionKanji,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: description,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &invalidURL,
 				Name: name,
 			},
-			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+			testutils.HTTPError(t, "Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: description,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: tooLongString,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Name with Kanji": {
 			http.StatusBadRequest,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: description,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: tooLongName,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 since time is after until time": {
 			http.StatusBadRequest,
-			handler.CreateContestJSONRequestBody{
+			schema.CreateContestJSONRequestBody{
 				Description: description,
-				Duration: handler.Duration{
+				Duration: schema.Duration{
 					Since: until,
 					Until: &since,
 				},
 				Link: &link,
 				Name: name,
 			},
-			testutils.HTTPError("Bad Request: validate error: duration: must be a valid date."),
+			testutils.HTTPError(t, "Bad Request: validate error: duration: must be a valid date."),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_create_contests")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_create_contests")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -239,7 +239,7 @@ func TestCreateContest(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.CreateContest), &tt.reqbody)
 			switch want := tt.want.(type) {
-			case handler.ContestDetail:
+			case schema.ContestDetail:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
 			case error:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
@@ -267,15 +267,15 @@ func TestEditContest(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		contestID  uuid.UUID
-		reqBody    handler.EditContestJSONRequestBody
+		reqBody    schema.EditContestJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Description: &description,
-				Duration: &handler.Duration{
+				Duration: &schema.Duration{
 					Since: since,
 					Until: &until,
 				},
@@ -287,9 +287,9 @@ func TestEditContest(t *testing.T) {
 		"204 with kanji": {
 			http.StatusNoContent,
 			mockdata.ContestID2(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Description: &justCountDescription,
-				Duration: &handler.Duration{
+				Duration: &schema.Duration{
 					Since: since,
 					Until: &until,
 				},
@@ -301,84 +301,84 @@ func TestEditContest(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.ContestID3(),
-			handler.EditContestJSONRequestBody{},
+			schema.EditContestJSONRequestBody{},
 			nil,
 		},
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			handler.EditContestJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.EditContestJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Description: &tooLongString,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid description with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Description: &tooLongDescriptionKanji,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Link: &invalidURL,
 			},
-			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+			testutils.HTTPError(t, "Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Name: &tooLongString,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Name with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Name: &tooLongName,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 since time is after until time": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.EditContestJSONRequestBody{
-				Duration: &handler.Duration{
+			schema.EditContestJSONRequestBody{
+				Duration: &schema.Duration{
 					Since: until,
 					Until: &since,
 				},
 			},
-			testutils.HTTPError("Bad Request: validate error: duration: must be a valid date."),
+			testutils.HTTPError(t, "Bad Request: validate error: duration: must be a valid date."),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.EditContestJSONRequestBody{
+			schema.EditContestJSONRequestBody{
 				Description: &description,
-				Duration: &handler.Duration{
+				Duration: &schema.Duration{
 					Since: since,
 					Until: &until,
 				},
 				Link: &link,
 				Name: &name,
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_edit_contest")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -387,7 +387,7 @@ func TestEditContest(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
-				var contest handler.ContestDetail
+				var contest schema.ContestDetail
 				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &contest)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
@@ -435,17 +435,17 @@ func TestDeleteContest(t *testing.T) {
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_delete_contest")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_delete_contest")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -474,17 +474,17 @@ func TestGetContestTeams(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_get_contest_team")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_get_contest_team")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -518,20 +518,20 @@ func TestAddContestTeam(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		contestID  uuid.UUID
-		reqbody    handler.AddContestTeamJSONRequestBody
+		reqbody    schema.AddContestTeamJSONRequestBody
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: description,
 				Link:        &link,
 				Name:        name,
 				Result:      &result,
 			},
-			handler.ContestTeam{
-				Id:     testutils.DummyUUID(), //テスト時にOptSyncIDで同期するため適当
+			schema.ContestTeam{
+				Id:     testutils.DummyUUID(t), //テスト時にOptSyncIDで同期するため適当
 				Name:   name,
 				Result: result,
 			},
@@ -539,14 +539,14 @@ func TestAddContestTeam(t *testing.T) {
 		"201 with kanji": {
 			http.StatusCreated,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: justCountDescription,
 				Link:        &link,
 				Name:        justCountName,
 				Result:      &justCountResult,
 			},
-			handler.ContestTeam{
-				Id:     testutils.DummyUUID(),
+			schema.ContestTeam{
+				Id:     testutils.DummyUUID(t),
 				Name:   justCountName,
 				Result: justCountResult,
 			},
@@ -554,84 +554,84 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: tooLongString,
 				Link:        &link,
 				Name:        name,
 				Result:      &result,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid description kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: tooLongDescriptionKanji,
 				Link:        &link,
 				Name:        name,
 				Result:      &result,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: description,
 				Link:        &invalidURL,
 				Name:        name,
 				Result:      &result,
 			},
-			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+			testutils.HTTPError(t, "Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: description,
 				Link:        &link,
 				Name:        tooLongString,
 				Result:      &result,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Name kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: description,
 				Link:        &link,
 				Name:        tooLongName,
 				Result:      &result,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Result": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: description,
 				Link:        &link,
 				Name:        name,
 				Result:      &tooLongResultKanji,
 			},
-			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: result: the length must be no more than 32."),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			handler.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamJSONRequestBody{
 				Description: description,
 				Link:        &link,
 				Name:        name,
 				Result:      &result,
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_add_contest_team")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_add_contest_team")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -640,7 +640,7 @@ func TestAddContestTeam(t *testing.T) {
 			t.Parallel()
 			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeam, tt.contestID), &tt.reqbody)
 			switch tt.want.(type) {
-			case handler.ContestDetail:
+			case schema.ContestDetail:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID)
 			case error:
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
@@ -671,14 +671,14 @@ func TestEditContestTeam(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqBody    handler.EditContestTeamJSONRequestBody
+		reqBody    schema.EditContestTeamJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Description: &description,
 				Link:        &link,
 				Name:        &name,
@@ -690,7 +690,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID2(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Description: &justCountDescription,
 				Link:        &link,
 				Name:        &justCountName,
@@ -702,102 +702,102 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID3(),
-			handler.EditContestTeamJSONRequestBody{},
+			schema.EditContestTeamJSONRequestBody{},
 			nil,
 		},
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.EditContestTeamJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid contestTeamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			handler.EditContestTeamJSONRequestBody{},
-			testutils.HTTPError("Bad Request: nil id"),
+			schema.EditContestTeamJSONRequestBody{},
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Description: &tooLongString,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid description with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Description: &tooLongDescriptionKanji,
 			},
-			testutils.HTTPError("Bad Request: validate error: description: the length must be between 1 and 256."),
+			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Link: &invalidURL,
 			},
-			testutils.HTTPError("Bad Request: validate error: link: must be a valid URL."),
+			testutils.HTTPError(t, "Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Name: &tooLongString,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Name with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Name: &tooLongName,
 			},
-			testutils.HTTPError("Bad Request: validate error: name: the length must be between 1 and 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Result": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Result: &tooLongString,
 			},
-			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: result: the length must be no more than 32."),
 		},
 		"400 invalid Result with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Result: &tooLongResultKanji,
 			},
-			testutils.HTTPError("Bad Request: validate error: result: the length must be no more than 32."),
+			testutils.HTTPError(t, "Bad Request: validate error: result: the length must be no more than 32."),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			handler.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamJSONRequestBody{
 				Description: &description,
 				Link:        &link,
 				Name:        &name,
 				Result:      &result,
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest_team")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_edit_contest_team")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -806,7 +806,7 @@ func TestEditContestTeam(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
-				var contestTeam handler.ContestTeamDetail
+				var contestTeam schema.ContestTeamDetail
 				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeam, tt.contestID, tt.teamID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &contestTeam)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
@@ -857,30 +857,30 @@ func TestDeleteContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400: invalid teamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404: contest not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			mockdata.ContestTeamID1(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 		"404: team not found": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_delete_contest_team")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_delete_contest_team")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -906,7 +906,7 @@ func TestGetContestTeamMembers(t *testing.T) {
 			http.StatusOK,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			[]handler.User{
+			[]schema.User{
 				mockdata.CloneHandlerMockUsers()[0],
 			},
 		},
@@ -914,36 +914,36 @@ func TestGetContestTeamMembers(t *testing.T) {
 			http.StatusOK,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID2(),
-			[]handler.User{},
+			[]schema.User{},
 		},
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"404 contestID not exist": {
 			http.StatusNotFound,
 			random.UUID(),
 			mockdata.ContestTeamID1(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 		"404 teamID not exist": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_get_contest_team_members")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_get_contest_team_members")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -963,14 +963,14 @@ func TestAddContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    handler.AddContestTeamMembersJSONRequestBody
+		reqbody    schema.AddContestTeamMembersJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.AddContestTeamMembersJSONRequestBody{
+			schema.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
@@ -981,61 +981,61 @@ func TestAddContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			handler.AddContestTeamMembersJSONRequestBody{
+			schema.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			handler.AddContestTeamMembersJSONRequestBody{
+			schema.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.AddContestTeamMembersJSONRequestBody{
+			schema.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					uuid.Nil,
 				},
 			},
-			testutils.HTTPError("Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
+			testutils.HTTPError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 invalid member": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.AddContestTeamMembersJSONRequestBody{
+			schema.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					random.UUID(),
 				},
 			},
-			testutils.HTTPError("Bad Request: argument error"),
+			testutils.HTTPError(t, "Bad Request: argument error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			handler.AddContestTeamMembersJSONRequestBody{
+			schema.AddContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_add_contest_team_member")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_add_contest_team_member")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
@@ -1055,14 +1055,14 @@ func TestEditContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    handler.EditContestTeamMembersJSONRequestBody
+		reqbody    schema.EditContestTeamMembersJSONRequestBody
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamMembersJSONRequestBody{
+			schema.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
@@ -1074,64 +1074,64 @@ func TestEditContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamMembersJSONRequestBody{
+			schema.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid teamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			handler.EditContestTeamMembersJSONRequestBody{
+			schema.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("Bad Request: nil id"),
+			testutils.HTTPError(t, "Bad Request: nil id"),
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamMembersJSONRequestBody{
+			schema.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					uuid.Nil,
 				},
 			},
-			testutils.HTTPError("Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
+			testutils.HTTPError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 invalid member": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			handler.EditContestTeamMembersJSONRequestBody{
+			schema.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					random.UUID(),
 				},
 			},
-			testutils.HTTPError("Bad Request: argument error"),
+			testutils.HTTPError(t, "Bad Request: argument error"),
 		},
 		"404 team not found": {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			handler.EditContestTeamMembersJSONRequestBody{
+			schema.EditContestTeamMembersJSONRequestBody{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
 			},
-			testutils.HTTPError("Not Found: not found"),
+			testutils.HTTPError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName("contest_handler_edit_contest_team_member")
+	conf := testutils.GetConfigWithDBName(t, "contest_handler_edit_contest_team_member")
 	api, err := testutils.SetupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {

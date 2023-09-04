@@ -10,6 +10,6 @@ import (
 )
 
 type GroupRepository interface {
-	GetAllGroups(ctx context.Context) ([]*domain.Group, error)
+	GetGroups(ctx context.Context) ([]*domain.Group, error)
 	GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error)
 }

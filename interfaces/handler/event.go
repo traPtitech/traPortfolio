@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
@@ -16,25 +17,23 @@ import (
 )
 
 type EventHandler struct {
-	srv service.EventService
+	s service.EventService
 }
 
 // NewEventHandler creates a EventHandler
-func NewEventHandler(service service.EventService) *EventHandler {
-	return &EventHandler{service}
+func NewEventHandler(s service.EventService) *EventHandler {
+	return &EventHandler{s}
 }
 
 // GetEvents GET /events
-func (h *EventHandler) GetEvents(_c echo.Context) error {
-	c := _c.(*Context)
-
+func (h *EventHandler) GetEvents(c echo.Context) error {
 	ctx := c.Request().Context()
-	events, err := h.srv.GetEvents(ctx)
+	events, err := h.s.GetEvents(ctx)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	res := make([]Event, len(events))
+	res := make([]schema.Event, len(events))
 	for i, v := range events {
 		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
 	}
@@ -43,21 +42,19 @@ func (h *EventHandler) GetEvents(_c echo.Context) error {
 }
 
 // GetEvent GET /events/:eventID
-func (h *EventHandler) GetEvent(_c echo.Context) error {
-	c := _c.(*Context)
-
-	eventID, err := c.getID(keyEventID)
+func (h *EventHandler) GetEvent(c echo.Context) error {
+	eventID, err := getID(c, keyEventID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
 	ctx := c.Request().Context()
-	event, err := h.srv.GetEventByID(ctx, eventID)
+	event, err := h.s.GetEventByID(ctx, eventID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	hostname := make([]User, len(event.HostName))
+	hostname := make([]schema.User, len(event.HostName))
 	for i, v := range event.HostName {
 		hostname[i] = newUser(v.ID, v.Name, v.RealName())
 	}
@@ -72,17 +69,15 @@ func (h *EventHandler) GetEvent(_c echo.Context) error {
 }
 
 // EditEvent PATCH /events/:eventID
-func (h *EventHandler) EditEvent(_c echo.Context) error {
-	c := _c.(*Context)
-
-	eventID, err := c.getID(keyEventID)
+func (h *EventHandler) EditEvent(c echo.Context) error {
+	eventID, err := getID(c, keyEventID)
 	if err != nil {
-		return convertError(err)
+		return err
 	}
 
-	req := EditEventJSONRequestBody{}
-	if err := c.BindAndValidate(&req); err != nil {
-		return convertError(err)
+	req := schema.EditEventJSONRequestBody{}
+	if err := c.Bind(&req); err != nil {
+		return err
 	}
 
 	ctx := c.Request().Context()
@@ -91,31 +86,31 @@ func (h *EventHandler) EditEvent(_c echo.Context) error {
 		Level: optional.FromPtr((*domain.EventLevel)(req.EventLevel)),
 	}
 
-	if err := h.srv.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
-		return convertError(err)
+	if err := h.s.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
+		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) Event {
-	return Event{
+func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) schema.Event {
+	return schema.Event{
 		Id:   id,
 		Name: name,
-		Duration: Duration{
+		Duration: schema.Duration{
 			Since: since,
 			Until: &until,
 		},
 	}
 }
 
-func newEventDetail(event Event, description string, eventLevel domain.EventLevel, hostname []User, place string) EventDetail {
-	return EventDetail{
+func newEventDetail(event schema.Event, description string, eventLevel domain.EventLevel, hostname []schema.User, place string) schema.EventDetail {
+	return schema.EventDetail{
 		Description: description,
-		Duration: Duration{
+		Duration: schema.Duration{
 			Since: event.Duration.Since,
 			Until: event.Duration.Until,
 		},
-		EventLevel: EventLevel(eventLevel),
+		EventLevel: schema.EventLevel(eventLevel),
 		Hostname:   hostname,
 		Id:         event.Id,
 		Name:       event.Name,

@@ -11,7 +11,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
@@ -24,7 +23,8 @@ type mockContestRepositoryFields struct {
 	portal *mock_external.MockPortalAPI
 }
 
-func newMockContestRepositoryFields(ctrl *gomock.Controller) mockContestRepositoryFields {
+func newMockContestRepositoryFields(t *testing.T, ctrl *gomock.Controller) mockContestRepositoryFields {
+	t.Helper()
 	return mockContestRepositoryFields{
 		h:      mock_database.NewMockSQLHandler(),
 		portal: mock_external.NewMockPortalAPI(ctrl),
@@ -77,7 +77,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -151,7 +151,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -270,7 +270,7 @@ func TestContestRepository_CreateContest(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -350,7 +350,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -424,7 +424,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -476,7 +476,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.id).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -510,7 +510,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -572,7 +572,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.contestID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -601,7 +601,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -667,7 +667,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID, args.contestID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -678,7 +678,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -757,7 +757,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.contestID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -794,7 +794,7 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -872,7 +872,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
 			assertion: assert.Error,
@@ -944,7 +944,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -995,7 +995,7 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -1056,7 +1056,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name", "check"}).
 							AddRow(u.ID, u.Name, u.Check),
 					)
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
+				f.portal.EXPECT().GetUsers().Return(makePortalUsers(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -1103,7 +1103,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want), nil)
+				f.portal.EXPECT().GetUsers().Return(makePortalUsers(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -1118,7 +1118,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
 					WithArgs(args.contestID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1140,7 +1140,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1210,7 +1210,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "name"}).
 							AddRow(u.ID, u.Name),
 					)
-				f.portal.EXPECT().GetAll().Return(nil, errUnexpected)
+				f.portal.EXPECT().GetUsers().Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -1221,7 +1221,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args, tt.want)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -1304,7 +1304,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1366,7 +1366,7 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
@@ -1439,7 +1439,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID).
-					WillReturnError(database.ErrNoRows)
+					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
 		},
@@ -1548,7 +1548,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			t.Parallel()
 			// Setup mock
 			ctrl := gomock.NewController(t)
-			f := newMockContestRepositoryFields(ctrl)
+			f := newMockContestRepositoryFields(t, ctrl)
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h, f.portal)
 			// Assertion
