@@ -178,6 +178,8 @@ func (r *ContestRepository) DeleteContest(ctx context.Context, contestID uuid.UU
 }
 
 func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+
+	//IDがcontestIDであるようなcontestが存在するかチェック
 	if err := r.h.
 		WithContext(ctx).
 		Where(&model.Contest{ID: contestID}).
@@ -186,6 +188,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		return nil, err
 	}
 
+	//ContestIDがcontestIDであるようなcontestTeamを10件まで列挙する
 	teams := make([]*model.ContestTeam, 10)
 	err := r.h.
 		WithContext(ctx).
@@ -196,6 +199,28 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		return nil, err
 	}
 
+	//teamsの要素vについてTeamIDがv.IDである(TeamIDがteamsIDListに入っているID)ようなContestTeamUserBelongingを列挙する
+	var teamsIDList = make([]*uuid.UUID, len(teams))
+	for i, v := range teams {
+		teamsIDList[i] = &v.ID
+	}
+
+	var belongings []*model.ContestTeamUserBelonging
+	err = r.h.
+		WithContext(ctx).
+		Preload("User").
+		Where("team_id IN ?", teamsIDList).
+		Find(&belongings).
+		Error()
+	if err != nil {
+		return nil, err
+	}
+
+	belongingMap := make(map[uuid.UUID]([]*model.ContestTeamUserBelonging))
+	for _, v := range belongings {
+		belongingMap[v.TeamID] = append(belongingMap[v.TeamID], v)
+	}
+
 	nameMap, err := r.makeUserNameMap()
 	if err != nil {
 		return nil, err
@@ -204,19 +229,8 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 	result := make([]*domain.ContestTeam, 0, len(teams))
 	for _, v := range teams {
 
-		var belongings []*model.ContestTeamUserBelonging
-		err = r.h.
-			WithContext(ctx).
-			Preload("User").
-			Where(&model.ContestTeamUserBelonging{TeamID: v.ID}).
-			Find(&belongings).
-			Error()
-		if err != nil {
-			return nil, err
-		}
-
-		members := make([]*domain.User, len(belongings))
-		for i, w := range belongings {
+		members := make([]*domain.User, len(belongingMap[v.ID]))
+		for i, w := range belongingMap[v.ID] {
 			u := w.User
 			members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
 		}
@@ -231,6 +245,11 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 			Members: members,
 		})
 	}
+
+	// if len(result) == 0 {
+	// 	result = []*domain.ContestTeam{}
+	// }
+
 	return result, nil
 }
 
