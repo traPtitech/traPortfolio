@@ -58,7 +58,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 		hostName = append(hostName, &domain.User{ID: aid})
 	}
 
-	result := &domain.EventDetail{
+	ed := domain.EventDetail{
 		Event: domain.Event{
 			ID:        er.ID,
 			Name:      er.Name,
@@ -75,14 +75,18 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 
 	elv, err := r.getEventLevelByID(ctx, eventID)
 	if err == nil {
-		result.Level = elv.Level
+		ed.Level = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
-		result.Level = domain.EventLevelAnonymous
+		ed.Level = domain.EventLevelAnonymous
 	} else {
 		return nil, err
 	}
 
-	return result, nil
+	res := domain.ApplyEventLevel(ed)
+	if v, ok := res.V(); ok {
+		return &v, nil
+	}
+	return nil, repository.ErrNotFound
 }
 
 func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.CreateEventLevelArgs) error {

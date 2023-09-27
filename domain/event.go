@@ -32,9 +32,9 @@ type EventDetail struct {
 func ApplyEventLevel(e EventDetail) optional.Of[EventDetail] {
 	switch e.Level {
 	case EventLevelAnonymous:
+		e.HostName = nil
 		return optional.From(e)
 	case EventLevelPublic:
-		e.HostName = nil
 		return optional.From(e)
 	case EventLevelPrivate:
 		return optional.Of[EventDetail]{}
