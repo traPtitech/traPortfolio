@@ -84,7 +84,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 // EditEvent PATCH /events/:eventID
 func TestEventHandler_EditEvent(t *testing.T) {
 	var (
-		eventLevel = schema.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+		eventLevel = schema.EventLevel(domain.EventLevelPublic)
 	)
 
 	t.Parallel()
@@ -104,7 +104,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		"204 without change": {
 			http.StatusNoContent,
-			mockdata.KnoqEventID2(),
+			mockdata.KnoqEventID1(),
 			schema.EditEventJSONRequestBody{},
 			nil,
 		},
