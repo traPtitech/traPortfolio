@@ -64,10 +64,10 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
 				f.knoq.EXPECT().GetEvents().Return(makeKnoqEvents(t, want), nil)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT `id` FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
 					WithArgs(domain.EventLevelPrivate, want[0].ID.String(), want[1].ID.String()).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "level", "created_at", "updated_at"}),
+						sqlmock.NewRows([]string{"id"}),
 					)
 			},
 			assertion: assert.NoError,
@@ -475,10 +475,10 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
 				f.knoq.EXPECT().GetEventsByUserID(args.userID).Return(makeKnoqEvents(t, want), nil)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
+					ExpectQuery(makeSQLQueryRegexp("SELECT `id` FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
 					WithArgs(domain.EventLevelPrivate, want[0].ID.String(), want[1].ID.String()).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "level", "created_at", "updated_at"}),
+						sqlmock.NewRows([]string{"id"}),
 					)
 			},
 			assertion: assert.NoError,

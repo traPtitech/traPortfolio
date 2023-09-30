@@ -169,6 +169,7 @@ func (r *EventRepository) filterAccessibleEvents(ctx context.Context, events []*
 	privateRels := make([]*model.EventLevelRelation, 0, len(events))
 	err := r.h.
 		WithContext(ctx).
+		Select("id").
 		Where("level = ? AND id IN ?", domain.EventLevelPrivate, ids).
 		Find(&privateRels).
 		Error()
