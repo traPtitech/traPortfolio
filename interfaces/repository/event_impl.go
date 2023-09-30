@@ -163,11 +163,10 @@ func (r *EventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) (
 
 func (r *EventRepository) filterAccessibleEvents(ctx context.Context, events []*external.EventResponse) ([]*external.EventResponse, error) {
 	// privateのものだけ除外する
-	ids := make([]string, 0, len(events))
-	for _, v := range events {
-		ids = append(ids, v.ID.String())
-	}
-	privateRels := make([]*model.EventLevelRelation, 0, len(ids))
+	ids := lo.Map(events, func(e *external.EventResponse, _ int) uuid.UUID {
+		return e.ID
+	})
+	privateRels := make([]*model.EventLevelRelation, 0, len(events))
 	err := r.h.
 		WithContext(ctx).
 		Where("level = ? AND id IN ?", domain.EventLevelPrivate, ids).
@@ -178,7 +177,7 @@ func (r *EventRepository) filterAccessibleEvents(ctx context.Context, events []*
 	}
 	return lo.Filter(events, func(e *external.EventResponse, _ int) bool {
 		return !lo.ContainsBy(privateRels, func(r *model.EventLevelRelation) bool {
-			return r.ID.String() == e.ID.String()
+			return r.ID == e.ID
 		})
 	}), nil
 }
