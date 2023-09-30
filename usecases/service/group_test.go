@@ -36,7 +36,7 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 				},
 			},
 			setup: func(group *mock_repository.MockGroupRepository, user *mock_repository.MockUserRepository, args args, want []*domain.Group) {
-				group.EXPECT().GetAllGroups(args.ctx).Return(want, nil)
+				group.EXPECT().GetGroups(args.ctx).Return(want, nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -53,7 +53,7 @@ func TestGroupService_GetAllGroups(t *testing.T) {
 			tt.setup(group, user, tt.args, tt.want)
 
 			s := NewGroupService(group, user)
-			got, err := s.GetAllGroups(tt.args.ctx)
+			got, err := s.GetGroups(tt.args.ctx)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
 		})

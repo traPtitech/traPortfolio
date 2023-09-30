@@ -30,7 +30,7 @@ func NewKnoqAPI(conf *config.KnoqConfig, isDevelopment bool) (external.KnoqAPI, 
 	return &KnoqAPI{newAPIClient(jar, conf.API())}, nil
 }
 
-func (a *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
+func (a *KnoqAPI) GetEvents() ([]*external.EventResponse, error) {
 	res, err := a.apiGet("/events")
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (a *KnoqAPI) GetAll() ([]*external.EventResponse, error) {
 	return er, nil
 }
 
-func (a *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
+func (a *KnoqAPI) GetEvent(eventID uuid.UUID) (*external.EventResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/events/%s", eventID))
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (a *KnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, erro
 	return &er, nil
 }
 
-func (a *KnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
+func (a *KnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/users/%s/events", userID))
 	if err != nil {
 		return nil, err
