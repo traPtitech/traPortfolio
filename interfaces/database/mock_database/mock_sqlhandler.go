@@ -71,6 +71,11 @@ func (h *MockSQLHandler) Where(query interface{}, args ...interface{}) database.
 	return &MockSQLHandler{Conn: db}
 }
 
+func (h *MockSQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
+	db := h.Conn.Select(query, args...)
+	return &MockSQLHandler{Conn: db}
+}
+
 func (h *MockSQLHandler) Model(value interface{}) database.SQLHandler {
 	db := h.Conn.Model(value)
 	return &MockSQLHandler{Conn: db}
