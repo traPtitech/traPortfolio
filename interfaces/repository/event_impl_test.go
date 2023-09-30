@@ -125,7 +125,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
-				Level:       domain.EventLevelPrivate,
+				Level:       domain.EventLevelPublic,
 				HostName:    []*domain.User{{ID: random.UUID()}},
 				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
@@ -137,7 +137,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "level"}).
-							AddRow(args.id, domain.EventLevelPrivate),
+							AddRow(args.id, domain.EventLevelPublic),
 					)
 			},
 			assertion: assert.NoError,
@@ -167,7 +167,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				},
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
-				HostName:    []*domain.User{{ID: random.UUID()}},
+				HostName:    nil,
 				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
