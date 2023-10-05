@@ -29,17 +29,23 @@ var (
 
 func CloneHandlerMockContestDetails() []schema.ContestDetail {
 	var (
-		mContests       = CloneMockContests()
-		hContestTeams   = CloneMockContestTeams()
-		mContestTeams   = make([]schema.ContestTeam, len(hContestTeams))
-		hContestDetails = make([]schema.ContestDetail, len(mContests))
+		mContests        = CloneMockContests()
+		hContestTeams    = CloneMockContestTeams()
+		hTeamMembersByID = CloneHandlerMockContestTeamMembersByID()
+		mContestTeams    = make([]schema.ContestTeam, len(hContestTeams))
+		hContestDetails  = make([]schema.ContestDetail, len(mContests))
 	)
 
 	for i, c := range hContestTeams {
+		members, ok := hTeamMembersByID[c.ID]
+		if !ok {
+			members = make([]schema.User, 0)
+		}
 		mContestTeams[i] = schema.ContestTeam{
-			Id:     c.ID,
-			Name:   c.Name,
-			Result: c.Result,
+			Id:      c.ID,
+			Members: members,
+			Name:    c.Name,
+			Result:  c.Result,
 		}
 	}
 
@@ -106,6 +112,7 @@ func CloneHandlerMockContestTeamMembersByID() map[uuid.UUID][]schema.User {
 		hContestTeams         = CloneMockContestTeams()
 		mockMembersBelongings = CloneMockContestTeamUserBelongings()
 		mockMembers           = CloneMockUsers()
+		portalUsers           = CloneMockPortalUsers()
 		hContestMembers       = make(map[uuid.UUID][]schema.User, len(hContestTeams))
 	)
 
@@ -113,11 +120,12 @@ func CloneHandlerMockContestTeamMembersByID() map[uuid.UUID][]schema.User {
 		for _, ct := range mockMembersBelongings {
 			if c.ID == ct.TeamID {
 
-				for _, cm := range mockMembers {
+				for i, cm := range mockMembers {
 					if ct.UserID == cm.ID {
 						hContestMembers[ct.TeamID] = append(hContestMembers[c.ID], schema.User{
-							Id:   cm.ID,
-							Name: cm.Name,
+							Id:       cm.ID,
+							Name:     cm.Name,
+							RealName: portalUsers[i].RealName,
 						})
 					}
 				}
