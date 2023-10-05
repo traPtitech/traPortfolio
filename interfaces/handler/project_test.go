@@ -10,6 +10,7 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
+	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -43,6 +44,20 @@ func makeCreateProjectRequest(t *testing.T, description string, since schema.Yea
 		Link: &link,
 	}
 }
+
+// func makeAddProjectMembersRequest(members []ProjectMember) *AddProjectMembersJSONRequestBody {
+// 	ret := &AddProjectMembersJSONRequestBody{}
+// 	for _, v := range members {
+// 		ret.Members = append(ret.Members, MemberIDWithYearWithSemesterDuration{
+// 			Duration: YearWithSemesterDuration{
+// 				Since: v.Duration.Since,
+// 				Until: v.Duration.Until,
+// 			},
+// 			UserId: v.Id,
+// 		})
+// 	}
+// 	return ret
+// }
 
 func TestProjectHandler_GetProjects(t *testing.T) {
 	t.Parallel()
@@ -311,6 +326,154 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
 			assert.Equal(t, resBody, res)
+		})
+	}
+}
+
+func TestProjectHandler_AddProjectMembers(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
+				projectID := random.UUID()
+				userID := random.UUID()
+				duration := domain.YearWithSemesterDuration{
+					Since: domain.YearWithSemester{
+						Year:     2021,
+						Semester: 0,
+					},
+					Until: domain.YearWithSemester{
+						Year:     2023,
+						Semester: 1,
+					},
+				}
+				reqBody := &schema.AddProjectMembersJSONRequestBody{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.Semester),
+									Year:     duration.Until.Year,
+								},
+							},
+							UserId: userID,
+						},
+					},
+				}
+				memberReq := []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        userID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+				}
+				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
+				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "BadRequest: Invalid Project ID",
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string) {
+				projectID := random.UUID()
+				return nil, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid request body: member is empty",
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string) {
+				projectID := random.UUID()
+				return &schema.AddProjectMembersJSONRequestBody{}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid request body: memberID is invalid",
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string) {
+				projectID := random.UUID()
+				duration := random.Duration()
+				return &schema.AddProjectMembersJSONRequestBody{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.Semester),
+									Year:     duration.Until.Year,
+								},
+							},
+							UserId: uuid.Nil,
+						},
+					},
+				}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
+			name: "BadRequest: invalid request body: member is already exists",
+			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
+				userID := random.UUID()
+				projectID := random.UUID()
+				duration := random.Duration()
+				reqBody := &schema.AddProjectMembersJSONRequestBody{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.Semester),
+									Year:     duration.Until.Year,
+								},
+							},
+							UserId: userID,
+						},
+					},
+				}
+				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        userID,
+						SinceYear:     int(duration.Since.Year),
+						SinceSemester: int(duration.Since.Semester),
+						UntilYear:     int(duration.Until.Year),
+						UntilSemester: int(duration.Until.Semester),
+					},
+				}).Return(repository.ErrInvalidArg)
+				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupProjectMock(t)
+
+			reqBody, path := tt.setup(s)
+
+			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
 		})
 	}
 }
