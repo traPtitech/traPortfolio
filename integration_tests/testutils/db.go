@@ -10,6 +10,7 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
