@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -74,7 +76,8 @@ func makeSQLQueryRegexp(query string) string {
 	return fmt.Sprintf("^%s$", regexp.QuoteMeta(query))
 }
 
-func makeKnoqEvents(events []*domain.Event) []*external.EventResponse {
+func makeKnoqEvents(t *testing.T, events []*domain.Event) []*external.EventResponse {
+	t.Helper()
 	res := make([]*external.EventResponse, len(events))
 	for i, e := range events {
 		res[i] = &external.EventResponse{
@@ -88,7 +91,8 @@ func makeKnoqEvents(events []*domain.Event) []*external.EventResponse {
 	return res
 }
 
-func makeKnoqEvent(event *domain.EventDetail) *external.EventResponse {
+func makeKnoqEvent(t *testing.T, event *domain.EventDetail) *external.EventResponse {
+	t.Helper()
 	admins := make([]uuid.UUID, len(event.HostName))
 	for i, h := range event.HostName {
 		admins[i] = h.ID
@@ -111,9 +115,7 @@ func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *exter
 	t.Helper()
 
 	eargs, err := makeTraqGetAllArgs(rargs)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 
 	return eargs
 }
@@ -132,6 +134,7 @@ func makeTraqUsers(t *testing.T, users []*domain.User) []*external.TraQUserRespo
 }
 
 func makePortalUsers(t *testing.T, users []*domain.User) []*external.PortalUserResponse {
+	t.Helper()
 	res := make([]*external.PortalUserResponse, len(users))
 	for i, u := range users {
 		res[i] = makePortalUser(t, u)
@@ -141,6 +144,7 @@ func makePortalUsers(t *testing.T, users []*domain.User) []*external.PortalUserR
 }
 
 func makePortalUser(t *testing.T, user *domain.User) *external.PortalUserResponse {
+	t.Helper()
 	return &external.PortalUserResponse{
 		TraQID:         user.Name,
 		RealName:       user.RealNameForTest(t),
@@ -148,7 +152,8 @@ func makePortalUser(t *testing.T, user *domain.User) *external.PortalUserRespons
 	}
 }
 
-func makeTraqUser(user *domain.UserDetail) *external.TraQUserResponse {
+func makeTraqUser(t *testing.T, user *domain.UserDetail) *external.TraQUserResponse {
+	t.Helper()
 	return &external.TraQUserResponse{
 		ID:    user.ID,
 		State: user.State,

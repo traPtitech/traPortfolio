@@ -11,11 +11,18 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
-func Setup(e *echo.Echo, api API) error {
+type Option func(*echo.Echo) error
+
+func Setup(e *echo.Echo, api API, opts ...Option) error {
 	e.HTTPErrorHandler = newHTTPErrorHandler(e)
 	e.Binder = &binderWithValidation{}
 
-	e.Use(middleware.Logger())
+	for _, opt := range opts {
+		if err := opt(e); err != nil {
+			return fmt.Errorf("apply option: %w", err)
+		}
+	}
+
 	e.Use(middleware.Recover())
 
 	apiGroup := e.Group("/api")
@@ -52,6 +59,8 @@ func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 		case errors.Is(err, repository.ErrNotFound):
 			code = http.StatusNotFound
 
+		case errors.Is(err, repository.ErrDBInternal):
+			fallthrough
 		default:
 			e.Logger.Error(err)
 			code = http.StatusInternalServerError
@@ -91,4 +100,11 @@ func (b *binderWithValidation) Bind(i interface{}, c echo.Context) error {
 	}
 
 	return nil
+}
+
+func WithRequestLogger() Option {
+	return func(e *echo.Echo) error {
+		e.Use(middleware.Logger())
+		return nil
+	}
 }

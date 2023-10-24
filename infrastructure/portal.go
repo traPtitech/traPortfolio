@@ -37,7 +37,7 @@ func NewPortalAPI(conf *config.PortalConfig, isDevelopment bool) (external.Porta
 	}, nil
 }
 
-func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
+func (a *PortalAPI) GetUsers() ([]*external.PortalUserResponse, error) {
 	portalUsers, found := a.cache.Get(cacheKey)
 	if found {
 		return portalUsers.([]*external.PortalUserResponse), nil
@@ -60,7 +60,7 @@ func (a *PortalAPI) GetAll() ([]*external.PortalUserResponse, error) {
 	return userResponses, nil
 }
 
-func (a *PortalAPI) GetByTraqID(traQID string) (*external.PortalUserResponse, error) {
+func (a *PortalAPI) GetUserByTraqID(traQID string) (*external.PortalUserResponse, error) {
 	if traQID == "" {
 		return nil, fmt.Errorf("invalid traQID")
 	}

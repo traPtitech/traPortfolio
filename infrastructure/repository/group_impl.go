@@ -18,7 +18,7 @@ func NewGroupRepository(sql *gorm.DB) repository.GroupRepository {
 	return &GroupRepository{h: sql}
 }
 
-func (r *GroupRepository) GetAllGroups(ctx context.Context) ([]*domain.Group, error) {
+func (r *GroupRepository) GetGroups(ctx context.Context) ([]*domain.Group, error) {
 	groups := make([]*model.Group, 0)
 	err := r.h.WithContext(ctx).Find(&groups).Error
 	if err != nil {

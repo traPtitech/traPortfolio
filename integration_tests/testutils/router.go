@@ -58,11 +58,13 @@ func DoRequest(t *testing.T, e *echo.Echo, method string, path string, body inte
 }
 
 // OptRetrieveIDなどですぐに変更され得るUUIDであることの明示に使う
-func DummyUUID() uuid.UUID {
+func DummyUUID(t *testing.T) uuid.UUID {
+	t.Helper()
 	return random.UUID()
 }
 
-func HTTPError(message string) *echo.HTTPError {
+func HTTPError(t *testing.T, message string) *echo.HTTPError {
+	t.Helper()
 	return &echo.HTTPError{
 		Message: message,
 	}

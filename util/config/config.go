@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"log"
 	"os"
 	"sync/atomic"
@@ -206,12 +207,26 @@ func (c *PortalConfig) API() *APIConfig {
 	return (*APIConfig)(c)
 }
 
-func (c *SQLConfig) Dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port, c.Name)
+func (c *SQLConfig) DsnConfig() *mysql.Config {
+	return &mysql.Config{
+		User:                 c.User,
+		Passwd:               c.Pass,
+		Net:                  "tcp",
+		Addr:                 fmt.Sprintf("%s:%d", c.Host, c.Port),
+		DBName:               c.Name,
+		Collation:            "utf8mb4_general_ci",
+		ParseTime:            true,
+		AllowNativePasswords: true,
+		Params: map[string]string{
+			"charset": "utf8mb4",
+		},
+	}
 }
 
-func (c *SQLConfig) DsnWithoutName() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&collation=utf8mb4_general_ci", c.User, c.Pass, c.Host, c.Port)
+func (c *SQLConfig) DsnConfigWithoutName() *mysql.Config {
+	cfg := c.DsnConfig()
+	cfg.DBName = ""
+	return cfg
 }
 
 func (c *SQLConfig) GormConfig() *gorm.Config {

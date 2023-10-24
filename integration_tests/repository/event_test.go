@@ -20,7 +20,7 @@ import (
 func TestEventRepository_GetEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("event_repository_get_events")
+	conf := testutils.GetConfigWithDBName(t, "event_repository_get_events")
 	sqlConf := conf.SQLConf()
 	db := testutils.SetupGormDB(t, sqlConf)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
@@ -44,7 +44,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 func TestEventRepository_GetEvent(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("event_repository_get_event")
+	conf := testutils.GetConfigWithDBName(t, "event_repository_get_event")
 	sqlConf := conf.SQLConf()
 	db := testutils.SetupGormDB(t, sqlConf)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
@@ -90,7 +90,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("event_repository_update_event_level")
+	conf := testutils.GetConfigWithDBName(t, "event_repository_update_event_level")
 	sqlConf := conf.SQLConf()
 	db := testutils.SetupGormDB(t, sqlConf)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
@@ -122,7 +122,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 func TestEventRepository_GetUserEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName("event_repository_get_user_events")
+	conf := testutils.GetConfigWithDBName(t, "event_repository_get_user_events")
 	sqlConf := conf.SQLConf()
 	db := testutils.SetupGormDB(t, sqlConf)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
@@ -145,8 +145,9 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 
 // Create at least 1 event level.
 func createRandomEventLevels(t *testing.T, repo urepository.EventRepository) map[uuid.UUID]*urepository.CreateEventLevelArgs {
-	created := make(map[uuid.UUID]*urepository.CreateEventLevelArgs)
+	t.Helper()
 
+	created := make(map[uuid.UUID]*urepository.CreateEventLevelArgs)
 	for idx, e := range mockdata.MockKnoqEvents {
 		if idx == 0 || random.Bool() {
 			args := &urepository.CreateEventLevelArgs{

@@ -13,11 +13,11 @@ func NewMockKnoqAPI() *MockKnoqAPI {
 	return &MockKnoqAPI{}
 }
 
-func (m *MockKnoqAPI) GetAll() ([]*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetEvents() ([]*external.EventResponse, error) {
 	return mockdata.MockKnoqEvents, nil
 }
 
-func (m *MockKnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetEvent(eventID uuid.UUID) (*external.EventResponse, error) {
 	for _, v := range mockdata.MockKnoqEvents {
 		if v.ID == eventID {
 			return v, nil
@@ -27,7 +27,7 @@ func (m *MockKnoqAPI) GetByEventID(eventID uuid.UUID) (*external.EventResponse, 
 	return nil, repository.ErrNotFound
 }
 
-func (m *MockKnoqAPI) GetByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
+func (m *MockKnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
 	events := make([]*external.EventResponse, 0, len(mockdata.MockKnoqEvents))
 
 	// TODO: adminsではなくattendeesを取得して判定する？

@@ -12,17 +12,17 @@ import (
 )
 
 type ProjectHandler struct {
-	service service.ProjectService
+	s service.ProjectService
 }
 
 func NewProjectHandler(s service.ProjectService) *ProjectHandler {
-	return &ProjectHandler{service: s}
+	return &ProjectHandler{s}
 }
 
 // GetProjects GET /projects
 func (h *ProjectHandler) GetProjects(c echo.Context) error {
 	ctx := c.Request().Context()
-	projects, err := h.service.GetProjects(ctx)
+	projects, err := h.s.GetProjects(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	project, err := h.service.GetProject(ctx, projectID)
+	project, err := h.s.GetProject(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	project, err := h.service.CreateProject(ctx, &createReq)
+	project, err := h.s.CreateProject(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.service.UpdateProject(ctx, projectID, &patchReq)
+	err = h.s.UpdateProject(ctx, projectID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	members, err := h.service.GetProjectMembers(ctx, projectID)
+	members, err := h.s.GetProjectMembers(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -191,7 +191,7 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.service.AddProjectMembers(ctx, projectID, createReq)
+	err = h.s.AddProjectMembers(ctx, projectID, createReq)
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.service.DeleteProjectMembers(ctx, projectID, req.Members)
+	err = h.s.DeleteProjectMembers(ctx, projectID, req.Members)
 	if err != nil {
 		return err
 	}

@@ -26,16 +26,16 @@ type UserService interface {
 }
 
 type userService struct {
-	repo  repository.UserRepository
+	user  repository.UserRepository
 	event repository.EventRepository
 }
 
 func NewUserService(userRepository repository.UserRepository, eventRepository repository.EventRepository) UserService {
-	return &userService{repo: userRepository, event: eventRepository}
+	return &userService{user: userRepository, event: eventRepository}
 }
 
 func (s *userService) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
-	users, err := s.repo.GetUsers(ctx, args)
+	users, err := s.user.GetUsers(ctx, args)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (s *userService) GetUsers(ctx context.Context, args *repository.GetUsersArg
 }
 
 func (s *userService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
-	user, err := s.repo.GetUser(ctx, userID)
+	user, err := s.user.GetUser(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -51,34 +51,34 @@ func (s *userService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.Us
 }
 
 func (s *userService) Update(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error {
-	return s.repo.UpdateUser(ctx, userID, args)
+	return s.user.UpdateUser(ctx, userID, args)
 }
 
 func (s *userService) GetAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error) {
-	return s.repo.GetAccount(ctx, userID, accountID)
+	return s.user.GetAccount(ctx, userID, accountID)
 }
 
 func (s *userService) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*domain.Account, error) {
-	return s.repo.GetAccounts(ctx, userID)
+	return s.user.GetAccounts(ctx, userID)
 }
 
 func (s *userService) CreateAccount(ctx context.Context, userID uuid.UUID, account *repository.CreateAccountArgs) (*domain.Account, error) {
-	return s.repo.CreateAccount(ctx, userID, account)
+	return s.user.CreateAccount(ctx, userID, account)
 }
 
 func (s *userService) EditAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
-	return s.repo.UpdateAccount(ctx, userID, accountID, args)
+	return s.user.UpdateAccount(ctx, userID, accountID, args)
 }
 
 func (s *userService) DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error {
 	//TODO
 	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
 
-	return s.repo.DeleteAccount(ctx, userID, accountID)
+	return s.user.DeleteAccount(ctx, userID, accountID)
 }
 
 func (s *userService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]*domain.UserProject, error) {
-	projects, err := s.repo.GetProjects(ctx, userID)
+	projects, err := s.user.GetProjects(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *userService) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]
 }
 
 func (s *userService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]*domain.UserContest, error) {
-	contests, err := s.repo.GetContests(ctx, userID)
+	contests, err := s.user.GetContests(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *userService) GetUserContests(ctx context.Context, userID uuid.UUID) ([]
 }
 
 func (s *userService) GetGroupsByUserID(ctx context.Context, userID uuid.UUID) ([]*domain.UserGroup, error) {
-	groups, err := s.repo.GetGroupsByUserID(ctx, userID)
+	groups, err := s.user.GetGroupsByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

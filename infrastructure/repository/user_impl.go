@@ -45,17 +45,13 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 
-	limit := -1
-
-	if v, ok := args.Limit.V(); ok {
-		limit = v
-	}
+	limit := args.Limit.ValueOr(-1)
 
 	if err != nil {
 		return nil, err
 	}
 
-	traqUsers, err := r.traQ.GetAll(eargs)
+	traqUsers, err := r.traQ.GetUsers(eargs)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +74,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 	if l := len(users); l == 0 {
 		return []*domain.User{}, nil
 	} else if l == 1 {
-		portalUser, err := r.portal.GetByTraqID(users[0].Name)
+		portalUser, err := r.portal.GetUserByTraqID(users[0].Name)
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +93,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 			userMap[v.Name] = v
 		}
 
-		portalUsers, err := r.portal.GetAll()
+		portalUsers, err := r.portal.GetUsers()
 		if err != nil {
 			return nil, err
 		}
@@ -141,12 +137,12 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		})
 	}
 
-	portalUser, err := r.portal.GetByTraqID(user.Name)
+	portalUser, err := r.portal.GetUserByTraqID(user.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	traQUser, err := r.traQ.GetByUserID(userID)
+	traQUser, err := r.traQ.GetUser(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +163,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 }
 
 func (r *UserRepository) CreateUser(ctx context.Context, args *repository.CreateUserArgs) (*domain.UserDetail, error) {
-	portalUser, err := r.portal.GetByTraqID(args.Name)
+	portalUser, err := r.portal.GetUserByTraqID(args.Name)
 	if err != nil {
 		return nil, err
 	}
