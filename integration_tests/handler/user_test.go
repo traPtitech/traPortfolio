@@ -827,10 +827,8 @@ func TestGetUserEvents(t *testing.T) {
 		},
 		"200 no events with existing userID": {
 			http.StatusOK,
-			mockdata.UserID1(),
-			[]schema.Event{
-				mockdata.HMockUserEvents[0],
-			},
+			mockdata.UserID3(),
+			[]schema.Event{},
 		},
 		"200 no events with non-existing userID": {
 			http.StatusOK,
