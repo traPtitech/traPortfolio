@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/gofrs/uuid"
+	"github.com/samber/lo"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/database"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
@@ -21,12 +22,16 @@ func NewEventRepository(sql database.SQLHandler, knoq external.KnoqAPI) reposito
 	return &EventRepository{h: sql, knoq: knoq}
 }
 
-func (r *EventRepository) GetEvents(_ context.Context) ([]*domain.Event, error) {
+func (r *EventRepository) GetEvents(ctx context.Context) ([]*domain.Event, error) {
 	events, err := r.knoq.GetEvents()
 	if err != nil {
 		return nil, err
 	}
 
+	events, err = r.filterAccessibleEvents(ctx, events)
+	if err != nil {
+		return nil, err
+	}
 	result := make([]*domain.Event, 0, len(events))
 	for _, v := range events {
 		e := &domain.Event{
@@ -53,7 +58,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 		hostName = append(hostName, &domain.User{ID: aid})
 	}
 
-	result := &domain.EventDetail{
+	ed := domain.EventDetail{
 		Event: domain.Event{
 			ID:        er.ID,
 			Name:      er.Name,
@@ -70,14 +75,18 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 
 	elv, err := r.getEventLevelByID(ctx, eventID)
 	if err == nil {
-		result.Level = elv.Level
+		ed.Level = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
-		result.Level = domain.EventLevelAnonymous
+		ed.Level = domain.EventLevelAnonymous
 	} else {
 		return nil, err
 	}
 
-	return result, nil
+	res := domain.ApplyEventLevel(ed)
+	if v, ok := res.V(); ok {
+		return &v, nil
+	}
+	return nil, repository.ErrNotFound
 }
 
 func (r *EventRepository) CreateEventLevel(ctx context.Context, arg *repository.CreateEventLevelArgs) error {
@@ -129,12 +138,16 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 	return nil
 }
 
-func (r *EventRepository) GetUserEvents(_ context.Context, userID uuid.UUID) ([]*domain.Event, error) {
+func (r *EventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
 	events, err := r.knoq.GetEventsByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
 
+	events, err = r.filterAccessibleEvents(ctx, events)
+	if err != nil {
+		return nil, err
+	}
 	result := make([]*domain.Event, 0, len(events))
 	for _, v := range events {
 		e := &domain.Event{
@@ -146,6 +159,28 @@ func (r *EventRepository) GetUserEvents(_ context.Context, userID uuid.UUID) ([]
 		result = append(result, e)
 	}
 	return result, nil
+}
+
+func (r *EventRepository) filterAccessibleEvents(ctx context.Context, events []*external.EventResponse) ([]*external.EventResponse, error) {
+	// privateのものだけ除外する
+	ids := lo.Map(events, func(e *external.EventResponse, _ int) uuid.UUID {
+		return e.ID
+	})
+	privateRels := make([]*model.EventLevelRelation, 0, len(events))
+	err := r.h.
+		WithContext(ctx).
+		Select("id").
+		Where("level = ? AND id IN ?", domain.EventLevelPrivate, ids).
+		Find(&privateRels).
+		Error()
+	if err != nil {
+		return nil, err
+	}
+	return lo.Filter(events, func(e *external.EventResponse, _ int) bool {
+		return !lo.ContainsBy(privateRels, func(r *model.EventLevelRelation) bool {
+			return r.ID == e.ID
+		})
+	}), nil
 }
 
 func (r *EventRepository) getEventLevelByID(ctx context.Context, eventID uuid.UUID) (*model.EventLevelRelation, error) {

@@ -9,6 +9,7 @@ type SQLHandler interface {
 	Create(value interface{}) SQLHandler
 	Delete(value interface{}, where ...interface{}) SQLHandler
 	Where(query interface{}, args ...interface{}) SQLHandler
+	Select(query interface{}, args ...interface{}) SQLHandler
 	Model(value interface{}) SQLHandler
 	Update(column string, value interface{}) SQLHandler
 	Updates(values interface{}) SQLHandler

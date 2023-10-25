@@ -95,40 +95,28 @@ func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]schema.ContestTeam {
 
 func CloneHandlerMockEvents() []schema.Event {
 	var (
-		knoqEvents = CloneMockKnoqEvents()
-		hEvents    = make([]schema.Event, len(knoqEvents))
+		eventDetails = CloneHandlerMockEventDetails()
+		events       = make([]schema.Event, len(eventDetails))
 	)
 
-	for i, e := range knoqEvents {
-		var (
-			hostname = make([]schema.User, len(e.Admins))
-		)
-
-		for j, uid := range e.Admins {
-			hostname[j] = getUser(uid)
-		}
-
-		hEvents[i] = schema.Event{
-			Duration: schema.Duration{
-				Since: e.TimeStart,
-				Until: &e.TimeEnd,
-			},
-			Id:   e.ID,
-			Name: e.Name,
+	for i, e := range eventDetails {
+		events[i] = schema.Event{
+			Duration: e.Duration,
+			Id:       e.Id,
+			Name:     e.Name,
 		}
 	}
-
-	return hEvents
+	return events
 }
 
 func CloneHandlerMockEventDetails() []schema.EventDetail {
 	var (
 		mEventLevels = CloneMockEventLevelRelations()
 		knoqEvents   = CloneMockKnoqEvents()
-		hEvents      = make([]schema.EventDetail, len(knoqEvents))
+		hEvents      = make([]schema.EventDetail, 0, len(knoqEvents))
 	)
 
-	for i, e := range knoqEvents {
+	for _, e := range knoqEvents {
 		var (
 			eventLevel schema.EventLevel
 			hostname   = make([]schema.User, len(e.Admins))
@@ -145,7 +133,7 @@ func CloneHandlerMockEventDetails() []schema.EventDetail {
 			hostname[j] = getUser(uid)
 		}
 
-		hEvents[i] = schema.EventDetail{
+		event := schema.EventDetail{
 			Description: e.Description,
 			Duration: schema.Duration{
 				Since: e.TimeStart,
@@ -156,6 +144,17 @@ func CloneHandlerMockEventDetails() []schema.EventDetail {
 			Id:         e.ID,
 			Name:       e.Name,
 			Place:      e.Place,
+		}
+		switch eventLevel {
+		case schema.EventLevel(domain.EventLevelPrivate):
+			continue
+		case schema.EventLevel(domain.EventLevelPublic):
+			hEvents = append(hEvents, event)
+		case schema.EventLevel(domain.EventLevelAnonymous):
+			event.Hostname = nil
+			hEvents = append(hEvents, event)
+		default:
+			panic("invalid event level")
 		}
 	}
 

@@ -63,6 +63,12 @@ func TestEventRepository_GetEvents(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, want []*domain.Event) {
 				f.knoq.EXPECT().GetEvents().Return(makeKnoqEvents(t, want), nil)
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT `id` FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
+					WithArgs(domain.EventLevelPrivate, want[0].ID.String(), want[1].ID.String()).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}),
+					)
 			},
 			assertion: assert.NoError,
 		},
@@ -119,7 +125,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
-				Level:       domain.EventLevelPrivate,
+				Level:       domain.EventLevelPublic,
 				HostName:    []*domain.User{{ID: random.UUID()}},
 				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
@@ -131,7 +137,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "level"}).
-							AddRow(args.id, domain.EventLevelPrivate),
+							AddRow(args.id, domain.EventLevelPublic),
 					)
 			},
 			assertion: assert.NoError,
@@ -161,7 +167,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				},
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
-				HostName:    []*domain.User{{ID: random.UUID()}},
+				HostName:    nil,
 				Description: random.AlphaNumeric(),
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
@@ -468,6 +474,12 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 			},
 			setup: func(f mockEventRepositoryFields, args args, want []*domain.Event) {
 				f.knoq.EXPECT().GetEventsByUserID(args.userID).Return(makeKnoqEvents(t, want), nil)
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT `id` FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
+					WithArgs(domain.EventLevelPrivate, want[0].ID.String(), want[1].ID.String()).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}),
+					)
 			},
 			assertion: assert.NoError,
 		},
