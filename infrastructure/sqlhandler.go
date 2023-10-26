@@ -84,6 +84,11 @@ func (h *SQLHandler) Where(query interface{}, args ...interface{}) database.SQLH
 	return &SQLHandler{conn: db}
 }
 
+func (h *SQLHandler) Select(query interface{}, args ...interface{}) database.SQLHandler {
+	db := h.conn.Select(query, args...)
+	return &SQLHandler{conn: db}
+}
+
 func (h *SQLHandler) Model(value interface{}) database.SQLHandler {
 	db := h.conn.Model(value)
 	return &SQLHandler{conn: db}

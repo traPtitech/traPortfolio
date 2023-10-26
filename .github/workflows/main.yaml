@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'main'
+      - main
   pull_request:
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
@@ -26,19 +26,24 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs:
+      - build
     steps:
-      - uses: actions/checkout@v3
-      - name: Run linters
-        uses: reviewdog/action-golangci-lint@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
         with:
-          filter_mode: nofilter
+          go-version-file: ./go.mod
+      - uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          install-mode: goinstall
   test-unit:
     name: Test (Unit)
     runs-on: ubuntu-latest
     needs:
       - build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
@@ -54,7 +59,7 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup MySQL container
         run: make up-db-container
       - uses: actions/setup-go@v4
@@ -73,7 +78,7 @@ jobs:
       - test-unit
       - test-integration
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: coverages
@@ -93,7 +98,7 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: traPortfolio
@@ -111,6 +116,6 @@ jobs:
     container:
       image: stoplight/spectral:6.5.1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Spectral checks
         run: spectral lint ./docs/swagger/traPortfolio.v1.yaml

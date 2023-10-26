@@ -60,7 +60,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 		return nil, err
 	}
 
-	portalUsers, err := r.portal.GetAll()
+	portalUsers, err := r.portal.GetUsers()
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 		return nil, err
 	}
 
-	portalUsers, err := r.portal.GetAll()
+	portalUsers, err := r.portal.GetUsers()
 	if err != nil {
 		return nil, err
 	}

@@ -16,18 +16,18 @@ import (
 )
 
 type ContestHandler struct {
-	srv service.ContestService
+	s service.ContestService
 }
 
 // NewContestHandler creates a ContestHandler
-func NewContestHandler(service service.ContestService) *ContestHandler {
-	return &ContestHandler{service}
+func NewContestHandler(s service.ContestService) *ContestHandler {
+	return &ContestHandler{s}
 }
 
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(c echo.Context) error {
 	ctx := c.Request().Context()
-	contests, err := h.srv.GetContests(ctx)
+	contests, err := h.s.GetContests(ctx)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contest, err := h.srv.GetContest(ctx, contestID)
+	contest, err := h.s.GetContest(ctx, contestID)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contest, err := h.srv.CreateContest(ctx, &createReq)
+	contest, err := h.s.CreateContest(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (h *ContestHandler) EditContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.srv.UpdateContest(ctx, contestID, &patchReq)
+	err = h.s.UpdateContest(ctx, contestID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (h *ContestHandler) DeleteContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := h.srv.DeleteContest(ctx, contestID); err != nil {
+	if err := h.s.DeleteContest(ctx, contestID); err != nil {
 		return err
 	}
 
@@ -156,7 +156,7 @@ func (h *ContestHandler) GetContestTeams(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeams, err := h.srv.GetContestTeams(ctx, contestID)
+	contestTeams, err := h.s.GetContestTeams(ctx, contestID)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (h *ContestHandler) GetContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeam, err := h.srv.GetContestTeam(ctx, contestID, teamID)
+	contestTeam, err := h.s.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeam, err := h.srv.CreateContestTeam(ctx, contestID, &args)
+	contestTeam, err := h.s.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
 		return err
 	}
@@ -261,7 +261,7 @@ func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.srv.UpdateContestTeam(ctx, teamID, &args); err != nil {
+	if err = h.s.UpdateContestTeam(ctx, teamID, &args); err != nil {
 		return err
 	}
 
@@ -281,7 +281,7 @@ func (h *ContestHandler) DeleteContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.srv.DeleteContestTeam(ctx, contestID, teamID); err != nil {
+	if err = h.s.DeleteContestTeam(ctx, contestID, teamID); err != nil {
 		return err
 	}
 
@@ -301,7 +301,7 @@ func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	users, err := h.srv.GetContestTeamMembers(ctx, contestID, teamID)
+	users, err := h.s.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
 		return err
 	}
@@ -337,7 +337,7 @@ func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
 		return err
 	}
 
-	err = h.srv.AddContestTeamMembers(ctx, teamID, req.Members)
+	err = h.s.AddContestTeamMembers(ctx, teamID, req.Members)
 	if err != nil {
 		return err
 	}
@@ -363,7 +363,7 @@ func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.srv.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
+	if err = h.s.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)

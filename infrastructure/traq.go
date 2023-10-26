@@ -28,7 +28,7 @@ func NewTraQAPI(conf *config.TraqConfig, isDevelopment bool) (external.TraQAPI, 
 	return &TraQAPI{newAPIClient(jar, conf.API())}, nil
 }
 
-func (a *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
+func (a *TraQAPI) GetUsers(args *external.TraQGetAllArgs) ([]*external.TraQUserResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (a *TraQAPI) GetAll(args *external.TraQGetAllArgs) ([]*external.TraQUserRes
 	return usersResponse, nil
 }
 
-func (a *TraQAPI) GetByUserID(userID uuid.UUID) (*external.TraQUserResponse, error) {
+func (a *TraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/users/%v", userID))
 	if err != nil {
 		return nil, err
