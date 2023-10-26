@@ -547,8 +547,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 						Result:    random.AlphaNumeric(),
 					},
 					Members: []*domain.User{
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
 					},
 				},
 			},
@@ -565,6 +565,34 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
 					WithArgs(args.contestID).
 					WillReturnRows(rows)
+
+				teamsIDList := make([]driver.Value, len(want))
+				teamRows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				for i, u := range want {
+					teamsIDList[i] = u.ID
+					for _, w := range u.Members {
+						teamRows.AddRow(u.ID, w.ID)
+					}
+				}
+
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE team_id IN (?)")).
+					WithArgs(teamsIDList...).
+					WillReturnRows(teamRows)
+
+				userIDs := make([]driver.Value, len(want[0].Members))
+				userRows := sqlmock.NewRows([]string{"id", "name", "check"})
+				for i, u := range want[0].Members {
+					userIDs[i] = u.ID
+					userRows.AddRow(u.ID, u.Name, u.Check)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
+					WithArgs(userIDs...).
+					WillReturnRows(userRows)
+
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want[0].Members), nil)
+
 			},
 			assertion: assert.NoError,
 		},

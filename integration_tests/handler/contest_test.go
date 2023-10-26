@@ -389,7 +389,7 @@ func TestEditContest(t *testing.T) {
 				// Get response before update
 				var contest schema.ContestDetail
 				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
-				assert.Equal(t, http.StatusOK, res.Code)
+				assert.Equal(t, http.StatusNoContent, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &contest)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
 
 				// Update & Assert
@@ -410,7 +410,7 @@ func TestEditContest(t *testing.T) {
 					contest.Name = *tt.reqBody.Name
 				}
 				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
-				testutils.AssertResponse(t, http.StatusOK, contest, res)
+				testutils.AssertResponse(t, http.StatusNoContent, contest, res)
 			} else {
 				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Contest.EditContest, tt.contestID), &tt.reqBody)
 				testutils.AssertResponse(t, tt.statusCode, tt.want, res)

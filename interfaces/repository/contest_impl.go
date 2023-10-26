@@ -200,18 +200,19 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 	}
 
 	//teamsの要素vについてTeamIDがv.IDである(TeamIDがteamsIDListに入っているID)ようなContestTeamUserBelongingを列挙する
-	var teamsIDList = make([]*uuid.UUID, len(teams))
+	var teamsIDList = make([]uuid.UUID, len(teams))
 	for i, v := range teams {
-		teamsIDList[i] = &v.ID
+		teamsIDList[i] = v.ID
 	}
 
-	var belongings []*model.ContestTeamUserBelonging
+	var belongings = []*model.ContestTeamUserBelonging{}
 	err = r.h.
 		WithContext(ctx).
 		Preload("User").
-		Where("team_id IN ?", teamsIDList).
+		Where("team_id IN (?)", teamsIDList).
 		Find(&belongings).
 		Error()
+
 	if err != nil {
 		return nil, err
 	}
