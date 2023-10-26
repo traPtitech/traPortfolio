@@ -538,7 +538,10 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 							Name:      random.AlphaNumeric(),
 							Result:    random.AlphaNumeric(),
 						},
-						Members: make([]*domain.User, 0),
+						Members: []*domain.User{
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						},
 					},
 					{
 						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
@@ -547,21 +550,30 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 							Name:      random.AlphaNumeric(),
 							Result:    random.AlphaNumeric(),
 						},
-						Members: make([]*domain.User, 0),
+						Members: []*domain.User{
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						},
 					},
 				}
 				hres = []*schema.ContestTeam{
 					{
-						Id:      repoContestTeams[0].ID,
-						Members: make([]schema.User, 0),
-						Name:    repoContestTeams[0].Name,
-						Result:  repoContestTeams[0].Result,
+						Id: repoContestTeams[0].ID,
+						Members: []schema.User{
+							{Id: repoContestTeams[0].Members[0].ID, Name: repoContestTeams[0].Members[0].Name, RealName: repoContestTeams[0].Members[0].RealName()},
+							{Id: repoContestTeams[0].Members[1].ID, Name: repoContestTeams[0].Members[1].Name, RealName: repoContestTeams[0].Members[1].RealName()},
+						},
+						Name:   repoContestTeams[0].Name,
+						Result: repoContestTeams[0].Result,
 					},
 					{
-						Id:      repoContestTeams[1].ID,
-						Members: make([]schema.User, 0),
-						Name:    repoContestTeams[1].Name,
-						Result:  repoContestTeams[1].Result,
+						Id: repoContestTeams[1].ID,
+						Members: []schema.User{
+							{Id: repoContestTeams[1].Members[0].ID, Name: repoContestTeams[1].Members[0].Name, RealName: repoContestTeams[1].Members[0].RealName()},
+							{Id: repoContestTeams[1].Members[1].ID, Name: repoContestTeams[1].Members[1].Name, RealName: repoContestTeams[1].Members[1].RealName()},
+						},
+						Name:   repoContestTeams[1].Name,
+						Result: repoContestTeams[1].Result,
 					},
 				}
 				s.EXPECT().GetContestTeams(anyCtx{}, contestID).Return(repoContestTeams, nil)
