@@ -676,12 +676,16 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 						Name:      random.AlphaNumeric(),
 						Result:    random.AlphaNumeric(),
 					},
+					Members: []*domain.User{
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), true),
+					},
 				},
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(),
-				// Members
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
+				u := want.Members[0]
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
 					WithArgs(args.teamID, args.contestID).
@@ -689,6 +693,36 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "result", "link", "description"}).
 							AddRow(want.ContestTeam.ID, want.ContestTeam.ContestID, want.ContestTeam.Name, want.ContestTeam.Result, want.Link, want.Description),
 					)
+
+				belongingRows := sqlmock.NewRows([]string{"team_id", "user_id"})
+				for _, u := range want.Members {
+					belongingRows.AddRow(args.teamID, u.ID)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_team_user_belongings` WHERE `contest_team_user_belongings`.`team_id` = ?")).
+					WithArgs(args.teamID).
+					WillReturnRows(belongingRows)
+
+				userIDs := make([]driver.Value, len(want.Members))
+				userRows := sqlmock.NewRows([]string{"id", "name", "check"})
+				for i, u := range want.Members {
+					userIDs[i] = u.ID
+					userRows.AddRow(u.ID, u.Name, u.Check)
+				}
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` IN (?,?)")).
+					WithArgs(userIDs...).
+					WillReturnRows(userRows)
+
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ?")).
+					WithArgs(u.ID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "name", "check"}).
+							AddRow(u.ID, u.Name, u.Check),
+					)
+
+				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want.Members), nil)
 			},
 			assertion: assert.NoError,
 		},
