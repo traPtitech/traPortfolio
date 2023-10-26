@@ -178,7 +178,6 @@ func (r *ContestRepository) DeleteContest(ctx context.Context, contestID uuid.UU
 }
 
 func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
-
 	//IDがcontestIDであるようなcontestが存在するかチェック
 	if err := r.h.
 		WithContext(ctx).
@@ -229,7 +228,6 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 
 	result := make([]*domain.ContestTeam, 0, len(teams))
 	for _, v := range teams {
-
 		members := make([]*domain.User, len(belongingMap[v.ID]))
 		for i, w := range belongingMap[v.ID] {
 			u := w.User
