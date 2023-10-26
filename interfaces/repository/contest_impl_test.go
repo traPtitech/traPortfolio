@@ -591,7 +591,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 					WithArgs(userIDs...).
 					WillReturnRows(userRows)
 
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want[0].Members), nil)
+				f.portal.EXPECT().GetUsers().Return(makePortalUsers(t, want[0].Members), nil)
 
 			},
 			assertion: assert.NoError,
@@ -722,7 +722,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 							AddRow(u.ID, u.Name, u.Check),
 					)
 
-				f.portal.EXPECT().GetAll().Return(makePortalUsers(t, want.Members), nil)
+				f.portal.EXPECT().GetUsers().Return(makePortalUsers(t, want.Members), nil)
 			},
 			assertion: assert.NoError,
 		},
