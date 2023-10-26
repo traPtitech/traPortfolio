@@ -93,11 +93,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 		return err
 	}
 
-	contestTeams := make([]schema.ContestTeam, 0, len(contest.ContestTeams))
-	for _, team := range contest.ContestTeams {
-		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result, []schema.User{}))
-	}
-	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
+	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, []schema.ContestTeam{})
 
 	return c.JSON(http.StatusCreated, res)
 }
