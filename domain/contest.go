@@ -20,16 +20,20 @@ type ContestDetail struct {
 	ContestTeams []*ContestTeam
 }
 
-type ContestTeam struct {
+type ContestTeamWithoutMembers struct {
 	ID        uuid.UUID
 	ContestID uuid.UUID
 	Name      string
 	Result    string
 }
 
+type ContestTeam struct {
+	ContestTeamWithoutMembers
+	Members []*User
+}
+
 type ContestTeamDetail struct {
 	ContestTeam
 	Link        string
 	Description string
-	Members     []*User
 }

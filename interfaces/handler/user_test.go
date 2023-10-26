@@ -1189,7 +1189,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 				Name:      random.AlphaNumeric(),
 				TimeStart: random.Time(),
 				TimeEnd:   random.Time(),
-				Teams: []*domain.ContestTeam{
+				Teams: []*domain.ContestTeamWithoutMembers{
 					{
 						ID:        random.UUID(),
 						ContestID: random.UUID(),
@@ -1201,8 +1201,8 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 			hcontest := newUserContest(
 				newContest(rcontest.ID, rcontest.Name, rcontest.TimeStart, rcontest.TimeEnd),
-				[]schema.ContestTeam{
-					newContestTeam(rcontest.Teams[0].ID, rcontest.Teams[0].Name, rcontest.Teams[0].Result),
+				[]schema.ContestTeamWithoutMembers{
+					newContestTeamWithoutMembers(rcontest.Teams[0].ID, rcontest.Teams[0].Name, rcontest.Teams[0].Result),
 				},
 			)
 

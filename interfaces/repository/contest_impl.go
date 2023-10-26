@@ -178,6 +178,7 @@ func (r *ContestRepository) DeleteContest(ctx context.Context, contestID uuid.UU
 }
 
 func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.UUID) ([]*domain.ContestTeam, error) {
+	//IDがcontestIDであるようなcontestが存在するかチェック
 	if err := r.h.
 		WithContext(ctx).
 		Where(&model.Contest{ID: contestID}).
@@ -186,6 +187,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		return nil, err
 	}
 
+	//ContestIDがcontestIDであるようなcontestTeamを10件まで列挙する
 	teams := make([]*model.ContestTeam, 10)
 	err := r.h.
 		WithContext(ctx).
@@ -195,15 +197,58 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 	if err != nil {
 		return nil, err
 	}
+
+	//teamsの要素vについてTeamIDがv.IDである(TeamIDがteamsIDListに入っているID)ようなContestTeamUserBelongingを列挙する
+	var teamsIDList = make([]uuid.UUID, len(teams))
+	for i, v := range teams {
+		teamsIDList[i] = v.ID
+	}
+
+	var belongings = []*model.ContestTeamUserBelonging{}
+	err = r.h.
+		WithContext(ctx).
+		Preload("User").
+		Where("team_id IN (?)", teamsIDList).
+		Find(&belongings).
+		Error()
+
+	if err != nil {
+		return nil, err
+	}
+
+	belongingMap := make(map[uuid.UUID]([]*model.ContestTeamUserBelonging))
+	for _, v := range belongings {
+		belongingMap[v.TeamID] = append(belongingMap[v.TeamID], v)
+	}
+
+	nameMap, err := r.makeUserNameMap()
+	if err != nil {
+		return nil, err
+	}
+
 	result := make([]*domain.ContestTeam, 0, len(teams))
 	for _, v := range teams {
+		members := make([]*domain.User, len(belongingMap[v.ID]))
+		for i, w := range belongingMap[v.ID] {
+			u := w.User
+			members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
+		}
+
 		result = append(result, &domain.ContestTeam{
-			ID:        v.ID,
-			ContestID: v.ContestID,
-			Name:      v.Name,
-			Result:    v.Result,
+			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+				ID:        v.ID,
+				ContestID: v.ContestID,
+				Name:      v.Name,
+				Result:    v.Result,
+			},
+			Members: members,
 		})
 	}
+
+	// if len(result) == 0 {
+	// 	result = []*domain.ContestTeam{}
+	// }
+
 	return result, nil
 }
 
@@ -218,16 +263,40 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		return nil, err
 	}
 
+	var belongings []*model.ContestTeamUserBelonging
+	err := r.h.
+		WithContext(ctx).
+		Preload("User").
+		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
+		Find(&belongings).
+		Error()
+	if err != nil {
+		return nil, err
+	}
+
+	nameMap, err := r.makeUserNameMap()
+	if err != nil {
+		return nil, err
+	}
+
+	members := make([]*domain.User, len(belongings))
+	for i, w := range belongings {
+		u := w.User
+		members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
+	}
+
 	res := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
-			ID:        team.ID,
-			ContestID: team.ContestID,
-			Name:      team.Name,
-			Result:    team.Result,
+			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+				ID:        team.ID,
+				ContestID: team.ContestID,
+				Name:      team.Name,
+				Result:    team.Result,
+			},
+			Members: members,
 		},
 		Link:        team.Link,
 		Description: team.Description,
-		// Members:
 	}
 	return res, nil
 }
@@ -257,14 +326,16 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 
 	result := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
-			ID:        contestTeam.ID,
-			ContestID: contestTeam.ContestID,
-			Name:      contestTeam.Name,
-			Result:    contestTeam.Result,
+			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+				ID:        contestTeam.ID,
+				ContestID: contestTeam.ContestID,
+				Name:      contestTeam.Name,
+				Result:    contestTeam.Result,
+			},
+			Members: make([]*domain.User, 0),
 		},
 		Link:        contestTeam.Link,
 		Description: contestTeam.Description,
-		Members:     nil,
 	}
 	return result, nil
 }

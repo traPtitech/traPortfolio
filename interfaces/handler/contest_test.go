@@ -124,26 +124,47 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 		Description: random.AlphaNumeric(),
 		ContestTeams: []*domain.ContestTeam{
 			{
-				ID:        getContestID[1],
-				ContestID: getContestID[0],
-				Name:      random.AlphaNumeric(),
-				Result:    random.AlphaNumeric(),
+				ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+					ID:        getContestID[1],
+					ContestID: getContestID[0],
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
+				},
+				Members: []*domain.User{
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				},
 			},
 			{
-				ID:        getContestID[2],
-				ContestID: getContestID[0],
-				Name:      random.AlphaNumeric(),
-				Result:    random.AlphaNumeric(),
+				ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+					ID:        getContestID[2],
+					ContestID: getContestID[0],
+					Name:      random.AlphaNumeric(),
+					Result:    random.AlphaNumeric(),
+				},
+				Members: []*domain.User{
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				},
 			},
 		},
 	}
 
 	teams := make([]schema.ContestTeam, len(d.ContestTeams))
 	for i, v := range d.ContestTeams {
+		member := make([]schema.User, len(v.Members))
+		for j, w := range v.Members {
+			member[j] = schema.User{
+				Id:       w.ID,
+				Name:     w.Name,
+				RealName: w.RealName(),
+			}
+		}
 		teams[i] = schema.ContestTeam{
-			Id:     v.ID,
-			Name:   v.Name,
-			Result: v.Result,
+			Id:      v.ID,
+			Members: member,
+			Name:    v.Name,
+			Result:  v.Result,
 		}
 	}
 
@@ -511,26 +532,46 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 				contestID := random.UUID()
 				repoContestTeams := []*domain.ContestTeam{
 					{
-						ID:        random.UUID(),
-						ContestID: contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        random.UUID(),
+							ContestID: contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						Members: []*domain.User{
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						},
 					},
 					{
-						ID:        random.UUID(),
-						ContestID: contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        random.UUID(),
+							ContestID: contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						Members: []*domain.User{
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						},
 					},
 				}
 				hres = []*schema.ContestTeam{
 					{
-						Id:     repoContestTeams[0].ID,
+						Id: repoContestTeams[0].ID,
+						Members: []schema.User{
+							{Id: repoContestTeams[0].Members[0].ID, Name: repoContestTeams[0].Members[0].Name, RealName: repoContestTeams[0].Members[0].RealName()},
+							{Id: repoContestTeams[0].Members[1].ID, Name: repoContestTeams[0].Members[1].Name, RealName: repoContestTeams[0].Members[1].RealName()},
+						},
 						Name:   repoContestTeams[0].Name,
 						Result: repoContestTeams[0].Result,
 					},
 					{
-						Id:     repoContestTeams[1].ID,
+						Id: repoContestTeams[1].ID,
+						Members: []schema.User{
+							{Id: repoContestTeams[1].Members[0].ID, Name: repoContestTeams[1].Members[0].Name, RealName: repoContestTeams[1].Members[0].RealName()},
+							{Id: repoContestTeams[1].Members[1].ID, Name: repoContestTeams[1].Members[1].Name, RealName: repoContestTeams[1].Members[1].RealName()},
+						},
 						Name:   repoContestTeams[1].Name,
 						Result: repoContestTeams[1].Result,
 					},
@@ -580,17 +621,19 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				repoContestTeamDetail := domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        teamID,
-						ContestID: contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        teamID,
+							ContestID: contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
+						Members: []*domain.User{
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						},
 					},
 					Link:        random.AlphaNumeric(),
 					Description: random.AlphaNumeric(),
-					Members: []*domain.User{
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-					},
 				}
 				members := make([]schema.User, 0, len(repoContestTeamDetail.Members))
 				for _, member := range repoContestTeamDetail.Members {
@@ -684,19 +727,22 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				}
 				want := domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        teamID,
-						ContestID: contestID,
-						Name:      args.Name,
-						Result:    args.Result.ValueOrZero(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        teamID,
+							ContestID: contestID,
+							Name:      args.Name,
+							Result:    args.Result.ValueOrZero(),
+						},
+						Members: make([]*domain.User, 0),
 					},
 					Link:        args.Link.ValueOrZero(),
 					Description: args.Description,
-					Members:     nil,
 				}
 				expectedResBody := schema.ContestTeam{
-					Id:     teamID,
-					Name:   want.Name,
-					Result: want.Result,
+					Id:      teamID,
+					Members: make([]schema.User, 0),
+					Name:    want.Name,
+					Result:  want.Result,
 				}
 				s.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(&want, nil)
 				return reqBody, expectedResBody, fmt.Sprintf("/api/v1/contests/%s/teams", contestID)

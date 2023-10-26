@@ -545,14 +545,16 @@ func TestUserRepository_GetContests(t *testing.T) {
 	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
 	expected1 := []*domain.UserContest{
-		newUserContest(t, &contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam}),
-		newUserContest(t, &contest2.Contest, []*domain.ContestTeam{&team2.ContestTeam}),
+		newUserContest(t, &contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}),
+		newUserContest(t, &contest2.Contest, []*domain.ContestTeamWithoutMembers{&team2.ContestTeam.ContestTeamWithoutMembers}),
 	}
 	contests1, err := userRepo.GetContests(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected1, contests1)
 
-	expected2 := []*domain.UserContest{newUserContest(t, &contest1.Contest, []*domain.ContestTeam{&team1.ContestTeam})}
+	expected2 := []*domain.UserContest{
+		newUserContest(t, &contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}),
+	}
 	contests2, err := userRepo.GetContests(context.Background(), user2.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, contests2)
@@ -580,8 +582,7 @@ func newUserProject(t *testing.T, args *urepository.CreateProjectMemberArgs, pro
 	}
 }
 
-func newUserContest(t *testing.T, contest *domain.Contest, teams []*domain.ContestTeam) *domain.UserContest {
-	t.Helper()
+func newUserContest(t *testing.T, contest *domain.Contest, teams []*domain.ContestTeamWithoutMembers) *domain.UserContest {
 	return &domain.UserContest{
 		ID:        contest.ID,
 		Name:      contest.Name,

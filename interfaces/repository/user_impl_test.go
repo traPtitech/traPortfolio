@@ -1466,7 +1466,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
-					Teams: []*domain.ContestTeam{
+					Teams: []*domain.ContestTeamWithoutMembers{
 						{
 							ID:        random.UUID(),
 							ContestID: cid,
@@ -1518,7 +1518,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 					Name:      random.AlphaNumeric(),
 					TimeStart: random.Time(),
 					TimeEnd:   random.Time(),
-					Teams: []*domain.ContestTeam{
+					Teams: []*domain.ContestTeamWithoutMembers{
 						{
 							ID:        random.UUID(),
 							ContestID: cid,
