@@ -130,7 +130,10 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 					Name:      random.AlphaNumeric(),
 					Result:    random.AlphaNumeric(),
 				},
-				Members: make([]*domain.User, 0),
+				Members: []*domain.User{
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				},
 			},
 			{
 				ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
@@ -139,16 +142,27 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 					Name:      random.AlphaNumeric(),
 					Result:    random.AlphaNumeric(),
 				},
-				Members: make([]*domain.User, 0),
+				Members: []*domain.User{
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+				},
 			},
 		},
 	}
 
 	teams := make([]schema.ContestTeam, len(d.ContestTeams))
 	for i, v := range d.ContestTeams {
+		member := make([]schema.User, len(v.Members))
+		for j, w := range v.Members {
+			member[j] = schema.User{
+				Id:       w.ID,
+				Name:     w.Name,
+				RealName: w.RealName(),
+			}
+		}
 		teams[i] = schema.ContestTeam{
 			Id:      v.ID,
-			Members: make([]schema.User, 0),
+			Members: member,
 			Name:    v.Name,
 			Result:  v.Result,
 		}
