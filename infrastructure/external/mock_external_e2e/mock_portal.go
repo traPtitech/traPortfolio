@@ -3,7 +3,7 @@ package mock_external_e2e //nolint:revive
 import (
 	"fmt"
 
-	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 )
 

@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	external "github.com/traPtitech/traPortfolio/interfaces/external"
+	external "github.com/traPtitech/traPortfolio/infrastructure/external"
 )
 
 // MockPortalAPI is a mock of PortalAPI interface.

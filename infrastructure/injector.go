@@ -1,6 +1,8 @@
 package infrastructure
 
 import (
+	"github.com/traPtitech/traPortfolio/infrastructure/external"
+	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/service"
@@ -10,17 +12,33 @@ import (
 
 func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	// external API
-	portalAPI, err := NewPortalAPI(c.PortalConf(), !c.IsProduction)
-	if err != nil {
-		return handler.API{}, err
-	}
-	traQAPI, err := NewTraQAPI(c.TraqConf(), !c.IsProduction)
-	if err != nil {
-		return handler.API{}, err
-	}
-	knoqAPI, err := NewKnoqAPI(c.KnoqConf(), !c.IsProduction)
-	if err != nil {
-		return handler.API{}, err
+	var (
+		portalAPI external.PortalAPI
+		traQAPI   external.TraQAPI
+		knoqAPI   external.KnoqAPI
+	)
+
+	if c.IsProduction {
+		var err error
+
+		portalAPI, err = external.NewPortalAPI(c.PortalConf())
+		if err != nil {
+			return handler.API{}, err
+		}
+
+		traQAPI, err = external.NewTraQAPI(c.TraqConf())
+		if err != nil {
+			return handler.API{}, err
+		}
+
+		knoqAPI, err = external.NewKnoqAPI(c.KnoqConf())
+		if err != nil {
+			return handler.API{}, err
+		}
+	} else {
+		portalAPI = mock_external_e2e.NewMockPortalAPI()
+		traQAPI = mock_external_e2e.NewMockTraQAPI()
+		knoqAPI = mock_external_e2e.NewMockKnoqAPI()
 	}
 
 	// repository
