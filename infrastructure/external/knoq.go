@@ -1,36 +1,56 @@
-package infrastructure
+//go:generate go run github.com/golang/mock/mockgen@latest -source=$GOFILE -destination=mock_$GOPACKAGE/mock_$GOFILE
+
+package external
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/traPtitech/traPortfolio/interfaces/external"
-	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
-type KnoqAPI struct {
+type EventResponse struct {
+	ID          uuid.UUID   `json:"eventId"`
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Place       string      `json:"place"`
+	GroupID     uuid.UUID   `json:"groupId"`
+	RoomID      uuid.UUID   `json:"roomId"`
+	TimeStart   time.Time   `json:"timeStart"`
+	TimeEnd     time.Time   `json:"timeEnd"`
+	SharedRoom  bool        `json:"sharedRoom"`
+	Admins      []uuid.UUID `json:"admins"`
+}
+
+type KnoqAPI interface {
+	GetEvents() ([]*EventResponse, error)
+	GetEvent(eventID uuid.UUID) (*EventResponse, error)
+	GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, error)
+}
+
+type knoqAPI struct {
 	apiClient
 }
 
-func NewKnoqAPI(conf *config.KnoqConfig, isDevelopment bool) (external.KnoqAPI, error) {
-	if isDevelopment {
-		return &mock_external_e2e.MockKnoqAPI{}, nil
-	}
+func NewKnoqAPI(conf *config.KnoqConfig, isDevelopment bool) (KnoqAPI, error) {
+	// if isDevelopment {
+	// 	return &mock_external_e2e.MockKnoqAPI{}, nil
+	// }
 
 	jar, err := newCookieJar(conf.API(), "session")
 	if err != nil {
 		return nil, err
 	}
 
-	return &KnoqAPI{newAPIClient(jar, conf.API())}, nil
+	return &knoqAPI{newAPIClient(jar, conf.API())}, nil
 }
 
-func (a *KnoqAPI) GetEvents() ([]*external.EventResponse, error) {
+func (a *knoqAPI) GetEvents() ([]*EventResponse, error) {
 	res, err := a.apiGet("/events")
 	if err != nil {
 		return nil, err
@@ -41,14 +61,14 @@ func (a *KnoqAPI) GetEvents() ([]*external.EventResponse, error) {
 		return nil, errors.New("GET /events failed")
 	}
 
-	var er []*external.EventResponse
+	var er []*EventResponse
 	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
 		return nil, err
 	}
 	return er, nil
 }
 
-func (a *KnoqAPI) GetEvent(eventID uuid.UUID) (*external.EventResponse, error) {
+func (a *knoqAPI) GetEvent(eventID uuid.UUID) (*EventResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/events/%s", eventID))
 	if err != nil {
 		return nil, err
@@ -63,14 +83,14 @@ func (a *KnoqAPI) GetEvent(eventID uuid.UUID) (*external.EventResponse, error) {
 		return nil, fmt.Errorf("GET /events/%s failed: %d", eventID, res.StatusCode)
 	}
 
-	var er external.EventResponse
+	var er EventResponse
 	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
 		return nil, err
 	}
 	return &er, nil
 }
 
-func (a *KnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse, error) {
+func (a *knoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/users/%s/events", userID))
 	if err != nil {
 		return nil, err
@@ -81,7 +101,7 @@ func (a *KnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse
 		return nil, fmt.Errorf("GET /users/%s/events failed", userID)
 	}
 
-	var er []*external.EventResponse
+	var er []*EventResponse
 	if err := json.NewDecoder(res.Body).Decode(&er); err != nil {
 		return nil, err
 	}
@@ -90,5 +110,5 @@ func (a *KnoqAPI) GetEventsByUserID(userID uuid.UUID) ([]*external.EventResponse
 
 // Interface guards
 var (
-	_ external.KnoqAPI = (*KnoqAPI)(nil)
+	_ KnoqAPI = (*knoqAPI)(nil)
 )

@@ -9,7 +9,7 @@ import (
 	"github.com/traPtitech/traPortfolio/domain"
 	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
 
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"

@@ -7,8 +7,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/samber/lo"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
-	"github.com/traPtitech/traPortfolio/interfaces/external"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"gorm.io/gorm"
 )

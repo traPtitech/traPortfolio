@@ -9,7 +9,7 @@ import (
 
 	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
-	external "github.com/traPtitech/traPortfolio/interfaces/external"
+	external "github.com/traPtitech/traPortfolio/infrastructure/external"
 )
 
 // MockTraQAPI is a mock of TraQAPI interface.

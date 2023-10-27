@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/usecases/service"
@@ -10,15 +11,15 @@ import (
 
 func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	// external API
-	portalAPI, err := NewPortalAPI(c.PortalConf(), !c.IsProduction)
+	portalAPI, err := external.NewPortalAPI(c.PortalConf(), !c.IsProduction)
 	if err != nil {
 		return handler.API{}, err
 	}
-	traQAPI, err := NewTraQAPI(c.TraqConf(), !c.IsProduction)
+	traQAPI, err := external.NewTraQAPI(c.TraqConf(), !c.IsProduction)
 	if err != nil {
 		return handler.API{}, err
 	}
-	knoqAPI, err := NewKnoqAPI(c.KnoqConf(), !c.IsProduction)
+	knoqAPI, err := external.NewKnoqAPI(c.KnoqConf(), !c.IsProduction)
 	if err != nil {
 		return handler.API{}, err
 	}
