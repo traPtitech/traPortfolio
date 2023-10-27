@@ -6,19 +6,19 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	h      database.SQLHandler
+	h      *gorm.DB
 	portal external.PortalAPI
 	traQ   external.TraQAPI
 }
 
-func NewUserRepository(h database.SQLHandler, portalAPI external.PortalAPI, traQAPI external.TraQAPI) repository.UserRepository {
+func NewUserRepository(h *gorm.DB, portalAPI external.PortalAPI, traQAPI external.TraQAPI) repository.UserRepository {
 	return &UserRepository{
 		h:      h,
 		portal: portalAPI,
@@ -67,7 +67,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 		Where("`users`.`id` IN (?)", traqUserIDs).
 		Limit(limit).
 		Find(&users).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -121,7 +121,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		Preload("Accounts").
 		Where(&model.User{ID: userID}).
 		First(user).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 		Name:        args.Name,
 	}
 
-	err = r.h.WithContext(ctx).Create(&user).Error()
+	err = r.h.WithContext(ctx).Create(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -207,17 +207,17 @@ func (r *UserRepository) UpdateUser(ctx context.Context, userID uuid.UUID, args 
 		return nil
 	}
 
-	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		user := new(model.User)
 		err := tx.
 			WithContext(ctx).Where(&model.User{ID: userID}).
 			First(user).
-			Error()
+			Error
 		if err != nil {
 			return err
 		}
 
-		err = tx.WithContext(ctx).Model(user).Updates(changes).Error()
+		err = tx.WithContext(ctx).Model(user).Updates(changes).Error
 		if err != nil {
 			return err
 		}
@@ -235,7 +235,7 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +245,7 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 		WithContext(ctx).
 		Where(&model.Account{UserID: userID}).
 		Find(&accounts).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (r *UserRepository) GetAccount(ctx context.Context, userID uuid.UUID, accou
 		WithContext(ctx).
 		Where(&model.Account{ID: accountID, UserID: userID}).
 		First(account).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +293,7 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 	if err := r.h.
 		Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", userID, uint8(args.Type)).
 		First(&model.Account{}).
-		Error(); err == nil {
+		Error; err == nil {
 		return nil, repository.ErrAlreadyExists
 	} else if !errors.Is(err, repository.ErrNotFound) {
 		return nil, err
@@ -307,7 +307,7 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		UserID: userID,
 		Check:  args.PrPermitted,
 	}
-	err := r.h.WithContext(ctx).Create(&account).Error()
+	err := r.h.WithContext(ctx).Create(&account).Error
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +317,7 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		WithContext(ctx).
 		Where(&model.Account{ID: account.ID}).
 		First(ver).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -349,12 +349,12 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 		return nil
 	}
 
-	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		account := new(model.Account)
 		err := tx.
 			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			First(account).
-			Error()
+			Error
 		if err != nil {
 			return err
 		}
@@ -366,7 +366,7 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 				WithContext(ctx).
 				Where("`accounts`.`user_id` = ? AND `accounts`.`type` = ?", userID, uint8(av)).
 				First(&model.Account{}).
-				Error(); err == nil {
+				Error; err == nil {
 				return repository.ErrAlreadyExists
 			} else if !errors.Is(err, repository.ErrNotFound) {
 				return err
@@ -390,7 +390,7 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 			}
 		}
 
-		err = tx.WithContext(ctx).Model(account).Updates(changes).Error()
+		err = tx.WithContext(ctx).Model(account).Updates(changes).Error
 		if err != nil {
 			return err
 		}
@@ -400,18 +400,18 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 }
 
 func (r *UserRepository) DeleteAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) error {
-	if err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	if err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.
 			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			First(&model.Account{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
 		if err := tx.
 			WithContext(ctx).Where(&model.Account{ID: accountID, UserID: userID}).
 			Delete(&model.Account{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -428,7 +428,7 @@ func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*
 		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -439,7 +439,7 @@ func (r *UserRepository) GetProjects(ctx context.Context, userID uuid.UUID) ([]*
 		Preload("Project").
 		Where(&model.ProjectMember{UserID: userID}).
 		Find(&projects).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +462,7 @@ func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID
 		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -473,7 +473,7 @@ func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID
 		Preload("Group").
 		Where(&model.GroupUserBelonging{UserID: userID}).
 		Find(&groups).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -504,7 +504,7 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 		WithContext(ctx).
 		Where(&model.User{ID: userID}).
 		First(&model.User{}).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -515,7 +515,7 @@ func (r *UserRepository) GetContests(ctx context.Context, userID uuid.UUID) ([]*
 		Preload("ContestTeam.Contest").
 		Where(&model.ContestTeamUserBelonging{UserID: userID}).
 		Find(&contestTeamUserBelongings).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}

@@ -5,24 +5,24 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
+	"gorm.io/gorm"
 )
 
 type ContestRepository struct {
-	h      database.SQLHandler
+	h      *gorm.DB
 	portal external.PortalAPI
 }
 
-func NewContestRepository(sql database.SQLHandler, portal external.PortalAPI) repository.ContestRepository {
+func NewContestRepository(sql *gorm.DB, portal external.PortalAPI) repository.ContestRepository {
 	return &ContestRepository{h: sql, portal: portal}
 }
 
 func (r *ContestRepository) GetContests(ctx context.Context) ([]*domain.Contest, error) {
 	contests := make([]*model.Contest, 10)
-	err := r.h.WithContext(ctx).Find(&contests).Error()
+	err := r.h.WithContext(ctx).Find(&contests).Error
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (r *ContestRepository) getContest(ctx context.Context, contestID uuid.UUID)
 		WithContext(ctx).
 		Where(&model.Contest{ID: contestID}).
 		First(contest).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -80,7 +80,7 @@ func (r *ContestRepository) CreateContest(ctx context.Context, args *repository.
 		Until:       args.Until.ValueOrZero(),
 	}
 
-	err := r.h.WithContext(ctx).Create(contest).Error()
+	err := r.h.WithContext(ctx).Create(contest).Error
 	if err != nil {
 		return nil, err
 	}
@@ -116,12 +116,12 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 	}
 
 	var c model.Contest
-	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
 			First(&model.Contest{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -129,7 +129,7 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 			WithContext(ctx).
 			Model(&model.Contest{ID: contestID}).
 			Updates(changes).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -137,7 +137,7 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
 			First(&c).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -151,12 +151,12 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 }
 
 func (r *ContestRepository) DeleteContest(ctx context.Context, contestID uuid.UUID) error {
-	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
 			First(&model.Contest{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -164,7 +164,7 @@ func (r *ContestRepository) DeleteContest(ctx context.Context, contestID uuid.UU
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
 			Delete(&model.Contest{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -183,7 +183,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		WithContext(ctx).
 		Where(&model.Contest{ID: contestID}).
 		First(&model.Contest{}).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -193,7 +193,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		WithContext(ctx).
 		Where(&model.ContestTeam{ContestID: contestID}).
 		Find(&teams).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -210,8 +210,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		Preload("User").
 		Where("team_id IN (?)", teamsIDList).
 		Find(&belongings).
-		Error()
-
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +258,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		WithContext(ctx).
 		Where(&model.ContestTeam{ID: teamID, ContestID: contestID}).
 		First(&team).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -269,7 +268,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +305,7 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 		WithContext(ctx).
 		Where(&model.Contest{ID: contestID}).
 		First(&model.Contest{}).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -319,7 +318,7 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 		Link:        _contestTeam.Link.ValueOrZero(),
 	}
 
-	err := r.h.WithContext(ctx).Create(contestTeam).Error()
+	err := r.h.WithContext(ctx).Create(contestTeam).Error
 	if err != nil {
 		return nil, err
 	}
@@ -360,12 +359,12 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 	}
 
 	var ct model.ContestTeam
-	err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
 			First(&model.ContestTeam{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -373,7 +372,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 			WithContext(ctx).
 			Model(&model.ContestTeam{ID: teamID}).
 			Updates(changes).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -381,7 +380,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
 			First(&ct).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -394,13 +393,13 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 }
 
 func (r *ContestRepository) DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error {
-	if err := r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	if err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 存在確認
 		if err := tx.
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID, ContestID: contestID}).
 			First(&model.ContestTeam{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -408,7 +407,7 @@ func (r *ContestRepository) DeleteContestTeam(ctx context.Context, contestID uui
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
 			Delete(&model.ContestTeam{}).
-			Error(); err != nil {
+			Error; err != nil {
 			return err
 		}
 
@@ -426,7 +425,7 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 		WithContext(ctx).
 		Where(&model.Contest{ID: contestID}).
 		First(&model.Contest{}).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -434,7 +433,7 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 		WithContext(ctx).
 		Where(&model.ContestTeam{ID: teamID}).
 		First(&model.ContestTeam{}).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -445,7 +444,7 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -473,7 +472,7 @@ func (r *ContestRepository) AddContestTeamMembers(ctx context.Context, teamID uu
 		WithContext(ctx).
 		Where(&model.ContestTeam{ID: teamID}).
 		First(&model.ContestTeam{}).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -485,7 +484,7 @@ func (r *ContestRepository) AddContestTeamMembers(ctx context.Context, teamID uu
 		WithContext(ctx).
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&_belongings).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -493,12 +492,12 @@ func (r *ContestRepository) AddContestTeamMembers(ctx context.Context, teamID uu
 		belongingsMap[v.UserID] = struct{}{}
 	}
 
-	err = r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, memberID := range members {
 			if _, ok := belongingsMap[memberID]; ok {
 				continue
 			}
-			err = tx.WithContext(ctx).Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error()
+			err = tx.WithContext(ctx).Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error
 			if err != nil {
 				return err
 			}
@@ -517,7 +516,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		WithContext(ctx).
 		Where(&model.ContestTeam{ID: teamID}).
 		First(&model.ContestTeam{}).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -528,7 +527,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		WithContext(ctx).
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&_belongings).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -541,7 +540,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		membersMap[v] = struct{}{}
 	}
 
-	err = r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		//チームに所属していなくて渡された配列に入っているメンバーをチームに追加
 		membersToBeAdded := make([]*model.ContestTeamUserBelonging, 0, len(members))
 		for _, memberID := range members {
@@ -550,7 +549,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 			}
 		}
 		if len(membersToBeAdded) > 0 {
-			err = tx.WithContext(ctx).Create(&membersToBeAdded).Error()
+			err = tx.WithContext(ctx).Create(&membersToBeAdded).Error
 			if err != nil {
 				return err
 			}
@@ -568,7 +567,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 				Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 				Where("`contest_team_user_belongings`.`user_id` IN (?)", membersToBeRemoved).
 				Delete(&model.ContestTeamUserBelonging{}).
-				Error()
+				Error
 			if err != nil {
 				return err
 			}

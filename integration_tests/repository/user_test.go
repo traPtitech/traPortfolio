@@ -7,9 +7,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
@@ -22,10 +22,10 @@ func TestUserRepository_GetUsers(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName(t, "user_repository_get_users")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		args *urepository.GetUsersArgs
@@ -122,10 +122,10 @@ func TestUserRepository_GetUser(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName(t, "user_repository_get_user")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		userID uuid.UUID
@@ -205,8 +205,8 @@ func TestUserRepository_CreateUser(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName(t, "user_repository_create_user")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	db := testutils.SetupGormDB(t, sqlConf)
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		args *urepository.CreateUserArgs
@@ -259,10 +259,10 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName(t, "user_repository_update_user")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	tests := []struct {
 		name string
@@ -320,10 +320,10 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName(t, "user_repository_get_accounts")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -356,10 +356,10 @@ func TestUserRepository_GetAccount(t *testing.T) {
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName(t, "user_repository_get_account")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -393,10 +393,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName(t, "user_repository_update_account")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -442,10 +442,10 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
 	conf := testutils.GetConfigWithDBName(t, "user_repository_delete_account")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -483,11 +483,11 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName(t, "user_repository_get_user_projects")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
-	projectRepo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	userRepo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	projectRepo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProject(t, projectRepo, nil)
 	project2 := mustMakeProject(t, projectRepo, nil)
@@ -516,11 +516,11 @@ func TestUserRepository_GetContests(t *testing.T) {
 
 	conf := testutils.GetConfigWithDBName(t, "user_repository_get_contests")
 	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t, sqlConf)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	userRepo := irepository.NewUserRepository(h, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
-	contestRepo := irepository.NewContestRepository(h, mock_external_e2e.NewMockPortalAPI())
+	userRepo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	contestRepo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contestNum := 3
 	var contests []*domain.ContestDetail

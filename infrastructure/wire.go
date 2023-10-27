@@ -5,8 +5,8 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
+	impl "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	impl "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/gorm"
@@ -46,10 +46,6 @@ var contestSet = wire.NewSet(
 	handler.NewContestHandler,
 )
 
-var sqlSet = wire.NewSet(
-	NewSQLHandler,
-)
-
 var externalSet = wire.NewSet(
 	NewKnoqAPI,
 	NewPortalAPI,
@@ -78,7 +74,6 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 		eventSet,
 		groupSet,
 		contestSet,
-		sqlSet,
 		externalSet,
 		apiSet,
 		confSet,

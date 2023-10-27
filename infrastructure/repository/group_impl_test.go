@@ -8,18 +8,17 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database/mock_database"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
 type mockGroupRepositoryFields struct {
-	h *mock_database.MockSQLHandler
+	h *MockSQLHandler
 }
 
 func newMockGroupRepositoryFields(t *testing.T) mockGroupRepositoryFields {
 	t.Helper()
 	return mockGroupRepositoryFields{
-		h: mock_database.NewMockSQLHandler(),
+		h: NewMockSQLHandler(),
 	}
 }
 
@@ -67,7 +66,7 @@ func TestGroupRepository_GetAllGroups(t *testing.T) {
 			t.Parallel()
 			f := newMockGroupRepositoryFields(t)
 			tt.setup(f, tt.want)
-			repo := NewGroupRepository(f.h)
+			repo := NewGroupRepository(f.h.Conn)
 			got, err := repo.GetGroups(context.Background())
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -235,7 +234,7 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 			t.Parallel()
 			f := newMockGroupRepositoryFields(t)
 			tt.setup(f, tt.args, tt.want)
-			repo := NewGroupRepository(f.h)
+			repo := NewGroupRepository(f.h.Conn)
 			got, err := repo.GetGroup(context.Background(), tt.args.id)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)

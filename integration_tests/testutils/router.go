@@ -21,7 +21,7 @@ func SetupRoutes(t *testing.T, e *echo.Echo, conf *config.Config) (*handler.API,
 	t.Helper()
 
 	db := SetupGormDB(t, conf.SQLConf())
-	if err := mockdata.InsertSampleDataToDB(infrastructure.NewSQLHandler(db)); err != nil {
+	if err := mockdata.InsertSampleDataToDB(db); err != nil {
 		return nil, err
 	}
 

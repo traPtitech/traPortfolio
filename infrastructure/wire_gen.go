@@ -8,8 +8,8 @@ package infrastructure
 
 import (
 	"github.com/google/wire"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/gorm"
@@ -19,7 +19,6 @@ import (
 
 func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	pingHandler := handler.NewPingHandler()
-	sqlHandler := NewSQLHandler(db)
 	portalConfig := providePortalConf(c)
 	bool2 := provideIsDevelopMent(c)
 	portalAPI, err := NewPortalAPI(portalConfig, bool2)
@@ -31,24 +30,24 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	if err != nil {
 		return handler.API{}, err
 	}
-	userRepository := repository.NewUserRepository(sqlHandler, portalAPI, traQAPI)
+	userRepository := repository.NewUserRepository(db, portalAPI, traQAPI)
 	knoqConfig := provideKnoqConf(c)
 	knoqAPI, err := NewKnoqAPI(knoqConfig, bool2)
 	if err != nil {
 		return handler.API{}, err
 	}
-	eventRepository := repository.NewEventRepository(sqlHandler, knoqAPI)
+	eventRepository := repository.NewEventRepository(db, knoqAPI)
 	userService := service.NewUserService(userRepository, eventRepository)
 	userHandler := handler.NewUserHandler(userService)
-	projectRepository := repository.NewProjectRepository(sqlHandler, portalAPI)
+	projectRepository := repository.NewProjectRepository(db, portalAPI)
 	projectService := service.NewProjectService(projectRepository)
 	projectHandler := handler.NewProjectHandler(projectService)
 	eventService := service.NewEventService(eventRepository, userRepository)
 	eventHandler := handler.NewEventHandler(eventService)
-	contestRepository := repository.NewContestRepository(sqlHandler, portalAPI)
+	contestRepository := repository.NewContestRepository(db, portalAPI)
 	contestService := service.NewContestService(contestRepository)
 	contestHandler := handler.NewContestHandler(contestService)
-	groupRepository := repository.NewGroupRepository(sqlHandler)
+	groupRepository := repository.NewGroupRepository(db)
 	groupService := service.NewGroupService(groupRepository, userRepository)
 	groupHandler := handler.NewGroupHandler(groupService)
 	api := handler.NewAPI(pingHandler, userHandler, projectHandler, eventHandler, contestHandler, groupHandler)
@@ -68,10 +67,6 @@ var eventSet = wire.NewSet(repository.NewEventRepository, service.NewEventServic
 var groupSet = wire.NewSet(repository.NewGroupRepository, service.NewGroupService, handler.NewGroupHandler)
 
 var contestSet = wire.NewSet(repository.NewContestRepository, service.NewContestService, handler.NewContestHandler)
-
-var sqlSet = wire.NewSet(
-	NewSQLHandler,
-)
 
 var externalSet = wire.NewSet(
 	NewKnoqAPI,

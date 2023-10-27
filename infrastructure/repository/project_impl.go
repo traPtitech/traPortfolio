@@ -5,25 +5,25 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/database"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 	"github.com/traPtitech/traPortfolio/interfaces/external"
-	"github.com/traPtitech/traPortfolio/interfaces/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
+	"gorm.io/gorm"
 )
 
 type ProjectRepository struct {
-	h      database.SQLHandler
+	h      *gorm.DB
 	portal external.PortalAPI
 }
 
-func NewProjectRepository(h database.SQLHandler, portal external.PortalAPI) repository.ProjectRepository {
+func NewProjectRepository(h *gorm.DB, portal external.PortalAPI) repository.ProjectRepository {
 	return &ProjectRepository{h, portal}
 }
 
 func (r *ProjectRepository) GetProjects(ctx context.Context) ([]*domain.Project, error) {
 	projects := make([]*model.Project, 0)
-	err := r.h.WithContext(ctx).Find(&projects).Error()
+	err := r.h.WithContext(ctx).Find(&projects).Error
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
 		First(project).
-		Error(); err != nil {
+		Error; err != nil {
 		return nil, err
 	}
 
@@ -55,7 +55,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 		Preload("User").
 		Where(model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 	}
 	p.Link = args.Link.ValueOr(p.Link)
 
-	err := r.h.WithContext(ctx).Create(&p).Error()
+	err := r.h.WithContext(ctx).Create(&p).Error
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		Model(&model.Project{}).
 		Where(&model.Project{ID: projectID}).
 		Updates(changes).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 		Preload("User").
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
 		First(&model.Project{}).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -241,7 +241,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		WithContext(ctx).
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&_mmbs).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -264,12 +264,12 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		members = append(members, m)
 	}
 
-	err = r.h.WithContext(ctx).Transaction(func(tx database.SQLHandler) error {
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, v := range members {
 			if _, ok := mmbsMp[v.UserID]; ok {
 				continue
 			}
-			err = tx.WithContext(ctx).Create(v).Error()
+			err = tx.WithContext(ctx).Create(v).Error
 			if err != nil {
 				return err
 			}
@@ -293,7 +293,7 @@ func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID 
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
 		First(&model.Project{}).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
@@ -303,7 +303,7 @@ func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID 
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Where("`project_members`.`user_id` IN (?)", members).
 		Delete(&model.ProjectMember{}).
-		Error()
+		Error
 	if err != nil {
 		return err
 	}
