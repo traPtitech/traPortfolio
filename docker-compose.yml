@@ -9,6 +9,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./
 
   mysql:
     image: mariadb:10.6.4
