@@ -118,10 +118,12 @@ func TestContestService_GetContest(t *testing.T) {
 				Description: random.AlphaNumeric(),
 				ContestTeams: []*domain.ContestTeam{
 					{
-						ID:        random.UUID(),
-						ContestID: cid,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        random.UUID(),
+							ContestID: cid,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
 					},
 				},
 			},
@@ -449,10 +451,12 @@ func TestContestService_GetContestTeams(t *testing.T) {
 			},
 			want: []*domain.ContestTeam{
 				{
-					ID:        random.UUID(),
-					ContestID: cid,
-					Name:      random.AlphaNumeric(),
-					Result:    random.AlphaNumeric(),
+					ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+						ID:        random.UUID(),
+						ContestID: cid,
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
+					},
 				},
 			},
 			setup: func(f fields, args args, want []*domain.ContestTeam) {
@@ -524,25 +528,29 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 			},
 			want: &domain.ContestTeamDetail{
 				ContestTeam: domain.ContestTeam{
-					ID:        tid,
-					ContestID: cid,
-					Name:      random.AlphaNumeric(),
-					Result:    random.AlphaNumeric(),
+					ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+						ID:        tid,
+						ContestID: cid,
+						Name:      random.AlphaNumeric(),
+						Result:    random.AlphaNumeric(),
+					},
+					Members: []*domain.User{
+						domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					},
 				},
 				Link:        random.RandURLString(),
 				Description: random.AlphaNumeric(),
-				Members: []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-				},
 			},
 			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().GetContestTeam(args.ctx, args.contestID, args.teamID).Return(&domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        args.teamID,
-						ContestID: args.contestID,
-						Name:      want.Name,
-						Result:    want.Result,
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        args.teamID,
+							ContestID: args.contestID,
+							Name:      want.Name,
+							Result:    want.Result,
+						},
 					},
 					Link:        want.Link,
 					Description: want.Description,
@@ -577,10 +585,12 @@ func Test_contestService_GetContestTeam(t *testing.T) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().GetContestTeam(args.ctx, args.contestID, args.teamID).Return(&domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        args.teamID,
-						ContestID: args.contestID,
-						Name:      random.AlphaNumeric(),
-						Result:    random.AlphaNumeric(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        args.teamID,
+							ContestID: args.contestID,
+							Name:      random.AlphaNumeric(),
+							Result:    random.AlphaNumeric(),
+						},
 					},
 					Link:        random.RandURLString(),
 					Description: random.AlphaNumeric(),
@@ -650,27 +660,31 @@ func TestContestService_CreateContestTeam(t *testing.T) {
 			},
 			want: &domain.ContestTeamDetail{
 				ContestTeam: domain.ContestTeam{
-					ID:        tid,
-					ContestID: cid,
-					Name:      name,
-					Result:    result,
+					ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+						ID:        tid,
+						ContestID: cid,
+						Name:      name,
+						Result:    result,
+					},
+					Members: nil,
 				},
 				Link:        link,
 				Description: description,
-				Members:     nil,
 			},
 			setup: func(f fields, args args, want *domain.ContestTeamDetail) {
 				repo := f.repo.(*mock_repository.MockContestRepository)
 				repo.EXPECT().CreateContestTeam(args.ctx, args.contestID, args.args).Return(&domain.ContestTeamDetail{
 					ContestTeam: domain.ContestTeam{
-						ID:        tid,
-						ContestID: args.contestID,
-						Name:      args.args.Name,
-						Result:    args.args.Result.ValueOrZero(),
+						ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
+							ID:        tid,
+							ContestID: args.contestID,
+							Name:      args.args.Name,
+							Result:    args.args.Result.ValueOrZero(),
+						},
+						Members: nil,
 					},
 					Link:        args.args.Link.ValueOrZero(),
 					Description: args.args.Description,
-					Members:     nil,
 				}, nil)
 			},
 			assertion: assert.NoError,

@@ -135,6 +135,10 @@ func CloneMockEventLevelRelations() []model.EventLevelRelation {
 			ID:    KnoqEventID2(),
 			Level: domain.EventLevelPrivate,
 		},
+		{
+			ID:    KnoqEventID3(),
+			Level: domain.EventLevelAnonymous,
+		},
 	}
 }
 

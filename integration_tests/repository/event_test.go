@@ -76,10 +76,24 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		GroupID:     selected.GroupID,
 		RoomID:      selected.RoomID,
 	}
+	switch level {
+	case domain.EventLevelPrivate:
+		expected = nil
+	case domain.EventLevelAnonymous:
+		expected.HostName = nil
+	case domain.EventLevelPublic:
+	// do nothing
+	default:
+		t.Fatal("invalid level")
+	}
 
 	got, err := repo.GetEvent(context.Background(), selected.ID)
+	if level == domain.EventLevelPrivate {
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		return
+	}
 	assert.NoError(t, err)
-
 	assert.Equal(t, expected, got)
 }
 
@@ -105,6 +119,11 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	}
 
 	got, err := repo.GetEvent(context.Background(), selected.EventID)
+	if selected.Level == domain.EventLevelPrivate {
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		return
+	}
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
@@ -115,6 +134,11 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	assert.NoError(t, err)
 
 	got, err = repo.GetEvent(context.Background(), selected.EventID)
+	if updatedLevel == domain.EventLevelPrivate {
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		return
+	}
 	assert.NoError(t, err)
 	assert.Equal(t, updatedLevel, got.Level)
 }

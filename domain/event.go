@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -25,6 +26,21 @@ type EventDetail struct {
 	HostName    []*User
 	GroupID     uuid.UUID
 	RoomID      uuid.UUID
+}
+
+// ApplyEventLevel EventDetailのLevelに応じてEventを返す
+func ApplyEventLevel(e EventDetail) optional.Of[EventDetail] {
+	switch e.Level {
+	case EventLevelAnonymous:
+		e.HostName = nil
+		return optional.From(e)
+	case EventLevelPublic:
+		return optional.From(e)
+	case EventLevelPrivate:
+		return optional.Of[EventDetail]{}
+	default:
+		return optional.Of[EventDetail]{}
+	}
 }
 
 type EventLevel uint8
