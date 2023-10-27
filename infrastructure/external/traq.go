@@ -31,11 +31,7 @@ type traQAPI struct {
 	apiClient
 }
 
-func NewTraQAPI(conf *config.TraqConfig, isDevelopment bool) (TraQAPI, error) {
-	// if isDevelopment {
-	// 	return mock_external_e2e.NewMockTraQAPI(), nil
-	// }
-
+func NewTraQAPI(conf *config.TraqConfig) (TraQAPI, error) {
 	jar, err := newCookieJar(conf.API(), "r_session")
 	if err != nil {
 		return nil, err

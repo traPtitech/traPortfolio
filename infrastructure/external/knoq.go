@@ -37,11 +37,7 @@ type knoqAPI struct {
 	apiClient
 }
 
-func NewKnoqAPI(conf *config.KnoqConfig, isDevelopment bool) (KnoqAPI, error) {
-	// if isDevelopment {
-	// 	return &mock_external_e2e.MockKnoqAPI{}, nil
-	// }
-
+func NewKnoqAPI(conf *config.KnoqConfig) (KnoqAPI, error) {
 	jar, err := newCookieJar(conf.API(), "session")
 	if err != nil {
 		return nil, err
