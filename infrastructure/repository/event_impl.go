@@ -172,7 +172,7 @@ func (r *EventRepository) filterAccessibleEvents(ctx context.Context, events []*
 		Select("id").
 		Where("level = ? AND id IN ?", domain.EventLevelPrivate, ids).
 		Find(&privateRels).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}

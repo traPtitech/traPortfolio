@@ -210,8 +210,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		Preload("User").
 		Where("team_id IN (?)", teamsIDList).
 		Find(&belongings).
-		Error()
-
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +268,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).
-		Error()
+		Error
 	if err != nil {
 		return nil, err
 	}
