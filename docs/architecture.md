@@ -49,69 +49,64 @@
 
 ```mermaid
 classDiagram
-    namespace domain {
-        class User {
-            ID       uuid.UUID
-            Name     string
-            realName string
-            Check    bool
-        }
+    class User["domain.User"] {
+        ID       uuid.UUID
+        Name     string
+        realName string
+        Check    bool
     }
 
-    namespace usecases {
-        class IUS["service.UserService"] {
-            <<interface>>
-            GetUsers(...) ([]*domain.User, error)
-            ...
-        }
-        class US["service.userService"] {
-            user repository.UserRepository
-            event repository.EventRepository
-        }
-
-        class IUR["repository.UserRepository"] {
-            <<interface>>
-            GetUsers(...) ([]*domain.User, error)
-            ...
-        }
+    class IUS["usecases.service.UserService"] {
+        <<interface>>
+        GetUsers(...) ([]*domain.User, error)
+        ...
     }
+    class US["usecases.service.userService"] {
+        user repository.UserRepository
+        event repository.EventRepository
+    }
+
+    class IUR["usecases.repository.UserRepository"] {
+        <<interface>>
+        GetUsers(...) ([]*domain.User, error)
+        ...
+    }
+
     IUS --> User
     IUR --> User
     US --|> IUS
     US --> IUR
 
-    namespace interfaces {
-        class API["handler.API"] {
-            Ping *PingHandler
-            User *UserHandler
-            ...
-        }
-        class UH["handler.UserHandler"] {
-            s service.UserService
-        }
+    class API["interfaces.handler.API"] {
+        Ping *PingHandler
+        User *UserHandler
+        ...
     }
+    class UH["interfaces.handler.UserHandler"] {
+        s service.UserService
+    }
+
     API --> UH
     UH --> IUS
 
-    namespace infrastructure {
-        class UR["repository.UserRepository"] {
-            h      *gorm.DB
-            portal external.PortalAPI
-            traQ   external.TraQAPI
-        }
-
-        class IPortalAPI["external.PortalAPI"] {
-            <<interface>>
-            ...
-        }
-        class PortalAPI["external.portalAPI"]
-
-        class ITraQAPI["external.TraQAPI"] {
-            <<interface>>
-            ...
-        }
-        class TraQAPI["external.traQAPI"]
+    class UR["infrastructure.repository.UserRepository"] {
+        h      *gorm.DB
+        portal external.PortalAPI
+        traQ   external.TraQAPI
     }
+
+    class IPortalAPI["infrastructure.external.PortalAPI"] {
+        <<interface>>
+        ...
+    }
+    class PortalAPI["infrastructure.external.portalAPI"]
+
+    class ITraQAPI["infrastructure.external.TraQAPI"] {
+        <<interface>>
+        ...
+    }
+    class TraQAPI["infrastructure.external.traQAPI"]
+
     UR --|> IUR
     PortalAPI --|> IPortalAPI
     TraQAPI --|> ITraQAPI
