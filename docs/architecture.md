@@ -1,6 +1,8 @@
-# パッケージ構成
+# アーキテクチャ
 
 クリーンアーキテクチャを参考に構成
+
+## パッケージ構成
 
 ```bash
 .
@@ -39,4 +41,75 @@
 │  ├── optional # null値を扱うためのパッケージ
 │  └── random # テストで用いる乱数生成パッケージ
 └── main.go
+```
+
+## 依存関係
+
+ユーザー周りに限って紹介
+
+```mermaid
+classDiagram
+    class User["domain.User"] {
+        ID       uuid.UUID
+        Name     string
+        realName string
+        Check    bool
+    }
+
+    class IUS["usecases.service.UserService"] {
+        <<interface>>
+        GetUsers(...) ([]*domain.User, error)
+        ...
+    }
+    class US["usecases.service.userService"] {
+        user repository.UserRepository
+        event repository.EventRepository
+    }
+
+    class IUR["usecases.repository.UserRepository"] {
+        <<interface>>
+        GetUsers(...) ([]*domain.User, error)
+        ...
+    }
+
+    IUS --> User
+    IUR --> User
+    US --|> IUS
+    US --> IUR
+
+    class API["interfaces.handler.API"] {
+        Ping *PingHandler
+        User *UserHandler
+        ...
+    }
+    class UH["interfaces.handler.UserHandler"] {
+        s service.UserService
+    }
+
+    API --> UH
+    UH --> IUS
+
+    class UR["infrastructure.repository.UserRepository"] {
+        h      *gorm.DB
+        portal external.PortalAPI
+        traQ   external.TraQAPI
+    }
+
+    class IPortalAPI["infrastructure.external.PortalAPI"] {
+        <<interface>>
+        ...
+    }
+    class PortalAPI["infrastructure.external.portalAPI"]
+
+    class ITraQAPI["infrastructure.external.TraQAPI"] {
+        <<interface>>
+        ...
+    }
+    class TraQAPI["infrastructure.external.traQAPI"]
+
+    UR --|> IUR
+    PortalAPI --|> IPortalAPI
+    TraQAPI --|> ITraQAPI
+    UR --> IPortalAPI
+    UR --> ITraQAPI
 ```
