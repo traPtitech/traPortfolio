@@ -11,7 +11,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.9
 	github.com/json-iterator/go v1.1.12
-	github.com/labstack/echo/v4 v4.11.1
+	github.com/labstack/echo/v4 v4.11.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/samber/lo v1.38.1
 	github.com/spf13/pflag v1.0.5
