@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"math/rand"
 	"net/http"
 	"strings"
 	"testing"
@@ -659,12 +658,12 @@ func TestDeleteUserAccount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+				accountType := mockdata.AccountTypesMockUserDoesntHave(tt.userID)[0]
 				reqBody := schema.AddUserAccountJSONRequestBody{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: schema.PrPermitted(random.Bool()),
-					Type:        schema.AccountType(accountType),
-					Url:         random.AccountURLString(accountType),
+					Type:        accountType,
+					Url:         random.AccountURLString(domain.AccountType(accountType)),
 				}
 				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
 				testutils.AssertResponse(t, http.StatusCreated, schema.Account{
