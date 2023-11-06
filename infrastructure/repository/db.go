@@ -26,8 +26,11 @@ func (d dialector) Translate(err error) error {
 		err = translater.Translate(err)
 	}
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
 		return repository.ErrNotFound
+	case errors.Is(err, gorm.ErrForeignKeyViolated):
+		return repository.ErrInvalidArg
 	}
 
 	// 外部キー制約エラーの変換
