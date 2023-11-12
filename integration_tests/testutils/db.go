@@ -3,7 +3,6 @@ package testutils
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strconv"
 	"testing"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -51,42 +49,6 @@ func establishTestDBConnection(t *testing.T) *gorm.DB {
 	assert.NoError(t, err)
 
 	return db
-}
-
-func WaitTestDBConnection(conf *config.SQLConfig) <-chan struct{} {
-	ch := make(chan struct{})
-	go func() {
-		waitTestDBConnection(conf)
-		close(ch)
-	}()
-
-	return ch
-}
-
-func waitTestDBConnection(conf *config.SQLConfig) {
-	db, err := gorm.Open(mysql.New(mysql.Config{DSNConfig: conf.DsnConfig()}), conf.GormConfig())
-	if err != nil {
-		panic(err)
-	}
-	sqlDB, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-	defer sqlDB.Close()
-
-	// DBとの接続が確立できるまで待つ
-	for i := 0; ; i++ {
-		log.Println(i)
-		if i > 10 {
-			panic(fmt.Errorf("failed to connect to DB"))
-		}
-		err = sqlDB.Ping()
-		log.Println(err)
-		if err == nil {
-			break
-		}
-		time.Sleep(time.Second * 10)
-	}
 }
 
 func dropAll(t *testing.T, db *gorm.DB) {
