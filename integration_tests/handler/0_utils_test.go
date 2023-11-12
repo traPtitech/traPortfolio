@@ -19,25 +19,21 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupRoutes(t *testing.T, e *echo.Echo) (*handler.API, error) {
+func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	t.Helper()
 
 	db := testutils.SetupGormDB(t)
-	if err := mockdata.InsertSampleDataToDB(db); err != nil {
-		return nil, err
-	}
+	err := mockdata.InsertSampleDataToDB(db)
+	assert.NoError(t, err)
 
 	c := config.Load()
 	api, err := infrastructure.InjectAPIServer(c, db)
-	if err != nil {
-		return nil, err
-	}
+	assert.NoError(t, err)
 
-	if err := handler.Setup(e, api); err != nil {
-		return nil, err
-	}
+	err = handler.Setup(e, api)
+	assert.NoError(t, err)
 
-	return &api, nil
+	return &api
 }
 
 func doRequest(t *testing.T, e *echo.Echo, method string, path string, body interface{}) *httptest.ResponseRecorder {

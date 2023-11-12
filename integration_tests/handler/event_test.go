@@ -28,8 +28,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -66,8 +65,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -108,8 +106,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {

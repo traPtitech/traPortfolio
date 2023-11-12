@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
 // GET /ping
@@ -19,8 +18,7 @@ func TestPing(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {

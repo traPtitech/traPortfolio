@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -32,8 +31,7 @@ func TestGetGroups(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 
 	for name, tt := range tests {
 		tt := tt
@@ -72,8 +70,7 @@ func TestGetGroup(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 
 	for name, tt := range tests {
 		tt := tt

@@ -29,8 +29,7 @@ func TestGetContests(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -67,8 +66,7 @@ func TestGetContest(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -227,8 +225,7 @@ func TestCreateContest(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -374,8 +371,7 @@ func TestEditContest(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -440,8 +436,7 @@ func TestDeleteContest(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -478,8 +473,7 @@ func TestGetContestTeams(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -624,8 +618,7 @@ func TestAddContestTeam(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -789,8 +782,7 @@ func TestEditContestTeam(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -871,8 +863,7 @@ func TestDeleteContestTeam(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -933,8 +924,7 @@ func TestGetContestTeamMembers(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -1024,8 +1014,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
@@ -1119,8 +1108,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 	}
 
 	e := echo.New()
-	api, err := setupRoutes(t, e)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
