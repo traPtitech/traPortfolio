@@ -6,8 +6,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -33,16 +31,14 @@ func TestGetGroups(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "group_handler_get_groups")
-	api, err := testutils.SetupRoutes(t, e, conf)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroups), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroups), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -64,26 +60,24 @@ func TestGetGroup(t *testing.T) {
 		"400 invalid userID": {
 			statusCode: http.StatusBadRequest,
 			groupID:    uuid.Nil,
-			want:       testutils.HTTPError(t, "Bad Request: nil id"),
+			want:       httpError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			statusCode: http.StatusNotFound,
 			groupID:    random.UUID(),
-			want:       testutils.HTTPError(t, "Not Found: not found"),
+			want:       httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "group_handler_get_group")
-	api, err := testutils.SetupRoutes(t, e, conf)
-	assert.NoError(t, err)
+	api := setupRoutes(t, e)
 
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroup, tt.groupID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroup, tt.groupID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }

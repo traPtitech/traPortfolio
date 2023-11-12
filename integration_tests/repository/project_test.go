@@ -21,9 +21,7 @@ import (
 func TestProjectRepository_GetProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_get_projects")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
@@ -41,9 +39,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 func TestProjectRepository_GetProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
@@ -69,9 +65,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_update_project")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	tests := []struct {
@@ -131,9 +125,7 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project_members")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
@@ -215,9 +207,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_delete_project_members")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())

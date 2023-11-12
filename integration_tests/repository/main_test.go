@@ -19,7 +19,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	if err := testutils.ParseConfig("../testdata"); err != nil {
+	if err := config.ReadDefault(); err != nil {
 		panic(err)
 	}
 

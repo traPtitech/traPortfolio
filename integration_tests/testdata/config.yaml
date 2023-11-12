@@ -1,6 +1,0 @@
-port: 1323
-db:
-  user: 'root'
-  pass: 'password'
-  host: 'localhost'
-  port: 3306

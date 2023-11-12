@@ -20,10 +20,7 @@ import (
 func TestContestRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contests")
-	sqlConf := conf.SQLConf()
-
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -38,10 +35,7 @@ func TestContestRepository_GetContests(t *testing.T) {
 func TestContestRepository_GetContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest")
-	sqlConf := conf.SQLConf()
-
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -58,10 +52,7 @@ func TestContestRepository_GetContest(t *testing.T) {
 func TestContestRepository_UpdateContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_update_contest")
-	sqlConf := conf.SQLConf()
-
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	tests := []struct {
 		name string
@@ -119,10 +110,7 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 func TestContestRepository_DeleteContest(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_delete_contest")
-	sqlConf := conf.SQLConf()
-
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -150,10 +138,7 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 func TestContestRepository_GetContestTeams(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_teams")
-	sqlConf := conf.SQLConf()
-
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -185,9 +170,7 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 func TestContestRepository_GetContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_team")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -220,9 +203,7 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_update_contest_teams")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	tests := []struct {
@@ -272,10 +253,7 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_delete_contest_teams")
-	sqlConf := conf.SQLConf()
-
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
@@ -321,9 +299,7 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_get_contest_team_members")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
@@ -384,9 +360,7 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "contest_repository_edit_contest_team_members")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
