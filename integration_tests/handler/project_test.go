@@ -30,14 +30,14 @@ func TestGetProjects(t *testing.T) {
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_get_projects")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Project.GetProjects), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProjects), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -58,25 +58,25 @@ func TestGetProject(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_get_project")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Project.GetProject, tt.projectID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProject, tt.projectID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -137,7 +137,7 @@ func TestCreateProject(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: link: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
 		},
 		"400 too long description": {
 			http.StatusBadRequest,
@@ -147,7 +147,7 @@ func TestCreateProject(t *testing.T) {
 				Description: tooLongDescriptionKanji,
 				Duration:    duration,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
+			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"400 too long name": {
 			http.StatusBadRequest,
@@ -157,7 +157,7 @@ func TestCreateProject(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
+			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 empty name": {
 			http.StatusBadRequest,
@@ -166,7 +166,7 @@ func TestCreateProject(t *testing.T) {
 				Description: description,
 				Duration:    duration,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: name: cannot be blank."),
+			httpError(t, "Bad Request: validate error: name: cannot be blank."),
 		},
 		"400 empty description": {
 			http.StatusBadRequest,
@@ -175,7 +175,7 @@ func TestCreateProject(t *testing.T) {
 				Link:     &link,
 				Duration: duration,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: description: cannot be blank."),
+			httpError(t, "Bad Request: validate error: description: cannot be blank."),
 		},
 		"400 empty duration": {
 			http.StatusBadRequest,
@@ -184,24 +184,24 @@ func TestCreateProject(t *testing.T) {
 				Link:        &link,
 				Description: description,
 			},
-			testutils.HTTPError(t, "Bad Request: argument error"),
+			httpError(t, "Bad Request: argument error"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_add_project")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject), &tt.reqBody)
+			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject), &tt.reqBody)
 			switch want := tt.want.(type) {
 			case schema.Project:
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
+				assertResponse(t, tt.statusCode, tt.want, res, optSyncID, optRetrieveID(&want.Id))
 			case error:
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				assertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
@@ -259,7 +259,7 @@ func TestEditProject(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			schema.EditProjectJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -267,7 +267,7 @@ func TestEditProject(t *testing.T) {
 			schema.EditProjectJSONRequestBody{
 				Name: &tooLongName,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
+			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
 		"400 invalid Description": {
 			http.StatusBadRequest,
@@ -275,19 +275,19 @@ func TestEditProject(t *testing.T) {
 			schema.EditProjectJSONRequestBody{
 				Description: &tooLongDescriptionKanji,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
+			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
 			schema.EditProjectJSONRequestBody{},
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_update_project")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -296,15 +296,15 @@ func TestEditProject(t *testing.T) {
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
 				var project schema.ProjectDetail
-				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Project.GetProject, tt.projectID), nil)
+				res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProject, tt.projectID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &project))
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Project.EditProject, tt.projectID), &tt.reqBody)
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				res = doRequest(t, e, http.MethodPatch, e.URL(api.Project.EditProject, tt.projectID), &tt.reqBody)
+				assertResponse(t, tt.statusCode, tt.want, res)
 			} else {
-				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.Project.EditProject, tt.projectID), &tt.reqBody)
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				res := doRequest(t, e, http.MethodPatch, e.URL(api.Project.EditProject, tt.projectID), &tt.reqBody)
+				assertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
@@ -334,20 +334,20 @@ func TestGetProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_get_project_members")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Project.GetProjectMembers, tt.projectID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProjectMembers, tt.projectID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -389,20 +389,20 @@ func TestAddProjectMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			schema.AddProjectMembersJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_add_member")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &tt.reqBody)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -433,7 +433,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 			schema.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{userID1},
 			},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid memberID": {
 			http.StatusBadRequest,
@@ -441,13 +441,13 @@ func TestDeleteProjectMembers(t *testing.T) {
 			schema.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{uuid.Nil},
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
+			httpError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 empty members": {
 			http.StatusBadRequest,
 			random.UUID(),
 			schema.DeleteProjectMembersJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: validate error: members: cannot be blank."),
+			httpError(t, "Bad Request: validate error: members: cannot be blank."),
 		},
 		"400 empty memberIDs": {
 			http.StatusBadRequest,
@@ -455,7 +455,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 			schema.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{},
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: members: cannot be blank."),
+			httpError(t, "Bad Request: validate error: members: cannot be blank."),
 		},
 		"404 not found": {
 			http.StatusNotFound,
@@ -463,20 +463,20 @@ func TestDeleteProjectMembers(t *testing.T) {
 			schema.DeleteProjectMembersJSONRequestBody{
 				Members: []uuid.UUID{userID1},
 			},
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "project_handler_delete_project")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), &tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), &tt.reqBody)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }

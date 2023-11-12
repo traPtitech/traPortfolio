@@ -65,34 +65,34 @@ func TestGetUsers(t *testing.T) {
 				IncludeSuspended: &includeSuspended,
 				Name:             &name,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: include_suspended and name cannot be specified at the same time"),
+			httpError(t, "Bad Request: validate error: include_suspended and name cannot be specified at the same time"),
 		},
 		"400 invalid limit with 0": {
 			http.StatusBadRequest,
 			schema.GetUsersParams{
 				Limit: &limitBlank,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: limit: cannot be blank."),
+			httpError(t, "Bad Request: validate error: limit: cannot be blank."),
 		},
 		"400 invalid limit less than 1": {
 			http.StatusBadRequest,
 			schema.GetUsersParams{
 				Limit: &limitLessThan1,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: limit: must be no less than 1."),
+			httpError(t, "Bad Request: validate error: limit: must be no less than 1."),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_users")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.reqBody)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -113,25 +113,25 @@ func TestGetUser(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -169,13 +169,13 @@ func TestUpdateUser(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			schema.EditUserJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_update_user")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -184,12 +184,12 @@ func TestUpdateUser(t *testing.T) {
 			if tt.statusCode == http.StatusNoContent {
 				// Get response before update
 				var user schema.UserDetail
-				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
+				res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
 				assert.Equal(t, http.StatusOK, res.Code)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &user)) // TODO: ここだけjson.Unmarshalを直接行っているのでスマートではない
 				// Update & Assert
-				res = testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				res = doRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
+				assertResponse(t, tt.statusCode, tt.want, res)
 				// Get updated response & Assert
 				if tt.reqBody.Check != nil && *tt.reqBody.Check == false {
 					user.RealName = ""
@@ -198,11 +198,11 @@ func TestUpdateUser(t *testing.T) {
 					user.Bio = *tt.reqBody.Bio
 				}
 				// if tt.reqBody.Check != nil {} // TODO: Checkに応じて処理を書く
-				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
-				testutils.AssertResponse(t, http.StatusOK, user, res)
+				res = doRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
+				assertResponse(t, http.StatusOK, user, res)
 			} else {
-				res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				res := doRequest(t, e, http.MethodPatch, e.URL(api.User.UpdateUser, tt.userID), &tt.reqBody)
+				assertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
@@ -229,25 +229,25 @@ func TestGetUserAccounts(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_accounts")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccounts, tt.userID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccounts, tt.userID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -271,44 +271,44 @@ func TestGetUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.AccountID1(),
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid accountID": {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404 userID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			mockdata.AccountID1(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 		"404 accountID not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 		"404 both userID and accountID not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_account")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -374,7 +374,7 @@ func TestAddUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			schema.AddUserAccountJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
@@ -385,7 +385,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        accountType,
 				Url:         "invalid url",
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: url: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: url: must be a valid URL."),
 		},
 		"400 invalid account type": {
 			http.StatusBadRequest,
@@ -396,7 +396,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        schema.AccountType(domain.AccountLimit),
 				Url:         accountURL,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: type: must be no greater than 11."),
+			httpError(t, "Bad Request: validate error: type: must be no greater than 11."),
 		},
 		"409 conflict already exists": {
 			http.StatusConflict,
@@ -407,7 +407,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        conflictType,
 				Url:         random.AccountURLString(domain.AccountType(conflictType)),
 			},
-			testutils.HTTPError(t, "Conflict: already exists"),
+			httpError(t, "Conflict: already exists"),
 		},
 		"400 too long display name": {
 			http.StatusBadRequest,
@@ -418,24 +418,24 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        accountType,
 				Url:         accountURL,
 			},
-			testutils.HTTPError(t, "Bad Request: validate error: displayName: the length must be between 1 and 256."),
+			httpError(t, "Bad Request: validate error: displayName: the length must be between 1 and 256."),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_add_user_account")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
+			res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
 			switch want := tt.want.(type) {
 			case schema.Account:
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res, testutils.OptSyncID, testutils.OptRetrieveID(&want.Id))
+				assertResponse(t, tt.statusCode, tt.want, res, optSyncID, optRetrieveID(&want.Id))
 			case error:
-				testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+				assertResponse(t, tt.statusCode, tt.want, res)
 			}
 		})
 	}
@@ -489,7 +489,7 @@ func TestEditUserAccount(t *testing.T) {
 			uuid.Nil,
 			mockdata.AccountID1(),
 			schema.EditUserAccountJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 			false,
 		},
 		"400 invalid accountID": {
@@ -497,7 +497,7 @@ func TestEditUserAccount(t *testing.T) {
 			mockdata.UserID1(),
 			uuid.Nil,
 			schema.EditUserAccountJSONRequestBody{},
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 			false,
 		},
 		"400 invalud url without accountType": {
@@ -507,7 +507,7 @@ func TestEditUserAccount(t *testing.T) {
 			schema.EditUserAccountJSONRequestBody{
 				Url: &invalidAccountURL,
 			},
-			testutils.HTTPError(t, "Bad Request: argument error"),
+			httpError(t, "Bad Request: argument error"),
 			false,
 		},
 		"400 invalid url without accountURL": {
@@ -517,7 +517,7 @@ func TestEditUserAccount(t *testing.T) {
 			schema.EditUserAccountJSONRequestBody{
 				Type: &invalidAccountType,
 			},
-			testutils.HTTPError(t, "Bad Request: argument error"),
+			httpError(t, "Bad Request: argument error"),
 			false,
 		},
 		"404 user not found": {
@@ -527,7 +527,7 @@ func TestEditUserAccount(t *testing.T) {
 			schema.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 			false,
 		},
 		"404 account not found": {
@@ -537,7 +537,7 @@ func TestEditUserAccount(t *testing.T) {
 			schema.EditUserAccountJSONRequestBody{
 				DisplayName: &displayName,
 			},
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 			false,
 		},
 		"404 account type conflicted by update": {
@@ -550,14 +550,14 @@ func TestEditUserAccount(t *testing.T) {
 				Type:        &accountType,
 				Url:         &accountURL,
 			},
-			testutils.HTTPError(t, "Conflict: already exists"),
+			httpError(t, "Conflict: already exists"),
 			true,
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_edit_user_account")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -572,22 +572,22 @@ func TestEditUserAccount(t *testing.T) {
 					Type:        schema.AccountType(initialAccountType),
 					Url:         random.AccountURLString(initialAccountType),
 				}
-				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), schema.AddUserAccountJSONRequestBody{
+				res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), schema.AddUserAccountJSONRequestBody{
 					DisplayName: account.DisplayName,
 					PrPermitted: account.PrPermitted,
 					Type:        account.Type,
 					Url:         account.Url,
 				})
-				testutils.AssertResponse(t, http.StatusCreated, account, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
+				assertResponse(t, http.StatusCreated, account, res, optSyncID, optRetrieveID(&tt.accountID))
 				account.Id = tt.accountID
 			} else {
 				// Get account data
-				res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+				res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
 				assert.NoError(t, json.Unmarshal(res.Body.Bytes(), &account))
 			}
 			// Update & Assert
-			res := testutils.DoRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodPatch, e.URL(api.User.EditUserAccount, tt.userID, tt.accountID), tt.reqBody)
+			assertResponse(t, tt.statusCode, tt.want, res)
 			if tt.statusCode == http.StatusNoContent {
 				// Get updated response & Assert
 				if tt.reqBody.DisplayName != nil {
@@ -602,8 +602,8 @@ func TestEditUserAccount(t *testing.T) {
 				if tt.reqBody.Url != nil {
 					account.Url = *tt.reqBody.Url
 				}
-				res = testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
-				testutils.AssertResponse(t, http.StatusOK, account, res)
+				res = doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
+				assertResponse(t, http.StatusOK, account, res)
 			}
 		})
 	}
@@ -622,7 +622,7 @@ func TestDeleteUserAccount(t *testing.T) {
 		"204": {
 			http.StatusNoContent,
 			mockdata.UserID1(),
-			testutils.DummyUUID(t),
+			dummyUUID(t),
 			nil,
 			true,
 		},
@@ -630,28 +630,28 @@ func TestDeleteUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			random.UUID(),
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 			false,
 		},
 		"404 user not found": {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 			false,
 		},
 		"404 account not found": {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 			false,
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_delete_user_account")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -665,16 +665,16 @@ func TestDeleteUserAccount(t *testing.T) {
 					Type:        accountType,
 					Url:         random.AccountURLString(domain.AccountType(accountType)),
 				}
-				res := testutils.DoRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
-				testutils.AssertResponse(t, http.StatusCreated, schema.Account{
+				res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
+				assertResponse(t, http.StatusCreated, schema.Account{
 					DisplayName: reqBody.DisplayName,
 					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
 					Url:         reqBody.Url,
-				}, res, testutils.OptSyncID, testutils.OptRetrieveID(&tt.accountID))
+				}, res, optSyncID, optRetrieveID(&tt.accountID))
 			}
-			res := testutils.DoRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, tt.accountID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodDelete, e.URL(api.User.DeleteUserAccount, tt.userID, tt.accountID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -700,25 +700,25 @@ func TestGetUserProjects(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_projects")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -744,25 +744,25 @@ func TestGetUserContests(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_contests")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -788,25 +788,25 @@ func TestGetUserGroups(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 		"404 no accounts with not-existing userID": {
 			http.StatusNotFound,
 			random.UUID(),
-			testutils.HTTPError(t, "Not Found: not found"),
+			httpError(t, "Not Found: not found"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_groups")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
@@ -837,20 +837,20 @@ func TestGetUserEvents(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			testutils.HTTPError(t, "Bad Request: nil id"),
+			httpError(t, "Bad Request: nil id"),
 		},
 	}
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_events")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }

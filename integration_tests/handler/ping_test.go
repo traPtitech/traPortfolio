@@ -21,14 +21,14 @@ func TestPing(t *testing.T) {
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName(t, "ping_handler_get_ping")
-	api, err := testutils.SetupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e, conf)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := testutils.DoRequest(t, e, http.MethodGet, e.URL(api.Ping.Ping), nil)
-			testutils.AssertResponse(t, tt.statusCode, tt.want, res)
+			res := doRequest(t, e, http.MethodGet, e.URL(api.Ping.Ping), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
 }
