@@ -20,9 +20,7 @@ import (
 func TestEventRepository_GetEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_get_events")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
@@ -44,9 +42,7 @@ func TestEventRepository_GetEvents(t *testing.T) {
 func TestEventRepository_GetEvent(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_get_event")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
@@ -104,9 +100,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_update_event_level")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
@@ -146,9 +140,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 func TestEventRepository_GetUserEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_get_user_events")
-	sqlConf := conf.SQLConf()
-	db := testutils.SetupGormDB(t, sqlConf)
+	db := testutils.SetupGormDB(t)
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)

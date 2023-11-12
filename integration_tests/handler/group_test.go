@@ -7,7 +7,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -33,8 +32,7 @@ func TestGetGroups(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "group_handler_get_groups")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 
 	for name, tt := range tests {
@@ -74,8 +72,7 @@ func TestGetGroup(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "group_handler_get_group")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 
 	for name, tt := range tests {

@@ -9,7 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -29,8 +28,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "event_handler_get_events")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -68,8 +66,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "event_handler_get_event")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -111,8 +108,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "event_handler_edit_event")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -153,7 +149,7 @@ func TestGetXXX(t *testing.T) {
 
 	e := echo.New()
 	conf := testutils.GetConfigWithDBName("xxx_handler_get_xxx")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e,)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt

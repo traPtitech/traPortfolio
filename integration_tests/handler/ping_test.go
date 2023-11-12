@@ -6,7 +6,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 )
 
 // GET /ping
@@ -20,8 +19,7 @@ func TestPing(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "ping_handler_get_ping")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt

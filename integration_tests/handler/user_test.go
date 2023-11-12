@@ -10,7 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -84,8 +83,7 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_users")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -123,8 +121,7 @@ func TestGetUser(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -174,8 +171,7 @@ func TestUpdateUser(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_update_user")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -239,8 +235,7 @@ func TestGetUserAccounts(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_accounts")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -300,8 +295,7 @@ func TestGetUserAccount(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_account")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -423,8 +417,7 @@ func TestAddUserAccount(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_add_user_account")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -556,8 +549,7 @@ func TestEditUserAccount(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_edit_user_account")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -650,8 +642,7 @@ func TestDeleteUserAccount(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_delete_user_account")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -710,8 +701,7 @@ func TestGetUserProjects(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_projects")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -754,8 +744,7 @@ func TestGetUserContests(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_contests")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -798,8 +787,7 @@ func TestGetUserGroups(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_groups")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt
@@ -842,8 +830,7 @@ func TestGetUserEvents(t *testing.T) {
 	}
 
 	e := echo.New()
-	conf := testutils.GetConfigWithDBName(t, "user_handler_get_user_events")
-	api, err := setupRoutes(t, e, conf)
+	api, err := setupRoutes(t, e)
 	assert.NoError(t, err)
 	for name, tt := range tests {
 		tt := tt

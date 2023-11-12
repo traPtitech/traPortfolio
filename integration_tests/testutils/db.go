@@ -24,10 +24,10 @@ var (
 	Port int
 )
 
-func SetupGormDB(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
+func SetupGormDB(t *testing.T) *gorm.DB {
 	t.Helper()
 
-	db := establishTestDBConnection(t, sqlConf)
+	db := establishTestDBConnection(t)
 	dropAll(t, db)
 	init, err := migration.Migrate(db, migration.AllTables())
 	assert.True(t, init)
@@ -36,13 +36,17 @@ func SetupGormDB(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
 	return db
 }
 
-func establishTestDBConnection(t *testing.T, sqlConf *config.SQLConfig) *gorm.DB {
+func establishTestDBConnection(t *testing.T) *gorm.DB {
 	t.Helper()
+
+	sqlConf := config.Load(func(c *config.Config) {
+		c.DB.Name = "portfolio_test_" + t.Name()
+		c.DB.Port = Port
+	}).SQLConf()
 
 	_, err := DB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 	assert.NoError(t, err)
 
-	sqlConf.Port = Port
 	db, err := repository.NewGormDB(sqlConf)
 	assert.NoError(t, err)
 
@@ -93,12 +97,6 @@ func dropAll(t *testing.T, db *gorm.DB) {
 
 	err := db.Migrator().DropTable(tables...)
 	assert.NoError(t, err)
-}
-
-func testDBName(dbName string) string {
-	const dbPrefix = "portfolio_test_"
-
-	return dbPrefix + dbName
 }
 
 func RunMySQLContainerOnDocker(sqlConf *config.SQLConfig) (*sql.DB, func() error, error) {
