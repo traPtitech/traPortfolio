@@ -60,8 +60,6 @@ jobs:
       - build
     steps:
       - uses: actions/checkout@v4
-      - name: Setup MySQL container
-        run: make up-db-container
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
