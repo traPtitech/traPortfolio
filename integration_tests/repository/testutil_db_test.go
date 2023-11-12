@@ -2,9 +2,12 @@ package repository
 
 import (
 	"context"
+	"io"
+	"log"
 	"math/rand"
 	"testing"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -20,9 +23,22 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	appConf := config.Load()
-	sqlConf := appConf.SQLConf()
-	<-testutils.WaitTestDBConnection(sqlConf)
+	c := config.Load()
+
+	// disable mysql driver logging
+	_ = mysql.SetLogger(mysql.Logger(log.New(io.Discard, "", 0)))
+	_db, closeFunc, err := testutils.RunMySQLContainerOnDocker(c.SQLConf())
+	if err != nil {
+		panic(err)
+	}
+
+	testutils.DB = _db
+
+	defer func() {
+		if err := closeFunc(); err != nil {
+			panic(err)
+		}
+	}()
 
 	m.Run()
 }
