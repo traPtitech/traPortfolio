@@ -1,15 +1,10 @@
 package testutils
 
 import (
-	"github.com/spf13/viper"
-	"github.com/traPtitech/traPortfolio/util/config"
 	"testing"
-)
 
-func ParseConfig(path string) error {
-	viper.AddConfigPath(path)
-	return config.ReadFromFile()
-}
+	"github.com/traPtitech/traPortfolio/util/config"
+)
 
 func GetConfigWithDBName(t *testing.T, dbName string) *config.Config {
 	t.Helper()
