@@ -450,7 +450,35 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
 				userID := random.UUID()
 				projectID := random.UUID()
-				duration := random.Duration()
+				project := domain.ProjectDetail{
+					Project: domain.Project{
+						ID:   projectID,
+						Name: random.AlphaNumeric(),
+						Duration: domain.YearWithSemesterDuration{
+							Since: domain.YearWithSemester{
+								Year:     2020,
+								Semester: 0,
+							},
+							Until: domain.YearWithSemester{
+								Year:     2023,
+								Semester: 0,
+							},
+						},
+					},
+					Description: random.AlphaNumeric(),
+					Link:        random.RandURLString(),
+					Members:     []*domain.UserWithDuration{},
+				}
+				duration := domain.YearWithSemesterDuration{
+					Since: domain.YearWithSemester{
+						Year:     2021,
+						Semester: 1,
+					},
+					Until: domain.YearWithSemester{
+						Year:     2023,
+						Semester: 0,
+					},
+				}
 				reqBody := &schema.AddProjectMembersJSONRequestBody{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
@@ -468,7 +496,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&domain.ProjectDetail{}, nil)
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&project, nil)
 				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        userID,
