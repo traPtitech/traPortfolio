@@ -399,7 +399,7 @@ func TestAddProjectMembers(t *testing.T) {
 		"400 exceeded duration user exists": {
 			http.StatusBadRequest,
 			mockdata.ProjectID1(),
-			schema.AddProjectMembersJSONRequestBody{
+			schema.AddProjectMembersRequest{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{
 						Duration: schema.YearWithSemesterDuration{
