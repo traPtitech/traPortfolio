@@ -328,25 +328,6 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
 				projectID := random.UUID()
-				project := domain.ProjectDetail{
-					Project: domain.Project{
-						ID:   projectID,
-						Name: random.AlphaNumeric(),
-						Duration: domain.YearWithSemesterDuration{
-							Since: domain.YearWithSemester{
-								Year:     2020,
-								Semester: 0,
-							},
-							Until: domain.YearWithSemester{
-								Year:     2022,
-								Semester: 1,
-							},
-						},
-					},
-					Description: random.AlphaNumeric(),
-					Link:        random.RandURLString(),
-					Members:     []*domain.UserWithDuration{},
-				}
 				userID := random.UUID()
 				userDuration := domain.YearWithSemesterDuration{
 					Since: domain.YearWithSemester{
@@ -384,7 +365,6 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						UntilSemester: userDuration.Until.Semester,
 					},
 				}
-				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&project, nil)
 				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
@@ -436,25 +416,6 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
 				userID := random.UUID()
 				projectID := random.UUID()
-				project := domain.ProjectDetail{
-					Project: domain.Project{
-						ID:   projectID,
-						Name: random.AlphaNumeric(),
-						Duration: domain.YearWithSemesterDuration{
-							Since: domain.YearWithSemester{
-								Year:     2020,
-								Semester: 0,
-							},
-							Until: domain.YearWithSemester{
-								Year:     2023,
-								Semester: 0,
-							},
-						},
-					},
-					Description: random.AlphaNumeric(),
-					Link:        random.RandURLString(),
-					Members:     []*domain.UserWithDuration{},
-				}
 				duration := domain.YearWithSemesterDuration{
 					Since: domain.YearWithSemester{
 						Year:     2021,
@@ -482,7 +443,6 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&project, nil)
 				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        userID,
@@ -492,68 +452,6 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						UntilSemester: int(duration.Until.Semester),
 					},
 				}).Return(repository.ErrInvalidArg)
-				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
-			},
-			statusCode: http.StatusBadRequest,
-		},
-		{
-			name: "BadRequest: invalid request body: bad duration user exists",
-			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
-				userID := random.UUID()
-				projectID := random.UUID()
-				userDuration := domain.YearWithSemesterDuration{
-					Since: domain.YearWithSemester{
-						Year:     2021,
-						Semester: 0,
-					},
-					Until: domain.YearWithSemester{
-						Year:     2023,
-						Semester: 1,
-					},
-				}
-				projectDuration := domain.YearWithSemesterDuration{
-					Since: domain.YearWithSemester{
-						Year:     2022,
-						Semester: 0,
-					},
-					Until: domain.YearWithSemester{
-						Year:     2023,
-						Semester: 1,
-					},
-				}
-				reqBody := &schema.AddProjectMembersJSONRequestBody{
-					Members: []schema.MemberIDWithYearWithSemesterDuration{
-						{
-							Duration: schema.YearWithSemesterDuration{
-								Since: schema.YearWithSemester{
-									Semester: schema.Semester(userDuration.Since.Semester),
-									Year:     userDuration.Since.Year,
-								},
-								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(userDuration.Until.Semester),
-									Year:     userDuration.Until.Year,
-								},
-							},
-							UserId: userID,
-						},
-					},
-				}
-				project := domain.ProjectDetail{
-					Project: domain.Project{
-						ID:       projectID,
-						Name:     random.AlphaNumeric(),
-						Duration: projectDuration,
-					},
-					Description: random.AlphaNumeric(),
-					Link:        random.RandURLString(),
-					Members: []*domain.UserWithDuration{
-						{
-							User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-							Duration: random.Duration(),
-						},
-					},
-				}
-				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&project, nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
 			statusCode: http.StatusBadRequest,

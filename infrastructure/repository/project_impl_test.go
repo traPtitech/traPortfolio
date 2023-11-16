@@ -738,8 +738,8 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}).
-							AddRow(args.projectID),
+						sqlmock.NewRows([]string{"id", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(args.projectID, duration.Since.Year, duration.Since.Semester, duration.Until.Year, duration.Until.Semester),
 					)
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
@@ -815,6 +815,38 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
 					WithArgs(args.projectID).
 					WillReturnError(errUnexpected)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_DurationExceedMember",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        random.UUID(),
+						SinceYear:     2020,
+						SinceSemester: 0,
+						UntilYear:     2021,
+						UntilSemester: 1,
+					},
+					{
+						UserID:        random.UUID(),
+						SinceYear:     2021,
+						SinceSemester: 0,
+						UntilYear:     2022,
+						UntilSemester: 0,
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(args.projectID, 2020, 0, 2021, 1),
+					)
 			},
 			assertion: assert.Error,
 		},

@@ -216,7 +216,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return repository.ErrInvalidArg
 	}
 
-	// ユーザーの重複チェック
+	// 追加するユーザー内の重複チェック
 	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
 	for _, v := range projectMembers {
 		if _, ok := projectMembersMap[v.UserID]; ok {
@@ -225,14 +225,57 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		projectMembersMap[v.UserID] = struct{}{}
 	}
 
+	projectRaw := new(model.Project)
+
 	// プロジェクトの存在チェック
 	err := r.h.
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
-		First(&model.Project{}).
+		First(&projectRaw).
 		Error
 	if err != nil {
 		return err
+	}
+
+	// 追加するユーザーの期間がプロジェクトの期間内かどうか
+	project := &domain.ProjectDetail{
+		Project: domain.Project{
+			ID:   projectID,
+			Name: projectRaw.Name,
+			Duration: domain.YearWithSemesterDuration{
+				Since: domain.YearWithSemester{
+					Year:     int(projectRaw.SinceYear),
+					Semester: int(projectRaw.SinceSemester),
+				},
+				Until: domain.YearWithSemester{
+					Year:     int(projectRaw.UntilYear),
+					Semester: int(projectRaw.UntilSemester),
+				},
+			},
+		},
+		Description: projectRaw.Description,
+		Link:        projectRaw.Link,
+	}
+
+	joinReq := make([]*domain.UserWithDuration, 0, len(projectMembers))
+	for _, v := range projectMembers {
+		joinReq = append(joinReq, &domain.UserWithDuration{
+			User: domain.User{ID: v.UserID},
+			Duration: domain.YearWithSemesterDuration{
+				Since: domain.YearWithSemester{
+					Year:     int(v.SinceYear),
+					Semester: int(v.SinceSemester),
+				},
+				Until: domain.YearWithSemester{
+					Year:     int(v.UntilYear),
+					Semester: int(v.UntilSemester),
+				},
+			},
+		})
+	}
+
+	if !project.CanAddMembers(joinReq) {
+		return repository.ErrInvalidArg
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
