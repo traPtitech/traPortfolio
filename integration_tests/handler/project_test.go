@@ -93,12 +93,12 @@ func TestCreateProject(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		reqBody    schema.CreateProjectJSONRequestBody
+		reqBody    schema.CreateProjectRequest
 		want       interface{} // schema.Project | echo.HTTPError
 	}{
 		"201": {
 			http.StatusCreated,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:        name,
 				Link:        &link,
 				Description: description,
@@ -112,7 +112,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"201 with kanji": {
 			http.StatusCreated,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:        justCountName,
 				Link:        &link,
 				Description: justCountDescription,
@@ -126,7 +126,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:        name,
 				Link:        &invalidLink,
 				Description: description,
@@ -136,7 +136,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"400 too long description": {
 			http.StatusBadRequest,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:        name,
 				Link:        &link,
 				Description: tooLongDescriptionKanji,
@@ -146,7 +146,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"400 too long name": {
 			http.StatusBadRequest,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:        tooLongName,
 				Link:        &link,
 				Description: description,
@@ -156,7 +156,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"400 empty name": {
 			http.StatusBadRequest,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Link:        &link,
 				Description: description,
 				Duration:    duration,
@@ -165,7 +165,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"400 empty description": {
 			http.StatusBadRequest,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:     name,
 				Link:     &link,
 				Duration: duration,
@@ -174,7 +174,7 @@ func TestCreateProject(t *testing.T) {
 		},
 		"400 empty duration": {
 			http.StatusBadRequest,
-			schema.CreateProjectJSONRequestBody{
+			schema.CreateProjectRequest{
 				Name:        name,
 				Link:        &link,
 				Description: description,
@@ -217,13 +217,13 @@ func TestEditProject(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		projectID  uuid.UUID
-		reqBody    schema.EditProjectJSONRequestBody
+		reqBody    schema.EditProjectRequest
 		want       interface{} // nil | echo.HTTPError
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ProjectID1(),
-			schema.EditProjectJSONRequestBody{
+			schema.EditProjectRequest{
 				Name:        &name,
 				Link:        &link,
 				Description: &description,
@@ -234,7 +234,7 @@ func TestEditProject(t *testing.T) {
 		"204 with kanji": {
 			http.StatusNoContent,
 			mockdata.ProjectID1(),
-			schema.EditProjectJSONRequestBody{
+			schema.EditProjectRequest{
 				Name:        &justCountName,
 				Link:        &link,
 				Description: &justCountDescription,
@@ -245,19 +245,19 @@ func TestEditProject(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.ProjectID2(),
-			schema.EditProjectJSONRequestBody{},
+			schema.EditProjectRequest{},
 			nil,
 		},
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.EditProjectJSONRequestBody{},
+			schema.EditProjectRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ProjectID1(),
-			schema.EditProjectJSONRequestBody{
+			schema.EditProjectRequest{
 				Name: &tooLongName,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
@@ -265,7 +265,7 @@ func TestEditProject(t *testing.T) {
 		"400 invalid Description": {
 			http.StatusBadRequest,
 			mockdata.ProjectID1(),
-			schema.EditProjectJSONRequestBody{
+			schema.EditProjectRequest{
 				Description: &tooLongDescriptionKanji,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
@@ -273,7 +273,7 @@ func TestEditProject(t *testing.T) {
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			schema.EditProjectJSONRequestBody{},
+			schema.EditProjectRequest{},
 			httpError(t, "Not Found: not found"),
 		},
 	}
@@ -352,13 +352,13 @@ func TestAddProjectMembers(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		projectID  uuid.UUID
-		reqBody    schema.AddProjectMembersJSONRequestBody
+		reqBody    schema.AddProjectMembersRequest
 		want       interface{} // nil | echo.HTTPError
 	}{
-		"204": {
-			http.StatusNoContent,
-			mockdata.ProjectID3(),
-			schema.AddProjectMembersJSONRequestBody{
+		"200": {
+			http.StatusOK,
+			mockdata.ProjectID1(),
+			schema.AddProjectMembersRequest{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{
 						Duration: schema.YearWithSemesterDuration{
@@ -393,7 +393,7 @@ func TestAddProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.AddProjectMembersJSONRequestBody{},
+			schema.AddProjectMembersRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 exceeded duration user exists": {
@@ -441,13 +441,13 @@ func TestDeleteProjectMembers(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		projectID  uuid.UUID
-		reqBody    schema.DeleteProjectMembersJSONRequestBody
+		reqBody    schema.MemberIDs
 		want       interface{} // nil | echo.HTTPError
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ProjectID1(),
-			schema.DeleteProjectMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{userID1},
 			},
 			nil,
@@ -455,7 +455,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.DeleteProjectMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{userID1},
 			},
 			httpError(t, "Bad Request: nil id"),
@@ -463,7 +463,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 		"400 invalid memberID": {
 			http.StatusBadRequest,
 			random.UUID(),
-			schema.DeleteProjectMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{uuid.Nil},
 			},
 			httpError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
@@ -471,13 +471,13 @@ func TestDeleteProjectMembers(t *testing.T) {
 		"400 empty members": {
 			http.StatusBadRequest,
 			random.UUID(),
-			schema.DeleteProjectMembersJSONRequestBody{},
+			schema.MemberIDs{},
 			httpError(t, "Bad Request: validate error: members: cannot be blank."),
 		},
 		"400 empty memberIDs": {
 			http.StatusBadRequest,
 			random.UUID(),
-			schema.DeleteProjectMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{},
 			},
 			httpError(t, "Bad Request: validate error: members: cannot be blank."),
@@ -485,7 +485,7 @@ func TestDeleteProjectMembers(t *testing.T) {
 		"404 not found": {
 			http.StatusNotFound,
 			random.UUID(),
-			schema.DeleteProjectMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{userID1},
 			},
 			httpError(t, "Not Found: not found"),

@@ -32,9 +32,9 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, link string) *schema.CreateProjectJSONRequestBody {
+func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, link string) *schema.CreateProjectRequest {
 	t.Helper()
-	return &schema.CreateProjectJSONRequestBody{
+	return &schema.CreateProjectRequest{
 		Description: description,
 		Duration: schema.YearWithSemesterDuration{
 			Since: since,
@@ -245,12 +245,12 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectJSONRequestBody, expectedResBody schema.Project, path string)
+		setup      func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectJSONRequestBody, expectedResBody schema.Project, path string) {
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string) {
 				duration := random.Duration()
 				reqBody = makeCreateProjectRequest(
 					t,
@@ -321,12 +321,12 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string)
+		setup      func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersRequest, string) {
 				projectID := random.UUID()
 				userID := random.UUID()
 				userDuration := domain.YearWithSemesterDuration{
@@ -339,7 +339,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						Semester: 1,
 					},
 				}
-				reqBody := &schema.AddProjectMembersJSONRequestBody{
+				reqBody := &schema.AddProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
@@ -372,7 +372,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid Project ID",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string) {
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
@@ -380,18 +380,18 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid request body: member is empty",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string) {
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string) {
 				projectID := random.UUID()
-				return &schema.AddProjectMembersJSONRequestBody{}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+				return &schema.AddProjectMembersRequest{}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "BadRequest: invalid request body: memberID is invalid",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersJSONRequestBody, path string) {
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				duration := random.Duration()
-				return &schema.AddProjectMembersJSONRequestBody{
+				return &schema.AddProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
@@ -413,7 +413,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid request body: member is already exists",
-			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
+			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersRequest, string) {
 				userID := random.UUID()
 				projectID := random.UUID()
 				duration := domain.YearWithSemesterDuration{
@@ -426,7 +426,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						Semester: 0,
 					},
 				}
-				reqBody := &schema.AddProjectMembersJSONRequestBody{
+				reqBody := &schema.AddProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
