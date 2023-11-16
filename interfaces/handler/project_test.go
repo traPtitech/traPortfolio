@@ -342,14 +342,33 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersJSONRequestBody, string) {
 				projectID := random.UUID()
+				project := domain.ProjectDetail{
+					Project: domain.Project{
+						ID:   projectID,
+						Name: random.AlphaNumeric(),
+						Duration: domain.YearWithSemesterDuration{
+							Since: domain.YearWithSemester{
+								Year:     2020,
+								Semester: 0,
+							},
+							Until: domain.YearWithSemester{
+								Year:     2022,
+								Semester: 1,
+							},
+						},
+					},
+					Description: random.AlphaNumeric(),
+					Link:        random.RandURLString(),
+					Members:     []*domain.UserWithDuration{},
+				}
 				userID := random.UUID()
-				duration := domain.YearWithSemesterDuration{
+				userDuration := domain.YearWithSemesterDuration{
 					Since: domain.YearWithSemester{
 						Year:     2021,
 						Semester: 0,
 					},
 					Until: domain.YearWithSemester{
-						Year:     2023,
+						Year:     2022,
 						Semester: 1,
 					},
 				}
@@ -358,12 +377,12 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						{
 							Duration: schema.YearWithSemesterDuration{
 								Since: schema.YearWithSemester{
-									Semester: schema.Semester(duration.Since.Semester),
-									Year:     duration.Since.Year,
+									Semester: schema.Semester(userDuration.Since.Semester),
+									Year:     userDuration.Since.Year,
 								},
 								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(duration.Until.Semester),
-									Year:     duration.Until.Year,
+									Semester: schema.Semester(userDuration.Until.Semester),
+									Year:     userDuration.Until.Year,
 								},
 							},
 							UserId: userID,
@@ -373,13 +392,13 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 				memberReq := []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        userID,
-						SinceYear:     duration.Since.Year,
-						SinceSemester: duration.Since.Semester,
-						UntilYear:     duration.Until.Year,
-						UntilSemester: duration.Until.Semester,
+						SinceYear:     userDuration.Since.Year,
+						SinceSemester: userDuration.Since.Semester,
+						UntilYear:     userDuration.Until.Year,
+						UntilSemester: userDuration.Until.Semester,
 					},
 				}
-				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&domain.ProjectDetail{}, nil)
+				s.EXPECT().GetProject(anyCtx{}, projectID).Return(&project, nil)
 				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
