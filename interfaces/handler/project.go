@@ -66,7 +66,7 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 
 // CreateProject POST /projects
 func (h *ProjectHandler) CreateProject(c echo.Context) error {
-	req := schema.CreateProjectJSONRequestBody{}
+	req := schema.CreateProjectRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditProjectJSONRequestBody{}
+	req := schema.EditProjectRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -169,7 +169,7 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 		return err
 	}
 
-	req := schema.AddProjectMembersJSONRequestBody{}
+	req := schema.AddProjectMembersRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
 		return err
 	}
 
-	req := schema.DeleteProjectMembersJSONRequestBody{}
+	req := schema.MemberIDs{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}

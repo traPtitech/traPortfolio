@@ -75,7 +75,7 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditEventJSONRequestBody{}
+	req := schema.EditEventRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}

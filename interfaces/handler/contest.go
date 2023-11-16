@@ -74,7 +74,7 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 
 // CreateContest POST /contests
 func (h *ContestHandler) CreateContest(c echo.Context) error {
-	req := schema.CreateContestJSONRequestBody{}
+	req := schema.CreateContestRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (h *ContestHandler) EditContest(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditContestJSONRequestBody{}
+	req := schema.EditContestRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -208,7 +208,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 		return err
 	}
 
-	req := schema.AddContestTeamJSONRequestBody{}
+	req := schema.AddContestTeamRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditContestTeamJSONRequestBody{}
+	req := schema.EditContestTeamRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -328,7 +328,7 @@ func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
 		return err
 	}
 
-	req := schema.AddContestTeamMembersJSONRequestBody{}
+	req := schema.MemberIDs{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -353,7 +353,7 @@ func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditContestTeamMembersJSONRequestBody{}
+	req := schema.MemberIDs{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}

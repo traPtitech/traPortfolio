@@ -283,12 +283,12 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserJSONRequestBody, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*schema.EditUserJSONRequestBody, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
@@ -296,7 +296,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &schema.EditUserJSONRequestBody{
+				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -314,7 +314,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Success with description args(len=256)",
-			setup: func(s *mock_service.MockUserService) (*schema.EditUserJSONRequestBody, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 256)
 				userCheck := false
@@ -322,7 +322,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &schema.EditUserJSONRequestBody{
+				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -340,7 +340,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockUserService) (*schema.EditUserJSONRequestBody, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
@@ -348,7 +348,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &schema.EditUserJSONRequestBody{
+				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -366,7 +366,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*schema.EditUserJSONRequestBody, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
@@ -374,7 +374,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 					userCheck = true
 				}
 
-				reqBody := &schema.EditUserJSONRequestBody{
+				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
 					Check: &userCheck,
 				}
@@ -392,7 +392,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: invalid userID",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -400,11 +400,11 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: too long description(len>256)",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 257)
 
-				reqBody := &schema.EditUserJSONRequestBody{
+				reqBody := &schema.EditUserRequest{
 					Bio: &userBio,
 				}
 
@@ -633,16 +633,16 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *schema.AddUserAccountJSONRequestBody, expectedResBody schema.Account, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *schema.AddAccountRequest, expectedResBody schema.Account, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
-				reqBody := schema.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(accountType),
@@ -680,10 +680,10 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Success: Account Type is 0",
-			setup: func(s *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 
-				reqBody := schema.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        0,
@@ -721,11 +721,11 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: DisplayName is empty",
-			setup: func(_ *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
-				reqBody := schema.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddAccountRequest{
 					DisplayName: "",
 					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(accountType),
@@ -739,10 +739,10 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: Account Type is invalid",
-			setup: func(_ *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 
-				reqBody := schema.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(domain.AccountLimit),
@@ -756,7 +756,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(_ *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -766,7 +766,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.AlphaNumericn(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -776,11 +776,11 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (*schema.AddUserAccountJSONRequestBody, schema.Account, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
 
-				reqBody := schema.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(accountType),
@@ -825,12 +825,12 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserAccountJSONRequestBody, path string)
+		setup      func(s *mock_service.MockUserService) (reqBody *schema.EditUserAccountRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
@@ -841,7 +841,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsType := schema.AccountType(accountType)
 				argsURL := random.AccountURLString(domain.AccountType(accountType))
 
-				reqBody := schema.EditUserAccountJSONRequestBody{
+				reqBody := schema.EditUserAccountRequest{
 					DisplayName: &argsName,
 					PrPermitted: &argsPermit,
 					Type:        &argsType,
@@ -863,7 +863,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(s *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
@@ -874,7 +874,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				argsType := schema.AccountType(accountType)
 				argsURL := random.AccountURLString(domain.AccountType(accountType))
 
-				reqBody := schema.EditUserAccountJSONRequestBody{
+				reqBody := schema.EditUserAccountRequest{
 					DisplayName: &argsName,
 					PrPermitted: &argsPermit,
 					Type:        &argsType,
@@ -896,13 +896,13 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: empty display name(but not nil)",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
 				argsName := "" // empty but not nil
 
-				reqBody := schema.EditUserAccountJSONRequestBody{
+				reqBody := schema.EditUserAccountRequest{
 					DisplayName: &argsName,
 				}
 
@@ -914,13 +914,13 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large account type",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
 				argsType := schema.AccountType(domain.AccountLimit)
 
-				reqBody := schema.EditUserAccountJSONRequestBody{
+				reqBody := schema.EditUserAccountRequest{
 					Type: &argsType,
 				}
 
@@ -932,13 +932,13 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: invalid url",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
 				argsURL := random.AlphaNumeric()
 
-				reqBody := schema.EditUserAccountJSONRequestBody{
+				reqBody := schema.EditUserAccountRequest{
 					Url: &argsURL,
 				}
 
@@ -950,7 +950,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.AlphaNumericn(36)
 				accountID := random.UUID()
 
@@ -961,7 +961,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID2",
-			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.AlphaNumericn(36)
 
