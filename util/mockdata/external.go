@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/interfaces/external"
+	"github.com/traPtitech/traPortfolio/infrastructure/external"
 )
 
 type TraQUser struct {
@@ -49,6 +49,20 @@ func CloneMockKnoqEvents() []*external.EventResponse {
 				UserID1(),
 				UserID2(),
 				UserID3(),
+			},
+		},
+		{
+			ID:          KnoqEventID3(),
+			Name:        "sample event",
+			Description: "This is a sample event.",
+			Place:       "S516",
+			GroupID:     KnoqEventGroupID3(),
+			RoomID:      KnoqEventRoomID3(),
+			TimeStart:   time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			TimeEnd:     time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC),
+			SharedRoom:  false,
+			Admins: []uuid.UUID{
+				UserID2(),
 			},
 		},
 	}

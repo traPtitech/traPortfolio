@@ -87,6 +87,10 @@ func KnoqEventID2() uuid.UUID {
 	return uuid.FromStringOrNil("e28ec610-226d-49c5-be7c-86af54f6839d")
 }
 
+func KnoqEventID3() uuid.UUID {
+	return uuid.FromStringOrNil("2355d389-236d-496e-a902-7e8a34bc35ce")
+}
+
 func KnoqEventGroupID1() uuid.UUID {
 	return uuid.FromStringOrNil("7ecabb2a-8e2c-4ebe-bb0b-13254a6eae05")
 }
@@ -95,10 +99,18 @@ func KnoqEventGroupID2() uuid.UUID {
 	return uuid.FromStringOrNil("9c592124-52a5-4981-a2c8-1e218c64a8e5")
 }
 
+func KnoqEventGroupID3() uuid.UUID {
+	return uuid.FromStringOrNil("be99ca56-0377-49ba-bdd2-e58eff9c9f79")
+}
+
 func KnoqEventRoomID1() uuid.UUID {
 	return uuid.FromStringOrNil("68319c0c-be20-45c1-a05d-7651473bd396")
 }
 
 func KnoqEventRoomID2() uuid.UUID {
 	return uuid.FromStringOrNil("cbd48b1f-6b20-41c8-b122-a9826bd968ed")
+}
+
+func KnoqEventRoomID3() uuid.UUID {
+	return uuid.FromStringOrNil("48f7e4d2-7803-4993-91e7-3041f719c92f")
 }

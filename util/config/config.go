@@ -3,11 +3,12 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
 	"log"
 	"os"
 	"sync/atomic"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -84,10 +85,10 @@ func init() {
 	pflag.Bool("only-migrate", false, "only migrate db (not start server)")
 	pflag.Bool("insert-mock-data", false, "insert sample mock data(for dev)")
 
-	pflag.String("db-user", "", "db user name")
-	pflag.String("db-pass", "", "db password")
-	pflag.String("db-host", "127.0.0.1", "db host")
-	pflag.String("db-name", "", "db name")
+	pflag.String("db-user", "root", "db user name")
+	pflag.String("db-pass", "password", "db password")
+	pflag.String("db-host", "localhost", "db host")
+	pflag.String("db-name", "portfolio", "db name")
 	pflag.Int("db-port", 3306, "db port")
 	pflag.Bool("db-verbose", false, "db verbose mode")
 	pflag.String("traq-cookie", "", "traq cookie")
@@ -146,6 +147,26 @@ func ReadFromFile() error {
 		}
 	} else {
 		log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
+	}
+
+	if err := viper.Unmarshal(&config); err != nil {
+		return fmt.Errorf("unmarshal config: %w", err)
+	}
+
+	isParsed.Store(true)
+
+	return nil
+}
+
+func ReadDefault() error {
+	for _, key := range flagKeys {
+		if err := viper.BindPFlag(key.path, pflag.Lookup(key.flag)); err != nil {
+			return fmt.Errorf("bind flag %s: %w", key.flag, err)
+		}
+	}
+
+	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
+		return fmt.Errorf("bind flags: %w", err)
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
@@ -253,5 +274,6 @@ func (c *SQLConfig) GormConfig() *gorm.Config {
 		NowFunc: func() time.Time {
 			return time.Now().Truncate(time.Microsecond)
 		},
+		TranslateError: true,
 	}
 }

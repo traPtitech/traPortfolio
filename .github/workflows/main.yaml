@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'main'
+      - main
   pull_request:
 
 jobs:
@@ -26,12 +26,17 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs:
+      - build
     steps:
       - uses: actions/checkout@v4
-      - name: Run linters
-        uses: reviewdog/action-golangci-lint@v2
+      - uses: actions/setup-go@v4
         with:
-          filter_mode: nofilter
+          go-version-file: ./go.mod
+      - uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          install-mode: goinstall
   test-unit:
     name: Test (Unit)
     runs-on: ubuntu-latest
@@ -55,8 +60,6 @@ jobs:
       - build
     steps:
       - uses: actions/checkout@v4
-      - name: Setup MySQL container
-        run: make up-db-container
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod

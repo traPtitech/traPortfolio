@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
@@ -16,7 +17,7 @@ func main() {
 	}
 
 	appConf := config.Load()
-	db, err := infrastructure.NewGormDB(appConf.SQLConf())
+	db, err := repository.NewGormDB(appConf.SQLConf())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +32,7 @@ func main() {
 			log.Fatal("cannot specify both `production` and `insert-mock-data`")
 		}
 
-		if err := mockdata.InsertSampleDataToDB(infrastructure.NewSQLHandler(db)); err != nil {
+		if err := mockdata.InsertSampleDataToDB(db); err != nil {
 			log.Fatal(err)
 		}
 	}

@@ -8,9 +8,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
+	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -20,10 +20,8 @@ import (
 func TestEventRepository_GetEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_get_events")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
 	for _, e := range mockdata.MockKnoqEvents {
@@ -44,10 +42,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 func TestEventRepository_GetEvent(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_get_event")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
 	selected := mockdata.MockKnoqEvents[rand.Intn(len(mockdata.MockKnoqEvents)-1)]
@@ -76,10 +72,24 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		GroupID:     selected.GroupID,
 		RoomID:      selected.RoomID,
 	}
+	switch level {
+	case domain.EventLevelPrivate:
+		expected = nil
+	case domain.EventLevelAnonymous:
+		expected.HostName = nil
+	case domain.EventLevelPublic:
+	// do nothing
+	default:
+		t.Fatal("invalid level")
+	}
 
 	got, err := repo.GetEvent(context.Background(), selected.ID)
+	if level == domain.EventLevelPrivate {
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		return
+	}
 	assert.NoError(t, err)
-
 	assert.Equal(t, expected, got)
 }
 
@@ -90,10 +100,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_update_event_level")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
 
@@ -105,6 +113,11 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	}
 
 	got, err := repo.GetEvent(context.Background(), selected.EventID)
+	if selected.Level == domain.EventLevelPrivate {
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		return
+	}
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
@@ -115,6 +128,11 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	assert.NoError(t, err)
 
 	got, err = repo.GetEvent(context.Background(), selected.EventID)
+	if updatedLevel == domain.EventLevelPrivate {
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		return
+	}
 	assert.NoError(t, err)
 	assert.Equal(t, updatedLevel, got.Level)
 }
@@ -122,10 +140,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 func TestEventRepository_GetUserEvents(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "event_repository_get_user_events")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewEventRepository(h, mock_external_e2e.NewMockKnoqAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
 	for _, e := range mockdata.MockKnoqEvents {

@@ -2,17 +2,18 @@ package repository
 
 import (
 	"context"
-	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"testing"
+
+	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 
 	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
+	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/interfaces/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/interfaces/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -20,10 +21,8 @@ import (
 func TestProjectRepository_GetProjects(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_get_projects")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
 	var projects []*domain.Project
@@ -40,10 +39,8 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 func TestProjectRepository_GetProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	projectNum := 4
 	var projects []*domain.ProjectDetail
@@ -68,10 +65,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_update_project")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	db := testutils.SetupGormDB(t)
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	tests := []struct {
 		name string
@@ -130,12 +125,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_get_project_members")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	project2 := mustMakeProjectDetail(t, repo, nil)
@@ -214,12 +207,10 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	t.Parallel()
 
-	conf := testutils.GetConfigWithDBName(t, "project_repository_delete_project_members")
-	sqlConf := conf.SQLConf()
-	h := testutils.SetupSQLHandler(t, sqlConf)
-	err := mockdata.InsertSampleDataToDB(h)
+	db := testutils.SetupGormDB(t)
+	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewProjectRepository(h, mock_external_e2e.NewMockPortalAPI())
+	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
 	project2 := mustMakeProjectDetail(t, repo, nil)

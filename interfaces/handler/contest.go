@@ -55,7 +55,11 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 
 	teams := make([]schema.ContestTeam, len(contest.ContestTeams))
 	for i, v := range contest.ContestTeams {
-		teams[i] = newContestTeam(v.ID, v.Name, v.Result)
+		members := make([]schema.User, len(v.Members))
+		for j, ct := range v.Members {
+			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+		}
+		teams[i] = newContestTeam(v.ID, v.Name, v.Result, members)
 	}
 
 	res := newContestDetail(
@@ -89,11 +93,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 		return err
 	}
 
-	contestTeams := make([]schema.ContestTeam, 0, len(contest.ContestTeams))
-	for _, team := range contest.ContestTeams {
-		contestTeams = append(contestTeams, newContestTeam(team.ID, team.Name, team.Result))
-	}
-	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, contestTeams)
+	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, []schema.ContestTeam{})
 
 	return c.JSON(http.StatusCreated, res)
 }
@@ -159,7 +159,11 @@ func (h *ContestHandler) GetContestTeams(c echo.Context) error {
 
 	res := make([]schema.ContestTeam, len(contestTeams))
 	for i, v := range contestTeams {
-		res[i] = newContestTeam(v.ID, v.Name, v.Result)
+		members := make([]schema.User, len(v.Members))
+		for j, ct := range v.Members {
+			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+		}
+		res[i] = newContestTeam(v.ID, v.Name, v.Result, members)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -189,10 +193,9 @@ func (h *ContestHandler) GetContestTeam(c echo.Context) error {
 	}
 
 	res := newContestTeamDetail(
-		newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result),
+		newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, members),
 		contestTeam.Link,
 		contestTeam.Description,
-		members,
 	)
 
 	return c.JSON(http.StatusOK, res)
@@ -223,7 +226,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 		return err
 	}
 
-	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result)
+	res := newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, []schema.User{})
 
 	return c.JSON(http.StatusCreated, res)
 }
@@ -384,20 +387,29 @@ func newContestDetail(contest schema.Contest, link string, description string, t
 	}
 }
 
-func newContestTeam(id uuid.UUID, name string, result string) schema.ContestTeam {
+func newContestTeam(id uuid.UUID, name string, result string, members []schema.User) schema.ContestTeam {
 	return schema.ContestTeam{
+		Id:      id,
+		Name:    name,
+		Result:  result,
+		Members: members,
+	}
+}
+
+func newContestTeamWithoutMembers(id uuid.UUID, name string, result string) schema.ContestTeamWithoutMembers {
+	return schema.ContestTeamWithoutMembers{
 		Id:     id,
 		Name:   name,
 		Result: result,
 	}
 }
 
-func newContestTeamDetail(team schema.ContestTeam, link string, description string, members []schema.User) schema.ContestTeamDetail {
+func newContestTeamDetail(team schema.ContestTeam, link string, description string) schema.ContestTeamDetail {
 	return schema.ContestTeamDetail{
 		Description: description,
 		Id:          team.Id,
 		Link:        link,
-		Members:     members,
+		Members:     team.Members,
 		Name:        team.Name,
 		Result:      team.Result,
 	}
