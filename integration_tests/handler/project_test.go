@@ -356,9 +356,27 @@ func TestGetProjectMembers(t *testing.T) {
 func TestAddProjectMembers(t *testing.T) {
 	var (
 		userID1   = mockdata.UserID1()
-		duration1 = schema.ConvertDuration(random.Duration())
+		duration1 = schema.YearWithSemesterDuration{
+			Since: schema.YearWithSemester{
+				Year:     2021,
+				Semester: 0,
+			},
+			Until: &schema.YearWithSemester{
+				Year:     2021,
+				Semester: 1,
+			},
+		}
 		userID2   = mockdata.UserID2()
-		duration2 = schema.ConvertDuration(random.Duration())
+		duration2 = schema.YearWithSemesterDuration{
+			Since: schema.YearWithSemester{
+				Year:     2021,
+				Semester: 1,
+			},
+			Until: &schema.YearWithSemester{
+				Year:     2022,
+				Semester: 1,
+			},
+		}
 	)
 
 	t.Parallel()
@@ -370,7 +388,7 @@ func TestAddProjectMembers(t *testing.T) {
 	}{
 		"204": {
 			http.StatusNoContent,
-			mockdata.ProjectID1(),
+			mockdata.ProjectID3(),
 			schema.AddProjectMembersJSONRequestBody{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{
@@ -390,6 +408,28 @@ func TestAddProjectMembers(t *testing.T) {
 			uuid.Nil,
 			schema.AddProjectMembersJSONRequestBody{},
 			testutils.HTTPError(t, "Bad Request: nil id"),
+		},
+		"400 exceeded duration user exists": {
+			http.StatusBadRequest,
+			mockdata.ProjectID1(),
+			schema.AddProjectMembersJSONRequestBody{
+				Members: []schema.MemberIDWithYearWithSemesterDuration{
+					{
+						Duration: schema.YearWithSemesterDuration{
+							Since: schema.YearWithSemester{
+								Year:     2021,
+								Semester: 0,
+							},
+							Until: &schema.YearWithSemester{
+								Year:     2024,
+								Semester: 1,
+							},
+						},
+						UserId: userID1,
+					},
+				},
+			},
+			testutils.HTTPError(t, "Bad Request: argument error"),
 		},
 	}
 

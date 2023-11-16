@@ -198,7 +198,7 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 	}
 
 	if !project.CanJoinMembers(joinReq) {
-		return c.JSON(http.StatusBadRequest, "bad duration user exists")
+		return repository.ErrInvalidArg
 	}
 
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
