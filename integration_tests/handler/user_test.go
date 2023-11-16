@@ -142,13 +142,13 @@ func TestUpdateUser(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		reqBody    schema.EditUserJSONRequestBody
+		reqBody    schema.EditUserRequest
 		want       interface{} // nil or error
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.UserID1(),
-			schema.EditUserJSONRequestBody{
+			schema.EditUserRequest{
 				Bio:   &bio,
 				Check: &check,
 			},
@@ -157,13 +157,13 @@ func TestUpdateUser(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.UserID2(),
-			schema.EditUserJSONRequestBody{},
+			schema.EditUserRequest{},
 			nil,
 		},
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.EditUserJSONRequestBody{},
+			schema.EditUserRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 	}
@@ -322,13 +322,13 @@ func TestAddUserAccount(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		userID     uuid.UUID
-		reqBody    schema.AddUserAccountJSONRequestBody
+		reqBody    schema.AddAccountRequest
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
 			testUserID,
-			schema.AddUserAccountJSONRequestBody{
+			schema.AddAccountRequest{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
@@ -345,7 +345,7 @@ func TestAddUserAccount(t *testing.T) {
 		"201 with kanji": {
 			http.StatusCreated,
 			testUserID2,
-			schema.AddUserAccountJSONRequestBody{
+			schema.AddAccountRequest{
 				DisplayName: justCountDisplayName,
 				PrPermitted: prPermitted,
 				Type:        accountType2,
@@ -362,13 +362,13 @@ func TestAddUserAccount(t *testing.T) {
 		"400 invalid userID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.AddUserAccountJSONRequestBody{},
+			schema.AddAccountRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid URL": {
 			http.StatusBadRequest,
 			testUserID,
-			schema.AddUserAccountJSONRequestBody{
+			schema.AddAccountRequest{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
@@ -379,7 +379,7 @@ func TestAddUserAccount(t *testing.T) {
 		"400 invalid account type": {
 			http.StatusBadRequest,
 			testUserID,
-			schema.AddUserAccountJSONRequestBody{
+			schema.AddAccountRequest{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        schema.AccountType(domain.AccountLimit),
@@ -390,7 +390,7 @@ func TestAddUserAccount(t *testing.T) {
 		"409 conflict already exists": {
 			http.StatusConflict,
 			testUserID,
-			schema.AddUserAccountJSONRequestBody{
+			schema.AddAccountRequest{
 				DisplayName: displayName,
 				PrPermitted: prPermitted,
 				Type:        conflictType,
@@ -401,7 +401,7 @@ func TestAddUserAccount(t *testing.T) {
 		"400 too long display name": {
 			http.StatusBadRequest,
 			testUserID,
-			schema.AddUserAccountJSONRequestBody{
+			schema.AddAccountRequest{
 				DisplayName: tooLongDisplayName,
 				PrPermitted: prPermitted,
 				Type:        accountType,
@@ -446,7 +446,7 @@ func TestEditUserAccount(t *testing.T) {
 		statusCode    int
 		userID        uuid.UUID
 		accountID     uuid.UUID
-		reqBody       schema.EditUserAccountJSONRequestBody
+		reqBody       schema.EditUserAccountRequest
 		want          interface{} // nil | error
 		needInsertion bool
 	}{
@@ -454,7 +454,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			schema.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountRequest{
 				DisplayName: &displayName,
 				PrPermitted: &prPermitted,
 				Type:        &accountType,
@@ -467,7 +467,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.UserID2(),
 			random.UUID(),
-			schema.EditUserAccountJSONRequestBody{},
+			schema.EditUserAccountRequest{},
 			nil,
 			true,
 		},
@@ -475,7 +475,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.AccountID1(),
-			schema.EditUserAccountJSONRequestBody{},
+			schema.EditUserAccountRequest{},
 			httpError(t, "Bad Request: nil id"),
 			false,
 		},
@@ -483,7 +483,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			uuid.Nil,
-			schema.EditUserAccountJSONRequestBody{},
+			schema.EditUserAccountRequest{},
 			httpError(t, "Bad Request: nil id"),
 			false,
 		},
@@ -491,7 +491,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			schema.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountRequest{
 				Url: &invalidAccountURL,
 			},
 			httpError(t, "Bad Request: argument error"),
@@ -501,7 +501,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			schema.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountRequest{
 				Type: &invalidAccountType,
 			},
 			httpError(t, "Bad Request: argument error"),
@@ -511,7 +511,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			schema.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountRequest{
 				DisplayName: &displayName,
 			},
 			httpError(t, "Not Found: not found"),
@@ -521,7 +521,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusNotFound,
 			mockdata.UserID1(),
 			random.UUID(),
-			schema.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountRequest{
 				DisplayName: &displayName,
 			},
 			httpError(t, "Not Found: not found"),
@@ -531,7 +531,7 @@ func TestEditUserAccount(t *testing.T) {
 			http.StatusConflict,
 			mockdata.UserID1(),
 			mockdata.AccountID1(),
-			schema.EditUserAccountJSONRequestBody{
+			schema.EditUserAccountRequest{
 				DisplayName: &displayName,
 				PrPermitted: &prPermitted,
 				Type:        &accountType,
@@ -557,7 +557,7 @@ func TestEditUserAccount(t *testing.T) {
 					Type:        schema.AccountType(initialAccountType),
 					Url:         random.AccountURLString(initialAccountType),
 				}
-				res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), schema.AddUserAccountJSONRequestBody{
+				res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), schema.AddAccountRequest{
 					DisplayName: account.DisplayName,
 					PrPermitted: account.PrPermitted,
 					Type:        account.Type,
@@ -642,7 +642,7 @@ func TestDeleteUserAccount(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
 				accountType := mockdata.AccountTypesMockUserDoesntHave(tt.userID)[0]
-				reqBody := schema.AddUserAccountJSONRequestBody{
+				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
 					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        accountType,

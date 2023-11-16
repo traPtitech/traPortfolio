@@ -31,9 +31,9 @@ func setupProjectMock(t *testing.T) (*mock_service.MockProjectService, API) {
 	return s, api
 }
 
-func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, link string) *schema.CreateProjectJSONRequestBody {
+func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, link string) *schema.CreateProjectRequest {
 	t.Helper()
-	return &schema.CreateProjectJSONRequestBody{
+	return &schema.CreateProjectRequest{
 		Description: description,
 		Duration: schema.YearWithSemesterDuration{
 			Since: since,
@@ -244,12 +244,12 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectJSONRequestBody, expectedResBody schema.Project, path string)
+		setup      func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectJSONRequestBody, expectedResBody schema.Project, path string) {
+			setup: func(s *mock_service.MockProjectService) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string) {
 				duration := random.Duration()
 				reqBody = makeCreateProjectRequest(
 					t,

@@ -82,7 +82,7 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditUserJSONRequestBody{}
+	req := schema.EditUserRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func (h *UserHandler) AddUserAccount(c echo.Context) error {
 		return err
 	}
 
-	req := schema.AddUserAccountJSONRequestBody{}
+	req := schema.AddAccountRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (h *UserHandler) EditUserAccount(c echo.Context) error {
 		return err
 	}
 
-	req := schema.EditUserAccountJSONRequestBody{}
+	req := schema.EditUserAccountRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}

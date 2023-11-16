@@ -208,16 +208,16 @@ func TestEventHandler_EditEvent(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockEventService) (reqBody *schema.EditEventJSONRequestBody, path string)
+		setup      func(s *mock_service.MockEventService) (reqBody *schema.EditEventRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &schema.EditEventJSONRequestBody{
+				reqBody := &schema.EditEventRequest{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -233,18 +233,18 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid event ID",
-			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Conflict",
-			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &schema.EditEventJSONRequestBody{
+				reqBody := &schema.EditEventRequest{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -260,11 +260,11 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &schema.EditEventJSONRequestBody{
+				reqBody := &schema.EditEventRequest{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -280,11 +280,11 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: bind error",
-			setup: func(s *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
+			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
-				reqBody := &schema.EditEventJSONRequestBody{
+				reqBody := &schema.EditEventRequest{
 					EventLevel: hLevel(eventLevel),
 				}
 
@@ -300,11 +300,11 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large level",
-			setup: func(_ *mock_service.MockEventService) (*schema.EditEventJSONRequestBody, string) {
+			setup: func(_ *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := schema.EventLevel(domain.EventLevelLimit)
 
-				reqBody := &schema.EditEventJSONRequestBody{
+				reqBody := &schema.EditEventRequest{
 					EventLevel: &eventLevel,
 				}
 

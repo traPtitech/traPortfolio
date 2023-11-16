@@ -95,12 +95,12 @@ func TestCreateContest(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		statusCode int
-		reqbody    schema.CreateContestJSONRequestBody
+		reqbody    schema.CreateContestRequest
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: description,
 				Duration: schema.Duration{
 					Since: since,
@@ -123,7 +123,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"201 with Kanji": {
 			http.StatusCreated,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: justCountDescription,
 				Duration: schema.Duration{
 					Since: since,
@@ -146,7 +146,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"400 invalid description": {
 			http.StatusBadRequest,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: tooLongString,
 				Duration: schema.Duration{
 					Since: since,
@@ -159,7 +159,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"400 invalid description with Kanji": {
 			http.StatusBadRequest,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: tooLongDescriptionKanji,
 				Duration: schema.Duration{
 					Since: since,
@@ -172,7 +172,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"400 invalid Link": {
 			http.StatusBadRequest,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: description,
 				Duration: schema.Duration{
 					Since: since,
@@ -185,7 +185,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: description,
 				Duration: schema.Duration{
 					Since: since,
@@ -198,7 +198,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"400 invalid Name with Kanji": {
 			http.StatusBadRequest,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: description,
 				Duration: schema.Duration{
 					Since: since,
@@ -211,7 +211,7 @@ func TestCreateContest(t *testing.T) {
 		},
 		"400 since time is after until time": {
 			http.StatusBadRequest,
-			schema.CreateContestJSONRequestBody{
+			schema.CreateContestRequest{
 				Description: description,
 				Duration: schema.Duration{
 					Since: until,
@@ -260,13 +260,13 @@ func TestEditContest(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		contestID  uuid.UUID
-		reqBody    schema.EditContestJSONRequestBody
+		reqBody    schema.EditContestRequest
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Description: &description,
 				Duration: &schema.Duration{
 					Since: since,
@@ -280,7 +280,7 @@ func TestEditContest(t *testing.T) {
 		"204 with kanji": {
 			http.StatusNoContent,
 			mockdata.ContestID2(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Description: &justCountDescription,
 				Duration: &schema.Duration{
 					Since: since,
@@ -294,19 +294,19 @@ func TestEditContest(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.ContestID3(),
-			schema.EditContestJSONRequestBody{},
+			schema.EditContestRequest{},
 			nil,
 		},
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.EditContestJSONRequestBody{},
+			schema.EditContestRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Description: &tooLongString,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
@@ -314,7 +314,7 @@ func TestEditContest(t *testing.T) {
 		"400 invalid description with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Description: &tooLongDescriptionKanji,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
@@ -322,7 +322,7 @@ func TestEditContest(t *testing.T) {
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Link: &invalidURL,
 			},
 			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
@@ -330,7 +330,7 @@ func TestEditContest(t *testing.T) {
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Name: &tooLongString,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
@@ -338,7 +338,7 @@ func TestEditContest(t *testing.T) {
 		"400 invalid Name with kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Name: &tooLongName,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
@@ -346,7 +346,7 @@ func TestEditContest(t *testing.T) {
 		"400 since time is after until time": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Duration: &schema.Duration{
 					Since: until,
 					Until: &since,
@@ -357,7 +357,7 @@ func TestEditContest(t *testing.T) {
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			schema.EditContestJSONRequestBody{
+			schema.EditContestRequest{
 				Description: &description,
 				Duration: &schema.Duration{
 					Since: since,
@@ -505,13 +505,13 @@ func TestAddContestTeam(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		contestID  uuid.UUID
-		reqbody    schema.AddContestTeamJSONRequestBody
+		reqbody    schema.AddContestTeamRequest
 		want       interface{}
 	}{
 		"201": {
 			http.StatusCreated,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: description,
 				Link:        &link,
 				Name:        name,
@@ -526,7 +526,7 @@ func TestAddContestTeam(t *testing.T) {
 		"201 with kanji": {
 			http.StatusCreated,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: justCountDescription,
 				Link:        &link,
 				Name:        justCountName,
@@ -541,7 +541,7 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: tooLongString,
 				Link:        &link,
 				Name:        name,
@@ -552,7 +552,7 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid description kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: tooLongDescriptionKanji,
 				Link:        &link,
 				Name:        name,
@@ -563,7 +563,7 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid Link": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: description,
 				Link:        &invalidURL,
 				Name:        name,
@@ -574,7 +574,7 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: description,
 				Link:        &link,
 				Name:        tooLongString,
@@ -585,7 +585,7 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid Name kanji": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: description,
 				Link:        &link,
 				Name:        tooLongName,
@@ -596,7 +596,7 @@ func TestAddContestTeam(t *testing.T) {
 		"400 invalid Result": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: description,
 				Link:        &link,
 				Name:        name,
@@ -607,7 +607,7 @@ func TestAddContestTeam(t *testing.T) {
 		"404": {
 			http.StatusNotFound,
 			random.UUID(),
-			schema.AddContestTeamJSONRequestBody{
+			schema.AddContestTeamRequest{
 				Description: description,
 				Link:        &link,
 				Name:        name,
@@ -656,14 +656,14 @@ func TestEditContestTeam(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqBody    schema.EditContestTeamJSONRequestBody
+		reqBody    schema.EditContestTeamRequest
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Description: &description,
 				Link:        &link,
 				Name:        &name,
@@ -675,7 +675,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID2(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Description: &justCountDescription,
 				Link:        &link,
 				Name:        &justCountName,
@@ -687,28 +687,28 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID3(),
-			schema.EditContestTeamJSONRequestBody{},
+			schema.EditContestTeamRequest{},
 			nil,
 		},
 		"400 invalid contestID": {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{},
+			schema.EditContestTeamRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid contestTeamID": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			schema.EditContestTeamJSONRequestBody{},
+			schema.EditContestTeamRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 invalid description": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Description: &tooLongString,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
@@ -717,7 +717,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Description: &tooLongDescriptionKanji,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
@@ -726,7 +726,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Link: &invalidURL,
 			},
 			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
@@ -735,7 +735,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Name: &tooLongString,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
@@ -744,7 +744,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Name: &tooLongName,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
@@ -753,7 +753,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Result: &tooLongString,
 			},
 			httpError(t, "Bad Request: validate error: result: the length must be no more than 32."),
@@ -762,7 +762,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Result: &tooLongResultKanji,
 			},
 			httpError(t, "Bad Request: validate error: result: the length must be no more than 32."),
@@ -771,7 +771,7 @@ func TestEditContestTeam(t *testing.T) {
 			http.StatusNotFound,
 			random.UUID(),
 			random.UUID(),
-			schema.EditContestTeamJSONRequestBody{
+			schema.EditContestTeamRequest{
 				Description: &description,
 				Link:        &link,
 				Name:        &name,
@@ -942,14 +942,14 @@ func TestAddContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    schema.AddContestTeamMembersJSONRequestBody
+		reqbody    schema.MemberIDs
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.AddContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
@@ -960,7 +960,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			schema.AddContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
@@ -971,7 +971,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			schema.AddContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
@@ -982,7 +982,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.AddContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					uuid.Nil,
 				},
@@ -993,7 +993,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.AddContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					random.UUID(),
 				},
@@ -1004,7 +1004,7 @@ func TestAddContestTeamMembers(t *testing.T) {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			schema.AddContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID2(),
 				},
@@ -1032,14 +1032,14 @@ func TestEditContestTeamMembers(t *testing.T) {
 		statusCode int
 		contestID  uuid.UUID
 		teamID     uuid.UUID
-		reqbody    schema.EditContestTeamMembersJSONRequestBody
+		reqbody    schema.MemberIDs
 		want       interface{}
 	}{
 		"204": {
 			http.StatusNoContent,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
@@ -1051,7 +1051,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
@@ -1063,7 +1063,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			uuid.Nil,
-			schema.EditContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
@@ -1075,7 +1075,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					uuid.Nil,
 				},
@@ -1086,7 +1086,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
-			schema.EditContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					random.UUID(),
 				},
@@ -1097,7 +1097,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			http.StatusNotFound,
 			mockdata.ContestID1(),
 			random.UUID(),
-			schema.EditContestTeamMembersJSONRequestBody{
+			schema.MemberIDs{
 				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
