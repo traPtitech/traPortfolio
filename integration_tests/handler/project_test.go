@@ -355,9 +355,9 @@ func TestAddProjectMembers(t *testing.T) {
 		reqBody    schema.AddProjectMembersRequest
 		want       interface{} // nil | echo.HTTPError
 	}{
-		"200": {
-			http.StatusOK,
-			mockdata.ProjectID1(),
+		"204": {
+			http.StatusNoContent,
+			mockdata.ProjectID3(),
 			schema.AddProjectMembersRequest{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{

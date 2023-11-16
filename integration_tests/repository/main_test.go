@@ -153,23 +153,31 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	return project
 }
 
-func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
+func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectDetail domain.ProjectDetail, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
 	t.Helper()
 
-	assert.NotEmpty(t, projectID)
+	assert.NotEmpty(t, projectDetail)
 	assert.NotEmpty(t, userID)
+
+	duration := domain.YearWithSemesterDuration{}
+	for {
+		duration = random.Duration()
+		if projectDetail.Duration.Includes(duration) {
+			break
+		}
+	}
 
 	if args == nil {
 		args = &repository.CreateProjectMemberArgs{
 			UserID:        userID,
-			SinceYear:     rand.Intn(2100),
-			SinceSemester: rand.Intn(2),
-			UntilYear:     rand.Intn(2100),
-			UntilSemester: rand.Intn(2),
+			SinceYear:     duration.Since.Year,
+			SinceSemester: duration.Since.Semester,
+			UntilYear:     duration.Until.Year,
+			UntilSemester: duration.Until.Semester,
 		}
 	}
 
-	err := repo.AddProjectMembers(context.Background(), projectID, []*repository.CreateProjectMemberArgs{args})
+	err := repo.AddProjectMembers(context.Background(), projectDetail.ID, []*repository.CreateProjectMemberArgs{args})
 	assert.NoError(t, err)
 
 	return args
