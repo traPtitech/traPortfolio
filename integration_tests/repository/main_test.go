@@ -159,7 +159,7 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 	assert.NotEmpty(t, projectDetail)
 	assert.NotEmpty(t, userID)
 
-	duration := domain.YearWithSemesterDuration{}
+	var duration domain.YearWithSemesterDuration
 	for {
 		duration = random.Duration()
 		if projectDetail.Duration.Includes(duration) {
