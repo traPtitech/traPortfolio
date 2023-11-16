@@ -344,28 +344,8 @@ func TestGetProjectMembers(t *testing.T) {
 // AddProjectMembers POST /projects/:projectID/members
 func TestAddProjectMembers(t *testing.T) {
 	var (
-		userID1   = mockdata.UserID1()
-		duration1 = schema.YearWithSemesterDuration{
-			Since: schema.YearWithSemester{
-				Year:     2021,
-				Semester: 0,
-			},
-			Until: &schema.YearWithSemester{
-				Year:     2021,
-				Semester: 1,
-			},
-		}
-		userID2   = mockdata.UserID2()
-		duration2 = schema.YearWithSemesterDuration{
-			Since: schema.YearWithSemester{
-				Year:     2021,
-				Semester: 1,
-			},
-			Until: &schema.YearWithSemester{
-				Year:     2022,
-				Semester: 1,
-			},
-		}
+		userID1 = mockdata.UserID1()
+		userID2 = mockdata.UserID2()
 	)
 
 	t.Parallel()
@@ -381,12 +361,30 @@ func TestAddProjectMembers(t *testing.T) {
 			schema.AddProjectMembersJSONRequestBody{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{
-						Duration: duration1,
-						UserId:   userID1,
+						Duration: schema.YearWithSemesterDuration{
+							Since: schema.YearWithSemester{
+								Year:     2021,
+								Semester: 0,
+							},
+							Until: &schema.YearWithSemester{
+								Year:     2021,
+								Semester: 1,
+							},
+						},
+						UserId: userID1,
 					},
 					{
-						Duration: duration2,
-						UserId:   userID2,
+						Duration: schema.YearWithSemesterDuration{
+							Since: schema.YearWithSemester{
+								Year:     2021,
+								Semester: 1,
+							},
+							Until: &schema.YearWithSemester{
+								Year:     2022,
+								Semester: 1,
+							},
+						},
+						UserId: userID2,
 					},
 				},
 			},

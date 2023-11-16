@@ -197,7 +197,7 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 		})
 	}
 
-	if !project.CanJoinMembers(joinReq) {
+	if !project.CanAddMembers(joinReq) {
 		return repository.ErrInvalidArg
 	}
 

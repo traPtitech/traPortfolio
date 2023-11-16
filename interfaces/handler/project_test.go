@@ -45,20 +45,6 @@ func makeCreateProjectRequest(t *testing.T, description string, since schema.Yea
 	}
 }
 
-// func makeAddProjectMembersRequest(members []ProjectMember) *AddProjectMembersJSONRequestBody {
-// 	ret := &AddProjectMembersJSONRequestBody{}
-// 	for _, v := range members {
-// 		ret.Members = append(ret.Members, MemberIDWithYearWithSemesterDuration{
-// 			Duration: YearWithSemesterDuration{
-// 				Since: v.Duration.Since,
-// 				Until: v.Duration.Until,
-// 			},
-// 			UserId: v.Id,
-// 		})
-// 	}
-// 	return ret
-// }
-
 func TestProjectHandler_GetProjects(t *testing.T) {
 	t.Parallel()
 
