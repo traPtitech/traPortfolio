@@ -418,7 +418,7 @@ func TestAddProjectMembers(t *testing.T) {
 					},
 				},
 			},
-			testutils.HTTPError(t, "Bad Request: argument error"),
+			httpError(t, "Bad Request: argument error"),
 		},
 	}
 
