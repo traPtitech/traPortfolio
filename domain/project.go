@@ -19,7 +19,7 @@ type ProjectDetail struct {
 
 func (p ProjectDetail) CanJoinMembers(users []*UserWithDuration) bool {
 	for _, user := range users {
-		if !p.Duration.IsIncludes(user.Duration) {
+		if !p.Duration.Includes(user.Duration) {
 			return false
 		}
 	}
