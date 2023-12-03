@@ -53,7 +53,7 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	// service, handler, API
 	api := handler.NewAPI(
 		handler.NewPingHandler(),
-		handler.NewUserHandler(service.NewUserService(userRepo, eventRepo)),
+		handler.NewUserHandler(userRepo, eventRepo),
 		handler.NewProjectHandler(service.NewProjectService(projectRepo)),
 		handler.NewEventHandler(service.NewEventService(eventRepo, userRepo)),
 		handler.NewContestHandler(service.NewContestService(contestRepo)),
