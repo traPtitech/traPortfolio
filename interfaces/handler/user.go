@@ -51,7 +51,7 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 // SyncUsers POST /users/sync
 func (h *UserHandler) SyncUsers(c echo.Context) error {
 	ctx := c.Request().Context()
-	if err := h.s.SyncUsers(ctx); err != nil {
+	if err := h.user.SyncUsers(ctx); err != nil {
 		return err
 	}
 

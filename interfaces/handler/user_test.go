@@ -179,21 +179,21 @@ func TestUserHandler_SyncUsers(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockUserService) (path string)
+		setup      func(mr MockRepo) (path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockUserService) (path string) {
-				s.EXPECT().SyncUsers(anyCtx{}).Return(nil)
+			setup: func(mr MockRepo) (path string) {
+				mr.user.EXPECT().SyncUsers(anyCtx{}).Return(nil)
 				return "/api/v1/users/sync"
 			},
 			statusCode: http.StatusNoContent,
 		},
 		{
 			name: "internal error",
-			setup: func(s *mock_service.MockUserService) (path string) {
-				s.EXPECT().SyncUsers(anyCtx{}).Return(errors.New("Internal Server Error"))
+			setup: func(mr MockRepo) (path string) {
+				mr.user.EXPECT().SyncUsers(anyCtx{}).Return(errors.New("Internal Server Error"))
 				return "/api/v1/users/sync"
 			},
 			statusCode: http.StatusInternalServerError,
