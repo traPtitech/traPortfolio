@@ -257,7 +257,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 			return repository.ErrInvalidArg
 		}
 		if _, ok := projectMembersMap[v.UserID]; ok { // 重複していないかどうか
-			return repository.ErrInvalidArg
+			return fmt.Errorf("%w: duplicate user", repository.ErrInvalidArg)
 		}
 		projectMembersMap[v.UserID] = struct{}{}
 	}
