@@ -158,14 +158,30 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 
 	assert.NotEmpty(t, projectDetail)
 	assert.NotEmpty(t, userID)
+	assert.True(t, projectDetail.Duration.IsValid())
 
-	var duration domain.YearWithSemesterDuration
-	for {
-		duration = random.Duration()
-		if projectDetail.Duration.Includes(duration) {
-			break
-		}
+	var start = projectDetail.Duration.Since.Year*2 + projectDetail.Duration.Since.Semester
+	var end = projectDetail.Duration.Until.Year*2 + projectDetail.Duration.Until.Semester
+
+	var since = rand.Intn(end-start+1) + start
+	var until = rand.Intn(end-start+1) + start
+
+	if since > until {
+		since, until = until, since
 	}
+
+	var duration = &domain.YearWithSemesterDuration{
+		Since: domain.YearWithSemester{
+			Year:     since / 2,
+			Semester: since % 2,
+		},
+		Until: domain.YearWithSemester{
+			Year:     until / 2,
+			Semester: until % 2,
+		},
+	}
+
+	assert.True(t, duration.IsValid())
 
 	if args == nil {
 		args = &repository.CreateProjectMemberArgs{
