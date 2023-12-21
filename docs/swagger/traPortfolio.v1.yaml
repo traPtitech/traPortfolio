@@ -978,10 +978,6 @@ components:
       allOf:
         - $ref: "#/components/schemas/Event"
         - properties:
-            description:
-              type: string
-              example: 第n回の進捗会です。
-              description: イベント説明
             place:
               type: string
               description: 大学、オンラインなどの大まかな場所

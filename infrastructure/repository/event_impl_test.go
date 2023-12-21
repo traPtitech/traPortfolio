@@ -126,7 +126,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelPublic,
 				HostName:    []*domain.User{{ID: random.UUID()}},
-				Description: random.AlphaNumeric(),
+				Description: "",
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
 			},
@@ -167,7 +167,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 				Place:       random.AlphaNumeric(),
 				Level:       domain.EventLevelAnonymous,
 				HostName:    nil,
-				Description: random.AlphaNumeric(),
+				Description: "",
 				GroupID:     random.UUID(),
 				RoomID:      random.UUID(),
 			},
@@ -248,15 +248,15 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			setup: func(f mockEventRepositoryFields, args args) {
 				since, until := random.SinceAndUntil()
 				event := external.EventResponse{
-					ID:          args.args.EventID,
-					Name:        random.AlphaNumeric(),
-					Description: random.AlphaNumeric(),
-					Place:       random.AlphaNumeric(),
-					GroupID:     random.UUID(),
-					RoomID:      random.UUID(),
-					TimeStart:   since,
-					TimeEnd:     until,
-					SharedRoom:  random.Bool(),
+					ID:   args.args.EventID,
+					Name: random.AlphaNumeric(),
+					// Description: random.AlphaNumeric(),
+					Place:      random.AlphaNumeric(),
+					GroupID:    random.UUID(),
+					RoomID:     random.UUID(),
+					TimeStart:  since,
+					TimeEnd:    until,
+					SharedRoom: random.Bool(),
 				}
 				f.knoq.EXPECT().GetEvent(args.args.EventID).Return(&event, nil)
 				f.h.Mock.ExpectBegin()
@@ -291,15 +291,15 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			setup: func(f mockEventRepositoryFields, args args) {
 				since, until := random.SinceAndUntil()
 				event := external.EventResponse{
-					ID:          args.args.EventID,
-					Name:        random.AlphaNumeric(),
-					Description: random.AlphaNumeric(),
-					Place:       random.AlphaNumeric(),
-					GroupID:     random.UUID(),
-					RoomID:      random.UUID(),
-					TimeStart:   since,
-					TimeEnd:     until,
-					SharedRoom:  random.Bool(),
+					ID:   args.args.EventID,
+					Name: random.AlphaNumeric(),
+					// Description: random.AlphaNumeric(),
+					Place:      random.AlphaNumeric(),
+					GroupID:    random.UUID(),
+					RoomID:     random.UUID(),
+					TimeStart:  since,
+					TimeEnd:    until,
+					SharedRoom: random.Bool(),
 				}
 				f.knoq.EXPECT().GetEvent(args.args.EventID).Return(&event, nil)
 				f.h.Mock.ExpectBegin()

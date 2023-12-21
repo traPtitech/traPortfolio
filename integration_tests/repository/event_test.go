@@ -65,7 +65,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			TimeStart: selected.TimeStart,
 			TimeEnd:   selected.TimeEnd,
 		},
-		Description: selected.Description,
+		Description: "",
 		Place:       selected.Place,
 		Level:       level,
 		HostName:    hostName,
