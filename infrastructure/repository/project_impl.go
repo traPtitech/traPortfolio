@@ -216,15 +216,6 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return repository.ErrInvalidArg
 	}
 
-	// 追加するユーザー内の重複チェック
-	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
-	for _, v := range projectMembers {
-		if _, ok := projectMembersMap[v.UserID]; ok {
-			return repository.ErrInvalidArg
-		}
-		projectMembersMap[v.UserID] = struct{}{}
-	}
-
 	projectRaw := new(model.Project)
 
 	// プロジェクトの存在チェック
@@ -257,25 +248,18 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		Link:        projectRaw.Link,
 	}
 
-	joinReq := make([]*domain.UserWithDuration, 0, len(projectMembers))
+	// 追加するユーザー群について
+	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
 	for _, v := range projectMembers {
-		joinReq = append(joinReq, &domain.UserWithDuration{
-			User: domain.User{ID: v.UserID},
-			Duration: domain.YearWithSemesterDuration{
-				Since: domain.YearWithSemester{
-					Year:     int(v.SinceYear),
-					Semester: int(v.SinceSemester),
-				},
-				Until: domain.YearWithSemester{
-					Year:     int(v.UntilYear),
-					Semester: int(v.UntilSemester),
-				},
-			},
-		})
-	}
-
-	if !project.CanAddMembers(joinReq) {
-		return repository.ErrInvalidArg
+		if !project.Duration.Includes( // プロジェクトの期間内かどうか
+			domain.NewYearWithSemesterDuration(
+				v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)) {
+			return repository.ErrInvalidArg
+		}
+		if _, ok := projectMembersMap[v.UserID]; ok { // 重複していないかどうか
+			return repository.ErrInvalidArg
+		}
+		projectMembersMap[v.UserID] = struct{}{}
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
