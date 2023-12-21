@@ -136,8 +136,8 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	t.Helper()
 
 	if args == nil {
-		since := rand.Intn(2100 * 2)
-		until := rand.Intn(2100 * 2)
+		since := rand.Intn(2030*2) + 1970*2
+		until := rand.Intn(2030*2) + 1970*2
 		if since > until {
 			since, until = until, since
 		}
