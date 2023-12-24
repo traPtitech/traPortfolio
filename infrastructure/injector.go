@@ -5,7 +5,6 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/gorm"
 )
@@ -57,7 +56,7 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 		handler.NewProjectHandler(projectRepo),
 		handler.NewEventHandler(eventRepo, userRepo),
 		handler.NewContestHandler(contestRepo),
-		handler.NewGroupHandler(service.NewGroupService(groupRepo, userRepo)),
+		handler.NewGroupHandler(groupRepo, userRepo),
 	)
 
 	return api, nil
