@@ -23,9 +23,10 @@ func setupEventMock(t *testing.T) (MockRepo, API) {
 	ctrl := gomock.NewController(t)
 	event := mock_repository.NewMockEventRepository(ctrl)
 	user := mock_repository.NewMockUserRepository(ctrl)
+	mr := MockRepo{user, event, nil, nil, nil}
 	api := NewAPI(nil, nil, nil, NewEventHandler(event, user), nil, nil)
 
-	return MockRepo{user, event}, api
+	return mr, api
 }
 
 func TestEventHandler_GetEvents(t *testing.T) {

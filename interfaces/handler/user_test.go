@@ -18,21 +18,13 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-type MockRepo struct {
-	user  *mock_repository.MockUserRepository
-	event *mock_repository.MockEventRepository
-}
-
 func setupUserMock(t *testing.T) (MockRepo, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	user := mock_repository.NewMockUserRepository(ctrl)
 	event := mock_repository.NewMockEventRepository(ctrl)
-	mr := MockRepo{
-		user,
-		event,
-	}
+	mr := MockRepo{user, event, nil, nil, nil}
 	api := NewAPI(nil, NewUserHandler(user, event), nil, nil, nil, nil)
 
 	return mr, api
