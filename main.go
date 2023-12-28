@@ -17,7 +17,7 @@ func main() {
 	}
 
 	appConf := config.Load()
-	db, err := repository.NewGormDB(appConf.SQLConf())
+	db, err := repository.NewGormDB(appConf.DB)
 	if err != nil {
 		log.Fatal(err)
 	}

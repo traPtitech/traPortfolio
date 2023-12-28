@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 
 	// disable mysql driver logging
 	_ = mysql.SetLogger(mysql.Logger(log.New(io.Discard, "", 0)))
-	_db, closeFunc, err := testutils.RunMySQLContainerOnDocker(c.SQLConf())
+	_db, closeFunc, err := testutils.RunMySQLContainerOnDocker(c.DB)
 	if err != nil {
 		panic(err)
 	}

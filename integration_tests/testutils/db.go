@@ -40,7 +40,7 @@ func establishTestDBConnection(t *testing.T) *gorm.DB {
 	sqlConf := config.Load(func(c *config.Config) {
 		c.DB.Name = "portfolio_test_" + t.Name()
 		c.DB.Port = Port
-	}).SQLConf()
+	}).DB
 
 	_, err := DB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 	assert.NoError(t, err)
@@ -61,7 +61,7 @@ func dropAll(t *testing.T, db *gorm.DB) {
 	assert.NoError(t, err)
 }
 
-func RunMySQLContainerOnDocker(sqlConf *config.SQLConfig) (*sql.DB, func() error, error) {
+func RunMySQLContainerOnDocker(sqlConf config.SQLConfig) (*sql.DB, func() error, error) {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		return nil, nil, fmt.Errorf("create docker pool: %w", err)
