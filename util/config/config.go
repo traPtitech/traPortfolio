@@ -200,10 +200,6 @@ func (c *Config) Addr() string {
 	return fmt.Sprintf(":%d", c.Port)
 }
 
-func (c *Config) TraqConf() *TraqConfig {
-	return &c.Traq
-}
-
 func (c *Config) KnoqConf() *KnoqConfig {
 	return &c.Knoq
 }

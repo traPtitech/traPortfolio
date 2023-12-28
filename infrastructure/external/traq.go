@@ -31,7 +31,7 @@ type traQAPI struct {
 	apiClient
 }
 
-func NewTraQAPI(conf *config.TraqConfig) (TraQAPI, error) {
+func NewTraQAPI(conf config.TraqConfig) (TraQAPI, error) {
 	jar, err := newCookieJar(conf.API(), "r_session")
 	if err != nil {
 		return nil, err

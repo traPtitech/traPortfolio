@@ -26,7 +26,7 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 			return handler.API{}, err
 		}
 
-		traQAPI, err = external.NewTraQAPI(c.TraqConf())
+		traQAPI, err = external.NewTraQAPI(c.Traq)
 		if err != nil {
 			return handler.API{}, err
 		}
