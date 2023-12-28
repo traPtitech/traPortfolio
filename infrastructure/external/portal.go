@@ -32,14 +32,15 @@ type portalAPI struct {
 	cache *cache.Cache
 }
 
-func NewPortalAPI(conf *config.PortalConfig) (PortalAPI, error) {
-	jar, err := newCookieJar(conf.API(), "access_token")
+func NewPortalAPI(conf config.PortalConfig) (PortalAPI, error) {
+	apiConfig := (config.APIConfig)(conf)
+	jar, err := newCookieJar(apiConfig, "access_token")
 	if err != nil {
 		return nil, err
 	}
 
 	return &portalAPI{
-		apiClient: newAPIClient(jar, conf.API()),
+		apiClient: newAPIClient(jar, apiConfig),
 		cache:     cache.New(1*time.Hour, 2*time.Hour),
 	}, nil
 }

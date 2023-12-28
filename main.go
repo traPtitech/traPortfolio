@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -17,7 +18,7 @@ func main() {
 	}
 
 	appConf := config.Load()
-	db, err := repository.NewGormDB(appConf.SQLConf())
+	db, err := repository.NewGormDB(appConf.DB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,5 +49,5 @@ func main() {
 	}
 
 	// Start server
-	e.Logger.Fatal(e.Start(appConf.Addr()))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", appConf.Port)))
 }
