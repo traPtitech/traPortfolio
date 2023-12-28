@@ -37,7 +37,7 @@ type knoqAPI struct {
 	apiClient
 }
 
-func NewKnoqAPI(conf *config.KnoqConfig) (KnoqAPI, error) {
+func NewKnoqAPI(conf config.KnoqConfig) (KnoqAPI, error) {
 	jar, err := newCookieJar(conf.API(), "session")
 	if err != nil {
 		return nil, err

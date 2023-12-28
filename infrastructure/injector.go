@@ -31,7 +31,7 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 			return handler.API{}, err
 		}
 
-		knoqAPI, err = external.NewKnoqAPI(c.KnoqConf())
+		knoqAPI, err = external.NewKnoqAPI(c.Knoq)
 		if err != nil {
 			return handler.API{}, err
 		}
