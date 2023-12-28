@@ -216,12 +216,6 @@ func (c *SQLConfig) DsnConfig() *mysql.Config {
 	}
 }
 
-func (c *SQLConfig) DsnConfigWithoutName() *mysql.Config {
-	cfg := c.DsnConfig()
-	cfg.DBName = ""
-	return cfg
-}
-
 func (c *SQLConfig) GormConfig() *gorm.Config {
 	var (
 		logLevel  = logger.Warn
