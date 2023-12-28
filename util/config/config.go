@@ -196,10 +196,6 @@ func (c *Config) clone() *Config {
 	return &cloned
 }
 
-func (c *Config) Addr() string {
-	return fmt.Sprintf(":%d", c.Port)
-}
-
 func (c *SQLConfig) DsnConfig() *mysql.Config {
 	return &mysql.Config{
 		User:                 c.User,
