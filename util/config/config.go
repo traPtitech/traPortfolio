@@ -200,10 +200,6 @@ func (c *Config) Addr() string {
 	return fmt.Sprintf(":%d", c.Port)
 }
 
-func (c *Config) PortalConf() *PortalConfig {
-	return &c.Portal
-}
-
 func (c *TraqConfig) API() *APIConfig {
 	return (*APIConfig)(c)
 }

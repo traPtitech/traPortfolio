@@ -21,7 +21,7 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	if c.IsProduction {
 		var err error
 
-		portalAPI, err = external.NewPortalAPI(c.PortalConf())
+		portalAPI, err = external.NewPortalAPI(c.Portal)
 		if err != nil {
 			return handler.API{}, err
 		}
