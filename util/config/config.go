@@ -200,18 +200,6 @@ func (c *Config) Addr() string {
 	return fmt.Sprintf(":%d", c.Port)
 }
 
-func (c *TraqConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-func (c *KnoqConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-func (c *PortalConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
 func (c *SQLConfig) DsnConfig() *mysql.Config {
 	return &mysql.Config{
 		User:                 c.User,

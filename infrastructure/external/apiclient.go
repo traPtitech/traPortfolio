@@ -11,10 +11,10 @@ import (
 
 type apiClient struct {
 	client *http.Client
-	conf   *config.APIConfig
+	conf   config.APIConfig
 }
 
-func newAPIClient(jar *cookiejar.Jar, conf *config.APIConfig) apiClient {
+func newAPIClient(jar *cookiejar.Jar, conf config.APIConfig) apiClient {
 	return apiClient{
 		client: &http.Client{Jar: jar},
 		conf:   conf,
@@ -30,7 +30,7 @@ func (c *apiClient) apiGet(path string) (*http.Response, error) {
 	return c.client.Do(req)
 }
 
-func newCookieJar(c *config.APIConfig, name string) (*cookiejar.Jar, error) {
+func newCookieJar(c config.APIConfig, name string) (*cookiejar.Jar, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, err

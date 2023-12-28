@@ -38,12 +38,13 @@ type knoqAPI struct {
 }
 
 func NewKnoqAPI(conf config.KnoqConfig) (KnoqAPI, error) {
-	jar, err := newCookieJar(conf.API(), "session")
+	apiConfig := (config.APIConfig)(conf)
+	jar, err := newCookieJar(apiConfig, "session")
 	if err != nil {
 		return nil, err
 	}
 
-	return &knoqAPI{newAPIClient(jar, conf.API())}, nil
+	return &knoqAPI{newAPIClient(jar, apiConfig)}, nil
 }
 
 func (a *knoqAPI) GetEvents() ([]*EventResponse, error) {
