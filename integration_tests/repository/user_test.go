@@ -484,8 +484,8 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	assert.ElementsMatch(t, expected1, users1)
 	assert.ElementsMatch(t, expected2, users2)
 
-	args1 := mustAddProjectMember(t, projectRepo, *project1, user1.ID, nil)
-	args2 := mustAddProjectMember(t, projectRepo, *project2, user1.ID, nil)
+	args1 := mustAddProjectMember(t, projectRepo, project1.ID, project1.Duration, user1.ID, nil)
+	args2 := mustAddProjectMember(t, projectRepo, project2.ID, project2.Duration, user1.ID, nil)
 
 	expected3 := []*domain.UserProject{newUserProject(t, args1, &project1.Project), newUserProject(t, args2, &project2.Project)}
 	projects1, err := userRepo.GetProjects(context.Background(), user1.ID)

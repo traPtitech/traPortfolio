@@ -145,9 +145,9 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		mockdata.MockUsers[1].Check,
 	)
 
-	args1 := mustAddProjectMember(t, repo, *project1, user1.ID, nil)
-	args2 := mustAddProjectMember(t, repo, *project1, user2.ID, nil)
-	args3 := mustAddProjectMember(t, repo, *project2, user2.ID, nil)
+	args1 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user1.ID, nil)
+	args2 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user2.ID, nil)
+	args3 := mustAddProjectMember(t, repo, project2.ID, project2.Duration, user2.ID, nil)
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
@@ -227,9 +227,9 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		mockdata.MockUsers[2].Check,
 	)
 
-	args1 := mustAddProjectMember(t, repo, *project1, user1.ID, nil)
-	args2 := mustAddProjectMember(t, repo, *project1, user2.ID, nil)
-	args3 := mustAddProjectMember(t, repo, *project2, user2.ID, nil)
+	args1 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user1.ID, nil)
+	args2 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user2.ID, nil)
+	args3 := mustAddProjectMember(t, repo, project2.ID, project2.Duration, user2.ID, nil)
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
