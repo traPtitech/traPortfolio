@@ -229,35 +229,26 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return err
 	}
 
-	// 追加するユーザーの期間がプロジェクトの期間内かどうか
-	project := &domain.ProjectDetail{
-		Project: domain.Project{
-			ID:   projectID,
-			Name: projectRaw.Name,
-			Duration: domain.YearWithSemesterDuration{
-				Since: domain.YearWithSemester{
-					Year:     int(projectRaw.SinceYear),
-					Semester: int(projectRaw.SinceSemester),
-				},
-				Until: domain.YearWithSemester{
-					Year:     int(projectRaw.UntilYear),
-					Semester: int(projectRaw.UntilSemester),
-				},
-			},
+	projectDuration := domain.YearWithSemesterDuration{
+		Since: domain.YearWithSemester{
+			Year:     int(projectRaw.SinceYear),
+			Semester: int(projectRaw.SinceSemester),
 		},
-		Description: projectRaw.Description,
-		Link:        projectRaw.Link,
+		Until: domain.YearWithSemester{
+			Year:     int(projectRaw.UntilYear),
+			Semester: int(projectRaw.UntilSemester),
+		},
 	}
 
-	// 追加するユーザー群について
 	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
 	for _, v := range projectMembers {
-		if !project.Duration.Includes( // プロジェクトの期間内かどうか
-			domain.NewYearWithSemesterDuration(
-				v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)) {
+		memberDuration := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
+		// プロジェクトの期間内かどうか
+		if !projectDuration.Includes(memberDuration) {
 			return repository.ErrInvalidArg
 		}
-		if _, ok := projectMembersMap[v.UserID]; ok { // 重複していないかどうか
+		// 重複していないかどうか
+		if _, ok := projectMembersMap[v.UserID]; ok {
 			return fmt.Errorf("%w: duplicate user", repository.ErrInvalidArg)
 		}
 		projectMembersMap[v.UserID] = struct{}{}

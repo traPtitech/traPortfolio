@@ -821,17 +821,17 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 		{
 			name: "UnexpectedError_DurationExceedMember",
 			args: args{
-				projectID: random.UUID(),
+				projectID: random.UUID(), // projectDuration: 2020-0 ~ 2021-1
 				projectMembers: []*repository.CreateProjectMemberArgs{
 					{
-						UserID:        random.UUID(),
+						UserID:        random.UUID(), // OK
 						SinceYear:     2020,
 						SinceSemester: 0,
 						UntilYear:     2021,
 						UntilSemester: 1,
 					},
 					{
-						UserID:        random.UUID(),
+						UserID:        random.UUID(), // NG
 						SinceYear:     2021,
 						SinceSemester: 0,
 						UntilYear:     2022,
