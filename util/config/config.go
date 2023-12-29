@@ -41,26 +41,25 @@ var (
 )
 
 type (
-	// Immutable except within this package or EditFunc
 	Config struct {
 		IsProduction   bool `mapstructure:"production"`
-		Port           int  `mapstructure:"port"`
-		OnlyMigrate    bool `mapstructure:"onlyMigrate"`
-		InsertMockData bool `mapstructure:"insertMockData"`
+		Port           int
+		OnlyMigrate    bool
+		InsertMockData bool
 
-		DB     SQLConfig    `mapstructure:"db"`
-		Traq   TraqConfig   `mapstructure:"traq"`
-		Knoq   KnoqConfig   `mapstructure:"knoq"`
-		Portal PortalConfig `mapstructure:"portal"`
+		DB     SQLConfig
+		Traq   TraqConfig
+		Knoq   KnoqConfig
+		Portal PortalConfig
 	}
 
 	SQLConfig struct {
-		User    string `mapstructure:"user"`
-		Pass    string `mapstructure:"pass"`
-		Host    string `mapstructure:"host"`
-		Name    string `mapstructure:"name"`
-		Port    int    `mapstructure:"port"`
-		Verbose bool   `mapstructure:"verbose"`
+		User    string
+		Pass    string
+		Host    string
+		Name    string
+		Port    int
+		Verbose bool
 	}
 
 	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
@@ -70,8 +69,8 @@ type (
 	PortalConfig APIConfig
 
 	APIConfig struct {
-		Cookie      string `mapstructure:"cookie"`
-		APIEndpoint string `mapstructure:"apiEndpoint"`
+		Cookie      string
+		APIEndpoint string
 	}
 
 	EditFunc func(*Config)
