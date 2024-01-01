@@ -77,7 +77,7 @@ jobs:
       - test-integration
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverages
       - name: Upload coverage data (Unit)
@@ -97,7 +97,7 @@ jobs:
       - build
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: traPortfolio
       - name: Setup MySQL container
