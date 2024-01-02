@@ -968,10 +968,13 @@ components:
         duration:
           # description: イベントの開催期間
           $ref: "#/components/schemas/Duration"
+        eventLevel:
+          $ref: "#/components/schemas/EventLevel"
       required:
         - id
         - name
         - duration
+        - eventLevel
     EventDetail:
       description: イベントの詳細情報
       title: EventDetail
