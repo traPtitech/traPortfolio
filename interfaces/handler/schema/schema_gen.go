@@ -288,6 +288,12 @@ type Event struct {
 	// Duration イベントやコンテストなどの存続期間
 	Duration Duration `json:"duration"`
 
+	// EventLevel 公開範囲設定
+	// 0 イベント企画者の名前を伏せて公開
+	// 1 全て公開
+	// 2 外部に非公開
+	EventLevel EventLevel `json:"eventLevel"`
+
 	// Id イベントuuid
 	Id uuid.UUID `json:"id"`
 
