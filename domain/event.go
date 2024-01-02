@@ -11,10 +11,11 @@ import (
 )
 
 type Event struct {
-	ID        uuid.UUID
-	Name      string
-	TimeStart time.Time
-	TimeEnd   time.Time
+	ID         uuid.UUID
+	Name       string
+	EventLevel EventLevel
+	TimeStart  time.Time
+	TimeEnd    time.Time
 }
 
 // Event knoQ上のイベント情報
