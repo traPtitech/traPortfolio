@@ -11,6 +11,9 @@ env:
 
 jobs:
   image:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Login to GitHub Container Registry

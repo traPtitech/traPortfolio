@@ -10,6 +10,9 @@ env:
 
 jobs:
   image:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Set IMAGE_TAG env
