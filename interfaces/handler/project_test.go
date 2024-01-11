@@ -329,16 +329,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersRequest, string) {
 				projectID := random.UUID()
 				userID := random.UUID()
-				userDuration := domain.YearWithSemesterDuration{
-					Since: domain.YearWithSemester{
-						Year:     2021,
-						Semester: 0,
-					},
-					Until: domain.YearWithSemester{
-						Year:     2022,
-						Semester: 1,
-					},
-				}
+				userDuration := random.Duration()
 				reqBody := &schema.AddProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
@@ -416,16 +407,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersRequest, string) {
 				userID := random.UUID()
 				projectID := random.UUID()
-				duration := domain.YearWithSemesterDuration{
-					Since: domain.YearWithSemester{
-						Year:     2021,
-						Semester: 1,
-					},
-					Until: domain.YearWithSemester{
-						Year:     2023,
-						Semester: 0,
-					},
-				}
+				duration := random.Duration()
 				reqBody := &schema.AddProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
