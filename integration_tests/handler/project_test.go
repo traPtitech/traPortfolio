@@ -416,7 +416,7 @@ func TestAddProjectMembers(t *testing.T) {
 					},
 				},
 			},
-			httpError(t, "Bad Request: argument error"),
+			httpError(t, "Bad Request: argument error: exceeded duration user"),
 		},
 	}
 
