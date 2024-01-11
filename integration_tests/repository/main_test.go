@@ -136,19 +136,15 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	t.Helper()
 
 	if args == nil {
-		since := rand.Intn(2030*2) + 1970*2
-		until := rand.Intn(2030*2) + 1970*2
-		if since > until {
-			since, until = until, since
-		}
+		duration := random.Duration()
 		args = &repository.CreateProjectArgs{
 			Name:          random.AlphaNumeric(),
 			Description:   random.AlphaNumeric(),
 			Link:          random.Optional(random.RandURLString()),
-			SinceYear:     since / 2,
-			SinceSemester: since % 2,
-			UntilYear:     until / 2,
-			UntilSemester: until % 2,
+			SinceYear:     duration.Since.Year,
+			SinceSemester: duration.Since.Semester,
+			UntilYear:     duration.Until.Year,
+			UntilSemester: duration.Until.Semester,
 		}
 	}
 
