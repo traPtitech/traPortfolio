@@ -196,38 +196,6 @@ func (c *Config) clone() *Config {
 	return &cloned
 }
 
-func (c *Config) Addr() string {
-	return fmt.Sprintf(":%d", c.Port)
-}
-
-func (c *Config) SQLConf() *SQLConfig {
-	return &c.DB
-}
-
-func (c *Config) TraqConf() *TraqConfig {
-	return &c.Traq
-}
-
-func (c *Config) KnoqConf() *KnoqConfig {
-	return &c.Knoq
-}
-
-func (c *Config) PortalConf() *PortalConfig {
-	return &c.Portal
-}
-
-func (c *TraqConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-func (c *KnoqConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
-func (c *PortalConfig) API() *APIConfig {
-	return (*APIConfig)(c)
-}
-
 func (c *SQLConfig) DsnConfig() *mysql.Config {
 	return &mysql.Config{
 		User:                 c.User,
@@ -242,12 +210,6 @@ func (c *SQLConfig) DsnConfig() *mysql.Config {
 			"charset": "utf8mb4",
 		},
 	}
-}
-
-func (c *SQLConfig) DsnConfigWithoutName() *mysql.Config {
-	cfg := c.DsnConfig()
-	cfg.DBName = ""
-	return cfg
 }
 
 func (c *SQLConfig) GormConfig() *gorm.Config {

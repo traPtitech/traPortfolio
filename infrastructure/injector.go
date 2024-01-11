@@ -21,17 +21,17 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	if c.IsProduction {
 		var err error
 
-		portalAPI, err = external.NewPortalAPI(c.PortalConf())
+		portalAPI, err = external.NewPortalAPI(c.Portal)
 		if err != nil {
 			return handler.API{}, err
 		}
 
-		traQAPI, err = external.NewTraQAPI(c.TraqConf())
+		traQAPI, err = external.NewTraQAPI(c.Traq)
 		if err != nil {
 			return handler.API{}, err
 		}
 
-		knoqAPI, err = external.NewKnoqAPI(c.KnoqConf())
+		knoqAPI, err = external.NewKnoqAPI(c.Knoq)
 		if err != nil {
 			return handler.API{}, err
 		}

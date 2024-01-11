@@ -42,7 +42,7 @@ func (d dialector) Translate(err error) error {
 	return err
 }
 
-func NewGormDB(conf *config.SQLConfig) (*gorm.DB, error) {
+func NewGormDB(conf config.SQLConfig) (*gorm.DB, error) {
 	d := dialector{mysql.New(mysql.Config{DSNConfig: conf.DsnConfig()})}
 	engine, err := gorm.Open(d, conf.GormConfig())
 	if err != nil {
