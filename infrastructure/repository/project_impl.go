@@ -217,35 +217,26 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return repository.ErrInvalidArg
 	}
 
-	projectRaw := new(model.Project)
+	raw := new(model.Project)
 
 	// プロジェクトの存在チェック
 	err := r.h.
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
-		First(&projectRaw).
+		First(&raw).
 		Error
 	if err != nil {
 		return err
 	}
 
-	projectDuration := domain.YearWithSemesterDuration{
-		Since: domain.YearWithSemester{
-			Year:     int(projectRaw.SinceYear),
-			Semester: int(projectRaw.SinceSemester),
-		},
-		Until: domain.YearWithSemester{
-			Year:     int(projectRaw.UntilYear),
-			Semester: int(projectRaw.UntilSemester),
-		},
-	}
+	projectDuration := domain.NewYearWithSemesterDuration(raw.SinceYear, raw.SinceSemester, raw.UntilYear, raw.UntilSemester)
 
 	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
 	for _, v := range projectMembers {
 		memberDuration := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
 		// プロジェクトの期間内かどうか
 		if !projectDuration.Includes(memberDuration) {
-			return repository.ErrInvalidArg
+			return fmt.Errorf("%w: exceeded duration user", repository.ErrInvalidArg)
 		}
 		// 重複していないかどうか
 		if _, ok := projectMembersMap[v.UserID]; ok {
