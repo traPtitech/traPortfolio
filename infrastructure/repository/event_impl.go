@@ -28,21 +28,11 @@ func (r *EventRepository) GetEvents(ctx context.Context) ([]*domain.Event, error
 		return nil, err
 	}
 
-	events, err = r.filterAccessibleEvents(ctx, events)
+	result, err := r.completeEventLevels(ctx, events)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*domain.Event, 0, len(events))
-	for _, v := range events {
-		e := &domain.Event{
-			ID:        v.ID,
-			Name:      v.Name,
-			TimeStart: v.TimeStart,
-			TimeEnd:   v.TimeEnd,
-		}
-		result = append(result, e)
-	}
-
+	result = filterAccessibleEvents(result)
 	return result, nil
 }
 
@@ -144,43 +134,52 @@ func (r *EventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) (
 		return nil, err
 	}
 
-	events, err = r.filterAccessibleEvents(ctx, events)
+	result, err := r.completeEventLevels(ctx, events)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*domain.Event, 0, len(events))
-	for _, v := range events {
-		e := &domain.Event{
-			ID:        v.ID,
-			Name:      v.Name,
-			TimeStart: v.TimeStart,
-			TimeEnd:   v.TimeEnd,
-		}
-		result = append(result, e)
-	}
+	// TODO: 自分のイベントで非公開のものが見られない
+	result = filterAccessibleEvents(result)
 	return result, nil
 }
 
-func (r *EventRepository) filterAccessibleEvents(ctx context.Context, events []*external.EventResponse) ([]*external.EventResponse, error) {
-	// privateのものだけ除外する
+func (r *EventRepository) completeEventLevels(ctx context.Context, events []*external.EventResponse) ([]*domain.Event, error) {
 	ids := lo.Map(events, func(e *external.EventResponse, _ int) uuid.UUID {
 		return e.ID
 	})
-	privateRels := make([]*model.EventLevelRelation, 0, len(events))
+	rels := make([]*model.EventLevelRelation, 0, len(events))
 	err := r.h.
 		WithContext(ctx).
-		Select("id").
-		Where("level = ? AND id IN ?", domain.EventLevelPrivate, ids).
-		Find(&privateRels).
+		Where("id IN ?", ids).
+		Find(&rels).
 		Error
 	if err != nil {
 		return nil, err
 	}
-	return lo.Filter(events, func(e *external.EventResponse, _ int) bool {
-		return !lo.ContainsBy(privateRels, func(r *model.EventLevelRelation) bool {
-			return r.ID == e.ID
-		})
-	}), nil
+	relById := lo.Associate(rels, func(r *model.EventLevelRelation) (uuid.UUID, domain.EventLevel) {
+		return r.ID, r.Level
+	})
+	result := lo.Map(events, func(e *external.EventResponse, _ int) *domain.Event {
+		level, ok := relById[e.ID]
+		if !ok {
+			level = domain.EventLevelAnonymous
+		}
+		return &domain.Event{
+			ID:         e.ID,
+			Name:       e.Name,
+			TimeStart:  e.TimeStart,
+			TimeEnd:    e.TimeEnd,
+			EventLevel: level,
+		}
+	})
+	return result, nil
+}
+
+func filterAccessibleEvents(events []*domain.Event) []*domain.Event {
+	// privateのものだけ除外する
+	return lo.Filter(events, func(e *domain.Event, _ int) bool {
+		return e.EventLevel != domain.EventLevelPrivate
+	})
 }
 
 func (r *EventRepository) getEventLevelByID(ctx context.Context, eventID uuid.UUID) (*model.EventLevelRelation, error) {
