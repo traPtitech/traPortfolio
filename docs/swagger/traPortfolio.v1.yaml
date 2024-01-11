@@ -7,6 +7,8 @@ info:
     url: "https://github.com/traPtitech/traPortfolio"
   description: traPortfolio v1 API
 servers:
+  - url: "https://portfolio-dev.trapti.tech/api/v1"
+    description: staging
   - url: "http://localhost:1323/api/v1"
     description: local
 paths:
@@ -1180,7 +1182,7 @@ components:
               type: array
               description: チームメンバーのユーザー情報
               items:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
           required:
             - members
     ContestTeamDetail:
