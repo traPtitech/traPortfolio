@@ -217,19 +217,19 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return repository.ErrInvalidArg
 	}
 
-	raw := new(model.Project)
+	p := new(model.Project)
 
 	// プロジェクトの存在チェック
 	err := r.h.
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
-		First(&raw).
+		First(&p).
 		Error
 	if err != nil {
 		return err
 	}
 
-	projectDuration := domain.NewYearWithSemesterDuration(raw.SinceYear, raw.SinceSemester, raw.UntilYear, raw.UntilSemester)
+	projectDuration := domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester)
 
 	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
 	for _, v := range projectMembers {
