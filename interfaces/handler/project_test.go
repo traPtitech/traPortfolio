@@ -368,7 +368,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
-			statusCode: http.StatusNoContent,
+			statusCode: http.StatusOK,
 		},
 		{
 			name: "BadRequest: Invalid Project ID",

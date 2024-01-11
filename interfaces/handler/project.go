@@ -196,7 +196,7 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return nil
 }
 
 // DeleteProjectMembers DELETE /projects/:projectID/members
