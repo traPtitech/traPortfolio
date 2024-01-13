@@ -142,9 +142,10 @@ func CloneHandlerMockEvents() []schema.Event {
 
 	for i, e := range eventDetails {
 		events[i] = schema.Event{
-			Duration: e.Duration,
-			Id:       e.Id,
-			Name:     e.Name,
+			Duration:   e.Duration,
+			Id:         e.Id,
+			Name:       e.Name,
+			EventLevel: e.EventLevel,
 		}
 	}
 	return events
@@ -421,9 +422,10 @@ func CloneHandlerMockUserEvents() []schema.Event {
 
 	for i, e := range hEventDetails {
 		mUserEvents[i] = schema.Event{
-			Duration: e.Duration,
-			Id:       e.Id,
-			Name:     e.Name,
+			Duration:   e.Duration,
+			Id:         e.Id,
+			Name:       e.Name,
+			EventLevel: e.EventLevel,
 		}
 	}
 
