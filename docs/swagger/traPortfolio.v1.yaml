@@ -993,13 +993,10 @@ components:
               description: 主催者
               items:
                 $ref: "#/components/schemas/User"
-            eventLevel:
-              $ref: "#/components/schemas/EventLevel"
           required:
             - description
             - place
             - hostname
-            - eventLevel
       type: object
     EventLevel:
       type: integer
