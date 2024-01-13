@@ -65,9 +65,9 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 
 	elv, err := r.getEventLevelByID(ctx, eventID)
 	if err == nil {
-		ed.Level = elv.Level
+		ed.EventLevel = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
-		ed.Level = domain.EventLevelAnonymous
+		ed.EventLevel = domain.EventLevelAnonymous
 	} else {
 		return nil, err
 	}

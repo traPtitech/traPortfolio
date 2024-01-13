@@ -23,7 +23,6 @@ type EventDetail struct {
 	Event
 	Description string
 	Place       string
-	Level       EventLevel
 	HostName    []*User
 	GroupID     uuid.UUID
 	RoomID      uuid.UUID
@@ -31,7 +30,7 @@ type EventDetail struct {
 
 // ApplyEventLevel EventDetailのLevelに応じてEventを返す
 func ApplyEventLevel(e EventDetail) optional.Of[EventDetail] {
-	switch e.Level {
+	switch e.EventLevel {
 	case EventLevelAnonymous:
 		e.HostName = nil
 		return optional.From(e)
