@@ -122,15 +122,14 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				since, until := random.SinceAndUntil()
 				revent := domain.EventDetail{
 					Event: domain.Event{
-						ID:        random.UUID(),
-						Name:      random.AlphaNumeric(),
-						TimeStart: since,
-						TimeEnd:   until,
+						ID:         random.UUID(),
+						Name:       random.AlphaNumeric(),
+						EventLevel: domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
+						TimeStart:  since,
+						TimeEnd:    until,
 					},
-
 					Description: random.AlphaNumeric(),
 					Place:       random.AlphaNumeric(),
-					Level:       domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
 					HostName:    rHost,
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
@@ -142,7 +141,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 						Since: revent.Event.TimeStart,
 						Until: &revent.Event.TimeEnd,
 					},
-					EventLevel: schema.EventLevel(revent.Level),
+					EventLevel: schema.EventLevel(revent.EventLevel),
 					Hostname:   hHost,
 					Id:         revent.Event.ID,
 					Name:       revent.Event.Name,

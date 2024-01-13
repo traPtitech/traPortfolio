@@ -100,13 +100,13 @@ func TestEventService_GetEventByID(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					// ID:
-					Name:      random.AlphaNumeric(),
-					TimeStart: time.Now(),
-					TimeEnd:   time.Now(),
+					Name:       random.AlphaNumeric(),
+					EventLevel: domain.EventLevelAnonymous,
+					TimeStart:  time.Now(),
+					TimeEnd:    time.Now(),
 				},
 				Description: random.AlphaNumeric(),
 				Place:       random.AlphaNumeric(),
-				Level:       domain.EventLevelAnonymous,
 				HostName: []*domain.User{
 					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
@@ -119,14 +119,14 @@ func TestEventService_GetEventByID(t *testing.T) {
 				u := f.user.(*mock_repository.MockUserRepository)
 				e.EXPECT().GetEvent(args.ctx, args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
-						ID:        args.id,
-						Name:      want.Name,
-						TimeStart: want.TimeStart,
-						TimeEnd:   want.TimeEnd,
+						ID:         args.id,
+						Name:       want.Name,
+						EventLevel: want.EventLevel,
+						TimeStart:  want.TimeStart,
+						TimeEnd:    want.TimeEnd,
 					},
 					Description: want.Description,
 					Place:       want.Place,
-					Level:       want.Level,
 					HostName:    []*domain.User{{ID: want.HostName[0].ID}},
 					GroupID:     want.GroupID,
 					RoomID:      want.RoomID,
@@ -160,14 +160,14 @@ func TestEventService_GetEventByID(t *testing.T) {
 				u := f.user.(*mock_repository.MockUserRepository)
 				e.EXPECT().GetEvent(args.ctx, args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
-						ID:        args.id,
-						Name:      random.AlphaNumeric(),
-						TimeStart: time.Now(),
-						TimeEnd:   time.Now(),
+						ID:         args.id,
+						Name:       random.AlphaNumeric(),
+						EventLevel: domain.EventLevelAnonymous,
+						TimeStart:  time.Now(),
+						TimeEnd:    time.Now(),
 					},
 					Description: random.AlphaNumeric(),
 					Place:       random.AlphaNumeric(),
-					Level:       domain.EventLevelAnonymous,
 					HostName:    []*domain.User{{ID: random.UUID()}},
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),
