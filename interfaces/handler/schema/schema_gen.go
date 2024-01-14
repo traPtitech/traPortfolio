@@ -233,11 +233,11 @@ type EditContestTeamRequest struct {
 
 // EditEventRequest イベント情報修正リクエスト
 type EditEventRequest struct {
-	// EventLevel 公開範囲設定
+	// Level 公開範囲設定
 	// 0 イベント企画者の名前を伏せて公開
 	// 1 全て公開
 	// 2 外部に非公開
-	EventLevel *EventLevel `json:"eventLevel,omitempty"`
+	Level *EventLevel `json:"level,omitempty"`
 }
 
 // EditProjectRequest プロジェクト変更リクエスト
@@ -288,14 +288,14 @@ type Event struct {
 	// Duration イベントやコンテストなどの存続期間
 	Duration Duration `json:"duration"`
 
-	// EventLevel 公開範囲設定
+	// Id イベントuuid
+	Id uuid.UUID `json:"id"`
+
+	// Level 公開範囲設定
 	// 0 イベント企画者の名前を伏せて公開
 	// 1 全て公開
 	// 2 外部に非公開
-	EventLevel EventLevel `json:"eventLevel"`
-
-	// Id イベントuuid
-	Id uuid.UUID `json:"id"`
+	Level EventLevel `json:"level"`
 
 	// Name イベント名
 	Name string `json:"name"`
@@ -309,17 +309,17 @@ type EventDetail struct {
 	// Duration イベントやコンテストなどの存続期間
 	Duration Duration `json:"duration"`
 
-	// EventLevel 公開範囲設定
-	// 0 イベント企画者の名前を伏せて公開
-	// 1 全て公開
-	// 2 外部に非公開
-	EventLevel EventLevel `json:"eventLevel"`
-
 	// Hostname 主催者
 	Hostname []User `json:"hostname"`
 
 	// Id イベントuuid
 	Id uuid.UUID `json:"id"`
+
+	// Level 公開範囲設定
+	// 0 イベント企画者の名前を伏せて公開
+	// 1 全て公開
+	// 2 外部に非公開
+	Level EventLevel `json:"level"`
 
 	// Name イベント名
 	Name string `json:"name"`
