@@ -11,11 +11,11 @@ import (
 )
 
 type Event struct {
-	ID         uuid.UUID
-	Name       string
-	EventLevel EventLevel
-	TimeStart  time.Time
-	TimeEnd    time.Time
+	ID        uuid.UUID
+	Name      string
+	Level     EventLevel
+	TimeStart time.Time
+	TimeEnd   time.Time
 }
 
 // Event knoQ上のイベント情報
@@ -30,7 +30,7 @@ type EventDetail struct {
 
 // ApplyEventLevel EventDetailのLevelに応じてEventを返す
 func ApplyEventLevel(e EventDetail) optional.Of[EventDetail] {
-	switch e.EventLevel {
+	switch e.Level {
 	case EventLevelAnonymous:
 		e.HostName = nil
 		return optional.From(e)

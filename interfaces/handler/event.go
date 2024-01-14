@@ -35,7 +35,7 @@ func (h *EventHandler) GetEvents(c echo.Context) error {
 
 	res := make([]schema.Event, len(events))
 	for i, v := range events {
-		res[i] = newEvent(v.ID, v.Name, v.EventLevel, v.TimeStart, v.TimeEnd)
+		res[i] = newEvent(v.ID, v.Name, v.Level, v.TimeStart, v.TimeEnd)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -60,7 +60,7 @@ func (h *EventHandler) GetEvent(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, newEventDetail(
-		newEvent(event.ID, event.Name, event.EventLevel, event.TimeStart, event.TimeEnd),
+		newEvent(event.ID, event.Name, event.Level, event.TimeStart, event.TimeEnd),
 		event.Description,
 		hostname,
 		event.Place,
@@ -82,7 +82,7 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	patchReq := repository.UpdateEventLevelArgs{
-		Level: optional.FromPtr((*domain.EventLevel)(req.EventLevel)),
+		Level: optional.FromPtr((*domain.EventLevel)(req.Level)),
 	}
 
 	if err := h.s.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
@@ -93,9 +93,9 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 
 func newEvent(id uuid.UUID, name string, level domain.EventLevel, since time.Time, until time.Time) schema.Event {
 	return schema.Event{
-		Id:         id,
-		Name:       name,
-		EventLevel: schema.EventLevel(level),
+		Id:    id,
+		Name:  name,
+		Level: schema.EventLevel(level),
 		Duration: schema.Duration{
 			Since: since,
 			Until: &until,
@@ -110,10 +110,10 @@ func newEventDetail(event schema.Event, description string, hostname []schema.Us
 			Since: event.Duration.Since,
 			Until: event.Duration.Until,
 		},
-		EventLevel: event.EventLevel,
-		Hostname:   hostname,
-		Id:         event.Id,
-		Name:       event.Name,
-		Place:      place,
+		Level:    event.Level,
+		Hostname: hostname,
+		Id:       event.Id,
+		Name:     event.Name,
+		Place:    place,
 	}
 }

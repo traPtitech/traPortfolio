@@ -313,7 +313,7 @@ func (h *UserHandler) GetUserEvents(c echo.Context) error {
 
 	res := make([]schema.Event, len(events))
 	for i, v := range events {
-		res[i] = newEvent(v.ID, v.Name, v.EventLevel, v.TimeStart, v.TimeEnd)
+		res[i] = newEvent(v.ID, v.Name, v.Level, v.TimeStart, v.TimeEnd)
 	}
 
 	return c.JSON(http.StatusOK, res)

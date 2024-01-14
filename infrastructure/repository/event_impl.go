@@ -50,24 +50,24 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 
 	ed := domain.EventDetail{
 		Event: domain.Event{
-			ID:        er.ID,
-			Name:      er.Name,
+			ID:   er.ID,
+			Name: er.Name,
+			// Level:
 			TimeStart: er.TimeStart,
 			TimeEnd:   er.TimeEnd,
 		},
 		Description: er.Description,
 		Place:       er.Place,
-		// Level:
-		HostName: hostName,
-		GroupID:  er.GroupID,
-		RoomID:   er.RoomID,
+		HostName:    hostName,
+		GroupID:     er.GroupID,
+		RoomID:      er.RoomID,
 	}
 
 	elv, err := r.getEventLevelByID(ctx, eventID)
 	if err == nil {
-		ed.EventLevel = elv.Level
+		ed.Level = elv.Level
 	} else if errors.Is(err, repository.ErrNotFound) {
-		ed.EventLevel = domain.EventLevelAnonymous
+		ed.Level = domain.EventLevelAnonymous
 	} else {
 		return nil, err
 	}
@@ -165,11 +165,11 @@ func (r *EventRepository) completeEventLevels(ctx context.Context, events []*ext
 			level = domain.EventLevelAnonymous
 		}
 		return &domain.Event{
-			ID:         e.ID,
-			Name:       e.Name,
-			TimeStart:  e.TimeStart,
-			TimeEnd:    e.TimeEnd,
-			EventLevel: level,
+			ID:        e.ID,
+			Name:      e.Name,
+			TimeStart: e.TimeStart,
+			TimeEnd:   e.TimeEnd,
+			Level:     level,
 		}
 	})
 	return result, nil
@@ -178,7 +178,7 @@ func (r *EventRepository) completeEventLevels(ctx context.Context, events []*ext
 func filterAccessibleEvents(events []*domain.Event) []*domain.Event {
 	// privateのものだけ除外する
 	return lo.Filter(events, func(e *domain.Event, _ int) bool {
-		return e.EventLevel != domain.EventLevelPrivate
+		return e.Level != domain.EventLevelPrivate
 	})
 }
 
