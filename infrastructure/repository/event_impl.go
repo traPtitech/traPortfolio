@@ -23,16 +23,19 @@ func NewEventRepository(sql *gorm.DB, knoq external.KnoqAPI) repository.EventRep
 }
 
 func (r *EventRepository) GetEvents(ctx context.Context) ([]*domain.Event, error) {
-	events, err := r.knoq.GetEvents()
+	knoqEvents, err := r.knoq.GetEvents()
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := r.completeEventLevels(ctx, events)
+	levelByID, err := r.getEventLevelMap(ctx, lo.Map(knoqEvents, func(e *external.EventResponse, _ int) uuid.UUID {
+		return e.ID
+	}))
 	if err != nil {
 		return nil, err
 	}
-	result = filterAccessibleEvents(result)
+	events := r.convertEvents(knoqEvents, levelByID)
+	result := filterAccessibleEvents(events)
 	return result, nil
 }
 
@@ -129,38 +132,42 @@ func (r *EventRepository) UpdateEventLevel(ctx context.Context, eventID uuid.UUI
 }
 
 func (r *EventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) ([]*domain.Event, error) {
-	events, err := r.knoq.GetEventsByUserID(userID)
+	knoqEvents, err := r.knoq.GetEventsByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := r.completeEventLevels(ctx, events)
+	levelByID, err := r.getEventLevelMap(ctx, lo.Map(knoqEvents, func(e *external.EventResponse, _ int) uuid.UUID {
+		return e.ID
+	}))
 	if err != nil {
 		return nil, err
 	}
+	events := r.convertEvents(knoqEvents, levelByID)
 	// TODO: 自分のイベントで非公開のものが見られない
-	result = filterAccessibleEvents(result)
+	result := filterAccessibleEvents(events)
 	return result, nil
 }
 
-func (r *EventRepository) completeEventLevels(ctx context.Context, events []*external.EventResponse) ([]*domain.Event, error) {
-	ids := lo.Map(events, func(e *external.EventResponse, _ int) uuid.UUID {
-		return e.ID
-	})
-	rels := make([]*model.EventLevelRelation, 0, len(events))
+func (r *EventRepository) getEventLevelMap(ctx context.Context, eventIDs []uuid.UUID) (map[uuid.UUID]domain.EventLevel, error) {
+	rels := make([]*model.EventLevelRelation, 0, len(eventIDs))
 	err := r.h.
 		WithContext(ctx).
-		Where("id IN ?", ids).
+		Where("id IN ?", eventIDs).
 		Find(&rels).
 		Error
 	if err != nil {
 		return nil, err
 	}
-	relById := lo.Associate(rels, func(r *model.EventLevelRelation) (uuid.UUID, domain.EventLevel) {
+	relByID := lo.Associate(rels, func(r *model.EventLevelRelation) (uuid.UUID, domain.EventLevel) {
 		return r.ID, r.Level
 	})
+	return relByID, nil
+}
+
+func (r *EventRepository) convertEvents(events []*external.EventResponse, levelByID map[uuid.UUID]domain.EventLevel) []*domain.Event {
 	result := lo.Map(events, func(e *external.EventResponse, _ int) *domain.Event {
-		level, ok := relById[e.ID]
+		level, ok := levelByID[e.ID]
 		if !ok {
 			level = domain.EventLevelAnonymous
 		}
@@ -172,7 +179,7 @@ func (r *EventRepository) completeEventLevels(ctx context.Context, events []*ext
 			Level:     level,
 		}
 	})
-	return result, nil
+	return result
 }
 
 func filterAccessibleEvents(events []*domain.Event) []*domain.Event {
