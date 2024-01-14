@@ -122,11 +122,11 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				since, until := random.SinceAndUntil()
 				revent := domain.EventDetail{
 					Event: domain.Event{
-						ID:         random.UUID(),
-						Name:       random.AlphaNumeric(),
-						EventLevel: domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
-						TimeStart:  since,
-						TimeEnd:    until,
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(),
+						Level:     random.Iotan(domain.EventLevelLimit),
+						TimeStart: since,
+						TimeEnd:   until,
 					},
 					Description: random.AlphaNumeric(),
 					Place:       random.AlphaNumeric(),
@@ -141,11 +141,11 @@ func TestEventHandler_GetEvent(t *testing.T) {
 						Since: revent.Event.TimeStart,
 						Until: &revent.Event.TimeEnd,
 					},
-					EventLevel: schema.EventLevel(revent.EventLevel),
-					Hostname:   hHost,
-					Id:         revent.Event.ID,
-					Name:       revent.Event.Name,
-					Place:      revent.Place,
+					Level:    schema.EventLevel(revent.Level),
+					Hostname: hHost,
+					Id:       revent.Event.ID,
+					Name:     revent.Event.Name,
+					Place:    revent.Place,
 				}
 
 				repoEvent := &revent
@@ -217,7 +217,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &schema.EditEventRequest{
-					EventLevel: hLevel(eventLevel),
+					Level: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -244,7 +244,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &schema.EditEventRequest{
-					EventLevel: hLevel(eventLevel),
+					Level: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -264,7 +264,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &schema.EditEventRequest{
-					EventLevel: hLevel(eventLevel),
+					Level: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -284,7 +284,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 
 				reqBody := &schema.EditEventRequest{
-					EventLevel: hLevel(eventLevel),
+					Level: hLevel(eventLevel),
 				}
 
 				args := repository.UpdateEventLevelArgs{
@@ -304,7 +304,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				eventLevel := schema.EventLevel(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
-					EventLevel: &eventLevel,
+					Level: &eventLevel,
 				}
 
 				path := fmt.Sprintf("/api/v1/events/%s", eventID)

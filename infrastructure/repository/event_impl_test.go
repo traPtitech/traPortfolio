@@ -122,11 +122,11 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			want: &domain.EventDetail{
 				Event: domain.Event{
-					ID:         random.UUID(),
-					Name:       random.AlphaNumeric(),
-					EventLevel: domain.EventLevelPublic,
-					TimeStart:  since,
-					TimeEnd:    until,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(),
+					Level:     domain.EventLevelPublic,
+					TimeStart: since,
+					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
 				HostName:    []*domain.User{{ID: random.UUID()}},
@@ -163,11 +163,11 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			},
 			want: &domain.EventDetail{
 				Event: domain.Event{
-					ID:         random.UUID(),
-					Name:       random.AlphaNumeric(),
-					EventLevel: domain.EventLevelAnonymous,
-					TimeStart:  since,
-					TimeEnd:    until,
+					ID:        random.UUID(),
+					Name:      random.AlphaNumeric(),
+					Level:     domain.EventLevelAnonymous,
+					TimeStart: since,
+					TimeEnd:   until,
 				},
 				Place:       random.AlphaNumeric(),
 				HostName:    nil,
@@ -192,11 +192,11 @@ func TestEventRepository_GetEvent(t *testing.T) {
 			setup: func(f mockEventRepositoryFields, args args, want *domain.EventDetail) {
 				ed := domain.EventDetail{
 					Event: domain.Event{
-						ID:         random.UUID(),
-						Name:       random.AlphaNumeric(),
-						EventLevel: domain.EventLevelPrivate,
-						TimeStart:  since,
-						TimeEnd:    until,
+						ID:        random.UUID(),
+						Name:      random.AlphaNumeric(),
+						Level:     domain.EventLevelPrivate,
+						TimeStart: since,
+						TimeEnd:   until,
 					},
 					Place:       random.AlphaNumeric(),
 					HostName:    []*domain.User{{ID: random.UUID()}},

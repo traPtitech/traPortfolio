@@ -100,10 +100,10 @@ func TestEventService_GetEventByID(t *testing.T) {
 			want: &domain.EventDetail{
 				Event: domain.Event{
 					// ID:
-					Name:       random.AlphaNumeric(),
-					EventLevel: domain.EventLevelAnonymous,
-					TimeStart:  time.Now(),
-					TimeEnd:    time.Now(),
+					Name:      random.AlphaNumeric(),
+					Level:     domain.EventLevelAnonymous,
+					TimeStart: time.Now(),
+					TimeEnd:   time.Now(),
 				},
 				Description: random.AlphaNumeric(),
 				Place:       random.AlphaNumeric(),
@@ -119,11 +119,11 @@ func TestEventService_GetEventByID(t *testing.T) {
 				u := f.user.(*mock_repository.MockUserRepository)
 				e.EXPECT().GetEvent(args.ctx, args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
-						ID:         args.id,
-						Name:       want.Name,
-						EventLevel: want.EventLevel,
-						TimeStart:  want.TimeStart,
-						TimeEnd:    want.TimeEnd,
+						ID:        args.id,
+						Name:      want.Name,
+						Level:     want.Level,
+						TimeStart: want.TimeStart,
+						TimeEnd:   want.TimeEnd,
 					},
 					Description: want.Description,
 					Place:       want.Place,
@@ -160,11 +160,11 @@ func TestEventService_GetEventByID(t *testing.T) {
 				u := f.user.(*mock_repository.MockUserRepository)
 				e.EXPECT().GetEvent(args.ctx, args.id).Return(&domain.EventDetail{
 					Event: domain.Event{
-						ID:         args.id,
-						Name:       random.AlphaNumeric(),
-						EventLevel: domain.EventLevelAnonymous,
-						TimeStart:  time.Now(),
-						TimeEnd:    time.Now(),
+						ID:        args.id,
+						Name:      random.AlphaNumeric(),
+						Level:     domain.EventLevelAnonymous,
+						TimeStart: time.Now(),
+						TimeEnd:   time.Now(),
 					},
 					Description: random.AlphaNumeric(),
 					Place:       random.AlphaNumeric(),

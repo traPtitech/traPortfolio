@@ -60,11 +60,11 @@ func TestEventRepository_GetEvent(t *testing.T) {
 	}
 	expected := &domain.EventDetail{
 		Event: domain.Event{
-			ID:         selected.ID,
-			Name:       selected.Name,
-			EventLevel: level,
-			TimeStart:  selected.TimeStart,
-			TimeEnd:    selected.TimeEnd,
+			ID:        selected.ID,
+			Name:      selected.Name,
+			Level:     level,
+			TimeStart: selected.TimeStart,
+			TimeEnd:   selected.TimeEnd,
 		},
 		Description: selected.Description,
 		Place:       selected.Place,
@@ -119,7 +119,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		return
 	}
 	assert.NoError(t, err)
-	assert.Equal(t, selected.Level, got.EventLevel)
+	assert.Equal(t, selected.Level, got.Level)
 
 	updatedLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
 	err = repo.UpdateEventLevel(context.Background(), selected.EventID, &urepository.UpdateEventLevelArgs{
@@ -134,7 +134,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		return
 	}
 	assert.NoError(t, err)
-	assert.Equal(t, updatedLevel, got.EventLevel)
+	assert.Equal(t, updatedLevel, got.Level)
 }
 
 func TestEventRepository_GetUserEvents(t *testing.T) {
