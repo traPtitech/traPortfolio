@@ -66,12 +66,6 @@ func TestEventRepository_GetEvents(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE id IN (?,?)")).
 					WithArgs(want[0].ID.String(), want[1].ID.String()).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}))
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT `id` FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
-					WithArgs(domain.EventLevelPrivate, want[0].ID.String(), want[1].ID.String()).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}),
-					)
 			},
 			assertion: assert.NoError,
 		},
@@ -481,12 +475,6 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `event_level_relations` WHERE id IN (?,?)")).
 					WithArgs(want[0].ID.String(), want[1].ID.String()).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}))
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT `id` FROM `event_level_relations` WHERE level = ? AND id IN (?,?)")).
-					WithArgs(domain.EventLevelPrivate, want[0].ID.String(), want[1].ID.String()).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}),
-					)
 			},
 			assertion: assert.NoError,
 		},
