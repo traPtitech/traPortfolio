@@ -13,6 +13,7 @@ import (
 type Event struct {
 	ID        uuid.UUID
 	Name      string
+	Level     EventLevel
 	TimeStart time.Time
 	TimeEnd   time.Time
 }
@@ -22,7 +23,6 @@ type EventDetail struct {
 	Event
 	Description string
 	Place       string
-	Level       EventLevel
 	HostName    []*User
 	GroupID     uuid.UUID
 	RoomID      uuid.UUID

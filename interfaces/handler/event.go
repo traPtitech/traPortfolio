@@ -35,7 +35,7 @@ func (h *EventHandler) GetEvents(c echo.Context) error {
 
 	res := make([]schema.Event, len(events))
 	for i, v := range events {
-		res[i] = newEvent(v.ID, v.Name, v.TimeStart, v.TimeEnd)
+		res[i] = newEvent(v.ID, v.Name, v.Level, v.TimeStart, v.TimeEnd)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -60,9 +60,8 @@ func (h *EventHandler) GetEvent(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, newEventDetail(
-		newEvent(event.ID, event.Name, event.TimeStart, event.TimeEnd),
+		newEvent(event.ID, event.Name, event.Level, event.TimeStart, event.TimeEnd),
 		event.Description,
-		event.Level,
 		hostname,
 		event.Place,
 	))
@@ -83,7 +82,7 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	patchReq := repository.UpdateEventLevelArgs{
-		Level: optional.FromPtr((*domain.EventLevel)(req.EventLevel)),
+		Level: optional.FromPtr((*domain.EventLevel)(req.Level)),
 	}
 
 	if err := h.s.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
@@ -92,10 +91,11 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) schema.Event {
+func newEvent(id uuid.UUID, name string, level domain.EventLevel, since time.Time, until time.Time) schema.Event {
 	return schema.Event{
-		Id:   id,
-		Name: name,
+		Id:    id,
+		Name:  name,
+		Level: schema.EventLevel(level),
 		Duration: schema.Duration{
 			Since: since,
 			Until: &until,
@@ -103,17 +103,17 @@ func newEvent(id uuid.UUID, name string, since time.Time, until time.Time) schem
 	}
 }
 
-func newEventDetail(event schema.Event, description string, eventLevel domain.EventLevel, hostname []schema.User, place string) schema.EventDetail {
+func newEventDetail(event schema.Event, description string, hostname []schema.User, place string) schema.EventDetail {
 	return schema.EventDetail{
 		Description: description,
 		Duration: schema.Duration{
 			Since: event.Duration.Since,
 			Until: event.Duration.Until,
 		},
-		EventLevel: schema.EventLevel(eventLevel),
-		Hostname:   hostname,
-		Id:         event.Id,
-		Name:       event.Name,
-		Place:      place,
+		Level:    event.Level,
+		Hostname: hostname,
+		Id:       event.Id,
+		Name:     event.Name,
+		Place:    place,
 	}
 }

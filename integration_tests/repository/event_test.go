@@ -62,12 +62,12 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		Event: domain.Event{
 			ID:        selected.ID,
 			Name:      selected.Name,
+			Level:     level,
 			TimeStart: selected.TimeStart,
 			TimeEnd:   selected.TimeEnd,
 		},
 		Description: selected.Description,
 		Place:       selected.Place,
-		Level:       level,
 		HostName:    hostName,
 		GroupID:     selected.GroupID,
 		RoomID:      selected.RoomID,
