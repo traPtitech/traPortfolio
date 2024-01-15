@@ -151,6 +151,7 @@ func (r *EventRepository) GetUserEvents(ctx context.Context, userID uuid.UUID) (
 
 func (r *EventRepository) getEventLevelMap(ctx context.Context, eventIDs []uuid.UUID) (map[uuid.UUID]domain.EventLevel, error) {
 	rels := make([]*model.EventLevelRelation, 0, len(eventIDs))
+	// NOTE: level指定がないので取得件数が増えそう
 	err := r.h.
 		WithContext(ctx).
 		Where("id IN ?", eventIDs).
