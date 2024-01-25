@@ -766,30 +766,6 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "duplicatedMembers",
-			args: args{
-				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
-					{
-						UserID:        duplicatedMemberID,
-						SinceYear:     duration.Since.Year,
-						SinceSemester: duration.Since.Semester,
-						UntilYear:     duration.Until.Year,
-						UntilSemester: duration.Until.Semester,
-					},
-					{
-						UserID:        duplicatedMemberID,
-						SinceYear:     duration.Since.Year,
-						SinceSemester: duration.Since.Semester,
-						UntilYear:     duration.Until.Year,
-						UntilSemester: duration.Until.Semester,
-					},
-				},
-			},
-			setup:     func(f mockProjectRepositoryFields, args args) {},
-			assertion: assert.Error,
-		},
-		{
 			name: "UnexpectedError_FindProject",
 			args: args{
 				projectID: random.UUID(),
@@ -847,6 +823,38 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(args.projectID, 2020, 0, 2021, 1),
+					)
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_DuplicateMember",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        duplicatedMemberID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+					{
+						UserID:        duplicatedMemberID,
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(args.projectID, duration.Since.Year, duration.Since.Semester, duration.Until.Year, duration.Until.Semester),
 					)
 			},
 			assertion: assert.Error,
