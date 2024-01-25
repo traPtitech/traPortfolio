@@ -136,14 +136,15 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	t.Helper()
 
 	if args == nil {
+		duration := random.Duration()
 		args = &repository.CreateProjectArgs{
 			Name:          random.AlphaNumeric(),
 			Description:   random.AlphaNumeric(),
 			Link:          random.Optional(random.RandURLString()),
-			SinceYear:     rand.Intn(2100),
-			SinceSemester: rand.Intn(2),
-			UntilYear:     rand.Intn(2100),
-			UntilSemester: rand.Intn(2),
+			SinceYear:     duration.Since.Year,
+			SinceSemester: duration.Since.Semester,
+			UntilYear:     duration.Until.Year,
+			UntilSemester: duration.Until.Semester,
 		}
 	}
 
@@ -153,19 +154,44 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	return project
 }
 
-func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
+func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, projectDuration domain.YearWithSemesterDuration, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
 	t.Helper()
 
 	assert.NotEmpty(t, projectID)
+	assert.NotEmpty(t, projectDuration)
 	assert.NotEmpty(t, userID)
+	assert.True(t, projectDuration.IsValid())
+
+	var start = projectDuration.Since.Year*2 + projectDuration.Since.Semester
+	var end = projectDuration.Until.Year*2 + projectDuration.Until.Semester
+
+	var since = rand.Intn(end-start+1) + start
+	var until = rand.Intn(end-start+1) + start
+
+	if since > until {
+		since, until = until, since
+	}
+
+	var duration = &domain.YearWithSemesterDuration{
+		Since: domain.YearWithSemester{
+			Year:     since / 2,
+			Semester: since % 2,
+		},
+		Until: domain.YearWithSemester{
+			Year:     until / 2,
+			Semester: until % 2,
+		},
+	}
+
+	assert.True(t, duration.IsValid())
 
 	if args == nil {
 		args = &repository.CreateProjectMemberArgs{
 			UserID:        userID,
-			SinceYear:     rand.Intn(2100),
-			SinceSemester: rand.Intn(2),
-			UntilYear:     rand.Intn(2100),
-			UntilSemester: rand.Intn(2),
+			SinceYear:     duration.Since.Year,
+			SinceSemester: duration.Since.Semester,
+			UntilYear:     duration.Until.Year,
+			UntilSemester: duration.Until.Semester,
 		}
 	}
 
