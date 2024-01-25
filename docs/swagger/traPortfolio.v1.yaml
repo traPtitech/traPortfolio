@@ -970,10 +970,13 @@ components:
         duration:
           # description: イベントの開催期間
           $ref: "#/components/schemas/Duration"
+        level:
+          $ref: "#/components/schemas/EventLevel"
       required:
         - id
         - name
         - duration
+        - level
     EventDetail:
       description: イベントの詳細情報
       title: EventDetail
@@ -992,13 +995,10 @@ components:
               description: 主催者
               items:
                 $ref: "#/components/schemas/User"
-            eventLevel:
-              $ref: "#/components/schemas/EventLevel"
           required:
             - description
             - place
             - hostname
-            - eventLevel
       type: object
     EventLevel:
       type: integer
@@ -1356,7 +1356,7 @@ components:
       type: object
       description: イベント情報修正リクエスト
       properties:
-        eventLevel:
+        level:
           $ref: "#/components/schemas/EventLevel"
     CreateProjectRequest:
       title: CreateProjectRequest

@@ -101,12 +101,12 @@ func TestEventService_GetEventByID(t *testing.T) {
 				Event: domain.Event{
 					// ID:
 					Name:      random.AlphaNumeric(),
+					Level:     domain.EventLevelAnonymous,
 					TimeStart: time.Now(),
 					TimeEnd:   time.Now(),
 				},
 				Description: random.AlphaNumeric(),
 				Place:       random.AlphaNumeric(),
-				Level:       domain.EventLevelAnonymous,
 				HostName: []*domain.User{
 					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
@@ -121,12 +121,12 @@ func TestEventService_GetEventByID(t *testing.T) {
 					Event: domain.Event{
 						ID:        args.id,
 						Name:      want.Name,
+						Level:     want.Level,
 						TimeStart: want.TimeStart,
 						TimeEnd:   want.TimeEnd,
 					},
 					Description: want.Description,
 					Place:       want.Place,
-					Level:       want.Level,
 					HostName:    []*domain.User{{ID: want.HostName[0].ID}},
 					GroupID:     want.GroupID,
 					RoomID:      want.RoomID,
@@ -162,12 +162,12 @@ func TestEventService_GetEventByID(t *testing.T) {
 					Event: domain.Event{
 						ID:        args.id,
 						Name:      random.AlphaNumeric(),
+						Level:     domain.EventLevelAnonymous,
 						TimeStart: time.Now(),
 						TimeEnd:   time.Now(),
 					},
 					Description: random.AlphaNumeric(),
 					Place:       random.AlphaNumeric(),
-					Level:       domain.EventLevelAnonymous,
 					HostName:    []*domain.User{{ID: random.UUID()}},
 					GroupID:     random.UUID(),
 					RoomID:      random.UUID(),

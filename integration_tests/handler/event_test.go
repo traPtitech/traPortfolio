@@ -93,7 +93,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.KnoqEventID1(),
 			schema.EditEventRequest{
-				EventLevel: &eventLevel,
+				Level: &eventLevel,
 			},
 			nil,
 		},
@@ -123,8 +123,8 @@ func TestEventHandler_EditEvent(t *testing.T) {
 				assertResponse(t, tt.statusCode, tt.want, res)
 
 				// Get updated response & Assert
-				if tt.reqBody.EventLevel != nil {
-					event.EventLevel = *tt.reqBody.EventLevel
+				if tt.reqBody.Level != nil {
+					event.Level = *tt.reqBody.Level
 				}
 				res = doRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventID), nil)
 				assertResponse(t, http.StatusOK, event, res)

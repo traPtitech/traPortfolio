@@ -104,7 +104,7 @@ func (r EditContestTeamRequest) Validate() error {
 
 func (r EditEventRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.EventLevel, vdRuleEventLevelMax),
+		vd.Field(&r.Level, vdRuleEventLevelMax),
 	)
 }
 
