@@ -84,12 +84,12 @@ jobs:
         with:
           name: coverage_integration
       - name: Upload coverage data (Unit)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage_unit.txt
           flags: unit
       - name: Upload coverage data (Integration)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage_integration.txt
           flags: integration
