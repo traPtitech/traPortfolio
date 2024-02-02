@@ -11,18 +11,22 @@ updates:
       interval: "monthly"
     reviewers:
       - "ras0q"
+    commit-message:
+      prefix: ":arrow_up: "
     groups:
-      dependencies:
+      actions-deps:
         patterns:
           - "*"
-  - package-ecosystem: "gomod"
+- package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
     reviewers:
       - "ras0q"
+    commit-message:
+      prefix: ":arrow_up: "
     groups:
-      dependencies:
+      gomod-deps:
         patterns:
           - "*"
         update-types:
