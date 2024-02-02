@@ -9,9 +9,22 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    reviewers: ["ras0q"]
+    reviewers:
+      - "ras0q"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
-    reviewers: ["ras0q"]
+    reviewers:
+      - "ras0q"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
