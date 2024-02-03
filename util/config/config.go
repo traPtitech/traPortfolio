@@ -112,11 +112,7 @@ func ReadFromFile() error {
 		return fmt.Errorf("bind flags: %w", err)
 	}
 
-	configPath, err := pflag.CommandLine.GetString("config")
-	if err != nil {
-		return fmt.Errorf("get config flag: %w", err)
-	}
-
+	configPath := viper.GetString("config")
 	if len(configPath) > 0 {
 		viper.SetConfigFile(configPath)
 	} else {
@@ -132,7 +128,7 @@ func ReadFromFile() error {
 				return fmt.Errorf("read config from %s: %w", configPath, err)
 			}
 
-			log.Printf("config file does not found: %v", err)
+			log.Printf("config file does not found: %v\n", err)
 		} else {
 			return fmt.Errorf("read config: %w", err)
 		}
