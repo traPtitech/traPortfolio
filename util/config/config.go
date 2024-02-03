@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync/atomic"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -17,9 +16,6 @@ import (
 )
 
 var (
-	config   Config
-	isParsed atomic.Bool
-
 	flagKeys = []struct{ path, flag string }{
 		{"production", "production"},
 		{"port", "port"},
@@ -69,8 +65,6 @@ type (
 )
 
 func init() {
-	isParsed.Store(false)
-
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", 1323, "api port")
 	pflag.Bool("only-migrate", false, "only migrate db (not start server)")
@@ -92,90 +86,55 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 }
 
-func Parse() error {
+type LoadOpts struct {
+	SkipReadFromFiles bool
+}
+
+func Load(opts LoadOpts) (*Config, error) {
+	var c Config
+
 	pflag.Parse()
-	if err := ReadFromFile(); err != nil {
-		return fmt.Errorf("read config from file: %w", err)
-	}
-
-	return nil
-}
-
-func ReadFromFile() error {
 	for _, key := range flagKeys {
 		if err := viper.BindPFlag(key.path, pflag.Lookup(key.flag)); err != nil {
-			return fmt.Errorf("bind flag %s: %w", key.flag, err)
+			return nil, fmt.Errorf("bind flag %s: %w", key.flag, err)
 		}
 	}
 
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		return fmt.Errorf("bind flags: %w", err)
+		return nil, fmt.Errorf("bind flags: %w", err)
 	}
 
-	configPath := viper.GetString("config")
-	if len(configPath) > 0 {
-		viper.SetConfigFile(configPath)
-	} else {
-		// default path is ./config.yaml
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-		viper.AddConfigPath(".")
-	}
-
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			if len(configPath) > 0 {
-				return fmt.Errorf("read config from %s: %w", configPath, err)
-			}
-
-			log.Printf("config file does not found: %v\n", err)
+	if !opts.SkipReadFromFiles {
+		configPath := viper.GetString("config")
+		if len(configPath) > 0 {
+			viper.SetConfigFile(configPath)
 		} else {
-			return fmt.Errorf("read config: %w", err)
+			// default path is ./config.yaml
+			viper.SetConfigName("config")
+			viper.SetConfigType("yaml")
+			viper.AddConfigPath(".")
 		}
-	} else {
-		log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
-	}
 
-	if err := viper.Unmarshal(&config); err != nil {
-		return fmt.Errorf("unmarshal config: %w", err)
-	}
+		if err := viper.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				if len(configPath) > 0 {
+					return nil, fmt.Errorf("read config from %s: %w", configPath, err)
+				}
 
-	isParsed.Store(true)
-
-	return nil
-}
-
-func ReadDefault() error {
-	for _, key := range flagKeys {
-		if err := viper.BindPFlag(key.path, pflag.Lookup(key.flag)); err != nil {
-			return fmt.Errorf("bind flag %s: %w", key.flag, err)
+				log.Printf("config file does not found: %v\n", err)
+			} else {
+				return nil, fmt.Errorf("read config: %w", err)
+			}
+		} else {
+			log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
 		}
 	}
 
-	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		return fmt.Errorf("bind flags: %w", err)
+	if err := viper.Unmarshal(&c); err != nil {
+		return nil, fmt.Errorf("unmarshal config: %w", err)
 	}
 
-	if err := viper.Unmarshal(&config); err != nil {
-		return fmt.Errorf("unmarshal config: %w", err)
-	}
-
-	isParsed.Store(true)
-
-	return nil
-}
-
-func Load() *Config {
-	if !isParsed.Load() {
-		panic("config does not parsed")
-	}
-
-	return config.clone()
-}
-
-func (c *Config) clone() *Config {
-	cloned := *c
-	return &cloned
+	return &c, nil
 }
 
 func (c *SQLConfig) DsnConfig() *mysql.Config {

@@ -19,11 +19,10 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	if err := config.ReadDefault(); err != nil {
+	c, err := config.Load(config.LoadOpts{SkipReadFromFiles: true})
+	if err != nil {
 		panic(err)
 	}
-
-	c := config.Load()
 
 	// disable mysql driver logging
 	_ = mysql.SetLogger(mysql.Logger(log.New(io.Discard, "", 0)))

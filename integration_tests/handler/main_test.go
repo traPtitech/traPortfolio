@@ -11,15 +11,16 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	if err := config.ReadDefault(); err != nil {
+	_c, err := config.Load(config.LoadOpts{SkipReadFromFiles: true})
+	if err != nil {
 		panic(err)
 	}
 
-	c := config.Load()
+	testutils.Config = _c
 
 	// disable mysql driver logging
 	_ = mysql.SetLogger(mysql.Logger(log.New(io.Discard, "", 0)))
-	_db, closeFunc, err := testutils.RunMySQLContainerOnDocker(c.DB)
+	_db, closeFunc, err := testutils.RunMySQLContainerOnDocker(testutils.Config.DB)
 	if err != nil {
 		panic(err)
 	}

@@ -13,11 +13,11 @@ import (
 )
 
 func main() {
-	if err := config.Parse(); err != nil {
+	appConf, err := config.Load(config.LoadOpts{})
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	appConf := config.Load()
 	db, err := repository.NewGormDB(appConf.DB)
 	if err != nil {
 		log.Fatal(err)
