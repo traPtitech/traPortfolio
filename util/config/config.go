@@ -66,8 +66,6 @@ type (
 		Cookie      string
 		APIEndpoint string
 	}
-
-	EditFunc func(*Config)
 )
 
 func init() {
@@ -171,17 +169,12 @@ func ReadDefault() error {
 	return nil
 }
 
-func Load(editFuncs ...EditFunc) *Config {
+func Load() *Config {
 	if !isParsed.Load() {
 		panic("config does not parsed")
 	}
 
-	cloned := config.clone()
-	for _, f := range editFuncs {
-		f(cloned)
-	}
-
-	return cloned
+	return config.clone()
 }
 
 func (c *Config) clone() *Config {
