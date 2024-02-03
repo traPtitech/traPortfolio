@@ -48,9 +48,9 @@ type (
 		InsertMockData bool
 
 		DB     SQLConfig
-		Traq   TraqConfig
-		Knoq   KnoqConfig
-		Portal PortalConfig
+		Traq   APIConfig
+		Knoq   APIConfig
+		Portal APIConfig
 	}
 
 	SQLConfig struct {
@@ -61,12 +61,6 @@ type (
 		Port    int
 		Verbose bool
 	}
-
-	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
-	// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
-	TraqConfig   APIConfig
-	KnoqConfig   APIConfig
-	PortalConfig APIConfig
 
 	APIConfig struct {
 		Cookie      string

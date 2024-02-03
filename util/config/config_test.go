@@ -24,15 +24,15 @@ func TestParse(t *testing.T) {
 			Port:    3001,
 			Verbose: true,
 		},
-		Traq: TraqConfig{
+		Traq: APIConfig{
 			Cookie:      "traq cookie",
 			APIEndpoint: "traq endpoint",
 		},
-		Knoq: KnoqConfig{
+		Knoq: APIConfig{
 			Cookie:      "knoq cookie",
 			APIEndpoint: "knoq endpoint",
 		},
-		Portal: PortalConfig{
+		Portal: APIConfig{
 			Cookie:      "portal cookie",
 			APIEndpoint: "portal endpoint",
 		},

@@ -31,14 +31,13 @@ type traQAPI struct {
 	apiClient
 }
 
-func NewTraQAPI(conf config.TraqConfig) (TraQAPI, error) {
-	apiConfig := (config.APIConfig)(conf)
-	jar, err := newCookieJar(apiConfig, "r_session")
+func NewTraQAPI(conf config.APIConfig) (TraQAPI, error) {
+	jar, err := newCookieJar(conf, "r_session")
 	if err != nil {
 		return nil, err
 	}
 
-	return &traQAPI{newAPIClient(jar, apiConfig)}, nil
+	return &traQAPI{newAPIClient(jar, conf)}, nil
 }
 
 func (a *traQAPI) GetUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error) {
