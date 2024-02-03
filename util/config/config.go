@@ -41,40 +41,31 @@ var (
 )
 
 type (
-	// Immutable except within this package or EditFunc
 	Config struct {
 		IsProduction   bool `mapstructure:"production"`
-		Port           int  `mapstructure:"port"`
-		OnlyMigrate    bool `mapstructure:"onlyMigrate"`
-		InsertMockData bool `mapstructure:"insertMockData"`
+		Port           int
+		OnlyMigrate    bool
+		InsertMockData bool
 
-		DB     SQLConfig    `mapstructure:"db"`
-		Traq   TraqConfig   `mapstructure:"traq"`
-		Knoq   KnoqConfig   `mapstructure:"knoq"`
-		Portal PortalConfig `mapstructure:"portal"`
+		DB     SQLConfig
+		Traq   APIConfig
+		Knoq   APIConfig
+		Portal APIConfig
 	}
 
 	SQLConfig struct {
-		User    string `mapstructure:"user"`
-		Pass    string `mapstructure:"pass"`
-		Host    string `mapstructure:"host"`
-		Name    string `mapstructure:"name"`
-		Port    int    `mapstructure:"port"`
-		Verbose bool   `mapstructure:"verbose"`
+		User    string
+		Pass    string
+		Host    string
+		Name    string
+		Port    int
+		Verbose bool
 	}
-
-	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
-	// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
-	TraqConfig   APIConfig
-	KnoqConfig   APIConfig
-	PortalConfig APIConfig
 
 	APIConfig struct {
-		Cookie      string `mapstructure:"cookie"`
-		APIEndpoint string `mapstructure:"apiEndpoint"`
+		Cookie      string
+		APIEndpoint string
 	}
-
-	EditFunc func(*Config)
 )
 
 func init() {
@@ -121,11 +112,7 @@ func ReadFromFile() error {
 		return fmt.Errorf("bind flags: %w", err)
 	}
 
-	configPath, err := pflag.CommandLine.GetString("config")
-	if err != nil {
-		return fmt.Errorf("get config flag: %w", err)
-	}
-
+	configPath := viper.GetString("config")
 	if len(configPath) > 0 {
 		viper.SetConfigFile(configPath)
 	} else {
@@ -141,7 +128,7 @@ func ReadFromFile() error {
 				return fmt.Errorf("read config from %s: %w", configPath, err)
 			}
 
-			log.Printf("config file does not found: %v", err)
+			log.Printf("config file does not found: %v\n", err)
 		} else {
 			return fmt.Errorf("read config: %w", err)
 		}
@@ -178,17 +165,12 @@ func ReadDefault() error {
 	return nil
 }
 
-func Load(editFuncs ...EditFunc) *Config {
+func Load() *Config {
 	if !isParsed.Load() {
 		panic("config does not parsed")
 	}
 
-	cloned := config.clone()
-	for _, f := range editFuncs {
-		f(cloned)
-	}
-
-	return cloned
+	return config.clone()
 }
 
 func (c *Config) clone() *Config {
