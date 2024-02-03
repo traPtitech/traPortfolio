@@ -23,8 +23,6 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-
-
 	defer func() {
 		if err := closeFunc(); err != nil {
 			panic(err)
