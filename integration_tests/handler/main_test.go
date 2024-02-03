@@ -11,27 +11,28 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	_c, err := config.Load(config.LoadOpts{SkipReadFromFiles: true})
+	c, err := config.Load(config.LoadOpts{SkipReadFromFiles: true})
 	if err != nil {
 		panic(err)
 	}
-
-	testutils.Config = _c
 
 	// disable mysql driver logging
 	_ = mysql.SetLogger(mysql.Logger(log.New(io.Discard, "", 0)))
-	_db, closeFunc, err := testutils.RunMySQLContainerOnDocker(testutils.Config.DB)
+	db, closeFunc, err := testutils.RunMySQLContainerOnDocker(c.DB)
 	if err != nil {
 		panic(err)
 	}
 
-	testutils.DB = _db
+
 
 	defer func() {
 		if err := closeFunc(); err != nil {
 			panic(err)
 		}
 	}()
+
+	testutils.Config = c
+	testutils.DB = db
 
 	m.Run()
 }
