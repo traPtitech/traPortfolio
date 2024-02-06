@@ -17,7 +17,7 @@ updates:
       actions-deps:
         patterns:
           - "*"
-- package-ecosystem: "gomod"
+  - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
