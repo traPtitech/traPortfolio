@@ -51,6 +51,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 		hostName = append(hostName, &domain.User{ID: aid})
 	}
 
+	// Descriptionはknoqからの情報を使わず、空文字でおく
 	ed := domain.EventDetail{
 		Event: domain.Event{
 			ID:   er.ID,
@@ -59,7 +60,7 @@ func (r *EventRepository) GetEvent(ctx context.Context, eventID uuid.UUID) (*dom
 			TimeStart: er.TimeStart,
 			TimeEnd:   er.TimeEnd,
 		},
-		Description: er.Description,
+		Description: "",
 		Place:       er.Place,
 		HostName:    hostName,
 		GroupID:     er.GroupID,

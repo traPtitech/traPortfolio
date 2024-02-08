@@ -303,9 +303,6 @@ type Event struct {
 
 // EventDetail defines model for EventDetail.
 type EventDetail struct {
-	// Description イベント説明
-	Description string `json:"description"`
-
 	// Duration イベントやコンテストなどの存続期間
 	Duration Duration `json:"duration"`
 

@@ -99,15 +99,14 @@ func makeKnoqEvent(t *testing.T, event *domain.EventDetail) *external.EventRespo
 	}
 
 	return &external.EventResponse{
-		ID:          event.ID,
-		Name:        event.Name,
-		Description: event.Description,
-		Place:       event.Place,
-		GroupID:     event.GroupID,
-		RoomID:      event.RoomID,
-		TimeStart:   event.TimeStart,
-		TimeEnd:     event.TimeEnd,
-		Admins:      admins,
+		ID:        event.ID,
+		Name:      event.Name,
+		Place:     event.Place,
+		GroupID:   event.GroupID,
+		RoomID:    event.RoomID,
+		TimeStart: event.TimeStart,
+		TimeEnd:   event.TimeEnd,
+		Admins:    admins,
 	}
 }
 
