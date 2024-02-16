@@ -14,7 +14,6 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
@@ -26,8 +25,7 @@ func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 
-	c := config.Load()
-	api, err := infrastructure.InjectAPIServer(c, db)
+	api, err := infrastructure.InjectAPIServer(testutils.Config, db)
 	assert.NoError(t, err)
 
 	err = handler.Setup(e, api)
