@@ -41,7 +41,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 				repoGroups := []*domain.Group{}
 				hresGroups := []*schema.Group{}
 
-				for i := 0; i < casenum; i++ {
+				for range casenum {
 					rgroup := domain.Group{
 						ID:   random.UUID(),
 						Name: random.AlphaNumeric(),
@@ -103,7 +103,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				hgroupAdmins := []schema.User{}
 
 				adminLen := rand.IntN(256)
-				for i := 0; i < adminLen; i++ {
+				for range adminLen {
 					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
 					hgroupAdmin := schema.User{
@@ -120,7 +120,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				hgroupMembers := []schema.GroupMember{}
 
 				groupLen := rand.IntN(256)
-				for i := 0; i < groupLen; i++ {
+				for range groupLen {
 					rgroupmember := domain.UserWithDuration{
 						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),

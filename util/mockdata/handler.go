@@ -564,7 +564,7 @@ func AccountTypesMockUserDoesntHave(userID uuid.UUID) []schema.AccountType {
 		holdAccountsMap[account] = struct{}{}
 	}
 
-	for i := uint8(0); i < schema.AccountType(domain.AccountLimit); i++ {
+	for i := range schema.AccountType(domain.AccountLimit) {
 		if _, ok := holdAccountsMap[i]; !ok {
 			vacantAccounts = append(vacantAccounts, i)
 		}

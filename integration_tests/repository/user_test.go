@@ -503,13 +503,13 @@ func TestUserRepository_GetContests(t *testing.T) {
 
 	contestNum := 3
 	var contests []*domain.ContestDetail
-	for i := 0; i < contestNum; i++ {
+	for range contestNum {
 		contests = append(contests, mustMakeContest(t, contestRepo, nil))
 	}
 
 	contestTeamNum := 10
 	var contestTeams []*domain.ContestTeamDetail
-	for i := 0; i < contestTeamNum; i++ {
+	for i := range contestTeamNum {
 		contestTeams = append(contestTeams, mustMakeContestTeam(t, contestRepo, contests[i%contestNum].ID, nil))
 	}
 

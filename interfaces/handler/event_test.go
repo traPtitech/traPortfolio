@@ -41,7 +41,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 				repoEvents := []*domain.Event{}
 				hresEvents := []*schema.Event{}
 
-				for i := 0; i < casenum; i++ {
+				for range casenum {
 					since, until := random.SinceAndUntil()
 					revent := domain.Event{
 						ID:        random.UUID(),
@@ -106,7 +106,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				rHost := []*domain.User{}
 				hHost := []schema.User{}
 
-				for i := 0; i < hostnum; i++ {
+				for range hostnum {
 					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					hhost := schema.User{
 						Id:       rhost.ID,

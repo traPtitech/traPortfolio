@@ -43,7 +43,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				repoUsers := []*domain.User{}
 				hresUsers := []*schema.User{}
 
-				for i := 0; i < casenum; i++ {
+				for range casenum {
 					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := schema.User{
 						Id:       ruser.ID,
@@ -69,7 +69,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				repoUsers := []*domain.User{}
 				hresUsers := []*schema.User{}
 
-				for i := 0; i < casenum; i++ {
+				for range casenum {
 					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := schema.User{
 						Id:       ruser.ID,
@@ -179,7 +179,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				rAccounts := []*domain.Account{}
 				hAccounts := []schema.Account{}
 
-				for i := 0; i < accountNum; i++ {
+				for range accountNum {
 					prRandom := false
 					if rand.IntN(2) == 1 {
 						prRandom = true
@@ -448,7 +448,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 				rAccounts := []*domain.Account{}
 				hAccounts := []*schema.Account{}
 
-				for i := 0; i < int(domain.AccountLimit); i++ {
+				for i := range int(domain.AccountLimit) {
 					if (accountKinds>>i)%2 == 0 {
 						continue
 					}
@@ -1073,7 +1073,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		repoProjects := []*domain.UserProject{}
 		hresProjects := []*schema.UserProject{}
 
-		for i := 0; i < projectsLen; i++ {
+		for range projectsLen {
 			//TODO: DurationはUserDurationを包含しているべき
 			rproject := domain.UserProject{
 				ID:           random.UUID(),
@@ -1174,7 +1174,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		repoContests := []*domain.UserContest{}
 		hresContests := []*schema.UserContest{}
 
-		for i := 0; i < contestsLen; i++ {
+		for range contestsLen {
 			rcontest := domain.UserContest{
 				ID:        random.UUID(),
 				Name:      random.AlphaNumeric(),
@@ -1280,7 +1280,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		repoGroups := []*domain.UserGroup{}
 		hresGroups := []*schema.UserGroup{}
 
-		for i := 0; i < groupsLen; i++ {
+		for range groupsLen {
 			rgroup := domain.UserGroup{
 				ID:       random.UUID(),
 				Name:     random.AlphaNumeric(),
@@ -1383,7 +1383,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		repoEvents := []*domain.Event{}
 		hresEvents := []*schema.Event{}
 
-		for i := 0; i < eventsLen; i++ {
+		for range eventsLen {
 			timeStart, timeEnd := random.SinceAndUntil()
 
 			revent := domain.Event{
