@@ -1,6 +1,8 @@
 package random
 
 import (
+	"math/rand/v2"
+
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -102,7 +104,7 @@ func OptUpdateUserArgs() *repository.UpdateUserArgs {
 func UpdateAccountArgs() *repository.UpdateAccountArgs {
 	a := repository.UpdateAccountArgs{
 		DisplayName: optional.From(AlphaNumeric()),
-		Type:        optional.From(Iotan(domain.AccountLimit)),
+		Type:        optional.From(rand.N(domain.AccountLimit)),
 		URL:         optional.From(RandURLString()),
 		PrPermitted: optional.From(Bool()),
 	}
@@ -113,7 +115,7 @@ func UpdateAccountArgs() *repository.UpdateAccountArgs {
 func OptUpdateAccountArgs() *repository.UpdateAccountArgs {
 	a := repository.UpdateAccountArgs{
 		DisplayName: Optional(AlphaNumeric()),
-		Type:        Optional(Iotan(domain.AccountLimit)),
+		Type:        Optional(rand.N(domain.AccountLimit)),
 		URL:         Optional(RandURLString()),
 		PrPermitted: Optional(Bool()),
 	}

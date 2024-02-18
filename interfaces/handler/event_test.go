@@ -124,7 +124,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 					Event: domain.Event{
 						ID:        random.UUID(),
 						Name:      random.AlphaNumeric(),
-						Level:     random.Iotan(domain.EventLevelLimit),
+						Level:     rand.N(domain.EventLevelLimit),
 						TimeStart: since,
 						TimeEnd:   until,
 					},

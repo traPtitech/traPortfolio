@@ -999,7 +999,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 }
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
-	aType := optional.From(random.Iotan(domain.AccountLimit))
+	aType := optional.From(rand.N(domain.AccountLimit))
 
 	t.Parallel()
 	type args struct {
@@ -1054,7 +1054,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1076,7 +1076,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1102,7 +1102,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1128,7 +1128,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {

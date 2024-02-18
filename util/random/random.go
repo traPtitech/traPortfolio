@@ -174,10 +174,6 @@ func Bool() bool {
 	return rand.Int()%2 == 0
 }
 
-func Iotan[T ~uint8](n T) T {
-	return rand.N(n)
-}
-
 func Optional[T any](t T) optional.Of[T] {
 	return optional.New(t, Bool())
 }
