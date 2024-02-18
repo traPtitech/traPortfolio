@@ -20,7 +20,6 @@ func TestPing(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Ping.Ping), nil)

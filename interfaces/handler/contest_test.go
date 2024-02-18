@@ -79,7 +79,6 @@ func TestContestHandler_GetContests(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -221,7 +220,6 @@ func TestContestHandler_GetContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -345,7 +343,6 @@ func TestContestHandler_CreateContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -464,7 +461,6 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -504,7 +500,6 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -590,7 +585,6 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -684,7 +678,6 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -876,7 +869,6 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -1006,7 +998,6 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -1078,7 +1069,6 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)
@@ -1179,7 +1169,6 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupContestMock(t)

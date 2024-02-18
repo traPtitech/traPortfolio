@@ -85,7 +85,6 @@ func TestGetUsers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUsers), &tt.reqBody)
@@ -122,7 +121,6 @@ func TestGetUser(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUser, tt.userID), nil)
@@ -171,7 +169,6 @@ func TestUpdateUser(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
@@ -234,7 +231,6 @@ func TestGetUserAccounts(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccounts, tt.userID), nil)
@@ -293,7 +289,6 @@ func TestGetUserAccount(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserAccount, tt.userID, tt.accountID), nil)
@@ -414,7 +409,6 @@ func TestAddUserAccount(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &tt.reqBody)
@@ -545,7 +539,6 @@ func TestEditUserAccount(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			account := schema.Account{}
@@ -637,7 +630,6 @@ func TestDeleteUserAccount(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.needInsertion {
@@ -695,7 +687,6 @@ func TestGetUserProjects(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserProjects, tt.userID), nil)
@@ -737,7 +728,6 @@ func TestGetUserContests(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserContests, tt.userID), nil)
@@ -779,7 +769,6 @@ func TestGetUserGroups(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserGroups, tt.userID), nil)
@@ -821,7 +810,6 @@ func TestGetUserEvents(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.User.GetUserEvents, tt.userID), nil)

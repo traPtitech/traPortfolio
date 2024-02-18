@@ -79,7 +79,6 @@ func TestEventRepository_GetEvents(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -207,7 +206,6 @@ func TestEventRepository_GetEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -310,7 +308,6 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -422,7 +419,6 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -491,7 +487,6 @@ func TestEventRepository_GetUserEvents(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock

@@ -71,7 +71,6 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			contest1 := mustMakeContest(t, repo, nil)
 			contest2 := mustMakeContest(t, repo, nil)
@@ -223,7 +222,6 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			contest := mustMakeContest(t, repo, nil)

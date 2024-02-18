@@ -275,7 +275,6 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	for i, tt := range tests {
 		// FIXME: i=0の時はAccountが存在するため失敗する
 		i := i + 1
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			user := mockdata.MockUsers[i]
