@@ -180,10 +180,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				hAccounts := []schema.Account{}
 
 				for range accountNum {
-					prRandom := false
-					if rand.IntN(2) == 1 {
-						prRandom = true
-					}
+					prRandom := random.Bool()
 
 					raccount := domain.Account{
 						ID:          random.UUID(),
@@ -289,10 +286,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
-				userCheck := false
-				if rand.IntN(2) == 1 {
-					userCheck = true
-				}
+				userCheck := random.Bool()
 
 				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
@@ -315,10 +309,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 256)
-				userCheck := false
-				if rand.IntN(2) == 1 {
-					userCheck = true
-				}
+				userCheck := random.Bool()
 
 				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
@@ -341,10 +332,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
-				userCheck := false
-				if rand.IntN(2) == 1 {
-					userCheck = true
-				}
+				userCheck := random.Bool()
 
 				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
@@ -367,10 +355,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
-				userCheck := false
-				if rand.IntN(2) == 1 {
-					userCheck = true
-				}
+				userCheck := random.Bool()
 
 				reqBody := &schema.EditUserRequest{
 					Bio:   &userBio,
@@ -453,11 +438,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 						continue
 					}
 
-					prRandom := false
-					if rand.IntN(2) == 1 {
-						prRandom = true
-					}
-
+					prRandom := random.Bool()
 					raccount := domain.Account{
 						ID:          random.UUID(),
 						DisplayName: random.AlphaNumeric(),
@@ -544,10 +525,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 			name: "success",
 			setup: func(s *mock_service.MockUserService) (hres *schema.Account, path string) {
 				userID := random.UUID()
-				prRandom := false
-				if rand.IntN(2) == 1 {
-					prRandom = true
-				}
+				prRandom := random.Bool()
 
 				rAccount := domain.Account{
 					ID:          random.UUID(),
