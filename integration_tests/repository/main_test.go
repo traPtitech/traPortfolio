@@ -94,7 +94,7 @@ func mustMakeEventLevel(t *testing.T, repo repository.EventRepository, args *rep
 	if args == nil {
 		args = &repository.CreateEventLevelArgs{
 			EventID: random.UUID(),
-			Level:   domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
+			Level:   rand.N(domain.EventLevelLimit),
 		}
 	}
 

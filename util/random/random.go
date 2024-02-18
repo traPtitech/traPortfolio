@@ -170,10 +170,6 @@ func Duration() domain.YearWithSemesterDuration {
 	}
 }
 
-func Uint8n(n uint8) uint8 {
-	return rand.N(n)
-}
-
 func Bool() bool {
 	return rand.Int()%2 == 0
 }

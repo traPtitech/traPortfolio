@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"net/http"
 	"testing"
 
@@ -212,7 +213,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -239,7 +240,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Conflict",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -259,7 +260,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Not Found",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -279,7 +280,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Bad Request: bind error",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),

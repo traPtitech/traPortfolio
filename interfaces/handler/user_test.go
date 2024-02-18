@@ -185,7 +185,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 					raccount := domain.Account{
 						ID:          random.UUID(),
 						DisplayName: random.AlphaNumeric(),
-						Type:        domain.AccountType(random.Uint8n(uint8(domain.AccountLimit))),
+						Type:        rand.N(domain.AccountLimit),
 						PrPermitted: prRandom,
 						URL:         random.AlphaNumeric(),
 					}
@@ -204,7 +204,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 
 				repoUser := domain.UserDetail{
 					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-					State:    domain.TraQState(random.Uint8n(uint8(domain.TraqStateLimit))),
+					State:    rand.N(domain.TraqStateLimit),
 					Bio:      random.AlphaNumericn(rand.IntN(256) + 1),
 					Accounts: rAccounts,
 				}
@@ -530,7 +530,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 				rAccount := domain.Account{
 					ID:          random.UUID(),
 					DisplayName: random.AlphaNumeric(),
-					Type:        domain.AccountType(uint8(random.Uint8n(uint8(domain.AccountLimit)))),
+					Type:        rand.N(domain.AccountLimit),
 					PrPermitted: prRandom,
 					URL:         random.AlphaNumeric(),
 				}
