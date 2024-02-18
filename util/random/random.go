@@ -20,9 +20,9 @@ const (
 	rs6LetterIdxMax  = 63 / rs6LetterIdxBits
 )
 
-// AlphaNumericn 指定した文字数のランダム英数字文字列を生成します
+// AlphaNumericN 指定した文字数のランダム英数字文字列を生成します
 // この関数はmath/rand/v2が生成する擬似乱数を使用します
-func AlphaNumericn(n int) string {
+func AlphaNumericN(n int) string {
 	b := make([]byte, n)
 	cache, remain := rand.Int64(), rs6LetterIdxMax
 	for i := n - 1; i >= 0; {
@@ -41,7 +41,7 @@ func AlphaNumericn(n int) string {
 }
 
 func AlphaNumeric() string {
-	return AlphaNumericn(rand.IntN(30) + 1)
+	return AlphaNumericN(rand.IntN(30) + 1)
 }
 
 // UUID ランダムなUUIDを生成します
@@ -76,7 +76,7 @@ func URL(useHTTPS bool, domainLength int) *url.URL {
 	}
 	scheme += "://"
 
-	scheme += AlphaNumericn(domainLength)
+	scheme += AlphaNumericN(domainLength)
 	url, err := url.Parse(scheme)
 	if err != nil {
 		panic(err)

@@ -205,7 +205,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				repoUser := domain.UserDetail{
 					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 					State:    rand.N(domain.TraqStateLimit),
-					Bio:      random.AlphaNumericn(rand.IntN(256) + 1),
+					Bio:      random.AlphaNumericN(rand.IntN(256) + 1),
 					Accounts: rAccounts,
 				}
 
@@ -247,7 +247,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (hres *schema.UserDetail, userpath string) {
-				id := random.AlphaNumericn(36)
+				id := random.AlphaNumericN(36)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
 			},
@@ -488,7 +488,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (hres []*schema.Account, path string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
 			},
@@ -563,7 +563,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: invalid userID",
 			setup: func(_ *mock_service.MockUserService) (hres *schema.Account, path string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 				accountID := random.UUID()
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -575,7 +575,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (hres *schema.Account, path string) {
 				userID := random.UUID()
-				accountID := random.AlphaNumericn(36)
+				accountID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
@@ -740,7 +740,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, schema.Account{}, path
@@ -923,7 +923,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: nonUUID1",
 			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 				accountID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -935,7 +935,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			name: "Bad Request: validate error: nonUUID2",
 			setup: func(_ *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
-				accountID := random.AlphaNumericn(36)
+				accountID := random.AlphaNumericN(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return nil, path
@@ -1006,7 +1006,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		{
 			name: "Bad Request: validate error: nonUUID1",
 			setup: func(_ *mock_service.MockUserService) string {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 				accountID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -1018,7 +1018,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 			name: "Bad Request: validate error: nonUUID2",
 			setup: func(_ *mock_service.MockUserService) string {
 				userID := random.UUID()
-				accountID := random.AlphaNumericn(36)
+				accountID := random.AlphaNumericN(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
 				return path
@@ -1118,7 +1118,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(t *testing.T, _ *mock_service.MockUserService) (hres []*schema.UserProject, path string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
 				return nil, path
@@ -1226,7 +1226,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(t *testing.T, _ *mock_service.MockUserService) (hres []*schema.UserContest, path string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
 				return nil, path
@@ -1329,7 +1329,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(_ *mock_service.MockUserService) (hres []*schema.UserGroup, path string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
 				return nil, path
@@ -1438,7 +1438,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		{
 			name: "Bad Request: validate error",
 			setup: func(_ *mock_service.MockUserService) (hres []*schema.Event, path string) {
-				userID := random.AlphaNumericn(36)
+				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/events", userID)
 				return nil, path
