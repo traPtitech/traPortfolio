@@ -61,11 +61,11 @@ func SinceAndUntil() (time.Time, time.Time) {
 }
 
 func Time() time.Time {
-	min := time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
-	max := time.Date(2070, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
-	delta := max - min
+	minimum := time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
+	maximum := time.Date(2070, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
+	delta := maximum - minimum
 
-	sec := rand.Int64N(delta) + min
+	sec := rand.Int64N(delta) + minimum
 	return time.UnixMicro(sec).In(time.UTC)
 }
 
