@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -238,7 +238,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			args: args{
 				args: &repository.CreateEventLevelArgs{
 					EventID: random.UUID(),
-					Level:   domain.EventLevel(rand.Intn(int(domain.EventLevelLimit))),
+					Level:   rand.N(domain.EventLevelLimit),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -268,7 +268,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			args: args{
 				args: &repository.CreateEventLevelArgs{
 					EventID: random.UUID(),
-					Level:   domain.EventLevel(rand.Intn(int(domain.EventLevelLimit))),
+					Level:   rand.N(domain.EventLevelLimit),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {
@@ -281,7 +281,7 @@ func TestEventRepository_CreateEventLevel(t *testing.T) {
 			args: args{
 				args: &repository.CreateEventLevelArgs{
 					EventID: random.UUID(),
-					Level:   domain.EventLevel(rand.Intn(int(domain.EventLevelLimit))),
+					Level:   rand.N(domain.EventLevelLimit),
 				},
 			},
 			setup: func(f mockEventRepositoryFields, args args) {

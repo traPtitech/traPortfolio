@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -46,7 +46,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
-	selected := mockdata.MockKnoqEvents[rand.Intn(len(mockdata.MockKnoqEvents)-1)]
+	selected := mockdata.MockKnoqEvents[rand.IntN(len(mockdata.MockKnoqEvents)-1)]
 	hostName := make([]*domain.User, 0, len(selected.Admins))
 	for _, aid := range selected.Admins {
 		hostName = append(hostName, &domain.User{ID: aid})

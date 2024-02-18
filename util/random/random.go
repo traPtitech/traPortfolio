@@ -2,7 +2,7 @@ package random
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"net/url"
 	"sort"
 	"time"
@@ -21,13 +21,13 @@ const (
 )
 
 // AlphaNumericn 指定した文字数のランダム英数字文字列を生成します
-// この関数はmath/randが生成する擬似乱数を使用します
+// この関数はmath/rand/v2が生成する擬似乱数を使用します
 func AlphaNumericn(n int) string {
 	b := make([]byte, n)
-	cache, remain := rand.Int63(), rs6LetterIdxMax
+	cache, remain := rand.Int64(), rs6LetterIdxMax
 	for i := n - 1; i >= 0; {
 		if remain == 0 {
-			cache, remain = rand.Int63(), rs6LetterIdxMax
+			cache, remain = rand.Int64(), rs6LetterIdxMax
 		}
 		idx := int(cache & rs6LetterIdxMask)
 		if idx < len(rs6Letters) {
@@ -41,7 +41,7 @@ func AlphaNumericn(n int) string {
 }
 
 func AlphaNumeric() string {
-	return AlphaNumericn(rand.Intn(30) + 1)
+	return AlphaNumericn(rand.IntN(30) + 1)
 }
 
 // UUID ランダムなUUIDを生成します
@@ -65,7 +65,7 @@ func Time() time.Time {
 	max := time.Date(2070, 1, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
 	delta := max - min
 
-	sec := rand.Int63n(delta) + min
+	sec := rand.Int64N(delta) + min
 	return time.UnixMicro(sec).In(time.UTC)
 }
 
@@ -85,7 +85,7 @@ func URL(useHTTPS bool, domainLength int) *url.URL {
 }
 
 func RandURLString() string {
-	return URL(rand.Intn(2) < 1, rand.Intn(20)+1).String()
+	return URL(rand.IntN(2) < 1, rand.IntN(20)+1).String()
 }
 
 func AccountURLString(accountType domain.AccountType) string {
@@ -144,18 +144,18 @@ func AccountURLString(accountType domain.AccountType) string {
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
 		return fmt.Sprintf("https://%s", AlphaNumeric())
 	}
-	return AccountURLs[accountType][rand.Intn(3)]
+	return AccountURLs[accountType][rand.IntN(3)]
 }
 
 func Duration() domain.YearWithSemesterDuration {
 	yss := []domain.YearWithSemester{
 		{
 			Year:     Time().Year(),
-			Semester: rand.Intn(2),
+			Semester: rand.IntN(2),
 		},
 		{
 			Year:     Time().Year(),
-			Semester: rand.Intn(2),
+			Semester: rand.IntN(2),
 		},
 	}
 
@@ -171,7 +171,7 @@ func Duration() domain.YearWithSemesterDuration {
 }
 
 func Uint8n(n uint8) uint8 {
-	return uint8(rand.Int31n(int32(n)))
+	return rand.N(n)
 }
 
 func Bool() bool {
@@ -179,7 +179,7 @@ func Bool() bool {
 }
 
 func Iotan[T ~uint8](n T) T {
-	return T(rand.Intn(int(n)))
+	return rand.N(n)
 }
 
 func Optional[T any](t T) optional.Of[T] {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 	"log"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 
 	"github.com/go-sql-driver/mysql"
@@ -108,7 +108,7 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 	t.Helper()
 
 	if args == nil {
-		accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+		accountType := rand.N(domain.AccountLimit)
 		args = &repository.CreateAccountArgs{
 			DisplayName: random.AlphaNumeric(),
 			Type:        accountType,
@@ -140,10 +140,10 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 			Name:          random.AlphaNumeric(),
 			Description:   random.AlphaNumeric(),
 			Link:          random.Optional(random.RandURLString()),
-			SinceYear:     rand.Intn(2100),
-			SinceSemester: rand.Intn(2),
-			UntilYear:     rand.Intn(2100),
-			UntilSemester: rand.Intn(2),
+			SinceYear:     rand.IntN(2100),
+			SinceSemester: rand.IntN(2),
+			UntilYear:     rand.IntN(2100),
+			UntilSemester: rand.IntN(2),
 		}
 	}
 
@@ -162,10 +162,10 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 	if args == nil {
 		args = &repository.CreateProjectMemberArgs{
 			UserID:        userID,
-			SinceYear:     rand.Intn(2100),
-			SinceSemester: rand.Intn(2),
-			UntilYear:     rand.Intn(2100),
-			UntilSemester: rand.Intn(2),
+			SinceYear:     rand.IntN(2100),
+			SinceSemester: rand.IntN(2),
+			UntilYear:     rand.IntN(2100),
+			UntilSemester: rand.IntN(2),
 		}
 	}
 

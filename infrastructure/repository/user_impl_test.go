@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -205,7 +205,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			args: args{
 				&repository.GetUsersArgs{
 					Name:  optional.From(random.AlphaNumeric()),
-					Limit: optional.From(rand.Intn(200)),
+					Limit: optional.From(rand.IntN(200)),
 				},
 			},
 			want: []*domain.User{

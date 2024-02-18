@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"testing"
 
@@ -102,7 +102,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				rgroupAdmins := []*domain.User{}
 				hgroupAdmins := []schema.User{}
 
-				adminLen := rand.Intn(256)
+				adminLen := rand.IntN(256)
 				for i := 0; i < adminLen; i++ {
 					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
@@ -119,7 +119,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				rgroupMembers := []*domain.UserWithDuration{}
 				hgroupMembers := []schema.GroupMember{}
 
-				groupLen := rand.Intn(256)
+				groupLen := rand.IntN(256)
 				for i := 0; i < groupLen; i++ {
 					rgroupmember := domain.UserWithDuration{
 						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),

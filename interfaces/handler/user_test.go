@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"strings"
 	"testing"
@@ -181,7 +181,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 
 				for i := 0; i < accountNum; i++ {
 					prRandom := false
-					if rand.Intn(2) == 1 {
+					if rand.IntN(2) == 1 {
 						prRandom = true
 					}
 
@@ -208,7 +208,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				repoUser := domain.UserDetail{
 					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 					State:    domain.TraQState(random.Uint8n(uint8(domain.TraqStateLimit))),
-					Bio:      random.AlphaNumericn(rand.Intn(256) + 1),
+					Bio:      random.AlphaNumericn(rand.IntN(256) + 1),
 					Accounts: rAccounts,
 				}
 
@@ -290,7 +290,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
-				if rand.Intn(2) == 1 {
+				if rand.IntN(2) == 1 {
 					userCheck = true
 				}
 
@@ -316,7 +316,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 256)
 				userCheck := false
-				if rand.Intn(2) == 1 {
+				if rand.IntN(2) == 1 {
 					userCheck = true
 				}
 
@@ -342,7 +342,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
-				if rand.Intn(2) == 1 {
+				if rand.IntN(2) == 1 {
 					userCheck = true
 				}
 
@@ -368,7 +368,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := false
-				if rand.Intn(2) == 1 {
+				if rand.IntN(2) == 1 {
 					userCheck = true
 				}
 
@@ -440,7 +440,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 			name: "success",
 			setup: func(s *mock_service.MockUserService) (hres []*schema.Account, path string) {
 				userID := random.UUID()
-				accountKinds := rand.Intn((1<<domain.AccountLimit)-1) + 1
+				accountKinds := rand.IntN((1<<domain.AccountLimit)-1) + 1
 				//AccountLimit種類のうち、テストに使うものだけbitが立っている
 				//例えば0(HOMEPAGE)と2(TWITTER)と7(ATCODER)なら10000101=133
 				//0(bitがすべて立っていない)は除外
@@ -454,7 +454,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 					}
 
 					prRandom := false
-					if rand.Intn(2) == 1 {
+					if rand.IntN(2) == 1 {
 						prRandom = true
 					}
 
@@ -545,7 +545,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (hres *schema.Account, path string) {
 				userID := random.UUID()
 				prRandom := false
-				if rand.Intn(2) == 1 {
+				if rand.IntN(2) == 1 {
 					prRandom = true
 				}
 
@@ -635,7 +635,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+				accountType := rand.N(domain.AccountLimit)
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
@@ -718,7 +718,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			name: "Bad Request: DisplayName is empty",
 			setup: func(_ *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+				accountType := rand.N(domain.AccountLimit)
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: "",
@@ -773,7 +773,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 			name: "internal error",
 			setup: func(s *mock_service.MockUserService) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+				accountType := rand.N(domain.AccountLimit)
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
@@ -827,7 +827,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit))) // TODO: domain.AccountType型にする
+				accountType := rand.N(domain.AccountLimit)
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
@@ -860,7 +860,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 			setup: func(s *mock_service.MockUserService) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
-				accountType := domain.AccountType(rand.Intn(int(domain.AccountLimit)))
+				accountType := rand.N(domain.AccountLimit)
 				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
