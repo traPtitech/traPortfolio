@@ -207,7 +207,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		{
 			name: "Validation Error",
 			setup: func(s *mock_service.MockProjectService) (*schema.ProjectDetail, string) {
-				projectID := random.AlphaNumericn(36)
+				projectID := random.AlphaNumericN(36)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
 			statusCode: http.StatusBadRequest,

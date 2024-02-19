@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -205,7 +205,7 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			args: args{
 				&repository.GetUsersArgs{
 					Name:  optional.From(random.AlphaNumeric()),
-					Limit: optional.From(rand.Intn(200)),
+					Limit: optional.From(rand.IntN(200)),
 				},
 			},
 			want: []*domain.User{
@@ -317,7 +317,6 @@ func TestUserRepository_GetUsers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -461,7 +460,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -566,7 +564,6 @@ func TestUserRepository_CreateUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -653,7 +650,6 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -723,7 +719,6 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -824,7 +819,6 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -989,7 +983,6 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -1006,7 +999,7 @@ func TestUserRepository_CreateAccount(t *testing.T) {
 }
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
-	aType := optional.From(random.Iotan(domain.AccountLimit))
+	aType := optional.From(rand.N(domain.AccountLimit))
 
 	t.Parallel()
 	type args struct {
@@ -1061,7 +1054,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1083,7 +1076,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1109,7 +1102,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1135,7 +1128,7 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 					DisplayName: optional.From(random.AlphaNumeric()),
 					URL:         optional.From(random.RandURLString()),
 					PrPermitted: optional.From(random.Bool()),
-					Type:        optional.From(random.Iotan(domain.AccountLimit)),
+					Type:        optional.From(rand.N(domain.AccountLimit)),
 				},
 			},
 			setup: func(f mockUserRepositoryFields, args args) {
@@ -1157,7 +1150,6 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -1240,7 +1232,6 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -1333,7 +1324,6 @@ func TestUserRepository_GetProjects(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -1426,7 +1416,6 @@ func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -1598,7 +1587,6 @@ func TestUserRepository_GetContests(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock

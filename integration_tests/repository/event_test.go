@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -46,7 +46,7 @@ func TestEventRepository_GetEvent(t *testing.T) {
 	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
-	selected := mockdata.MockKnoqEvents[rand.Intn(len(mockdata.MockKnoqEvents)-1)]
+	selected := mockdata.MockKnoqEvents[rand.IntN(len(mockdata.MockKnoqEvents)-1)]
 	hostName := make([]*domain.User, 0, len(selected.Admins))
 	for _, aid := range selected.Admins {
 		hostName = append(hostName, &domain.User{ID: aid})
@@ -121,7 +121,7 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, selected.Level, got.Level)
 
-	updatedLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+	updatedLevel := rand.N(domain.EventLevelLimit)
 	err = repo.UpdateEventLevel(context.Background(), selected.EventID, &urepository.UpdateEventLevelArgs{
 		Level: optional.From(updatedLevel),
 	})
@@ -168,7 +168,7 @@ func createRandomEventLevels(t *testing.T, repo urepository.EventRepository) map
 		if idx == 0 || random.Bool() {
 			args := &urepository.CreateEventLevelArgs{
 				EventID: e.ID,
-				Level:   domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit))),
+				Level:   rand.N(domain.EventLevelLimit),
 			}
 
 			mustMakeEventLevel(t, repo, args)

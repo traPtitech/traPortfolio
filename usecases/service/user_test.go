@@ -57,7 +57,6 @@ func TestUserService_GetUsers(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -127,7 +126,6 @@ func TestUserService_GetUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -196,7 +194,6 @@ func TestUserService_Update(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -246,7 +243,6 @@ func TestUserService_GetAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -297,7 +293,6 @@ func TestUserService_GetAccounts(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -353,7 +348,6 @@ func TestUserService_CreateAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -426,7 +420,6 @@ func TestUserService_EditAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -469,7 +462,6 @@ func TestUserService_DeleteAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -531,7 +523,6 @@ func TestUserService_GetUserProjects(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -602,7 +593,6 @@ func TestUserService_GetUserContests(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -665,7 +655,6 @@ func TestUserService_GetGroupsByUserID(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
@@ -728,7 +717,6 @@ func TestUserService_GetUserEvents(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)

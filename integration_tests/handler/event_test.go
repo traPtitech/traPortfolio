@@ -30,7 +30,6 @@ func TestEventHandler_GetEvents(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvents), nil)
@@ -67,7 +66,6 @@ func TestEventHandler_GetEvent(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Event.GetEvent, tt.eventID), nil)
@@ -108,7 +106,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
@@ -149,7 +146,6 @@ func TestGetXXX(t *testing.T) {
 	api, err := setupRoutes(t, e,)
 	assert.NoError(t, err)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
                         t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.XXX.GetXXX, tt.userID), nil)

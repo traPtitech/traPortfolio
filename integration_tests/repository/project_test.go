@@ -26,7 +26,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 
 	projectNum := 4
 	var projects []*domain.Project
-	for i := 0; i < projectNum; i++ {
+	for range projectNum {
 		projects = append(projects, mustMakeProject(t, repo, nil))
 	}
 
@@ -44,7 +44,7 @@ func TestProjectRepository_GetProject(t *testing.T) {
 
 	projectNum := 4
 	var projects []*domain.ProjectDetail
-	for i := 0; i < projectNum; i++ {
+	for range projectNum {
 		projects = append(projects, mustMakeProjectDetail(t, repo, nil))
 	}
 
@@ -85,7 +85,6 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			project1 := mustMakeProjectDetail(t, repo, nil)
 			mustMakeProjectDetail(t, repo, nil)

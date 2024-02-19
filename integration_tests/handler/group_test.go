@@ -34,7 +34,6 @@ func TestGetGroups(t *testing.T) {
 	api := setupRoutes(t, e)
 
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroups), nil)
@@ -73,7 +72,6 @@ func TestGetGroup(t *testing.T) {
 	api := setupRoutes(t, e)
 
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Group.GetGroup, tt.groupID), nil)

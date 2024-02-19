@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"testing"
 
@@ -41,7 +41,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 				repoGroups := []*domain.Group{}
 				hresGroups := []*schema.Group{}
 
-				for i := 0; i < casenum; i++ {
+				for range casenum {
 					rgroup := domain.Group{
 						ID:   random.UUID(),
 						Name: random.AlphaNumeric(),
@@ -71,7 +71,6 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -103,8 +102,8 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				rgroupAdmins := []*domain.User{}
 				hgroupAdmins := []schema.User{}
 
-				adminLen := rand.Intn(256)
-				for i := 0; i < adminLen; i++ {
+				adminLen := rand.IntN(256)
+				for range adminLen {
 					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
 					hgroupAdmin := schema.User{
@@ -120,8 +119,8 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				rgroupMembers := []*domain.UserWithDuration{}
 				hgroupMembers := []schema.GroupMember{}
 
-				groupLen := rand.Intn(256)
-				for i := 0; i < groupLen; i++ {
+				groupLen := rand.IntN(256)
+				for range groupLen {
 					rgroupmember := domain.UserWithDuration{
 						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
@@ -195,7 +194,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		{
 			name: "Bad Request: validate error nonUUID",
 			setup: func(_ *mock_service.MockGroupService) (hres *schema.GroupDetail, path string) {
-				groupID := random.AlphaNumericn(36)
+				groupID := random.AlphaNumericN(36)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path
 			},
@@ -203,7 +202,6 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
