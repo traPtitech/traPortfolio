@@ -88,11 +88,13 @@ jobs:
         with:
           files: ./coverage_unit.txt
           flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage data (Integration)
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage_integration.txt
           flags: integration
+          token: ${{ secrets.CODECOV_TOKEN }}
   tbls:
     name: TBLS
     runs-on: ubuntu-latest
