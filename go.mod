@@ -18,8 +18,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
-	gorm.io/driver/mysql v1.5.2
-	gorm.io/gorm v1.25.6
+	gorm.io/driver/mysql v1.5.4
+	gorm.io/gorm v1.25.7-0.20240204074919-46816ad31dde
 )
 
 require (
