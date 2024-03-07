@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
 	"github.com/traPtitech/traPortfolio/domain"
@@ -17,18 +16,19 @@ import (
 )
 
 type EventHandler struct {
-	s service.EventService
+	event repository.EventRepository
+	user  repository.UserRepository
 }
 
 // NewEventHandler creates a EventHandler
-func NewEventHandler(s service.EventService) *EventHandler {
-	return &EventHandler{s}
+func NewEventHandler(event repository.EventRepository, user repository.UserRepository) *EventHandler {
+	return &EventHandler{event, user}
 }
 
 // GetEvents GET /events
 func (h *EventHandler) GetEvents(c echo.Context) error {
 	ctx := c.Request().Context()
-	events, err := h.s.GetEvents(ctx)
+	events, err := h.event.GetEvents(ctx)
 	if err != nil {
 		return err
 	}
@@ -49,11 +49,28 @@ func (h *EventHandler) GetEvent(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	event, err := h.s.GetEventByID(ctx, eventID)
+	event, err := h.event.GetEvent(ctx, eventID)
 	if err != nil {
 		return err
 	}
+	{
+		// hostnameの詳細を取得
+		users, err := h.user.GetUsers(ctx, &repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
+		if err != nil {
+			return err
+		}
 
+		umap := make(map[uuid.UUID]*domain.User)
+		for _, u := range users {
+			umap[u.ID] = u
+		}
+
+		for i, v := range event.HostName {
+			if u, ok := umap[v.ID]; ok {
+				event.HostName[i] = u
+			}
+		}
+	}
 	hostname := make([]schema.User, len(event.HostName))
 	for i, v := range event.HostName {
 		hostname[i] = newUser(v.ID, v.Name, v.RealName())
@@ -85,7 +102,7 @@ func (h *EventHandler) EditEvent(c echo.Context) error {
 		Level: optional.FromPtr((*domain.EventLevel)(req.Level)),
 	}
 
-	if err := h.s.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
+	if err := h.event.UpdateEventLevel(ctx, eventID, &patchReq); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
