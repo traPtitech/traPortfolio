@@ -44,7 +44,7 @@ func main() {
 	}
 
 	e := echo.New()
-	if err := handler.Setup(e, api, handler.WithRequestLogger()); err != nil {
+	if err := handler.Setup(appConf.IsProduction, e, api, handler.WithRequestLogger()); err != nil {
 		log.Fatal(err)
 	}
 

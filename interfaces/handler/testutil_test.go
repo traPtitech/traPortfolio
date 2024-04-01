@@ -22,7 +22,7 @@ func doRequest(t *testing.T, api API, method, path string, reqBody interface{}, 
 
 	e := echo.New()
 
-	err := Setup(e, api)
+	err := Setup(false, e, api)
 	assert.NoError(t, err)
 	e.ServeHTTP(rec, req)
 
