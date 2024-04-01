@@ -28,7 +28,7 @@ func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	api, err := infrastructure.InjectAPIServer(testutils.Config, db)
 	assert.NoError(t, err)
 
-	err = handler.Setup(e, api)
+	err = handler.Setup(false, e, api)
 	assert.NoError(t, err)
 
 	return &api
