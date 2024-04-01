@@ -220,7 +220,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		belongingMap[v.TeamID] = append(belongingMap[v.TeamID], v)
 	}
 
-	nameMap, err := r.makeUserNameMap()
+	realNameMap, err := external.GetRealNameMap(r.portal)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (r *ContestRepository) GetContestTeams(ctx context.Context, contestID uuid.
 		members := make([]*domain.User, len(belongingMap[v.ID]))
 		for i, w := range belongingMap[v.ID] {
 			u := w.User
-			members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
+			members[i] = domain.NewUser(u.ID, u.Name, realNameMap[u.Name], u.Check)
 		}
 
 		result = append(result, &domain.ContestTeam{
@@ -273,7 +273,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		return nil, err
 	}
 
-	nameMap, err := r.makeUserNameMap()
+	realNameMap, err := external.GetRealNameMap(r.portal)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +281,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 	members := make([]*domain.User, len(belongings))
 	for i, w := range belongings {
 		u := w.User
-		members[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
+		members[i] = domain.NewUser(u.ID, u.Name, realNameMap[u.Name], u.Check)
 	}
 
 	res := &domain.ContestTeamDetail{
@@ -449,7 +449,7 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 		return nil, err
 	}
 
-	nameMap, err := r.makeUserNameMap()
+	realNameMap, err := external.GetRealNameMap(r.portal)
 	if err != nil {
 		return nil, err
 	}
@@ -457,7 +457,7 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 	result := make([]*domain.User, len(belongings))
 	for i, v := range belongings {
 		u := v.User
-		result[i] = domain.NewUser(u.ID, u.Name, nameMap[u.Name], u.Check)
+		result[i] = domain.NewUser(u.ID, u.Name, realNameMap[u.Name], u.Check)
 	}
 	return result, nil
 }
@@ -578,20 +578,6 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		return err
 	}
 	return nil
-}
-
-func (r *ContestRepository) makeUserNameMap() (map[string]string, error) {
-	users, err := r.portal.GetUsers()
-	if err != nil {
-		return nil, err
-	}
-
-	mp := make(map[string]string, len(users))
-
-	for _, v := range users {
-		mp[v.TraQID] = v.RealName
-	}
-	return mp, nil
 }
 
 // Interface guards

@@ -18,13 +18,15 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 		knoqAPI   external.KnoqAPI
 	)
 
+	// TODO: 初期リリースではPortalとknoQとは連携しない
 	if c.IsProduction {
 		var err error
 
-		portalAPI, err = external.NewPortalAPI(c.Portal)
-		if err != nil {
-			return handler.API{}, err
-		}
+		// portalAPI, err = external.NewPortalAPI(c.Portal)
+		// if err != nil {
+		// 	return handler.API{}, err
+		// }
+		portalAPI = external.NewNopPortalAPI()
 
 		traQAPI, err = external.NewTraQAPI(c.Traq)
 		if err != nil {

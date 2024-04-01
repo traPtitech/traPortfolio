@@ -93,3 +93,31 @@ func (a *portalAPI) GetUserByTraqID(traQID string) (*PortalUserResponse, error) 
 var (
 	_ PortalAPI = (*portalAPI)(nil)
 )
+
+func GetRealNameMap(p PortalAPI) (map[string]string, error) {
+	users, err := p.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	realNameMap := make(map[string]string, len(users))
+	for _, u := range users {
+		realNameMap[u.TraQID] = u.RealName
+	}
+
+	return realNameMap, nil
+}
+
+type nopPortalAPI struct{}
+
+func NewNopPortalAPI() PortalAPI {
+	return &nopPortalAPI{}
+}
+
+func (a *nopPortalAPI) GetUsers() ([]*PortalUserResponse, error) {
+	return []*PortalUserResponse{}, nil
+}
+
+func (a *nopPortalAPI) GetUserByTraqID(traQID string) (*PortalUserResponse, error) {
+	return &PortalUserResponse{}, nil
+}

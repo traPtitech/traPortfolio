@@ -88,26 +88,19 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 			),
 		}, nil
 	} else {
-		userMap := make(map[string]*model.User, l)
-		for _, v := range users {
-			userMap[v.Name] = v
-		}
-
-		portalUsers, err := r.portal.GetUsers()
+		realNameMap, err := external.GetRealNameMap(r.portal)
 		if err != nil {
 			return nil, err
 		}
 
 		result := make([]*domain.User, 0, l)
-		for _, v := range portalUsers {
-			if u, ok := userMap[v.TraQID]; ok {
-				result = append(result, domain.NewUser(
-					u.ID,
-					u.Name,
-					v.RealName,
-					u.Check,
-				))
-			}
+		for _, v := range users {
+			result = append(result, domain.NewUser(
+				v.ID,
+				v.Name,
+				realNameMap[v.Name],
+				v.Check,
+			))
 		}
 
 		return result, nil
