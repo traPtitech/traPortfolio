@@ -107,3 +107,17 @@ func GetRealNameMap(p PortalAPI) (map[string]string, error) {
 
 	return realNameMap, nil
 }
+
+type nopPortalAPI struct{}
+
+func NewNopPortalAPI() PortalAPI {
+	return &nopPortalAPI{}
+}
+
+func (a *nopPortalAPI) GetUsers() ([]*PortalUserResponse, error) {
+	return []*PortalUserResponse{}, nil
+}
+
+func (a *nopPortalAPI) GetUserByTraqID(traQID string) (*PortalUserResponse, error) {
+	return &PortalUserResponse{}, nil
+}
