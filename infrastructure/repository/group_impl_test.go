@@ -61,7 +61,6 @@ func TestGroupRepository_GetAllGroups(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			f := newMockGroupRepositoryFields(t)
@@ -229,7 +228,6 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			f := newMockGroupRepositoryFields(t)

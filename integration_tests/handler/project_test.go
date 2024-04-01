@@ -30,7 +30,6 @@ func TestGetProjects(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProjects), nil)
@@ -67,7 +66,6 @@ func TestGetProject(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProject, tt.projectID), nil)
@@ -186,7 +184,6 @@ func TestCreateProject(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject), &tt.reqBody)
@@ -281,7 +278,6 @@ func TestEditProject(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
@@ -332,7 +328,6 @@ func TestGetProjectMembers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Project.GetProjectMembers, tt.projectID), nil)
@@ -385,7 +380,6 @@ func TestAddProjectMembers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &tt.reqBody)
@@ -457,7 +451,6 @@ func TestDeleteProjectMembers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), &tt.reqBody)

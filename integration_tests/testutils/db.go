@@ -18,8 +18,9 @@ import (
 
 // TODO: integration_tests/handler以下に置く
 var (
-	DB   *sql.DB
-	Port int
+	Config *config.Config
+	DB     *sql.DB
+	Port   int
 )
 
 func SetupGormDB(t *testing.T) *gorm.DB {
@@ -37,7 +38,7 @@ func SetupGormDB(t *testing.T) *gorm.DB {
 func establishTestDBConnection(t *testing.T) *gorm.DB {
 	t.Helper()
 
-	sqlConf := config.Load().DB
+	sqlConf := Config.DB
 	sqlConf.Name = "portfolio_test_" + t.Name()
 	sqlConf.Port = Port
 

@@ -17,7 +17,7 @@ updates:
       actions-deps:
         patterns:
           - "*"
-- package-ecosystem: "gomod"
+  - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
@@ -32,3 +32,11 @@ updates:
         update-types:
           - "minor"
           - "patch"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "ras0q"
+    commit-message:
+      prefix: ":arrow_up: "

@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"net/http"
 	"testing"
 
@@ -41,7 +42,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 				repoEvents := []*domain.Event{}
 				hresEvents := []*schema.Event{}
 
-				for i := 0; i < casenum; i++ {
+				for range casenum {
 					since, until := random.SinceAndUntil()
 					revent := domain.Event{
 						ID:        random.UUID(),
@@ -77,7 +78,6 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -107,7 +107,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				rHost := []*domain.User{}
 				hHost := []schema.User{}
 
-				for i := 0; i < hostnum; i++ {
+				for range hostnum {
 					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					hhost := schema.User{
 						Id:       rhost.ID,
@@ -124,7 +124,7 @@ func TestEventHandler_GetEvent(t *testing.T) {
 					Event: domain.Event{
 						ID:        random.UUID(),
 						Name:      random.AlphaNumeric(),
-						Level:     random.Iotan(domain.EventLevelLimit),
+						Level:     rand.N(domain.EventLevelLimit),
 						TimeStart: since,
 						TimeEnd:   until,
 					},
@@ -176,7 +176,6 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupEventMock(t)
@@ -214,7 +213,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Success",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -241,7 +240,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Conflict",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -261,7 +260,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Not Found",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -281,7 +280,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 			name: "Bad Request: bind error",
 			setup: func(s *mock_service.MockEventService) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
-				eventLevel := domain.EventLevel(random.Uint8n(uint8(domain.EventLevelLimit)))
+				eventLevel := rand.N(domain.EventLevelLimit)
 
 				reqBody := &schema.EditEventRequest{
 					Level: hLevel(eventLevel),
@@ -315,7 +314,6 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
