@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/cmd"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/config"
@@ -38,7 +38,7 @@ func main() {
 		}
 	}
 
-	api, err := infrastructure.InjectAPIServer(appConf, db)
+	api, err := cmd.InjectAPIServer(appConf, db)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-package infrastructure
+package cmd
 
 import (
 	"github.com/traPtitech/traPortfolio/infrastructure/external"

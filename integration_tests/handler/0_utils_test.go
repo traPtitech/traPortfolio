@@ -11,7 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/cmd"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
@@ -25,7 +25,7 @@ func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 
-	api, err := infrastructure.InjectAPIServer(testutils.Config, db)
+	api, err := cmd.InjectAPIServer(testutils.Config, db)
 	assert.NoError(t, err)
 
 	err = handler.Setup(false, e, api)
