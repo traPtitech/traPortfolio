@@ -118,8 +118,8 @@ func TestContestRepository_GetContest(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows(
 							[]string{"id", "name", "since", "until", "link", "description"}).
@@ -136,8 +136,8 @@ func TestContestRepository_GetContest(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
@@ -203,8 +203,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(anyUUID{}).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(anyUUID{}, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until"}).
 							AddRow(uuid.Nil, args.args.Name, args.args.Description, args.args.Link.ValueOrZero(), args.args.Since, args.args.Until.ValueOrZero()),
@@ -254,8 +254,8 @@ func TestContestRepository_CreateContest(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(anyUUID{}).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(anyUUID{}, 1).
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
@@ -308,8 +308,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
 							AddRow(args.id, "", "", "", time.Time{}, time.Time{}, time.Time{}, time.Time{}),
@@ -319,8 +319,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Since.ValueOrZero(), args.args.Until.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
 							AddRow(args.id, args.args.Name.ValueOrZero(), args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Since.ValueOrZero(), args.args.Until.ValueOrZero(), time.Time{}, time.Time{}),
@@ -344,8 +344,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
@@ -366,8 +366,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
 							AddRow(args.id, "", "", "", time.Time{}, time.Time{}, time.Time{}, time.Time{}),
@@ -395,8 +395,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
 							AddRow(args.id, "", "", "", time.Time{}, time.Time{}, time.Time{}, time.Time{}),
@@ -406,8 +406,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Since.ValueOrZero(), args.args.Until.ValueOrZero(), anyTime{}, args.id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -447,8 +447,8 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
 							AddRow(args.id, "", "", "", time.Time{}, time.Time{}, time.Time{}, time.Time{}),
@@ -469,8 +469,8 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
@@ -484,8 +484,8 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since", "until", "created_at", "updated_at"}).
 							AddRow(args.id, "", "", "", time.Time{}, time.Time{}, time.Time{}, time.Time{}),
@@ -552,8 +552,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 					rows.AddRow(v.ID, v.ContestID, v.Name, v.Result)
 				}
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
@@ -597,8 +597,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -611,8 +611,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.ContestTeam) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`contest_id` = ?")).
@@ -679,8 +679,8 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
 				u := want.Members[0]
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID, args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "result", "link", "description"}).
 							AddRow(want.ContestTeam.ID, want.ContestTeam.ContestID, want.ContestTeam.Name, want.ContestTeam.Result, want.Link, want.Description),
@@ -727,8 +727,8 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID, args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, args.contestID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -792,8 +792,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
@@ -818,8 +818,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -838,8 +838,8 @@ func TestContestRepository_CreateContestTeam(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want *domain.ContestTeamDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(args.contestID))
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
@@ -897,8 +897,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 				cid := random.UUID()
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
 							AddRow(args.teamID, cid, "", "", "", "", time.Time{}, time.Time{}),
@@ -908,8 +908,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Result.ValueOrZero(), anyTime{}, args.teamID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
 							AddRow(args.teamID, cid, args.args.Name, args.args.Description, args.args.Result, args.args.Link, time.Time{}, time.Time{}),
@@ -932,8 +932,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnError(repository.ErrNotFound)
 				f.h.Mock.ExpectRollback()
 			},
@@ -953,8 +953,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
 							AddRow(args.teamID, random.UUID(), "", "", "", "", time.Time{}, time.Time{}),
@@ -981,8 +981,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id", "name", "description", "result", "link", "created_at", "updated_at"}).
 							AddRow(args.teamID, random.UUID(), "", "", "", "", time.Time{}, time.Time{}),
@@ -992,8 +992,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 					WithArgs(args.args.Description.ValueOrZero(), args.args.Link.ValueOrZero(), args.args.Name.ValueOrZero(), args.args.Result.ValueOrZero(), anyTime{}, args.teamID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
@@ -1035,8 +1035,8 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID, args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? AND `contest_teams`.`contest_id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, args.contestID),
@@ -1089,15 +1089,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				u := want[0]
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(random.UUID()),
 					)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1136,15 +1136,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 					belongingRows.AddRow(args.teamID, u.ID)
 				}
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(random.UUID()),
 					)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1176,8 +1176,8 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -1191,15 +1191,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(random.UUID()),
 					)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -1213,15 +1213,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			want: nil,
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(random.UUID()),
 					)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1243,15 +1243,15 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 			setup: func(f mockContestRepositoryFields, args args, want []*domain.User) {
 				u := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT 1")).
-					WithArgs(args.contestID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contests` WHERE `contests`.`id` = ? ORDER BY `contests`.`id` LIMIT ?")).
+					WithArgs(args.contestID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(random.UUID()),
 					)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1323,8 +1323,8 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 					}
 				}
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1361,8 +1361,8 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -1375,8 +1375,8 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1396,8 +1396,8 @@ func TestContestRepository_AddContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1462,8 +1462,8 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				rows.AddRow(args.teamID, memberToBeRemoved)
 
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1495,8 +1495,8 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnError(repository.ErrNotFound)
 			},
 			assertion: assert.Error,
@@ -1511,8 +1511,8 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			},
 			setup: func(f mockContestRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1539,8 +1539,8 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				memberToBeAdded := args.members[1]
 				rows.AddRow(args.teamID, memberToBeRemained)
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),
@@ -1576,8 +1576,8 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 				rows.AddRow(args.teamID, memberToBeRemoved)
 
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT 1")).
-					WithArgs(args.teamID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `contest_teams` WHERE `contest_teams`.`id` = ? ORDER BY `contest_teams`.`id` LIMIT ?")).
+					WithArgs(args.teamID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "contest_id"}).
 							AddRow(args.teamID, random.UUID()),

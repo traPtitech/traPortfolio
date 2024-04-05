@@ -118,8 +118,8 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 			},
 			setup: func(f mockGroupRepositoryFields, args args, want *domain.GroupDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"group_id", "name", "link", "description"}).
 							AddRow(want.ID, want.Name, want.Link, want.Description),
@@ -187,8 +187,8 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 			},
 			setup: func(f mockGroupRepositoryFields, args args, want *domain.GroupDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"group_id", "name", "link", "description"}).
 							AddRow(want.ID, want.Name, want.Link, want.Description),
@@ -220,8 +220,8 @@ func TestGroupRepository_GetGroup(t *testing.T) {
 			want: nil,
 			setup: func(f mockGroupRepositoryFields, args args, want *domain.GroupDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `groups` WHERE `groups`.`group_id` = ? ORDER BY `groups`.`group_id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
