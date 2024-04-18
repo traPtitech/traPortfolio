@@ -21,9 +21,8 @@ func TestParse(t *testing.T) {
 			Port:    3001,
 			Verbose: true,
 		},
-		Traq: APIConfig{
-			Cookie:      "traq cookie",
-			APIEndpoint: "traq endpoint",
+		Traq: TraqConfig{
+			AccessToken: "traq token",
 		},
 		Knoq: APIConfig{
 			Cookie:      "knoq cookie",
