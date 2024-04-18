@@ -22,7 +22,7 @@ func TestParse(t *testing.T) {
 			Verbose: true,
 		},
 		Traq: TraqConfig{
-			AccessToken: "traq token",
+			AccessToken: "traq access token",
 		},
 		Knoq: APIConfig{
 			Cookie:      "knoq cookie",
