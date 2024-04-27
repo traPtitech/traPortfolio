@@ -11,6 +11,7 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepository struct {
@@ -115,44 +116,22 @@ func (r *UserRepository) SyncUsers(ctx context.Context) error {
 		return err
 	}
 
-	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		existingUsers := make([]*model.User, 0)
-		if err := tx.WithContext(ctx).Find(&existingUsers).Error; err != nil {
-			return err
+	users := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *model.User {
+		return &model.User{
+			ID:    u.ID,
+			Name:  u.Name,
+			State: u.State,
 		}
-
-		existingUsersMap := lo.SliceToMap(existingUsers, func(u *model.User) (uuid.UUID, *model.User) {
-			return u.ID, u
-		})
-
-		newUsers := make([]*model.User, 0, len(traqUsers))
-		for _, tu := range traqUsers {
-			if eu, ok := existingUsersMap[tu.ID]; ok {
-				if eu.Name == tu.Name && eu.State == tu.State {
-					continue
-				}
-
-				eu.Name = tu.Name
-				eu.State = tu.State
-
-				if err := tx.WithContext(ctx).Save(eu).Error; err != nil {
-					return err
-				}
-			}
-
-			newUsers = append(newUsers, &model.User{
-				ID:    tu.ID,
-				Name:  tu.Name,
-				State: tu.State,
-			})
-		}
-
-		if err := tx.WithContext(ctx).Create(&newUsers).Error; err != nil {
-			return err
-		}
-
-		return nil
 	})
+
+	err = r.h.
+		WithContext(ctx).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"name", "state", "updated_at"}),
+		}).
+		Create(&users).
+		Error
 	if err != nil {
 		return err
 	}
