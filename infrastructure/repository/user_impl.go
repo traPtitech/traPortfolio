@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/gofrs/uuid"
+	"github.com/samber/lo"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
@@ -115,21 +116,41 @@ func (r *UserRepository) SyncUsers(ctx context.Context) error {
 	}
 
 	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, v := range traqUsers {
-			user := model.User{
-				ID:          v.ID,
-				Description: "",
-				Name:        v.Name,
-				State:       v.State,
-			}
-			err := tx.
-				WithContext(ctx).
-				FirstOrCreate(&user, &model.User{ID: v.ID}).
-				Error
-			if err != nil {
-				return err
-			}
+		existingUsers := make([]*model.User, 0)
+		if err := tx.WithContext(ctx).Find(&existingUsers).Error; err != nil {
+			return err
 		}
+
+		existingUsersMap := lo.SliceToMap(existingUsers, func(u *model.User) (uuid.UUID, *model.User) {
+			return u.ID, u
+		})
+
+		newUsers := make([]*model.User, 0, len(traqUsers))
+		for _, tu := range traqUsers {
+			if eu, ok := existingUsersMap[tu.ID]; ok {
+				if eu.Name == tu.Name && eu.State == tu.State {
+					continue
+				}
+
+				eu.Name = tu.Name
+				eu.State = tu.State
+
+				if err := tx.WithContext(ctx).Save(eu).Error; err != nil {
+					return err
+				}
+			}
+
+			newUsers = append(newUsers, &model.User{
+				ID:    tu.ID,
+				Name:  tu.Name,
+				State: tu.State,
+			})
+		}
+
+		if err := tx.WithContext(ctx).Create(&newUsers).Error; err != nil {
+			return err
+		}
+
 		return nil
 	})
 	if err != nil {
