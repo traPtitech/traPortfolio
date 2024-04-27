@@ -27,7 +27,6 @@ type TraQGetAllArgs struct {
 
 type TraQAPI interface {
 	GetUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error)
-	GetUser(userID uuid.UUID) (*TraQUserResponse, error)
 }
 
 type traQAPI struct {
@@ -71,28 +70,3 @@ func (a *traQAPI) GetUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error) {
 
 	return usersResponse, nil
 }
-
-func (a *traQAPI) GetUser(userID uuid.UUID) (*TraQUserResponse, error) {
-	ctx := context.WithValue(context.Background(), traq.ContextAccessToken, a.accessToken)
-	user, res, err := a.apiClient.UserApi.GetUser(ctx, userID.String()).Execute()
-	if err != nil {
-		return nil, fmt.Errorf("traQ API GetUser error: %w", err)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("traQ API GetUser invalid status: %s", res.Status)
-	}
-
-	userResponse := &TraQUserResponse{
-		ID:    uuid.FromStringOrNil(user.Id),
-		Name:  user.Name,
-		State: domain.TraQState(user.State),
-	}
-
-	return userResponse, nil
-}
-
-// Interface guards
-var (
-	_ TraQAPI = (*traQAPI)(nil)
-)

@@ -378,7 +378,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(rows)
 				f.portal.EXPECT().GetUserByTraqID(want.User.Name).Return(makePortalUser(t, &want.User), nil)
-				f.traq.EXPECT().GetUser(args.id).Return(makeTraqUser(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},

@@ -7,7 +7,6 @@ package mock_external
 import (
 	reflect "reflect"
 
-	uuid "github.com/gofrs/uuid"
 	gomock "github.com/golang/mock/gomock"
 	external "github.com/traPtitech/traPortfolio/infrastructure/external"
 )
@@ -33,21 +32,6 @@ func NewMockTraQAPI(ctrl *gomock.Controller) *MockTraQAPI {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockTraQAPI) EXPECT() *MockTraQAPIMockRecorder {
 	return m.recorder
-}
-
-// GetUser mocks base method.
-func (m *MockTraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", userID)
-	ret0, _ := ret[0].(*external.TraQUserResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUser indicates an expected call of GetUser.
-func (mr *MockTraQAPIMockRecorder) GetUser(userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockTraQAPI)(nil).GetUser), userID)
 }
 
 // GetUsers mocks base method.
