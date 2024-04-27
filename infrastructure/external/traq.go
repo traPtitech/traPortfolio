@@ -15,9 +15,10 @@ import (
 )
 
 type TraQUserResponse struct {
-	ID    uuid.UUID        `json:"id"`
-	Name  string           `json:"name"`
-	State domain.TraQState `json:"state"`
+	ID    uuid.UUID
+	Name  string
+	State domain.TraQState
+	Bot   bool
 }
 
 type TraQGetAllArgs struct {
@@ -63,6 +64,7 @@ func (a *traQAPI) GetUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error) {
 			ID:    uid,
 			Name:  u.Name,
 			State: domain.TraQState(u.State),
+			Bot:   u.Bot,
 		}
 
 		return r

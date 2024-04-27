@@ -116,13 +116,18 @@ func (r *UserRepository) SyncUsers(ctx context.Context) error {
 		return err
 	}
 
-	users := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *model.User {
-		return &model.User{
-			ID:    u.ID,
-			Name:  u.Name,
-			State: u.State,
-		}
-	})
+	users := lo.Map(
+		lo.Filter(traqUsers, func(u *external.TraQUserResponse, _ int) bool {
+			return !u.Bot
+		}),
+		func(u *external.TraQUserResponse, _ int) *model.User {
+			return &model.User{
+				ID:    u.ID,
+				Name:  u.Name,
+				State: u.State,
+			}
+		},
+	)
 
 	err = r.h.
 		WithContext(ctx).
