@@ -21,12 +21,12 @@ var (
 	errInternal = errors.New("internal error")
 )
 
-func setupProjectMock(t *testing.T) (MockRepo, API) {
+func setupProjectMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	r := mock_repository.NewMockProjectRepository(ctrl)
-	mr := MockRepo{nil, nil, nil, nil, r}
+	mr := MockRepository{nil, nil, nil, nil, r}
 	api := NewAPI(nil, nil, NewProjectHandler(r), nil, nil, nil)
 
 	return mr, api
@@ -50,12 +50,12 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) ([]*schema.Project, string)
+		setup      func(mr MockRepository) ([]*schema.Project, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) ([]*schema.Project, string) {
+			setup: func(mr MockRepository) ([]*schema.Project, string) {
 				duration := random.Duration()
 				repo := []*domain.Project{
 					{
@@ -95,7 +95,7 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			setup: func(mr MockRepo) ([]*schema.Project, string) {
+			setup: func(mr MockRepository) ([]*schema.Project, string) {
 				mr.project.EXPECT().GetProjects(anyCtx{}).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
@@ -124,12 +124,12 @@ func TestProjectHandler_GetProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (*schema.ProjectDetail, string)
+		setup      func(mr MockRepository) (*schema.ProjectDetail, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.ProjectDetail, string) {
+			setup: func(mr MockRepository) (*schema.ProjectDetail, string) {
 				duration := random.Duration()
 				projectID := random.UUID()
 				repo := domain.ProjectDetail{
@@ -191,14 +191,14 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Bad Request: Validate error: invalid projectID",
-			setup: func(_ MockRepo) (*schema.ProjectDetail, string) {
+			setup: func(_ MockRepository) (*schema.ProjectDetail, string) {
 				return nil, fmt.Sprintf("/api/v1/projects/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Internal Error",
-			setup: func(mr MockRepo) (*schema.ProjectDetail, string) {
+			setup: func(mr MockRepository) (*schema.ProjectDetail, string) {
 				projectID := random.UUID()
 				mr.project.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, errInternal)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
@@ -207,7 +207,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Validation Error",
-			setup: func(_ MockRepo) (*schema.ProjectDetail, string) {
+			setup: func(_ MockRepository) (*schema.ProjectDetail, string) {
 				projectID := random.AlphaNumericN(36)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
 			},
@@ -215,7 +215,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 		},
 		{
 			name: "Not Found Error",
-			setup: func(mr MockRepo) (*schema.ProjectDetail, string) {
+			setup: func(mr MockRepository) (*schema.ProjectDetail, string) {
 				projectID := random.UUID()
 				mr.project.EXPECT().GetProject(anyCtx{}, projectID).Return(nil, repository.ErrNotFound)
 				return nil, fmt.Sprintf("/api/v1/projects/%s", projectID)
@@ -245,12 +245,12 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string)
+		setup      func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string) {
 				duration := random.Duration()
 				reqBody = makeCreateProjectRequest(
 					t,

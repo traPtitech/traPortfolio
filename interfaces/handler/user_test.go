@@ -18,13 +18,13 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupUserMock(t *testing.T) (MockRepo, API) {
+func setupUserMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	user := mock_repository.NewMockUserRepository(ctrl)
 	event := mock_repository.NewMockEventRepository(ctrl)
-	mr := MockRepo{user, event, nil, nil, nil}
+	mr := MockRepository{user, event, nil, nil, nil}
 	api := NewAPI(nil, NewUserHandler(user, event), nil, nil, nil, nil)
 
 	return mr, api
@@ -35,12 +35,12 @@ func TestUserHandler_GetUsers(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.User, path string)
+		setup      func(mr MockRepository) (hres []*schema.User, path string)
 		statusCode int
 	}{
 		{
 			name: "Success_NoOpts",
-			setup: func(mr MockRepo) (hres []*schema.User, path string) {
+			setup: func(mr MockRepository) (hres []*schema.User, path string) {
 				casenum := 2
 				repoUsers := []*domain.User{}
 				hresUsers := []*schema.User{}
@@ -66,7 +66,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 		},
 		{
 			name: "Success_WithOpts_IncludeSuspended",
-			setup: func(mr MockRepo) (hres []*schema.User, path string) {
+			setup: func(mr MockRepository) (hres []*schema.User, path string) {
 				casenum := 2
 				repoUsers := []*domain.User{}
 				hresUsers := []*schema.User{}
@@ -95,7 +95,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 		},
 		{
 			name: "Success_WithOpts_Name",
-			setup: func(mr MockRepo) (hres []*schema.User, path string) {
+			setup: func(mr MockRepository) (hres []*schema.User, path string) {
 				repoUsers := []*domain.User{
 					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				}
@@ -118,14 +118,14 @@ func TestUserHandler_GetUsers(t *testing.T) {
 		},
 		{
 			name: "invalid args: multiple options",
-			setup: func(_ MockRepo) (hres []*schema.User, path string) {
+			setup: func(_ MockRepository) (hres []*schema.User, path string) {
 				return nil, fmt.Sprintf("/api/v1/users?includeSuspended=%t&name=%s", random.Bool(), random.AlphaNumeric())
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres []*schema.User, path string) {
+			setup: func(mr MockRepository) (hres []*schema.User, path string) {
 				args := repository.GetUsersArgs{}
 
 				mr.user.EXPECT().GetUsers(anyCtx{}, &args).Return(nil, errors.New("Internal Server Error"))
@@ -135,14 +135,14 @@ func TestUserHandler_GetUsers(t *testing.T) {
 		},
 		{
 			name: "invalid limit with 0",
-			setup: func(_ MockRepo) (hres []*schema.User, path string) {
+			setup: func(_ MockRepository) (hres []*schema.User, path string) {
 				return nil, fmt.Sprintf("/api/v1/users?limit=%d", 0)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "invalid limit less than 1",
-			setup: func(_ MockRepo) (hres []*schema.User, path string) {
+			setup: func(_ MockRepository) (hres []*schema.User, path string) {
 				return nil, fmt.Sprintf("/api/v1/users?limit=%d", -1)
 			},
 			statusCode: http.StatusBadRequest,
@@ -171,12 +171,12 @@ func TestUserHandler_SyncUsers(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (path string)
+		setup      func(mr MockRepository) (path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (path string) {
+			setup: func(mr MockRepository) (path string) {
 				mr.user.EXPECT().SyncUsers(anyCtx{}).Return(nil)
 				return "/api/v1/users/sync"
 			},
@@ -184,7 +184,7 @@ func TestUserHandler_SyncUsers(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (path string) {
+			setup: func(mr MockRepository) (path string) {
 				mr.user.EXPECT().SyncUsers(anyCtx{}).Return(errors.New("Internal Server Error"))
 				return "/api/v1/users/sync"
 			},
@@ -212,12 +212,12 @@ func TestUserHandler_GetUser(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres *schema.UserDetail, userpath string)
+		setup      func(mr MockRepository) (hres *schema.UserDetail, userpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(mr MockRepo) (hres *schema.UserDetail, userpath string) {
+			setup: func(mr MockRepository) (hres *schema.UserDetail, userpath string) {
 				const accountNum int = 9
 				rAccounts := []*domain.Account{}
 				hAccounts := []schema.Account{}
@@ -269,7 +269,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres *schema.UserDetail, userpath string) {
+			setup: func(mr MockRepository) (hres *schema.UserDetail, userpath string) {
 				id := random.UUID()
 				mr.user.EXPECT().GetUser(anyCtx{}, id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/users/%s", id)
@@ -279,7 +279,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(mr MockRepo) (hres *schema.UserDetail, userpath string) {
+			setup: func(mr MockRepository) (hres *schema.UserDetail, userpath string) {
 				id := random.UUID()
 				mr.user.EXPECT().GetUser(anyCtx{}, id).Return(nil, repository.ErrValidate)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
@@ -289,7 +289,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ MockRepo) (hres *schema.UserDetail, userpath string) {
+			setup: func(_ MockRepository) (hres *schema.UserDetail, userpath string) {
 				id := random.AlphaNumericN(36)
 				path := fmt.Sprintf("/api/v1/users/%s", id)
 				return nil, path
@@ -321,12 +321,12 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.EditUserRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.EditUserRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.EditUserRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := random.Bool()
@@ -349,7 +349,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Success with description args(len=256)",
-			setup: func(mr MockRepo) (*schema.EditUserRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 256)
 				userCheck := random.Bool()
@@ -372,7 +372,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(mr MockRepo) (*schema.EditUserRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := random.Bool()
@@ -395,7 +395,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) (*schema.EditUserRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := random.AlphaNumeric()
 				userCheck := random.Bool()
@@ -418,7 +418,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: invalid userID",
-			setup: func(_ MockRepo) (*schema.EditUserRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserRequest, string) {
 				path := fmt.Sprintf("/api/v1/users/%s", "invalid")
 				return nil, path
 			},
@@ -426,7 +426,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "Bad Request: too long description(len>256)",
-			setup: func(_ MockRepo) (*schema.EditUserRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserRequest, string) {
 				userID := random.UUID()
 				userBio := strings.Repeat("a", 257)
 
@@ -461,12 +461,12 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.Account, path string)
+		setup      func(mr MockRepository) (hres []*schema.Account, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(mr MockRepo) (hres []*schema.Account, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Account, path string) {
 				userID := random.UUID()
 				accountKinds := rand.IntN((1<<domain.AccountLimit)-1) + 1
 				//AccountLimit種類のうち、テストに使うものだけbitが立っている
@@ -510,7 +510,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres []*schema.Account, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Account, path string) {
 				userID := random.UUID()
 				mr.user.EXPECT().GetAccounts(anyCtx{}, userID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -520,7 +520,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(mr MockRepo) (hres []*schema.Account, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Account, path string) {
 				userID := random.UUID()
 				mr.user.EXPECT().GetAccounts(anyCtx{}, userID).Return(nil, repository.ErrValidate)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -530,7 +530,7 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ MockRepo) (hres []*schema.Account, path string) {
+			setup: func(_ MockRepository) (hres []*schema.Account, path string) {
 				userID := random.AlphaNumericN(36)
 				path = fmt.Sprintf("/api/v1/users/%s/accounts", userID)
 				return nil, path
@@ -561,12 +561,12 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres *schema.Account, path string)
+		setup      func(mr MockRepository) (hres *schema.Account, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(mr MockRepo) (hres *schema.Account, path string) {
+			setup: func(mr MockRepository) (hres *schema.Account, path string) {
 				userID := random.UUID()
 				prRandom := random.Bool()
 
@@ -593,7 +593,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres *schema.Account, path string) {
+			setup: func(mr MockRepository) (hres *schema.Account, path string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -605,7 +605,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: invalid userID",
-			setup: func(_ MockRepo) (hres *schema.Account, path string) {
+			setup: func(_ MockRepository) (hres *schema.Account, path string) {
 				userID := random.AlphaNumericN(36)
 				accountID := random.UUID()
 
@@ -616,7 +616,7 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ MockRepo) (hres *schema.Account, path string) {
+			setup: func(_ MockRepository) (hres *schema.Account, path string) {
 				userID := random.UUID()
 				accountID := random.AlphaNumericN(36)
 
@@ -649,12 +649,12 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.AddAccountRequest, expectedResBody schema.Account, path string)
+		setup      func(mr MockRepository) (reqBody *schema.AddAccountRequest, expectedResBody schema.Account, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(mr MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
 
@@ -696,7 +696,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Success: Account Type is 0",
-			setup: func(mr MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(mr MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 
 				reqBody := schema.AddAccountRequest{
@@ -737,7 +737,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: DisplayName is empty",
-			setup: func(_ MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(_ MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
 
@@ -755,7 +755,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: Account Type is invalid",
-			setup: func(_ MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(_ MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 
 				reqBody := schema.AddAccountRequest{
@@ -772,7 +772,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: UUID",
-			setup: func(_ MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(_ MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -782,7 +782,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(_ MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.AlphaNumericN(36)
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -792,7 +792,7 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (*schema.AddAccountRequest, schema.Account, string) {
+			setup: func(mr MockRepository) (*schema.AddAccountRequest, schema.Account, string) {
 				userID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
 
@@ -840,12 +840,12 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.EditUserAccountRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.EditUserAccountRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
@@ -878,7 +878,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
@@ -911,7 +911,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: empty display name(but not nil)",
-			setup: func(_ MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -929,7 +929,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large account type",
-			setup: func(_ MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -947,7 +947,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: invalid url",
-			setup: func(_ MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -965,7 +965,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
-			setup: func(_ MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.AlphaNumericN(36)
 				accountID := random.UUID()
 
@@ -976,7 +976,7 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID2",
-			setup: func(_ MockRepo) (*schema.EditUserAccountRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditUserAccountRequest, string) {
 				userID := random.UUID()
 				accountID := random.AlphaNumericN(36)
 
@@ -1007,12 +1007,12 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (path string)
+		setup      func(mr MockRepository) (path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) string {
+			setup: func(mr MockRepository) string {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -1024,7 +1024,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 		{
 			name: "Forbidden",
-			setup: func(mr MockRepo) string {
+			setup: func(mr MockRepository) string {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -1036,7 +1036,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) string {
+			setup: func(mr MockRepository) string {
 				userID := random.UUID()
 				accountID := random.UUID()
 
@@ -1048,7 +1048,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID1",
-			setup: func(_ MockRepo) string {
+			setup: func(_ MockRepository) string {
 				userID := random.AlphaNumericN(36)
 				accountID := random.UUID()
 
@@ -1059,7 +1059,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: nonUUID2",
-			setup: func(_ MockRepo) string {
+			setup: func(_ MockRepository) string {
 				userID := random.UUID()
 				accountID := random.AlphaNumericN(36)
 
@@ -1086,7 +1086,7 @@ func TestUserHandler_DeleteUserAccount(t *testing.T) {
 }
 
 func TestUserHandler_GetUserProjects(t *testing.T) {
-	makeProjects := func(t *testing.T, mr MockRepo, projectsLen int) (hres []*schema.UserProject, path string) {
+	makeProjects := func(t *testing.T, mr MockRepository, projectsLen int) (hres []*schema.UserProject, path string) {
 		t.Helper()
 
 		userID := random.UUID()
@@ -1123,33 +1123,33 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(t *testing.T, mr MockRepo) (hres []*schema.UserProject, path string)
+		setup      func(t *testing.T, mr MockRepository) (hres []*schema.UserProject, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserProject, path string) {
 				return makeProjects(t, mr, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserProject, path string) {
 				return makeProjects(t, mr, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserProject, path string) {
 				return makeProjects(t, mr, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserProject, path string) {
 				userID := random.UUID()
 
 				mr.user.EXPECT().GetProjects(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1160,7 +1160,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(t *testing.T, _ MockRepo) (hres []*schema.UserProject, path string) {
+			setup: func(t *testing.T, _ MockRepository) (hres []*schema.UserProject, path string) {
 				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/projects", userID)
@@ -1187,7 +1187,7 @@ func TestUserHandler_GetUserProjects(t *testing.T) {
 }
 
 func TestUserHandler_GetUserContests(t *testing.T) {
-	makeContests := func(t *testing.T, mr MockRepo, contestsLen int) (hres []*schema.UserContest, path string) {
+	makeContests := func(t *testing.T, mr MockRepository, contestsLen int) (hres []*schema.UserContest, path string) {
 		t.Helper()
 
 		userID := random.UUID()
@@ -1231,33 +1231,33 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(t *testing.T, mr MockRepo) (hres []*schema.UserContest, path string)
+		setup      func(t *testing.T, mr MockRepository) (hres []*schema.UserContest, path string)
 		statusCode int
 	}{
 		{
 			name: "success 1",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserContest, path string) {
 				return makeContests(t, mr, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserContest, path string) {
 				return makeContests(t, mr, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserContest, path string) {
 				return makeContests(t, mr, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(t *testing.T, mr MockRepo) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, mr MockRepository) (hres []*schema.UserContest, path string) {
 				userID := random.UUID()
 
 				mr.user.EXPECT().GetContests(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1268,7 +1268,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(t *testing.T, _ MockRepo) (hres []*schema.UserContest, path string) {
+			setup: func(t *testing.T, _ MockRepository) (hres []*schema.UserContest, path string) {
 				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/contests", userID)
@@ -1295,7 +1295,7 @@ func TestUserHandler_GetUserContests(t *testing.T) {
 }
 
 func TestUserHandler_GetUserGroups(t *testing.T) {
-	makeGroups := func(mr MockRepo, groupsLen int) (hres []*schema.UserGroup, path string) {
+	makeGroups := func(mr MockRepository, groupsLen int) (hres []*schema.UserGroup, path string) {
 		userID := random.UUID()
 
 		repoGroups := []*domain.UserGroup{}
@@ -1327,40 +1327,40 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.UserGroup, path string)
+		setup      func(mr MockRepository) (hres []*schema.UserGroup, path string)
 		statusCode int
 	}{
 		{
 			name: "success 0",
-			setup: func(mr MockRepo) (hres []*schema.UserGroup, path string) {
+			setup: func(mr MockRepository) (hres []*schema.UserGroup, path string) {
 				return makeGroups(mr, 0)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 1",
-			setup: func(mr MockRepo) (hres []*schema.UserGroup, path string) {
+			setup: func(mr MockRepository) (hres []*schema.UserGroup, path string) {
 				return makeGroups(mr, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(mr MockRepo) (hres []*schema.UserGroup, path string) {
+			setup: func(mr MockRepository) (hres []*schema.UserGroup, path string) {
 				return makeGroups(mr, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(mr MockRepo) (hres []*schema.UserGroup, path string) {
+			setup: func(mr MockRepository) (hres []*schema.UserGroup, path string) {
 				return makeGroups(mr, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) (hres []*schema.UserGroup, path string) {
+			setup: func(mr MockRepository) (hres []*schema.UserGroup, path string) {
 				userID := random.UUID()
 
 				mr.user.EXPECT().GetGroupsByUserID(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1371,7 +1371,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ MockRepo) (hres []*schema.UserGroup, path string) {
+			setup: func(_ MockRepository) (hres []*schema.UserGroup, path string) {
 				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/groups", userID)
@@ -1398,7 +1398,7 @@ func TestUserHandler_GetUserGroups(t *testing.T) {
 }
 
 func TestUserHandler_GetUserEvents(t *testing.T) {
-	makeEvents := func(mr MockRepo, eventsLen int) (hres []*schema.Event, path string) {
+	makeEvents := func(mr MockRepository, eventsLen int) (hres []*schema.Event, path string) {
 		userID := random.UUID()
 
 		repoEvents := []*domain.Event{}
@@ -1436,40 +1436,40 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.Event, path string)
+		setup      func(mr MockRepository) (hres []*schema.Event, path string)
 		statusCode int
 	}{
 		{
 			name: "success 0",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				return makeEvents(mr, 0)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 1",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				return makeEvents(mr, 1)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 2",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				return makeEvents(mr, 2)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "success 32",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				return makeEvents(mr, 32)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				userID := random.UUID()
 
 				mr.event.EXPECT().GetUserEvents(anyCtx{}, userID).Return(nil, repository.ErrNotFound)
@@ -1480,7 +1480,7 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error",
-			setup: func(_ MockRepo) (hres []*schema.Event, path string) {
+			setup: func(_ MockRepository) (hres []*schema.Event, path string) {
 				userID := random.AlphaNumericN(36)
 
 				path = fmt.Sprintf("/api/v1/users/%s/events", userID)

@@ -14,7 +14,7 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 )
 
-type MockRepo struct {
+type MockRepository struct {
 	user    *mock_repository.MockUserRepository
 	event   *mock_repository.MockEventRepository
 	contest *mock_repository.MockContestRepository

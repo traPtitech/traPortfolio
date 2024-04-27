@@ -23,12 +23,12 @@ const (
 	invalidID = "invalid"
 )
 
-func setupContestMock(t *testing.T) (MockRepo, API) {
+func setupContestMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	r := mock_repository.NewMockContestRepository(ctrl)
-	mr := MockRepo{nil, nil, r, nil, nil}
+	mr := MockRepository{nil, nil, r, nil, nil}
 	api := NewAPI(nil, nil, nil, nil, NewContestHandler(r), nil)
 
 	return mr, api
@@ -48,14 +48,14 @@ func TestContestHandler_GetContests(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name         string
-		setup        func(mr MockRepo, want []*domain.Contest) (path string)
+		setup        func(mr MockRepository, want []*domain.Contest) (path string)
 		statusCode   int
 		repoContests []*domain.Contest
 		hresContests []*schema.Contest
 	}{
 		{
 			name: "success",
-			setup: func(mr MockRepo, want []*domain.Contest) string {
+			setup: func(mr MockRepository, want []*domain.Contest) string {
 				mr.contest.EXPECT().GetContests(anyCtx{}).Return(want, nil)
 				return "/api/v1/contests"
 			},
@@ -187,12 +187,12 @@ func TestContestHandler_GetContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (repoContest *domain.ContestDetail, hresContest *schema.ContestDetail, path string)
+		setup      func(mr MockRepository) (repoContest *domain.ContestDetail, hresContest *schema.ContestDetail, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*domain.ContestDetail, *schema.ContestDetail, string) {
+			setup: func(mr MockRepository) (*domain.ContestDetail, *schema.ContestDetail, string) {
 				want, hres := makeContest(t)
 				mr.contest.EXPECT().GetContest(anyCtx{}, want.ID).Return(want, nil)
 				mr.contest.EXPECT().GetContestTeams(anyCtx{}, want.ID).Return(want.ContestTeams, nil)
@@ -204,7 +204,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		},
 		{
 			name: "Invalid ID",
-			setup: func(_ MockRepo) (*domain.ContestDetail, *schema.ContestDetail, string) {
+			setup: func(_ MockRepository) (*domain.ContestDetail, *schema.ContestDetail, string) {
 				path := fmt.Sprintf("/api/v1/contests/%s", invalidID)
 				return &domain.ContestDetail{}, &schema.ContestDetail{}, path
 			},
@@ -212,7 +212,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) (*domain.ContestDetail, *schema.ContestDetail, string) {
+			setup: func(mr MockRepository) (*domain.ContestDetail, *schema.ContestDetail, string) {
 				uid := random.UUID()
 				mr.contest.EXPECT().GetContest(anyCtx{}, uid).Return(nil, repository.ErrNotFound)
 
@@ -255,12 +255,12 @@ func TestContestHandler_CreateContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					t,
@@ -304,7 +304,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 		},
 		{
 			name: "Bad Request: invalid url",
-			setup: func(_ MockRepo) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
+			setup: func(_ MockRepository) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					t,
@@ -321,7 +321,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 		},
 		{
 			name: "Conflict",
-			setup: func(mr MockRepo) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.CreateContestRequest, expectedResBody *schema.Contest, resBody *schema.Contest, path string) {
 				since, until := random.SinceAndUntil()
 				reqBody = makeCreateContestRequest(
 					t,
@@ -364,12 +364,12 @@ func TestContestHandler_PatchContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.EditContestRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.EditContestRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success 1",
-			setup: func(mr MockRepo) (*schema.EditContestRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
 				name := random.AlphaNumeric()
 				link := random.RandURLString()
@@ -399,7 +399,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid ID",
-			setup: func(_ MockRepo) (*schema.EditContestRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestRequest, string) {
 				path := fmt.Sprintf("/api/v1/contests/%s", invalidID)
 				return &schema.EditContestRequest{}, path
 			},
@@ -407,7 +407,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: too long description",
-			setup: func(_ MockRepo) (*schema.EditContestRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
 				description := strings.Repeat("a", 257)
 				reqBody := &schema.EditContestRequest{
@@ -420,7 +420,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid link",
-			setup: func(_ MockRepo) (*schema.EditContestRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
 				link := random.AlphaNumeric()
 				reqBody := &schema.EditContestRequest{
@@ -433,7 +433,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid duration",
-			setup: func(_ MockRepo) (*schema.EditContestRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
 				since, until := random.SinceAndUntil()
 				since, until = until, since
@@ -450,7 +450,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: too long name",
-			setup: func(_ MockRepo) (*schema.EditContestRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
 				name := strings.Repeat("a", 33)
 				reqBody := &schema.EditContestRequest{
@@ -481,12 +481,12 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (path string)
+		setup      func(mr MockRepository) (path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) string {
+			setup: func(mr MockRepository) string {
 				contestID := random.UUID()
 				mr.contest.EXPECT().DeleteContest(anyCtx{}, contestID).Return(nil)
 				return fmt.Sprintf("/api/v1/contests/%s", contestID)
@@ -495,7 +495,7 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid ID",
-			setup: func(mr MockRepo) string {
+			setup: func(mr MockRepository) string {
 				return fmt.Sprintf("/api/v1/contests/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
@@ -520,12 +520,12 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.ContestTeam, path string)
+		setup      func(mr MockRepository) (hres []*schema.ContestTeam, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (hres []*schema.ContestTeam, path string) {
+			setup: func(mr MockRepository) (hres []*schema.ContestTeam, path string) {
 				contestID := random.UUID()
 				repoContestTeams := []*domain.ContestTeam{
 					{
@@ -580,7 +580,7 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid ID",
-			setup: func(_ MockRepo) (hres []*schema.ContestTeam, path string) {
+			setup: func(_ MockRepository) (hres []*schema.ContestTeam, path string) {
 				return []*schema.ContestTeam{}, fmt.Sprintf("/api/v1/contests/%s/teams", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
@@ -607,12 +607,12 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres schema.ContestTeamDetail, path string)
+		setup      func(mr MockRepository) (hres schema.ContestTeamDetail, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (schema.ContestTeamDetail, string) {
+			setup: func(mr MockRepository) (schema.ContestTeamDetail, string) {
 				teamID := random.UUID()
 				contestID := random.UUID()
 				repoContestTeamDetail := domain.ContestTeamDetail{
@@ -657,21 +657,21 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(_ MockRepo) (schema.ContestTeamDetail, string) {
+			setup: func(_ MockRepository) (schema.ContestTeamDetail, string) {
 				return schema.ContestTeamDetail{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s", invalidID, random.UUID())
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(_ MockRepo) (schema.ContestTeamDetail, string) {
+			setup: func(_ MockRepository) (schema.ContestTeamDetail, string) {
 				return schema.ContestTeamDetail{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "NotFound: Contest not found",
-			setup: func(mr MockRepo) (schema.ContestTeamDetail, string) {
+			setup: func(mr MockRepository) (schema.ContestTeamDetail, string) {
 				teamID := random.UUID()
 				contestID := random.UUID()
 				mr.contest.EXPECT().GetContestTeam(anyCtx{}, contestID, teamID).Return(nil, repository.ErrNotFound)
@@ -701,12 +701,12 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.AddContestTeamRequest, expectedResBody schema.ContestTeam, path string)
+		setup      func(mr MockRepository) (reqBody *schema.AddContestTeamRequest, expectedResBody schema.ContestTeam, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(mr MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
@@ -747,7 +747,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(_ MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
 					Link:        ptr(t, random.RandURLString()),
@@ -760,7 +760,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: missing required arg",
-			setup: func(_ MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					// Name:        random.AlphaNumeric(), // missing
@@ -774,7 +774,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: too long description",
-			setup: func(_ MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
@@ -788,7 +788,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid link",
-			setup: func(_ MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
@@ -802,7 +802,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: too long name",
-			setup: func(_ MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        strings.Repeat("a", 33),
@@ -816,7 +816,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: too long result",
-			setup: func(_ MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
@@ -830,7 +830,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "Contest not exist",
-			setup: func(mr MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(mr MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
@@ -851,7 +851,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 		},
 		{
 			name: "conflict contest",
-			setup: func(mr MockRepo) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
+			setup: func(mr MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
@@ -892,12 +892,12 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.EditContestTeamRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.EditContestTeamRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditContestTeamRequest, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &schema.EditContestTeamRequest{
@@ -919,7 +919,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(_ MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
 					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
@@ -932,7 +932,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(_ MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
 					Name:        ptr(t, random.AlphaNumeric()),
 					Link:        ptr(t, random.RandURLString()),
@@ -945,7 +945,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid request body: not nil but empty",
-			setup: func(_ MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				emptyStr := ""
 				reqBody := &schema.EditContestTeamRequest{
 					Description: &emptyStr,
@@ -957,7 +957,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid request body: too long string",
-			setup: func(_ MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
 					Description: ptr(t, strings.Repeat("a", 257)),
 					Name:        ptr(t, strings.Repeat("a", 33)),
@@ -969,7 +969,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid request body: invalid link",
-			setup: func(_ MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
 					Link: ptr(t, random.AlphaNumeric()),
 				}
@@ -979,7 +979,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 		},
 		{
 			name: "Contest not exist",
-			setup: func(mr MockRepo) (*schema.EditContestTeamRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditContestTeamRequest, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &schema.EditContestTeamRequest{
@@ -1019,12 +1019,12 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.User, path string)
+		setup      func(mr MockRepository) (hres []*schema.User, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) ([]*schema.User, string) {
+			setup: func(mr MockRepository) ([]*schema.User, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				users := []*domain.User{
@@ -1046,7 +1046,7 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(_ MockRepo) ([]*schema.User, string) {
+			setup: func(_ MockRepository) ([]*schema.User, string) {
 				teamID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
@@ -1054,7 +1054,7 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(_ MockRepo) ([]*schema.User, string) {
+			setup: func(_ MockRepository) ([]*schema.User, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},
@@ -1062,7 +1062,7 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "Contest not exist",
-			setup: func(mr MockRepo) ([]*schema.User, string) {
+			setup: func(mr MockRepository) ([]*schema.User, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				mr.contest.EXPECT().GetContestTeamMembers(anyCtx{}, contestID, teamID).Return(nil, repository.ErrNotFound)
@@ -1096,12 +1096,12 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 	}
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *Req, path string)
+		setup      func(mr MockRepository) (reqBody *Req, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*Req, string) {
+			setup: func(mr MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &Req{
@@ -1117,7 +1117,7 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				teamID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
@@ -1125,7 +1125,7 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},
@@ -1133,7 +1133,7 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid request body: members is empty",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				return &Req{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
@@ -1142,7 +1142,7 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid request body: memberID is invalid",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				return &Req{
@@ -1156,7 +1156,7 @@ func TestContestHandler_AddContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "Contest or team not exist",
-			setup: func(mr MockRepo) (*Req, string) {
+			setup: func(mr MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &Req{
@@ -1194,12 +1194,12 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 	}
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (*Req, string)
+		setup      func(mr MockRepository) (*Req, string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*Req, string) {
+			setup: func(mr MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &Req{
@@ -1215,7 +1215,7 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid contest ID",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				teamID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", invalidID, teamID)
 			},
@@ -1223,7 +1223,7 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid team ID",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, invalidID)
 			},
@@ -1231,7 +1231,7 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid request body: members is empty",
-			setup: func(_ MockRepo) (*Req, string) {
+			setup: func(_ MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				return &Req{}, fmt.Sprintf("/api/v1/contests/%s/teams/%s/members", contestID, teamID)
@@ -1240,7 +1240,7 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 		},
 		{
 			name: "Contest or team not exist",
-			setup: func(mr MockRepo) (*Req, string) {
+			setup: func(mr MockRepository) (*Req, string) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &Req{

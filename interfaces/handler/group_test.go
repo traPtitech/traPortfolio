@@ -16,13 +16,13 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupGroupMock(t *testing.T) (MockRepo, API) {
+func setupGroupMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	user := mock_repository.NewMockUserRepository(ctrl)
 	group := mock_repository.NewMockGroupRepository(ctrl)
-	mr := MockRepo{user, nil, nil, group, nil}
+	mr := MockRepository{user, nil, nil, group, nil}
 	api := NewAPI(nil, nil, nil, nil, nil, NewGroupHandler(group, user))
 
 	return mr, api
@@ -33,12 +33,12 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.Group, path string)
+		setup      func(mr MockRepository) (hres []*schema.Group, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(mr MockRepo) (hres []*schema.Group, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Group, path string) {
 				casenum := 2
 				repoGroups := []*domain.Group{}
 				hresGroups := []*schema.Group{}
@@ -65,7 +65,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres []*schema.Group, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Group, path string) {
 				mr.group.EXPECT().GetGroups(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/groups"
 			},
@@ -95,12 +95,12 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres *schema.GroupDetail, path string)
+		setup      func(mr MockRepository) (hres *schema.GroupDetail, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(mr MockRepo) (hres *schema.GroupDetail, path string) {
+			setup: func(mr MockRepository) (hres *schema.GroupDetail, path string) {
 				rgroupAdmins := []*domain.User{}
 				hgroupAdmins := []schema.User{}
 
@@ -166,7 +166,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres *schema.GroupDetail, path string) {
+			setup: func(mr MockRepository) (hres *schema.GroupDetail, path string) {
 				groupID := random.UUID()
 				mr.group.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, errors.New("Internal Server Error"))
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
@@ -176,7 +176,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "forbidden",
-			setup: func(mr MockRepo) (hres *schema.GroupDetail, path string) {
+			setup: func(mr MockRepository) (hres *schema.GroupDetail, path string) {
 				groupID := random.UUID()
 				mr.group.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, repository.ErrForbidden)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
@@ -186,7 +186,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "not found",
-			setup: func(mr MockRepo) (hres *schema.GroupDetail, path string) {
+			setup: func(mr MockRepository) (hres *schema.GroupDetail, path string) {
 				groupID := random.UUID()
 				mr.group.EXPECT().GetGroup(anyCtx{}, groupID).Return(nil, repository.ErrNotFound)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
@@ -196,7 +196,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error nonUUID",
-			setup: func(_ MockRepo) (hres *schema.GroupDetail, path string) {
+			setup: func(_ MockRepository) (hres *schema.GroupDetail, path string) {
 				groupID := random.AlphaNumericN(36)
 				path = fmt.Sprintf("/api/v1/groups/%s", groupID)
 				return nil, path

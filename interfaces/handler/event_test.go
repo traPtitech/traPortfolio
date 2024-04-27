@@ -17,13 +17,13 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func setupEventMock(t *testing.T) (MockRepo, API) {
+func setupEventMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	event := mock_repository.NewMockEventRepository(ctrl)
 	user := mock_repository.NewMockUserRepository(ctrl)
-	mr := MockRepo{user, event, nil, nil, nil}
+	mr := MockRepository{user, event, nil, nil, nil}
 	api := NewAPI(nil, nil, nil, NewEventHandler(event, user), nil, nil)
 
 	return mr, api
@@ -34,12 +34,12 @@ func TestEventHandler_GetEvents(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (hres []*schema.Event, path string)
+		setup      func(mr MockRepository) (hres []*schema.Event, path string)
 		statusCode int
 	}{
 		{
 			name: "success",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				casenum := 2
 				repoEvents := []*domain.Event{}
 				hresEvents := []*schema.Event{}
@@ -72,7 +72,7 @@ func TestEventHandler_GetEvents(t *testing.T) {
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo) (hres []*schema.Event, path string) {
+			setup: func(mr MockRepository) (hres []*schema.Event, path string) {
 				mr.event.EXPECT().GetEvents(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/events"
 			},
@@ -100,12 +100,12 @@ func TestEventHandler_GetEvents(t *testing.T) {
 func TestEventHandler_GetEvent(t *testing.T) {
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo, hostnum int) (hres *schema.EventDetail, eventpath string)
+		setup      func(mr MockRepository, hostnum int) (hres *schema.EventDetail, eventpath string)
 		statusCode int
 	}{
 		{
 			name: "success random",
-			setup: func(mr MockRepo, hostnum int) (hres *schema.EventDetail, eventpath string) {
+			setup: func(mr MockRepository, hostnum int) (hres *schema.EventDetail, eventpath string) {
 				rHost := []*domain.User{}
 				hHost := []schema.User{}
 
@@ -162,14 +162,14 @@ func TestEventHandler_GetEvent(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid event ID",
-			setup: func(_ MockRepo, hostnum int) (hres *schema.EventDetail, eventpath string) {
+			setup: func(_ MockRepository, hostnum int) (hres *schema.EventDetail, eventpath string) {
 				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "internal error",
-			setup: func(mr MockRepo, _ int) (hres *schema.EventDetail, eventpath string) {
+			setup: func(mr MockRepository, _ int) (hres *schema.EventDetail, eventpath string) {
 				id := random.UUID()
 				mr.event.EXPECT().GetEvent(anyCtx{}, id).Return(nil, errors.New("Internal Server Error"))
 				path := fmt.Sprintf("/api/v1/events/%s", id)
@@ -209,12 +209,12 @@ func TestEventHandler_EditEvent(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepo) (reqBody *schema.EditEventRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.EditEventRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepo) (*schema.EditEventRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := rand.N(domain.EventLevelLimit)
 
@@ -234,14 +234,14 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "BadRequest: Invalid event ID",
-			setup: func(_ MockRepo) (*schema.EditEventRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditEventRequest, string) {
 				return nil, fmt.Sprintf("/api/v1/events/%s", invalidID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "Conflict",
-			setup: func(mr MockRepo) (*schema.EditEventRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := rand.N(domain.EventLevelLimit)
 
@@ -261,7 +261,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Not Found",
-			setup: func(mr MockRepo) (*schema.EditEventRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := rand.N(domain.EventLevelLimit)
 
@@ -281,7 +281,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: bind error",
-			setup: func(mr MockRepo) (*schema.EditEventRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := rand.N(domain.EventLevelLimit)
 
@@ -301,7 +301,7 @@ func TestEventHandler_EditEvent(t *testing.T) {
 		},
 		{
 			name: "Bad Request: validate error: too large level",
-			setup: func(_ MockRepo) (*schema.EditEventRequest, string) {
+			setup: func(_ MockRepository) (*schema.EditEventRequest, string) {
 				eventID := random.UUID()
 				eventLevel := schema.EventLevel(domain.EventLevelLimit)
 
