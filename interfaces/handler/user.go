@@ -35,9 +35,9 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 			return fmt.Errorf("%w: cannot specify both 'me' and 'name'", repository.ErrInvalidArg)
 		}
 
-		name, err := getMyName(c)
-		if err != nil {
-			return err
+		name, ok := getMyName(c)
+		if !ok {
+			return fmt.Errorf("%w: user name not found", repository.ErrForbidden)
 		}
 
 		req.Name = &name
