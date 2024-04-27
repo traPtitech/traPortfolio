@@ -152,14 +152,6 @@ func makePortalUser(t *testing.T, user *domain.User) *external.PortalUserRespons
 	}
 }
 
-func makeTraqUser(t *testing.T, user *domain.UserDetail) *external.TraQUserResponse {
-	t.Helper()
-	return &external.TraQUserResponse{
-		ID:    user.ID,
-		State: user.State,
-	}
-}
-
 // Interface guards
 var (
 	_ sqlmock.Argument = anyTime{}
