@@ -42,6 +42,7 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 	return eargs, nil
 }
 
+// TODO: traQを切り離す
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 
@@ -119,6 +120,7 @@ func (r *UserRepository) SyncUsers(ctx context.Context) error {
 				ID:          v.ID,
 				Description: "",
 				Name:        v.Name,
+				State:       v.State,
 			}
 			err := tx.
 				WithContext(ctx).
@@ -165,11 +167,6 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		return nil, err
 	}
 
-	traQUser, err := r.traQ.GetUser(userID)
-	if err != nil {
-		return nil, err
-	}
-
 	result := domain.UserDetail{
 		User: *domain.NewUser(
 			user.ID,
@@ -177,7 +174,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 			portalUser.RealName,
 			user.Check,
 		),
-		State:    traQUser.State,
+		State:    user.State,
 		Bio:      user.Description,
 		Accounts: accounts,
 	}
@@ -185,6 +182,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 	return &result, nil
 }
 
+// TODO: テスト用にしか使われていないので消すかテスト用であることを明示する
 func (r *UserRepository) CreateUser(ctx context.Context, args *repository.CreateUserArgs) (*domain.UserDetail, error) {
 	portalUser, err := r.portal.GetUserByTraqID(args.Name)
 	if err != nil {
@@ -197,6 +195,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 		Description: args.Description,
 		Check:       args.Check,
 		Name:        args.Name,
+		State:       domain.TraqStateActive,
 	}
 
 	err = r.h.WithContext(ctx).Create(&user).Error

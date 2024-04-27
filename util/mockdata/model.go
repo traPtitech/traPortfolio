@@ -29,18 +29,21 @@ func CloneMockUsers() []*model.User {
 			Description: "I am user1",
 			Check:       true,
 			Name:        userName1,
+			State:       domain.TraqStateActive,
 		},
 		{
 			ID:          UserID2(),
 			Description: "I am user2",
 			Check:       true,
 			Name:        userName2,
+			State:       domain.TraqStateDeactivated,
 		},
 		{
 			ID:          UserID3(),
 			Description: "I am lolico",
 			Check:       false,
 			Name:        userName3,
+			State:       domain.TraqStateActive,
 		},
 	}
 }
