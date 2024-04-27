@@ -88,28 +88,22 @@ func CloneMockPortalUsers() []*external.PortalUserResponse {
 	}
 }
 
-func CloneMockTraQUsers() []*TraQUser {
-	return []*TraQUser{
+func CloneMockTraQUsers() []*external.TraQUserResponse {
+	return []*external.TraQUserResponse{
 		{
-			User: &external.TraQUserResponse{
-				ID:    UserID1(),
-				State: domain.TraqStateActive,
-			},
-			Name: userName1,
+			ID:    UserID1(),
+			Name:  userName1,
+			State: domain.TraqStateActive,
 		},
 		{
-			User: &external.TraQUserResponse{
-				ID:    UserID2(),
-				State: domain.TraqStateDeactivated,
-			},
-			Name: userName2,
+			ID:    UserID2(),
+			Name:  userName2,
+			State: domain.TraqStateDeactivated,
 		},
 		{
-			User: &external.TraQUserResponse{
-				ID:    UserID3(),
-				State: domain.TraqStateActive,
-			},
-			Name: userName3,
+			ID:    UserID3(),
+			Name:  userName3,
+			State: domain.TraqStateActive,
 		},
 	}
 }

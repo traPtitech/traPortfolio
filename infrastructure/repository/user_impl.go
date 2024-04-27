@@ -5,11 +5,13 @@ import (
 	"errors"
 
 	"github.com/gofrs/uuid"
+	"github.com/samber/lo"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepository struct {
@@ -114,24 +116,22 @@ func (r *UserRepository) SyncUsers(ctx context.Context) error {
 		return err
 	}
 
-	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, v := range traqUsers {
-			user := model.User{
-				ID:          v.ID,
-				Description: "",
-				Name:        v.Name,
-				State:       v.State,
-			}
-			err := tx.
-				WithContext(ctx).
-				FirstOrCreate(&user, &model.User{ID: v.ID}).
-				Error
-			if err != nil {
-				return err
-			}
+	users := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *model.User {
+		return &model.User{
+			ID:    u.ID,
+			Name:  u.Name,
+			State: u.State,
 		}
-		return nil
 	})
+
+	err = r.h.
+		WithContext(ctx).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"name", "state", "updated_at"}),
+		}).
+		Create(&users).
+		Error
 	if err != nil {
 		return err
 	}

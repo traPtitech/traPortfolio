@@ -16,13 +16,13 @@ func (m *MockTraQAPI) GetUsers(args *external.TraQGetAllArgs) ([]*external.TraQU
 	users := make([]*external.TraQUserResponse, 0, len(mockdata.MockTraQUsers))
 	for _, u := range mockdata.MockTraQUsers {
 		if args.Name == u.Name {
-			users = append(users, u.User)
+			users = append(users, u)
 
 			return users, nil
 		}
 
-		if args.IncludeSuspended || u.User.State == domain.TraqStateActive {
-			users = append(users, u.User)
+		if args.IncludeSuspended || u.State == domain.TraqStateActive {
+			users = append(users, u)
 		}
 	}
 

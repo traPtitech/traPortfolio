@@ -39,13 +39,13 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			args: args{args: &urepository.GetUsersArgs{}},
 			expected: []*domain.User{
 				domain.NewUser(
-					mockdata.MockTraQUsers[0].User.ID,
+					mockdata.MockTraQUsers[0].ID,
 					mockdata.MockTraQUsers[0].Name,
 					mockdata.MockPortalUsers[0].RealName,
 					mockdata.MockUsers[0].Check,
 				),
 				domain.NewUser(
-					mockdata.MockTraQUsers[2].User.ID,
+					mockdata.MockTraQUsers[2].ID,
 					mockdata.MockTraQUsers[2].Name,
 					mockdata.MockPortalUsers[2].RealName,
 					mockdata.MockUsers[2].Check,
@@ -136,7 +136,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 		{
 			name: "No account",
 			args: args{
-				mockdata.MockTraQUsers[2].User.ID,
+				mockdata.MockTraQUsers[2].ID,
 			},
 			expected: &domain.UserDetail{
 				User: *domain.NewUser(
@@ -145,7 +145,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					mockdata.MockPortalUsers[2].RealName,
 					mockdata.MockUsers[2].Check,
 				),
-				State:    mockdata.MockTraQUsers[2].User.State,
+				State:    mockdata.MockTraQUsers[2].State,
 				Bio:      mockdata.MockUsers[2].Description,
 				Accounts: []*domain.Account{},
 			},
@@ -154,7 +154,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 		{
 			name: "With account",
 			args: args{
-				mockdata.MockTraQUsers[0].User.ID,
+				mockdata.MockTraQUsers[0].ID,
 			},
 			expected: &domain.UserDetail{
 				User: *domain.NewUser(
@@ -163,7 +163,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 					mockdata.MockPortalUsers[0].RealName,
 					mockdata.MockUsers[0].Check,
 				),
-				State: mockdata.MockTraQUsers[0].User.State,
+				State: mockdata.MockTraQUsers[0].State,
 				Bio:   mockdata.MockUsers[0].Description,
 				Accounts: []*domain.Account{
 					{
@@ -230,7 +230,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 					mockdata.MockPortalUsers[1].RealName,
 					check,
 				),
-				State:    mockdata.MockTraQUsers[1].User.State,
+				State:    mockdata.MockTraQUsers[1].State,
 				Bio:      description,
 				Accounts: []*domain.Account{},
 			},
@@ -295,7 +295,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 					portalUser.RealName,
 					check,
 				),
-				State:    traqUser.User.State,
+				State:    traqUser.State,
 				Bio:      bio,
 				Accounts: []*domain.Account{},
 			}
