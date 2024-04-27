@@ -49,6 +49,16 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// SyncUsers POST /users/sync
+func (h *UserHandler) SyncUsers(c echo.Context) error {
+	ctx := c.Request().Context()
+	if err := h.s.SyncUsers(ctx); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 // GetUser GET /users/:userID
 func (h *UserHandler) GetUser(c echo.Context) error {
 	userID, err := getID(c, keyUserID)

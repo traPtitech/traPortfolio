@@ -12,6 +12,7 @@ import (
 
 type UserService interface {
 	GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error)
+	SyncUsers(ctx context.Context) error
 	GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error)
 	Update(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error
 	GetAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
@@ -40,6 +41,10 @@ func (s *userService) GetUsers(ctx context.Context, args *repository.GetUsersArg
 		return nil, err
 	}
 	return users, nil
+}
+
+func (s *userService) SyncUsers(ctx context.Context) error {
+	return s.user.SyncUsers(ctx)
 }
 
 func (s *userService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {

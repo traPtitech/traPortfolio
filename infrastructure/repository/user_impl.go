@@ -107,6 +107,36 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 	}
 }
 
+func (r *UserRepository) SyncUsers(ctx context.Context) error {
+	traqUsers, err := r.traQ.GetUsers(&external.TraQGetAllArgs{IncludeSuspended: true})
+	if err != nil {
+		return err
+	}
+
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, v := range traqUsers {
+			user := model.User{
+				ID:          v.ID,
+				Description: "",
+				Name:        v.Name,
+			}
+			err := tx.
+				WithContext(ctx).
+				FirstOrCreate(&user, &model.User{ID: v.ID}).
+				Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
 	user := new(model.User)
 	err := r.h.
@@ -162,6 +192,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 	}
 
 	user := model.User{
+		// TODO: traQのUUIDを使うべきかも
 		ID:          uuid.Must(uuid.NewV4()),
 		Description: args.Description,
 		Check:       args.Check,

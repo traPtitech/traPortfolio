@@ -34,6 +34,18 @@ paths:
         - $ref: "#/components/parameters/limitInQuery"
       tags:
         - user
+  "/users/sync":
+    post:
+      summary: ユーザー情報の同期
+      operationId: syncUsers
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+      description: ユーザー情報を同期します
+      tags:
+        - user
   "/users/{userId}":
     parameters:
       - $ref: "#/components/parameters/userIdInPath"

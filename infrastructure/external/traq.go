@@ -14,6 +14,7 @@ import (
 
 type TraQUserResponse struct {
 	ID    uuid.UUID        `json:"id"`
+	Name  string           `json:"name"`
 	State domain.TraQState `json:"state"`
 }
 
