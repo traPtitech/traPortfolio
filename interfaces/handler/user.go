@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/traPtitech/traPortfolio/domain"
@@ -27,6 +28,19 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 	req := schema.GetUsersParams{}
 	if err := c.Bind(&req); err != nil {
 		return err
+	}
+
+	if req.Me != nil && *req.Me {
+		if req.Name != nil {
+			return fmt.Errorf("%w: cannot specify both 'me' and 'name'", repository.ErrInvalidArg)
+		}
+
+		name, err := getMyName(c)
+		if err != nil {
+			return err
+		}
+
+		req.Name = &name
 	}
 
 	ctx := c.Request().Context()

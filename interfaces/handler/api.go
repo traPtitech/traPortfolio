@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"cmp"
 	"fmt"
 	"net/http"
 
@@ -133,4 +134,14 @@ func getID(c echo.Context, key idKey) (uuid.UUID, error) {
 	}
 
 	return id, nil
+}
+
+func getMyName(c echo.Context) (string, error) {
+	h := c.Request().Header
+	name := cmp.Or(h.Get("X-Forwarded-User"), h.Get("X-Showcase-User"))
+	if name == "" {
+		return "", repository.ErrForbidden
+	}
+
+	return name, nil
 }

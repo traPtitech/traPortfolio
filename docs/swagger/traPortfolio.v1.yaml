@@ -31,6 +31,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/includeSuspendedInQuery"
         - $ref: "#/components/parameters/nameInQuery"
+        - $ref: "#/components/parameters/meInQuery"
         - $ref: "#/components/parameters/limitInQuery"
       tags:
         - user
@@ -1584,6 +1585,15 @@ components:
       description: 指定した文字列がtraP IDに含まれているかどうか
       x-oapi-codegen-extra-tags:
         query: name
+    meInQuery:
+      name: me
+      in: query
+      schema:
+        type: boolean
+        default: false
+      description: 自分自身の情報を取得するかどうか
+      x-oapi-codegen-extra-tags:
+        query: me
     limitInQuery:
       name: limit
       in: query

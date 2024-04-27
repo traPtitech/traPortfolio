@@ -584,6 +584,9 @@ type IncludeSuspendedInQuery = bool
 // LimitInQuery defines model for limitInQuery.
 type LimitInQuery = int
 
+// MeInQuery defines model for meInQuery.
+type MeInQuery = bool
+
 // NameInQuery defines model for nameInQuery.
 type NameInQuery = string
 
@@ -603,6 +606,9 @@ type GetUsersParams struct {
 
 	// Name 指定した文字列がtraP IDに含まれているかどうか
 	Name *NameInQuery `form:"name,omitempty" json:"name,omitempty" query:"name"`
+
+	// Me 自分自身の情報を取得するかどうか
+	Me *MeInQuery `form:"me,omitempty" json:"me,omitempty" query:"me"`
 
 	// Limit 取得数の上限
 	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
