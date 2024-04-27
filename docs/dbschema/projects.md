@@ -54,7 +54,35 @@ CREATE TABLE `projects` (
 
 ## Relations
 
-![er](projects.svg)
+```mermaid
+erDiagram
+
+"project_members" }o--|| "projects" : "FOREIGN KEY (project_id) REFERENCES projects (id)"
+
+"projects" {
+  char_36_ id PK
+  varchar_32_ name
+  text description
+  text link
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"project_members" {
+  char_36_ id PK
+  char_36_ project_id FK
+  char_36_ user_id FK
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

@@ -19,7 +19,7 @@ CREATE TABLE `contest_teams` (
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_contest_teams_contest` (`contest_id`),
-  CONSTRAINT `fk_contest_teams_contest` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`id`)
+  CONSTRAINT `fk_contest_teams_contest` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -54,7 +54,39 @@ CREATE TABLE `contest_teams` (
 
 ## Relations
 
-![er](contest_teams.svg)
+```mermaid
+erDiagram
+
+"contest_team_user_belongings" }o--|| "contest_teams" : "FOREIGN KEY (team_id) REFERENCES contest_teams (id)"
+"contest_teams" }o--|| "contests" : "FOREIGN KEY (contest_id) REFERENCES contests (id)"
+
+"contest_teams" {
+  char_36_ id PK
+  char_36_ contest_id FK
+  varchar_32_ name
+  text description
+  text result
+  text link
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"contest_team_user_belongings" {
+  char_36_ team_id PK
+  char_36_ user_id PK
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"contests" {
+  char_36_ id PK
+  varchar_32_ name
+  text description
+  text link
+  datetime_6_ since
+  datetime_6_ until
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 
