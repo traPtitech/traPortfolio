@@ -164,6 +164,47 @@ func TestUserHandler_GetUsers(t *testing.T) {
 	}
 }
 
+func TestUserHandler_SyncUsers(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		setup      func(s *mock_service.MockUserService) (path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(s *mock_service.MockUserService) (path string) {
+				s.EXPECT().SyncUsers(anyCtx{}).Return(nil)
+				return "/api/v1/users/sync"
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "internal error",
+			setup: func(s *mock_service.MockUserService) (path string) {
+				s.EXPECT().SyncUsers(anyCtx{}).Return(errors.New("Internal Server Error"))
+				return "/api/v1/users/sync"
+			},
+			statusCode: http.StatusInternalServerError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			s, api := setupUserMock(t)
+
+			path := tt.setup(s)
+
+			statusCode, _ := doRequest(t, api, http.MethodPost, path, nil, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+		})
+	}
+}
+
 func TestUserHandler_GetUser(t *testing.T) {
 	t.Parallel()
 

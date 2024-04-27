@@ -52,6 +52,7 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 	userAPI := v1.Group("/users")
 	{
 		userAPI.GET("", api.User.GetUsers)
+		userAPI.POST("/sync", api.User.SyncUsers)
 		userAPI.GET("/:userID", api.User.GetUser)
 		userAPI.PATCH("/:userID", api.User.UpdateUser)
 		userAPI.GET("/:userID/accounts", api.User.GetUserAccounts)

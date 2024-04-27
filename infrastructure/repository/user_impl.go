@@ -42,6 +42,7 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 	return eargs, nil
 }
 
+// TODO: traQを切り離す
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 
@@ -107,6 +108,37 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 	}
 }
 
+func (r *UserRepository) SyncUsers(ctx context.Context) error {
+	traqUsers, err := r.traQ.GetUsers(&external.TraQGetAllArgs{IncludeSuspended: true})
+	if err != nil {
+		return err
+	}
+
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, v := range traqUsers {
+			user := model.User{
+				ID:          v.ID,
+				Description: "",
+				Name:        v.Name,
+				State:       v.State,
+			}
+			err := tx.
+				WithContext(ctx).
+				FirstOrCreate(&user, &model.User{ID: v.ID}).
+				Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
 	user := new(model.User)
 	err := r.h.
@@ -135,11 +167,6 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		return nil, err
 	}
 
-	traQUser, err := r.traQ.GetUser(userID)
-	if err != nil {
-		return nil, err
-	}
-
 	result := domain.UserDetail{
 		User: *domain.NewUser(
 			user.ID,
@@ -147,7 +174,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 			portalUser.RealName,
 			user.Check,
 		),
-		State:    traQUser.State,
+		State:    user.State,
 		Bio:      user.Description,
 		Accounts: accounts,
 	}
@@ -155,6 +182,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 	return &result, nil
 }
 
+// TODO: テスト用にしか使われていないので消すかテスト用であることを明示する
 func (r *UserRepository) CreateUser(ctx context.Context, args *repository.CreateUserArgs) (*domain.UserDetail, error) {
 	portalUser, err := r.portal.GetUserByTraqID(args.Name)
 	if err != nil {
@@ -162,10 +190,12 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 	}
 
 	user := model.User{
+		// TODO: traQのUUIDを使うべきかも
 		ID:          uuid.Must(uuid.NewV4()),
 		Description: args.Description,
 		Check:       args.Check,
 		Name:        args.Name,
+		State:       domain.TraqStateActive,
 	}
 
 	err = r.h.WithContext(ctx).Create(&user).Error

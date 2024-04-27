@@ -366,8 +366,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows(
-							[]string{"id", "name", "check", "description"}).
-							AddRow(want.User.ID, want.User.Name, want.Check, want.Bio),
+							[]string{"id", "name", "check", "description", "state"}).
+							AddRow(want.User.ID, want.User.Name, want.Check, want.Bio, want.State),
 					)
 				rows := sqlmock.NewRows([]string{"id", "user_id", "type", "check"})
 				for _, v := range want.Accounts {
@@ -378,7 +378,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 					WithArgs(args.id).
 					WillReturnRows(rows)
 				f.portal.EXPECT().GetUserByTraqID(want.User.Name).Return(makePortalUser(t, &want.User), nil)
-				f.traq.EXPECT().GetUser(args.id).Return(makeTraqUser(t, want), nil)
 			},
 			assertion: assert.NoError,
 		},
@@ -428,32 +427,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 							AddRow(random.UUID(), args.id, 0, 0),
 					)
 				f.portal.EXPECT().GetUserByTraqID(name).Return(nil, errUnexpected)
-			},
-			assertion: assert.Error,
-		},
-		{
-			name: "TraqError",
-			args: args{random.UUID()},
-			want: nil,
-			setup: func(f mockUserRepositoryFields, args args, want *domain.UserDetail) {
-				name := random.AlphaNumeric()
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT ?")).
-					WithArgs(args.id, 1).
-					WillReturnRows(
-						sqlmock.NewRows(
-							[]string{"id", "name", "description"}).
-							AddRow(args.id, name, random.AlphaNumeric()),
-					)
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `accounts` WHERE `accounts`.`user_id` = ?")).
-					WithArgs(args.id).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id", "user_id", "type", "check"}).
-							AddRow(random.UUID(), args.id, 0, 0),
-					)
-				f.portal.EXPECT().GetUserByTraqID(name).Return(makePortalUser(t, &domain.User{Name: name}), nil)
-				f.traq.EXPECT().GetUser(args.id).Return(nil, errUnexpected)
 			},
 			assertion: assert.Error,
 		},
@@ -513,8 +486,8 @@ func TestUserRepository_CreateUser(t *testing.T) {
 
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectExec(makeSQLQueryRegexp("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
+					ExpectExec(makeSQLQueryRegexp("INSERT INTO `users` (`id`,`description`,`check`,`name`,`state`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, domain.TraqStateActive, anyTime{}, anyTime{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				f.h.Mock.ExpectCommit()
 			},
@@ -553,8 +526,8 @@ func TestUserRepository_CreateUser(t *testing.T) {
 
 				f.h.Mock.ExpectBegin()
 				f.h.Mock.
-					ExpectExec(makeSQLQueryRegexp("INSERT INTO `users` (`id`,`description`,`check`,`name`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?)")).
-					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, anyTime{}, anyTime{}).
+					ExpectExec(makeSQLQueryRegexp("INSERT INTO `users` (`id`,`description`,`check`,`name`,`state`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?)")).
+					WithArgs(anyUUID{}, args.args.Description, args.args.Check, args.args.Name, domain.TraqStateActive, anyTime{}, anyTime{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},

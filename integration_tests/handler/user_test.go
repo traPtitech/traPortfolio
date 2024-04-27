@@ -93,6 +93,30 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
+// SyncUsers POST /users/sync
+func TestSyncUsers(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		statusCode int
+		want       interface{} // nil or error
+	}{
+		"204": {
+			http.StatusNoContent,
+			nil,
+		},
+	}
+
+	e := echo.New()
+	api := setupRoutes(t, e)
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			res := doRequest(t, e, http.MethodPost, e.URL(api.User.SyncUsers), nil)
+			assertResponse(t, tt.statusCode, tt.want, res)
+		})
+	}
+}
+
 // GetUser GET /users/:userID
 func TestGetUser(t *testing.T) {
 	t.Parallel()

@@ -27,8 +27,7 @@ var (
 		{"db.name", "db-name"},
 		{"db.port", "db-port"},
 		{"db.verbose", "db-verbose"},
-		{"traq.cookie", "traq-cookie"},
-		{"traq.apiEndpoint", "traq-api-endpoint"},
+		{"traq.accessToken", "traq-access-token"},
 		{"knoq.cookie", "knoq-cookie"},
 		{"knoq.apiEndpoint", "knoq-api-endpoint"},
 		{"portal.cookie", "portal-cookie"},
@@ -44,7 +43,7 @@ type (
 		InsertMockData bool
 
 		DB     SQLConfig
-		Traq   APIConfig
+		Traq   TraqConfig
 		Knoq   APIConfig
 		Portal APIConfig
 	}
@@ -62,6 +61,10 @@ type (
 		Cookie      string
 		APIEndpoint string
 	}
+
+	TraqConfig struct {
+		AccessToken string
+	}
 )
 
 func init() {
@@ -76,8 +79,7 @@ func init() {
 	pflag.String("db-name", "portfolio", "db name")
 	pflag.Int("db-port", 3306, "db port")
 	pflag.Bool("db-verbose", false, "db verbose mode")
-	pflag.String("traq-cookie", "", "traq cookie")
-	pflag.String("traq-api-endpoint", "", "traq api endpoint")
+	pflag.String("traq-access-token", "", "traq access token")
 	pflag.String("knoq-cookie", "", "knoq cookie")
 	pflag.String("knoq-api-endpoint", "", "knoq api endpoint")
 	pflag.String("portal-cookie", "", "portal cookie")
