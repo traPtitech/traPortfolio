@@ -1,29 +1,30 @@
 package handler
 
 import (
+	"github.com/gofrs/uuid"
 	"net/http"
 
-	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
-	"github.com/traPtitech/traPortfolio/usecases/service"
-
 	"github.com/traPtitech/traPortfolio/domain"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
+	"github.com/traPtitech/traPortfolio/usecases/repository"
 
 	"github.com/labstack/echo/v4"
 )
 
 type GroupHandler struct {
-	s service.GroupService
+	group repository.GroupRepository
+	user  repository.UserRepository
 }
 
 // NewGroupHandler creates a GroupHandler
-func NewGroupHandler(s service.GroupService) *GroupHandler {
-	return &GroupHandler{s}
+func NewGroupHandler(group repository.GroupRepository, user repository.UserRepository) *GroupHandler {
+	return &GroupHandler{group, user}
 }
 
 // GetGroups GET /groups
 func (h *GroupHandler) GetGroups(c echo.Context) error {
 	ctx := c.Request().Context()
-	groups, err := h.s.GetGroups(ctx)
+	groups, err := h.group.GetGroups(ctx)
 	if err != nil {
 		return err
 	}
@@ -44,9 +45,36 @@ func (h *GroupHandler) GetGroup(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	group, err := h.s.GetGroup(ctx, groupID)
+	group, err := h.group.GetGroup(ctx, groupID)
 	if err != nil {
 		return err
+	}
+
+	// pick all users info
+	users, err := h.user.GetUsers(ctx, &repository.GetUsersArgs{}) // TODO: IncludeSuspendedをtrueにするか考える
+	if err != nil {
+		return err
+	}
+
+	umap := make(map[uuid.UUID]*domain.User)
+	for _, u := range users {
+		umap[u.ID] = u
+	}
+
+	// fill members info
+	for i, v := range group.Members {
+		if u, ok := umap[v.User.ID]; ok {
+			m := *u
+			group.Members[i].User = m
+		}
+	}
+
+	// fill leader info
+	for i, v := range group.Admin {
+		if u, ok := umap[v.ID]; ok {
+			m := u
+			group.Admin[i] = m
+		}
 	}
 
 	return c.JSON(http.StatusOK, formatGetGroup(group))

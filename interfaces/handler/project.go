@@ -5,24 +5,24 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 type ProjectHandler struct {
-	s service.ProjectService
+	project repository.ProjectRepository
 }
 
-func NewProjectHandler(s service.ProjectService) *ProjectHandler {
-	return &ProjectHandler{s}
+func NewProjectHandler(r repository.ProjectRepository) *ProjectHandler {
+	return &ProjectHandler{r}
 }
 
 // GetProjects GET /projects
 func (h *ProjectHandler) GetProjects(c echo.Context) error {
 	ctx := c.Request().Context()
-	projects, err := h.s.GetProjects(ctx)
+	projects, err := h.project.GetProjects(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	project, err := h.s.GetProject(ctx, projectID)
+	project, err := h.project.GetProject(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -83,9 +83,13 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 		createReq.UntilYear = req.Duration.Until.Year
 		createReq.UntilSemester = int(req.Duration.Until.Semester)
 	}
+	d := domain.NewYearWithSemesterDuration(createReq.SinceYear, createReq.SinceSemester, createReq.UntilYear, createReq.UntilSemester)
+	if !d.IsValid() {
+		return repository.ErrInvalidArg
+	}
 
 	ctx := c.Request().Context()
-	project, err := h.s.CreateProject(ctx, &createReq)
+	project, err := h.project.CreateProject(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -130,7 +134,32 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.s.UpdateProject(ctx, projectID, &patchReq)
+	{
+		old, err := h.project.GetProject(ctx, projectID)
+		if err != nil {
+			return err
+		}
+
+		d := old.Duration
+		if sy, ok := patchReq.SinceYear.V(); ok {
+			if ss, ok := patchReq.SinceSemester.V(); ok {
+				d.Since.Year = int(sy)
+				d.Since.Semester = int(ss)
+			}
+		}
+		if uy, ok := patchReq.UntilYear.V(); ok {
+			if us, ok := patchReq.UntilSemester.V(); ok {
+				d.Until.Year = int(uy)
+				d.Until.Semester = int(us)
+			}
+		}
+
+		if !d.IsValid() {
+			return repository.ErrInvalidArg
+		}
+	}
+
+	err = h.project.UpdateProject(ctx, projectID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -146,7 +175,7 @@ func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	members, err := h.s.GetProjectMembers(ctx, projectID)
+	members, err := h.project.GetProjectMembers(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -187,11 +216,16 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 			m.UntilSemester = int(v.Duration.Until.Semester)
 		}
 
+		d := domain.NewYearWithSemesterDuration(m.SinceYear, m.SinceSemester, m.UntilYear, m.UntilSemester)
+		if !d.IsValid() {
+			return repository.ErrInvalidArg
+		}
+
 		createReq = append(createReq, m)
 	}
 
 	ctx := c.Request().Context()
-	err = h.s.AddProjectMembers(ctx, projectID, createReq)
+	err = h.project.AddProjectMembers(ctx, projectID, createReq)
 	if err != nil {
 		return err
 	}
@@ -212,7 +246,7 @@ func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.s.DeleteProjectMembers(ctx, projectID, req.Members)
+	err = h.project.DeleteProjectMembers(ctx, projectID, req.Members)
 	if err != nil {
 		return err
 	}

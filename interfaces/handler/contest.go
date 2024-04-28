@@ -1,13 +1,12 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
-	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
-	"github.com/traPtitech/traPortfolio/usecases/service"
-
 	"github.com/gofrs/uuid"
+	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 
 	"github.com/traPtitech/traPortfolio/util/optional"
 
@@ -16,18 +15,18 @@ import (
 )
 
 type ContestHandler struct {
-	s service.ContestService
+	contest repository.ContestRepository
 }
 
 // NewContestHandler creates a ContestHandler
-func NewContestHandler(s service.ContestService) *ContestHandler {
-	return &ContestHandler{s}
+func NewContestHandler(r repository.ContestRepository) *ContestHandler {
+	return &ContestHandler{r}
 }
 
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(c echo.Context) error {
 	ctx := c.Request().Context()
-	contests, err := h.s.GetContests(ctx)
+	contests, err := h.contest.GetContests(ctx)
 	if err != nil {
 		return err
 	}
@@ -48,9 +47,17 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contest, err := h.s.GetContest(ctx, contestID)
+	contest, err := h.contest.GetContest(ctx, contestID)
 	if err != nil {
 		return err
+	}
+
+	{
+		teams, err := h.contest.GetContestTeams(ctx, contestID)
+		if err != nil && !errors.Is(err, repository.ErrNotFound) {
+			return err
+		}
+		contest.ContestTeams = teams // TODO: repositoryで行うべきな気がする
 	}
 
 	teams := make([]schema.ContestTeam, len(contest.ContestTeams))
@@ -88,7 +95,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contest, err := h.s.CreateContest(ctx, &createReq)
+	contest, err := h.contest.CreateContest(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -121,7 +128,7 @@ func (h *ContestHandler) EditContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.s.UpdateContest(ctx, contestID, &patchReq)
+	err = h.contest.UpdateContest(ctx, contestID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -137,7 +144,7 @@ func (h *ContestHandler) DeleteContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := h.s.DeleteContest(ctx, contestID); err != nil {
+	if err := h.contest.DeleteContest(ctx, contestID); err != nil {
 		return err
 	}
 
@@ -152,7 +159,7 @@ func (h *ContestHandler) GetContestTeams(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeams, err := h.s.GetContestTeams(ctx, contestID)
+	contestTeams, err := h.contest.GetContestTeams(ctx, contestID)
 	if err != nil {
 		return err
 	}
@@ -182,9 +189,18 @@ func (h *ContestHandler) GetContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeam, err := h.s.GetContestTeam(ctx, contestID, teamID)
+	contestTeam, err := h.contest.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
 		return err
+	}
+
+	{
+		members, err := h.contest.GetContestTeamMembers(ctx, contestID, teamID)
+		if err != nil {
+			return err
+		}
+
+		contestTeam.Members = members // TODO: repositoryで行うべきな気がする
 	}
 
 	members := make([]schema.User, len(contestTeam.Members))
@@ -221,7 +237,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeam, err := h.s.CreateContestTeam(ctx, contestID, &args)
+	contestTeam, err := h.contest.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
 		return err
 	}
@@ -257,7 +273,7 @@ func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.s.UpdateContestTeam(ctx, teamID, &args); err != nil {
+	if err = h.contest.UpdateContestTeam(ctx, teamID, &args); err != nil {
 		return err
 	}
 
@@ -277,7 +293,7 @@ func (h *ContestHandler) DeleteContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.s.DeleteContestTeam(ctx, contestID, teamID); err != nil {
+	if err = h.contest.DeleteContestTeam(ctx, contestID, teamID); err != nil {
 		return err
 	}
 
@@ -297,7 +313,7 @@ func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	users, err := h.s.GetContestTeamMembers(ctx, contestID, teamID)
+	users, err := h.contest.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
 		return err
 	}
@@ -333,7 +349,7 @@ func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
 		return err
 	}
 
-	err = h.s.AddContestTeamMembers(ctx, teamID, req.Members)
+	err = h.contest.AddContestTeamMembers(ctx, teamID, req.Members)
 	if err != nil {
 		return err
 	}
@@ -359,7 +375,7 @@ func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.s.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
+	if err = h.contest.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)

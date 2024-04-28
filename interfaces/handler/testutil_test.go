@@ -11,7 +11,16 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/traPtitech/traPortfolio/usecases/repository/mock_repository"
 )
+
+type MockRepository struct {
+	user    *mock_repository.MockUserRepository
+	event   *mock_repository.MockEventRepository
+	contest *mock_repository.MockContestRepository
+	group   *mock_repository.MockGroupRepository
+	project *mock_repository.MockProjectRepository
+}
 
 func doRequest(t *testing.T, api API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()
