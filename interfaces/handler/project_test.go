@@ -25,9 +25,9 @@ func setupProjectMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
-	r := mock_repository.NewMockProjectRepository(ctrl)
-	mr := MockRepository{nil, nil, nil, nil, r}
-	api := NewAPI(nil, nil, NewProjectHandler(r), nil, nil, nil)
+	project := mock_repository.NewMockProjectRepository(ctrl)
+	mr := MockRepository{project: project}
+	api := NewAPI(nil, nil, NewProjectHandler(project), nil, nil, nil)
 
 	return mr, api
 }

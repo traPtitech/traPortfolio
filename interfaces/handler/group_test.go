@@ -22,7 +22,7 @@ func setupGroupMock(t *testing.T) (MockRepository, API) {
 	ctrl := gomock.NewController(t)
 	user := mock_repository.NewMockUserRepository(ctrl)
 	group := mock_repository.NewMockGroupRepository(ctrl)
-	mr := MockRepository{user, nil, nil, group, nil}
+	mr := MockRepository{user: user, group: group}
 	api := NewAPI(nil, nil, nil, nil, nil, NewGroupHandler(group, user))
 
 	return mr, api

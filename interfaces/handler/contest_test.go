@@ -27,9 +27,9 @@ func setupContestMock(t *testing.T) (MockRepository, API) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
-	r := mock_repository.NewMockContestRepository(ctrl)
-	mr := MockRepository{nil, nil, r, nil, nil}
-	api := NewAPI(nil, nil, nil, nil, NewContestHandler(r), nil)
+	contest := mock_repository.NewMockContestRepository(ctrl)
+	mr := MockRepository{contest: contest}
+	api := NewAPI(nil, nil, nil, nil, NewContestHandler(contest), nil)
 
 	return mr, api
 }
