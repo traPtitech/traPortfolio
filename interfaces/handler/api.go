@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
@@ -28,7 +29,17 @@ func NewAPI(ping *PingHandler, user *UserHandler, project *ProjectHandler, event
 	}
 }
 
-func setupV1API(g *echo.Group, api API) {
+func setupV1API(g *echo.Group, api API, isProduction bool) {
+	// TODO: 初期バージョンではevent APIの機能を止めている
+	tmpEventMiddleware := func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if isProduction {
+				return echo.NewHTTPError(http.StatusNotImplemented, "event API is not implemented in this version")
+			}
+			return next(c)
+		}
+	}
+
 	v1 := g.Group("/v1")
 
 	// ping API
@@ -41,6 +52,7 @@ func setupV1API(g *echo.Group, api API) {
 	userAPI := v1.Group("/users")
 	{
 		userAPI.GET("", api.User.GetUsers)
+		userAPI.POST("/sync", api.User.SyncUsers)
 		userAPI.GET("/:userID", api.User.GetUser)
 		userAPI.PATCH("/:userID", api.User.UpdateUser)
 		userAPI.GET("/:userID/accounts", api.User.GetUserAccounts)
@@ -51,7 +63,7 @@ func setupV1API(g *echo.Group, api API) {
 		userAPI.GET("/:userID/projects", api.User.GetUserProjects)
 		userAPI.GET("/:userID/contests", api.User.GetUserContests)
 		userAPI.GET("/:userID/groups", api.User.GetUserGroups)
-		userAPI.GET("/:userID/events", api.User.GetUserEvents)
+		userAPI.GET("/:userID/events", api.User.GetUserEvents, tmpEventMiddleware)
 	}
 
 	// project API
@@ -67,7 +79,7 @@ func setupV1API(g *echo.Group, api API) {
 	}
 
 	// event API
-	eventAPI := v1.Group("/events")
+	eventAPI := v1.Group("/events", tmpEventMiddleware)
 	{
 		eventAPI.GET("", api.Event.GetEvents)
 		eventAPI.GET("/:eventID", api.Event.GetEvent)

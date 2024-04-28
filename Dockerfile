@@ -3,7 +3,7 @@
 ##
 ## Build stage
 ##
-FROM golang:1.20-alpine AS build
+FROM golang:1.22.1-alpine AS build
 
 WORKDIR /app
 

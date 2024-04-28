@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
-      - uses: golangci/golangci-lint-action@v3
+      - uses: golangci/golangci-lint-action@v4
         with:
           version: latest
           install-mode: goinstall
@@ -84,15 +84,17 @@ jobs:
         with:
           name: coverage_integration
       - name: Upload coverage data (Unit)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage_unit.txt
           flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage data (Integration)
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage_integration.txt
           flags: integration
+          token: ${{ secrets.CODECOV_TOKEN }}
   tbls:
     name: TBLS
     runs-on: ubuntu-latest

@@ -5,7 +5,6 @@ import (
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/usecases/service"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"gorm.io/gorm"
 )
@@ -18,13 +17,15 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 		knoqAPI   external.KnoqAPI
 	)
 
+	// TODO: 初期リリースではPortalとknoQとは連携しない
 	if c.IsProduction {
 		var err error
 
-		portalAPI, err = external.NewPortalAPI(c.Portal)
-		if err != nil {
-			return handler.API{}, err
-		}
+		// portalAPI, err = external.NewPortalAPI(c.Portal)
+		// if err != nil {
+		// 	return handler.API{}, err
+		// }
+		portalAPI = external.NewNopPortalAPI()
 
 		traQAPI, err = external.NewTraQAPI(c.Traq)
 		if err != nil {
@@ -51,11 +52,11 @@ func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	// service, handler, API
 	api := handler.NewAPI(
 		handler.NewPingHandler(),
-		handler.NewUserHandler(service.NewUserService(userRepo, eventRepo)),
-		handler.NewProjectHandler(service.NewProjectService(projectRepo)),
-		handler.NewEventHandler(service.NewEventService(eventRepo, userRepo)),
-		handler.NewContestHandler(service.NewContestService(contestRepo)),
-		handler.NewGroupHandler(service.NewGroupService(groupRepo, userRepo)),
+		handler.NewUserHandler(userRepo, eventRepo),
+		handler.NewProjectHandler(projectRepo),
+		handler.NewEventHandler(eventRepo, userRepo),
+		handler.NewContestHandler(contestRepo),
+		handler.NewGroupHandler(groupRepo, userRepo),
 	)
 
 	return api, nil

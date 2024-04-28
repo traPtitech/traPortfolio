@@ -32,15 +32,14 @@ type portalAPI struct {
 	cache *cache.Cache
 }
 
-func NewPortalAPI(conf config.PortalConfig) (PortalAPI, error) {
-	apiConfig := (config.APIConfig)(conf)
-	jar, err := newCookieJar(apiConfig, "access_token")
+func NewPortalAPI(conf config.APIConfig) (PortalAPI, error) {
+	jar, err := newCookieJar(conf, "access_token")
 	if err != nil {
 		return nil, err
 	}
 
 	return &portalAPI{
-		apiClient: newAPIClient(jar, apiConfig),
+		apiClient: newAPIClient(jar, conf),
 		cache:     cache.New(1*time.Hour, 2*time.Hour),
 	}, nil
 }
@@ -94,3 +93,31 @@ func (a *portalAPI) GetUserByTraqID(traQID string) (*PortalUserResponse, error) 
 var (
 	_ PortalAPI = (*portalAPI)(nil)
 )
+
+func GetRealNameMap(p PortalAPI) (map[string]string, error) {
+	users, err := p.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	realNameMap := make(map[string]string, len(users))
+	for _, u := range users {
+		realNameMap[u.TraQID] = u.RealName
+	}
+
+	return realNameMap, nil
+}
+
+type nopPortalAPI struct{}
+
+func NewNopPortalAPI() PortalAPI {
+	return &nopPortalAPI{}
+}
+
+func (a *nopPortalAPI) GetUsers() ([]*PortalUserResponse, error) {
+	return []*PortalUserResponse{}, nil
+}
+
+func (a *nopPortalAPI) GetUserByTraqID(traQID string) (*PortalUserResponse, error) {
+	return &PortalUserResponse{}, nil
+}

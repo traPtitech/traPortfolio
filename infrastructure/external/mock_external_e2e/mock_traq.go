@@ -1,9 +1,6 @@
 package mock_external_e2e //nolint:revive
 
 import (
-	"fmt"
-
-	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
@@ -19,25 +16,15 @@ func (m *MockTraQAPI) GetUsers(args *external.TraQGetAllArgs) ([]*external.TraQU
 	users := make([]*external.TraQUserResponse, 0, len(mockdata.MockTraQUsers))
 	for _, u := range mockdata.MockTraQUsers {
 		if args.Name == u.Name {
-			users = append(users, u.User)
+			users = append(users, u)
 
 			return users, nil
 		}
 
-		if args.IncludeSuspended || u.User.State == domain.TraqStateActive {
-			users = append(users, u.User)
+		if args.IncludeSuspended || u.State == domain.TraqStateActive {
+			users = append(users, u)
 		}
 	}
 
 	return users, nil
-}
-
-func (m *MockTraQAPI) GetUser(userID uuid.UUID) (*external.TraQUserResponse, error) {
-	for _, u := range mockdata.MockTraQUsers {
-		if u.User.ID == userID {
-			return u.User, nil
-		}
-	}
-
-	return nil, fmt.Errorf("GET /users/%v failed: 404", userID)
 }

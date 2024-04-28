@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync/atomic"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -17,9 +16,6 @@ import (
 )
 
 var (
-	config   Config
-	isParsed atomic.Bool
-
 	flagKeys = []struct{ path, flag string }{
 		{"production", "production"},
 		{"port", "port"},
@@ -31,8 +27,7 @@ var (
 		{"db.name", "db-name"},
 		{"db.port", "db-port"},
 		{"db.verbose", "db-verbose"},
-		{"traq.cookie", "traq-cookie"},
-		{"traq.apiEndpoint", "traq-api-endpoint"},
+		{"traq.accessToken", "traq-access-token"},
 		{"knoq.cookie", "knoq-cookie"},
 		{"knoq.apiEndpoint", "knoq-api-endpoint"},
 		{"portal.cookie", "portal-cookie"},
@@ -41,45 +36,38 @@ var (
 )
 
 type (
-	// Immutable except within this package or EditFunc
 	Config struct {
 		IsProduction   bool `mapstructure:"production"`
-		Port           int  `mapstructure:"port"`
-		OnlyMigrate    bool `mapstructure:"onlyMigrate"`
-		InsertMockData bool `mapstructure:"insertMockData"`
+		Port           int
+		OnlyMigrate    bool
+		InsertMockData bool
 
-		DB     SQLConfig    `mapstructure:"db"`
-		Traq   TraqConfig   `mapstructure:"traq"`
-		Knoq   KnoqConfig   `mapstructure:"knoq"`
-		Portal PortalConfig `mapstructure:"portal"`
+		DB     SQLConfig
+		Traq   TraqConfig
+		Knoq   APIConfig
+		Portal APIConfig
 	}
 
 	SQLConfig struct {
-		User    string `mapstructure:"user"`
-		Pass    string `mapstructure:"pass"`
-		Host    string `mapstructure:"host"`
-		Name    string `mapstructure:"name"`
-		Port    int    `mapstructure:"port"`
-		Verbose bool   `mapstructure:"verbose"`
+		User    string
+		Pass    string
+		Host    string
+		Name    string
+		Port    int
+		Verbose bool
 	}
-
-	// NOTE: wireが複数の同じ型の変数を扱えないためdefined typeを用いる
-	// Ref: https://github.com/google/wire/blob/d07cde0df9/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type
-	TraqConfig   APIConfig
-	KnoqConfig   APIConfig
-	PortalConfig APIConfig
 
 	APIConfig struct {
-		Cookie      string `mapstructure:"cookie"`
-		APIEndpoint string `mapstructure:"apiEndpoint"`
+		Cookie      string
+		APIEndpoint string
 	}
 
-	EditFunc func(*Config)
+	TraqConfig struct {
+		AccessToken string
+	}
 )
 
 func init() {
-	isParsed.Store(false)
-
 	pflag.Bool("production", false, "whether production or development")
 	pflag.Int("port", 1323, "api port")
 	pflag.Bool("only-migrate", false, "only migrate db (not start server)")
@@ -91,8 +79,7 @@ func init() {
 	pflag.String("db-name", "portfolio", "db name")
 	pflag.Int("db-port", 3306, "db port")
 	pflag.Bool("db-verbose", false, "db verbose mode")
-	pflag.String("traq-cookie", "", "traq cookie")
-	pflag.String("traq-api-endpoint", "", "traq api endpoint")
+	pflag.String("traq-access-token", "", "traq access token")
 	pflag.String("knoq-cookie", "", "knoq cookie")
 	pflag.String("knoq-api-endpoint", "", "knoq api endpoint")
 	pflag.String("portal-cookie", "", "portal cookie")
@@ -101,99 +88,55 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 }
 
-func Parse() error {
+type LoadOpts struct {
+	SkipReadFromFiles bool
+}
+
+func Load(opts LoadOpts) (*Config, error) {
+	var c Config
+
 	pflag.Parse()
-	if err := ReadFromFile(); err != nil {
-		return fmt.Errorf("read config from file: %w", err)
-	}
-
-	return nil
-}
-
-func ReadFromFile() error {
 	for _, key := range flagKeys {
 		if err := viper.BindPFlag(key.path, pflag.Lookup(key.flag)); err != nil {
-			return fmt.Errorf("bind flag %s: %w", key.flag, err)
+			return nil, fmt.Errorf("bind flag %s: %w", key.flag, err)
 		}
 	}
 
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		return fmt.Errorf("bind flags: %w", err)
+		return nil, fmt.Errorf("bind flags: %w", err)
 	}
 
-	configPath, err := pflag.CommandLine.GetString("config")
-	if err != nil {
-		return fmt.Errorf("get config flag: %w", err)
-	}
-
-	if len(configPath) > 0 {
-		viper.SetConfigFile(configPath)
-	} else {
-		// default path is ./config.yaml
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-		viper.AddConfigPath(".")
-	}
-
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			if len(configPath) > 0 {
-				return fmt.Errorf("read config from %s: %w", configPath, err)
-			}
-
-			log.Printf("config file does not found: %v", err)
+	if !opts.SkipReadFromFiles {
+		configPath := viper.GetString("config")
+		if len(configPath) > 0 {
+			viper.SetConfigFile(configPath)
 		} else {
-			return fmt.Errorf("read config: %w", err)
+			// default path is ./config.yaml
+			viper.SetConfigName("config")
+			viper.SetConfigType("yaml")
+			viper.AddConfigPath(".")
 		}
-	} else {
-		log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
-	}
 
-	if err := viper.Unmarshal(&config); err != nil {
-		return fmt.Errorf("unmarshal config: %w", err)
-	}
+		if err := viper.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				if len(configPath) > 0 {
+					return nil, fmt.Errorf("read config from %s: %w", configPath, err)
+				}
 
-	isParsed.Store(true)
-
-	return nil
-}
-
-func ReadDefault() error {
-	for _, key := range flagKeys {
-		if err := viper.BindPFlag(key.path, pflag.Lookup(key.flag)); err != nil {
-			return fmt.Errorf("bind flag %s: %w", key.flag, err)
+				log.Printf("config file does not found: %v\n", err)
+			} else {
+				return nil, fmt.Errorf("read config: %w", err)
+			}
+		} else {
+			log.Printf("successfully loaded config from %s", viper.ConfigFileUsed())
 		}
 	}
 
-	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		return fmt.Errorf("bind flags: %w", err)
+	if err := viper.Unmarshal(&c); err != nil {
+		return nil, fmt.Errorf("unmarshal config: %w", err)
 	}
 
-	if err := viper.Unmarshal(&config); err != nil {
-		return fmt.Errorf("unmarshal config: %w", err)
-	}
-
-	isParsed.Store(true)
-
-	return nil
-}
-
-func Load(editFuncs ...EditFunc) *Config {
-	if !isParsed.Load() {
-		panic("config does not parsed")
-	}
-
-	cloned := config.clone()
-	for _, f := range editFuncs {
-		f(cloned)
-	}
-
-	return cloned
-}
-
-func (c *Config) clone() *Config {
-	cloned := *c
-	return &cloned
+	return &c, nil
 }
 
 func (c *SQLConfig) DsnConfig() *mysql.Config {

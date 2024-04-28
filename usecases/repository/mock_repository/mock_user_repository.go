@@ -186,6 +186,20 @@ func (mr *MockUserRepositoryMockRecorder) GetUsers(ctx, args interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockUserRepository)(nil).GetUsers), ctx, args)
 }
 
+// SyncUsers mocks base method.
+func (m *MockUserRepository) SyncUsers(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SyncUsers", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SyncUsers indicates an expected call of SyncUsers.
+func (mr *MockUserRepositoryMockRecorder) SyncUsers(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SyncUsers", reflect.TypeOf((*MockUserRepository)(nil).SyncUsers), ctx)
+}
+
 // UpdateAccount mocks base method.
 func (m *MockUserRepository) UpdateAccount(ctx context.Context, userID, accountID uuid.UUID, args *repository.UpdateAccountArgs) error {
 	m.ctrl.T.Helper()

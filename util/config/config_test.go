@@ -8,9 +8,6 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	viper.AddConfigPath("./testdata")
-	assert.NoError(t, Parse())
-
 	expected := Config{
 		IsProduction:   true,
 		Port:           3000,
@@ -25,18 +22,21 @@ func TestParse(t *testing.T) {
 			Verbose: true,
 		},
 		Traq: TraqConfig{
-			Cookie:      "traq cookie",
-			APIEndpoint: "traq endpoint",
+			AccessToken: "traq token",
 		},
-		Knoq: KnoqConfig{
+		Knoq: APIConfig{
 			Cookie:      "knoq cookie",
 			APIEndpoint: "knoq endpoint",
 		},
-		Portal: PortalConfig{
+		Portal: APIConfig{
 			Cookie:      "portal cookie",
 			APIEndpoint: "portal endpoint",
 		},
 	}
 
-	assert.Equal(t, &expected, Load())
+	viper.AddConfigPath("./testdata")
+
+	got, err := Load(LoadOpts{})
+	assert.NoError(t, err)
+	assert.Equal(t, &expected, got)
 }

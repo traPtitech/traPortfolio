@@ -71,7 +71,6 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -124,8 +123,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				wd := want.Duration
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(want.ID, want.Name, want.Description, want.Link, wd.Since.Year, wd.Since.Semester, wd.Until.Year, wd.Until.Semester),
@@ -182,8 +181,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				wd := want.Duration
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(want.ID, want.Name, want.Description, want.Link, wd.Since.Year, wd.Since.Semester, wd.Until.Year, wd.Until.Semester),
@@ -226,8 +225,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			want: nil,
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}))
 			},
 			assertion: assert.Error,
@@ -241,8 +240,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				d := random.Duration()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
@@ -272,8 +271,8 @@ func TestProjectRepository_GetProject(t *testing.T) {
 			setup: func(f mockProjectRepositoryFields, args args, want *domain.ProjectDetail) {
 				d := random.Duration()
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.id).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.id, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "name", "description", "link", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(
@@ -319,7 +318,6 @@ func TestProjectRepository_GetProject(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -419,7 +417,6 @@ func TestProjectRepository_CreateProject(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -502,7 +499,6 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -658,7 +654,6 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -735,8 +730,8 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 					}
 				}
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.projectID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id", "since_year", "since_semester", "until_year", "until_semester"}).
 							AddRow(args.projectID, duration.Since.Year, duration.Since.Semester, duration.Until.Year, duration.Until.Semester),
@@ -882,8 +877,8 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.projectID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
@@ -918,8 +913,8 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.projectID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
@@ -943,7 +938,6 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock
@@ -980,8 +974,8 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.projectID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
@@ -1015,8 +1009,8 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.projectID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
 					WillReturnError(errUnexpected)
 			},
 			assertion: assert.Error,
@@ -1032,8 +1026,8 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT 1")).
-					WithArgs(args.projectID).
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
 					WillReturnRows(
 						sqlmock.NewRows([]string{"id"}).
 							AddRow(args.projectID),
@@ -1049,7 +1043,6 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			// Setup mock

@@ -7,19 +7,18 @@ import (
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/util/optional"
 
-	"github.com/traPtitech/traPortfolio/usecases/service"
-
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 )
 
 type UserHandler struct {
-	s service.UserService
+	user  repository.UserRepository
+	event repository.EventRepository
 }
 
-func NewUserHandler(s service.UserService) *UserHandler {
-	return &UserHandler{s}
+func NewUserHandler(user repository.UserRepository, event repository.EventRepository) *UserHandler {
+	return &UserHandler{user, event}
 }
 
 // GetUsers GET /users
@@ -36,7 +35,7 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 		Limit:            optional.FromPtr((*int)(req.Limit)),
 	}
 
-	users, err := h.s.GetUsers(ctx, &args)
+	users, err := h.user.GetUsers(ctx, &args)
 	if err != nil {
 		return err
 	}
@@ -49,6 +48,16 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// SyncUsers POST /users/sync
+func (h *UserHandler) SyncUsers(c echo.Context) error {
+	ctx := c.Request().Context()
+	if err := h.user.SyncUsers(ctx); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 // GetUser GET /users/:userID
 func (h *UserHandler) GetUser(c echo.Context) error {
 	userID, err := getID(c, keyUserID)
@@ -57,7 +66,7 @@ func (h *UserHandler) GetUser(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	user, err := h.s.GetUser(ctx, userID)
+	user, err := h.user.GetUser(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -93,7 +102,7 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 		Check:       optional.FromPtr(req.Check),
 	}
 
-	if err := h.s.Update(ctx, userID, &u); err != nil {
+	if err := h.user.UpdateUser(ctx, userID, &u); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -107,7 +116,7 @@ func (h *UserHandler) GetUserAccounts(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	accounts, err := h.s.GetAccounts(ctx, userID)
+	accounts, err := h.user.GetAccounts(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -133,7 +142,7 @@ func (h *UserHandler) GetUserAccount(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	account, err := h.s.GetAccount(ctx, userID, accountID)
+	account, err := h.user.GetAccount(ctx, userID, accountID)
 	if err != nil {
 		return err
 	}
@@ -160,7 +169,7 @@ func (h *UserHandler) AddUserAccount(c echo.Context) error {
 		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
-	account, err := h.s.CreateAccount(ctx, userID, &args)
+	account, err := h.user.CreateAccount(ctx, userID, &args)
 	if err != nil {
 		return err
 	}
@@ -194,7 +203,7 @@ func (h *UserHandler) EditUserAccount(c echo.Context) error {
 		PrPermitted: optional.FromPtr(req.PrPermitted),
 	}
 
-	err = h.s.EditAccount(ctx, userID, accountID, &args)
+	err = h.user.UpdateAccount(ctx, userID, accountID, &args)
 	if err != nil {
 		return err
 	}
@@ -215,7 +224,9 @@ func (h *UserHandler) DeleteUserAccount(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := h.s.DeleteAccount(ctx, userID, accountID); err != nil {
+	//TODO
+	/*userのaccount.type番目のアカウントを削除する処理をしたい*/
+	if err := h.user.DeleteAccount(ctx, userID, accountID); err != nil {
 		return err
 	}
 
@@ -230,7 +241,7 @@ func (h *UserHandler) GetUserProjects(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	projects, err := h.s.GetUserProjects(ctx, userID)
+	projects, err := h.user.GetProjects(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -255,7 +266,7 @@ func (h *UserHandler) GetUserContests(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contests, err := h.s.GetUserContests(ctx, userID)
+	contests, err := h.user.GetContests(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -283,7 +294,7 @@ func (h *UserHandler) GetUserGroups(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	groups, err := h.s.GetGroupsByUserID(ctx, userID)
+	groups, err := h.user.GetGroupsByUserID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -306,7 +317,7 @@ func (h *UserHandler) GetUserEvents(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	events, err := h.s.GetUserEvents(ctx, userID)
+	events, err := h.event.GetUserEvents(ctx, userID)
 	if err != nil {
 		return err
 	}

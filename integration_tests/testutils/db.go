@@ -18,8 +18,9 @@ import (
 
 // TODO: integration_tests/handler以下に置く
 var (
-	DB   *sql.DB
-	Port int
+	Config *config.Config
+	DB     *sql.DB
+	Port   int
 )
 
 func SetupGormDB(t *testing.T) *gorm.DB {
@@ -37,10 +38,9 @@ func SetupGormDB(t *testing.T) *gorm.DB {
 func establishTestDBConnection(t *testing.T) *gorm.DB {
 	t.Helper()
 
-	sqlConf := config.Load(func(c *config.Config) {
-		c.DB.Name = "portfolio_test_" + t.Name()
-		c.DB.Port = Port
-	}).DB
+	sqlConf := Config.DB
+	sqlConf.Name = "portfolio_test_" + t.Name()
+	sqlConf.Port = Port
 
 	_, err := DB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
 	assert.NoError(t, err)

@@ -43,6 +43,7 @@ type UpdateAccountArgs struct {
 
 type UserRepository interface {
 	GetUsers(ctx context.Context, args *GetUsersArgs) ([]*domain.User, error)
+	SyncUsers(ctx context.Context) error
 	GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error)
 	CreateUser(ctx context.Context, args *CreateUserArgs) (*domain.UserDetail, error)
 	UpdateUser(ctx context.Context, userID uuid.UUID, args *UpdateUserArgs) error

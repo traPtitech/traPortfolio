@@ -3,18 +3,22 @@
 package external
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/gofrs/uuid"
+	"github.com/samber/lo"
+	"github.com/traPtitech/go-traq"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/util/config"
 )
 
 type TraQUserResponse struct {
-	ID    uuid.UUID        `json:"id"`
-	State domain.TraQState `json:"state"`
+	ID    uuid.UUID
+	Name  string
+	State domain.TraQState
+	Bot   bool
 }
 
 type TraQGetAllArgs struct {
@@ -24,60 +28,47 @@ type TraQGetAllArgs struct {
 
 type TraQAPI interface {
 	GetUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error)
-	GetUser(userID uuid.UUID) (*TraQUserResponse, error)
 }
 
 type traQAPI struct {
-	apiClient
+	apiClient   *traq.APIClient
+	accessToken string
 }
 
 func NewTraQAPI(conf config.TraqConfig) (TraQAPI, error) {
-	apiConfig := (config.APIConfig)(conf)
-	jar, err := newCookieJar(apiConfig, "r_session")
-	if err != nil {
-		return nil, err
-	}
+	apiClient := traq.NewAPIClient(traq.NewConfiguration())
 
-	return &traQAPI{newAPIClient(jar, apiConfig)}, nil
+	return &traQAPI{
+		apiClient:   apiClient,
+		accessToken: conf.AccessToken,
+	}, nil
 }
 
 func (a *traQAPI) GetUsers(args *TraQGetAllArgs) ([]*TraQUserResponse, error) {
-	res, err := a.apiGet(fmt.Sprintf("/users?include-suspended=%t&name=%s", args.IncludeSuspended, args.Name))
+	ctx := context.WithValue(context.Background(), traq.ContextAccessToken, a.accessToken)
+	users, res, err := a.apiClient.UserApi.GetUsers(ctx).
+		IncludeSuspended(args.IncludeSuspended).
+		Name(args.Name).
+		Execute()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("traQ API GetUsers error: %w", err)
 	}
-	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users failed: %v", res.Status)
+		return nil, fmt.Errorf("traQ API GetUsers invalid status: %s", res.Status)
 	}
 
-	var usersResponse []*TraQUserResponse
-	if err := json.NewDecoder(res.Body).Decode(&usersResponse); err != nil {
-		return nil, fmt.Errorf("decode failed: %w", err)
-	}
+	usersResponse := lo.Map(users, func(u traq.User, i int) *TraQUserResponse {
+		uid := uuid.FromStringOrNil(u.Id)
+		r := &TraQUserResponse{
+			ID:    uid,
+			Name:  u.Name,
+			State: domain.TraQState(u.State),
+			Bot:   u.Bot,
+		}
+
+		return r
+	})
+
 	return usersResponse, nil
 }
-
-func (a *traQAPI) GetUser(userID uuid.UUID) (*TraQUserResponse, error) {
-	res, err := a.apiGet(fmt.Sprintf("/users/%v", userID))
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET /users/%v failed: %v", userID, res.Status)
-	}
-
-	var userResponse TraQUserResponse
-	if err := json.NewDecoder(res.Body).Decode(&userResponse); err != nil {
-		return nil, fmt.Errorf("decode failed: %v", err)
-	}
-	return &userResponse, nil
-}
-
-// Interface guards
-var (
-	_ TraQAPI = (*traQAPI)(nil)
-)

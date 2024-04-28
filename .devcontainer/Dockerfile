@@ -1,4 +1,4 @@
-FROM golang:1.20
+FROM golang:1.22.0
 
 RUN apt update -y
 RUN apt upgrade -y

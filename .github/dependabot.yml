@@ -9,9 +9,34 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    reviewers: ["ras0q"]
+    reviewers:
+      - "ras0q"
+    commit-message:
+      prefix: ":arrow_up: "
+    groups:
+      actions-deps:
+        patterns:
+          - "*"
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
-    reviewers: ["ras0q"]
+    reviewers:
+      - "ras0q"
+    commit-message:
+      prefix: ":arrow_up: "
+    groups:
+      gomod-deps:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "ras0q"
+    commit-message:
+      prefix: ":arrow_up: "

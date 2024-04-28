@@ -5,11 +5,13 @@ import (
 	"errors"
 
 	"github.com/gofrs/uuid"
+	"github.com/samber/lo"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository/model"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepository struct {
@@ -42,6 +44,7 @@ func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArg
 	return eargs, nil
 }
 
+// TODO: traQを切り離す
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	eargs, err := makeTraqGetAllArgs(args)
 
@@ -88,30 +91,56 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 			),
 		}, nil
 	} else {
-		userMap := make(map[string]*model.User, l)
-		for _, v := range users {
-			userMap[v.Name] = v
-		}
-
-		portalUsers, err := r.portal.GetUsers()
+		realNameMap, err := external.GetRealNameMap(r.portal)
 		if err != nil {
 			return nil, err
 		}
 
 		result := make([]*domain.User, 0, l)
-		for _, v := range portalUsers {
-			if u, ok := userMap[v.TraQID]; ok {
-				result = append(result, domain.NewUser(
-					u.ID,
-					u.Name,
-					v.RealName,
-					u.Check,
-				))
-			}
+		for _, v := range users {
+			result = append(result, domain.NewUser(
+				v.ID,
+				v.Name,
+				realNameMap[v.Name],
+				v.Check,
+			))
 		}
 
 		return result, nil
 	}
+}
+
+func (r *UserRepository) SyncUsers(ctx context.Context) error {
+	traqUsers, err := r.traQ.GetUsers(&external.TraQGetAllArgs{IncludeSuspended: true})
+	if err != nil {
+		return err
+	}
+
+	users := lo.FilterMap(traqUsers, func(u *external.TraQUserResponse, _ int) (*model.User, bool) {
+		if u.Bot {
+			return nil, false
+		}
+
+		return &model.User{
+			ID:    u.ID,
+			Name:  u.Name,
+			State: u.State,
+		}, true
+	})
+
+	err = r.h.
+		WithContext(ctx).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"name", "state", "updated_at"}),
+		}).
+		Create(&users).
+		Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error) {
@@ -142,11 +171,6 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 		return nil, err
 	}
 
-	traQUser, err := r.traQ.GetUser(userID)
-	if err != nil {
-		return nil, err
-	}
-
 	result := domain.UserDetail{
 		User: *domain.NewUser(
 			user.ID,
@@ -154,7 +178,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 			portalUser.RealName,
 			user.Check,
 		),
-		State:    traQUser.State,
+		State:    user.State,
 		Bio:      user.Description,
 		Accounts: accounts,
 	}
@@ -162,6 +186,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 	return &result, nil
 }
 
+// TODO: テスト用にしか使われていないので消すかテスト用であることを明示する
 func (r *UserRepository) CreateUser(ctx context.Context, args *repository.CreateUserArgs) (*domain.UserDetail, error) {
 	portalUser, err := r.portal.GetUserByTraqID(args.Name)
 	if err != nil {
@@ -169,10 +194,12 @@ func (r *UserRepository) CreateUser(ctx context.Context, args *repository.Create
 	}
 
 	user := model.User{
+		// TODO: traQのUUIDを使うべきかも
 		ID:          uuid.Must(uuid.NewV4()),
 		Description: args.Description,
 		Check:       args.Check,
 		Name:        args.Name,
+		State:       domain.TraqStateActive,
 	}
 
 	err = r.h.WithContext(ctx).Create(&user).Error

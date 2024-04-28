@@ -31,7 +31,6 @@ func TestGetContests(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContests), nil)
@@ -68,7 +67,6 @@ func TestGetContest(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
@@ -227,7 +225,6 @@ func TestCreateContest(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodPost, e.URL(api.Contest.CreateContest), &tt.reqbody)
@@ -373,7 +370,6 @@ func TestEditContest(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
@@ -438,7 +434,6 @@ func TestDeleteContest(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodDelete, e.URL(api.Contest.DeleteContest, tt.contestID), nil)
@@ -475,7 +470,6 @@ func TestGetContestTeams(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeams, tt.contestID), nil)
@@ -620,7 +614,6 @@ func TestAddContestTeam(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeam, tt.contestID), &tt.reqbody)
@@ -784,7 +777,6 @@ func TestEditContestTeam(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
@@ -865,7 +857,6 @@ func TestDeleteContestTeam(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodDelete, e.URL(api.Contest.DeleteContestTeam, tt.contestID, tt.teamID), nil)
@@ -926,7 +917,6 @@ func TestGetContestTeamMembers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeamMembers, tt.contestID, tt.teamID), nil)
@@ -1016,7 +1006,6 @@ func TestAddContestTeamMembers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			res := doRequest(t, e, http.MethodPost, e.URL(api.Contest.AddContestTeamMembers, tt.contestID, tt.teamID), &tt.reqbody)
@@ -1110,7 +1099,6 @@ func TestEditContestTeamMembers(t *testing.T) {
 	e := echo.New()
 	api := setupRoutes(t, e)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
@@ -1154,7 +1142,6 @@ func TestGetXXX(t *testing.T) {
 	api, err := setupRoutes(t, e,)
 	assert.NoError(t, err)
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
                         t.Parallel()
 			res := doRequest(t, e, http.MethodGet, e.URL(api.XXX.GetXXX, tt.userID), nil)

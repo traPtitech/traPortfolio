@@ -13,7 +13,7 @@ import (
 
 type Option func(*echo.Echo) error
 
-func Setup(e *echo.Echo, api API, opts ...Option) error {
+func Setup(isProduction bool, e *echo.Echo, api API, opts ...Option) error {
 	e.HTTPErrorHandler = newHTTPErrorHandler(e)
 	e.Binder = &binderWithValidation{}
 
@@ -26,7 +26,7 @@ func Setup(e *echo.Echo, api API, opts ...Option) error {
 	e.Use(middleware.Recover())
 
 	apiGroup := e.Group("/api")
-	setupV1API(apiGroup, api)
+	setupV1API(apiGroup, api, isProduction)
 
 	return nil
 }

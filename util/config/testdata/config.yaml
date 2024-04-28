@@ -10,8 +10,7 @@ db:
   port: 3001
   verbose: true
 traq:
-  cookie: 'traq cookie'
-  apiEndpoint: 'traq endpoint'
+  accessToken: 'traq token'
 knoq:
   cookie: 'knoq cookie'
   apiEndpoint: 'knoq endpoint'

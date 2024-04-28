@@ -61,24 +61,18 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 		return nil, err
 	}
 
-	portalUsers, err := r.portal.GetUsers()
+	realNameMap, err := external.GetRealNameMap(r.portal)
 	if err != nil {
 		return nil, err
 	}
 
-	nameMap := make(map[string]string, len(portalUsers))
-	for _, v := range portalUsers {
-		nameMap[v.TraQID] = v.RealName
-	}
-
 	m := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
-		realName := nameMap[v.User.Name]
 		pm := domain.UserWithDuration{
 			User: *domain.NewUser(
 				v.User.ID,
 				v.User.Name,
-				realName,
+				realNameMap[v.User.Name],
 				v.User.Check,
 			),
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
@@ -183,24 +177,18 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 		return nil, err
 	}
 
-	portalUsers, err := r.portal.GetUsers()
+	realNameMap, err := external.GetRealNameMap(r.portal)
 	if err != nil {
 		return nil, err
 	}
 
-	nameMap := make(map[string]string, len(portalUsers))
-	for _, v := range portalUsers {
-		nameMap[v.TraQID] = v.RealName
-	}
-
 	res := make([]*domain.UserWithDuration, len(members))
 	for i, v := range members {
-		realName := nameMap[v.User.Name]
 		u := domain.UserWithDuration{
 			User: *domain.NewUser(
 				v.User.ID,
 				v.User.Name,
-				realName,
+				realNameMap[v.User.Name],
 				v.User.Check,
 			),
 			Duration: domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester),
