@@ -15,7 +15,7 @@ import (
 )
 
 type ContestHandler struct {
-	r repository.ContestRepository
+	contest repository.ContestRepository
 }
 
 // NewContestHandler creates a ContestHandler
@@ -26,7 +26,7 @@ func NewContestHandler(r repository.ContestRepository) *ContestHandler {
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(c echo.Context) error {
 	ctx := c.Request().Context()
-	contests, err := h.r.GetContests(ctx)
+	contests, err := h.contest.GetContests(ctx)
 	if err != nil {
 		return err
 	}
@@ -47,13 +47,13 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contest, err := h.r.GetContest(ctx, contestID)
+	contest, err := h.contest.GetContest(ctx, contestID)
 	if err != nil {
 		return err
 	}
 
 	{
-		teams, err := h.r.GetContestTeams(ctx, contestID)
+		teams, err := h.contest.GetContestTeams(ctx, contestID)
 		if err != nil && !errors.Is(err, repository.ErrNotFound) {
 			return err
 		}
@@ -95,7 +95,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contest, err := h.r.CreateContest(ctx, &createReq)
+	contest, err := h.contest.CreateContest(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (h *ContestHandler) EditContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.r.UpdateContest(ctx, contestID, &patchReq)
+	err = h.contest.UpdateContest(ctx, contestID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -144,7 +144,7 @@ func (h *ContestHandler) DeleteContest(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err := h.r.DeleteContest(ctx, contestID); err != nil {
+	if err := h.contest.DeleteContest(ctx, contestID); err != nil {
 		return err
 	}
 
@@ -159,7 +159,7 @@ func (h *ContestHandler) GetContestTeams(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeams, err := h.r.GetContestTeams(ctx, contestID)
+	contestTeams, err := h.contest.GetContestTeams(ctx, contestID)
 	if err != nil {
 		return err
 	}
@@ -189,13 +189,13 @@ func (h *ContestHandler) GetContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeam, err := h.r.GetContestTeam(ctx, contestID, teamID)
+	contestTeam, err := h.contest.GetContestTeam(ctx, contestID, teamID)
 	if err != nil {
 		return err
 	}
 
 	{
-		members, err := h.r.GetContestTeamMembers(ctx, contestID, teamID)
+		members, err := h.contest.GetContestTeamMembers(ctx, contestID, teamID)
 		if err != nil {
 			return err
 		}
@@ -237,7 +237,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	contestTeam, err := h.r.CreateContestTeam(ctx, contestID, &args)
+	contestTeam, err := h.contest.CreateContestTeam(ctx, contestID, &args)
 	if err != nil {
 		return err
 	}
@@ -273,7 +273,7 @@ func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.r.UpdateContestTeam(ctx, teamID, &args); err != nil {
+	if err = h.contest.UpdateContestTeam(ctx, teamID, &args); err != nil {
 		return err
 	}
 
@@ -293,7 +293,7 @@ func (h *ContestHandler) DeleteContestTeam(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.r.DeleteContestTeam(ctx, contestID, teamID); err != nil {
+	if err = h.contest.DeleteContestTeam(ctx, contestID, teamID); err != nil {
 		return err
 	}
 
@@ -313,7 +313,7 @@ func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	users, err := h.r.GetContestTeamMembers(ctx, contestID, teamID)
+	users, err := h.contest.GetContestTeamMembers(ctx, contestID, teamID)
 	if err != nil {
 		return err
 	}
@@ -349,7 +349,7 @@ func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
 		return err
 	}
 
-	err = h.r.AddContestTeamMembers(ctx, teamID, req.Members)
+	err = h.contest.AddContestTeamMembers(ctx, teamID, req.Members)
 	if err != nil {
 		return err
 	}
@@ -375,7 +375,7 @@ func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	if err = h.r.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
+	if err = h.contest.EditContestTeamMembers(ctx, teamID, req.Members); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)

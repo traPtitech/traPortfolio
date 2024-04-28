@@ -1,18 +1,18 @@
 package handler
 
 import (
-	"github.com/traPtitech/traPortfolio/domain"
 	"net/http"
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
 
 type ProjectHandler struct {
-	r repository.ProjectRepository
+	project repository.ProjectRepository
 }
 
 func NewProjectHandler(r repository.ProjectRepository) *ProjectHandler {
@@ -22,7 +22,7 @@ func NewProjectHandler(r repository.ProjectRepository) *ProjectHandler {
 // GetProjects GET /projects
 func (h *ProjectHandler) GetProjects(c echo.Context) error {
 	ctx := c.Request().Context()
-	projects, err := h.r.GetProjects(ctx)
+	projects, err := h.project.GetProjects(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	project, err := h.r.GetProject(ctx, projectID)
+	project, err := h.project.GetProject(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	project, err := h.r.CreateProject(ctx, &createReq)
+	project, err := h.project.CreateProject(ctx, &createReq)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	{
-		old, err := h.r.GetProject(ctx, projectID)
+		old, err := h.project.GetProject(ctx, projectID)
 		if err != nil {
 			return err
 		}
@@ -159,7 +159,7 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 		}
 	}
 
-	err = h.r.UpdateProject(ctx, projectID, &patchReq)
+	err = h.project.UpdateProject(ctx, projectID, &patchReq)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	members, err := h.r.GetProjectMembers(ctx, projectID)
+	members, err := h.project.GetProjectMembers(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.r.AddProjectMembers(ctx, projectID, createReq)
+	err = h.project.AddProjectMembers(ctx, projectID, createReq)
 	if err != nil {
 		return err
 	}
@@ -246,7 +246,7 @@ func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.r.DeleteProjectMembers(ctx, projectID, req.Members)
+	err = h.project.DeleteProjectMembers(ctx, projectID, req.Members)
 	if err != nil {
 		return err
 	}
