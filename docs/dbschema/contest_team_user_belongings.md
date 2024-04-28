@@ -15,8 +15,8 @@ CREATE TABLE `contest_team_user_belongings` (
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`team_id`,`user_id`),
   KEY `fk_contest_team_user_belongings_user` (`user_id`),
-  CONSTRAINT `fk_contest_team_user_belongings_contest_team` FOREIGN KEY (`team_id`) REFERENCES `contest_teams` (`id`),
-  CONSTRAINT `fk_contest_team_user_belongings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_contest_team_user_belongings_contest_team` FOREIGN KEY (`team_id`) REFERENCES `contest_teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_contest_team_user_belongings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -48,7 +48,38 @@ CREATE TABLE `contest_team_user_belongings` (
 
 ## Relations
 
-![er](contest_team_user_belongings.svg)
+```mermaid
+erDiagram
+
+"contest_team_user_belongings" }o--|| "contest_teams" : "FOREIGN KEY (team_id) REFERENCES contest_teams (id)"
+"contest_team_user_belongings" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+
+"contest_team_user_belongings" {
+  char_36_ team_id PK
+  char_36_ user_id PK
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"contest_teams" {
+  char_36_ id PK
+  char_36_ contest_id FK
+  varchar_32_ name
+  text description
+  text result
+  text link
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"users" {
+  char_36_ id PK
+  text description
+  tinyint_1_ check
+  varchar_32_ name
+  tinyint_1_ state
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

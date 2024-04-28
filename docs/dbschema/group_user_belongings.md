@@ -19,8 +19,8 @@ CREATE TABLE `group_user_belongings` (
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
   KEY `fk_group_user_belongings_group` (`group_id`),
-  CONSTRAINT `fk_group_user_belongings_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`),
-  CONSTRAINT `fk_group_user_belongings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_group_user_belongings_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_group_user_belongings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -56,7 +56,40 @@ CREATE TABLE `group_user_belongings` (
 
 ## Relations
 
-![er](group_user_belongings.svg)
+```mermaid
+erDiagram
+
+"group_user_belongings" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+"group_user_belongings" }o--|| "groups" : "FOREIGN KEY (group_id) REFERENCES groups (group_id)"
+
+"group_user_belongings" {
+  char_36_ user_id PK
+  char_36_ group_id PK
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"users" {
+  char_36_ id PK
+  text description
+  tinyint_1_ check
+  varchar_32_ name
+  tinyint_1_ state
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"groups" {
+  char_36_ group_id PK
+  varchar_32_ name
+  text link
+  text description
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

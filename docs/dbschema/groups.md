@@ -46,7 +46,37 @@ CREATE TABLE `groups` (
 
 ## Relations
 
-![er](groups.svg)
+```mermaid
+erDiagram
+
+"group_user_admins" }o--|| "groups" : "FOREIGN KEY (group_id) REFERENCES groups (group_id)"
+"group_user_belongings" }o--|| "groups" : "FOREIGN KEY (group_id) REFERENCES groups (group_id)"
+
+"groups" {
+  char_36_ group_id PK
+  varchar_32_ name
+  text link
+  text description
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"group_user_admins" {
+  char_36_ user_id PK
+  char_36_ group_id PK
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"group_user_belongings" {
+  char_36_ user_id PK
+  char_36_ group_id PK
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

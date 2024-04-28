@@ -42,7 +42,17 @@ CREATE TABLE `event_level_relations` (
 
 ## Relations
 
-![er](event_level_relations.svg)
+```mermaid
+erDiagram
+
+
+"event_level_relations" {
+  char_36_ id PK
+  tinyint_3__unsigned level
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

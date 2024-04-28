@@ -50,7 +50,32 @@ CREATE TABLE `contests` (
 
 ## Relations
 
-![er](contests.svg)
+```mermaid
+erDiagram
+
+"contest_teams" }o--|| "contests" : "FOREIGN KEY (contest_id) REFERENCES contests (id)"
+
+"contests" {
+  char_36_ id PK
+  varchar_32_ name
+  text description
+  text link
+  datetime_6_ since
+  datetime_6_ until
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"contest_teams" {
+  char_36_ id PK
+  char_36_ contest_id FK
+  varchar_32_ name
+  text description
+  text result
+  text link
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

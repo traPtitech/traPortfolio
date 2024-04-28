@@ -15,7 +15,7 @@ CREATE TABLE `group_user_admins` (
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
   KEY `fk_group_user_admins_group` (`group_id`),
-  CONSTRAINT `fk_group_user_admins_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`)
+  CONSTRAINT `fk_group_user_admins_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -46,7 +46,26 @@ CREATE TABLE `group_user_admins` (
 
 ## Relations
 
-![er](group_user_admins.svg)
+```mermaid
+erDiagram
+
+"group_user_admins" }o--|| "groups" : "FOREIGN KEY (group_id) REFERENCES groups (group_id)"
+
+"group_user_admins" {
+  char_36_ user_id PK
+  char_36_ group_id PK
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"groups" {
+  char_36_ group_id PK
+  varchar_32_ name
+  text link
+  text description
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 
