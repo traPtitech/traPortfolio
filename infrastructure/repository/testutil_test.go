@@ -9,13 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -109,28 +106,6 @@ func makeKnoqEvent(t *testing.T, event *domain.EventDetail) *external.EventRespo
 		TimeEnd:     event.TimeEnd,
 		Admins:      admins,
 	}
-}
-
-func mustMakeTraqGetAllArgs(t *testing.T, rargs *repository.GetUsersArgs) *external.TraQGetAllArgs {
-	t.Helper()
-
-	eargs, err := makeTraqGetAllArgs(rargs)
-	assert.NoError(t, err)
-
-	return eargs
-}
-
-func makeTraqUsers(t *testing.T, users []*domain.User) []*external.TraQUserResponse {
-	t.Helper()
-
-	res := make([]*external.TraQUserResponse, len(users))
-	for i, u := range users {
-		res[i] = &external.TraQUserResponse{
-			ID: u.ID,
-		}
-	}
-
-	return res
 }
 
 func makePortalUsers(t *testing.T, users []*domain.User) []*external.PortalUserResponse {
