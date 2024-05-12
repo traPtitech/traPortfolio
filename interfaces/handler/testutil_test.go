@@ -25,8 +25,16 @@ type MockRepository struct {
 func doRequest(t *testing.T, api API, method, path string, reqBody interface{}, resBody interface{}) (int, *httptest.ResponseRecorder) {
 	t.Helper()
 
+	return doRequestWithHeader(t, api, method, path, reqBody, resBody, nil)
+}
+
+// TODO: merge with doRequest
+func doRequestWithHeader(t *testing.T, api API, method, path string, reqBody interface{}, resBody interface{}, header map[string]string) (int, *httptest.ResponseRecorder) {
 	req := httptest.NewRequest(method, path, requestEncode(t, reqBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
 	rec := httptest.NewRecorder()
 
 	e := echo.New()

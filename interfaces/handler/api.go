@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"cmp"
 	"fmt"
 	"net/http"
 
@@ -64,6 +65,11 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 		userAPI.GET("/:userID/contests", api.User.GetUserContests)
 		userAPI.GET("/:userID/groups", api.User.GetUserGroups)
 		userAPI.GET("/:userID/events", api.User.GetUserEvents, tmpEventMiddleware)
+
+		userMeAPI := userAPI.Group("/me")
+		{
+			userMeAPI.GET("", api.User.GetMe, authMeMiddleware)
+		}
 	}
 
 	// project API
@@ -109,6 +115,22 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 	{
 		groupAPI.GET("", api.Group.GetGroups)
 		groupAPI.GET("/:groupID", api.Group.GetGroup)
+	}
+}
+
+const keyUserName = "userName"
+
+func authMeMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		h := c.Request().Header
+		name := cmp.Or(h.Get("X-Forwarded-User"), h.Get("X-Showcase-User"))
+		if name == "" {
+			return fmt.Errorf("%w: %s", repository.ErrUnauthorized, "missing user name")
+		}
+
+		c.Set(keyUserName, name)
+
+		return next(c)
 	}
 }
 
