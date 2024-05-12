@@ -53,6 +53,9 @@ func newHTTPErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 		case errors.Is(err, repository.ErrAlreadyExists):
 			code = http.StatusConflict
 
+		case errors.Is(err, repository.ErrUnauthorized):
+			code = http.StatusUnauthorized
+
 		case errors.Is(err, repository.ErrForbidden):
 			code = http.StatusForbidden
 

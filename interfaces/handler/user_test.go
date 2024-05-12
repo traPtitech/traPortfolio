@@ -1505,3 +1505,98 @@ func TestUserHandler_GetUserEvents(t *testing.T) {
 		})
 	}
 }
+
+func TestUserHandler_GetMe(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		setup      func(mr MockRepository) (hres *schema.UserDetail, path string, header map[string]string)
+		statusCode int
+	}{
+		{
+			name: "success",
+			setup: func(mr MockRepository) (hres *schema.UserDetail, path string, header map[string]string) {
+				username := random.AlphaNumeric()
+				header = map[string]string{
+					"X-Forwarded-User": username,
+				}
+
+				userID := random.UUID()
+
+				ruser := domain.NewUser(userID, username, random.AlphaNumeric(), random.Bool())
+				rusers := []*domain.User{ruser}
+				mr.user.EXPECT().GetUsers(anyCtx{}, &repository.GetUsersArgs{
+					Name: optional.From(ruser.Name),
+				}).Return(rusers, nil)
+
+				accountType := rand.N(domain.AccountLimit)
+				ruserDetail := domain.UserDetail{
+					User:  *ruser,
+					Bio:   random.AlphaNumeric(),
+					State: rand.N(domain.TraqStateLimit),
+					Accounts: []*domain.Account{
+						{
+							ID:          random.UUID(),
+							DisplayName: random.AlphaNumeric(),
+							Type:        accountType,
+							PrPermitted: random.Bool(),
+							URL:         random.AccountURLString(accountType),
+						},
+					},
+				}
+				mr.user.EXPECT().GetUser(anyCtx{}, userID).Return(&ruserDetail, nil)
+
+				haccounts := []schema.Account{}
+				for _, account := range ruserDetail.Accounts {
+					haccounts = append(haccounts, schema.Account{
+						Id:          account.ID,
+						DisplayName: account.DisplayName,
+						PrPermitted: schema.PrPermitted(account.PrPermitted),
+						Type:        schema.AccountType(account.Type),
+						Url:         account.URL,
+					})
+				}
+
+				huser := schema.UserDetail{
+					Id:       userID,
+					Name:     ruser.Name,
+					RealName: ruser.RealName(),
+					Accounts: haccounts,
+					Bio:      ruserDetail.Bio,
+					State:    schema.UserAccountState(ruserDetail.State),
+				}
+
+				path = "/api/v1/users/me"
+
+				return &huser, path, header
+			},
+			statusCode: http.StatusOK,
+		},
+		{
+			name: "Unauthorized",
+			setup: func(mr MockRepository) (hres *schema.UserDetail, path string, header map[string]string) {
+				header = map[string]string{}
+				path = "/api/v1/users/me"
+				return nil, path, header
+			},
+			statusCode: http.StatusUnauthorized,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// Setup mock
+			mr, api := setupUserMock(t)
+
+			hresUsers, path, header := tt.setup(mr)
+			var resBody *schema.UserDetail
+			statusCode, _ := doRequestWithHeader(t, api, http.MethodGet, path, nil, &resBody, header)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+			assert.Equal(t, hresUsers, resBody)
+		})
+	}
+}
