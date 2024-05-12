@@ -29,22 +29,6 @@ func NewUserRepository(h *gorm.DB, portalAPI external.PortalAPI, traQAPI externa
 	}
 }
 
-func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
-	eargs := new(external.TraQGetAllArgs)
-	includeSuspended, iok := rargs.IncludeSuspended.V()
-	name, nok := rargs.Name.V()
-	if iok && nok {
-		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
-		return nil, repository.ErrInvalidArg
-	} else if iok {
-		eargs.IncludeSuspended = includeSuspended
-	} else if nok {
-		eargs.Name = name
-	}
-
-	return eargs, nil
-}
-
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	limit := args.Limit.ValueOr(-1)
 	tx := r.h.WithContext(ctx).Limit(limit)

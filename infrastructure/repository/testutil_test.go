@@ -108,19 +108,6 @@ func makeKnoqEvent(t *testing.T, event *domain.EventDetail) *external.EventRespo
 	}
 }
 
-func makeTraqUsers(t *testing.T, users []*domain.User) []*external.TraQUserResponse {
-	t.Helper()
-
-	res := make([]*external.TraQUserResponse, len(users))
-	for i, u := range users {
-		res[i] = &external.TraQUserResponse{
-			ID: u.ID,
-		}
-	}
-
-	return res
-}
-
 func makePortalUsers(t *testing.T, users []*domain.User) []*external.PortalUserResponse {
 	t.Helper()
 	res := make([]*external.PortalUserResponse, len(users))
