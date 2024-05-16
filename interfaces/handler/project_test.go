@@ -322,12 +322,12 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersRequest, string) {
+			setup: func(mr MockRepository) (*schema.AddProjectMembersRequest, string) {
 				projectID := random.UUID()
 				userID := random.UUID()
 				userDuration := random.Duration()
@@ -357,14 +357,14 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						UntilSemester: userDuration.Until.Semester,
 					},
 				}
-				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
+				mr.project.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
 			statusCode: http.StatusOK,
 		},
 		{
 			name: "BadRequest: Invalid Project ID",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
@@ -372,7 +372,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid request body: member is empty",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				return &schema.AddProjectMembersRequest{}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
@@ -380,7 +380,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid request body: memberID is invalid",
-			setup: func(s *mock_service.MockProjectService) (reqBody *schema.AddProjectMembersRequest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				duration := random.Duration()
 				return &schema.AddProjectMembersRequest{
@@ -405,7 +405,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid request body: member is already exists",
-			setup: func(s *mock_service.MockProjectService) (*schema.AddProjectMembersRequest, string) {
+			setup: func(mr MockRepository) (*schema.AddProjectMembersRequest, string) {
 				userID := random.UUID()
 				projectID := random.UUID()
 				duration := random.Duration()
@@ -426,7 +426,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				s.EXPECT().AddProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
+				mr.project.EXPECT().AddProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
 					{
 						UserID:        userID,
 						SinceYear:     int(duration.Since.Year),

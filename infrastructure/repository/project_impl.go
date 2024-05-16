@@ -205,7 +205,7 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return repository.ErrInvalidArg
 	}
 
-	p := new(model.Project)
+	p := model.Project{}
 
 	// プロジェクトの存在チェック
 	err := r.h.
