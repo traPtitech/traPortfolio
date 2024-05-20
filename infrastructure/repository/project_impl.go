@@ -224,16 +224,16 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 	}
 
 	currentProjectMembers := make(map[uuid.UUID]*model.ProjectMember, len(updatedProjectMembers))
-	_mmbs := make([]*model.ProjectMember, 0, len(updatedProjectMembers))
+	memberOnDatabase := make([]*model.ProjectMember, 0, len(updatedProjectMembers))
 	err = r.h.
 		WithContext(ctx).
 		Where(&model.ProjectMember{ProjectID: projectID}).
-		Find(&_mmbs).
+		Find(&memberOnDatabase).
 		Error
 	if err != nil && err != repository.ErrNotFound {
 		return err
 	}
-	for _, v := range _mmbs {
+	for _, v := range memberOnDatabase {
 		currentProjectMembers[v.UserID] = &model.ProjectMember{
 			SinceYear:     v.SinceYear,
 			SinceSemester: v.SinceSemester,
@@ -289,9 +289,12 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 			}
 		}
 		// 残っているものは削除
-		for id := range currentProjectMembers {
+		for _, member := range memberOnDatabase {
+			if _, ok := currentProjectMembers[member.UserID]; !ok {
+				continue
+			}
 			err = tx.WithContext(ctx).
-				Where(&model.ProjectMember{ProjectID: projectID, UserID: id}).
+				Where(&model.ProjectMember{ProjectID: projectID, UserID: member.UserID}).
 				Delete(&model.ProjectMember{}).
 				Error
 			if err != nil {
