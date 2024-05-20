@@ -203,6 +203,7 @@ func (h *ProjectHandler) EditProjectMembers(c echo.Context) error {
 		return err
 	}
 
+	createMap := make(map[uuid.UUID]struct{}, len(req.Members))
 	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
 		m := &repository.CreateProjectMemberArgs{
@@ -216,12 +217,19 @@ func (h *ProjectHandler) EditProjectMembers(c echo.Context) error {
 			m.UntilSemester = int(v.Duration.Until.Semester)
 		}
 
+		// 設定された期間が有効かチェック
 		d := domain.NewYearWithSemesterDuration(m.SinceYear, m.SinceSemester, m.UntilYear, m.UntilSemester)
 		if !d.IsValid() {
 			return repository.ErrInvalidArg
 		}
 
+		// 重複していないかどうか
+		if _, ok := createMap[m.UserID]; ok {
+			return repository.ErrInvalidArg
+		}
+
 		createReq = append(createReq, m)
+		createMap[m.UserID] = struct{}{}
 	}
 
 	ctx := c.Request().Context()

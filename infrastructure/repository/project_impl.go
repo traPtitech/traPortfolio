@@ -200,8 +200,8 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 	return res, nil
 }
 
-func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
-	if len(projectMembers) == 0 {
+func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, updatedProjectMembers []*repository.CreateProjectMemberArgs) error {
+	if len(updatedProjectMembers) == 0 {
 		return repository.ErrInvalidArg
 	}
 
@@ -219,22 +219,16 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 
 	projectDuration := domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester)
 
-	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
-	for _, v := range projectMembers {
+	// プロジェクトの期間内かどうか
+	for _, v := range updatedProjectMembers {
 		memberDuration := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
-		// プロジェクトの期間内かどうか
 		if !projectDuration.Includes(memberDuration) {
 			return fmt.Errorf("%w: exceeded duration user", repository.ErrInvalidArg)
 		}
-		// 重複していないかどうか
-		if _, ok := projectMembersMap[v.UserID]; ok {
-			return fmt.Errorf("%w: duplicate user", repository.ErrInvalidArg)
-		}
-		projectMembersMap[v.UserID] = struct{}{}
 	}
 
-	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
-	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
+	currentProjectMembers := make(map[uuid.UUID]*model.ProjectMember, len(updatedProjectMembers))
+	_mmbs := make([]*model.ProjectMember, 0, len(updatedProjectMembers))
 	err = r.h.
 		WithContext(ctx).
 		Where(&model.ProjectMember{ProjectID: projectID}).
@@ -244,11 +238,16 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 		return err
 	}
 	for _, v := range _mmbs {
-		mmbsMp[v.UserID] = struct{}{}
+		currentProjectMembers[v.UserID] = &model.ProjectMember{
+			SinceYear:     v.SinceYear,
+			SinceSemester: v.SinceSemester,
+			UntilYear:     v.UntilYear,
+			UntilSemester: v.UntilSemester,
+		}
 	}
 
-	members := make([]*model.ProjectMember, 0, len(projectMembers))
-	for _, v := range projectMembers {
+	members := make([]*model.ProjectMember, 0, len(updatedProjectMembers))
+	for _, v := range updatedProjectMembers {
 		uid := uuid.Must(uuid.NewV4())
 		m := &model.ProjectMember{
 			ID:            uid,
@@ -264,10 +263,25 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 
 	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, v := range members {
-			if _, ok := mmbsMp[v.UserID]; ok {
+			// 既に登録されていたら更新を試し、そうでなければ新規作成
+			if vdb, ok := currentProjectMembers[v.UserID]; ok {
+				if v.SinceYear != vdb.SinceYear || v.SinceSemester != vdb.SinceSemester || v.UntilYear != vdb.UntilYear || v.UntilSemester != vdb.UntilSemester {
+					err = tx.WithContext(ctx).Updates(v).Error
+					if err != nil {
+						return err
+					}
+				}
+				delete(currentProjectMembers, v.UserID)
 				continue
 			}
 			err = tx.WithContext(ctx).Create(v).Error
+			if err != nil {
+				return err
+			}
+		}
+		// 残っているものは削除
+		for _, v := range currentProjectMembers {
+			err = tx.WithContext(ctx).Delete(v).Error
 			if err != nil {
 				return err
 			}
