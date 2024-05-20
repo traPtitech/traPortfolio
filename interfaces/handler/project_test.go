@@ -404,6 +404,45 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
+			name: "BadRequest: invalid request body: duplicated user",
+			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
+				projectID := random.UUID()
+				userID := random.UUID()
+				duration := random.Duration()
+				return &schema.EditProjectMembersRequest{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.Semester),
+									Year:     duration.Until.Year,
+								},
+							},
+							UserId: userID,
+						},
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.Semester),
+									Year:     duration.Until.Year,
+								},
+							},
+							UserId: userID,
+						},
+					},
+				}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "BadRequest: invalid request body: member is already exists",
 			setup: func(mr MockRepository) (*schema.EditProjectMembersRequest, string) {
 				userID := random.UUID()

@@ -818,14 +818,20 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"project_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"})
 				for i, pm := range args.projectMembers {
 					sinceSemester := pm.SinceSemester
+					sinceYear := pm.SinceYear
 					untilSemester := pm.UntilSemester
+					untilYear := pm.UntilYear
+					if i == 0 {
+						sinceYear = sinceYear - 1
+						untilYear = untilYear + 1
+					}
 					if i/2 == 0 {
-						sinceSemester = 1 - pm.SinceSemester
+						sinceSemester = 1 - sinceSemester
 					}
 					if i%2 == 0 {
-						untilSemester = 1 - pm.UntilSemester
+						untilSemester = 1 - untilSemester
 					}
-					rows.AddRow(args.projectID, pm.UserID, pm.SinceYear, sinceSemester, pm.UntilYear, untilSemester)
+					rows.AddRow(args.projectID, pm.UserID, sinceYear, sinceSemester, untilYear, untilSemester)
 				}
 				f.h.Mock.
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
@@ -841,8 +847,8 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 				f.h.Mock.ExpectBegin()
 				pm0 := args.projectMembers[0]
 				f.h.Mock.
-					ExpectExec(makeSQLQueryRegexp("UPDATE `project_members` SET `since_semester`=?,`until_semester`=?,`updated_at`=? WHERE `id` = ?")).
-					WithArgs(pm0.SinceSemester, pm0.UntilSemester, anyTime{}, anyUUID{}).
+					ExpectExec(makeSQLQueryRegexp("UPDATE `project_members` SET `since_semester`=?,`since_year`=?,`until_semester`=?,`until_year`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(pm0.SinceSemester, pm0.SinceYear, pm0.UntilSemester, pm0.UntilYear, anyTime{}, anyUUID{}).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				pm1 := args.projectMembers[1]
 				f.h.Mock.
@@ -999,7 +1005,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "UnexpectedError_EditProjectMembers",
+			name: "UnexpectedError_AddProjectMembers",
 			args: args{
 				projectID: random.UUID(),
 				projectMembers: []*repository.CreateProjectMemberArgs{
@@ -1039,6 +1045,75 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 				f.h.Mock.
 					ExpectExec(makeSQLQueryRegexp("INSERT INTO `project_members` (`id`,`project_id`,`user_id`,`since_year`,`since_semester`,`until_year`,`until_semester`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?,?)")).
 					WithArgs(anyUUID{}, args.projectID, pm.UserID, pm.SinceYear, pm.SinceSemester, pm.UntilYear, pm.UntilSemester, anyTime{}, anyTime{}).
+					WillReturnError(errUnexpected)
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_EditProjectMembers",
+			args: args{
+				projectID: random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{
+					{
+						UserID:        random.UUID(),
+						SinceYear:     duration.Since.Year,
+						SinceSemester: duration.Since.Semester,
+						UntilYear:     duration.Until.Year,
+						UntilSemester: duration.Until.Semester,
+					},
+				},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				pm := args.projectMembers[0]
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"project_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(args.projectID, pm.UserID, duration.Since.Year, 1-duration.Since.Semester, duration.Until.Year, 1-duration.Until.Semester),
+					)
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectExec(makeSQLQueryRegexp("UPDATE `project_members` SET `since_semester`=?,`until_semester`=?,`updated_at`=? WHERE `id` = ?")).
+					WithArgs(pm.SinceSemester, pm.UntilSemester, anyTime{}, anyUUID{}).
+					WillReturnError(errUnexpected)
+				f.h.Mock.ExpectRollback()
+			},
+			assertion: assert.Error,
+		},
+		{
+			name: "UnexpectedError_DeleteProjectMembers",
+			args: args{
+				projectID:      random.UUID(),
+				projectMembers: []*repository.CreateProjectMemberArgs{},
+			},
+			setup: func(f mockProjectRepositoryFields, args args) {
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
+					WithArgs(args.projectID, 1).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"id"}).
+							AddRow(args.projectID),
+					)
+				f.h.Mock.
+					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
+					WithArgs(args.projectID).
+					WillReturnRows(
+						sqlmock.NewRows([]string{"project_id", "user_id", "since_year", "since_semester", "until_year", "until_semester"}).
+							AddRow(args.projectID, random.UUID(), duration.Since.Year, 1-duration.Since.Semester, duration.Until.Year, 1-duration.Until.Semester),
+					)
+				f.h.Mock.ExpectBegin()
+				f.h.Mock.
+					ExpectExec(makeSQLQueryRegexp("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` = ?")).
+					WithArgs(args.projectID, anyUUID{}).
 					WillReturnError(errUnexpected)
 				f.h.Mock.ExpectRollback()
 			},
