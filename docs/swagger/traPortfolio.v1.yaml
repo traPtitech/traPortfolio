@@ -604,27 +604,6 @@ paths:
           description: Not Found
       operationId: getContestTeamMembers
       description: コンテストチームメンバーを取得します
-    post:
-      summary: コンテストチームメンバーの追加
-      operationId: addContestTeamMembers
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-      description: コンテストチームメンバーを追加します
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MemberIDs"
-      tags:
-        - contest
-        - user
     put:
       summary: コンテストチームメンバーの修正
       operationId: editContestTeamMembers

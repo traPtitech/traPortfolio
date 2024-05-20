@@ -55,6 +55,5 @@ type ContestRepository interface {
 	UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *UpdateContestTeamArgs) error
 	DeleteContestTeam(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) error
 	GetContestTeamMembers(ctx context.Context, contestID uuid.UUID, teamID uuid.UUID) ([]*domain.User, error)
-	AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
 	EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error
 }

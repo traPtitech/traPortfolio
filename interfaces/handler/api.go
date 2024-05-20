@@ -105,7 +105,6 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 		contestAPI.PATCH("/:contestID/teams/:teamID", api.Contest.EditContestTeam)
 		contestAPI.DELETE("/:contestID/teams/:teamID", api.Contest.DeleteContestTeam)
 		contestAPI.GET("/:contestID/teams/:teamID/members", api.Contest.GetContestTeamMembers)
-		contestAPI.POST("/:contestID/teams/:teamID/members", api.Contest.AddContestTeamMembers)
 		contestAPI.PUT("/:contestID/teams/:teamID/members", api.Contest.EditContestTeamMembers)
 	}
 

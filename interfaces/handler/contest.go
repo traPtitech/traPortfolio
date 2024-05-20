@@ -329,33 +329,6 @@ func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// AddContestTeamMembers POST /contests/:contestID/teams/:teamID/members
-func (h *ContestHandler) AddContestTeamMembers(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	// TODO: contestIDをAddContestTeamMembersの引数に含める
-	_, err := getID(c, keyContestID)
-	if err != nil {
-		return err
-	}
-
-	teamID, err := getID(c, keyContestTeamID)
-	if err != nil {
-		return err
-	}
-
-	req := schema.MemberIDs{}
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
-
-	err = h.contest.AddContestTeamMembers(ctx, teamID, req.Members)
-	if err != nil {
-		return err
-	}
-	return c.NoContent(http.StatusNoContent)
-}
-
 // EditContestTeamMembers PUT /contests/:contestID/teams/:teamID/members
 func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 	// TODO: contestIDをDeleteContestTeamMembersの引数に含める
