@@ -201,10 +201,6 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 }
 
 func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, updatedProjectMembers []*repository.CreateProjectMemberArgs) error {
-	if len(updatedProjectMembers) == 0 {
-		return repository.ErrInvalidArg
-	}
-
 	p := model.Project{}
 
 	// プロジェクトの存在チェック
