@@ -200,7 +200,7 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 	return res, nil
 }
 
-func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
+func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
 	if len(projectMembers) == 0 {
 		return repository.ErrInvalidArg
 	}
@@ -274,34 +274,6 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		}
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, members []uuid.UUID) error {
-	if len(members) == 0 {
-		return repository.ErrInvalidArg
-	}
-
-	// プロジェクトの存在チェック
-	err := r.h.
-		WithContext(ctx).
-		Where(&model.Project{ID: projectID}).
-		First(&model.Project{}).
-		Error
-	if err != nil {
-		return err
-	}
-
-	err = r.h.
-		WithContext(ctx).
-		Where(&model.ProjectMember{ProjectID: projectID}).
-		Where("`project_members`.`user_id` IN (?)", members).
-		Delete(&model.ProjectMember{}).
-		Error
 	if err != nil {
 		return err
 	}

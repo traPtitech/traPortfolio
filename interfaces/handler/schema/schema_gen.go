@@ -73,11 +73,6 @@ type AddContestTeamRequest struct {
 	Result *string `json:"result,omitempty"`
 }
 
-// AddProjectMembersRequest プロジェクトメンバー追加リクエスト
-type AddProjectMembersRequest struct {
-	Members []MemberIDWithYearWithSemesterDuration `json:"members"`
-}
-
 // Contest コンテスト情報
 type Contest struct {
 	// Duration イベントやコンテストなどの存続期間
@@ -238,6 +233,11 @@ type EditEventRequest struct {
 	// 1 全て公開
 	// 2 外部に非公開
 	Level *EventLevel `json:"level,omitempty"`
+}
+
+// EditProjectMembersRequest プロジェクトメンバー変更リクエスト
+type EditProjectMembersRequest struct {
+	Members []MemberIDWithYearWithSemesterDuration `json:"members"`
 }
 
 // EditProjectRequest プロジェクト変更リクエスト

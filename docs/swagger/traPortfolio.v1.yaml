@@ -723,7 +723,7 @@ paths:
       description: プロジェクトメンバーを取得します
     post:
       summary: プロジェクトメンバーの追加
-      operationId: addProjectMembers
+      operationId: editProjectMembers
       description: プロジェクトメンバーを追加します
       responses:
         "204":
@@ -738,7 +738,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddProjectMembersRequest"
+              $ref: "#/components/schemas/EditProjectMembersRequest"
       tags:
         - project
         - user
@@ -1428,10 +1428,10 @@ components:
           description: プロジェクト説明
         duration:
           $ref: "#/components/schemas/YearWithSemesterDuration"
-    AddProjectMembersRequest:
-      title: AddProjectMembersRequest
+    EditProjectMembersRequest:
+      title: EditProjectMembersRequest
       type: object
-      description: プロジェクトメンバー追加リクエスト
+      description: プロジェクトメンバー変更リクエスト
       properties:
         members:
           type: array

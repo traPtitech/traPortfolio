@@ -51,7 +51,7 @@ func (r AddContestTeamRequest) Validate() error {
 	)
 }
 
-func (r AddProjectMembersRequest) Validate() error {
+func (r EditProjectMembersRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Members, vd.Required),
 	)

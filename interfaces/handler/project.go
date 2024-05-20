@@ -191,14 +191,14 @@ func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// AddProjectMembers POST /projects/:projectID/members
-func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
+// EditProjectMembers POST /projects/:projectID/members
+func (h *ProjectHandler) EditProjectMembers(c echo.Context) error {
 	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
 
-	req := schema.AddProjectMembersRequest{}
+	req := schema.EditProjectMembersRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
@@ -225,33 +225,12 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	err = h.project.AddProjectMembers(ctx, projectID, createReq)
+	err = h.project.EditProjectMembers(ctx, projectID, createReq)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// DeleteProjectMembers DELETE /projects/:projectID/members
-func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
-	projectID, err := getID(c, keyProject)
-	if err != nil {
-		return err
-	}
-
-	req := schema.MemberIDs{}
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
-
-	ctx := c.Request().Context()
-	err = h.project.DeleteProjectMembers(ctx, projectID, req.Members)
-	if err != nil {
-		return err
-	}
-
-	return c.NoContent(http.StatusNoContent)
 }
 
 func newProject(id uuid.UUID, name string, duration schema.YearWithSemesterDuration) schema.Project {

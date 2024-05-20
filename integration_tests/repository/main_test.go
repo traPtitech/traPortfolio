@@ -176,7 +176,7 @@ func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, proje
 		}
 	}
 
-	err := repo.AddProjectMembers(context.Background(), projectID, []*repository.CreateProjectMemberArgs{args})
+	err := repo.EditProjectMembers(context.Background(), projectID, []*repository.CreateProjectMemberArgs{args})
 	assert.NoError(t, err)
 
 	return args

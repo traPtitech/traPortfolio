@@ -80,8 +80,7 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 		projectAPI.GET("/:projectID", api.Project.GetProject)
 		projectAPI.PATCH("/:projectID", api.Project.EditProject)
 		projectAPI.GET("/:projectID/members", api.Project.GetProjectMembers)
-		projectAPI.POST("/:projectID/members", api.Project.AddProjectMembers)
-		projectAPI.DELETE("/:projectID/members", api.Project.DeleteProjectMembers)
+		projectAPI.PUT("/:projectID/members", api.Project.EditProjectMembers)
 	}
 
 	// event API

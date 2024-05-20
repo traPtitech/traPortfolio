@@ -669,7 +669,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	}
 }
 
-func TestProjectRepository_AddProjectMembers(t *testing.T) {
+func TestProjectRepository_EditProjectMembers(t *testing.T) {
 	duration := random.Duration()
 	duplicatedMemberID := random.UUID()
 
@@ -891,7 +891,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
-			name: "UnexpectedError_AddProjectMembers",
+			name: "UnexpectedError_EditProjectMembers",
 			args: args{
 				projectID: random.UUID(),
 				projectMembers: []*repository.CreateProjectMemberArgs{
@@ -946,112 +946,7 @@ func TestProjectRepository_AddProjectMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewProjectRepository(f.h.Conn, f.portal)
 			// Assertion
-			tt.assertion(t, repo.AddProjectMembers(context.Background(), tt.args.projectID, tt.args.projectMembers))
-		})
-	}
-}
-
-func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
-	t.Parallel()
-	type args struct {
-		projectID uuid.UUID
-		members   []uuid.UUID
-	}
-	tests := []struct {
-		name      string
-		args      args
-		setup     func(f mockProjectRepositoryFields, args args)
-		assertion assert.ErrorAssertionFunc
-	}{
-		{
-			name: "Success",
-			args: args{
-				projectID: random.UUID(),
-				members: []uuid.UUID{
-					random.UUID(), // 元のメンバーであるため削除対象となる
-					random.UUID(), // 元のメンバーでないため削除対象とならない
-				},
-			},
-			setup: func(f mockProjectRepositoryFields, args args) {
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
-					WithArgs(args.projectID, 1).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}).
-							AddRow(args.projectID),
-					)
-				f.h.Mock.ExpectBegin()
-				f.h.Mock.
-					ExpectExec(makeSQLQueryRegexp("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` IN (?,?)")).
-					WithArgs(args.projectID, args.members[0], args.members[1]).
-					WillReturnResult(sqlmock.NewResult(0, int64(len(args.members)+1)/2))
-				f.h.Mock.ExpectCommit()
-			},
-			assertion: assert.NoError,
-		},
-		{
-			name: "ZeroMembers",
-			args: args{
-				projectID: random.UUID(),
-				members:   []uuid.UUID{},
-			},
-			setup:     func(f mockProjectRepositoryFields, args args) {},
-			assertion: assert.Error,
-		},
-		{
-			name: "UnexpectedError_FindProject",
-			args: args{
-				projectID: random.UUID(),
-				members: []uuid.UUID{
-					random.UUID(),
-					random.UUID(),
-				},
-			},
-			setup: func(f mockProjectRepositoryFields, args args) {
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
-					WithArgs(args.projectID, 1).
-					WillReturnError(errUnexpected)
-			},
-			assertion: assert.Error,
-		},
-		{
-			name: "UnexpectedError_DeleteMembers",
-			args: args{
-				projectID: random.UUID(),
-				members: []uuid.UUID{
-					random.UUID(),
-					random.UUID(),
-				},
-			},
-			setup: func(f mockProjectRepositoryFields, args args) {
-				f.h.Mock.
-					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `projects` WHERE `projects`.`id` = ? ORDER BY `projects`.`id` LIMIT ?")).
-					WithArgs(args.projectID, 1).
-					WillReturnRows(
-						sqlmock.NewRows([]string{"id"}).
-							AddRow(args.projectID),
-					)
-				f.h.Mock.ExpectBegin()
-				f.h.Mock.
-					ExpectExec(makeSQLQueryRegexp("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` IN (?,?)")).
-					WithArgs(args.projectID, args.members[0], args.members[1]).
-					WillReturnError(errUnexpected)
-				f.h.Mock.ExpectRollback()
-			},
-			assertion: assert.Error,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			// Setup mock
-			ctrl := gomock.NewController(t)
-			f := newMockProjectRepositoryFields(t, ctrl)
-			tt.setup(f, tt.args)
-			repo := NewProjectRepository(f.h.Conn, f.portal)
-			// Assertion
-			tt.assertion(t, repo.DeleteProjectMembers(context.Background(), tt.args.projectID, tt.args.members))
+			tt.assertion(t, repo.EditProjectMembers(context.Background(), tt.args.projectID, tt.args.projectMembers))
 		})
 	}
 }

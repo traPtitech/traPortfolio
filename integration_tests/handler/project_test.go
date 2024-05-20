@@ -336,8 +336,8 @@ func TestGetProjectMembers(t *testing.T) {
 	}
 }
 
-// AddProjectMembers POST /projects/:projectID/members
-func TestAddProjectMembers(t *testing.T) {
+// EditProjectMembers PUT /projects/:projectID/members
+func TestEditProjectMembers(t *testing.T) {
 	var (
 		userID1 = mockdata.UserID1()
 		userID2 = mockdata.UserID2()
@@ -347,13 +347,13 @@ func TestAddProjectMembers(t *testing.T) {
 	tests := map[string]struct {
 		statusCode int
 		projectID  uuid.UUID
-		reqBody    schema.AddProjectMembersRequest
+		reqBody    schema.EditProjectMembersRequest
 		want       interface{} // nil | echo.HTTPError
 	}{
 		"200": {
 			http.StatusOK,
 			mockdata.ProjectID3(),
-			schema.AddProjectMembersRequest{
+			schema.EditProjectMembersRequest{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{
 						Duration: schema.YearWithSemesterDuration{
@@ -388,13 +388,13 @@ func TestAddProjectMembers(t *testing.T) {
 		"400 invalid projectID": {
 			http.StatusBadRequest,
 			uuid.Nil,
-			schema.AddProjectMembersRequest{},
+			schema.EditProjectMembersRequest{},
 			httpError(t, "Bad Request: nil id"),
 		},
 		"400 exceeded duration user exists": {
 			http.StatusBadRequest,
 			mockdata.ProjectID1(),
-			schema.AddProjectMembersRequest{
+			schema.EditProjectMembersRequest{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
 					{
 						Duration: schema.YearWithSemesterDuration{
@@ -420,78 +420,7 @@ func TestAddProjectMembers(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.AddProjectMembers, tt.projectID), &tt.reqBody)
-			assertResponse(t, tt.statusCode, tt.want, res)
-		})
-	}
-}
-
-// DeleteProjectMembers DELETE /projects/:projectID/members
-func TestDeleteProjectMembers(t *testing.T) {
-	var (
-		userID1 = mockdata.MockProjectMembers[0].ID
-	)
-	t.Parallel()
-	tests := map[string]struct {
-		statusCode int
-		projectID  uuid.UUID
-		reqBody    schema.MemberIDs
-		want       interface{} // nil | echo.HTTPError
-	}{
-		"204": {
-			http.StatusNoContent,
-			mockdata.ProjectID1(),
-			schema.MemberIDs{
-				Members: []uuid.UUID{userID1},
-			},
-			nil,
-		},
-		"400 invalid projectID": {
-			http.StatusBadRequest,
-			uuid.Nil,
-			schema.MemberIDs{
-				Members: []uuid.UUID{userID1},
-			},
-			httpError(t, "Bad Request: nil id"),
-		},
-		"400 invalid memberID": {
-			http.StatusBadRequest,
-			random.UUID(),
-			schema.MemberIDs{
-				Members: []uuid.UUID{uuid.Nil},
-			},
-			httpError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
-		},
-		"400 empty members": {
-			http.StatusBadRequest,
-			random.UUID(),
-			schema.MemberIDs{},
-			httpError(t, "Bad Request: validate error: members: cannot be blank."),
-		},
-		"400 empty memberIDs": {
-			http.StatusBadRequest,
-			random.UUID(),
-			schema.MemberIDs{
-				Members: []uuid.UUID{},
-			},
-			httpError(t, "Bad Request: validate error: members: cannot be blank."),
-		},
-		"404 not found": {
-			http.StatusNotFound,
-			random.UUID(),
-			schema.MemberIDs{
-				Members: []uuid.UUID{userID1},
-			},
-			httpError(t, "Not Found: not found"),
-		},
-	}
-
-	e := echo.New()
-	api := setupRoutes(t, e)
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			res := doRequest(t, e, http.MethodDelete, e.URL(api.Project.DeleteProjectMembers, tt.projectID), &tt.reqBody)
+			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.EditProjectMembers, tt.projectID), &tt.reqBody)
 			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}
