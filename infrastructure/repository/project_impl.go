@@ -265,8 +265,21 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 		for _, v := range members {
 			// 既に登録されていたら更新を試し、そうでなければ新規作成
 			if vdb, ok := currentProjectMembers[v.UserID]; ok {
-				if v.SinceYear != vdb.SinceYear || v.SinceSemester != vdb.SinceSemester || v.UntilYear != vdb.UntilYear || v.UntilSemester != vdb.UntilSemester {
-					err = tx.WithContext(ctx).Updates(v).Error
+				changes := map[string]interface{}{}
+				if v.SinceYear != vdb.SinceYear {
+					changes["since_year"] = v.SinceYear
+				}
+				if v.SinceSemester != vdb.SinceSemester {
+					changes["since_semester"] = v.SinceSemester
+				}
+				if v.UntilYear != vdb.UntilYear {
+					changes["until_year"] = v.UntilYear
+				}
+				if v.UntilSemester != vdb.UntilSemester {
+					changes["until_semester"] = v.UntilSemester
+				}
+				if len(changes) > 0 {
+					err = tx.WithContext(ctx).Model(v).Updates(changes).Error
 					if err != nil {
 						return err
 					}
