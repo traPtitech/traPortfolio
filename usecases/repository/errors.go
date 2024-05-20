@@ -11,6 +11,8 @@ var (
 	ErrInvalidID = errors.New("invalid uuid")
 	// ErrNotFound not found
 	ErrNotFound = errors.New("not found")
+	// ErrUnauthorized unauthorized
+	ErrUnauthorized = errors.New("unauthorized")
 	// ErrForbidden forbidden
 	ErrForbidden = errors.New("forbidden")
 	// ErrAlreadyExists already exists

@@ -330,6 +330,43 @@ func (h *UserHandler) GetUserEvents(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// GetMe GET /users/me
+func (h *UserHandler) GetMe(c echo.Context) error {
+	name, ok := c.Get(keyUserName).(string)
+	if !ok {
+		return repository.ErrInvalidArg
+	}
+
+	ctx := c.Request().Context()
+	usersSimple, err := h.user.GetUsers(ctx, &repository.GetUsersArgs{
+		Name: optional.From(name),
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(usersSimple) == 0 {
+		return repository.ErrNotFound
+	}
+
+	user, err := h.user.GetUser(ctx, usersSimple[0].ID)
+	if err != nil {
+		return err
+	}
+
+	accounts := make([]schema.Account, len(user.Accounts))
+	for i, v := range user.Accounts {
+		accounts[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL, v.PrPermitted)
+	}
+
+	return c.JSON(http.StatusOK, newUserDetail(
+		newUser(user.ID, user.Name, user.RealName()),
+		accounts,
+		user.Bio,
+		user.State,
+	))
+}
+
 func newUser(id uuid.UUID, name string, realName string) schema.User {
 	return schema.User{
 		Id:       id,

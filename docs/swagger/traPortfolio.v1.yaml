@@ -214,6 +214,22 @@ paths:
       tags:
         - user
         - event
+  "/users/me":
+    get:
+      summary: 自分のユーザー情報の取得
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "404":
+          description: Not Found
+      operationId: getMe
+      description: 自分のユーザー情報を取得します
+      tags:
+        - user
   /projects:
     get:
       summary: プロジェクトのリストを取得

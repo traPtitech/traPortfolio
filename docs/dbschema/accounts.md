@@ -19,7 +19,7 @@ CREATE TABLE `accounts` (
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_users_accounts` (`user_id`),
-  CONSTRAINT `fk_users_accounts` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_users_accounts` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -54,7 +54,31 @@ CREATE TABLE `accounts` (
 
 ## Relations
 
-![er](accounts.svg)
+```mermaid
+erDiagram
+
+"accounts" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+
+"accounts" {
+  char_36_ id PK
+  tinyint_1_ type
+  varchar_256_ name
+  text url
+  char_36_ user_id FK
+  tinyint_1_ check
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"users" {
+  char_36_ id PK
+  text description
+  tinyint_1_ check
+  varchar_32_ name
+  tinyint_1_ state
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

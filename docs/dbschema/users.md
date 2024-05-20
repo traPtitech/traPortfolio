@@ -13,10 +13,11 @@ CREATE TABLE `users` (
   `description` text NOT NULL,
   `check` tinyint(1) NOT NULL DEFAULT 0,
   `name` varchar(32) NOT NULL,
+  `state` tinyint(1) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `uni_users_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -28,8 +29,9 @@ CREATE TABLE `users` (
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [accounts](accounts.md) [contest_team_user_belongings](contest_team_user_belongings.md) [group_user_belongings](group_user_belongings.md) [project_members](project_members.md) |  | ユーザーUUID |
 | description | text |  | false |  |  | 自己紹介文 |
-| check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 |
+| check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 (0: 停止, 1: 有効, 2: 一時停止) |
 | name | varchar(32) |  | false |  |  | ユーザー名 |
+| state | tinyint(1) |  | false |  |  | traQのユーザーアカウント状態 |
 | created_at | datetime(6) | NULL | true |  |  |  |
 | updated_at | datetime(6) | NULL | true |  |  |  |
 
@@ -37,19 +39,73 @@ CREATE TABLE `users` (
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
-| name | UNIQUE | UNIQUE KEY name (name) |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
+| uni_users_name | UNIQUE | UNIQUE KEY uni_users_name (name) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
 | PRIMARY | PRIMARY KEY (id) USING BTREE |
-| name | UNIQUE KEY name (name) USING BTREE |
+| uni_users_name | UNIQUE KEY uni_users_name (name) USING BTREE |
 
 ## Relations
 
-![er](users.svg)
+```mermaid
+erDiagram
+
+"accounts" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+"contest_team_user_belongings" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+"group_user_belongings" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+"project_members" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+
+"users" {
+  char_36_ id PK
+  text description
+  tinyint_1_ check
+  varchar_32_ name
+  tinyint_1_ state
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"accounts" {
+  char_36_ id PK
+  tinyint_1_ type
+  varchar_256_ name
+  text url
+  char_36_ user_id FK
+  tinyint_1_ check
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"contest_team_user_belongings" {
+  char_36_ team_id PK
+  char_36_ user_id PK
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"group_user_belongings" {
+  char_36_ user_id PK
+  char_36_ group_id PK
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"project_members" {
+  char_36_ id PK
+  char_36_ project_id FK
+  char_36_ user_id FK
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

@@ -21,8 +21,8 @@ CREATE TABLE `project_members` (
   PRIMARY KEY (`id`),
   KEY `fk_project_members_project` (`project_id`),
   KEY `fk_project_members_user` (`user_id`),
-  CONSTRAINT `fk_project_members_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`),
-  CONSTRAINT `fk_project_members_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_project_members_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_project_members_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
 ```
 
@@ -60,7 +60,45 @@ CREATE TABLE `project_members` (
 
 ## Relations
 
-![er](project_members.svg)
+```mermaid
+erDiagram
+
+"project_members" }o--|| "projects" : "FOREIGN KEY (project_id) REFERENCES projects (id)"
+"project_members" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
+
+"project_members" {
+  char_36_ id PK
+  char_36_ project_id FK
+  char_36_ user_id FK
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"projects" {
+  char_36_ id PK
+  varchar_32_ name
+  text description
+  text link
+  smallint_4_ since_year
+  tinyint_1_ since_semester
+  smallint_4_ until_year
+  tinyint_1_ until_semester
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+"users" {
+  char_36_ id PK
+  text description
+  tinyint_1_ check
+  varchar_32_ name
+  tinyint_1_ state
+  datetime_6_ created_at
+  datetime_6_ updated_at
+}
+```
 
 ---
 

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 	"github.com/samber/lo"
@@ -28,49 +29,21 @@ func NewUserRepository(h *gorm.DB, portalAPI external.PortalAPI, traQAPI externa
 	}
 }
 
-func makeTraqGetAllArgs(rargs *repository.GetUsersArgs) (*external.TraQGetAllArgs, error) {
-	eargs := new(external.TraQGetAllArgs)
-	includeSuspended, iok := rargs.IncludeSuspended.V()
-	name, nok := rargs.Name.V()
-	if iok && nok {
-		// Ref: https://github.com/traPtitech/traQ/blob/fa8cdf17d7b4869bfb7d0864873cd3c46b7543b2/router/v3/users.go#L31-L33
-		return nil, repository.ErrInvalidArg
-	} else if iok {
-		eargs.IncludeSuspended = includeSuspended
-	} else if nok {
-		eargs.Name = name
-	}
-
-	return eargs, nil
-}
-
-// TODO: traQを切り離す
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
-	eargs, err := makeTraqGetAllArgs(args)
-
 	limit := args.Limit.ValueOr(-1)
-
-	if err != nil {
-		return nil, err
-	}
-
-	traqUsers, err := r.traQ.GetUsers(eargs)
-	if err != nil {
-		return nil, err
-	}
-
-	traqUserIDs := make([]uuid.UUID, len(traqUsers))
-	for i, v := range traqUsers {
-		traqUserIDs[i] = v.ID
+	tx := r.h.WithContext(ctx).Limit(limit)
+	includeSuspended, iok := args.IncludeSuspended.V()
+	name, nok := args.Name.V()
+	if iok && nok {
+		return nil, fmt.Errorf("%w: you must not specify both includeSuspended and name", repository.ErrInvalidArg)
+	} else if nok {
+		tx = tx.Where(&model.User{Name: name})
+	} else if !(iok && includeSuspended) {
+		tx = tx.Where(&model.User{State: domain.TraqStateActive})
 	}
 
 	users := make([]*model.User, 0)
-	if err := r.h.
-		WithContext(ctx).
-		Where("`users`.`id` IN (?)", traqUserIDs).
-		Limit(limit).
-		Find(&users).
-		Error; err != nil {
+	if err := tx.Find(&users).Error; err != nil {
 		return nil, err
 	}
 
