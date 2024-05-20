@@ -721,10 +721,10 @@ paths:
                   $ref: "#/components/schemas/ProjectMember"
       operationId: getProjectMembers
       description: プロジェクトメンバーを取得します
-    post:
-      summary: プロジェクトメンバーの追加
+    put:
+      summary: プロジェクトメンバーの編集
       operationId: editProjectMembers
-      description: プロジェクトメンバーを追加します
+      description: プロジェクトメンバーを編集します
       responses:
         "204":
           description: No Content
@@ -739,27 +739,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/EditProjectMembersRequest"
-      tags:
-        - project
-        - user
-    delete:
-      summary: プロジェクトメンバーの削除
-      operationId: deleteProjectMembers
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-      description: プロジェクトメンバーを削除します
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MemberIDs"
       tags:
         - project
         - user
