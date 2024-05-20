@@ -230,7 +230,7 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 		Where(&model.ProjectMember{ProjectID: projectID}).
 		Find(&_mmbs).
 		Error
-	if err != nil {
+	if err != nil && err != repository.ErrNotFound {
 		return err
 	}
 	for _, v := range _mmbs {
@@ -289,8 +289,11 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 			}
 		}
 		// 残っているものは削除
-		for _, v := range currentProjectMembers {
-			err = tx.WithContext(ctx).Delete(v).Error
+		for id := range currentProjectMembers {
+			err = tx.WithContext(ctx).
+				Where(&model.ProjectMember{ProjectID: projectID, UserID: id}).
+				Delete(&model.ProjectMember{}).
+				Error
 			if err != nil {
 				return err
 			}
