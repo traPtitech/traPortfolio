@@ -4,18 +4,18 @@ import (
 	"context"
 	"testing"
 
-	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
+	urepository "github.com/traPtitech/traPortfolio/internal/repository"
 
 	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/util/mockdata"
-	"github.com/traPtitech/traPortfolio/util/random"
+	"github.com/traPtitech/traPortfolio/internal/domain"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/external/mock_external_e2e"
+	irepository "github.com/traPtitech/traPortfolio/internal/infrastructure/repository"
+	"github.com/traPtitech/traPortfolio/internal/util/mockdata"
+	"github.com/traPtitech/traPortfolio/internal/util/random"
 )
 
 func TestProjectRepository_GetProjects(t *testing.T) {

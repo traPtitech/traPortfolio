@@ -7,14 +7,14 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util/mockdata"
-	"github.com/traPtitech/traPortfolio/util/optional"
-	"github.com/traPtitech/traPortfolio/util/random"
+	"github.com/traPtitech/traPortfolio/internal/domain"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/external/mock_external_e2e"
+	irepository "github.com/traPtitech/traPortfolio/internal/infrastructure/repository"
+	urepository "github.com/traPtitech/traPortfolio/internal/repository"
+	"github.com/traPtitech/traPortfolio/internal/util/mockdata"
+	"github.com/traPtitech/traPortfolio/internal/util/optional"
+	"github.com/traPtitech/traPortfolio/internal/util/random"
 )
 
 func TestEventRepository_GetEvents(t *testing.T) {

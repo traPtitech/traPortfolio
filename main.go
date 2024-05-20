@@ -5,11 +5,11 @@ import (
 	"log"
 
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/infrastructure"
-	"github.com/traPtitech/traPortfolio/infrastructure/repository"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/util/config"
-	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/internal/handler"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/repository"
+	"github.com/traPtitech/traPortfolio/internal/util/config"
+	"github.com/traPtitech/traPortfolio/internal/util/mockdata"
 )
 
 func main() {

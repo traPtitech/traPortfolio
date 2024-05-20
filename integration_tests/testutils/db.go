@@ -10,9 +10,9 @@ import (
 	"github.com/ory/dockertest"
 	"github.com/ory/dockertest/docker"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/infrastructure/migration"
-	"github.com/traPtitech/traPortfolio/infrastructure/repository"
-	"github.com/traPtitech/traPortfolio/util/config"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/migration"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/repository"
+	"github.com/traPtitech/traPortfolio/internal/util/config"
 	"gorm.io/gorm"
 )
 

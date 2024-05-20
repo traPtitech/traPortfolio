@@ -10,12 +10,12 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/usecases/repository"
-	"github.com/traPtitech/traPortfolio/util/config"
-	"github.com/traPtitech/traPortfolio/util/optional"
-	"github.com/traPtitech/traPortfolio/util/random"
+	"github.com/traPtitech/traPortfolio/internal/domain"
+	"github.com/traPtitech/traPortfolio/internal/repository"
+	"github.com/traPtitech/traPortfolio/internal/util/config"
+	"github.com/traPtitech/traPortfolio/internal/util/optional"
+	"github.com/traPtitech/traPortfolio/internal/util/random"
 )
 
 func TestMain(m *testing.M) {

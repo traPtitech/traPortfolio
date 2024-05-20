@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
-	"github.com/traPtitech/traPortfolio/util/config"
+	"github.com/traPtitech/traPortfolio/internal/util/config"
 )
 
 func TestMain(m *testing.M) {
