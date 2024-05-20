@@ -350,8 +350,8 @@ func TestEditProjectMembers(t *testing.T) {
 		reqBody    schema.EditProjectMembersRequest
 		want       interface{} // nil | echo.HTTPError
 	}{
-		"200": {
-			http.StatusOK,
+		"204": {
+			http.StatusNoContent,
 			mockdata.ProjectID3(),
 			schema.EditProjectMembersRequest{
 				Members: []schema.MemberIDWithYearWithSemesterDuration{
@@ -420,7 +420,7 @@ func TestEditProjectMembers(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.EditProjectMembers, tt.projectID), &tt.reqBody)
+			res := doRequest(t, e, http.MethodPut, e.URL(api.Project.EditProjectMembers, tt.projectID), &tt.reqBody)
 			assertResponse(t, tt.statusCode, tt.want, res)
 		})
 	}

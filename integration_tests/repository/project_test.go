@@ -143,20 +143,45 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		mockdata.MockUsers[1].Check,
 	)
 
-	args1 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user1.ID, nil)
-	args2 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user2.ID, nil)
-	args3 := mustAddProjectMember(t, repo, project2.ID, project2.Duration, user2.ID, nil)
+	dur1 := random.DurationBetween(project1.Duration.Since, project1.Duration.Until)
+	dur2 := random.DurationBetween(project2.Duration.Since, project2.Duration.Until)
+
+	mustExistProjectMember(t, repo, project1.ID, project1.Duration, []*urepository.CreateProjectMemberArgs{
+		{
+			UserID:        user1.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.Year,
+			UntilSemester: dur1.Until.Semester,
+		},
+		{
+			UserID:        user2.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.Year,
+			UntilSemester: dur1.Until.Semester,
+		},
+	})
+	mustExistProjectMember(t, repo, project2.ID, project2.Duration, []*urepository.CreateProjectMemberArgs{
+		{
+			UserID:        user2.ID,
+			SinceYear:     dur2.Since.Year,
+			SinceSemester: dur2.Since.Semester,
+			UntilYear:     dur2.Until.Year,
+			UntilSemester: dur2.Until.Semester,
+		},
+	})
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
-				Year:     args1.SinceYear,
-				Semester: args1.SinceSemester,
+				Year:     dur1.Since.Year,
+				Semester: dur1.Since.Semester,
 			},
 			Until: domain.YearWithSemester{
-				Year:     args1.UntilYear,
-				Semester: args1.UntilSemester,
+				Year:     dur1.Until.Year,
+				Semester: dur1.Until.Semester,
 			},
 		},
 	}
@@ -164,12 +189,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		User: *user2,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
-				Year:     args2.SinceYear,
-				Semester: args2.SinceSemester,
+				Year:     dur1.Since.Year,
+				Semester: dur1.Since.Semester,
 			},
 			Until: domain.YearWithSemester{
-				Year:     args2.UntilYear,
-				Semester: args2.UntilSemester,
+				Year:     dur1.Until.Year,
+				Semester: dur1.Until.Semester,
 			},
 		},
 	}
@@ -182,12 +207,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		User: *user2,
 		Duration: domain.YearWithSemesterDuration{
 			Since: domain.YearWithSemester{
-				Year:     args3.SinceYear,
-				Semester: args3.SinceSemester,
+				Year:     dur2.Since.Year,
+				Semester: dur2.Since.Semester,
 			},
 			Until: domain.YearWithSemester{
-				Year:     args3.UntilYear,
-				Semester: args3.UntilSemester,
+				Year:     dur2.Until.Year,
+				Semester: dur2.Until.Semester,
 			},
 		},
 	}

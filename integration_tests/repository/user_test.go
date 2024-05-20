@@ -483,10 +483,25 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	assert.ElementsMatch(t, expected1, users1)
 	assert.ElementsMatch(t, expected2, users2)
 
-	args1 := mustAddProjectMember(t, projectRepo, project1.ID, project1.Duration, user1.ID, nil)
-	args2 := mustAddProjectMember(t, projectRepo, project2.ID, project2.Duration, user1.ID, nil)
+	arg1 := &urepository.CreateProjectMemberArgs{
+		UserID:        user1.ID,
+		SinceYear:     project1.Duration.Since.Year,
+		SinceSemester: project1.Duration.Since.Semester,
+		UntilYear:     project1.Duration.Until.Year,
+		UntilSemester: project1.Duration.Until.Semester,
+	}
+	arg2 := &urepository.CreateProjectMemberArgs{
+		UserID:        user1.ID,
+		SinceYear:     project2.Duration.Since.Year,
+		SinceSemester: project2.Duration.Since.Semester,
+		UntilYear:     project2.Duration.Until.Year,
+		UntilSemester: project2.Duration.Until.Semester,
+	}
 
-	expected3 := []*domain.UserProject{newUserProject(t, args1, &project1.Project), newUserProject(t, args2, &project2.Project)}
+	mustExistProjectMember(t, projectRepo, project1.ID, project1.Duration, []*urepository.CreateProjectMemberArgs{arg1})
+	mustExistProjectMember(t, projectRepo, project2.ID, project2.Duration, []*urepository.CreateProjectMemberArgs{arg2})
+
+	expected3 := []*domain.UserProject{newUserProject(t, arg1, &project1.Project), newUserProject(t, arg2, &project2.Project)}
 	projects1, err := userRepo.GetProjects(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, projects1)
@@ -520,8 +535,8 @@ func TestUserRepository_GetContests(t *testing.T) {
 	user1 := mockdata.MockUsers[1]
 	user2 := mockdata.MockUsers[2]
 
-	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
-	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
+	mustExistContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
+	mustExistContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
 	expected1 := []*domain.UserContest{
 		newUserContest(t, &contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}),
