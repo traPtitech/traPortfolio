@@ -326,7 +326,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 		statusCode int
 	}{
 		{
-			name: "Success",
+			name: "Success: Add Member",
 			setup: func(mr MockRepository) (*schema.EditProjectMembersRequest, string) {
 				projectID := random.UUID()
 				userID := random.UUID()
@@ -360,7 +360,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
-			statusCode: http.StatusOK,
+			statusCode: http.StatusNoContent,
 		},
 		{
 			name: "BadRequest: Invalid Project ID",
@@ -448,7 +448,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 
 			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)

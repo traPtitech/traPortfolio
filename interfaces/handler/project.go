@@ -238,7 +238,7 @@ func (h *ProjectHandler) EditProjectMembers(c echo.Context) error {
 		return err
 	}
 
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }
 
 func newProject(id uuid.UUID, name string, duration schema.YearWithSemesterDuration) schema.Project {
