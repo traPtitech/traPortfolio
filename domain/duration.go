@@ -31,5 +31,10 @@ func (d YearWithSemesterDuration) IsValid() bool {
 	s := d.Since
 	u := d.Until
 
-	return u.After(s) && s.Year >= 1970 && u.Year < 2070 && s.Semester >= 0 && s.Semester < 2 && u.Semester >= 0 && u.Semester < 2
+	return !s.After(u) && s.Year >= 1970 && s.Semester >= 0 && s.Semester < 2 && u.Semester >= 0 && u.Semester < 2
+}
+
+func (out YearWithSemesterDuration) Includes(in YearWithSemesterDuration) bool {
+	// out.Since <= in.Since <= in.Until <= out.Until
+	return in.IsValid() && out.IsValid() && !out.Since.After(in.Since) && !in.Until.After(out.Until)
 }

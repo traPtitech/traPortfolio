@@ -136,14 +136,15 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	t.Helper()
 
 	if args == nil {
+		duration := random.Duration()
 		args = &repository.CreateProjectArgs{
 			Name:          random.AlphaNumeric(),
 			Description:   random.AlphaNumeric(),
 			Link:          random.Optional(random.RandURLString()),
-			SinceYear:     rand.IntN(2100),
-			SinceSemester: rand.IntN(2),
-			UntilYear:     rand.IntN(2100),
-			UntilSemester: rand.IntN(2),
+			SinceYear:     duration.Since.Year,
+			SinceSemester: duration.Since.Semester,
+			UntilYear:     duration.Until.Year,
+			UntilSemester: duration.Until.Semester,
 		}
 	}
 
@@ -153,19 +154,25 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	return project
 }
 
-func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
+func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, projectDuration domain.YearWithSemesterDuration, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
 	t.Helper()
 
 	assert.NotEmpty(t, projectID)
+	assert.NotEmpty(t, projectDuration)
 	assert.NotEmpty(t, userID)
+	assert.True(t, projectDuration.IsValid())
+
+	var duration = random.DurationBetween(projectDuration.Since, projectDuration.Until)
+
+	assert.True(t, duration.IsValid())
 
 	if args == nil {
 		args = &repository.CreateProjectMemberArgs{
 			UserID:        userID,
-			SinceYear:     rand.IntN(2100),
-			SinceSemester: rand.IntN(2),
-			UntilYear:     rand.IntN(2100),
-			UntilSemester: rand.IntN(2),
+			SinceYear:     duration.Since.Year,
+			SinceSemester: duration.Since.Semester,
+			UntilYear:     duration.Until.Year,
+			UntilSemester: duration.Until.Semester,
 		}
 	}
 

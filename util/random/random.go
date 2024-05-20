@@ -170,6 +170,29 @@ func Duration() domain.YearWithSemesterDuration {
 	}
 }
 
+func DurationBetween(since domain.YearWithSemester, until domain.YearWithSemester) domain.YearWithSemesterDuration {
+	var start = since.Year*2 + since.Semester
+	var end = until.Year*2 + until.Semester
+
+	var before = rand.IntN(end-start+1) + start
+	var after = rand.IntN(end-start+1) + start
+
+	if before > after {
+		before, after = after, before
+	}
+
+	return domain.YearWithSemesterDuration{
+		Since: domain.YearWithSemester{
+			Year:     before / 2,
+			Semester: before % 2,
+		},
+		Until: domain.YearWithSemester{
+			Year:     after / 2,
+			Semester: after % 2,
+		},
+	}
+}
+
 func Bool() bool {
 	return rand.Int()%2 == 0
 }

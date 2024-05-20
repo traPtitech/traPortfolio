@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
@@ -204,23 +205,32 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 		return repository.ErrInvalidArg
 	}
 
-	// ユーザーの重複チェック
-	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
-	for _, v := range projectMembers {
-		if _, ok := projectMembersMap[v.UserID]; ok {
-			return repository.ErrInvalidArg
-		}
-		projectMembersMap[v.UserID] = struct{}{}
-	}
+	p := model.Project{}
 
 	// プロジェクトの存在チェック
 	err := r.h.
 		WithContext(ctx).
 		Where(&model.Project{ID: projectID}).
-		First(&model.Project{}).
+		First(&p).
 		Error
 	if err != nil {
 		return err
+	}
+
+	projectDuration := domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester)
+
+	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
+	for _, v := range projectMembers {
+		memberDuration := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
+		// プロジェクトの期間内かどうか
+		if !projectDuration.Includes(memberDuration) {
+			return fmt.Errorf("%w: exceeded duration user", repository.ErrInvalidArg)
+		}
+		// 重複していないかどうか
+		if _, ok := projectMembersMap[v.UserID]; ok {
+			return fmt.Errorf("%w: duplicate user", repository.ErrInvalidArg)
+		}
+		projectMembersMap[v.UserID] = struct{}{}
 	}
 
 	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
