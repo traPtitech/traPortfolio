@@ -211,6 +211,12 @@ type EditContestRequest struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// EditContestTeamMembersRequest コンテストチームメンバー修正リクエスト
+type EditContestTeamMembersRequest struct {
+	// Members ユーザーのUUIDの配列
+	Members *[]uuid.UUID `json:"members,omitempty"`
+}
+
 // EditContestTeamRequest コンテストチーム情報修正リクエスト
 type EditContestTeamRequest struct {
 	// Description チーム情報
@@ -237,7 +243,7 @@ type EditEventRequest struct {
 
 // EditProjectMembersRequest プロジェクトメンバー変更リクエスト
 type EditProjectMembersRequest struct {
-	Members []MemberIDWithYearWithSemesterDuration `json:"members"`
+	Members *[]MemberIDWithYearWithSemesterDuration `json:"members,omitempty"`
 }
 
 // EditProjectRequest プロジェクト変更リクエスト
@@ -388,12 +394,6 @@ type MemberIDWithYearWithSemesterDuration struct {
 	// untilがなかった場合存続中
 	Duration YearWithSemesterDuration `json:"duration"`
 	UserId   uuid.UUID                `json:"userId"`
-}
-
-// MemberIDs ユーザーのUUIDの配列
-type MemberIDs struct {
-	// Members ユーザーのUUIDの配列
-	Members []uuid.UUID `json:"members"`
 }
 
 // PrPermitted 広報での利用が許可されているかどうか

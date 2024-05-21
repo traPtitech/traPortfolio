@@ -342,7 +342,7 @@ func (h *ContestHandler) EditContestTeamMembers(c echo.Context) error {
 		return err
 	}
 
-	req := schema.MemberIDs{}
+	req := schema.EditContestTeamMembersRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}

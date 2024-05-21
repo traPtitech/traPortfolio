@@ -462,7 +462,7 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 	return result, nil
 }
 
-func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, members []uuid.UUID) error {
+func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, members *[]uuid.UUID) error {
 	// 存在チェック
 	err := r.h.
 		WithContext(ctx).
@@ -473,8 +473,8 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		return err
 	}
 
-	belongings := make(map[uuid.UUID]struct{}, len(members))
-	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
+	belongings := make(map[uuid.UUID]struct{}, len(*members))
+	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(*members))
 	err = r.h.
 		WithContext(ctx).
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
@@ -487,15 +487,15 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 		belongings[v.UserID] = struct{}{}
 	}
 
-	membersMap := make(map[uuid.UUID]struct{}, len(members))
-	for _, v := range members {
+	membersMap := make(map[uuid.UUID]struct{}, len(*members))
+	for _, v := range *members {
 		membersMap[v] = struct{}{}
 	}
 
 	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		//チームに所属していなくて渡された配列に入っているメンバーをチームに追加
-		membersToBeAdded := make([]*model.ContestTeamUserBelonging, 0, len(members))
-		for _, memberID := range members {
+		membersToBeAdded := make([]*model.ContestTeamUserBelonging, 0, len(*members))
+		for _, memberID := range *members {
 			if _, ok := belongings[memberID]; !ok {
 				membersToBeAdded = append(membersToBeAdded, &model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID})
 			}
@@ -507,7 +507,7 @@ func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID u
 			}
 		}
 		//チームに所属していて渡された配列に入っていないメンバーをチームから削除
-		membersToBeRemoved := make([]uuid.UUID, 0, len(members))
+		membersToBeRemoved := make([]uuid.UUID, 0, len(*members))
 		for _, belonging := range _belongings {
 			if _, ok := membersMap[belonging.UserID]; !ok {
 				membersToBeRemoved = append(membersToBeRemoved, belonging.UserID)

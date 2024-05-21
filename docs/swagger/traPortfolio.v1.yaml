@@ -619,7 +619,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MemberIDs"
+              $ref: "#/components/schemas/EditContestTeamMembersRequest"
       tags:
         - contest
         - user
@@ -1271,20 +1271,6 @@ components:
       required:
         - userId
         - duration
-    MemberIDs:
-      title: MemberIDs
-      type: object
-      description: ユーザーのUUIDの配列
-      properties:
-        members:
-          type: array
-          description: ユーザーのUUIDの配列
-          items:
-            type: string
-            format: uuid
-            x-go-type: uuid.UUID
-      required:
-        - members
     EditUserRequest:
       title: EditUserRequest
       type: object
@@ -1395,8 +1381,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MemberIDWithYearWithSemesterDuration"
-      required:
-        - members
     CreateContestRequest:
       title: CreateContestRequest
       type: object
@@ -1476,6 +1460,18 @@ components:
         result:
           type: string
           description: 順位などの結果
+    EditContestTeamMembersRequest:
+      title: EditContestTeamMembersRequest
+      type: object
+      description: コンテストチームメンバー修正リクエスト
+      properties:
+        members:
+          type: array
+          description: ユーザーのUUIDの配列
+          items:
+            type: string
+            format: uuid
+            x-go-type: uuid.UUID
   parameters:
     userIdInPath:
       name: userId

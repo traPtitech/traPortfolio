@@ -5,6 +5,7 @@ import (
 
 	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 )
 
@@ -53,7 +54,7 @@ func (r AddContestTeamRequest) Validate() error {
 
 func (r EditProjectMembersRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Members, vd.Required),
+		vd.Field(&r.Members, vd.NotNil),
 	)
 }
 
@@ -99,6 +100,14 @@ func (r EditContestTeamRequest) Validate() error {
 		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 		vd.Field(&r.Result, vdRuleResultLength),
+	)
+}
+
+func (r EditContestTeamMembersRequest) Validate() error {
+	return vd.ValidateStruct(&r,
+		vd.Field(&r.Members, vd.NotNil,
+			vd.By(validateUUIDs),
+		),
 	)
 }
 
@@ -150,9 +159,15 @@ func (r MemberIDWithYearWithSemesterDuration) Validate() error {
 	)
 }
 
-// TODO: MemberIDsを埋め込んだリクエストボディを実装する
-func (r MemberIDs) Validate() error {
-	return vd.ValidateStruct(&r,
-		vd.Field(&r.Members, vd.Required, vd.Each(vd.Required, is.UUIDv4)),
-	)
+func validateUUIDs(value interface{}) error {
+	members, ok := value.(*[]uuid.UUID)
+	if !ok || members == nil {
+		return nil
+	}
+	for _, member := range *members {
+		if err := vd.Validate(member.String(), is.UUIDv4); err != nil {
+			return err
+		}
+	}
+	return nil
 }

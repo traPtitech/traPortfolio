@@ -354,7 +354,7 @@ func TestEditProjectMembers(t *testing.T) {
 			http.StatusNoContent,
 			mockdata.ProjectID3(),
 			schema.EditProjectMembersRequest{
-				Members: []schema.MemberIDWithYearWithSemesterDuration{
+				Members: &[]schema.MemberIDWithYearWithSemesterDuration{
 					{
 						Duration: schema.YearWithSemesterDuration{
 							Since: schema.YearWithSemester{
@@ -395,7 +395,7 @@ func TestEditProjectMembers(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ProjectID1(),
 			schema.EditProjectMembersRequest{
-				Members: []schema.MemberIDWithYearWithSemesterDuration{
+				Members: &[]schema.MemberIDWithYearWithSemesterDuration{
 					{
 						Duration: schema.YearWithSemesterDuration{
 							Since: schema.YearWithSemester{
