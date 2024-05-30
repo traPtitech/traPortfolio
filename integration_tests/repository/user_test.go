@@ -483,14 +483,14 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	assert.ElementsMatch(t, expected1, users1)
 	assert.ElementsMatch(t, expected2, users2)
 
-	arg1 := &urepository.CreateProjectMemberArgs{
+	arg1 := &urepository.EditProjectMemberArgs{
 		UserID:        user1.ID,
 		SinceYear:     project1.Duration.Since.Year,
 		SinceSemester: project1.Duration.Since.Semester,
 		UntilYear:     project1.Duration.Until.Year,
 		UntilSemester: project1.Duration.Until.Semester,
 	}
-	arg2 := &urepository.CreateProjectMemberArgs{
+	arg2 := &urepository.EditProjectMemberArgs{
 		UserID:        user1.ID,
 		SinceYear:     project2.Duration.Since.Year,
 		SinceSemester: project2.Duration.Since.Semester,
@@ -498,8 +498,8 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 		UntilSemester: project2.Duration.Until.Semester,
 	}
 
-	mustExistProjectMember(t, projectRepo, project1.ID, project1.Duration, []*urepository.CreateProjectMemberArgs{arg1})
-	mustExistProjectMember(t, projectRepo, project2.ID, project2.Duration, []*urepository.CreateProjectMemberArgs{arg2})
+	mustExistProjectMember(t, projectRepo, project1.ID, project1.Duration, []*urepository.EditProjectMemberArgs{arg1})
+	mustExistProjectMember(t, projectRepo, project2.ID, project2.Duration, []*urepository.EditProjectMemberArgs{arg2})
 
 	expected3 := []*domain.UserProject{newUserProject(t, arg1, &project1.Project), newUserProject(t, arg2, &project2.Project)}
 	projects1, err := userRepo.GetProjects(context.Background(), user1.ID)
@@ -557,7 +557,7 @@ func TestUserRepository_GetContests(t *testing.T) {
 // func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 // }
 
-func newUserProject(t *testing.T, args *urepository.CreateProjectMemberArgs, project *domain.Project) *domain.UserProject {
+func newUserProject(t *testing.T, args *urepository.EditProjectMemberArgs, project *domain.Project) *domain.UserProject {
 	t.Helper()
 	return &domain.UserProject{
 		ID:       project.ID,

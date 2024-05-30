@@ -53,7 +53,7 @@ func (mr *MockProjectRepositoryMockRecorder) CreateProject(ctx, args interface{}
 }
 
 // EditProjectMembers mocks base method.
-func (m *MockProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
+func (m *MockProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.EditProjectMemberArgs) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EditProjectMembers", ctx, projectID, args)
 	ret0, _ := ret[0].(error)

@@ -348,7 +348,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				memberReq := []*repository.CreateProjectMemberArgs{
+				memberReq := []*repository.EditProjectMemberArgs{
 					{
 						UserID:        userID,
 						SinceYear:     userDuration.Since.Year,
@@ -366,7 +366,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 			name: "Success: Delete All Members",
 			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
 				projectID := random.UUID()
-				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{}).Return(nil)
+				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.EditProjectMemberArgs{}).Return(nil)
 				return &schema.EditProjectMembersRequest{Members: []schema.MemberIDWithYearWithSemesterDuration{}}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
 			statusCode: http.StatusNoContent,
@@ -474,7 +474,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
+				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.EditProjectMemberArgs{
 					{
 						UserID:        userID,
 						SinceYear:     int(duration.Since.Year),

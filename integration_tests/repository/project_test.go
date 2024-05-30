@@ -146,7 +146,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	dur1 := random.DurationBetween(project1.Duration.Since, project1.Duration.Until)
 	dur2 := random.DurationBetween(project2.Duration.Since, project2.Duration.Until)
 
-	mustExistProjectMember(t, repo, project1.ID, project1.Duration, []*urepository.CreateProjectMemberArgs{
+	mustExistProjectMember(t, repo, project1.ID, project1.Duration, []*urepository.EditProjectMemberArgs{
 		{
 			UserID:        user1.ID,
 			SinceYear:     dur1.Since.Year,
@@ -162,7 +162,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 			UntilSemester: dur1.Until.Semester,
 		},
 	})
-	mustExistProjectMember(t, repo, project2.ID, project2.Duration, []*urepository.CreateProjectMemberArgs{
+	mustExistProjectMember(t, repo, project2.ID, project2.Duration, []*urepository.EditProjectMemberArgs{
 		{
 			UserID:        user2.ID,
 			SinceYear:     dur2.Since.Year,

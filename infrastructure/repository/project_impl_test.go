@@ -677,7 +677,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		projectID      uuid.UUID
-		projectMembers []*repository.CreateProjectMemberArgs
+		projectMembers []*repository.EditProjectMemberArgs
 	}
 	tests := []struct {
 		name      string
@@ -689,7 +689,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "Success: Only Add Members",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
 						SinceYear:     duration.Since.Year,
@@ -747,7 +747,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "Success: Only Delete Members",
 			args: args{
 				projectID:      random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{},
+				projectMembers: []*repository.EditProjectMemberArgs{},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				memberCount := rand.IntN(8)
@@ -783,7 +783,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "Success: Modify Members",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
 						SinceYear:     duration.Since.Year,
@@ -878,7 +878,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "UnexpectedError_FindProject",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
 						SinceYear:     duration.Since.Year,
@@ -908,7 +908,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			args: args{
 				projectID: random.UUID(),
 				// project duration is 2020-0 ~ 2021-1
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(), // OK
 						SinceYear:     2020,
@@ -940,7 +940,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "UnexpectedError_DuplicateMember",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        duplicatedMemberID,
 						SinceYear:     duration.Since.Year,
@@ -972,7 +972,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "UnexpectedError_FindProjectMembers",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
 						SinceYear:     duration.Since.Year,
@@ -1008,7 +1008,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "UnexpectedError_AddProjectMembers",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
 						SinceYear:     duration.Since.Year,
@@ -1054,7 +1054,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "UnexpectedError_EditProjectMembers",
 			args: args{
 				projectID: random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{
+				projectMembers: []*repository.EditProjectMemberArgs{
 					{
 						UserID:        random.UUID(),
 						SinceYear:     duration.Since.Year,
@@ -1093,7 +1093,7 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 			name: "UnexpectedError_DeleteProjectMembers",
 			args: args{
 				projectID:      random.UUID(),
-				projectMembers: []*repository.CreateProjectMemberArgs{},
+				projectMembers: []*repository.EditProjectMemberArgs{},
 			},
 			setup: func(f mockProjectRepositoryFields, args args) {
 				f.h.Mock.

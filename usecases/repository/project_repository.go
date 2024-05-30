@@ -30,7 +30,7 @@ type UpdateProjectArgs struct {
 	UntilSemester optional.Of[int64]
 }
 
-type CreateProjectMemberArgs struct {
+type EditProjectMemberArgs struct {
 	UserID        uuid.UUID
 	SinceYear     int
 	SinceSemester int
@@ -44,5 +44,5 @@ type ProjectRepository interface {
 	CreateProject(ctx context.Context, args *CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(ctx context.Context, projectID uuid.UUID, args *UpdateProjectArgs) error
 	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error)
-	EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*CreateProjectMemberArgs) error
+	EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*EditProjectMemberArgs) error
 }

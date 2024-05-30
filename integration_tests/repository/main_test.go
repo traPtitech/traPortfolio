@@ -154,7 +154,7 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	return project
 }
 
-func mustExistProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, projectDuration domain.YearWithSemesterDuration, users []*repository.CreateProjectMemberArgs) {
+func mustExistProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, projectDuration domain.YearWithSemesterDuration, users []*repository.EditProjectMemberArgs) {
 	t.Helper()
 
 	assert.NotEmpty(t, projectID)
