@@ -1102,7 +1102,7 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &schema.EditContestTeamMembersRequest{
-					Members: &[]uuid.UUID{
+					Members: []uuid.UUID{
 						random.UUID(),
 						random.UUID(),
 					},
@@ -1143,7 +1143,7 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				reqBody := &schema.EditContestTeamMembersRequest{
-					Members: &[]uuid.UUID{
+					Members: []uuid.UUID{
 						random.UUID(),
 						random.UUID(),
 					},

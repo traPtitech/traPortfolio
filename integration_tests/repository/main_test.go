@@ -184,6 +184,6 @@ func mustExistContestTeamMembers(t *testing.T, repo repository.ContestRepository
 
 	assert.NotEmpty(t, teamID)
 
-	err := repo.EditContestTeamMembers(context.Background(), teamID, &userIDs)
+	err := repo.EditContestTeamMembers(context.Background(), teamID, userIDs)
 	assert.NoError(t, err)
 }

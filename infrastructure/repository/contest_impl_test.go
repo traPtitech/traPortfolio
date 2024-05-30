@@ -1467,7 +1467,7 @@ func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 			tt.setup(f, tt.args)
 			repo := NewContestRepository(f.h.Conn, f.portal)
 			// Assertion
-			tt.assertion(t, repo.EditContestTeamMembers(context.Background(), tt.args.teamID, &tt.args.members))
+			tt.assertion(t, repo.EditContestTeamMembers(context.Background(), tt.args.teamID, tt.args.members))
 		})
 	}
 }

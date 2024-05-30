@@ -96,7 +96,7 @@ func (mr *MockContestRepositoryMockRecorder) DeleteContestTeam(ctx, contestID, t
 }
 
 // EditContestTeamMembers mocks base method.
-func (m *MockContestRepository) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs *[]uuid.UUID) error {
+func (m *MockContestRepository) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EditContestTeamMembers", ctx, teamID, memberIDs)
 	ret0, _ := ret[0].(error)

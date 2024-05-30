@@ -214,7 +214,7 @@ type EditContestRequest struct {
 // EditContestTeamMembersRequest コンテストチームメンバー修正リクエスト
 type EditContestTeamMembersRequest struct {
 	// Members ユーザーのUUIDの配列
-	Members *[]uuid.UUID `json:"members,omitempty"`
+	Members []uuid.UUID `json:"members"`
 }
 
 // EditContestTeamRequest コンテストチーム情報修正リクエスト
@@ -243,7 +243,7 @@ type EditEventRequest struct {
 
 // EditProjectMembersRequest プロジェクトメンバー変更リクエスト
 type EditProjectMembersRequest struct {
-	Members *[]MemberIDWithYearWithSemesterDuration `json:"members,omitempty"`
+	Members []MemberIDWithYearWithSemesterDuration `json:"members"`
 }
 
 // EditProjectRequest プロジェクト変更リクエスト

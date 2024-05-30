@@ -5,7 +5,6 @@ import (
 
 	vd "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/domain"
 )
 
@@ -105,9 +104,7 @@ func (r EditContestTeamRequest) Validate() error {
 
 func (r EditContestTeamMembersRequest) Validate() error {
 	return vd.ValidateStruct(&r,
-		vd.Field(&r.Members, vd.NotNil,
-			vd.By(validateUUIDs),
-		),
+		vd.Field(&r.Members, vd.NotNil, vd.Each(vd.Required, is.UUIDv4)),
 	)
 }
 
@@ -157,17 +154,4 @@ func (r MemberIDWithYearWithSemesterDuration) Validate() error {
 		vd.Field(&r.Duration),
 		vd.Field(&r.UserId, vd.Required, is.UUIDv4),
 	)
-}
-
-func validateUUIDs(value interface{}) error {
-	members, ok := value.(*[]uuid.UUID)
-	if !ok || members == nil {
-		return nil
-	}
-	for _, member := range *members {
-		if err := vd.Validate(member.String(), is.UUIDv4); err != nil {
-			return err
-		}
-	}
-	return nil
 }

@@ -203,9 +203,9 @@ func (h *ProjectHandler) EditProjectMembers(c echo.Context) error {
 		return err
 	}
 
-	createMap := make(map[uuid.UUID]struct{}, len(*req.Members))
-	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(*req.Members))
-	for _, v := range *req.Members {
+	createMap := make(map[uuid.UUID]struct{}, len(req.Members))
+	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
+	for _, v := range req.Members {
 		m := &repository.CreateProjectMemberArgs{
 			UserID:        v.UserId,
 			SinceYear:     int(v.Duration.Since.Year),

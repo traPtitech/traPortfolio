@@ -940,7 +940,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			schema.EditContestTeamMembersRequest{
-				Members: &[]uuid.UUID{
+				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
@@ -952,7 +952,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			uuid.Nil,
 			mockdata.ContestTeamID1(),
 			schema.EditContestTeamMembersRequest{
-				Members: &[]uuid.UUID{
+				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
@@ -964,7 +964,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			mockdata.ContestID1(),
 			uuid.Nil,
 			schema.EditContestTeamMembersRequest{
-				Members: &[]uuid.UUID{
+				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
@@ -976,18 +976,18 @@ func TestEditContestTeamMembers(t *testing.T) {
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			schema.EditContestTeamMembersRequest{
-				Members: &[]uuid.UUID{
+				Members: []uuid.UUID{
 					uuid.Nil,
 				},
 			},
-			httpError(t, "Bad Request: validate error: members: must be a valid UUID v4."),
+			httpError(t, "Bad Request: validate error: members: (0: must be a valid UUID v4.)."),
 		},
 		"400 invalid member": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			schema.EditContestTeamMembersRequest{
-				Members: &[]uuid.UUID{
+				Members: []uuid.UUID{
 					random.UUID(),
 				},
 			},
@@ -998,7 +998,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			mockdata.ContestID1(),
 			random.UUID(),
 			schema.EditContestTeamMembersRequest{
-				Members: &[]uuid.UUID{
+				Members: []uuid.UUID{
 					mockdata.UserID1(),
 					mockdata.UserID2(),
 				},
@@ -1014,7 +1014,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 			t.Parallel()
 			if tt.statusCode == http.StatusNoContent {
 				// Update & Assert
-				res := doRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMembers, tt.contestID, tt.teamID), tt.reqbody)
+				res := doRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMembers, tt.contestID, tt.teamID), &tt.reqbody)
 				assertResponse(t, tt.statusCode, tt.want, res)
 
 				// Assert
@@ -1028,7 +1028,7 @@ func TestEditContestTeamMembers(t *testing.T) {
 				for _, memberID := range response {
 					userIDs = append(userIDs, memberID.ID)
 				}
-				assert.Equal(t, tt.reqbody.Members, &userIDs)
+				assert.Equal(t, tt.reqbody.Members, userIDs)
 			} else {
 				res := doRequest(t, e, http.MethodPut, e.URL(api.Contest.EditContestTeamMembers, tt.contestID, tt.teamID), &tt.reqbody)
 				assertResponse(t, tt.statusCode, tt.want, res)

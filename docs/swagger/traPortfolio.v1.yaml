@@ -1381,6 +1381,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MemberIDWithYearWithSemesterDuration"
+      required:
+        - members
     CreateContestRequest:
       title: CreateContestRequest
       type: object
@@ -1472,6 +1474,8 @@ components:
             type: string
             format: uuid
             x-go-type: uuid.UUID
+      required:
+        - members
   parameters:
     userIdInPath:
       name: userId

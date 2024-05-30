@@ -332,7 +332,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				userID := random.UUID()
 				userDuration := random.Duration()
 				reqBody := &schema.EditProjectMembersRequest{
-					Members: &[]schema.MemberIDWithYearWithSemesterDuration{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
 								Since: schema.YearWithSemester{
@@ -367,7 +367,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{}).Return(nil)
-				return &schema.EditProjectMembersRequest{Members: &[]schema.MemberIDWithYearWithSemesterDuration{}}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+				return &schema.EditProjectMembersRequest{Members: []schema.MemberIDWithYearWithSemesterDuration{}}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
 			statusCode: http.StatusNoContent,
 		},
@@ -393,7 +393,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				projectID := random.UUID()
 				duration := random.Duration()
 				return &schema.EditProjectMembersRequest{
-					Members: &[]schema.MemberIDWithYearWithSemesterDuration{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
 								Since: schema.YearWithSemester{
@@ -419,7 +419,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				userID := random.UUID()
 				duration := random.Duration()
 				return &schema.EditProjectMembersRequest{
-					Members: &[]schema.MemberIDWithYearWithSemesterDuration{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
 								Since: schema.YearWithSemester{
@@ -458,7 +458,7 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				projectID := random.UUID()
 				duration := random.Duration()
 				reqBody := &schema.EditProjectMembersRequest{
-					Members: &[]schema.MemberIDWithYearWithSemesterDuration{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.YearWithSemesterDuration{
 								Since: schema.YearWithSemester{
