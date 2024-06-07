@@ -37,7 +37,7 @@ func main() {
 		}
 	}
 
-	api, err := injectAPIServer(appConf, db)
+	api, err := injectIntoAPIServer(appConf, db)
 	if err != nil {
 		log.Fatal(err)
 	}

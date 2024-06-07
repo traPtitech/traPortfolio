@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func injectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
+func injectIntoAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	// external API
 	var (
 		portalAPI external.PortalAPI

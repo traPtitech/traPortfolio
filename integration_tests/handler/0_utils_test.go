@@ -21,7 +21,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func injectAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.API, error) {
+func injectIntoAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.API, error) {
 	t.Helper()
 
 	// モック前提のテストがあるためassert; FIXME
@@ -59,7 +59,7 @@ func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 
-	api, err := injectAPIServer(t, testutils.Config, db)
+	api, err := injectIntoAPIServer(t, testutils.Config, db)
 	assert.NoError(t, err)
 
 	err = handler.Setup(false, e, api)
