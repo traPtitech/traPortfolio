@@ -1,4 +1,4 @@
-package infrastructure
+package main
 
 import (
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InjectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
+func injectIntoAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
 	// external API
 	var (
 		portalAPI external.PortalAPI
