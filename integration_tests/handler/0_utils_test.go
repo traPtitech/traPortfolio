@@ -22,7 +22,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func injectAPIServer(c *config.Config, db *gorm.DB) (handler.API, error) {
+func injectAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.API, error) {
+	t.Helper()
+
 	// external API
 	var (
 		portalAPI external.PortalAPI
@@ -82,7 +84,7 @@ func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 
-	api, err := injectAPIServer(testutils.Config, db)
+	api, err := injectAPIServer(t, testutils.Config, db)
 	assert.NoError(t, err)
 
 	err = handler.Setup(false, e, api)
