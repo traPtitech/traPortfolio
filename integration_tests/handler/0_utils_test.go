@@ -11,7 +11,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
@@ -25,37 +24,13 @@ import (
 func injectAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.API, error) {
 	t.Helper()
 
+	// モック前提のテストがあるためassert; FIXME
+	assert.False(t, c.IsProduction)
+
 	// external API
-	var (
-		portalAPI external.PortalAPI
-		traQAPI   external.TraQAPI
-		knoqAPI   external.KnoqAPI
-	)
-
-	// TODO: 初期リリースではPortalとknoQとは連携しない
-	if c.IsProduction {
-		var err error
-
-		// portalAPI, err = external.NewPortalAPI(c.Portal)
-		// if err != nil {
-		// 	return handler.API{}, err
-		// }
-		portalAPI = external.NewNopPortalAPI()
-
-		traQAPI, err = external.NewTraQAPI(c.Traq)
-		if err != nil {
-			return handler.API{}, err
-		}
-
-		knoqAPI, err = external.NewKnoqAPI(c.Knoq)
-		if err != nil {
-			return handler.API{}, err
-		}
-	} else {
-		portalAPI = mock_external_e2e.NewMockPortalAPI()
-		traQAPI = mock_external_e2e.NewMockTraQAPI()
-		knoqAPI = mock_external_e2e.NewMockKnoqAPI()
-	}
+	portalAPI := mock_external_e2e.NewMockPortalAPI()
+	traQAPI := mock_external_e2e.NewMockTraQAPI()
+	knoqAPI := mock_external_e2e.NewMockKnoqAPI()
 
 	// repository
 	userRepo := repository.NewUserRepository(db, portalAPI, traQAPI)
