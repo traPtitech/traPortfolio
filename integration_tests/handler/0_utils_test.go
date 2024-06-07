@@ -24,7 +24,7 @@ import (
 func injectIntoAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.API, error) {
 	t.Helper()
 
-	// モック前提のテストがあるためassert; FIXME
+	// FIXME: モック前提のテストがあるためassert
 	assert.False(t, c.IsProduction)
 
 	// external API
