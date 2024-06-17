@@ -11,6 +11,5 @@ import (
 
 type GroupRepository interface {
 	GetGroups(ctx context.Context) ([]*domain.Group, error)
-	SyncGroups(ctx context.Context, groupNames []string) error
 	GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error)
 }

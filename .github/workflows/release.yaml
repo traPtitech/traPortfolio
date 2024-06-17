@@ -33,9 +33,10 @@ jobs:
           tags: |
             ghcr.io/traptitech/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
             ghcr.io/traptitech/${{ env.IMAGE_NAME }}:latest
-      - name: Generate release note
-        run: |
+      - run: |
           tag="${GITHUB_REF#refs/tags/}"
-          gh release create "$tag" --generate-notes
+          gh release create "$tag" \
+            --generate-notes \
+            main.js manifest.json styles.css
         env:
           GITHUB_TOKEN: ${{ github.token }}

@@ -114,7 +114,6 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 	groupAPI := v1.Group("/groups")
 	{
 		groupAPI.GET("", api.Group.GetGroups)
-		groupAPI.POST("/sync", api.Group.SyncGroups)
 		groupAPI.GET("/:groupID", api.Group.GetGroup)
 	}
 }
