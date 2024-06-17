@@ -122,7 +122,6 @@ func newEvent(id uuid.UUID, name string, level domain.EventLevel, since time.Tim
 
 func newEventDetail(event schema.Event, description string, hostname []schema.User, place string) schema.EventDetail {
 	return schema.EventDetail{
-		Description: description,
 		Duration: schema.Duration{
 			Since: event.Duration.Since,
 			Until: event.Duration.Until,

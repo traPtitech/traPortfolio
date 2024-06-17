@@ -138,7 +138,6 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				}
 
 				hevent := schema.EventDetail{
-					Description: revent.Description,
 					Duration: schema.Duration{
 						Since: revent.Event.TimeStart,
 						Until: &revent.Event.TimeEnd,

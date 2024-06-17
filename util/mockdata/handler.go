@@ -176,7 +176,6 @@ func CloneHandlerMockEventDetails() []schema.EventDetail {
 		}
 
 		event := schema.EventDetail{
-			Description: e.Description,
 			Duration: schema.Duration{
 				Since: e.TimeStart,
 				Until: &e.TimeEnd,
