@@ -35,6 +35,10 @@ func (r *GroupRepository) GetGroups(ctx context.Context) ([]*domain.Group, error
 	return result, nil
 }
 
+func (r *GroupRepository) SyncGroups(ctx context.Context, groupNames []string) error {
+
+}
+
 func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*domain.GroupDetail, error) {
 	group := &model.Group{}
 	if err := r.h.

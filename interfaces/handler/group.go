@@ -37,6 +37,24 @@ func (h *GroupHandler) GetGroups(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// SyncGroups POST /groups/sync
+func (h *GroupHandler) SyncGroups(c echo.Context) error {
+	ctx := c.Request().Context()
+	groupNames := []string{
+		"algorithm",
+		"CTF",
+		"Game",
+		"graphics",
+		"Sound",
+		"SysAd",
+	} // TODO: set in config package
+	if err := h.group.SyncGroup(ctx, groupNames); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 // GetGroup GET /groups/:groupID
 func (h *GroupHandler) GetGroup(c echo.Context) error {
 	groupID, err := getID(c, keyGroupID)
