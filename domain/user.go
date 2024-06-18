@@ -127,18 +127,18 @@ func IsValidAccountURL(accountType AccountType, URL string) bool {
 	}
 
 	var urlRegexp = map[AccountType]*regexp.Regexp{
-		HOMEPAGE:   regexp.MustCompile("^https?://.+$"),
-		BLOG:       regexp.MustCompile("^https?://.+$"),
-		TWITTER:    regexp.MustCompile("^https://(twitter|x)\\.com/[a-zA-Z0-9_]+$"),
-		FACEBOOK:   regexp.MustCompile("^https://www.facebook\\.com/[a-zA-Z0-9.]+$"),
-		PIXIV:      regexp.MustCompile("^https://www.pixiv\\.net/users/[0-9]+"),
-		GITHUB:     regexp.MustCompile("^https://github\\.com/[a-zA-Z0-9-]+$"),
-		QIITA:      regexp.MustCompile("^https://qiita\\.com/[a-zA-Z0-9-_]+$"),
-		ZENN:       regexp.MustCompile("^https://zenn\\.dev/[a-zA-Z0-9.]+$"),
-		ATCODER:    regexp.MustCompile("^https://atcoder\\.jp/users/[a-zA-Z0-9_]+$"),
-		SOUNDCLOUD: regexp.MustCompile("^https://soundcloud\\.com/[a-z0-9-_]+$"),
-		HACKTHEBOX: regexp.MustCompile("^https://app.hackthebox\\.com/users/[a-zA-Z0-9]+$"),
-		CTFTIME:    regexp.MustCompile("^https://ctftime\\.org/user/[0-9]+$"),
+		HOMEPAGE:   regexp.MustCompile(`^https?://.+$`),
+		BLOG:       regexp.MustCompile(`^https?://.+$`),
+		TWITTER:    regexp.MustCompile(`^https://(twitter|x)\.com/[a-zA-Z0-9_]+$`),
+		FACEBOOK:   regexp.MustCompile(`^https://www.facebook\.com/[a-zA-Z0-9.]+$`),
+		PIXIV:      regexp.MustCompile(`^https://www.pixiv\.net/users/[0-9]+`),
+		GITHUB:     regexp.MustCompile(`^https://github\.com/[a-zA-Z0-9-]+$`),
+		QIITA:      regexp.MustCompile(`^https://qiita\.com/[a-zA-Z0-9-_]+$`),
+		ZENN:       regexp.MustCompile(`^https://zenn\.dev/[a-zA-Z0-9.]+$`),
+		ATCODER:    regexp.MustCompile(`^https://atcoder\.jp/users/[a-zA-Z0-9_]+$`),
+		SOUNDCLOUD: regexp.MustCompile(`^https://soundcloud\.com/[a-z0-9-_]+$`),
+		HACKTHEBOX: regexp.MustCompile(`^https://app.hackthebox\.com/users/[a-zA-Z0-9]+$`),
+		CTFTIME:    regexp.MustCompile(`^https://ctftime\.org/user/[0-9]+$`),
 	}
 
 	if r, ok := urlRegexp[accountType]; ok {
