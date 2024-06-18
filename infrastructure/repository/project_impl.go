@@ -11,6 +11,7 @@ import (
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/random"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ProjectRepository struct {
@@ -259,49 +260,10 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 	}
 
 	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, v := range members {
-			// 既に登録されていたら更新を試し、そうでなければ新規作成
-			if vdb, ok := currentProjectMembersMap[v.UserID]; ok {
-				changes := map[string]interface{}{}
-				if v.SinceYear != vdb.SinceYear {
-					changes["since_year"] = v.SinceYear
-				}
-				if v.SinceSemester != vdb.SinceSemester {
-					changes["since_semester"] = v.SinceSemester
-				}
-				if v.UntilYear != vdb.UntilYear {
-					changes["until_year"] = v.UntilYear
-				}
-				if v.UntilSemester != vdb.UntilSemester {
-					changes["until_semester"] = v.UntilSemester
-				}
-				if len(changes) > 0 {
-					err = tx.WithContext(ctx).Model(v).Updates(changes).Error
-					if err != nil {
-						return err
-					}
-				}
-				delete(currentProjectMembersMap, v.UserID)
-				continue
-			}
-			err = tx.WithContext(ctx).Create(v).Error
-			if err != nil {
-				return err
-			}
-		}
-		// 残っているものは削除
-		for _, member := range currentProjectMembers {
-			if _, ok := currentProjectMembersMap[member.UserID]; !ok {
-				continue
-			}
-			err = tx.WithContext(ctx).
-				Where(&model.ProjectMember{ProjectID: projectID, UserID: member.UserID}).
-				Delete(&model.ProjectMember{}).
-				Error
-			if err != nil {
-				return err
-			}
-		}
+		tx.Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"since_year", "since_semester", "until_year", "until_semester"}),
+		}).Create(&members)
 		return nil
 	})
 	if err != nil {

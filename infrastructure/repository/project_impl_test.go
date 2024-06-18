@@ -768,14 +768,12 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 					ExpectQuery(makeSQLQueryRegexp("SELECT * FROM `project_members` WHERE `project_members`.`project_id` = ?")).
 					WithArgs(args.projectID).
 					WillReturnRows(rows)
-				f.h.Mock.ExpectBegin()
 				for _, userID := range members {
 					f.h.Mock.
 						ExpectExec(makeSQLQueryRegexp("DELETE FROM `project_members` WHERE `project_members`.`project_id` = ? AND `project_members`.`user_id` = ?")).
 						WithArgs(args.projectID, userID).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 				}
-				f.h.Mock.ExpectCommit()
 			},
 			assertion: assert.NoError,
 		},
