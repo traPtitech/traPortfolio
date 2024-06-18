@@ -9,9 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 
-	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
@@ -20,8 +18,8 @@ import (
 func TestContestRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
 	contests, err := repo.GetContests(context.Background())
@@ -35,8 +33,8 @@ func TestContestRepository_GetContests(t *testing.T) {
 func TestContestRepository_GetContest(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
 
@@ -52,8 +50,8 @@ func TestContestRepository_GetContest(t *testing.T) {
 func TestContestRepository_UpdateContest(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	tests := []struct {
 		name string
 		ctx  context.Context
@@ -109,8 +107,8 @@ func TestContestRepository_UpdateContest(t *testing.T) {
 func TestContestRepository_DeleteContest(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
 
@@ -137,8 +135,8 @@ func TestContestRepository_DeleteContest(t *testing.T) {
 func TestContestRepository_GetContestTeams(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -169,8 +167,8 @@ func TestContestRepository_GetContestTeams(t *testing.T) {
 func TestContestRepository_GetContestTeam(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -202,8 +200,8 @@ func TestContestRepository_GetContestTeam(t *testing.T) {
 func TestContestRepository_UpdateContestTeam(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	tests := []struct {
 		name string
@@ -251,8 +249,8 @@ func TestContestRepository_UpdateContestTeam(t *testing.T) {
 func TestContestRepository_DeleteContestTeam(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	db := SetupTestGormDB(t)
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -297,10 +295,10 @@ func TestContestRepository_DeleteContestTeam(t *testing.T) {
 func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)
@@ -358,10 +356,10 @@ func TestContestRepository_GetContestTeamMembers(t *testing.T) {
 func TestContestRepository_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	repo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contest1 := mustMakeContest(t, repo, nil)
 	contest2 := mustMakeContest(t, repo, nil)

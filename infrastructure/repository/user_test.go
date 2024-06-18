@@ -8,8 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
@@ -20,10 +18,10 @@ import (
 func TestUserRepository_GetUsers(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		args *urepository.GetUsersArgs
@@ -118,10 +116,10 @@ func TestUserRepository_GetUsers(t *testing.T) {
 func TestUserRepository_GetUser(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		userID uuid.UUID
@@ -199,8 +197,8 @@ func TestUserRepository_GetUser(t *testing.T) {
 func TestUserRepository_CreateUser(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	db := SetupTestGormDB(t)
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	type args struct {
 		args *urepository.CreateUserArgs
@@ -251,10 +249,10 @@ func TestUserRepository_CreateUser(t *testing.T) {
 func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	tests := []struct {
 		name string
@@ -309,10 +307,10 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 func TestUserRepository_GetAccounts(t *testing.T) {
 	t.Parallel()
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -343,10 +341,10 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 
 func TestUserRepository_GetAccount(t *testing.T) {
 	t.Parallel()
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -378,10 +376,10 @@ func TestUserRepository_GetAccount(t *testing.T) {
 
 func TestUserRepository_UpdateAccount(t *testing.T) {
 	t.Parallel()
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -425,10 +423,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 
 func TestUserRepository_DeleteAccount(t *testing.T) {
 	t.Parallel()
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	repo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
 
 	var (
 		idx          = 1
@@ -464,11 +462,11 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 func TestUserRepository_GetUserProjects(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	userRepo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
-	projectRepo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
+	userRepo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	projectRepo := NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, projectRepo, nil)
 	project2 := mustMakeProjectDetail(t, projectRepo, nil)
@@ -495,11 +493,11 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 func TestUserRepository_GetContests(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupTestGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
-	userRepo := irepository.NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
-	contestRepo := irepository.NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
+	userRepo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
+	contestRepo := NewContestRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	contestNum := 3
 	var contests []*domain.ContestDetail
