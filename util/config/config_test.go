@@ -1,3 +1,4 @@
+//nolint:errcheck
 package config_test
 
 import (
