@@ -15,7 +15,7 @@ import (
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
-func TestGetContests(t *testing.T) {
+func Test_GetContests(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -36,7 +36,7 @@ func TestGetContests(t *testing.T) {
 	})
 }
 
-func TestGetContest(t *testing.T) {
+func Test_GetContest(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -61,9 +61,9 @@ func TestGetContest(t *testing.T) {
 	})
 }
 
-func TestCreateContest(t *testing.T) {}
+func Test_CreateContest(t *testing.T) {}
 
-func TestUpdateContest(t *testing.T) {
+func Test_UpdateContest(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -101,7 +101,7 @@ func TestUpdateContest(t *testing.T) {
 	})
 }
 
-func TestDeleteContest(t *testing.T) {
+func Test_DeleteContest(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -133,7 +133,7 @@ func TestDeleteContest(t *testing.T) {
 	})
 }
 
-func TestGetContestTeams(t *testing.T) {
+func Test_GetContestTeams(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -168,7 +168,7 @@ func TestGetContestTeams(t *testing.T) {
 	})
 }
 
-func TestGetContestTeam(t *testing.T) {
+func Test_GetContestTeam(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -198,9 +198,9 @@ func TestGetContestTeam(t *testing.T) {
 	})
 }
 
-func TestCreateContestTeam(t *testing.T) {}
+func Test_CreateContestTeam(t *testing.T) {}
 
-func TestUpdateContestTeam(t *testing.T) {
+func Test_UpdateContestTeam(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -241,7 +241,7 @@ func TestUpdateContestTeam(t *testing.T) {
 	})
 }
 
-func TestDeleteContestTeam(t *testing.T) {
+func Test_DeleteContestTeam(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -283,7 +283,7 @@ func TestDeleteContestTeam(t *testing.T) {
 	})
 }
 
-func TestGetContestTeamMembers(t *testing.T) {
+func Test_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
@@ -320,9 +320,9 @@ func TestGetContestTeamMembers(t *testing.T) {
 }
 
 // TODO: #675がmergeされたら消す
-func TestContestRepository_AddContestTeamMembers(t *testing.T) {}
+func Test_AddContestTeamMembers(t *testing.T) {}
 
-func TestContestRepository_EditContestTeamMembers(t *testing.T) {
+func Test_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
 
 	db := SetupTestGormDB(t)
