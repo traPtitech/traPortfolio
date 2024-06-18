@@ -9,8 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
-	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/optional"
@@ -20,8 +18,8 @@ import (
 func TestEventRepository_GetEvents(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
+	db := SetupTestGormDB(t)
+	repo := NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
 	for _, e := range mockdata.MockKnoqEvents {
@@ -42,8 +40,8 @@ func TestEventRepository_GetEvents(t *testing.T) {
 func TestEventRepository_GetEvent(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
+	db := SetupTestGormDB(t)
+	repo := NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
 	selected := mockdata.MockKnoqEvents[rand.IntN(len(mockdata.MockKnoqEvents)-1)]
@@ -100,8 +98,8 @@ func TestEventRepository_GetEvent(t *testing.T) {
 func TestEventRepository_UpdateEventLevel(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
+	db := SetupTestGormDB(t)
+	repo := NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	levels := createRandomEventLevels(t, repo)
 
@@ -140,8 +138,8 @@ func TestEventRepository_UpdateEventLevel(t *testing.T) {
 func TestEventRepository_GetUserEvents(t *testing.T) {
 	t.Parallel()
 
-	db := testutils.SetupGormDB(t)
-	repo := irepository.NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
+	db := SetupTestGormDB(t)
+	repo := NewEventRepository(db, mock_external_e2e.NewMockKnoqAPI())
 
 	expected := make([]*domain.Event, 0)
 	for _, e := range mockdata.MockKnoqEvents {
