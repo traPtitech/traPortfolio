@@ -258,6 +258,7 @@ func Test_DeleteContestTeam(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("delete team1 (belongs to contest1)", func(t *testing.T) {
+		portalAPI.EXPECT().GetUsers().Return([]*external.PortalUserResponse{}, nil)
 		gotTeam1, err := repo.GetContestTeam(context.Background(), contest1.ID, team1.ID)
 		assert.NoError(t, err)
 		assert.Equal(t, team1, gotTeam1)
@@ -271,6 +272,7 @@ func Test_DeleteContestTeam(t *testing.T) {
 	})
 
 	t.Run("delete of team1 doesn't affect team2", func(t *testing.T) {
+		portalAPI.EXPECT().GetUsers().Return([]*external.PortalUserResponse{}, nil)
 		gotTeam2, err := repo.GetContestTeam(context.Background(), contest1.ID, team2.ID)
 		assert.NoError(t, err)
 		assert.Equal(t, team2, gotTeam2)
@@ -306,7 +308,7 @@ func Test_GetContestTeamMembers(t *testing.T) {
 	portalAPI.EXPECT().GetUserByTraqID(createUserArgs2.Name).Return(&external.PortalUserResponse{}, nil)
 	user2, err := userRepo.CreateUser(context.Background(), createUserArgs2)
 	assert.NoError(t, err)
-	memberIDs := []uuid.UUID{user1.ID}
+	memberIDs := []uuid.UUID{user1.ID, user2.ID}
 	err = repo.AddContestTeamMembers(context.Background(), team1.ID, memberIDs)
 	assert.NoError(t, err)
 
