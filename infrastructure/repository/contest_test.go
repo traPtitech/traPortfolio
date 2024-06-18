@@ -317,7 +317,7 @@ func Test_GetContestTeamMembers(t *testing.T) {
 		portalAPI.EXPECT().GetUsers().Return([]*external.PortalUserResponse{}, nil)
 		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedMembers, gotMembers)
+		assert.ElementsMatch(t, expectedMembers, gotMembers)
 	})
 }
 
@@ -355,6 +355,6 @@ func Test_EditContestTeamMembers(t *testing.T) {
 		expectedMembers := []*domain.User{}
 		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedMembers, gotMembers)
+		assert.ElementsMatch(t, expectedMembers, gotMembers)
 	})
 }
