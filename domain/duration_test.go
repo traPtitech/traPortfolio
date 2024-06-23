@@ -11,7 +11,6 @@ func Test_YearWithSemester_IsValid(t *testing.T) {
 		ys   YearWithSemester
 		want bool
 	}{
-
 		"valid": {
 			ys:   YearWithSemester{Year: 2021, Semester: 0},
 			want: true,
