@@ -7,23 +7,35 @@ import (
 )
 
 func Test_YearWithSemester_IsValid(t *testing.T) {
-	tests := []map[string]YearWithSemester{
-		{
-			"valid":             {Year: 2021, Semester: 0},
-			"year must >=1970":  {Year: 1969, Semester: 0},
-			"semester must >=0": {Year: 2021, Semester: -1},
-			"semester must <2":  {Year: 2021, Semester: 2},
+	tests := map[string]struct {
+		ys   YearWithSemester
+		want bool
+	}{
+
+		"valid": {
+			ys:   YearWithSemester{Year: 2021, Semester: 0},
+			want: true,
+		},
+		"year must >=1970": {
+			ys:   YearWithSemester{Year: 1969, Semester: 0},
+			want: false,
+		},
+		"semester must >=0": {
+			ys:   YearWithSemester{Year: 2021, Semester: -1},
+			want: false,
+		},
+		"semester must <2": {
+			ys:   YearWithSemester{Year: 2021, Semester: 2},
+			want: false,
 		},
 	}
 
-	for _, test := range tests {
-		for name, ys := range test {
-			t.Run(name, func(t *testing.T) {
-				if got, want := ys.IsValid(), true; got != want {
-					t.Errorf("got %v, want %v", got, want)
-				}
-			})
-		}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			if got := test.ys.IsValid(); got != test.want {
+				t.Errorf("got %v, want %v", got, test.want)
+			}
+		})
 	}
 }
 
