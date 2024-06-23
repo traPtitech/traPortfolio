@@ -15,6 +15,7 @@ import (
 	irepository "github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
+	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
 )
 
@@ -48,12 +49,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 		projects = append(projects, mustMakeProjectDetail(t, repo, nil))
 	}
 
-	opt := cmpopts.EquateEmpty()
+	opts := []cmp.Option{
+		cmpopts.EquateEmpty(),
+		cmp.AllowUnexported(optional.Of[domain.YearWithSemester]{}),
+	}
 	for _, p := range projects {
 		got, err := repo.GetProject(context.Background(), p.ID)
 		assert.NoError(t, err)
 
-		if diff := cmp.Diff(p, got, opt); diff != "" {
+		if diff := cmp.Diff(p, got, opts...); diff != "" {
 			t.Error(diff)
 		}
 	}
@@ -102,8 +106,10 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			}
 			if uy, ok := arg1.UntilYear.V(); ok {
 				if us, ok := arg1.UntilSemester.V(); ok {
-					project1.Duration.Until.Year = int(uy)
-					project1.Duration.Until.Semester = int(us)
+					project1.Duration.Until = optional.From(domain.YearWithSemester{
+						Year:     int(uy),
+						Semester: int(us),
+					})
 				}
 			}
 
@@ -113,8 +119,11 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			got, err := repo.GetProject(tt.ctx, project1.ID)
 			assert.NoError(t, err)
 
-			opt := cmpopts.EquateEmpty()
-			if diff := cmp.Diff(project1, got, opt); diff != "" {
+			opts := []cmp.Option{
+				cmpopts.EquateEmpty(),
+				cmp.AllowUnexported(optional.Of[domain.YearWithSemester]{}),
+			}
+			if diff := cmp.Diff(project1, got, opts...); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -150,29 +159,21 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
-		Duration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args1.SinceYear,
-				Semester: args1.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args1.UntilYear,
-				Semester: args1.UntilSemester,
-			},
-		},
+		Duration: domain.NewYearWithSemesterDuration(
+			args1.SinceYear,
+			args1.SinceSemester,
+			args1.UntilYear,
+			args1.UntilSemester,
+		),
 	}
 	projectMember2 := &domain.UserWithDuration{
 		User: *user2,
-		Duration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args2.SinceYear,
-				Semester: args2.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args2.UntilYear,
-				Semester: args2.UntilSemester,
-			},
-		},
+		Duration: domain.NewYearWithSemesterDuration(
+			args2.SinceYear,
+			args2.SinceSemester,
+			args2.UntilYear,
+			args2.UntilSemester,
+		),
 	}
 	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(context.Background(), project1.ID)
@@ -181,16 +182,12 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 
 	projectMember3 := &domain.UserWithDuration{
 		User: *user2,
-		Duration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args3.SinceYear,
-				Semester: args3.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args3.UntilYear,
-				Semester: args3.UntilSemester,
-			},
-		},
+		Duration: domain.NewYearWithSemesterDuration(
+			args3.SinceYear,
+			args3.SinceSemester,
+			args3.UntilYear,
+			args3.UntilSemester,
+		),
 	}
 
 	expected2 := []*domain.UserWithDuration{projectMember3}
@@ -232,29 +229,21 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
-		Duration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args1.SinceYear,
-				Semester: args1.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args1.UntilYear,
-				Semester: args1.UntilSemester,
-			},
-		},
+		Duration: domain.NewYearWithSemesterDuration(
+			args1.SinceYear,
+			args1.SinceSemester,
+			args1.UntilYear,
+			args1.UntilSemester,
+		),
 	}
 	projectMember2 := &domain.UserWithDuration{
 		User: *user2,
-		Duration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args2.SinceYear,
-				Semester: args2.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args2.UntilYear,
-				Semester: args2.UntilSemester,
-			},
-		},
+		Duration: domain.NewYearWithSemesterDuration(
+			args2.SinceYear,
+			args2.SinceSemester,
+			args2.UntilYear,
+			args2.UntilSemester,
+		),
 	}
 	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(context.Background(), project1.ID)
@@ -263,16 +252,12 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 
 	projectMember3 := &domain.UserWithDuration{
 		User: *user2,
-		Duration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args3.SinceYear,
-				Semester: args3.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args3.UntilYear,
-				Semester: args3.UntilSemester,
-			},
-		},
+		Duration: domain.NewYearWithSemesterDuration(
+			args3.SinceYear,
+			args3.SinceSemester,
+			args3.UntilYear,
+			args3.UntilSemester,
+		),
 	}
 	expected2 := []*domain.UserWithDuration{projectMember3}
 	users2, err := repo.GetProjectMembers(context.Background(), project2.ID)

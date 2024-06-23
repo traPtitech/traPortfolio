@@ -166,7 +166,7 @@ func Duration() domain.YearWithSemesterDuration {
 
 	return domain.YearWithSemesterDuration{
 		Since: yss[0],
-		Until: yss[1],
+		Until: optional.From(yss[1]),
 	}
 }
 
@@ -186,10 +186,10 @@ func DurationBetween(since domain.YearWithSemester, until domain.YearWithSemeste
 			Year:     before / 2,
 			Semester: before % 2,
 		},
-		Until: domain.YearWithSemester{
+		Until: optional.From(domain.YearWithSemester{
 			Year:     after / 2,
 			Semester: after % 2,
-		},
+		}),
 	}
 }
 

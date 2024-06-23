@@ -63,16 +63,12 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 				// Name:     v.Name,
 				// RealName: v.RealName,
 			},
-			Duration: domain.YearWithSemesterDuration{
-				Since: domain.YearWithSemester{
-					Year:     v.SinceYear,
-					Semester: v.SinceSemester,
-				},
-				Until: domain.YearWithSemester{
-					Year:     v.UntilYear,
-					Semester: v.UntilSemester,
-				},
-			},
+			Duration: domain.NewYearWithSemesterDuration(
+				v.SinceYear,
+				v.SinceSemester,
+				v.UntilYear,
+				v.UntilSemester,
+			),
 		})
 	}
 

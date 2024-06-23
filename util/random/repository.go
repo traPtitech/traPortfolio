@@ -61,9 +61,9 @@ func UpdateProjectArgs() *repository.UpdateProjectArgs {
 		Description:   optional.From(AlphaNumeric()),
 		Link:          optional.From(RandURLString()),
 		SinceYear:     optional.From(int64(2100)), // TODO: intでよさそう
-		SinceSemester: optional.From(int64(2)),
+		SinceSemester: optional.From(int64(0)),
 		UntilYear:     optional.From(int64(2100)),
-		UntilSemester: optional.From(int64(2)),
+		UntilSemester: optional.From(int64(1)),
 	}
 	return &a
 }
