@@ -49,12 +49,15 @@ func TestProjectRepository_GetProject(t *testing.T) {
 		projects = append(projects, mustMakeProjectDetail(t, repo, nil))
 	}
 
-	opt := cmpopts.EquateEmpty()
+	opts := []cmp.Option{
+		cmpopts.EquateEmpty(),
+		cmp.AllowUnexported(optional.Of[domain.YearWithSemester]{}),
+	}
 	for _, p := range projects {
 		got, err := repo.GetProject(context.Background(), p.ID)
 		assert.NoError(t, err)
 
-		if diff := cmp.Diff(p, got, opt); diff != "" {
+		if diff := cmp.Diff(p, got, opts...); diff != "" {
 			t.Error(diff)
 		}
 	}
@@ -116,8 +119,11 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 			got, err := repo.GetProject(tt.ctx, project1.ID)
 			assert.NoError(t, err)
 
-			opt := cmpopts.EquateEmpty()
-			if diff := cmp.Diff(project1, got, opt); diff != "" {
+			opts := []cmp.Option{
+				cmpopts.EquateEmpty(),
+				cmp.AllowUnexported(optional.Of[domain.YearWithSemester]{}),
+			}
+			if diff := cmp.Diff(project1, got, opts...); diff != "" {
 				t.Error(diff)
 			}
 		})
