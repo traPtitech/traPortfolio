@@ -484,16 +484,12 @@ func (r *UserRepository) GetGroupsByUserID(ctx context.Context, userID uuid.UUID
 		result = append(result, &domain.UserGroup{
 			ID:   gr.GroupID,
 			Name: gr.Name,
-			Duration: domain.YearWithSemesterDuration{
-				Since: domain.YearWithSemester{
-					Year:     v.SinceYear,
-					Semester: v.SinceSemester,
-				},
-				Until: domain.YearWithSemester{
-					Year:     v.UntilYear,
-					Semester: v.UntilSemester,
-				},
-			},
+			Duration: domain.NewYearWithSemesterDuration(
+				v.SinceYear,
+				v.SinceSemester,
+				v.UntilYear,
+				v.UntilSemester,
+			),
 		})
 	}
 	return result, nil
