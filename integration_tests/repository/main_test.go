@@ -143,8 +143,8 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 			Link:          random.Optional(random.RandURLString()),
 			SinceYear:     duration.Since.Year,
 			SinceSemester: duration.Since.Semester,
-			UntilYear:     duration.Until.Year,
-			UntilSemester: duration.Until.Semester,
+			UntilYear:     duration.Until.ValueOrZero().Year,
+			UntilSemester: duration.Until.ValueOrZero().Semester,
 		}
 	}
 
@@ -167,7 +167,7 @@ func mustExistProjectMember(t *testing.T, repo repository.ProjectRepository, pro
 		assert.True(t, userDuration.IsValid())
 	}
 
-	var duration = random.DurationBetween(projectDuration.Since, projectDuration.Until)
+	var duration = random.DurationBetween(projectDuration.Since, projectDuration.Until.ValueOrZero())
 
 	assert.True(t, duration.IsValid())
 

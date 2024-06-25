@@ -11,12 +11,46 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/traPtitech/traPortfolio/infrastructure"
+	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/infrastructure/repository"
 	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
+	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
 	"github.com/traPtitech/traPortfolio/util/random"
+	"gorm.io/gorm"
 )
+
+func injectIntoAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.API, error) {
+	t.Helper()
+
+	// FIXME: モック前提のテストがあるためassert
+	assert.False(t, c.IsProduction)
+
+	// external API
+	portalAPI := mock_external_e2e.NewMockPortalAPI()
+	traQAPI := mock_external_e2e.NewMockTraQAPI()
+	knoqAPI := mock_external_e2e.NewMockKnoqAPI()
+
+	// repository
+	userRepo := repository.NewUserRepository(db, portalAPI, traQAPI)
+	projectRepo := repository.NewProjectRepository(db, portalAPI)
+	eventRepo := repository.NewEventRepository(db, knoqAPI)
+	contestRepo := repository.NewContestRepository(db, portalAPI)
+	groupRepo := repository.NewGroupRepository(db)
+
+	// service, handler, API
+	api := handler.NewAPI(
+		handler.NewPingHandler(),
+		handler.NewUserHandler(userRepo, eventRepo),
+		handler.NewProjectHandler(projectRepo),
+		handler.NewEventHandler(eventRepo, userRepo),
+		handler.NewContestHandler(contestRepo),
+		handler.NewGroupHandler(groupRepo, userRepo),
+	)
+
+	return api, nil
+}
 
 func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	t.Helper()
@@ -25,7 +59,7 @@ func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 
-	api, err := infrastructure.InjectAPIServer(testutils.Config, db)
+	api, err := injectIntoAPIServer(t, testutils.Config, db)
 	assert.NoError(t, err)
 
 	err = handler.Setup(false, e, api)

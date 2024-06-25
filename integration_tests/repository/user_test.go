@@ -487,15 +487,15 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 		UserID:        user1.ID,
 		SinceYear:     project1.Duration.Since.Year,
 		SinceSemester: project1.Duration.Since.Semester,
-		UntilYear:     project1.Duration.Until.Year,
-		UntilSemester: project1.Duration.Until.Semester,
+		UntilYear:     project1.Duration.Until.ValueOrZero().Year,
+		UntilSemester: project1.Duration.Until.ValueOrZero().Semester,
 	}
 	arg2 := &urepository.EditProjectMemberArgs{
 		UserID:        user1.ID,
 		SinceYear:     project2.Duration.Since.Year,
 		SinceSemester: project2.Duration.Since.Semester,
-		UntilYear:     project2.Duration.Until.Year,
-		UntilSemester: project2.Duration.Until.Semester,
+		UntilYear:     project2.Duration.Until.ValueOrZero().Year,
+		UntilSemester: project2.Duration.Until.ValueOrZero().Semester,
 	}
 
 	mustExistProjectMember(t, projectRepo, project1.ID, project1.Duration, []*urepository.EditProjectMemberArgs{arg1})
@@ -563,20 +563,17 @@ func newUserProject(t *testing.T, args *urepository.EditProjectMemberArgs, proje
 		ID:       project.ID,
 		Name:     project.Name,
 		Duration: project.Duration,
-		UserDuration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args.SinceYear,
-				Semester: args.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args.UntilYear,
-				Semester: args.UntilSemester,
-			},
-		},
+		UserDuration: domain.NewYearWithSemesterDuration(
+			args.SinceYear,
+			args.SinceSemester,
+			args.UntilYear,
+			args.UntilSemester,
+		),
 	}
 }
 
 func newUserContest(t *testing.T, contest *domain.Contest, teams []*domain.ContestTeamWithoutMembers) *domain.UserContest {
+	t.Helper()
 	return &domain.UserContest{
 		ID:        contest.ID,
 		Name:      contest.Name,

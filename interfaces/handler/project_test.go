@@ -74,18 +74,9 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 				var reqBody []*schema.Project
 				for _, v := range repo {
 					reqBody = append(reqBody, &schema.Project{
-						Duration: schema.YearWithSemesterDuration{
-							Since: schema.YearWithSemester{
-								Year:     v.Duration.Since.Year,
-								Semester: schema.Semester(v.Duration.Since.Semester),
-							},
-							Until: &schema.YearWithSemester{
-								Year:     v.Duration.Until.Year,
-								Semester: schema.Semester(v.Duration.Until.Semester),
-							},
-						},
-						Id:   v.ID,
-						Name: v.Name,
+						Duration: schema.ConvertDuration(v.Duration),
+						Id:       v.ID,
+						Name:     v.Name,
 					})
 				}
 
@@ -152,16 +143,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 				var members []schema.ProjectMember
 				for _, v := range repo.Members {
 					members = append(members, schema.ProjectMember{
-						Duration: schema.YearWithSemesterDuration{
-							Since: schema.YearWithSemester{
-								Year:     v.Duration.Since.Year,
-								Semester: schema.Semester(v.Duration.Since.Semester),
-							},
-							Until: &schema.YearWithSemester{
-								Year:     v.Duration.Until.Year,
-								Semester: schema.Semester(v.Duration.Until.Semester),
-							},
-						},
+						Duration: schema.ConvertDuration(v.Duration),
 						Id:       v.User.ID,
 						Name:     v.User.Name,
 						RealName: v.User.RealName(),
@@ -169,20 +151,11 @@ func TestProjectHandler_GetProject(t *testing.T) {
 				}
 				reqBody := &schema.ProjectDetail{
 					Description: repo.Description,
-					Duration: schema.YearWithSemesterDuration{
-						Since: schema.YearWithSemester{
-							Semester: schema.Semester(repo.Duration.Since.Semester),
-							Year:     repo.Duration.Since.Year,
-						},
-						Until: &schema.YearWithSemester{
-							Semester: schema.Semester(repo.Duration.Until.Semester),
-							Year:     repo.Duration.Until.Year,
-						},
-					},
-					Id:      repo.ID,
-					Link:    repo.Link,
-					Members: members,
-					Name:    repo.Name,
+					Duration:    schema.ConvertDuration(repo.Duration),
+					Id:          repo.ID,
+					Link:        repo.Link,
+					Members:     members,
+					Name:        repo.Name,
 				}
 
 				mr.project.EXPECT().GetProject(anyCtx{}, projectID).Return(&repo, nil)
@@ -274,16 +247,12 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 					Project: domain.Project{
 						ID:   random.UUID(),
 						Name: args.Name,
-						Duration: domain.YearWithSemesterDuration{
-							Since: domain.YearWithSemester{
-								Year:     args.SinceYear,
-								Semester: args.SinceSemester,
-							},
-							Until: domain.YearWithSemester{
-								Year:     args.UntilYear,
-								Semester: args.UntilSemester,
-							},
-						},
+						Duration: domain.NewYearWithSemesterDuration(
+							args.SinceYear,
+							args.SinceSemester,
+							args.UntilYear,
+							args.UntilSemester,
+						),
 					},
 					Description: args.Description,
 					Link:        args.Link.ValueOrZero(),
@@ -334,17 +303,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				reqBody := &schema.EditProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
-							Duration: schema.YearWithSemesterDuration{
-								Since: schema.YearWithSemester{
-									Semester: schema.Semester(userDuration.Since.Semester),
-									Year:     userDuration.Since.Year,
-								},
-								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(userDuration.Until.Semester),
-									Year:     userDuration.Until.Year,
-								},
-							},
-							UserId: userID,
+							Duration: schema.ConvertDuration(userDuration),
+							UserId:   userID,
 						},
 					},
 				}
@@ -353,8 +313,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 						UserID:        userID,
 						SinceYear:     userDuration.Since.Year,
 						SinceSemester: userDuration.Since.Semester,
-						UntilYear:     userDuration.Until.Year,
-						UntilSemester: userDuration.Until.Semester,
+						UntilYear:     userDuration.Until.ValueOrZero().Year,
+						UntilSemester: userDuration.Until.ValueOrZero().Semester,
 					},
 				}
 				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
@@ -395,17 +355,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				return &schema.EditProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
-							Duration: schema.YearWithSemesterDuration{
-								Since: schema.YearWithSemester{
-									Semester: schema.Semester(duration.Since.Semester),
-									Year:     duration.Since.Year,
-								},
-								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(duration.Until.Semester),
-									Year:     duration.Until.Year,
-								},
-							},
-							UserId: uuid.Nil,
+							Duration: schema.ConvertDuration(duration),
+							UserId:   uuid.Nil,
 						},
 					},
 				}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
@@ -427,8 +378,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 									Year:     duration.Since.Year,
 								},
 								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(duration.Until.Semester),
-									Year:     duration.Until.Year,
+									Semester: schema.Semester(duration.Until.ValueOrZero().Semester),
+									Year:     duration.Until.ValueOrZero().Year,
 								},
 							},
 							UserId: userID,
@@ -440,8 +391,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 									Year:     duration.Since.Year,
 								},
 								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(duration.Until.Semester),
-									Year:     duration.Until.Year,
+									Semester: schema.Semester(duration.Until.ValueOrZero().Semester),
+									Year:     duration.Until.ValueOrZero().Year,
 								},
 							},
 							UserId: userID,
@@ -460,17 +411,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 				reqBody := &schema.EditProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
-							Duration: schema.YearWithSemesterDuration{
-								Since: schema.YearWithSemester{
-									Semester: schema.Semester(duration.Since.Semester),
-									Year:     duration.Since.Year,
-								},
-								Until: &schema.YearWithSemester{
-									Semester: schema.Semester(duration.Until.Semester),
-									Year:     duration.Until.Year,
-								},
-							},
-							UserId: userID,
+							Duration: schema.ConvertDuration(duration),
+							UserId:   userID,
 						},
 					},
 				}
@@ -479,8 +421,8 @@ func TestProjectHandler_EditProjectMembers(t *testing.T) {
 						UserID:        userID,
 						SinceYear:     int(duration.Since.Year),
 						SinceSemester: int(duration.Since.Semester),
-						UntilYear:     int(duration.Until.Year),
-						UntilSemester: int(duration.Until.Semester),
+						UntilYear:     int(duration.Until.ValueOrZero().Year),
+						UntilSemester: int(duration.Until.ValueOrZero().Semester),
 					},
 				}).Return(repository.ErrInvalidArg)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)

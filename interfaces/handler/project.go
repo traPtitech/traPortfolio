@@ -143,14 +143,18 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 		d := old.Duration
 		if sy, ok := patchReq.SinceYear.V(); ok {
 			if ss, ok := patchReq.SinceSemester.V(); ok {
-				d.Since.Year = int(sy)
-				d.Since.Semester = int(ss)
+				d.Since = domain.YearWithSemester{
+					Year:     int(sy),
+					Semester: int(ss),
+				}
 			}
 		}
 		if uy, ok := patchReq.UntilYear.V(); ok {
 			if us, ok := patchReq.UntilSemester.V(); ok {
-				d.Until.Year = int(uy)
-				d.Until.Semester = int(us)
+				d.Until = optional.From(domain.YearWithSemester{
+					Year:     int(uy),
+					Semester: int(us),
+				})
 			}
 		}
 

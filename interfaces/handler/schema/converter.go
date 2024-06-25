@@ -7,14 +7,25 @@ import (
 )
 
 func ConvertDuration(d domain.YearWithSemesterDuration) YearWithSemesterDuration {
+	since := YearWithSemester{
+		Year:     d.Since.Year,
+		Semester: Semester(d.Since.Semester),
+	}
+	u, ok := d.Until.V()
+	if !ok {
+		return YearWithSemesterDuration{
+			Since: since,
+			Until: nil,
+		}
+	}
+
+	until := YearWithSemester{
+		Year:     u.Year,
+		Semester: Semester(u.Semester),
+	}
+
 	return YearWithSemesterDuration{
-		Since: YearWithSemester{
-			Year:     d.Since.Year,
-			Semester: Semester(d.Since.Semester),
-		},
-		Until: &YearWithSemester{
-			Year:     d.Until.Year,
-			Semester: Semester(d.Until.Semester),
-		},
+		Since: since,
+		Until: &until,
 	}
 }
