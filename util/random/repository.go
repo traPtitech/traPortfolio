@@ -2,11 +2,23 @@ package random
 
 import (
 	"math/rand/v2"
+	"time"
 
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/optional"
 )
+
+// CreateContestArgs
+func CreateContestArgs() *repository.CreateContestArgs {
+	return &repository.CreateContestArgs{
+		Name:        AlphaNumeric(),
+		Description: AlphaNumeric(),
+		Link:        Optional(RandURLString()),
+		Since:       time.Now(),
+		Until:       Optional(time.Now().Add(time.Hour)),
+	}
+}
 
 // UpdateContestArgs 全てのフィールドがvalidなUpdateContestArgsを生成します
 func UpdateContestArgs() *repository.UpdateContestArgs {
@@ -20,16 +32,14 @@ func UpdateContestArgs() *repository.UpdateContestArgs {
 	return &a
 }
 
-// OptUpdateContestArgs validかどうかも含めてランダムなUpdateContestArgsを生成します
-func OptUpdateContestArgs() *repository.UpdateContestArgs {
-	a := repository.UpdateContestArgs{
-		Name:        Optional(AlphaNumeric()),
-		Description: Optional(AlphaNumeric()),
+// CreateContestTeamArgs
+func CreateContestTeamArgs() *repository.CreateContestTeamArgs {
+	return &repository.CreateContestTeamArgs{
+		Name:        AlphaNumeric(),
+		Result:      Optional(AlphaNumeric()),
 		Link:        Optional(RandURLString()),
-		Since:       Optional(Time()),
-		Until:       Optional(Time()),
+		Description: AlphaNumeric(),
 	}
-	return &a
 }
 
 // UpdateContestTeamArgs 全てのフィールドがvalidなUpdateContestTeamArgsを生成します
@@ -80,6 +90,15 @@ func OptUpdateProjectArgs() *repository.UpdateProjectArgs {
 		UntilSemester: Optional(int64(1)),
 	}
 	return &a
+}
+
+// CreateUserArgs
+func CreateUserArgs() *repository.CreateUserArgs {
+	return &repository.CreateUserArgs{
+		Description: AlphaNumeric(),
+		Check:       Bool(),
+		Name:        AlphaNumeric(),
+	}
 }
 
 // UpdateUserArgs 全てのフィールドがvalidなUpdateUserArgsを生成します
