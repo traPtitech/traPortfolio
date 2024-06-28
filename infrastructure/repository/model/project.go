@@ -24,9 +24,8 @@ func (*Project) TableName() string {
 }
 
 type ProjectMember struct {
-	ID            uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	ProjectID     uuid.UUID `gorm:"type:char(36);not null"`
-	UserID        uuid.UUID `gorm:"type:char(36);not null"`
+	ProjectID     uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	UserID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	SinceYear     int       `gorm:"type:smallint(4);not null"`
 	SinceSemester int       `gorm:"type:tinyint(1);not null"`
 	UntilYear     int       `gorm:"type:smallint(4);not null"`

@@ -216,7 +216,6 @@ func CloneMockProjects() []*model.Project {
 func CloneMockProjectMembers() []*model.ProjectMember {
 	return []*model.ProjectMember{
 		{
-			ID:            ProjectMemberID1(),
 			ProjectID:     ProjectID1(),
 			UserID:        UserID1(),
 			SinceYear:     2021,
@@ -225,7 +224,6 @@ func CloneMockProjectMembers() []*model.ProjectMember {
 			UntilSemester: 1,
 		},
 		{
-			ID:            ProjectMemberID2(),
 			ProjectID:     ProjectID1(),
 			UserID:        UserID2(),
 			SinceYear:     2022,
@@ -234,7 +232,6 @@ func CloneMockProjectMembers() []*model.ProjectMember {
 			UntilSemester: 1,
 		},
 		{
-			ID:            ProjectMemberID3(),
 			ProjectID:     ProjectID2(),
 			UserID:        UserID2(),
 			SinceYear:     2021,

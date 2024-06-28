@@ -245,9 +245,7 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 
 	members := make([]*model.ProjectMember, 0, len(projectMembers))
 	for _, v := range projectMembers {
-		uid := uuid.Must(uuid.NewV4())
 		m := &model.ProjectMember{
-			ID:            uid,
 			ProjectID:     projectID,
 			UserID:        v.UserID,
 			SinceYear:     v.SinceYear,
