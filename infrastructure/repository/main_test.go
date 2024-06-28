@@ -2,45 +2,71 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"io"
 	"log"
 	"math/rand/v2"
+	"strings"
 	"testing"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/usecases/repository"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/optional"
 	"github.com/traPtitech/traPortfolio/util/random"
+	"github.com/traPtitech/traPortfolio/util/testutils"
+	"gorm.io/gorm"
+)
+
+var (
+	testDB        *sql.DB
+	testSQLConfig config.SQLConfig
 )
 
 func TestMain(m *testing.M) {
-	c, err := config.Load(config.LoadOpts{SkipReadFromFiles: true})
-	if err != nil {
-		panic(err)
-	}
-
 	// disable mysql driver logging
 	_ = mysql.SetLogger(mysql.Logger(log.New(io.Discard, "", 0)))
-	db, closeFunc, err := testutils.RunMySQLContainerOnDocker(c.DB)
+
+	user, pass, host := "root", "password", "localhost"
+	db, port, closeFunc, err := testutils.RunMySQLContainerOnDocker(user, pass, host)
 	if err != nil {
 		panic(err)
 	}
 
-	defer func() {
-		if err := closeFunc(); err != nil {
-			panic(err)
-		}
-	}()
-
-	testutils.Config = c
-	testutils.DB = db
+	testDB = db
+	testSQLConfig = config.SQLConfig{
+		User: user,
+		Pass: pass,
+		Host: host,
+		Name: "",
+		Port: port,
+	}
 
 	m.Run()
+
+	if err := closeFunc(); err != nil {
+		panic(err)
+	}
+}
+
+func SetupTestGormDB(t *testing.T) *gorm.DB {
+	t.Helper()
+
+	dbName := fmt.Sprintf("portfolio_test_%s", strings.ToLower(t.Name()))
+	_, err := testDB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", dbName))
+	assert.NoError(t, err)
+
+	sqlConfig := testSQLConfig
+	sqlConfig.Name = dbName
+
+	gormDB, err := NewGormDB(sqlConfig)
+	assert.NoError(t, err)
+
+	return gormDB
 }
 
 func mustMakeContest(t *testing.T, repo repository.ContestRepository, args *repository.CreateContestArgs) *domain.ContestDetail {
