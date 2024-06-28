@@ -67,18 +67,6 @@ func ProjectID3() uuid.UUID {
 	return uuid.FromStringOrNil("bf9c1aec-7e3a-4587-8adc-651895aa6ec2")
 }
 
-func ProjectMemberID1() uuid.UUID {
-	return uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c7")
-}
-
-func ProjectMemberID2() uuid.UUID {
-	return uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c8")
-}
-
-func ProjectMemberID3() uuid.UUID {
-	return uuid.FromStringOrNil("a211a49c-9b30-48b9-8dbb-c449c99f12c9")
-}
-
 func KnoqEventID1() uuid.UUID {
 	return uuid.FromStringOrNil("d1274c6e-15cc-4ca0-b720-1c03ea3a60ec")
 }
