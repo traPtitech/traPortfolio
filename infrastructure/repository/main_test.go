@@ -169,8 +169,8 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 			Link:          random.Optional(random.RandURLString()),
 			SinceYear:     duration.Since.Year,
 			SinceSemester: duration.Since.Semester,
-			UntilYear:     duration.Until.Year,
-			UntilSemester: duration.Until.Semester,
+			UntilYear:     duration.Until.ValueOrZero().Year,
+			UntilSemester: duration.Until.ValueOrZero().Semester,
 		}
 	}
 
@@ -180,35 +180,28 @@ func mustMakeProjectDetail(t *testing.T, repo repository.ProjectRepository, args
 	return project
 }
 
-func mustAddProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, projectDuration domain.YearWithSemesterDuration, userID uuid.UUID, args *repository.CreateProjectMemberArgs) *repository.CreateProjectMemberArgs {
+func mustExistProjectMember(t *testing.T, repo repository.ProjectRepository, projectID uuid.UUID, projectDuration domain.YearWithSemesterDuration, users []*repository.EditProjectMemberArgs) {
 	t.Helper()
 
 	assert.NotEmpty(t, projectID)
 	assert.NotEmpty(t, projectDuration)
-	assert.NotEmpty(t, userID)
+	assert.NotEmpty(t, users)
 	assert.True(t, projectDuration.IsValid())
+	for _, user := range users {
+		assert.NotEmpty(t, user.UserID)
+		userDuration := domain.NewYearWithSemesterDuration(user.SinceYear, user.SinceSemester, user.UntilYear, user.UntilSemester)
+		assert.True(t, userDuration.IsValid())
+	}
 
-	var duration = random.DurationBetween(projectDuration.Since, projectDuration.Until)
+	var duration = random.DurationBetween(projectDuration.Since, projectDuration.Until.ValueOrZero())
 
 	assert.True(t, duration.IsValid())
 
-	if args == nil {
-		args = &repository.CreateProjectMemberArgs{
-			UserID:        userID,
-			SinceYear:     duration.Since.Year,
-			SinceSemester: duration.Since.Semester,
-			UntilYear:     duration.Until.Year,
-			UntilSemester: duration.Until.Semester,
-		}
-	}
-
-	err := repo.AddProjectMembers(context.Background(), projectID, []*repository.CreateProjectMemberArgs{args})
+	err := repo.EditProjectMembers(context.Background(), projectID, users)
 	assert.NoError(t, err)
-
-	return args
 }
 
-func mustAddContestTeamMembers(t *testing.T, repo repository.ContestRepository, teamID uuid.UUID, userIDs []uuid.UUID) {
+func mustExistContestTeamMembers(t *testing.T, repo repository.ContestRepository, teamID uuid.UUID, userIDs []uuid.UUID) {
 	t.Helper()
 
 	for _, id := range userIDs {
@@ -217,6 +210,6 @@ func mustAddContestTeamMembers(t *testing.T, repo repository.ContestRepository, 
 
 	assert.NotEmpty(t, teamID)
 
-	err := repo.AddContestTeamMembers(context.Background(), teamID, userIDs)
+	err := repo.EditContestTeamMembers(context.Background(), teamID, userIDs)
 	assert.NoError(t, err)
 }

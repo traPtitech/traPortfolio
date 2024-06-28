@@ -481,10 +481,25 @@ func TestUserRepository_GetUserProjects(t *testing.T) {
 	assert.ElementsMatch(t, expected1, users1)
 	assert.ElementsMatch(t, expected2, users2)
 
-	args1 := mustAddProjectMember(t, projectRepo, project1.ID, project1.Duration, user1.ID, nil)
-	args2 := mustAddProjectMember(t, projectRepo, project2.ID, project2.Duration, user1.ID, nil)
+	arg1 := &urepository.EditProjectMemberArgs{
+		UserID:        user1.ID,
+		SinceYear:     project1.Duration.Since.Year,
+		SinceSemester: project1.Duration.Since.Semester,
+		UntilYear:     project1.Duration.Until.ValueOrZero().Year,
+		UntilSemester: project1.Duration.Until.ValueOrZero().Semester,
+	}
+	arg2 := &urepository.EditProjectMemberArgs{
+		UserID:        user1.ID,
+		SinceYear:     project2.Duration.Since.Year,
+		SinceSemester: project2.Duration.Since.Semester,
+		UntilYear:     project2.Duration.Until.ValueOrZero().Year,
+		UntilSemester: project2.Duration.Until.ValueOrZero().Semester,
+	}
 
-	expected3 := []*domain.UserProject{newUserProject(t, args1, &project1.Project), newUserProject(t, args2, &project2.Project)}
+	mustExistProjectMember(t, projectRepo, project1.ID, project1.Duration, []*urepository.EditProjectMemberArgs{arg1})
+	mustExistProjectMember(t, projectRepo, project2.ID, project2.Duration, []*urepository.EditProjectMemberArgs{arg2})
+
+	expected3 := []*domain.UserProject{newUserProject(t, arg1, &project1.Project), newUserProject(t, arg2, &project2.Project)}
 	projects1, err := userRepo.GetProjects(context.Background(), user1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected3, projects1)
@@ -518,8 +533,8 @@ func TestUserRepository_GetContests(t *testing.T) {
 	user1 := mockdata.MockUsers[1]
 	user2 := mockdata.MockUsers[2]
 
-	mustAddContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
-	mustAddContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
+	mustExistContestTeamMembers(t, contestRepo, team1.ID, []uuid.UUID{user1.ID, user2.ID})
+	mustExistContestTeamMembers(t, contestRepo, team2.ID, []uuid.UUID{user1.ID})
 
 	expected1 := []*domain.UserContest{
 		newUserContest(t, &contest1.Contest, []*domain.ContestTeamWithoutMembers{&team1.ContestTeam.ContestTeamWithoutMembers}),
@@ -540,26 +555,23 @@ func TestUserRepository_GetContests(t *testing.T) {
 // func TestUserRepository_GetGroupsByUserID(t *testing.T) {
 // }
 
-func newUserProject(t *testing.T, args *urepository.CreateProjectMemberArgs, project *domain.Project) *domain.UserProject {
+func newUserProject(t *testing.T, args *urepository.EditProjectMemberArgs, project *domain.Project) *domain.UserProject {
 	t.Helper()
 	return &domain.UserProject{
 		ID:       project.ID,
 		Name:     project.Name,
 		Duration: project.Duration,
-		UserDuration: domain.YearWithSemesterDuration{
-			Since: domain.YearWithSemester{
-				Year:     args.SinceYear,
-				Semester: args.SinceSemester,
-			},
-			Until: domain.YearWithSemester{
-				Year:     args.UntilYear,
-				Semester: args.UntilSemester,
-			},
-		},
+		UserDuration: domain.NewYearWithSemesterDuration(
+			args.SinceYear,
+			args.SinceSemester,
+			args.UntilYear,
+			args.UntilSemester,
+		),
 	}
 }
 
 func newUserContest(t *testing.T, contest *domain.Contest, teams []*domain.ContestTeamWithoutMembers) *domain.UserContest {
+	t.Helper()
 	return &domain.UserContest{
 		ID:        contest.ID,
 		Name:      contest.Name,
