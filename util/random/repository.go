@@ -92,15 +92,6 @@ func OptUpdateProjectArgs() *repository.UpdateProjectArgs {
 	return &a
 }
 
-// CreateUserArgs
-func CreateUserArgs() *repository.CreateUserArgs {
-	return &repository.CreateUserArgs{
-		Description: AlphaNumeric(),
-		Check:       Bool(),
-		Name:        AlphaNumeric(),
-	}
-}
-
 // UpdateUserArgs 全てのフィールドがvalidなUpdateUserArgsを生成します
 func UpdateUserArgs() *repository.UpdateUserArgs {
 	a := repository.UpdateUserArgs{

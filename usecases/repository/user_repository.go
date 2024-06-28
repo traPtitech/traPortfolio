@@ -16,12 +16,6 @@ type GetUsersArgs struct {
 	Limit            optional.Of[int]
 }
 
-type CreateUserArgs struct {
-	Description string
-	Check       bool
-	Name        string
-}
-
 type UpdateUserArgs struct {
 	Description optional.Of[string]
 	Check       optional.Of[bool]
@@ -45,7 +39,6 @@ type UserRepository interface {
 	GetUsers(ctx context.Context, args *GetUsersArgs) ([]*domain.User, error)
 	SyncUsers(ctx context.Context) error
 	GetUser(ctx context.Context, userID uuid.UUID) (*domain.UserDetail, error)
-	CreateUser(ctx context.Context, args *CreateUserArgs) (*domain.UserDetail, error)
 	UpdateUser(ctx context.Context, userID uuid.UUID, args *UpdateUserArgs) error
 	GetAccounts(ctx context.Context, userID uuid.UUID) ([]*domain.Account, error)
 	GetAccount(ctx context.Context, userID uuid.UUID, accountID uuid.UUID) (*domain.Account, error)
