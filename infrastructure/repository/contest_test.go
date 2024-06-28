@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
@@ -325,18 +326,13 @@ func Test_GetContestTeamMembers(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("get team1 members", func(t *testing.T) {
-		portalUsers := []*external.PortalUserResponse{
-			{
-				TraQID:         traqUsers[0].Name,
-				RealName:       traqUsers[0].Name + " real",
-				AlphabeticName: traqUsers[0].Name + " alphabetic",
-			},
-			{
-				TraQID:         traqUsers[1].Name,
-				RealName:       traqUsers[1].Name + " real",
-				AlphabeticName: traqUsers[1].Name + " alphabetic",
-			},
-		}
+		portalUsers := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *external.PortalUserResponse {
+			return &external.PortalUserResponse{
+				TraQID:         u.Name,
+				RealName:       u.Name + " real",
+				AlphabeticName: u.Name + " alphabetic",
+			}
+		})
 		portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
 		expectedMembers := []*domain.User{
 			domain.NewUser(traqUsers[0].ID, traqUsers[0].Name, portalUsers[0].RealName, false),
@@ -381,18 +377,13 @@ func Test_EditContestTeamMembers(t *testing.T) {
 	err = userRepo.SyncUsers(context.Background())
 	assert.NoError(t, err)
 
-	portalUsers := []*external.PortalUserResponse{
-		{
-			TraQID:         traqUsers[0].Name,
-			RealName:       traqUsers[0].Name + " real",
-			AlphabeticName: traqUsers[0].Name + " alphabetic",
-		},
-		{
-			TraQID:         traqUsers[1].Name,
-			RealName:       traqUsers[1].Name + " real",
-			AlphabeticName: traqUsers[1].Name + " alphabetic",
-		},
-	}
+	portalUsers := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *external.PortalUserResponse {
+		return &external.PortalUserResponse{
+			TraQID:         u.Name,
+			RealName:       u.Name + " real",
+			AlphabeticName: u.Name + " alphabetic",
+		}
+	})
 	portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
 	users, err := userRepo.GetUsers(context.Background(), &repository.GetUsersArgs{})
 	assert.NoError(t, err)
