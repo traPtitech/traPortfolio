@@ -1161,7 +1161,6 @@ func TestContestHandler_EditContestTeamMembers(t *testing.T) {
 
 			reqBody, path := tt.setup(mr)
 
-			fmt.Printf("try: %s\n", tt.name)
 			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
