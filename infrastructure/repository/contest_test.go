@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/domain"
 	"github.com/traPtitech/traPortfolio/infrastructure/external"
@@ -295,26 +296,48 @@ func Test_GetContestTeamMembers(t *testing.T) {
 	userRepo := NewUserRepository(db, portalAPI, traqAPI)
 
 	// contest1 has a team (team1)
-	// team1 has two members (user1, user2)
+	// team1 has two members
 	contest1, err := repo.CreateContest(context.Background(), random.CreateContestArgs())
 	assert.NoError(t, err)
+
 	team1, err := repo.CreateContestTeam(context.Background(), contest1.ID, random.CreateContestTeamArgs())
 	assert.NoError(t, err)
-	createUserArgs1 := random.CreateUserArgs()
-	portalAPI.EXPECT().GetUserByTraqID(createUserArgs1.Name).Return(&external.PortalUserResponse{}, nil)
-	user1, err := userRepo.CreateUser(context.Background(), createUserArgs1)
+
+	traqUsers := []*external.TraQUserResponse{
+		{
+			ID:    random.UUID(),
+			Name:  "user1",
+			State: domain.TraqStateActive,
+			Bot:   false,
+		},
+		{
+			ID:    random.UUID(),
+			Name:  "user2",
+			State: domain.TraqStateActive,
+			Bot:   false,
+		},
+	}
+	traqAPI.EXPECT().GetUsers(&external.TraQGetAllArgs{IncludeSuspended: true}).Return(traqUsers, nil)
+	err = userRepo.SyncUsers(context.Background())
 	assert.NoError(t, err)
-	createUserArgs2 := random.CreateUserArgs()
-	portalAPI.EXPECT().GetUserByTraqID(createUserArgs2.Name).Return(&external.PortalUserResponse{}, nil)
-	user2, err := userRepo.CreateUser(context.Background(), createUserArgs2)
-	assert.NoError(t, err)
-	memberIDs := []uuid.UUID{user1.ID, user2.ID}
+
+	memberIDs := []uuid.UUID{traqUsers[0].ID, traqUsers[1].ID}
 	err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
 	assert.NoError(t, err)
 
 	t.Run("get team1 members", func(t *testing.T) {
-		expectedMembers := []*domain.User{&user1.User, &user2.User}
-		portalAPI.EXPECT().GetUsers().Return([]*external.PortalUserResponse{}, nil)
+		portalUsers := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *external.PortalUserResponse {
+			return &external.PortalUserResponse{
+				TraQID:         u.Name,
+				RealName:       u.Name + " real",
+				AlphabeticName: u.Name + " alphabetic",
+			}
+		})
+		portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
+		expectedMembers := []*domain.User{
+			domain.NewUser(traqUsers[0].ID, traqUsers[0].Name, portalUsers[0].RealName, false),
+			domain.NewUser(traqUsers[1].ID, traqUsers[1].Name, portalUsers[1].RealName, false),
+		}
 		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, expectedMembers, gotMembers)
@@ -330,26 +353,72 @@ func Test_EditContestTeamMembers(t *testing.T) {
 	traqAPI := mock_external.NewMockTraQAPI(gomock.NewController(t))
 	userRepo := NewUserRepository(db, portalAPI, traqAPI)
 
-	// contest1 has a team (team1)
-	// team1 has a member (user1)
 	contest1, err := repo.CreateContest(context.Background(), random.CreateContestArgs())
 	assert.NoError(t, err)
+
 	team1, err := repo.CreateContestTeam(context.Background(), contest1.ID, random.CreateContestTeamArgs())
 	assert.NoError(t, err)
-	createUserArgs1 := random.CreateUserArgs()
-	portalAPI.EXPECT().GetUserByTraqID(createUserArgs1.Name).Return(&external.PortalUserResponse{}, nil)
-	user1, err := userRepo.CreateUser(context.Background(), createUserArgs1)
-	assert.NoError(t, err)
-	memberIDs := []uuid.UUID{user1.ID}
-	err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
+
+	traqUsers := []*external.TraQUserResponse{
+		{
+			ID:    random.UUID(),
+			Name:  "user1",
+			State: domain.TraqStateActive,
+			Bot:   false,
+		},
+		{
+			ID:    random.UUID(),
+			Name:  "user2",
+			State: domain.TraqStateActive,
+			Bot:   false,
+		},
+	}
+	traqAPI.EXPECT().GetUsers(&external.TraQGetAllArgs{IncludeSuspended: true}).Return(traqUsers, nil)
+	err = userRepo.SyncUsers(context.Background())
 	assert.NoError(t, err)
 
-	t.Run("edit team1 members", func(t *testing.T) {
-		portalAPI.EXPECT().GetUsers().Return([]*external.PortalUserResponse{}, nil)
-		err := repo.EditContestTeamMembers(context.Background(), team1.ID, []uuid.UUID{})
+	portalUsers := lo.Map(traqUsers, func(u *external.TraQUserResponse, _ int) *external.PortalUserResponse {
+		return &external.PortalUserResponse{
+			TraQID:         u.Name,
+			RealName:       u.Name + " real",
+			AlphabeticName: u.Name + " alphabetic",
+		}
+	})
+	portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
+	users, err := userRepo.GetUsers(context.Background(), &repository.GetUsersArgs{})
+	assert.NoError(t, err)
+
+	t.Run("add a user to team1", func(t *testing.T) {
+		memberIDs := []uuid.UUID{users[0].ID}
+		err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
+		assert.NoError(t, err)
+
+		expectedMembers := []*domain.User{users[0]}
+		portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
+		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
+		assert.NoError(t, err)
+		assert.ElementsMatch(t, expectedMembers, gotMembers)
+	})
+
+	t.Run("add another user to team1", func(t *testing.T) {
+		memberIDs := []uuid.UUID{users[0].ID, users[1].ID}
+		err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
+		assert.NoError(t, err)
+
+		expectedMembers := []*domain.User{users[0], users[1]}
+		portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
+		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
+		assert.NoError(t, err)
+		assert.ElementsMatch(t, expectedMembers, gotMembers)
+	})
+
+	t.Run("delete all users from team1", func(t *testing.T) {
+		memberIDs := []uuid.UUID{}
+		err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
 		assert.NoError(t, err)
 
 		expectedMembers := []*domain.User{}
+		portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
 		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, expectedMembers, gotMembers)

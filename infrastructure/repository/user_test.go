@@ -194,58 +194,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}
 }
 
-func TestUserRepository_CreateUser(t *testing.T) {
-	t.Parallel()
-
-	db := SetupTestGormDB(t)
-	repo := NewUserRepository(db, mock_external_e2e.NewMockPortalAPI(), mock_external_e2e.NewMockTraQAPI())
-
-	type args struct {
-		args *urepository.CreateUserArgs
-	}
-
-	check := random.Bool()
-	description := random.AlphaNumeric()
-	cases := []struct {
-		name      string
-		args      args
-		expected  *domain.UserDetail
-		assertion assert.ErrorAssertionFunc
-	}{
-		{
-			name: "Success",
-			args: args{
-				args: &urepository.CreateUserArgs{
-					Description: description,
-					Check:       check,
-					Name:        mockdata.MockUsers[1].Name,
-				},
-			},
-			expected: &domain.UserDetail{
-				User: *domain.NewUser(
-					uuid.Nil, // ID is replaced by generated one.
-					mockdata.MockUsers[1].Name,
-					mockdata.MockPortalUsers[1].RealName,
-					check,
-				),
-				State:    mockdata.MockTraQUsers[1].State,
-				Bio:      description,
-				Accounts: []*domain.Account{},
-			},
-			assertion: assert.NoError,
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			user, err := repo.CreateUser(context.Background(), tc.args.args)
-			tc.expected.ID = user.ID
-			tc.assertion(t, err)
-			assert.Equal(t, tc.expected, user)
-		})
-	}
-}
-
 func TestUserRepository_UpdateUser(t *testing.T) {
 	t.Parallel()
 

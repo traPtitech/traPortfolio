@@ -52,21 +52,6 @@ func (mr *MockUserRepositoryMockRecorder) CreateAccount(ctx, userID, args interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockUserRepository)(nil).CreateAccount), ctx, userID, args)
 }
 
-// CreateUser mocks base method.
-func (m *MockUserRepository) CreateUser(ctx context.Context, args *repository.CreateUserArgs) (*domain.UserDetail, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", ctx, args)
-	ret0, _ := ret[0].(*domain.UserDetail)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateUser indicates an expected call of CreateUser.
-func (mr *MockUserRepositoryMockRecorder) CreateUser(ctx, args interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), ctx, args)
-}
-
 // DeleteAccount mocks base method.
 func (m *MockUserRepository) DeleteAccount(ctx context.Context, userID, accountID uuid.UUID) error {
 	m.ctrl.T.Helper()

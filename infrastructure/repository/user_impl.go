@@ -159,41 +159,6 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 	return &result, nil
 }
 
-// TODO: テスト用にしか使われていないので消すかテスト用であることを明示する
-func (r *UserRepository) CreateUser(ctx context.Context, args *repository.CreateUserArgs) (*domain.UserDetail, error) {
-	portalUser, err := r.portal.GetUserByTraqID(args.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	user := model.User{
-		// TODO: traQのUUIDを使うべきかも
-		ID:          uuid.Must(uuid.NewV4()),
-		Description: args.Description,
-		Check:       args.Check,
-		Name:        args.Name,
-		State:       domain.TraqStateActive,
-	}
-
-	err = r.h.WithContext(ctx).Create(&user).Error
-	if err != nil {
-		return nil, err
-	}
-
-	result := &domain.UserDetail{
-		User: *domain.NewUser(
-			user.ID,
-			user.Name,
-			portalUser.RealName,
-			user.Check,
-		),
-		State:    0,
-		Bio:      user.Description,
-		Accounts: []*domain.Account{},
-	}
-	return result, nil
-}
-
 func (r *UserRepository) UpdateUser(ctx context.Context, userID uuid.UUID, args *repository.UpdateUserArgs) error {
 	changes := map[string]interface{}{}
 	if v, ok := args.Description.V(); ok {
