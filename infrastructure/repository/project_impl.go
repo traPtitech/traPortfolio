@@ -257,15 +257,32 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 			UntilSemester: v.UntilSemester,
 		}
 		members = append(members, m)
+
+		delete(currentProjectMembersMap, v.UserID)
 	}
 
 	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		tx.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "id"}},
+			Columns:   []clause.Column{{Name: "project_id"}, {Name: "user_id"}},
 			DoUpdates: clause.AssignmentColumns([]string{"since_year", "since_semester", "until_year", "until_semester"}),
 		}).Create(&members)
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+
+	deletes := make([]uuid.UUID, 0, len(projectMembers))
+	for m := range currentProjectMembersMap {
+		deletes = append(deletes, m)
+	}
+
+	err = r.h.
+		WithContext(ctx).
+		Where(&model.ProjectMember{ProjectID: projectID}).
+		Where("`project_members`.`user_id` IN (?)", deletes).
+		Delete(&model.ProjectMember{}).
+		Error
 	if err != nil {
 		return err
 	}

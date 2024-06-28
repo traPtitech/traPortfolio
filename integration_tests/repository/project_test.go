@@ -224,7 +224,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 // func TestProjectRepository_AddProjectMembers(t *testing.T) {
 // }
 
-func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
+func TestProjectRepository_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 
 	db := testutils.SetupGormDB(t)
@@ -332,6 +332,8 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 			UntilSemester: dur1.Until.ValueOrZero().Semester,
 		},
 	})
+	assert.NoError(t, err)
+
 	expected2 := []*domain.UserWithDuration{projectMember3, projectMember4}
 	users2, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
