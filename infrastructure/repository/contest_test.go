@@ -309,7 +309,7 @@ func Test_GetContestTeamMembers(t *testing.T) {
 	user2, err := userRepo.CreateUser(context.Background(), createUserArgs2)
 	assert.NoError(t, err)
 	memberIDs := []uuid.UUID{user1.ID, user2.ID}
-	err = repo.AddContestTeamMembers(context.Background(), team1.ID, memberIDs)
+	err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
 	assert.NoError(t, err)
 
 	t.Run("get team1 members", func(t *testing.T) {
@@ -320,9 +320,6 @@ func Test_GetContestTeamMembers(t *testing.T) {
 		assert.ElementsMatch(t, expectedMembers, gotMembers)
 	})
 }
-
-// TODO: #675がmergeされたら消す
-func Test_AddContestTeamMembers(t *testing.T) {}
 
 func Test_EditContestTeamMembers(t *testing.T) {
 	t.Parallel()
@@ -344,7 +341,7 @@ func Test_EditContestTeamMembers(t *testing.T) {
 	user1, err := userRepo.CreateUser(context.Background(), createUserArgs1)
 	assert.NoError(t, err)
 	memberIDs := []uuid.UUID{user1.ID}
-	err = repo.AddContestTeamMembers(context.Background(), team1.ID, memberIDs)
+	err = repo.EditContestTeamMembers(context.Background(), team1.ID, memberIDs)
 	assert.NoError(t, err)
 
 	t.Run("edit team1 members", func(t *testing.T) {
