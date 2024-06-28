@@ -6,7 +6,6 @@ import (
 
 	urepository "github.com/traPtitech/traPortfolio/usecases/repository"
 
-	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
@@ -153,26 +152,51 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		mockdata.MockUsers[1].Check,
 	)
 
-	args1 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user1.ID, nil)
-	args2 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user2.ID, nil)
-	args3 := mustAddProjectMember(t, repo, project2.ID, project2.Duration, user2.ID, nil)
+	dur1 := random.DurationBetween(project1.Duration.Since, project1.Duration.Until.ValueOrZero())
+	dur2 := random.DurationBetween(project2.Duration.Since, project2.Duration.Until.ValueOrZero())
+
+	mustExistProjectMember(t, repo, project1.ID, project1.Duration, []*urepository.EditProjectMemberArgs{
+		{
+			UserID:        user1.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.ValueOrZero().Year,
+			UntilSemester: dur1.Until.ValueOrZero().Semester,
+		},
+		{
+			UserID:        user2.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.ValueOrZero().Year,
+			UntilSemester: dur1.Until.ValueOrZero().Semester,
+		},
+	})
+	mustExistProjectMember(t, repo, project2.ID, project2.Duration, []*urepository.EditProjectMemberArgs{
+		{
+			UserID:        user2.ID,
+			SinceYear:     dur2.Since.Year,
+			SinceSemester: dur2.Since.Semester,
+			UntilYear:     dur2.Until.ValueOrZero().Year,
+			UntilSemester: dur2.Until.ValueOrZero().Semester,
+		},
+	})
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
 		Duration: domain.NewYearWithSemesterDuration(
-			args1.SinceYear,
-			args1.SinceSemester,
-			args1.UntilYear,
-			args1.UntilSemester,
+			dur1.Since.Year,
+			dur1.Since.Semester,
+			dur1.Until.ValueOrZero().Year,
+			dur1.Until.ValueOrZero().Semester,
 		),
 	}
 	projectMember2 := &domain.UserWithDuration{
 		User: *user2,
 		Duration: domain.NewYearWithSemesterDuration(
-			args2.SinceYear,
-			args2.SinceSemester,
-			args2.UntilYear,
-			args2.UntilSemester,
+			dur1.Since.Year,
+			dur1.Since.Semester,
+			dur1.Until.ValueOrZero().Year,
+			dur1.Until.ValueOrZero().Semester,
 		),
 	}
 	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
@@ -183,10 +207,10 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	projectMember3 := &domain.UserWithDuration{
 		User: *user2,
 		Duration: domain.NewYearWithSemesterDuration(
-			args3.SinceYear,
-			args3.SinceSemester,
-			args3.UntilYear,
-			args3.UntilSemester,
+			dur2.Since.Year,
+			dur2.Since.Semester,
+			dur2.Until.ValueOrZero().Year,
+			dur2.Until.ValueOrZero().Semester,
 		),
 	}
 
@@ -200,7 +224,7 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 // func TestProjectRepository_AddProjectMembers(t *testing.T) {
 // }
 
-func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
+func TestProjectRepository_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 
 	db := testutils.SetupGormDB(t)
@@ -209,42 +233,64 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	repo := irepository.NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
 
 	project1 := mustMakeProjectDetail(t, repo, nil)
-	project2 := mustMakeProjectDetail(t, repo, nil)
 	user1 := domain.NewUser(
+		mockdata.MockUsers[0].ID,
+		mockdata.MockUsers[0].Name,
+		mockdata.MockPortalUsers[0].RealName,
+		mockdata.MockUsers[0].Check,
+	)
+	user2 := domain.NewUser(
 		mockdata.MockUsers[1].ID,
 		mockdata.MockUsers[1].Name,
 		mockdata.MockPortalUsers[1].RealName,
 		mockdata.MockUsers[1].Check,
 	)
-	user2 := domain.NewUser(
+	user3 := domain.NewUser(
 		mockdata.MockUsers[2].ID,
 		mockdata.MockUsers[2].Name,
 		mockdata.MockPortalUsers[2].RealName,
 		mockdata.MockUsers[2].Check,
 	)
 
-	args1 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user1.ID, nil)
-	args2 := mustAddProjectMember(t, repo, project1.ID, project1.Duration, user2.ID, nil)
-	args3 := mustAddProjectMember(t, repo, project2.ID, project2.Duration, user2.ID, nil)
+	dur1 := random.DurationBetween(project1.Duration.Since, project1.Duration.Until.ValueOrZero())
+	dur2 := random.DurationBetween(project1.Duration.Since, project1.Duration.Until.ValueOrZero())
+
+	mustExistProjectMember(t, repo, project1.ID, project1.Duration, []*urepository.EditProjectMemberArgs{
+		{
+			UserID:        user1.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.ValueOrZero().Year,
+			UntilSemester: dur1.Until.ValueOrZero().Semester,
+		},
+		{
+			UserID:        user2.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.ValueOrZero().Year,
+			UntilSemester: dur1.Until.ValueOrZero().Semester,
+		},
+	})
 
 	projectMember1 := &domain.UserWithDuration{
 		User: *user1,
 		Duration: domain.NewYearWithSemesterDuration(
-			args1.SinceYear,
-			args1.SinceSemester,
-			args1.UntilYear,
-			args1.UntilSemester,
+			dur1.Since.Year,
+			dur1.Since.Semester,
+			dur1.Until.ValueOrZero().Year,
+			dur1.Until.ValueOrZero().Semester,
 		),
 	}
 	projectMember2 := &domain.UserWithDuration{
 		User: *user2,
 		Duration: domain.NewYearWithSemesterDuration(
-			args2.SinceYear,
-			args2.SinceSemester,
-			args2.UntilYear,
-			args2.UntilSemester,
+			dur1.Since.Year,
+			dur1.Since.Semester,
+			dur1.Until.ValueOrZero().Year,
+			dur1.Until.ValueOrZero().Semester,
 		),
 	}
+
 	expected1 := []*domain.UserWithDuration{projectMember1, projectMember2}
 	users1, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
@@ -253,35 +299,43 @@ func TestProjectRepository_DeleteProjectMembers(t *testing.T) {
 	projectMember3 := &domain.UserWithDuration{
 		User: *user2,
 		Duration: domain.NewYearWithSemesterDuration(
-			args3.SinceYear,
-			args3.SinceSemester,
-			args3.UntilYear,
-			args3.UntilSemester,
+			dur2.Since.Year,
+			dur2.Since.Semester,
+			dur2.Until.ValueOrZero().Year,
+			dur2.Until.ValueOrZero().Semester,
 		),
 	}
-	expected2 := []*domain.UserWithDuration{projectMember3}
-	users2, err := repo.GetProjectMembers(context.Background(), project2.ID)
+
+	projectMember4 := &domain.UserWithDuration{
+		User: *user3,
+		Duration: domain.NewYearWithSemesterDuration(
+			dur1.Since.Year,
+			dur1.Since.Semester,
+			dur1.Until.ValueOrZero().Year,
+			dur1.Until.ValueOrZero().Semester,
+		),
+	}
+
+	err = repo.EditProjectMembers(context.Background(), project1.ID, []*urepository.EditProjectMemberArgs{
+		{
+			UserID:        user2.ID,
+			SinceYear:     dur2.Since.Year,
+			SinceSemester: dur2.Since.Semester,
+			UntilYear:     dur2.Until.ValueOrZero().Year,
+			UntilSemester: dur2.Until.ValueOrZero().Semester,
+		},
+		{
+			UserID:        user3.ID,
+			SinceYear:     dur1.Since.Year,
+			SinceSemester: dur1.Since.Semester,
+			UntilYear:     dur1.Until.ValueOrZero().Year,
+			UntilSemester: dur1.Until.ValueOrZero().Semester,
+		},
+	})
+	assert.NoError(t, err)
+
+	expected2 := []*domain.UserWithDuration{projectMember3, projectMember4}
+	users2, err := repo.GetProjectMembers(context.Background(), project1.ID)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected2, users2)
-
-	err = repo.DeleteProjectMembers(context.Background(), project1.ID, []uuid.UUID{projectMember1.User.ID})
-	assert.NoError(t, err)
-	expected3 := []*domain.UserWithDuration{projectMember2}
-	users3, err := repo.GetProjectMembers(context.Background(), project1.ID)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected3, users3)
-
-	err = repo.DeleteProjectMembers(context.Background(), project1.ID, []uuid.UUID{projectMember2.User.ID})
-	assert.NoError(t, err)
-	expected4 := []*domain.UserWithDuration{}
-	users4, err := repo.GetProjectMembers(context.Background(), project1.ID)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected4, users4)
-
-	err = repo.DeleteProjectMembers(context.Background(), project2.ID, []uuid.UUID{projectMember3.User.ID})
-	assert.NoError(t, err)
-	expected5 := []*domain.UserWithDuration{}
-	users5, err := repo.GetProjectMembers(context.Background(), project2.ID)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expected5, users5)
 }

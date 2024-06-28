@@ -200,11 +200,7 @@ func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uui
 	return res, nil
 }
 
-func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uuid.UUID, projectMembers []*repository.CreateProjectMemberArgs) error {
-	if len(projectMembers) == 0 {
-		return repository.ErrInvalidArg
-	}
-
+func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, projectMembers []*repository.EditProjectMemberArgs) error {
 	p := model.Project{}
 
 	// プロジェクトの存在チェック
@@ -219,32 +215,32 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 
 	projectDuration := domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester)
 
-	projectMembersMap := make(map[uuid.UUID]struct{}, len(projectMembers))
+	// プロジェクトの期間内かどうか
 	for _, v := range projectMembers {
 		memberDuration := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
-		// プロジェクトの期間内かどうか
 		if !projectDuration.Includes(memberDuration) {
 			return fmt.Errorf("%w: exceeded duration user", repository.ErrInvalidArg)
 		}
-		// 重複していないかどうか
-		if _, ok := projectMembersMap[v.UserID]; ok {
-			return fmt.Errorf("%w: duplicate user", repository.ErrInvalidArg)
-		}
-		projectMembersMap[v.UserID] = struct{}{}
 	}
 
-	mmbsMp := make(map[uuid.UUID]struct{}, len(projectMembers))
-	_mmbs := make([]*model.ProjectMember, 0, len(projectMembers))
+	currentProjectMembers := make([]*model.ProjectMember, 0, len(projectMembers))
 	err = r.h.
 		WithContext(ctx).
 		Where(&model.ProjectMember{ProjectID: projectID}).
-		Find(&_mmbs).
+		Find(&currentProjectMembers).
 		Error
-	if err != nil {
+	if err != nil && err != repository.ErrNotFound {
 		return err
 	}
-	for _, v := range _mmbs {
-		mmbsMp[v.UserID] = struct{}{}
+
+	currentProjectMembersMap := make(map[uuid.UUID]*model.ProjectMember, len(projectMembers))
+	for _, v := range currentProjectMembers {
+		currentProjectMembersMap[v.UserID] = &model.ProjectMember{
+			SinceYear:     v.SinceYear,
+			SinceSemester: v.SinceSemester,
+			UntilYear:     v.UntilYear,
+			UntilSemester: v.UntilSemester,
+		}
 	}
 
 	members := make([]*model.ProjectMember, 0, len(projectMembers))
@@ -264,7 +260,32 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 
 	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, v := range members {
-			if _, ok := mmbsMp[v.UserID]; ok {
+			// 既に登録されていたら更新を試し、そうでなければ新規作成
+			if vdb, ok := currentProjectMembersMap[v.UserID]; ok {
+				changes := map[string]interface{}{}
+				if v.SinceYear != vdb.SinceYear {
+					changes["since_year"] = v.SinceYear
+				}
+				if v.SinceSemester != vdb.SinceSemester {
+					changes["since_semester"] = v.SinceSemester
+				}
+				if v.UntilYear != vdb.UntilYear {
+					changes["until_year"] = v.UntilYear
+				}
+				if v.UntilSemester != vdb.UntilSemester {
+					changes["until_semester"] = v.UntilSemester
+				}
+				if len(changes) > 0 {
+					err = tx.WithContext(ctx).
+						Model(&model.ProjectMember{}).
+						Where(&model.ProjectMember{ProjectID: projectID, UserID: v.UserID}).
+						Updates(changes).
+						Error
+					if err != nil {
+						return err
+					}
+				}
+				delete(currentProjectMembersMap, v.UserID)
 				continue
 			}
 			err = tx.WithContext(ctx).Create(v).Error
@@ -272,36 +293,21 @@ func (r *ProjectRepository) AddProjectMembers(ctx context.Context, projectID uui
 				return err
 			}
 		}
+		// 残っているものは削除
+		for _, member := range currentProjectMembers {
+			if _, ok := currentProjectMembersMap[member.UserID]; !ok {
+				continue
+			}
+			err = tx.WithContext(ctx).
+				Where(&model.ProjectMember{ProjectID: projectID, UserID: member.UserID}).
+				Delete(&model.ProjectMember{}).
+				Error
+			if err != nil {
+				return err
+			}
+		}
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *ProjectRepository) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, members []uuid.UUID) error {
-	if len(members) == 0 {
-		return repository.ErrInvalidArg
-	}
-
-	// プロジェクトの存在チェック
-	err := r.h.
-		WithContext(ctx).
-		Where(&model.Project{ID: projectID}).
-		First(&model.Project{}).
-		Error
-	if err != nil {
-		return err
-	}
-
-	err = r.h.
-		WithContext(ctx).
-		Where(&model.ProjectMember{ProjectID: projectID}).
-		Where("`project_members`.`user_id` IN (?)", members).
-		Delete(&model.ProjectMember{}).
-		Error
 	if err != nil {
 		return err
 	}

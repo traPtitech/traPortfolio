@@ -604,27 +604,6 @@ paths:
           description: Not Found
       operationId: getContestTeamMembers
       description: コンテストチームメンバーを取得します
-    post:
-      summary: コンテストチームメンバーの追加
-      operationId: addContestTeamMembers
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-      description: コンテストチームメンバーを追加します
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MemberIDs"
-      tags:
-        - contest
-        - user
     put:
       summary: コンテストチームメンバーの修正
       operationId: editContestTeamMembers
@@ -640,7 +619,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MemberIDs"
+              $ref: "#/components/schemas/EditContestTeamMembersRequest"
       tags:
         - contest
         - user
@@ -721,10 +700,10 @@ paths:
                   $ref: "#/components/schemas/ProjectMember"
       operationId: getProjectMembers
       description: プロジェクトメンバーを取得します
-    post:
-      summary: プロジェクトメンバーの追加
-      operationId: addProjectMembers
-      description: プロジェクトメンバーを追加します
+    put:
+      summary: プロジェクトメンバーの編集
+      operationId: editProjectMembers
+      description: プロジェクトメンバーを編集します
       responses:
         "204":
           description: No Content
@@ -738,28 +717,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddProjectMembersRequest"
-      tags:
-        - project
-        - user
-    delete:
-      summary: プロジェクトメンバーの削除
-      operationId: deleteProjectMembers
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-      description: プロジェクトメンバーを削除します
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MemberIDs"
+              $ref: "#/components/schemas/EditProjectMembersRequest"
       tags:
         - project
         - user
@@ -1313,20 +1271,6 @@ components:
       required:
         - userId
         - duration
-    MemberIDs:
-      title: MemberIDs
-      type: object
-      description: ユーザーのUUIDの配列
-      properties:
-        members:
-          type: array
-          description: ユーザーのUUIDの配列
-          items:
-            type: string
-            format: uuid
-            x-go-type: uuid.UUID
-      required:
-        - members
     EditUserRequest:
       title: EditUserRequest
       type: object
@@ -1428,10 +1372,10 @@ components:
           description: プロジェクト説明
         duration:
           $ref: "#/components/schemas/YearWithSemesterDuration"
-    AddProjectMembersRequest:
-      title: AddProjectMembersRequest
+    EditProjectMembersRequest:
+      title: EditProjectMembersRequest
       type: object
-      description: プロジェクトメンバー追加リクエスト
+      description: プロジェクトメンバー変更リクエスト
       properties:
         members:
           type: array
@@ -1518,6 +1462,20 @@ components:
         result:
           type: string
           description: 順位などの結果
+    EditContestTeamMembersRequest:
+      title: EditContestTeamMembersRequest
+      type: object
+      description: コンテストチームメンバー修正リクエスト
+      properties:
+        members:
+          type: array
+          description: ユーザーのUUIDの配列
+          items:
+            type: string
+            format: uuid
+            x-go-type: uuid.UUID
+      required:
+        - members
   parameters:
     userIdInPath:
       name: userId

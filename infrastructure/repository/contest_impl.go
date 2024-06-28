@@ -462,54 +462,6 @@ func (r *ContestRepository) GetContestTeamMembers(ctx context.Context, contestID
 	return result, nil
 }
 
-func (r *ContestRepository) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, members []uuid.UUID) error {
-	if len(members) == 0 {
-		return repository.ErrInvalidArg
-	}
-
-	// 存在チェック
-	err := r.h.
-		WithContext(ctx).
-		Where(&model.ContestTeam{ID: teamID}).
-		First(&model.ContestTeam{}).
-		Error
-	if err != nil {
-		return err
-	}
-
-	// 既に所属しているメンバーを検索
-	belongingsMap := make(map[uuid.UUID]struct{}, len(members))
-	_belongings := make([]*model.ContestTeamUserBelonging, 0, len(members))
-	err = r.h.
-		WithContext(ctx).
-		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
-		Find(&_belongings).
-		Error
-	if err != nil {
-		return err
-	}
-	for _, v := range _belongings {
-		belongingsMap[v.UserID] = struct{}{}
-	}
-
-	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, memberID := range members {
-			if _, ok := belongingsMap[memberID]; ok {
-				continue
-			}
-			err = tx.WithContext(ctx).Create(&model.ContestTeamUserBelonging{TeamID: teamID, UserID: memberID}).Error
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (r *ContestRepository) EditContestTeamMembers(ctx context.Context, teamID uuid.UUID, members []uuid.UUID) error {
 	// 存在チェック
 	err := r.h.

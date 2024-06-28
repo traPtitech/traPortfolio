@@ -37,20 +37,6 @@ func (m *MockContestRepository) EXPECT() *MockContestRepositoryMockRecorder {
 	return m.recorder
 }
 
-// AddContestTeamMembers mocks base method.
-func (m *MockContestRepository) AddContestTeamMembers(ctx context.Context, teamID uuid.UUID, memberIDs []uuid.UUID) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddContestTeamMembers", ctx, teamID, memberIDs)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// AddContestTeamMembers indicates an expected call of AddContestTeamMembers.
-func (mr *MockContestRepositoryMockRecorder) AddContestTeamMembers(ctx, teamID, memberIDs interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddContestTeamMembers", reflect.TypeOf((*MockContestRepository)(nil).AddContestTeamMembers), ctx, teamID, memberIDs)
-}
-
 // CreateContest mocks base method.
 func (m *MockContestRepository) CreateContest(ctx context.Context, args *repository.CreateContestArgs) (*domain.ContestDetail, error) {
 	m.ctrl.T.Helper()

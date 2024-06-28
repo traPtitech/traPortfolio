@@ -286,21 +286,21 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 	}
 }
 
-func TestProjectHandler_AddProjectMembers(t *testing.T) {
+func TestProjectHandler_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string)
+		setup      func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string)
 		statusCode int
 	}{
 		{
-			name: "Success",
-			setup: func(mr MockRepository) (*schema.AddProjectMembersRequest, string) {
+			name: "Success: Add Member",
+			setup: func(mr MockRepository) (*schema.EditProjectMembersRequest, string) {
 				projectID := random.UUID()
 				userID := random.UUID()
 				userDuration := random.Duration()
-				reqBody := &schema.AddProjectMembersRequest{
+				reqBody := &schema.EditProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.ConvertDuration(userDuration),
@@ -308,7 +308,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				memberReq := []*repository.CreateProjectMemberArgs{
+				memberReq := []*repository.EditProjectMemberArgs{
 					{
 						UserID:        userID,
 						SinceYear:     userDuration.Since.Year,
@@ -317,14 +317,23 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						UntilSemester: userDuration.Until.ValueOrZero().Semester,
 					},
 				}
-				mr.project.EXPECT().AddProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
+				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, memberReq).Return(nil)
 				return reqBody, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
-			statusCode: http.StatusOK,
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Success: Delete All Members",
+			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
+				projectID := random.UUID()
+				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.EditProjectMemberArgs{}).Return(nil)
+				return &schema.EditProjectMembersRequest{Members: []schema.MemberIDWithYearWithSemesterDuration{}}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusNoContent,
 		},
 		{
 			name: "BadRequest: Invalid Project ID",
-			setup: func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				return nil, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
@@ -332,18 +341,18 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 		},
 		{
 			name: "BadRequest: invalid request body: member is empty",
-			setup: func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
 				projectID := random.UUID()
-				return &schema.AddProjectMembersRequest{}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+				return &schema.EditProjectMembersRequest{}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
 			},
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name: "BadRequest: invalid request body: memberID is invalid",
-			setup: func(mr MockRepository) (reqBody *schema.AddProjectMembersRequest, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
 				projectID := random.UUID()
 				duration := random.Duration()
-				return &schema.AddProjectMembersRequest{
+				return &schema.EditProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.ConvertDuration(duration),
@@ -355,12 +364,51 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 		},
 		{
+			name: "BadRequest: invalid request body: duplicated user",
+			setup: func(mr MockRepository) (reqBody *schema.EditProjectMembersRequest, path string) {
+				projectID := random.UUID()
+				userID := random.UUID()
+				duration := random.Duration()
+				return &schema.EditProjectMembersRequest{
+					Members: []schema.MemberIDWithYearWithSemesterDuration{
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.ValueOrZero().Semester),
+									Year:     duration.Until.ValueOrZero().Year,
+								},
+							},
+							UserId: userID,
+						},
+						{
+							Duration: schema.YearWithSemesterDuration{
+								Since: schema.YearWithSemester{
+									Semester: schema.Semester(duration.Since.Semester),
+									Year:     duration.Since.Year,
+								},
+								Until: &schema.YearWithSemester{
+									Semester: schema.Semester(duration.Until.ValueOrZero().Semester),
+									Year:     duration.Until.ValueOrZero().Year,
+								},
+							},
+							UserId: userID,
+						},
+					},
+				}, fmt.Sprintf("/api/v1/projects/%s/members", projectID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		{
 			name: "BadRequest: invalid request body: member is already exists",
-			setup: func(mr MockRepository) (*schema.AddProjectMembersRequest, string) {
+			setup: func(mr MockRepository) (*schema.EditProjectMembersRequest, string) {
 				userID := random.UUID()
 				projectID := random.UUID()
 				duration := random.Duration()
-				reqBody := &schema.AddProjectMembersRequest{
+				reqBody := &schema.EditProjectMembersRequest{
 					Members: []schema.MemberIDWithYearWithSemesterDuration{
 						{
 							Duration: schema.ConvertDuration(duration),
@@ -368,7 +416,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 						},
 					},
 				}
-				mr.project.EXPECT().AddProjectMembers(anyCtx{}, projectID, []*repository.CreateProjectMemberArgs{
+				mr.project.EXPECT().EditProjectMembers(anyCtx{}, projectID, []*repository.EditProjectMemberArgs{
 					{
 						UserID:        userID,
 						SinceYear:     int(duration.Since.Year),
@@ -390,7 +438,7 @@ func TestProjectHandler_AddProjectMembers(t *testing.T) {
 
 			reqBody, path := tt.setup(s)
 
-			statusCode, _ := doRequest(t, api, http.MethodPost, path, reqBody, nil)
+			statusCode, _ := doRequest(t, api, http.MethodPut, path, reqBody, nil)
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)

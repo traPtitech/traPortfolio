@@ -37,20 +37,6 @@ func (m *MockProjectRepository) EXPECT() *MockProjectRepositoryMockRecorder {
 	return m.recorder
 }
 
-// AddProjectMembers mocks base method.
-func (m *MockProjectRepository) AddProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.CreateProjectMemberArgs) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddProjectMembers", ctx, projectID, args)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// AddProjectMembers indicates an expected call of AddProjectMembers.
-func (mr *MockProjectRepositoryMockRecorder) AddProjectMembers(ctx, projectID, args interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProjectMembers", reflect.TypeOf((*MockProjectRepository)(nil).AddProjectMembers), ctx, projectID, args)
-}
-
 // CreateProject mocks base method.
 func (m *MockProjectRepository) CreateProject(ctx context.Context, args *repository.CreateProjectArgs) (*domain.ProjectDetail, error) {
 	m.ctrl.T.Helper()
@@ -66,18 +52,18 @@ func (mr *MockProjectRepositoryMockRecorder) CreateProject(ctx, args interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectRepository)(nil).CreateProject), ctx, args)
 }
 
-// DeleteProjectMembers mocks base method.
-func (m *MockProjectRepository) DeleteProjectMembers(ctx context.Context, projectID uuid.UUID, memberIDs []uuid.UUID) error {
+// EditProjectMembers mocks base method.
+func (m *MockProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.EditProjectMemberArgs) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteProjectMembers", ctx, projectID, memberIDs)
+	ret := m.ctrl.Call(m, "EditProjectMembers", ctx, projectID, args)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteProjectMembers indicates an expected call of DeleteProjectMembers.
-func (mr *MockProjectRepositoryMockRecorder) DeleteProjectMembers(ctx, projectID, memberIDs interface{}) *gomock.Call {
+// EditProjectMembers indicates an expected call of EditProjectMembers.
+func (mr *MockProjectRepositoryMockRecorder) EditProjectMembers(ctx, projectID, args interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProjectMembers", reflect.TypeOf((*MockProjectRepository)(nil).DeleteProjectMembers), ctx, projectID, memberIDs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditProjectMembers", reflect.TypeOf((*MockProjectRepository)(nil).EditProjectMembers), ctx, projectID, args)
 }
 
 // GetProject mocks base method.

@@ -195,21 +195,22 @@ func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// AddProjectMembers POST /projects/:projectID/members
-func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
+// EditProjectMembers POST /projects/:projectID/members
+func (h *ProjectHandler) EditProjectMembers(c echo.Context) error {
 	projectID, err := getID(c, keyProject)
 	if err != nil {
 		return err
 	}
 
-	req := schema.AddProjectMembersRequest{}
+	req := schema.EditProjectMembersRequest{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
 
-	createReq := make([]*repository.CreateProjectMemberArgs, 0, len(req.Members))
+	createMap := make(map[uuid.UUID]struct{}, len(req.Members))
+	createReq := make([]*repository.EditProjectMemberArgs, 0, len(req.Members))
 	for _, v := range req.Members {
-		m := &repository.CreateProjectMemberArgs{
+		m := &repository.EditProjectMemberArgs{
 			UserID:        v.UserId,
 			SinceYear:     int(v.Duration.Since.Year),
 			SinceSemester: int(v.Duration.Since.Semester),
@@ -220,37 +221,23 @@ func (h *ProjectHandler) AddProjectMembers(c echo.Context) error {
 			m.UntilSemester = int(v.Duration.Until.Semester)
 		}
 
+		// 設定された期間が有効かチェック
 		d := domain.NewYearWithSemesterDuration(m.SinceYear, m.SinceSemester, m.UntilYear, m.UntilSemester)
 		if !d.IsValid() {
 			return repository.ErrInvalidArg
 		}
 
+		// 重複していないかどうか
+		if _, ok := createMap[m.UserID]; ok {
+			return repository.ErrInvalidArg
+		}
+
 		createReq = append(createReq, m)
+		createMap[m.UserID] = struct{}{}
 	}
 
 	ctx := c.Request().Context()
-	err = h.project.AddProjectMembers(ctx, projectID, createReq)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// DeleteProjectMembers DELETE /projects/:projectID/members
-func (h *ProjectHandler) DeleteProjectMembers(c echo.Context) error {
-	projectID, err := getID(c, keyProject)
-	if err != nil {
-		return err
-	}
-
-	req := schema.MemberIDs{}
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
-
-	ctx := c.Request().Context()
-	err = h.project.DeleteProjectMembers(ctx, projectID, req.Members)
+	err = h.project.EditProjectMembers(ctx, projectID, createReq)
 	if err != nil {
 		return err
 	}
