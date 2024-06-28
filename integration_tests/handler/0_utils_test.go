@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http/httptest"
 	"reflect"
@@ -12,8 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/infrastructure/migration"
 	"github.com/traPtitech/traPortfolio/infrastructure/repository"
-	"github.com/traPtitech/traPortfolio/integration_tests/testutils"
 	"github.com/traPtitech/traPortfolio/interfaces/handler"
 	"github.com/traPtitech/traPortfolio/util/config"
 	"github.com/traPtitech/traPortfolio/util/mockdata"
@@ -55,17 +56,54 @@ func injectIntoAPIServer(t *testing.T, c *config.Config, db *gorm.DB) (handler.A
 func setupRoutes(t *testing.T, e *echo.Echo) *handler.API {
 	t.Helper()
 
-	db := testutils.SetupGormDB(t)
+	db := SetupGormDB(t)
 	err := mockdata.InsertSampleDataToDB(db)
 	assert.NoError(t, err)
 
-	api, err := injectIntoAPIServer(t, testutils.Config, db)
+	api, err := injectIntoAPIServer(t, testConfig, db)
 	assert.NoError(t, err)
 
 	err = handler.Setup(false, e, api)
 	assert.NoError(t, err)
 
 	return &api
+}
+
+func SetupGormDB(t *testing.T) *gorm.DB {
+	t.Helper()
+
+	db := establishTestDBConnection(t)
+	dropAll(t, db)
+	init, err := migration.Migrate(db, migration.AllTables())
+	assert.True(t, init)
+	assert.NoError(t, err)
+
+	return db
+}
+
+func establishTestDBConnection(t *testing.T) *gorm.DB {
+	t.Helper()
+
+	sqlConf := testConfig.DB
+	sqlConf.Name = "portfolio_test_" + t.Name()
+
+	_, err := testDB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", sqlConf.Name))
+	assert.NoError(t, err)
+
+	db, err := repository.NewGormDB(sqlConf)
+	assert.NoError(t, err)
+
+	return db
+}
+
+func dropAll(t *testing.T, db *gorm.DB) {
+	t.Helper()
+
+	tables := []interface{}{"migrations"}
+	tables = append(tables, migration.AllTables()...)
+
+	err := db.Migrator().DropTable(tables...)
+	assert.NoError(t, err)
 }
 
 func doRequest(t *testing.T, e *echo.Echo, method string, path string, body interface{}) *httptest.ResponseRecorder {
