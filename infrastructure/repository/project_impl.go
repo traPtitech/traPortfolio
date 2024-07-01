@@ -219,7 +219,7 @@ func (r *ProjectRepository) EditProjectMembers(ctx context.Context, projectID uu
 	for _, v := range projectMembers {
 		memberDuration := domain.NewYearWithSemesterDuration(v.SinceYear, v.SinceSemester, v.UntilYear, v.UntilSemester)
 		if !projectDuration.Includes(memberDuration) {
-			return fmt.Errorf("%w: exceeded duration user", repository.ErrInvalidArg)
+			return fmt.Errorf("%w: exceeded duration user(project: %+v, member: %+v)", repository.ErrInvalidArg, projectDuration, memberDuration)
 		}
 	}
 

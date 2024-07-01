@@ -411,7 +411,7 @@ func TestEditProjectMembers(t *testing.T) {
 					},
 				},
 			},
-			httpError(t, "Bad Request: argument error: exceeded duration user"),
+			httpError(t, "Bad Request: argument error: exceeded duration user(project: {Since:{Year:2021 Semester:0} Until:{v:{Year:2021 Semester:1} valid:true}}, member: {Since:{Year:2021 Semester:0} Until:{v:{Year:2024 Semester:1} valid:true}})"), // TODO: improve message
 		},
 	}
 
