@@ -142,37 +142,42 @@ func Test_YearWithSemesterDuration_Includes(t *testing.T) {
 		in   YearWithSemesterDuration
 		want bool
 	}{
-		"out.Since <= in.Since <= in.Until <= out.Until": {
+		"ok: out.Since <= in.Since <= in.Until <= out.Until": {
 			out:  NewYearWithSemesterDuration(1970, 0, 2000, 1),
 			in:   NewYearWithSemesterDuration(1980, 0, 1990, 1),
 			want: true,
 		},
-		"out.Since > in.Since": {
+		"ng: out.Since > in.Since": {
 			out:  NewYearWithSemesterDuration(1980, 0, 2000, 1),
 			in:   NewYearWithSemesterDuration(1970, 0, 1990, 1),
 			want: false,
 		},
-		"out.Until < in.Until": {
+		"ng: out.Until < in.Until": {
 			out:  NewYearWithSemesterDuration(1970, 0, 2000, 1),
 			in:   NewYearWithSemesterDuration(1980, 0, 2010, 1),
 			want: false,
 		},
-		"out.Until is nil": {
+		"ok: out.Until is nil": {
 			out:  NewYearWithSemesterDuration(1970, 0, 0, 0),
 			in:   NewYearWithSemesterDuration(1980, 0, 2000, 1),
 			want: true,
 		},
-		"in.Until is nil": {
+		"ng: in.Until is nil": {
 			out:  NewYearWithSemesterDuration(1970, 0, 2000, 1),
 			in:   NewYearWithSemesterDuration(1980, 0, 0, 0),
 			want: false,
 		},
-		"out is invalid": {
+		"ok: out.Until and in.Until are both nil": {
+			out:  NewYearWithSemesterDuration(1970, 0, 0, 0),
+			in:   NewYearWithSemesterDuration(1980, 0, 0, 0),
+			want: true,
+		},
+		"ng: out is invalid": {
 			out:  NewYearWithSemesterDuration(2000, 0, 1999, 0),
 			in:   NewYearWithSemesterDuration(1980, 0, 1990, 1),
 			want: false,
 		},
-		"in is invalid": {
+		"ng: in is invalid": {
 			out:  NewYearWithSemesterDuration(1970, 0, 2000, 1),
 			in:   NewYearWithSemesterDuration(1980, 0, 1979, 0),
 			want: false,
