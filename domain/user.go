@@ -134,7 +134,7 @@ func IsValidAccountURL(accountType AccountType, URL string) bool {
 		PIXIV:      regexp.MustCompile(`^https://www\.pixiv\.net/users/[0-9]+`),
 		GITHUB:     regexp.MustCompile(`^https://github\.com/[a-zA-Z0-9-]+$`),
 		QIITA:      regexp.MustCompile(`^https://qiita\.com/[a-zA-Z0-9-_]+$`),
-		ZENN:       regexp.MustCompile(`^https://zenn\.dev/[a-zA-Z0-9.-_]+$`),
+		ZENN:       regexp.MustCompile(`^https://zenn\.dev/[a-z0-9_]+$`),
 		ATCODER:    regexp.MustCompile(`^https://atcoder\.jp/users/[a-zA-Z0-9_]+$`),
 		SOUNDCLOUD: regexp.MustCompile(`^https://soundcloud\.com/[a-z0-9-_]+$`),
 		HACKTHEBOX: regexp.MustCompile(`^https://app\.hackthebox\.com/users/[a-zA-Z0-9]+$`),
