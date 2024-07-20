@@ -52,33 +52,6 @@ func TestUserRepository_GetUsers(t *testing.T) {
 			assertion: assert.NoError,
 		},
 		{
-			name: "All IncludeSuspended",
-			args: args{args: &urepository.GetUsersArgs{
-				IncludeSuspended: optional.From(true),
-			}},
-			expected: []*domain.User{
-				domain.NewUser(
-					mockdata.MockUsers[0].ID,
-					mockdata.MockUsers[0].Name,
-					mockdata.MockPortalUsers[0].RealName,
-					mockdata.MockUsers[0].Check,
-				),
-				domain.NewUser(
-					mockdata.MockUsers[1].ID,
-					mockdata.MockUsers[1].Name,
-					mockdata.MockPortalUsers[1].RealName,
-					mockdata.MockUsers[1].Check,
-				),
-				domain.NewUser(
-					mockdata.MockUsers[2].ID,
-					mockdata.MockUsers[2].Name,
-					mockdata.MockPortalUsers[2].RealName,
-					mockdata.MockUsers[2].Check,
-				),
-			},
-			assertion: assert.NoError,
-		},
-		{
 			name: "Name",
 			args: args{args: &urepository.GetUsersArgs{
 				Name: optional.From(mockdata.MockTraQUsers[0].Name),
@@ -92,15 +65,6 @@ func TestUserRepository_GetUsers(t *testing.T) {
 				),
 			},
 			assertion: assert.NoError,
-		},
-		{
-			name: "Invalid arg",
-			args: args{args: &urepository.GetUsersArgs{
-				Name:             optional.From(mockdata.MockTraQUsers[0].Name),
-				IncludeSuspended: optional.From(true),
-			}},
-			expected:  nil,
-			assertion: assert.Error,
 		},
 	}
 

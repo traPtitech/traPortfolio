@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/gofrs/uuid"
 	"github.com/samber/lo"
@@ -32,18 +31,14 @@ func NewUserRepository(h *gorm.DB, portalAPI external.PortalAPI, traQAPI externa
 func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsersArgs) ([]*domain.User, error) {
 	limit := args.Limit.ValueOr(-1)
 	tx := r.h.WithContext(ctx).Limit(limit)
-	includeSuspended, iok := args.IncludeSuspended.V()
-	name, nok := args.Name.V()
-	if iok && nok {
-		return nil, fmt.Errorf("%w: you must not specify both includeSuspended and name", repository.ErrInvalidArg)
-	} else if nok {
-		tx = tx.Where(&model.User{Name: name})
-	} else if !(iok && includeSuspended) {
-		tx = tx.Where(&model.User{State: domain.TraqStateActive})
+
+	userFilter := model.User{State: domain.TraqStateActive} // TODO: 凍結済みユーザーも許可があれば表示できるようにする
+	if name, ok := args.Name.V(); ok {
+		userFilter.Name = name
 	}
 
 	users := make([]*model.User, 0)
-	if err := tx.Find(&users).Error; err != nil {
+	if err := tx.Where(&userFilter).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
@@ -121,7 +116,10 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 	err := r.h.
 		WithContext(ctx).
 		Preload("Accounts").
-		Where(&model.User{ID: userID}).
+		Where(&model.User{
+			ID:    userID,
+			State: domain.TraqStateActive, // TODO: 凍結済みユーザーも許可があれば表示できるようにする
+		}).
 		First(user).
 		Error
 	if err != nil {

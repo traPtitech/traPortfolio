@@ -30,9 +30,8 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	args := repository.GetUsersArgs{
-		IncludeSuspended: optional.FromPtr((*bool)(req.IncludeSuspended)),
-		Name:             optional.FromPtr((*string)(req.Name)),
-		Limit:            optional.FromPtr((*int)(req.Limit)),
+		Name:  optional.FromPtr((*string)(req.Name)),
+		Limit: optional.FromPtr((*int)(req.Limit)),
 	}
 
 	users, err := h.user.GetUsers(ctx, &args)

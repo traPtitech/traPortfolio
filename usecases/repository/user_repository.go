@@ -11,7 +11,6 @@ import (
 )
 
 type GetUsersArgs struct {
-	IncludeSuspended optional.Of[bool]
 	Name             optional.Of[string]
 	Limit            optional.Of[int]
 }
