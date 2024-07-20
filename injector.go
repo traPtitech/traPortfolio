@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/traPtitech/traPortfolio/infrastructure/external"
-	"github.com/traPtitech/traPortfolio/infrastructure/external/mock_external_e2e"
-	"github.com/traPtitech/traPortfolio/infrastructure/repository"
-	"github.com/traPtitech/traPortfolio/interfaces/handler"
-	"github.com/traPtitech/traPortfolio/util/config"
+	"github.com/traPtitech/traPortfolio/internal/handler"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/external"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/external/mock_external_e2e"
+	"github.com/traPtitech/traPortfolio/internal/infrastructure/repository"
+	"github.com/traPtitech/traPortfolio/internal/pkgs/config"
 	"gorm.io/gorm"
 )
 
