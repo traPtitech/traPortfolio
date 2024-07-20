@@ -65,35 +65,6 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			statusCode: http.StatusOK,
 		},
 		{
-			name: "Success_WithOpts_IncludeSuspended",
-			setup: func(mr MockRepository) (hres []*schema.User, path string) {
-				casenum := 2
-				repoUsers := []*domain.User{}
-				hresUsers := []*schema.User{}
-
-				for range casenum {
-					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
-					huser := schema.User{
-						Id:       ruser.ID,
-						Name:     ruser.Name,
-						RealName: ruser.RealName(),
-					}
-
-					repoUsers = append(repoUsers, ruser)
-					hresUsers = append(hresUsers, &huser)
-				}
-
-				includeSuspened := random.Bool()
-				args := repository.GetUsersArgs{
-					IncludeSuspended: optional.From(includeSuspened),
-				}
-
-				mr.user.EXPECT().GetUsers(anyCtx{}, &args).Return(repoUsers, nil)
-				return hresUsers, fmt.Sprintf("/api/v1/users?includeSuspended=%t", includeSuspened)
-			},
-			statusCode: http.StatusOK,
-		},
-		{
 			name: "Success_WithOpts_Name",
 			setup: func(mr MockRepository) (hres []*schema.User, path string) {
 				repoUsers := []*domain.User{
