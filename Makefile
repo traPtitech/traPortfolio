@@ -36,7 +36,7 @@ check: all lint test-all db-lint openapi-lint
 test: ${GOFILES} test-unit
 
 test-unit: ${GOFILES}
-	go test ${GOTEST_FLAGS} $$(go list ./... | grep -v "integration_tests")
+	go test ${GOTEST_FLAGS} ./internal/...
 
 test-integration: ${GOFILES} up-db-container
 	go test ${GOTEST_FLAGS} ./integration_tests/...
