@@ -55,7 +55,6 @@ Build the binary.
 ```bash
 BINARY=./traPortfolio
 rm -f $BINARY
-go clean
 go mod download
 go build -o $BINARY
 ```
