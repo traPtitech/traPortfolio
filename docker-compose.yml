@@ -4,6 +4,13 @@ services:
   backend:
     build: ./
     restart: always
+    environment:
+      TPF_PORT: "1323"
+      TPF_DB_USER: "root"
+      TPF_DB_PASS: "password"
+      TPF_DB_HOST: "mysql"
+      TPF_DB_NAME: "portfolio"
+      TPF_DB_PORT: "3306"
     ports:
       - "1323:1323"
     depends_on:
