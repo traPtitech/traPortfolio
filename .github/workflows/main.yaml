@@ -111,7 +111,7 @@ jobs:
       - name: Run database linter
         run: |
           chmod +x ./traPortfolio
-          ./traPortfolio -c ./dev/config.yaml --only-migrate
+          ./traPortfolio --only-migrate
           tbls lint
   spectral:
     name: Spectral

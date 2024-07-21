@@ -1,8 +1,0 @@
-port: 1323
-insertMockData: false
-db:
-  user: 'root'
-  pass: 'password'
-  host: 'localhost'
-  name: 'portfolio'
-  port: 3306

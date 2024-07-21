@@ -1,6 +1,5 @@
 GOFILES=$(wildcard *.go **/*.go)
 BINARY=./bin/traPortfolio
-GO_RUN := ${BINARY} -c ./dev/config.yaml
 GOTEST_FLAGS := -v -cover -race
 
 GOLANGCI_LINT_VERSION := latest
@@ -51,7 +50,7 @@ go-gen:
 	@go generate -x ./...
 
 migrate: ${BINARY} up-db-container
-	@${GO_RUN} --only-migrate
+	@${BINARY} --only-migrate
 
 db-gen-docs: migrate
 	@${RM} -rf ./docs/dbschema
