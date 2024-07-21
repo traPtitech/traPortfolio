@@ -36,8 +36,6 @@ See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
 docker compose up
 ```
 
-Tips: You can change the configuration by rewriting [./dev/config.yaml](./dev/config.yaml)
-
 Now you can access to
 
 - <http://localhost:1323> for backend server.
