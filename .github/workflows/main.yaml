@@ -106,7 +106,7 @@ jobs:
         with:
           name: traPortfolio
       - name: Setup MySQL container
-        run: make up-db-container
+        run: docker compose up -d --wait mysql
       - uses: k1low/setup-tbls@v1
       - name: Run database linter
         run: |
