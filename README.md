@@ -89,7 +89,10 @@ go test -v -cover -race ./integration_tests/...
 
 ### test:all
 
+Run all tests.
+
 Requires: test:unit, test:integration
+RunDeps: async
 
 ### db:migrate
 
