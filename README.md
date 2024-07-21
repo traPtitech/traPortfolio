@@ -27,6 +27,13 @@ See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
 docker compose up
 ```
 
+or
+
+```bash
+# enable live reload
+docker compose watch
+```
+
 Now you can access to
 
 - <http://localhost:1323> for backend server.
@@ -47,17 +54,6 @@ Usable tasks are below.
 > ```bash
 > go install github.com/joerdav/xc/cmd/xc@latest
 > ```
-
-### build
-
-Build the binary.
-
-```bash
-BINARY=./traPortfolio
-rm -f $BINARY
-go mod download
-go build -o $BINARY
-```
 
 ### gen
 
