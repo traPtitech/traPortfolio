@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/traPtitech/traPortfolio/util/config"
-	"github.com/traPtitech/traPortfolio/util/testutils"
+	"github.com/traPtitech/traPortfolio/internal/pkgs/config"
+	"github.com/traPtitech/traPortfolio/internal/pkgs/testutils"
 )
 
 var (

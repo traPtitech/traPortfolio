@@ -48,7 +48,7 @@ jobs:
         with:
           go-version-file: ./go.mod
       - name: Run tests
-        run: go test $(go list ./... | grep -v "integration_tests") -coverprofile=coverage_unit.txt -race -vet=off
+        run: go test ./internal/... -coverprofile=coverage_unit.txt -race -vet=off
       - uses: actions/upload-artifact@v4
         with:
           name: coverage_unit

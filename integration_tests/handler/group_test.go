@@ -6,9 +6,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/traPtitech/traPortfolio/interfaces/handler/schema"
-	"github.com/traPtitech/traPortfolio/util/mockdata"
-	"github.com/traPtitech/traPortfolio/util/random"
+	"github.com/traPtitech/traPortfolio/internal/handler/schema"
+	"github.com/traPtitech/traPortfolio/internal/pkgs/mockdata"
+	"github.com/traPtitech/traPortfolio/internal/pkgs/random"
 )
 
 // GetGroups GET /groups
