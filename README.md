@@ -16,24 +16,22 @@ If you want to contribute to traPortfolio, then follow these pages.
 - [API schema](./docs/swagger/traPortfolio.v1.yaml)
 - [DB schema](./docs/dbschema)
 
-### Quick start with DevContainer (Recommended)
+### Quick start with DevContainer
 
 If you use VSCode, you can use [DevContainer](https://code.visualstudio.com/docs/remote/containers) to develop traPortfolio.
 See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
-
-### Requirements (for local development)
-
-- Bash
-- make
-- Docker
-- Docker Compose
-- Go
-- MySQL
 
 ### Start docker container (with Docker Compose)
 
 ```bash
 docker compose up
+```
+
+or
+
+```bash
+# enable live reload
+docker compose watch
 ```
 
 Now you can access to
@@ -45,62 +43,91 @@ Now you can access to
   - database: `portfolio`
   - port: `3306`
 
-### Run locally
+## Tasks
 
-**NOTE**: Make sure `backend` container is stopped because of port conflicts
+Usable tasks are below.
+
+> [!TIP]
+> You can use `xc` to run the following tasks easily.
+> See <https://xcfile.dev> for more details.
+>
+> ```bash
+> go install github.com/joerdav/xc/cmd/xc@latest
+> ```
+
+### gen
+
+Generate code.
 
 ```bash
-make up-db-container
-go run main.go -c ./dev/config.yaml
+go generate -x ./...
 ```
 
-Tips: You can change the configuration by
+### lint
 
-- Specifying it with flags (Run `go run main.go --help`)
-- Rewriting [./dev/config.yaml](dev/config.yaml)
-
-### Generate DB docs
+Run linter (golangci-lint).
 
 ```bash
-make db-gen-docs
+go run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run --fix ./...
 ```
 
-### Run linters
+### test:unit
 
-#### DB linter (tbls)
+Run unit tests.
 
 ```bash
-make db-lint
+go test -v -cover -race ./internal/...
 ```
 
-#### OpenAPI linter (spectral)
+### test:integration
+
+Run integration tests.
 
 ```bash
-make openapi-lint
+go test -v -cover -race ./integration_tests/...
 ```
 
-#### Go linter (golangci-lint)
+### test:all
+
+Run all tests.
+
+Requires: test:unit, test:integration
+RunDeps: async
+
+### db:migrate
+
+Migrate the database.
 
 ```bash
-make lint
+# TODO: use environment variables for config
+docker compose run --build --entrypoint "/traPortfolio -c /opt/traPortfolio/config.yaml --db-host mysql --only-migrate" backend
 ```
 
-### Run tests
+### db:gen-docs
 
-#### Unit tests
+Generate database schema documentation with tbls.
+
+Requires: db:migrate
 
 ```bash
-make test
+rm -rf ./docs/dbschema
+go run github.com/k1LoW/tbls@latest doc
 ```
 
-#### Integration tests
+### db:lint
+
+Lint the database schema with tbls.
+
+Requires: db:migrate
 
 ```bash
-make test-integration
+go run github.com/k1LoW/tbls@latest lint
 ```
 
-If you want to test both of them, run the following command.
+### openapi:lint
+
+Lint the OpenAPI schema with Spectral.
 
 ```bash
-make test-all
+docker run --rm -it -w /tmp -v $PWD:/tmp stoplight/spectral:latest lint ./docs/swagger/traPortfolio.v1.yaml
 ```
