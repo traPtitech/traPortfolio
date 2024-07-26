@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate Image Tags
-        uses: docker/metadata-action
+        uses: docker/metadata-action@v5
         id: meta
         with:
           images: ghcr.io/traptitech/${{ env.IMAGE_NAME }}
