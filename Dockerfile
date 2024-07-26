@@ -7,11 +7,14 @@ FROM golang:1.22.4-alpine AS build
 
 WORKDIR /app
 
-COPY ./go.mod ./go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
+  --mount=type=bind,source=go.sum,target=go.sum \
+  --mount=type=bind,source=go.mod,target=go.mod \
+  go mod download
 
-COPY ./ ./
-RUN go build -o /traPortfolio .
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+  --mount=type=bind,target=. \
+  go build -o /traPortfolio
 
 ##
 ## Deployment stage
@@ -22,4 +25,7 @@ WORKDIR /
 
 COPY --from=build /traPortfolio /traPortfolio
 
-ENTRYPOINT /traPortfolio
+ENV TPF_DB_PORT="1323"
+EXPOSE ${TPF_DB_PORT}
+
+ENTRYPOINT ["/traPortfolio"]
