@@ -8,6 +8,12 @@
   - [traPtitech/traPortfolio-UI](https://github.com/traPtitech/traPortfolio-UI)
   - [traPtitech/traPortfolio-Dashboard](https://github.com/traPtitech/traPortfolio-Dashboard)
 
+## Requirements
+
+- Go 1.22.5 or later
+- Docker 27.1.0 or later
+- Docker Compose 2.22.0 or later
+
 ## Quick Start
 
 ```bash
