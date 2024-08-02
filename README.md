@@ -2,29 +2,22 @@
 
 [![GitHub release](https://img.shields.io/github/release/traPtitech/traPortfolio.svg?logo=github)](https://GitHub.com/traPtitech/traPortfolio/releases/) [![CI](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/main.yaml) [![Build image](https://github.com/traPtitech/traPortfolio/actions/workflows/image.yaml/badge.svg)](https://github.com/traPtitech/traPortfolio/actions/workflows/image.yaml) [![codecov](https://codecov.io/gh/traPtitech/traPortfolio/branch/main/graph/badge.svg?token=2HB6P7RUX8)](https://codecov.io/gh/traPtitech/traPortfolio) [![OpenAPI](https://img.shields.io/badge/OpenAPI-apis.trap.jp-6BA539?logo=openapiinitiative)](https://apis.trap.jp/?urls.primaryName=traPortfolio)
 
-- Backend
+- Backend repository
   - [traPtitech/traPortfolio](https://github.com/traPtitech/traPortfolio) (this repository)
-- Frontend
+- Frontend repositories
   - [traPtitech/traPortfolio-UI](https://github.com/traPtitech/traPortfolio-UI)
   - [traPtitech/traPortfolio-Dashboard](https://github.com/traPtitech/traPortfolio-Dashboard)
 
-## Develop environment
+## Requirements
 
-If you want to contribute to traPortfolio, then follow these pages.
+- Go 1.22.5 or later
+- Docker 27.1.0 or later
+- Docker Compose 2.22.0 or later
 
-- [Architecture memo (in Japanese)](./docs/architecture.md)
-- [API schema](./docs/swagger/traPortfolio.v1.yaml)
-- [DB schema](./docs/dbschema)
-
-### Quick start with DevContainer
-
-If you use VSCode, you can use [DevContainer](https://code.visualstudio.com/docs/remote/containers) to develop traPortfolio.
-See [./.devcontainer/README.md](./.devcontainer/README.md) for more details.
-
-### Start docker container (with Docker Compose)
+## Quick Start
 
 ```bash
-docker compose up
+docker compose up # --build -d
 ```
 
 or
@@ -42,6 +35,14 @@ Now you can access to
   - password: `password`
   - database: `portfolio`
   - port: `3306`
+
+## Contributing
+
+If you want to contribute to traPortfolio, then follow these pages.
+
+- [Architecture memo (in Japanese)](./docs/architecture.md)
+- [API schema](./docs/swagger/traPortfolio.v1.yaml)
+- [DB schema](./docs/dbschema)
 
 ## Tasks
 
