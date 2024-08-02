@@ -1,6 +1,8 @@
 module github.com/traPtitech/traPortfolio
 
-go 1.22.0
+go 1.22
+
+toolchain go1.22.5
 
 require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
