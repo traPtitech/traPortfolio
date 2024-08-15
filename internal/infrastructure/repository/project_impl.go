@@ -166,11 +166,26 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 }
 
 func (r *ProjectRepository) DeleteProject(ctx context.Context, projectID uuid.UUID) error {
-	err := r.h.
-		WithContext(ctx).
-		Where(&model.Project{ID: projectID}).
-		Delete(&model.Project{}).
-		Error
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.
+			WithContext(ctx).
+			Where(&model.Project{ID: projectID}).
+			Delete(&model.Project{}).
+			Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.
+			WithContext(ctx).
+			Where(&model.ProjectMember{ProjectID: projectID}).
+			Delete(&model.ProjectMember{}).
+			Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}
