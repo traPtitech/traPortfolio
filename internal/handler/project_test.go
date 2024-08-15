@@ -286,6 +286,48 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 	}
 }
 
+func TestProjectHandler_DeleteProject(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		setup      func(mr MockRepository) (path string)
+		statusCode int
+	}{
+		{
+			name: "Success",
+			setup: func(mr MockRepository) (path string) {
+				projectID := random.UUID()
+				mr.project.EXPECT().DeleteProject(anyCtx{}, projectID).Return(nil)
+				return fmt.Sprintf("/api/v1/projects/%s", projectID)
+			},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name: "Bad Request: Invalid Project ID",
+			setup: func(mr MockRepository) (path string) {
+				return fmt.Sprintf("/api/v1/projects/%s", invalidID)
+			},
+			statusCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			s, api := setupProjectMock(t)
+
+			path := tt.setup(s)
+
+			statusCode, _ := doRequest(t, api, http.MethodDelete, path, nil, nil)
+
+			// Assertion
+			assert.Equal(t, tt.statusCode, statusCode)
+		})
+	}
+}
+
 func TestProjectHandler_EditProjectMembers(t *testing.T) {
 	t.Parallel()
 

@@ -43,6 +43,7 @@ type ProjectRepository interface {
 	GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error)
 	CreateProject(ctx context.Context, args *CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(ctx context.Context, projectID uuid.UUID, args *UpdateProjectArgs) error
+	DeleteProject(ctx context.Context, projectID uuid.UUID) error
 	GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error)
 	EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*EditProjectMemberArgs) error
 }

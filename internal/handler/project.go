@@ -171,6 +171,22 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// DeleteProject DELETE /projects/:projectID
+func (h *ProjectHandler) DeleteProject(c echo.Context) error {
+	projectID, err := getID(c, keyProject)
+	if err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	err = h.project.DeleteProject(ctx, projectID)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 // GetProjectMembers GET /projects/:projectID/members
 func (h *ProjectHandler) GetProjectMembers(c echo.Context) error {
 	projectID, err := getID(c, keyProject)

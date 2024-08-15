@@ -165,6 +165,19 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 	return nil
 }
 
+func (r *ProjectRepository) DeleteProject(ctx context.Context, projectID uuid.UUID) error {
+	err := r.h.
+		WithContext(ctx).
+		Where(&model.Project{ID: projectID}).
+		Delete(&model.Project{}).
+		Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *ProjectRepository) GetProjectMembers(ctx context.Context, projectID uuid.UUID) ([]*domain.UserWithDuration, error) {
 	members := make([]*model.ProjectMember, 0)
 	err := r.h.

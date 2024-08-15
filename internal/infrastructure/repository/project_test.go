@@ -127,6 +127,22 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 	}
 }
 
+func TestProjectRepository_DeleteProject(t *testing.T) {
+	t.Parallel()
+
+	db := SetupTestGormDB(t)
+	repo := NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
+
+	project1 := mustMakeProjectDetail(t, repo, nil)
+	mustMakeProjectDetail(t, repo, nil)
+
+	err := repo.DeleteProject(context.Background(), project1.ID)
+	assert.NoError(t, err)
+
+	_, err = repo.GetProject(context.Background(), project1.ID)
+	assert.Error(t, err)
+}
+
 func TestProjectRepository_GetProjectMembers(t *testing.T) {
 	t.Parallel()
 
