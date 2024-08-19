@@ -313,7 +313,6 @@ func TestProjectHandler_DeleteProject(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup mock
 			s, api := setupProjectMock(t)

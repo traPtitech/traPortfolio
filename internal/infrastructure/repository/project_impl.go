@@ -170,6 +170,15 @@ func (r *ProjectRepository) DeleteProject(ctx context.Context, projectID uuid.UU
 		err := tx.
 			WithContext(ctx).
 			Where(&model.Project{ID: projectID}).
+			First(&model.Project{}).
+			Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.
+			WithContext(ctx).
+			Where(&model.Project{ID: projectID}).
 			Delete(&model.Project{}).
 			Error
 		if err != nil {
