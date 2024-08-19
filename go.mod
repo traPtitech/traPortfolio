@@ -1,6 +1,8 @@
 module github.com/traPtitech/traPortfolio
 
-go 1.22.0
+go 1.22
+
+toolchain go1.22.5
 
 require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
@@ -13,13 +15,13 @@ require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/samber/lo v1.44.0
+	github.com/samber/lo v1.46.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/traPtitech/go-traq v0.0.0-20240224021219-538059ee2fa7
 	gorm.io/driver/mysql v1.5.7
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.25.11
 )
 
 require (
