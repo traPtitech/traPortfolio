@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid"
@@ -106,7 +107,19 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 	}
 	p.Link = args.Link.ValueOr(p.Link)
 
-	err := r.h.WithContext(ctx).Create(&p).Error
+	// 既に同名のプロジェクトが存在するか
+	err := r.h.
+		WithContext(ctx).
+		Where(&model.Project{Name: p.Name}).
+		First(&model.Project{}).
+		Error
+	if err == nil {
+		return nil, repository.ErrAlreadyExists
+	} else if !errors.Is(err, repository.ErrNotFound) {
+		return nil, err
+	}
+
+	err = r.h.WithContext(ctx).Create(&p).Error
 	if err != nil {
 		return nil, err
 	}

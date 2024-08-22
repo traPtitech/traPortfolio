@@ -64,6 +64,19 @@ func OptUpdateContestTeamArgs() *repository.UpdateContestTeamArgs {
 	return &a
 }
 
+// CreateProjectArgs 全てのフィールドがvalidなCreateProjectArgsを生成します
+func CreateProjectArgs() *repository.CreateProjectArgs {
+	return &repository.CreateProjectArgs{
+		Name:          AlphaNumeric(),
+		Description:   AlphaNumeric(),
+		Link:          Optional(RandURLString()),
+		SinceYear:     2100,
+		SinceSemester: 0,
+		UntilYear:     2100,
+		UntilSemester: 1,
+	}
+}
+
 // UpdateProjectArgs 全てのフィールドがvalidなUpdateProjectArgsを生成します
 func UpdateProjectArgs() *repository.UpdateProjectArgs {
 	a := repository.UpdateProjectArgs{

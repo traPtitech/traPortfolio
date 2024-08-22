@@ -86,6 +86,7 @@ func TestCreateProject(t *testing.T) {
 		tooLongName             = strings.Repeat("亜", 33)
 		tooLongDescriptionKanji = strings.Repeat("亜", 257)
 		duration                = schema.ConvertDuration(random.Duration())
+		projectAlreadyExists    = random.CreateProjectArgs()
 	)
 
 	t.Parallel()
@@ -179,6 +180,15 @@ func TestCreateProject(t *testing.T) {
 			},
 			httpError(t, "Bad Request: argument error"),
 		},
+		"400 project already exists": {
+			http.StatusBadRequest,
+			schema.CreateProjectRequest{
+				Name:        projectAlreadyExists.Name,
+				Link:        &link,
+				Description: description,
+			},
+			httpError(t, "Bad Request: argument error"),
+		},
 	}
 
 	e := echo.New()
@@ -186,6 +196,7 @@ func TestCreateProject(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+			_ = doRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject), &projectAlreadyExists)
 			res := doRequest(t, e, http.MethodPost, e.URL(api.Project.CreateProject), &tt.reqBody)
 			switch want := tt.want.(type) {
 			case schema.Project:
