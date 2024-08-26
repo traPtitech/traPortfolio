@@ -16,7 +16,7 @@ func v2() *gormigrate.Migration {
 	return &gormigrate.Migration{
 		ID: "2",
 		Migrate: func(db *gorm.DB) error {
-			if err := db.AutoMigrate(&v2Project{}, &v2Contest{}); err != nil {
+			if err := db.AutoMigrate(&v2Project{}, &v2Contest{}, &v2ContestTeam{}); err != nil {
 				return err
 			}
 
@@ -147,4 +147,21 @@ type v2Contest struct {
 
 func (*v2Contest) TableName() string {
 	return "contests"
+}
+
+type v2ContestTeam struct {
+	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	ContestID   uuid.UUID `gorm:"type:char(36);not null"`
+	Name        string    `gorm:"type:varchar(128)"`
+	Description string    `gorm:"type:text"`
+	Result      string    `gorm:"type:text"`
+	Link        string    `gorm:"type:text"`
+	CreatedAt   time.Time `gorm:"precision:6"`
+	UpdatedAt   time.Time `gorm:"precision:6"`
+
+	Contest model.Contest `gorm:"foreignKey:ContestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+func (*v2ContestTeam) TableName() string {
+	return "contest_teams"
 }
