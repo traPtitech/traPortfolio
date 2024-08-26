@@ -49,8 +49,8 @@ jobs:
           go-version-file: ./go.mod
       - name: Run tests
         run: |
-          go test ./internal/... -coverprofile=coverage_unit.txt -race -vet=off
-          grep -v "mock_" < coverage_unit.txt > coverage_unit.txt
+          go test ./internal/... -coverprofile=coverage_unit.tmp.txt -race -vet=off
+          grep -v "mock_" < coverage_unit.tmp.txt > coverage_unit.txt
       - uses: actions/upload-artifact@v4
         with:
           name: coverage_unit
@@ -67,8 +67,8 @@ jobs:
           go-version-file: ./go.mod
       - name: Run tests
         run: |
-          go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.txt -race -vet=off
-          grep -v "mock_" < coverage_integration.txt > coverage_integration.txt
+          go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.tmp.txt -race -vet=off
+          grep -v "mock_" < coverage_integration.tmp.txt > coverage_integration.txt
       - uses: actions/upload-artifact@v4
         with:
           name: coverage_integration
