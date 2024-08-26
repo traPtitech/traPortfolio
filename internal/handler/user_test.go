@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"github.com/traPtitech/traPortfolio/internal/handler/schema"
@@ -16,6 +15,7 @@ import (
 	"github.com/traPtitech/traPortfolio/internal/pkgs/random"
 	"github.com/traPtitech/traPortfolio/internal/usecases/repository"
 	"github.com/traPtitech/traPortfolio/internal/usecases/repository/mock_repository"
+	"go.uber.org/mock/gomock"
 )
 
 func setupUserMock(t *testing.T) (MockRepository, API) {
