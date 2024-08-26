@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/golang/mock/gomock"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"github.com/traPtitech/traPortfolio/internal/infrastructure/external"
 	"github.com/traPtitech/traPortfolio/internal/infrastructure/external/mock_external"
+	"go.uber.org/mock/gomock"
 
 	"github.com/traPtitech/traPortfolio/internal/pkgs/random"
 	"github.com/traPtitech/traPortfolio/internal/usecases/repository"

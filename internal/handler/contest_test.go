@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"github.com/traPtitech/traPortfolio/internal/handler/schema"
