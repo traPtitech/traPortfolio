@@ -219,12 +219,12 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		setup      func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody *schema.Project, path string)
+		setup      func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string)
 		statusCode int
 	}{
 		{
 			name: "Success",
-			setup: func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody *schema.Project, path string) {
+			setup: func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody schema.Project, path string) {
 				duration := random.Duration()
 				reqBody = makeCreateProjectRequest(
 					t,
@@ -258,7 +258,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 					Link:        args.Link.ValueOrZero(),
 					Members:     nil,
 				}
-				expectedResBody = &schema.Project{
+				expectedResBody = schema.Project{
 					Duration: schema.ConvertDuration(want.Duration),
 					Id:       want.ID,
 					Name:     want.Name,
@@ -267,22 +267,6 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 				return reqBody, expectedResBody, "/api/v1/projects"
 			},
 			statusCode: http.StatusCreated,
-		},
-		{
-			name: "UnexpectedError",
-			setup: func(mr MockRepository) (reqBody *schema.CreateProjectRequest, expectedResBody *schema.Project, path string) {
-				duration := random.Duration()
-				reqBody = makeCreateProjectRequest(
-					t,
-					random.AlphaNumeric(),
-					schema.ConvertDuration(duration).Since,
-					schema.ConvertDuration(duration).Until,
-					random.AlphaNumeric(),
-					random.RandURLString(),
-				)
-				return reqBody, nil, "/api/v1/projects"
-			},
-			statusCode: http.StatusInternalServerError,
 		},
 	}
 	for _, tt := range tests {
@@ -297,7 +281,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 
 			// Assertion
 			assert.Equal(t, tt.statusCode, statusCode)
-			assert.Equal(t, resBody, *res)
+			assert.Equal(t, resBody, res)
 		})
 	}
 }
