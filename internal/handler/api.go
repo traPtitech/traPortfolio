@@ -79,6 +79,7 @@ func setupV1API(g *echo.Group, api API, isProduction bool) {
 		projectAPI.POST("", api.Project.CreateProject)
 		projectAPI.GET("/:projectID", api.Project.GetProject)
 		projectAPI.PATCH("/:projectID", api.Project.EditProject)
+		projectAPI.DELETE("/:projectID", api.Project.DeleteProject)
 		projectAPI.GET("/:projectID/members", api.Project.GetProjectMembers)
 		projectAPI.PUT("/:projectID/members", api.Project.EditProjectMembers)
 	}

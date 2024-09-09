@@ -9,6 +9,7 @@ import (
 func Migrations() []*gormigrate.Migration {
 	return []*gormigrate.Migration{
 		v1(),
+		v2(), // プロジェクト名とコンテスト名の重複禁止と文字数制限増加(32->128)
 	}
 }
 

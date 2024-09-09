@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid"
@@ -106,7 +107,19 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 	}
 	p.Link = args.Link.ValueOr(p.Link)
 
-	err := r.h.WithContext(ctx).Create(&p).Error
+	// 既に同名のプロジェクトが存在するか
+	err := r.h.
+		WithContext(ctx).
+		Where(&model.Project{Name: p.Name}).
+		First(&model.Project{}).
+		Error
+	if err == nil {
+		return nil, repository.ErrAlreadyExists
+	} else if !errors.Is(err, repository.ErrNotFound) {
+		return nil, err
+	}
+
+	err = r.h.WithContext(ctx).Create(&p).Error
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +186,43 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		Where(&model.Project{ID: projectID}).
 		Updates(changes).
 		Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ProjectRepository) DeleteProject(ctx context.Context, projectID uuid.UUID) error {
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.
+			WithContext(ctx).
+			Where(&model.Project{ID: projectID}).
+			First(&model.Project{}).
+			Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.
+			WithContext(ctx).
+			Where(&model.Project{ID: projectID}).
+			Delete(&model.Project{}).
+			Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.
+			WithContext(ctx).
+			Where(&model.ProjectMember{ProjectID: projectID}).
+			Delete(&model.ProjectMember{}).
+			Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}

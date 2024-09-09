@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -81,7 +82,19 @@ func (r *ContestRepository) CreateContest(ctx context.Context, args *repository.
 		Until:       args.Until.ValueOrZero(),
 	}
 
-	err := r.h.WithContext(ctx).Create(contest).Error
+	// 既に同名のコンテストが存在するか
+	err := r.h.
+		WithContext(ctx).
+		Where(&model.Contest{Name: contest.Name}).
+		First(&model.Contest{}).
+		Error
+	if err == nil {
+		return nil, repository.ErrAlreadyExists
+	} else if !errors.Is(err, repository.ErrNotFound) {
+		return nil, err
+	}
+
+	err = r.h.WithContext(ctx).Create(contest).Error
 	if err != nil {
 		return nil, err
 	}

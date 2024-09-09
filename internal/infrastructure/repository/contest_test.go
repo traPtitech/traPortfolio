@@ -64,7 +64,37 @@ func Test_GetContest(t *testing.T) {
 	})
 }
 
-func Test_CreateContest(t *testing.T) {}
+func Test_CreateContest(t *testing.T) {
+	t.Parallel()
+
+	db := SetupTestGormDB(t)
+	portalAPI := mock_external.NewMockPortalAPI(gomock.NewController(t))
+	repo := NewContestRepository(db, portalAPI)
+
+	t.Run("create a contest", func(t *testing.T) {
+		ctx := context.Background()
+		args := random.CreateContestArgs()
+		contest, err := repo.CreateContest(ctx, args)
+		assert.NoError(t, err)
+
+		gotContest, err := repo.GetContest(ctx, contest.ID)
+		assert.NoError(t, err)
+		assert.Equal(t, contest, gotContest)
+	})
+
+	t.Run("create contests which name duplicated", func(t *testing.T) {
+		ctx := context.Background()
+		arg1 := random.CreateContestArgs()
+		arg2 := random.CreateContestArgs()
+		arg2.Name = arg1.Name
+
+		_, err := repo.CreateContest(ctx, arg1)
+		assert.NoError(t, err)
+
+		_, err = repo.CreateContest(ctx, arg2)
+		assert.Error(t, err)
+	})
+}
 
 func Test_UpdateContest(t *testing.T) {
 	t.Parallel()
