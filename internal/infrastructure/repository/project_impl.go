@@ -125,6 +125,15 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 }
 
 func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UUID, args *repository.UpdateProjectArgs) error {
+	origin := &model.Project{}
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.Project{ID: projectID}).
+		First(origin).
+		Error; err != nil {
+		return err
+	}
+
 	changes := map[string]interface{}{}
 	if v, ok := args.Name.V(); ok {
 		changes["name"] = v
@@ -141,10 +150,16 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 			changes["since_semester"] = ss
 		}
 	}
-	if uy, ok := args.UntilYear.V(); ok {
-		if us, ok := args.UntilSemester.V(); ok {
-			changes["until_year"] = uy
-			changes["until_semester"] = us
+	untilYear, validYear := args.UntilYear.V()
+	untilSemester, validSemester := args.UntilSemester.V()
+	if validYear == validSemester {
+		originUntil := domain.YearWithSemester{Year: origin.UntilYear, Semester: origin.UntilSemester}
+		argUntil := domain.YearWithSemester{Year: int(args.UntilYear.ValueOrZero()), Semester: int(args.UntilSemester.ValueOrZero())}
+		originValid := originUntil.IsValid()
+		// Untilが未定かどうかの状態が異なるか、Untilが異なる場合に更新
+		if validYear != originValid || (validYear && argUntil != originUntil) {
+			changes["until_year"] = untilYear
+			changes["until_semester"] = untilSemester
 		}
 	}
 
