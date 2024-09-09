@@ -33,15 +33,14 @@ func v2() *gormigrate.Migration {
 				}
 
 				updates := make(map[uuid.UUID]string, len(projects))
-				noDuplicate := false
-				for !noDuplicate {
-					noDuplicate = true
-					for name, arr := range projectMap {
-						if len(arr) <= 1 {
+				for {
+					noDuplicate := true
+					for name, ids := range projectMap {
+						if len(ids) <= 1 {
 							continue
 						}
 						noDuplicate = false
-						for i, pid := range arr {
+						for i, pid := range ids {
 							if i == 0 {
 								projectMap[name] = []uuid.UUID{pid}
 								continue
@@ -50,6 +49,9 @@ func v2() *gormigrate.Migration {
 							updates[pid] = nameNew
 							projectMap[nameNew] = append(projectMap[nameNew], pid)
 						}
+					}
+					if noDuplicate {
+						break
 					}
 				}
 
@@ -81,12 +83,12 @@ func v2() *gormigrate.Migration {
 				noDuplicate := false
 				for !noDuplicate {
 					noDuplicate = true
-					for name, arr := range contestMap {
-						if len(arr) <= 1 {
+					for name, ids := range contestMap {
+						if len(ids) <= 1 {
 							continue
 						}
 						noDuplicate = false
-						for i, cid := range arr {
+						for i, cid := range ids {
 							if i == 0 {
 								contestMap[name] = []uuid.UUID{cid}
 								continue
@@ -152,7 +154,7 @@ func (*v2Contest) TableName() string {
 type v2ContestTeam struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	ContestID   uuid.UUID `gorm:"type:char(36);not null"`
-	Name        string    `gorm:"type:varchar(128)"`
+	Name        string    `gorm:"type:varchar(128)"` // 制限増加 (32->128)
 	Description string    `gorm:"type:text"`
 	Result      string    `gorm:"type:text"`
 	Link        string    `gorm:"type:text"`
