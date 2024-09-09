@@ -242,7 +242,11 @@ func TestEditProject(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.ProjectID2(),
-			schema.EditProjectRequest{},
+			schema.EditProjectRequest{
+				Duration: &schema.YearWithSemesterDuration{
+					Until: duration.Until, // Untilはnilにすると「未定」に変更される
+				},
+			},
 			nil,
 		},
 		"400 invalid projectID": {
