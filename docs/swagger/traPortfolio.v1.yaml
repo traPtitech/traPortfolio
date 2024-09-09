@@ -267,19 +267,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateProjectRequest"
-    delete:
-      summary: プロジェクトの削除
-      operationId: deleteProject
-      responses:
-        "204":
-          description: No Content
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-      description: プロジェクトを削除します
-      tags:
-        - project
   "/projects/{projectId}":
     parameters:
       - $ref: "#/components/parameters/projectIdInPath"
@@ -319,6 +306,19 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/EditProjectRequest"
+    delete:
+      summary: プロジェクトの削除
+      operationId: deleteProject
+      responses:
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      description: プロジェクトを削除します
+      tags:
+        - project
   /events:
     get:
       summary: イベントリストを取得
