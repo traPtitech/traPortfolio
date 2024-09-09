@@ -8,7 +8,7 @@ import (
 
 type Contest struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Name        string    `gorm:"type:varchar(32)"`
+	Name        string    `gorm:"type:varchar(128)"`
 	Description string    `gorm:"type:text"`
 	Link        string    `gorm:"type:text"`
 	Since       time.Time `gorm:"precision:6"`
@@ -24,7 +24,7 @@ func (*Contest) TableName() string {
 type ContestTeam struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	ContestID   uuid.UUID `gorm:"type:char(36);not null"`
-	Name        string    `gorm:"type:varchar(32)"`
+	Name        string    `gorm:"type:varchar(128)"`
 	Description string    `gorm:"type:text"`
 	Result      string    `gorm:"type:text"`
 	Link        string    `gorm:"type:text"`

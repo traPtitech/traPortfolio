@@ -60,8 +60,53 @@ func TestProjectRepository_GetProject(t *testing.T) {
 	}
 }
 
-// func TestProjectRepository_CreateProject(t *testing.T) {
-// }
+func TestProjectRepository_CreateProject(t *testing.T) {
+	t.Parallel()
+
+	db := SetupTestGormDB(t)
+	repo := NewProjectRepository(db, mock_external_e2e.NewMockPortalAPI())
+
+	t.Run("create project success", func(t *testing.T) {
+		ctx := context.Background()
+		arg := random.CreateProjectArgs()
+
+		project, err := repo.CreateProject(ctx, arg)
+		assert.NoError(t, err)
+
+		got, err := repo.GetProject(ctx, project.ID)
+		assert.NoError(t, err)
+
+		opts := []cmp.Option{
+			cmpopts.EquateEmpty(),
+			cmp.AllowUnexported(optional.Of[domain.YearWithSemester]{}),
+		}
+		if diff := cmp.Diff(project, got, opts...); diff != "" {
+			t.Error(diff)
+		}
+	})
+
+	t.Run("create project with invalid args", func(t *testing.T) {
+		ctx := context.Background()
+		arg := random.CreateProjectArgs()
+		arg.Name = ""
+
+		_, err := repo.CreateProject(ctx, arg)
+		assert.Error(t, err)
+	})
+
+	t.Run("create projects which name duplicated", func(t *testing.T) {
+		ctx := context.Background()
+		arg1 := random.CreateProjectArgs()
+		arg2 := random.CreateProjectArgs()
+		arg2.Name = arg1.Name
+
+		_, err := repo.CreateProject(ctx, arg1)
+		assert.NoError(t, err)
+
+		_, err = repo.CreateProject(ctx, arg2)
+		assert.Error(t, err)
+	})
+}
 
 func TestProjectRepository_UpdateProject(t *testing.T) {
 	t.Parallel()
