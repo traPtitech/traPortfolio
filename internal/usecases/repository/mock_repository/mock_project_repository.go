@@ -81,6 +81,20 @@ func (c *MockProjectRepositoryCreateProjectCall) DoAndReturn(f func(context.Cont
 	return c
 }
 
+// DeleteProject mocks base method.
+func (m *MockProjectRepository) DeleteProject(ctx context.Context, projectID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProject", ctx, projectID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteProject indicates an expected call of DeleteProject.
+func (mr *MockProjectRepositoryMockRecorder) DeleteProject(ctx, projectID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectRepository)(nil).DeleteProject), ctx, projectID)
+}
+
 // EditProjectMembers mocks base method.
 func (m *MockProjectRepository) EditProjectMembers(ctx context.Context, projectID uuid.UUID, args []*repository.EditProjectMemberArgs) error {
 	m.ctrl.T.Helper()
