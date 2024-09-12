@@ -293,6 +293,8 @@ func TestEditContest(t *testing.T) {
 			mockdata.ContestID3(),
 			schema.EditContestRequest{
 				Duration: &schema.Duration{
+					// DurationのValidationで落とされるのでSinceも埋める
+					Since: mockdata.CloneMockContests()[2].Since,
 					Until: &until, // Untilはnilにすると「未定」に変更される
 				},
 			},
