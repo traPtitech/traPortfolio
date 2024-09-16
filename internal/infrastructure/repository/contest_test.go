@@ -145,6 +145,11 @@ func Test_UpdateContest(t *testing.T) {
 		err = repo.UpdateContest(context.Background(), contest.ID, argWithoutUntil)
 		assert.NoError(t, err)
 	})
+
+	t.Run("update failed: not contest id", func(t *testing.T) {
+		err = repo.UpdateContest(context.Background(), random.UUID(), &repository.UpdateContestArgs{})
+		assert.Error(t, err)
+	})
 }
 
 func Test_DeleteContest(t *testing.T) {
