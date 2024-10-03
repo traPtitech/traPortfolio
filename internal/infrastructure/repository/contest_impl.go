@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/internal/domain"
@@ -107,6 +108,16 @@ func (r *ContestRepository) CreateContest(ctx context.Context, args *repository.
 }
 
 func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error {
+	origin := &model.Contest{}
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.Contest{ID: contestID}).
+		First(origin).
+		Error; err != nil {
+		return err
+	}
+	untilEmpty := origin.Until.Equal(time.Time{})
+
 	changes := map[string]interface{}{}
 	if v, ok := args.Name.V(); ok {
 		changes["name"] = v
@@ -120,7 +131,7 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 	if v, ok := args.Since.V(); ok {
 		changes["since"] = v
 	}
-	if v, ok := args.Until.V(); ok {
+	if v, ok := args.Until.V(); ok == untilEmpty || v != origin.Until {
 		changes["until"] = v
 	}
 
@@ -130,14 +141,6 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 
 	var c model.Contest
 	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.
-			WithContext(ctx).
-			Where(&model.Contest{ID: contestID}).
-			First(&model.Contest{}).
-			Error; err != nil {
-			return err
-		}
-
 		if err := tx.
 			WithContext(ctx).
 			Model(&model.Contest{ID: contestID}).
