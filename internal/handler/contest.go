@@ -71,7 +71,7 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 
 	res := newContestDetail(
 		newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd),
-		contest.Link,
+		contest.Links,
 		contest.Description,
 		teams,
 	)
@@ -89,7 +89,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 	createReq := repository.CreateContestArgs{
 		Name:        req.Name,
 		Description: req.Description,
-		Link:        optional.FromPtr(req.Link),
+		Links:       req.Links,
 		Since:       req.Duration.Since,
 		Until:       optional.FromPtr(req.Duration.Until),
 	}
@@ -100,7 +100,7 @@ func (h *ContestHandler) CreateContest(c echo.Context) error {
 		return err
 	}
 
-	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Link, contest.Description, []schema.ContestTeam{})
+	res := newContestDetail(newContest(contest.ID, contest.Name, contest.TimeStart, contest.TimeEnd), contest.Links, contest.Description, []schema.ContestTeam{})
 
 	return c.JSON(http.StatusCreated, res)
 }
@@ -120,7 +120,7 @@ func (h *ContestHandler) EditContest(c echo.Context) error {
 	patchReq := repository.UpdateContestArgs{
 		Name:        optional.FromPtr(req.Name),
 		Description: optional.FromPtr(req.Description),
-		Link:        optional.FromPtr(req.Link),
+		Links:       optional.FromPtr(req.Links),
 	}
 	if req.Duration != nil {
 		patchReq.Since = optional.FromPtr(&req.Duration.Since)
@@ -210,7 +210,7 @@ func (h *ContestHandler) GetContestTeam(c echo.Context) error {
 
 	res := newContestTeamDetail(
 		newContestTeam(contestTeam.ID, contestTeam.Name, contestTeam.Result, members),
-		contestTeam.Link,
+		contestTeam.Links,
 		contestTeam.Description,
 	)
 
@@ -232,7 +232,7 @@ func (h *ContestHandler) AddContestTeam(c echo.Context) error {
 	args := repository.CreateContestTeamArgs{
 		Name:        req.Name,
 		Result:      optional.FromPtr(req.Result),
-		Link:        optional.FromPtr(req.Link),
+		Links:       req.Links,
 		Description: req.Description,
 	}
 
@@ -268,7 +268,7 @@ func (h *ContestHandler) EditContestTeam(c echo.Context) error {
 	args := repository.UpdateContestTeamArgs{
 		Name:        optional.FromPtr(req.Name),
 		Result:      optional.FromPtr(req.Result),
-		Link:        optional.FromPtr(req.Link),
+		Links:       optional.FromPtr(req.Links),
 		Description: optional.FromPtr(req.Description),
 	}
 
@@ -365,12 +365,12 @@ func newContest(id uuid.UUID, name string, since time.Time, until time.Time) sch
 	}
 }
 
-func newContestDetail(contest schema.Contest, link string, description string, teams []schema.ContestTeam) schema.ContestDetail {
+func newContestDetail(contest schema.Contest, links []string, description string, teams []schema.ContestTeam) schema.ContestDetail {
 	return schema.ContestDetail{
 		Description: description,
 		Duration:    contest.Duration,
 		Id:          contest.Id,
-		Link:        link,
+		Links:       links,
 		Name:        contest.Name,
 		Teams:       teams,
 	}
@@ -393,11 +393,11 @@ func newContestTeamWithoutMembers(id uuid.UUID, name string, result string) sche
 	}
 }
 
-func newContestTeamDetail(team schema.ContestTeam, link string, description string) schema.ContestTeamDetail {
+func newContestTeamDetail(team schema.ContestTeam, links []string, description string) schema.ContestTeamDetail {
 	return schema.ContestTeamDetail{
 		Description: description,
 		Id:          team.Id,
-		Link:        link,
+		Links:       links,
 		Members:     team.Members,
 		Name:        team.Name,
 		Result:      team.Result,

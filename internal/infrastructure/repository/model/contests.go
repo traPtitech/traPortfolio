@@ -10,7 +10,6 @@ type Contest struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Name        string    `gorm:"type:varchar(128)"`
 	Description string    `gorm:"type:text"`
-	Link        string    `gorm:"type:text"`
 	Since       time.Time `gorm:"precision:6"`
 	Until       time.Time `gorm:"precision:6"`
 	CreatedAt   time.Time `gorm:"precision:6"`
@@ -21,13 +20,24 @@ func (*Contest) TableName() string {
 	return "contests"
 }
 
+type ContestLink struct {
+	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order int       `gorm:"type:int;not null;primaryKey"`
+	Link  string    `gorm:"type:text;not null"`
+	// 256件とかリンク追加されても困るし小さくした方がいいか…？
+	// Order uint8     `gorm:"type:tinyint(1);not null;primaryKey"`
+}
+
+func (*ContestLink) TableName() string {
+	return "contest_links"
+}
+
 type ContestTeam struct {
 	ID          uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	ContestID   uuid.UUID `gorm:"type:char(36);not null"`
 	Name        string    `gorm:"type:varchar(128)"`
 	Description string    `gorm:"type:text"`
 	Result      string    `gorm:"type:text"`
-	Link        string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
 
@@ -50,4 +60,14 @@ type ContestTeamUserBelonging struct {
 
 func (*ContestTeamUserBelonging) TableName() string {
 	return "contest_team_user_belongings"
+}
+
+type ContestTeamLink struct {
+	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order int       `gorm:"type:int;not null;primaryKey"`
+	Link  string    `gorm:"type:text;not null"`
+}
+
+func (*ContestTeamLink) TableName() string {
+	return "contest_team_links"
 }

@@ -10,7 +10,6 @@ type Project struct {
 	ID            uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Name          string    `gorm:"type:varchar(128)"`
 	Description   string    `gorm:"type:text"`
-	Link          string    `gorm:"type:text"`
 	SinceYear     int       `gorm:"type:smallint(4);not null"`
 	SinceSemester int       `gorm:"type:tinyint(1);not null"`
 	UntilYear     int       `gorm:"type:smallint(4);not null"`
@@ -39,4 +38,14 @@ type ProjectMember struct {
 
 func (*ProjectMember) TableName() string {
 	return "project_members"
+}
+
+type ProjectLink struct {
+	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order int       `gorm:"type:int;not null;primaryKey"`
+	Link  string    `gorm:"type:text;not null"`
+}
+
+func (*ProjectLink) TableName() string {
+	return "project_links"
 }

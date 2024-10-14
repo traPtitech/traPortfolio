@@ -59,7 +59,7 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, newProjectDetail(
 		newProject(project.ID, project.Name, schema.ConvertDuration(project.Duration)),
 		project.Description,
-		project.Link,
+		project.Links,
 		members,
 	))
 }
@@ -74,7 +74,7 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	createReq := repository.CreateProjectArgs{
 		Name:          req.Name,
 		Description:   req.Description,
-		Link:          optional.FromPtr(req.Link),
+		Links:         req.Links,
 		SinceYear:     req.Duration.Since.Year,
 		SinceSemester: int(req.Duration.Since.Semester),
 	}
@@ -116,7 +116,7 @@ func (h *ProjectHandler) EditProject(c echo.Context) error {
 	patchReq := repository.UpdateProjectArgs{
 		Name:        optional.FromPtr(req.Name),
 		Description: optional.FromPtr(req.Description),
-		Link:        optional.FromPtr(req.Link),
+		Links:       optional.FromPtr(req.Links),
 	}
 
 	if d := req.Duration; d != nil {
@@ -269,11 +269,11 @@ func newProject(id uuid.UUID, name string, duration schema.YearWithSemesterDurat
 	}
 }
 
-func newProjectDetail(project schema.Project, description string, link string, members []schema.ProjectMember) schema.ProjectDetail {
+func newProjectDetail(project schema.Project, description string, links []string, members []schema.ProjectMember) schema.ProjectDetail {
 	return schema.ProjectDetail{
 		Description: description,
 		Duration:    project.Duration,
-		Link:        link,
+		Links:       links,
 		Id:          project.Id,
 		Members:     members,
 		Name:        project.Name,

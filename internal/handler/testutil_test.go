@@ -68,10 +68,35 @@ func responseDecode(t *testing.T, rec *httptest.ResponseRecorder, i interface{})
 }
 
 // FIXME: 暫定対処
-func ptr(t *testing.T, s string) *string {
+func ptr[T any](t *testing.T, s T) *T {
 	t.Helper()
 
 	return &s
+}
+
+func MatchStringArray(a1 []string, a2 []string) bool {
+	c1 := make([]string, 0, len(a1))
+	c2 := append([]string{}, a2...)
+
+	for _, e1 := range a1 {
+		found := -1
+		for i, e2 := range c2 {
+			if e1 == e2 {
+				found = i
+				break
+			}
+		}
+
+		if found >= 0 {
+			shorten := len(c2) - 1
+			c2[found] = c2[shorten]
+			c2 = c2[:shorten]
+		} else {
+			c1 = append(c1, e1)
+		}
+	}
+
+	return len(c1) == 0 && len(c2) == 0
 }
 
 type anyCtx struct{}

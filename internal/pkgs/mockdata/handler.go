@@ -30,6 +30,7 @@ var (
 func CloneHandlerMockContestDetails() []schema.ContestDetail {
 	var (
 		mContests        = CloneMockContests()
+		hContestLinks    = CloneHandlerMockContestLinksByID()
 		hContestTeams    = CloneMockContestTeams()
 		hTeamMembersByID = CloneHandlerMockContestTeamMembersByID()
 		mContestTeams    = make([]schema.ContestTeam, len(hContestTeams))
@@ -50,6 +51,7 @@ func CloneHandlerMockContestDetails() []schema.ContestDetail {
 	}
 
 	for i, c := range mContests {
+		contestLinks := hContestLinks[c.ID]
 		hContestDetails[i] = schema.ContestDetail{
 			Description: c.Description,
 			Duration: schema.Duration{
@@ -57,7 +59,7 @@ func CloneHandlerMockContestDetails() []schema.ContestDetail {
 				Until: &c.Until,
 			},
 			Id:    c.ID,
-			Link:  c.Link,
+			Links: contestLinks,
 			Name:  c.Name,
 			Teams: mContestTeams,
 		}
@@ -82,6 +84,24 @@ func CloneHandlerMockContests() []schema.Contest {
 		}
 	}
 	return hContests
+}
+
+func CloneHandlerMockContestLinksByID() map[uuid.UUID][]string {
+	var (
+		hContests        = CloneMockContests()
+		mockContestLinks = CloneMockContestLinks()
+		hContestLinks    = make(map[uuid.UUID][]string, len(hContests))
+	)
+
+	for _, c := range hContests {
+		hContestLinks[c.ID] = make([]string, 0)
+	}
+
+	for _, link := range mockContestLinks {
+		hContestLinks[link.ID] = append(hContestLinks[link.ID], link.Link)
+	}
+
+	return hContestLinks
 }
 
 func CloneHandlerMockContestTeamsByID() map[uuid.UUID][]schema.ContestTeam {
@@ -132,6 +152,24 @@ func CloneHandlerMockContestTeamMembersByID() map[uuid.UUID][]schema.User {
 	}
 
 	return hContestMembers
+}
+
+func CloneHandlerMockContestTeamLinksByID() map[uuid.UUID][]string {
+	var (
+		hContestTeams        = CloneMockContestTeams()
+		mockContestTeamLinks = CloneMockContestTeamLinks()
+		hContestTeamLinks    = make(map[uuid.UUID][]string, len(hContestTeams))
+	)
+
+	for _, c := range hContestTeams {
+		hContestTeamLinks[c.ID] = make([]string, 0)
+	}
+
+	for _, link := range mockContestTeamLinks {
+		hContestTeamLinks[link.ID] = append(hContestTeamLinks[link.ID], link.Link)
+	}
+
+	return hContestTeamLinks
 }
 
 func CloneHandlerMockEvents() []schema.Event {
@@ -206,6 +244,7 @@ func CloneHandlerMockEventDetails() []schema.EventDetail {
 func CloneHandlerMockGroups() []schema.GroupDetail {
 	var (
 		mGroups        = CloneMockGroups()
+		hGroupLinks    = CloneHandlerMockGroupLinksByID()
 		hGroupsMembers = CloneHandlerMockGroupMembersByID()
 		mGroupAdmins   = CloneMockGroupUserAdmins()
 		hGroups        = make([]schema.GroupDetail, len(mGroups))
@@ -218,11 +257,12 @@ func CloneHandlerMockGroups() []schema.GroupDetail {
 				mAdmins = append(mAdmins, getUser(adm.UserID))
 			}
 		}
+		hLinks := hGroupLinks[g.GroupID]
 		hGroups[i] = schema.GroupDetail{
 			Description: g.Description,
 			Id:          g.GroupID,
 			Admin:       mAdmins,
-			Link:        g.Link,
+			Links:       hLinks,
 			Members:     hGroupsMembers[g.GroupID],
 			Name:        g.Name,
 		}
@@ -264,6 +304,24 @@ func CloneHandlerMockGroupMembersByID() map[uuid.UUID][]schema.GroupMember {
 	return hGroupMembers
 }
 
+func CloneHandlerMockGroupLinksByID() map[uuid.UUID][]string {
+	var (
+		hGroups        = CloneMockGroups()
+		mockGroupLinks = CloneMockGroupLinks()
+		hGroupLinks    = make(map[uuid.UUID][]string, len(hGroups))
+	)
+
+	for _, c := range hGroups {
+		hGroupLinks[c.GroupID] = make([]string, 0)
+	}
+
+	for _, link := range mockGroupLinks {
+		hGroupLinks[link.ID] = append(hGroupLinks[link.ID], link.Link)
+	}
+
+	return hGroupLinks
+}
+
 func CloneHandlerMockProjects() []schema.Project {
 	var (
 		mProjects = CloneMockProjects()
@@ -293,12 +351,14 @@ func CloneHandlerMockProjects() []schema.Project {
 func CloneHandlerMockProjectDetails() []schema.ProjectDetail {
 	var (
 		mProjects       = CloneMockProjects()
+		hProjectLinks   = CloneHandlerMockProjectLinksByID()
 		hProjectMembers = CloneHandlerMockProjectMembers()
 		mProjectMembers = CloneMockProjectMembers()
 		hProjects       = make([]schema.ProjectDetail, len(mProjects))
 	)
 
 	for i, mp := range mProjects {
+		hLinks := hProjectLinks[mp.ID]
 		hProjects[i] = schema.ProjectDetail{
 			Description: mp.Description,
 			Duration: schema.YearWithSemesterDuration{
@@ -312,7 +372,7 @@ func CloneHandlerMockProjectDetails() []schema.ProjectDetail {
 				},
 			},
 			Id:      mp.ID,
-			Link:    mp.Link,
+			Links:   hLinks,
 			Members: []schema.ProjectMember{},
 			Name:    mp.Name,
 		}
@@ -351,6 +411,24 @@ func CloneHandlerMockProjectMembers() []schema.ProjectMember {
 	}
 
 	return hProjectMembers
+}
+
+func CloneHandlerMockProjectLinksByID() map[uuid.UUID][]string {
+	var (
+		hProjects        = CloneMockProjects()
+		mockProjectLinks = CloneMockProjectLinks()
+		hProjectLinks    = make(map[uuid.UUID][]string, len(hProjects))
+	)
+
+	for _, c := range hProjects {
+		hProjectLinks[c.ID] = make([]string, 0)
+	}
+
+	for _, link := range mockProjectLinks {
+		hProjectLinks[link.ID] = append(hProjectLinks[link.ID], link.Link)
+	}
+
+	return hProjectLinks
 }
 
 func CloneHandlerMockUsers() []schema.User {

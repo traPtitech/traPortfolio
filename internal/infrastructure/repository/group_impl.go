@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"sort"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/internal/domain"
@@ -54,6 +55,24 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 		return nil, err
 	}
 
+	groupLinks := make([]model.GroupLink, 0)
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.GroupLink{ID: groupID}).
+		Find(&groupLinks).
+		Error; err != nil {
+		if err != repository.ErrNotFound {
+			return nil, err
+		}
+	} else {
+		sort.Slice(groupLinks, func(i, j int) bool { return groupLinks[i].Order < groupLinks[j].Order })
+	}
+
+	links := make([]string, len(groupLinks))
+	for i, link := range groupLinks {
+		links[i] = link.Link
+	}
+
 	// Name, RealNameはusecasesでPortalから取得する
 	erMembers := make([]*domain.UserWithDuration, 0, len(users))
 	for _, v := range users {
@@ -90,7 +109,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 	result := &domain.GroupDetail{
 		ID:          groupID,
 		Name:        group.Name,
-		Link:        group.Link,
+		Links:       links,
 		Admin:       erAdmin,
 		Members:     erMembers,
 		Description: group.Description,

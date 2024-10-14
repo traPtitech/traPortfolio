@@ -13,7 +13,7 @@ import (
 type CreateProjectArgs struct {
 	Name          string
 	Description   string
-	Link          optional.Of[string]
+	Links         []string
 	SinceYear     int
 	SinceSemester int
 	UntilYear     int
@@ -23,7 +23,7 @@ type CreateProjectArgs struct {
 type UpdateProjectArgs struct {
 	Name          optional.Of[string]
 	Description   optional.Of[string]
-	Link          optional.Of[string]
+	Links         optional.Of[[]string]
 	SinceYear     optional.Of[int64]
 	SinceSemester optional.Of[int64]
 	UntilYear     optional.Of[int64]
