@@ -21,9 +21,9 @@ func (*Contest) TableName() string {
 }
 
 type ContestLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	ContestID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order     int       `gorm:"type:int;not null;primaryKey"`
+	Link      string    `gorm:"type:text;not null"`
 	// 256件とかリンク追加されても困るし小さくした方がいいか…？
 	// Order uint8     `gorm:"type:tinyint(1);not null;primaryKey"`
 }
@@ -63,9 +63,9 @@ func (*ContestTeamUserBelonging) TableName() string {
 }
 
 type ContestTeamLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	ContestID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order     int       `gorm:"type:int;not null;primaryKey"`
+	Link      string    `gorm:"type:text;not null"`
 }
 
 func (*ContestTeamLink) TableName() string {

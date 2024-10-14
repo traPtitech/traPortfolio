@@ -41,9 +41,9 @@ func (*ProjectMember) TableName() string {
 }
 
 type ProjectLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	ProjectID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order     int       `gorm:"type:int;not null;primaryKey"`
+	Link      string    `gorm:"type:text;not null"`
 }
 
 func (*ProjectLink) TableName() string {

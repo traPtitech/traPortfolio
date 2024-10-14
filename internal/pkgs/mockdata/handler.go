@@ -98,7 +98,7 @@ func CloneHandlerMockContestLinksByID() map[uuid.UUID][]string {
 	}
 
 	for _, link := range mockContestLinks {
-		hContestLinks[link.ID] = append(hContestLinks[link.ID], link.Link)
+		hContestLinks[link.ContestID] = append(hContestLinks[link.ContestID], link.Link)
 	}
 
 	return hContestLinks
@@ -166,7 +166,7 @@ func CloneHandlerMockContestTeamLinksByID() map[uuid.UUID][]string {
 	}
 
 	for _, link := range mockContestTeamLinks {
-		hContestTeamLinks[link.ID] = append(hContestTeamLinks[link.ID], link.Link)
+		hContestTeamLinks[link.ContestID] = append(hContestTeamLinks[link.ContestID], link.Link)
 	}
 
 	return hContestTeamLinks
@@ -316,7 +316,7 @@ func CloneHandlerMockGroupLinksByID() map[uuid.UUID][]string {
 	}
 
 	for _, link := range mockGroupLinks {
-		hGroupLinks[link.ID] = append(hGroupLinks[link.ID], link.Link)
+		hGroupLinks[link.GroupID] = append(hGroupLinks[link.GroupID], link.Link)
 	}
 
 	return hGroupLinks
@@ -425,7 +425,7 @@ func CloneHandlerMockProjectLinksByID() map[uuid.UUID][]string {
 	}
 
 	for _, link := range mockProjectLinks {
-		hProjectLinks[link.ID] = append(hProjectLinks[link.ID], link.Link)
+		hProjectLinks[link.ProjectID] = append(hProjectLinks[link.ProjectID], link.Link)
 	}
 
 	return hProjectLinks

@@ -28,9 +28,9 @@ func v3() *gormigrate.Migration {
 
 				for _, contest := range contests {
 					contestLink := v3ContestLink{
-						ID:    contest.ID,
-						Order: 0,
-						Link:  contest.Link,
+						ContestID: contest.ID,
+						Order:     0,
+						Link:      contest.Link,
 					}
 					if err := db.Create(&contestLink).Error; err != nil {
 						return err
@@ -51,9 +51,9 @@ func v3() *gormigrate.Migration {
 
 				for _, contestTeam := range contestTeams {
 					teamLink := v3ContestTeamLink{
-						ID:    contestTeam.ID,
-						Order: 0,
-						Link:  contestTeam.Link,
+						ContestTeamID: contestTeam.ID,
+						Order:         0,
+						Link:          contestTeam.Link,
 					}
 					if err := db.Create(&teamLink).Error; err != nil {
 						return err
@@ -74,9 +74,9 @@ func v3() *gormigrate.Migration {
 
 				for _, group := range groups {
 					groupLink := v3GroupLink{
-						ID:    group.GroupID,
-						Order: 0,
-						Link:  group.Link,
+						GroupID: group.GroupID,
+						Order:   0,
+						Link:    group.Link,
 					}
 					if err := db.Create(&groupLink).Error; err != nil {
 						return err
@@ -97,9 +97,9 @@ func v3() *gormigrate.Migration {
 
 				for _, project := range projects {
 					projectLink := v3ProjectLink{
-						ID:    project.ID,
-						Order: 0,
-						Link:  project.Link,
+						ProjectID: project.ID,
+						Order:     0,
+						Link:      project.Link,
 					}
 					if err := db.Create(&projectLink).Error; err != nil {
 						return err
@@ -134,9 +134,9 @@ func (*v3OldContest) TableName() string {
 }
 
 type v3ContestLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	ContestID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order     int       `gorm:"type:int;not null;primaryKey"`
+	Link      string    `gorm:"type:text;not null"`
 }
 
 func (*v3ContestLink) TableName() string {
@@ -161,9 +161,9 @@ func (*v3OldContestTeam) TableName() string {
 }
 
 type v3ContestTeamLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	ContestTeamID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order         int       `gorm:"type:int;not null;primaryKey"`
+	Link          string    `gorm:"type:text;not null"`
 }
 
 func (*v3ContestTeamLink) TableName() string {
@@ -184,9 +184,9 @@ func (*v3OldGroup) TableName() string {
 }
 
 type v3GroupLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	GroupID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order   int       `gorm:"type:int;not null;primaryKey"`
+	Link    string    `gorm:"type:text;not null"`
 }
 
 func (*v3GroupLink) TableName() string {
@@ -211,9 +211,9 @@ func (*v3OldProject) TableName() string {
 }
 
 type v3ProjectLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	ProjectID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order     int       `gorm:"type:int;not null;primaryKey"`
+	Link      string    `gorm:"type:text;not null"`
 }
 
 func (*v3ProjectLink) TableName() string {

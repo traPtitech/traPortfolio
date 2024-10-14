@@ -90,24 +90,24 @@ func CloneMockContests() []model.Contest {
 func CloneMockContestLinks() []model.ContestLink {
 	return []model.ContestLink{
 		{
-			ID:    ContestID1(),
-			Order: 0,
-			Link:  "https://sample.contests1.com",
+			ContestID: ContestID1(),
+			Order:     0,
+			Link:      "https://sample.contests1.com",
 		},
 		{
-			ID:    ContestID1(),
-			Order: 1,
-			Link:  "https://twitter.com/contest",
+			ContestID: ContestID1(),
+			Order:     1,
+			Link:      "https://twitter.com/contest",
 		},
 		{
-			ID:    ContestID2(),
-			Order: 0,
-			Link:  "https://sample.contests2.com",
+			ContestID: ContestID2(),
+			Order:     0,
+			Link:      "https://sample.contests2.com",
 		},
 		{
-			ID:    ContestID3(),
-			Order: 0,
-			Link:  "https://sample.contests3.com",
+			ContestID: ContestID3(),
+			Order:     0,
+			Link:      "https://sample.contests3.com",
 		},
 	}
 }
@@ -150,24 +150,24 @@ func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 func CloneMockContestTeamLinks() []model.ContestTeamLink {
 	return []model.ContestTeamLink{
 		{
-			ID:    ContestTeamID1(),
-			Order: 0,
-			Link:  "https://sample.contest_teams1.com",
+			ContestID: ContestTeamID1(),
+			Order:     0,
+			Link:      "https://sample.contest_teams1.com",
 		},
 		{
-			ID:    ContestTeamID1(),
-			Order: 1,
-			Link:  "https://twitter.com/contest_team1",
+			ContestID: ContestTeamID1(),
+			Order:     1,
+			Link:      "https://twitter.com/contest_team1",
 		},
 		{
-			ID:    ContestTeamID2(),
-			Order: 0,
-			Link:  "https://sample.contest_teams2.com",
+			ContestID: ContestTeamID2(),
+			Order:     0,
+			Link:      "https://sample.contest_teams2.com",
 		},
 		{
-			ID:    ContestTeamID3(),
-			Order: 0,
-			Link:  "https://sample.contest_teams3.com",
+			ContestID: ContestTeamID3(),
+			Order:     0,
+			Link:      "https://sample.contest_teams3.com",
 		},
 	}
 }
@@ -224,14 +224,14 @@ func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 func CloneMockGroupLinks() []model.GroupLink {
 	return []model.GroupLink{
 		{
-			ID:    GroupID1(),
-			Order: 0,
-			Link:  "https://sample.group1.com",
+			GroupID: GroupID1(),
+			Order:   0,
+			Link:    "https://sample.group1.com",
 		},
 		{
-			ID:    GroupID1(),
-			Order: 1,
-			Link:  "https://twitter.com/group1",
+			GroupID: GroupID1(),
+			Order:   1,
+			Link:    "https://twitter.com/group1",
 		},
 	}
 }
@@ -300,24 +300,24 @@ func CloneMockProjectMembers() []*model.ProjectMember {
 func CloneMockProjectLinks() []model.ProjectLink {
 	return []model.ProjectLink{
 		{
-			ID:    ProjectID1(),
-			Order: 0,
-			Link:  "https://sample.project1.com",
+			ProjectID: ProjectID1(),
+			Order:     0,
+			Link:      "https://sample.project1.com",
 		},
 		{
-			ID:    ProjectID1(),
-			Order: 1,
-			Link:  "https://twitter.com/project1",
+			ProjectID: ProjectID1(),
+			Order:     1,
+			Link:      "https://twitter.com/project1",
 		},
 		{
-			ID:    ProjectID2(),
-			Order: 0,
-			Link:  "https://sample.project2.com",
+			ProjectID: ProjectID2(),
+			Order:     0,
+			Link:      "https://sample.project2.com",
 		},
 		{
-			ID:    ProjectID3(),
-			Order: 0,
-			Link:  "https://sample.project3.com",
+			ProjectID: ProjectID3(),
+			Order:     0,
+			Link:      "https://sample.project3.com",
 		},
 	}
 }

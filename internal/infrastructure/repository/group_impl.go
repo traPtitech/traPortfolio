@@ -58,7 +58,7 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 	groupLinks := make([]model.GroupLink, 0)
 	if err := r.h.
 		WithContext(ctx).
-		Where(&model.GroupLink{ID: groupID}).
+		Where(&model.GroupLink{GroupID: groupID}).
 		Find(&groupLinks).
 		Error; err != nil {
 		if err != repository.ErrNotFound {

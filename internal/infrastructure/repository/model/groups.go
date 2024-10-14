@@ -50,9 +50,9 @@ func (*GroupUserAdmin) TableName() string {
 }
 
 type GroupLink struct {
-	ID    uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order int       `gorm:"type:int;not null;primaryKey"`
-	Link  string    `gorm:"type:text;not null"`
+	GroupID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order   int       `gorm:"type:int;not null;primaryKey"`
+	Link    string    `gorm:"type:text;not null"`
 }
 
 func (*GroupLink) TableName() string {

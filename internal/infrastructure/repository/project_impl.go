@@ -65,7 +65,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 	projectLinks := make([]model.ProjectLink, 0)
 	if err := r.h.
 		WithContext(ctx).
-		Where(&model.ProjectLink{ID: projectID}).
+		Where(&model.ProjectLink{ProjectID: projectID}).
 		Find(&projectLinks).
 		Error; err != nil {
 		if err != repository.ErrNotFound {
@@ -147,7 +147,7 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 		for i, link := range args.Links {
 			if err := tx.
 				WithContext(ctx).
-				Create(&model.ProjectLink{ID: p.ID, Order: i, Link: link}).
+				Create(&model.ProjectLink{ProjectID: p.ID, Order: i, Link: link}).
 				Error; err != nil {
 				return err
 			}
@@ -200,7 +200,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 	if afterLinks, ok := args.Links.V(); ok {
 		if err := r.h.
 			WithContext(ctx).
-			Where(&model.ProjectLink{ID: projectID}).
+			Where(&model.ProjectLink{ProjectID: projectID}).
 			Find(&projectLinks).
 			Error; err != nil {
 			if err != repository.ErrNotFound {
@@ -258,7 +258,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 			for i, link := range changeLinks {
 				if err := tx.
 					WithContext(ctx).
-					Where(&model.ProjectLink{ID: projectID, Order: i}).
+					Where(&model.ProjectLink{ProjectID: projectID, Order: i}).
 					Updates(&model.ProjectLink{Link: link}).
 					Error; err != nil {
 					return err
@@ -271,7 +271,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 			for _, order := range removeLinks {
 				if err := tx.
 					WithContext(ctx).
-					Where(&model.ProjectLink{ID: projectID, Order: order}).
+					Where(&model.ProjectLink{ProjectID: projectID, Order: order}).
 					Delete(&model.ProjectLink{}).
 					Error; err != nil {
 					return err
@@ -284,7 +284,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 			for i, insertLink := range insertLinks {
 				if err := tx.
 					WithContext(ctx).
-					Create(&model.ProjectLink{ID: projectID, Order: i, Link: insertLink}).
+					Create(&model.ProjectLink{ProjectID: projectID, Order: i, Link: insertLink}).
 					Error; err != nil {
 					return err
 				}
