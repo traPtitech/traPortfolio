@@ -63,9 +63,9 @@ func (*ContestTeamUserBelonging) TableName() string {
 }
 
 type ContestTeamLink struct {
-	ContestID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order     int       `gorm:"type:int;not null;primaryKey"`
-	Link      string    `gorm:"type:text;not null"`
+	TeamID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order  int       `gorm:"type:int;not null;primaryKey"`
+	Link   string    `gorm:"type:text;not null"`
 }
 
 func (*ContestTeamLink) TableName() string {

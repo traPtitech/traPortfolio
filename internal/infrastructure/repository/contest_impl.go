@@ -402,7 +402,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 
 	if err := r.h.
 		WithContext(ctx).
-		Where(&model.ContestTeamLink{ContestID: teamID}).
+		Where(&model.ContestTeamLink{TeamID: teamID}).
 		Find(&teamLinks).
 		Error; err != nil {
 		if err != repository.ErrNotFound {
@@ -472,7 +472,7 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 		for i, link := range _contestTeam.Links {
 			if err := tx.
 				WithContext(ctx).
-				Create(&model.ContestTeamLink{ContestID: contestTeam.ID, Order: i, Link: link}).
+				Create(&model.ContestTeamLink{TeamID: contestTeam.ID, Order: i, Link: link}).
 				Error; err != nil {
 				return err
 			}
@@ -529,7 +529,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 	if afterLinks, ok := args.Links.V(); ok {
 		if err := r.h.
 			WithContext(ctx).
-			Model(&model.ContestTeamLink{ContestID: teamID}).
+			Model(&model.ContestTeamLink{TeamID: teamID}).
 			Find(&teamLinks).
 			Error; err != nil {
 			if err != repository.ErrNotFound {
@@ -580,7 +580,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 			for i, link := range changeLinks {
 				if err := tx.
 					WithContext(ctx).
-					Where(&model.ContestTeamLink{ContestID: teamID, Order: i}).
+					Where(&model.ContestTeamLink{TeamID: teamID, Order: i}).
 					Updates(&model.ContestTeamLink{Link: link}).
 					Error; err != nil {
 					return err
@@ -593,7 +593,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 			for _, order := range removeLinks {
 				if err := tx.
 					WithContext(ctx).
-					Where(&model.ContestTeamLink{ContestID: teamID, Order: order}).
+					Where(&model.ContestTeamLink{TeamID: teamID, Order: order}).
 					Delete(&model.ContestTeamLink{}).
 					Error; err != nil {
 					return err
@@ -606,7 +606,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 			for i, insertLink := range insertLinks {
 				if err := tx.
 					WithContext(ctx).
-					Create(&model.ContestTeamLink{ContestID: teamID, Order: i, Link: insertLink}).
+					Create(&model.ContestTeamLink{TeamID: teamID, Order: i, Link: insertLink}).
 					Error; err != nil {
 					return err
 				}
@@ -642,7 +642,7 @@ func (r *ContestRepository) DeleteContestTeam(ctx context.Context, contestID uui
 
 		if err := tx.
 			WithContext(ctx).
-			Where(&model.ContestTeamLink{ContestID: teamID}).
+			Where(&model.ContestTeamLink{TeamID: teamID}).
 			Delete(&model.ContestTeamLink{}).
 			Error; err != nil {
 			return err

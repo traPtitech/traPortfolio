@@ -51,9 +51,9 @@ func v3() *gormigrate.Migration {
 
 				for _, contestTeam := range contestTeams {
 					teamLink := v3ContestTeamLink{
-						ContestTeamID: contestTeam.ID,
-						Order:         0,
-						Link:          contestTeam.Link,
+						TeamID: contestTeam.ID,
+						Order:  0,
+						Link:   contestTeam.Link,
 					}
 					if err := db.Create(&teamLink).Error; err != nil {
 						return err
@@ -161,9 +161,9 @@ func (*v3OldContestTeam) TableName() string {
 }
 
 type v3ContestTeamLink struct {
-	ContestTeamID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
-	Order         int       `gorm:"type:int;not null;primaryKey"`
-	Link          string    `gorm:"type:text;not null"`
+	TeamID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order  int       `gorm:"type:int;not null;primaryKey"`
+	Link   string    `gorm:"type:text;not null"`
 }
 
 func (*v3ContestTeamLink) TableName() string {

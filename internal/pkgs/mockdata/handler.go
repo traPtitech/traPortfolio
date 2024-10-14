@@ -166,7 +166,7 @@ func CloneHandlerMockContestTeamLinksByID() map[uuid.UUID][]string {
 	}
 
 	for _, link := range mockContestTeamLinks {
-		hContestTeamLinks[link.ContestID] = append(hContestTeamLinks[link.ContestID], link.Link)
+		hContestTeamLinks[link.TeamID] = append(hContestTeamLinks[link.TeamID], link.Link)
 	}
 
 	return hContestTeamLinks

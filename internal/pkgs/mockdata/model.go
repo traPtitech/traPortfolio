@@ -150,24 +150,24 @@ func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 func CloneMockContestTeamLinks() []model.ContestTeamLink {
 	return []model.ContestTeamLink{
 		{
-			ContestID: ContestTeamID1(),
-			Order:     0,
-			Link:      "https://sample.contest_teams1.com",
+			TeamID: ContestTeamID1(),
+			Order:  0,
+			Link:   "https://sample.contest_teams1.com",
 		},
 		{
-			ContestID: ContestTeamID1(),
-			Order:     1,
-			Link:      "https://twitter.com/contest_team1",
+			TeamID: ContestTeamID1(),
+			Order:  1,
+			Link:   "https://twitter.com/contest_team1",
 		},
 		{
-			ContestID: ContestTeamID2(),
-			Order:     0,
-			Link:      "https://sample.contest_teams2.com",
+			TeamID: ContestTeamID2(),
+			Order:  0,
+			Link:   "https://sample.contest_teams2.com",
 		},
 		{
-			ContestID: ContestTeamID3(),
-			Order:     0,
-			Link:      "https://sample.contest_teams3.com",
+			TeamID: ContestTeamID3(),
+			Order:  0,
+			Link:   "https://sample.contest_teams3.com",
 		},
 	}
 }
