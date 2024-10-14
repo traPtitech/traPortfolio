@@ -192,12 +192,12 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		}
 	}
 
-	projectLinks := make([]model.ProjectLink, 0)
-	changeLinks := make(map[int]string, 0)
-	insertLinks := make(map[int]string, 0)
-	removeLinks := make([]int, 0)
+	var changeLinkMap map[int]string
+	var insertLinkMap map[int]string
+	var removeLinks []int
 
 	if afterLinks, ok := args.Links.V(); ok {
+		var projectLinks []model.ProjectLink
 		if err := r.h.
 			WithContext(ctx).
 			Where(&model.ProjectLink{ProjectID: projectID}).
@@ -210,29 +210,30 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 			sort.Slice(projectLinks, func(i, j int) bool { return projectLinks[i].Order < projectLinks[j].Order })
 		}
 
-		links := make([]string, len(projectLinks))
-		for i, link := range projectLinks {
-			links[i] = link.Link
-		}
-
 		sizeBefore := len(projectLinks)
 		sizeAfter := len(afterLinks)
+		sizeChange := min(sizeBefore, sizeAfter)
 
-		for i := 0; i < min(sizeBefore, sizeAfter); i++ {
+		changeLinkMap = make(map[int]string, sizeChange)
+
+		i := 0
+		for ; i < sizeChange; i++ {
 			if projectLinks[i].Link != afterLinks[i] {
-				changeLinks[i] = afterLinks[i]
+				changeLinkMap[i] = afterLinks[i]
 			}
 		}
 
 		if sizeBefore > sizeAfter {
-			for i := sizeAfter; i < sizeBefore; i++ {
+			removeLinks = make([]int, sizeBefore-sizeAfter)
+			for ; i < sizeBefore; i++ {
 				removeLinks = append(removeLinks, i)
 			}
 		}
 
 		if sizeAfter > sizeBefore {
-			for i := sizeBefore; i < sizeAfter; i++ {
-				insertLinks[i] = afterLinks[i]
+			insertLinkMap = make(map[int]string, sizeAfter-sizeBefore)
+			for ; i < sizeAfter; i++ {
+				insertLinkMap[i] = afterLinks[i]
 			}
 		}
 	} else if len(changes) == 0 {
@@ -254,8 +255,8 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		}
 
 		// リンク変更
-		if len(changeLinks) > 0 {
-			for i, link := range changeLinks {
+		if len(changeLinkMap) > 0 {
+			for i, link := range changeLinkMap {
 				if err := tx.
 					WithContext(ctx).
 					Where(&model.ProjectLink{ProjectID: projectID, Order: i}).
@@ -280,8 +281,8 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		}
 
 		// リンク作成
-		if len(insertLinks) != 0 {
-			for i, insertLink := range insertLinks {
+		if len(insertLinkMap) != 0 {
+			for i, insertLink := range insertLinkMap {
 				if err := tx.
 					WithContext(ctx).
 					Create(&model.ProjectLink{ProjectID: projectID, Order: i, Link: insertLink}).

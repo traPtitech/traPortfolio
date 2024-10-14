@@ -167,12 +167,12 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 		changes["until"] = v
 	}
 
-	contestLinks := make([]*model.ContestLink, 0)
-	changeLinks := make(map[int]string, 0)
-	insertLinks := make(map[int]string, 0)
-	removeLinks := make([]int, 0)
+	var changeLinkMap map[int]string
+	var insertLinkMap map[int]string
+	var removeLinks []int
 
 	if afterLinks, ok := args.Links.V(); ok {
+		var contestLinks []model.ContestLink
 		if err := r.h.
 			WithContext(ctx).
 			Where(&model.ContestLink{ContestID: contestID}).
@@ -185,25 +185,30 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 			sort.Slice(contestLinks, func(i, j int) bool { return contestLinks[i].Order < contestLinks[j].Order })
 		}
 
-		// リンクの増減を確認
 		sizeBefore := len(contestLinks)
 		sizeAfter := len(afterLinks)
+		sizeChange := min(sizeBefore, sizeAfter)
 
-		for i := 0; i < min(sizeBefore, sizeAfter); i++ {
+		changeLinkMap = make(map[int]string, sizeChange)
+
+		i := 0
+		for ; i < sizeChange; i++ {
 			if contestLinks[i].Link != afterLinks[i] {
-				changeLinks[i] = afterLinks[i]
+				changeLinkMap[i] = afterLinks[i]
 			}
 		}
 
 		if sizeBefore > sizeAfter {
-			for i := sizeAfter; i < sizeBefore; i++ {
+			removeLinks = make([]int, sizeBefore-sizeAfter)
+			for ; i < sizeBefore; i++ {
 				removeLinks = append(removeLinks, i)
 			}
 		}
 
 		if sizeAfter > sizeBefore {
-			for i := sizeBefore; i < sizeAfter; i++ {
-				insertLinks[i] = afterLinks[i]
+			insertLinkMap = make(map[int]string, sizeAfter-sizeBefore)
+			for ; i < sizeAfter; i++ {
+				insertLinkMap[i] = afterLinks[i]
 			}
 		}
 	}
@@ -221,8 +226,8 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 		}
 
 		// リンク変更
-		if len(changeLinks) > 0 {
-			for i, link := range changeLinks {
+		if len(changeLinkMap) > 0 {
+			for i, link := range changeLinkMap {
 				if err := tx.
 					WithContext(ctx).
 					Where(&model.ContestLink{ContestID: contestID, Order: i}).
@@ -247,8 +252,8 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 		}
 
 		// リンク作成
-		if len(insertLinks) != 0 {
-			for i, insertLink := range insertLinks {
+		if len(insertLinkMap) != 0 {
+			for i, insertLink := range insertLinkMap {
 				if err := tx.
 					WithContext(ctx).
 					Create(&model.ContestLink{ContestID: contestID, Order: i, Link: insertLink}).
@@ -521,12 +526,12 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 		changes["result"] = v
 	}
 
-	teamLinks := make([]model.ContestTeamLink, 0)
-	changeLinks := make(map[int]string, 0)
-	insertLinks := make(map[int]string, 0)
-	removeLinks := make([]int, 0)
+	var changeLinkMap map[int]string
+	var insertLinkMap map[int]string
+	var removeLinks []int
 
 	if afterLinks, ok := args.Links.V(); ok {
+		var teamLinks []model.ContestTeamLink
 		if err := r.h.
 			WithContext(ctx).
 			Model(&model.ContestTeamLink{TeamID: teamID}).
@@ -541,22 +546,28 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 
 		sizeBefore := len(teamLinks)
 		sizeAfter := len(afterLinks)
+		sizeChange := min(sizeBefore, sizeAfter)
 
-		for i := 0; i < min(sizeBefore, sizeAfter); i++ {
+		changeLinkMap = make(map[int]string, sizeChange)
+
+		i := 0
+		for ; i < sizeChange; i++ {
 			if teamLinks[i].Link != afterLinks[i] {
-				changeLinks[i] = afterLinks[i]
+				changeLinkMap[i] = afterLinks[i]
 			}
 		}
 
 		if sizeBefore > sizeAfter {
-			for i := sizeAfter; i < sizeBefore; i++ {
+			removeLinks = make([]int, sizeBefore-sizeAfter)
+			for ; i < sizeBefore; i++ {
 				removeLinks = append(removeLinks, i)
 			}
 		}
 
 		if sizeAfter > sizeBefore {
-			for i := sizeBefore; i < sizeAfter; i++ {
-				insertLinks[i] = afterLinks[i]
+			insertLinkMap = make(map[int]string, sizeAfter-sizeBefore)
+			for ; i < sizeAfter; i++ {
+				insertLinkMap[i] = afterLinks[i]
 			}
 		}
 	} else if len(changes) == 0 {
@@ -576,8 +587,8 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 		}
 
 		// リンク変更
-		if len(changeLinks) > 0 {
-			for i, link := range changeLinks {
+		if len(changeLinkMap) > 0 {
+			for i, link := range changeLinkMap {
 				if err := tx.
 					WithContext(ctx).
 					Where(&model.ContestTeamLink{TeamID: teamID, Order: i}).
@@ -602,8 +613,8 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 		}
 
 		// リンク作成
-		if len(insertLinks) != 0 {
-			for i, insertLink := range insertLinks {
+		if len(insertLinkMap) != 0 {
+			for i, insertLink := range insertLinkMap {
 				if err := tx.
 					WithContext(ctx).
 					Create(&model.ContestTeamLink{TeamID: teamID, Order: i, Link: insertLink}).
