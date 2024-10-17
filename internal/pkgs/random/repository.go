@@ -14,7 +14,7 @@ func CreateContestArgs() *repository.CreateContestArgs {
 	return &repository.CreateContestArgs{
 		Name:        AlphaNumeric(),
 		Description: AlphaNumeric(),
-		Links:       Array(RandURLString, 1, 3),
+		Links:       Array(RandURLString, 1, 2),
 		Since:       time.Now(),
 		Until:       Optional(time.Now().Add(time.Hour)),
 	}
@@ -25,7 +25,7 @@ func UpdateContestArgs() *repository.UpdateContestArgs {
 	a := repository.UpdateContestArgs{
 		Name:        optional.From(AlphaNumeric()),
 		Description: optional.From(AlphaNumeric()),
-		Links:       optional.From(Array(RandURLString, 1, 3)),
+		Links:       optional.From(Array(RandURLString, 3, 4)),
 		Since:       optional.From(Time()),
 		Until:       optional.From(Time()),
 	}

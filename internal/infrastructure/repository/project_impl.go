@@ -226,7 +226,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		if sizeBefore > sizeAfter {
 			removeLinks = make([]int, sizeBefore-sizeAfter)
 			for ; i < sizeBefore; i++ {
-				removeLinks = append(removeLinks, i)
+				removeLinks[i-sizeAfter] = i
 			}
 		}
 
@@ -260,7 +260,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 				if err := tx.
 					WithContext(ctx).
 					Where(&model.ProjectLink{ProjectID: projectID, Order: i}).
-					Updates(&model.ProjectLink{Link: link}).
+					Updates(&model.ProjectLink{Link: link, Order: i}).
 					Error; err != nil {
 					return err
 				}

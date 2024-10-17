@@ -201,7 +201,7 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 		if sizeBefore > sizeAfter {
 			removeLinks = make([]int, sizeBefore-sizeAfter)
 			for ; i < sizeBefore; i++ {
-				removeLinks = append(removeLinks, i)
+				removeLinks[i-sizeAfter] = i
 			}
 		}
 
@@ -231,7 +231,7 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 				if err := tx.
 					WithContext(ctx).
 					Where(&model.ContestLink{ContestID: contestID, Order: i}).
-					Updates(&model.ContestLink{Link: link}).
+					Updates(&model.ContestLink{Link: link, Order: i}).
 					Error; err != nil {
 					return err
 				}
@@ -560,7 +560,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 		if sizeBefore > sizeAfter {
 			removeLinks = make([]int, sizeBefore-sizeAfter)
 			for ; i < sizeBefore; i++ {
-				removeLinks = append(removeLinks, i)
+				removeLinks[i-sizeAfter] = i
 			}
 		}
 
@@ -592,7 +592,7 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 				if err := tx.
 					WithContext(ctx).
 					Where(&model.ContestTeamLink{TeamID: teamID, Order: i}).
-					Updates(&model.ContestTeamLink{Link: link}).
+					Updates(&model.ContestTeamLink{Link: link, Order: i}).
 					Error; err != nil {
 					return err
 				}
