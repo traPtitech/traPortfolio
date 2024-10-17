@@ -15,7 +15,7 @@ type Contest struct {
 
 type ContestDetail struct {
 	Contest
-	Link         string
+	Links        []string
 	Description  string
 	ContestTeams []*ContestTeam
 }
@@ -34,6 +34,6 @@ type ContestTeam struct {
 
 type ContestTeamDetail struct {
 	ContestTeam
-	Link        string
+	Links       []string
 	Description string
 }

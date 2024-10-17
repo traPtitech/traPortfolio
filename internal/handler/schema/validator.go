@@ -45,7 +45,7 @@ func (r AddAccountRequest) Validate() error {
 func (r AddContestTeamRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
-		vd.Field(&r.Link, is.URL),
+		vd.Field(&r.Links, vd.Required, vd.Each(is.URL)),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
 		vd.Field(&r.Result, vdRuleResultLength),
 	)
@@ -61,7 +61,7 @@ func (r CreateContestRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
 		vd.Field(&r.Duration, vd.Required),
-		vd.Field(&r.Link, is.URL),
+		vd.Field(&r.Links, vd.Required, vd.Each(is.URL)),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
 	)
 }
@@ -70,7 +70,7 @@ func (r CreateProjectRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.Required, vdRuleDescriptionLength),
 		vd.Field(&r.Duration, vd.Required),
-		vd.Field(&r.Link, is.URL),
+		vd.Field(&r.Links, vd.Required, vd.Each(is.URL)),
 		vd.Field(&r.Name, vd.Required, vdRuleNameLength),
 	)
 }
@@ -85,18 +85,30 @@ func (r EditUserAccountRequest) Validate() error {
 }
 
 func (r EditContestRequest) Validate() error {
+	// vd.ValidateStructはフィールドをポインタでしか受け付けないため、vd.Eachルールでポインタのフィールドをうまく解釈できない
+	// vd.Field(&r.Links, vd.Each(is.URL)) ルールと等価
+	if r.Links != nil {
+		if err := vd.Validate(*r.Links, vd.Each(is.URL)); err != nil {
+			return err
+		}
+	}
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.NilOrNotEmpty, vdRuleDescriptionLength),
 		vd.Field(&r.Duration, vd.NilOrNotEmpty),
-		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 	)
 }
 
 func (r EditContestTeamRequest) Validate() error {
+	// vd.ValidateStructはフィールドをポインタでしか受け付けないため、vd.Eachルールでポインタのフィールドをうまく解釈できない
+	// vd.Field(&r.Links, vd.Each(is.URL)) ルールと等価
+	if r.Links != nil {
+		if err := vd.Validate(*r.Links, vd.Each(is.URL)); err != nil {
+			return err
+		}
+	}
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.NilOrNotEmpty, vdRuleDescriptionLength),
-		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 		vd.Field(&r.Result, vdRuleResultLength),
 	)
@@ -115,10 +127,16 @@ func (r EditEventRequest) Validate() error {
 }
 
 func (r EditProjectRequest) Validate() error {
+	// vd.ValidateStructはフィールドをポインタでしか受け付けないため、vd.Eachルールでポインタのフィールドをうまく解釈できない
+	// vd.Field(&r.Links, vd.Each(is.URL)) ルールと等価
+	if r.Links != nil {
+		if err := vd.Validate(*r.Links, vd.Each(is.URL)); err != nil {
+			return err
+		}
+	}
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.Description, vd.NilOrNotEmpty, vdRuleDescriptionLength),
 		vd.Field(&r.Duration, vd.NilOrNotEmpty),
-		vd.Field(&r.Link, is.URL),
 		vd.Field(&r.Name, vd.NilOrNotEmpty, vdRuleNameLength),
 	)
 }

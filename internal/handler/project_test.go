@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/traPtitech/traPortfolio/internal/handler/schema"
-	"github.com/traPtitech/traPortfolio/internal/pkgs/optional"
 	"github.com/traPtitech/traPortfolio/internal/usecases/repository"
 
 	"github.com/gofrs/uuid"
@@ -33,7 +32,7 @@ func setupProjectMock(t *testing.T) (MockRepository, API) {
 	return mr, api
 }
 
-func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, link string) *schema.CreateProjectRequest {
+func makeCreateProjectRequest(t *testing.T, description string, since schema.YearWithSemester, until *schema.YearWithSemester, name string, links []string) *schema.CreateProjectRequest {
 	t.Helper()
 	return &schema.CreateProjectRequest{
 		Description: description,
@@ -41,8 +40,8 @@ func makeCreateProjectRequest(t *testing.T, description string, since schema.Yea
 			Since: since,
 			Until: until,
 		},
-		Name: name,
-		Link: &link,
+		Name:  name,
+		Links: links,
 	}
 }
 
@@ -131,7 +130,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 						Duration: duration,
 					},
 					Description: random.AlphaNumeric(),
-					Link:        random.RandURLString(),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Members: []*domain.UserWithDuration{
 						{
 							User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
@@ -153,7 +152,7 @@ func TestProjectHandler_GetProject(t *testing.T) {
 					Description: repo.Description,
 					Duration:    schema.ConvertDuration(repo.Duration),
 					Id:          repo.ID,
-					Link:        repo.Link,
+					Links:       repo.Links,
 					Members:     members,
 					Name:        repo.Name,
 				}
@@ -232,12 +231,12 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 					schema.ConvertDuration(duration).Since,
 					schema.ConvertDuration(duration).Until,
 					random.AlphaNumeric(),
-					random.RandURLString(),
+					random.Array(random.RandURLString, 1, 3),
 				)
 				args := repository.CreateProjectArgs{
 					Name:          reqBody.Name,
 					Description:   reqBody.Description,
-					Link:          optional.FromPtr(reqBody.Link),
+					Links:         reqBody.Links,
 					SinceYear:     reqBody.Duration.Since.Year,
 					SinceSemester: int(reqBody.Duration.Since.Semester),
 					UntilYear:     reqBody.Duration.Until.Year,
@@ -255,7 +254,7 @@ func TestProjectHandler_CreateProject(t *testing.T) {
 						),
 					},
 					Description: args.Description,
-					Link:        args.Link.ValueOrZero(),
+					Links:       args.Links,
 					Members:     nil,
 				}
 				expectedResBody = schema.Project{

@@ -79,7 +79,7 @@ func TestGetContest(t *testing.T) {
 func TestCreateContest(t *testing.T) {
 	var (
 		name                    = random.AlphaNumeric()
-		link                    = random.RandURLString()
+		links                   = random.Array(random.RandURLString, 1, 3)
 		description             = random.AlphaNumeric()
 		since, until            = random.SinceAndUntil()
 		tooLongString           = strings.Repeat("a", 260)
@@ -87,7 +87,7 @@ func TestCreateContest(t *testing.T) {
 		justCountName           = strings.Repeat("亜", 32)
 		tooLongName             = strings.Repeat("亜", 33)
 		tooLongDescriptionKanji = strings.Repeat("亜", 257)
-		invalidURL              = "invalid url"
+		invalidURL              = []string{"invalid url"}
 	)
 
 	t.Parallel()
@@ -104,8 +104,8 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: name,
+				Links: links,
+				Name:  name,
 			},
 			schema.ContestDetail{
 				Description: description,
@@ -114,7 +114,7 @@ func TestCreateContest(t *testing.T) {
 					Until: &until,
 				},
 				Id:    uuid.Nil,
-				Link:  link,
+				Links: links,
 				Name:  name,
 				Teams: []schema.ContestTeam{},
 			},
@@ -127,8 +127,8 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: justCountName,
+				Links: links,
+				Name:  justCountName,
 			},
 			schema.ContestDetail{
 				Description: justCountDescription,
@@ -137,7 +137,7 @@ func TestCreateContest(t *testing.T) {
 					Until: &until,
 				},
 				Id:    uuid.Nil,
-				Link:  link,
+				Links: links,
 				Name:  justCountName,
 				Teams: []schema.ContestTeam{},
 			},
@@ -150,8 +150,8 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: name,
+				Links: links,
+				Name:  name,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
@@ -163,8 +163,8 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: name,
+				Links: links,
+				Name:  name,
 			},
 			httpError(t, "Bad Request: validate error: description: the length must be between 1 and 256."),
 		},
@@ -176,10 +176,10 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &invalidURL,
-				Name: name,
+				Links: invalidURL,
+				Name:  name,
 			},
-			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: links: (0: must be a valid URL.)."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -189,8 +189,8 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: tooLongString,
+				Links: links,
+				Name:  tooLongString,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
@@ -202,8 +202,8 @@ func TestCreateContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: tooLongName,
+				Links: links,
+				Name:  tooLongName,
 			},
 			httpError(t, "Bad Request: validate error: name: the length must be between 1 and 32."),
 		},
@@ -215,8 +215,8 @@ func TestCreateContest(t *testing.T) {
 					Since: until,
 					Until: &since,
 				},
-				Link: &link,
-				Name: name,
+				Links: links,
+				Name:  name,
 			},
 			httpError(t, "Bad Request: validate error: duration: must be a valid date."),
 		},
@@ -243,14 +243,14 @@ func TestEditContest(t *testing.T) {
 	var (
 		description             = random.AlphaNumeric()
 		since, until            = random.SinceAndUntil()
-		link                    = random.RandURLString()
+		links                   = random.Array(random.RandURLString, 1, 3)
 		name                    = random.AlphaNumeric()
 		tooLongString           = strings.Repeat("a", 260)
 		justCountDescription    = strings.Repeat("亜", 256)
 		justCountName           = strings.Repeat("亜", 32)
 		tooLongName             = strings.Repeat("亜", 33)
 		tooLongDescriptionKanji = strings.Repeat("亜", 257)
-		invalidURL              = "invalid url"
+		invalidURL              = []string{"invalid url"}
 	)
 
 	t.Parallel()
@@ -269,8 +269,8 @@ func TestEditContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: &name,
+				Links: &links,
+				Name:  &name,
 			},
 			nil,
 		},
@@ -283,8 +283,8 @@ func TestEditContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: &justCountName,
+				Links: &links,
+				Name:  &justCountName,
 			},
 			nil,
 		},
@@ -320,9 +320,9 @@ func TestEditContest(t *testing.T) {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			schema.EditContestRequest{
-				Link: &invalidURL,
+				Links: &invalidURL,
 			},
-			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: 0: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -360,8 +360,8 @@ func TestEditContest(t *testing.T) {
 					Since: since,
 					Until: &until,
 				},
-				Link: &link,
-				Name: &name,
+				Links: &links,
+				Name:  &name,
 			},
 			httpError(t, "Not Found: not found"),
 		},
@@ -390,12 +390,13 @@ func TestEditContest(t *testing.T) {
 				if tt.reqBody.Duration != nil {
 					contest.Duration = *tt.reqBody.Duration
 				}
-				if tt.reqBody.Link != nil {
-					contest.Link = *tt.reqBody.Link
-				}
 				if tt.reqBody.Name != nil {
 					contest.Name = *tt.reqBody.Name
 				}
+				if tt.reqBody.Links != nil {
+					contest.Links = *tt.reqBody.Links
+				}
+
 				res = doRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContest, tt.contestID), nil)
 				assertResponse(t, http.StatusOK, contest, res)
 			} else {
@@ -482,7 +483,7 @@ func TestGetContestTeams(t *testing.T) {
 func TestAddContestTeam(t *testing.T) {
 	var (
 		description             = random.AlphaNumeric()
-		link                    = random.RandURLString()
+		links                   = random.Array(random.RandURLString, 1, 3)
 		name                    = random.AlphaNumeric()
 		result                  = random.AlphaNumeric()
 		tooLongString           = strings.Repeat("a", 260)
@@ -492,7 +493,7 @@ func TestAddContestTeam(t *testing.T) {
 		tooLongName             = strings.Repeat("亜", 33)
 		tooLongDescriptionKanji = strings.Repeat("亜", 257)
 		tooLongResultKanji      = strings.Repeat("亜", 33)
-		invalidURL              = "invalid url"
+		invalidURL              = []string{"invalid url"}
 	)
 
 	t.Parallel()
@@ -507,7 +508,7 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: description,
-				Link:        &link,
+				Links:       links,
 				Name:        name,
 				Result:      &result,
 			},
@@ -522,7 +523,7 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: justCountDescription,
-				Link:        &link,
+				Links:       links,
 				Name:        justCountName,
 				Result:      &justCountResult,
 			},
@@ -537,7 +538,7 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: tooLongString,
-				Link:        &link,
+				Links:       links,
 				Name:        name,
 				Result:      &result,
 			},
@@ -548,7 +549,7 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: tooLongDescriptionKanji,
-				Link:        &link,
+				Links:       links,
 				Name:        name,
 				Result:      &result,
 			},
@@ -559,18 +560,18 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: description,
-				Link:        &invalidURL,
+				Links:       invalidURL,
 				Name:        name,
 				Result:      &result,
 			},
-			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: links: (0: must be a valid URL.)."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: description,
-				Link:        &link,
+				Links:       links,
 				Name:        tooLongString,
 				Result:      &result,
 			},
@@ -581,7 +582,7 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: description,
-				Link:        &link,
+				Links:       links,
 				Name:        tooLongName,
 				Result:      &result,
 			},
@@ -592,7 +593,7 @@ func TestAddContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			schema.AddContestTeamRequest{
 				Description: description,
-				Link:        &link,
+				Links:       links,
 				Name:        name,
 				Result:      &tooLongResultKanji,
 			},
@@ -603,7 +604,7 @@ func TestAddContestTeam(t *testing.T) {
 			random.UUID(),
 			schema.AddContestTeamRequest{
 				Description: description,
-				Link:        &link,
+				Links:       links,
 				Name:        name,
 				Result:      &result,
 			},
@@ -631,7 +632,7 @@ func TestAddContestTeam(t *testing.T) {
 func TestEditContestTeam(t *testing.T) {
 	var (
 		description             = random.AlphaNumeric()
-		link                    = random.RandURLString()
+		links                   = random.Array(random.RandURLString, 1, 3)
 		name                    = random.AlphaNumeric()
 		result                  = random.AlphaNumeric()
 		tooLongString           = strings.Repeat("a", 260)
@@ -641,7 +642,7 @@ func TestEditContestTeam(t *testing.T) {
 		tooLongName             = strings.Repeat("亜", 33)
 		tooLongDescriptionKanji = strings.Repeat("亜", 257)
 		tooLongResultKanji      = strings.Repeat("亜", 33)
-		invalidURL              = "invalid url"
+		invalidURL              = []string{"invalid url"}
 	)
 
 	t.Parallel()
@@ -658,7 +659,7 @@ func TestEditContestTeam(t *testing.T) {
 			mockdata.ContestTeamID1(),
 			schema.EditContestTeamRequest{
 				Description: &description,
-				Link:        &link,
+				Links:       &links,
 				Name:        &name,
 				Result:      &result,
 			},
@@ -670,7 +671,7 @@ func TestEditContestTeam(t *testing.T) {
 			mockdata.ContestTeamID2(),
 			schema.EditContestTeamRequest{
 				Description: &justCountDescription,
-				Link:        &link,
+				Links:       &links,
 				Name:        &justCountName,
 				Result:      &justCountResult,
 			},
@@ -720,9 +721,9 @@ func TestEditContestTeam(t *testing.T) {
 			mockdata.ContestID1(),
 			mockdata.ContestTeamID1(),
 			schema.EditContestTeamRequest{
-				Link: &invalidURL,
+				Links: &invalidURL,
 			},
-			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: 0: must be a valid URL."),
 		},
 		"400 invalid Name": {
 			http.StatusBadRequest,
@@ -766,7 +767,7 @@ func TestEditContestTeam(t *testing.T) {
 			random.UUID(),
 			schema.EditContestTeamRequest{
 				Description: &description,
-				Link:        &link,
+				Links:       &links,
 				Name:        &name,
 				Result:      &result,
 			},
@@ -794,15 +795,16 @@ func TestEditContestTeam(t *testing.T) {
 				if tt.reqBody.Description != nil {
 					contestTeam.Description = *tt.reqBody.Description
 				}
-				if tt.reqBody.Link != nil {
-					contestTeam.Link = *tt.reqBody.Link
-				}
 				if tt.reqBody.Name != nil {
 					contestTeam.Name = *tt.reqBody.Name
 				}
 				if tt.reqBody.Result != nil {
 					contestTeam.Result = *tt.reqBody.Result
 				}
+				if tt.reqBody.Links != nil {
+					contestTeam.Links = *tt.reqBody.Links
+				}
+
 				res = doRequest(t, e, http.MethodGet, e.URL(api.Contest.GetContestTeam, tt.contestID, tt.teamID), nil)
 				assertResponse(t, http.StatusOK, contestTeam, res)
 			} else {
