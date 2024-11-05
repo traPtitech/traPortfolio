@@ -13,6 +13,6 @@ type Project struct {
 type ProjectDetail struct {
 	Project
 	Description string
-	Link        string
+	Links       []string
 	Members     []*UserWithDuration
 }

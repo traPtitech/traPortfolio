@@ -98,7 +98,7 @@ func formatGetGroup(group *domain.GroupDetail) schema.GroupDetail {
 		newGroup(group.ID, group.Name),
 		group.Description,
 		adminRes,
-		group.Link,
+		group.Links,
 		groupRes,
 	)
 
@@ -114,12 +114,12 @@ func newGroupMember(user schema.User, Duration schema.YearWithSemesterDuration) 
 	}
 }
 
-func newGroupDetail(group schema.Group, desc string, admin []schema.User, link string, members []schema.GroupMember) schema.GroupDetail {
+func newGroupDetail(group schema.Group, desc string, admin []schema.User, links []string, members []schema.GroupMember) schema.GroupDetail {
 	return schema.GroupDetail{
 		Description: desc,
 		Id:          group.Id,
 		Admin:       admin,
-		Link:        link,
+		Links:       links,
 		Members:     members,
 		Name:        group.Name,
 	}

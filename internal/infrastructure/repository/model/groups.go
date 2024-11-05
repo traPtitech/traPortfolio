@@ -9,7 +9,6 @@ import (
 type Group struct {
 	GroupID     uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Name        string    `gorm:"type:varchar(32)"`
-	Link        string    `gorm:"type:text"`
 	Description string    `gorm:"type:text"`
 	CreatedAt   time.Time `gorm:"precision:6"`
 	UpdatedAt   time.Time `gorm:"precision:6"`
@@ -48,4 +47,14 @@ type GroupUserAdmin struct {
 
 func (*GroupUserAdmin) TableName() string {
 	return "group_user_admins"
+}
+
+type GroupLink struct {
+	GroupID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Order   int       `gorm:"type:int;not null;primaryKey"`
+	Link    string    `gorm:"type:text;not null"`
+}
+
+func (*GroupLink) TableName() string {
+	return "group_links"
 }

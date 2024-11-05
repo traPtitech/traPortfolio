@@ -78,8 +78,8 @@ func TestGetProject(t *testing.T) {
 func TestCreateProject(t *testing.T) {
 	var (
 		name                    = random.AlphaNumeric()
-		link                    = random.RandURLString()
-		invalidLink             = "invalid link"
+		links                   = random.Array(random.RandURLString, 1, 3)
+		invalidLink             = []string{"invalid link"}
 		description             = random.AlphaNumeric()
 		justCountName           = strings.Repeat("亜", 32)
 		justCountDescription    = strings.Repeat("亜", 256)
@@ -99,7 +99,7 @@ func TestCreateProject(t *testing.T) {
 			http.StatusCreated,
 			schema.CreateProjectRequest{
 				Name:        name,
-				Link:        &link,
+				Links:       links,
 				Description: description,
 				Duration:    duration,
 			},
@@ -113,7 +113,7 @@ func TestCreateProject(t *testing.T) {
 			http.StatusCreated,
 			schema.CreateProjectRequest{
 				Name:        justCountName,
-				Link:        &link,
+				Links:       links,
 				Description: justCountDescription,
 				Duration:    duration,
 			},
@@ -127,17 +127,17 @@ func TestCreateProject(t *testing.T) {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
 				Name:        name,
-				Link:        &invalidLink,
+				Links:       invalidLink,
 				Description: description,
 				Duration:    duration,
 			},
-			httpError(t, "Bad Request: validate error: link: must be a valid URL."),
+			httpError(t, "Bad Request: validate error: links: (0: must be a valid URL.)."),
 		},
 		"400 too long description": {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
 				Name:        name,
-				Link:        &link,
+				Links:       links,
 				Description: tooLongDescriptionKanji,
 				Duration:    duration,
 			},
@@ -147,7 +147,7 @@ func TestCreateProject(t *testing.T) {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
 				Name:        tooLongName,
-				Link:        &link,
+				Links:       links,
 				Description: description,
 				Duration:    duration,
 			},
@@ -156,7 +156,7 @@ func TestCreateProject(t *testing.T) {
 		"400 empty name": {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
-				Link:        &link,
+				Links:       links,
 				Description: description,
 				Duration:    duration,
 			},
@@ -166,7 +166,7 @@ func TestCreateProject(t *testing.T) {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
 				Name:     name,
-				Link:     &link,
+				Links:    links,
 				Duration: duration,
 			},
 			httpError(t, "Bad Request: validate error: description: cannot be blank."),
@@ -175,7 +175,7 @@ func TestCreateProject(t *testing.T) {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
 				Name:        name,
-				Link:        &link,
+				Links:       links,
 				Description: description,
 			},
 			httpError(t, "Bad Request: argument error"),
@@ -184,7 +184,7 @@ func TestCreateProject(t *testing.T) {
 			http.StatusBadRequest,
 			schema.CreateProjectRequest{
 				Name:        conflictedProject.Name,
-				Link:        &link,
+				Links:       links,
 				Description: description,
 			},
 			httpError(t, "Bad Request: argument error"),
@@ -212,7 +212,7 @@ func TestCreateProject(t *testing.T) {
 func TestEditProject(t *testing.T) {
 	var (
 		name                    = random.AlphaNumeric()
-		link                    = random.RandURLString()
+		links                   = random.Array(random.RandURLString, 1, 3)
 		description             = random.AlphaNumeric()
 		justCountName           = strings.Repeat("亜", 32)
 		justCountDescription    = strings.Repeat("亜", 256)
@@ -233,7 +233,7 @@ func TestEditProject(t *testing.T) {
 			mockdata.ProjectID1(),
 			schema.EditProjectRequest{
 				Name:        &name,
-				Link:        &link,
+				Links:       &links,
 				Description: &description,
 				Duration:    &duration,
 			},
@@ -244,7 +244,7 @@ func TestEditProject(t *testing.T) {
 			mockdata.ProjectID1(),
 			schema.EditProjectRequest{
 				Name:        &justCountName,
-				Link:        &link,
+				Links:       &links,
 				Description: &justCountDescription,
 				Duration:    &duration,
 			},

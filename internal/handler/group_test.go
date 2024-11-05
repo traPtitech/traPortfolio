@@ -142,7 +142,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				rgroup := domain.GroupDetail{
 					ID:          random.UUID(),
 					Name:        random.AlphaNumeric(),
-					Link:        random.AlphaNumeric(),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Admin:       rgroupAdmins,
 					Members:     rgroupMembers,
 					Description: random.AlphaNumeric(),
@@ -152,7 +152,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					Description: rgroup.Description,
 					Id:          rgroup.ID,
 					Admin:       hgroupAdmins,
-					Link:        rgroup.Link,
+					Links:       rgroup.Links,
 					Members:     hgroupMembers,
 					Name:        rgroup.Name,
 				}
