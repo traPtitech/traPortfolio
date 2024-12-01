@@ -88,13 +88,13 @@ jobs:
         with:
           name: coverage_integration
       - name: Upload coverage data (Unit)
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage_unit.txt
           flags: unit
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage data (Integration)
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage_integration.txt
           flags: integration
