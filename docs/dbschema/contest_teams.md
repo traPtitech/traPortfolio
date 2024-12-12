@@ -11,7 +11,7 @@
 CREATE TABLE `contest_teams` (
   `id` char(36) NOT NULL,
   `contest_id` char(36) NOT NULL,
-  `name` varchar(32) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `result` text DEFAULT NULL,
   `link` text DEFAULT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `contest_teams` (
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [contest_team_user_belongings](contest_team_user_belongings.md) |  | コンテストチームUUID |
 | contest_id | char(36) |  | false |  | [contests](contests.md) | コンテストUUID |
-| name | varchar(32) | NULL | true |  |  | チーム名 |
+| name | varchar(128) | NULL | true |  |  | チーム名 |
 | description | text | NULL | true |  |  | チーム情報 |
 | result | text | NULL | true |  |  | 順位などの結果 |
 | link | text | NULL | true |  |  | コンテストチームの詳細が載っているページへのリンク |
@@ -63,7 +63,7 @@ erDiagram
 "contest_teams" {
   char_36_ id PK
   char_36_ contest_id FK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text result
   text link
@@ -78,7 +78,7 @@ erDiagram
 }
 "contests" {
   char_36_ id PK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text link
   datetime_6_ since

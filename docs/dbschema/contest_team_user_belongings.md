@@ -63,7 +63,7 @@ erDiagram
 "contest_teams" {
   char_36_ id PK
   char_36_ contest_id FK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text result
   text link
@@ -75,6 +75,7 @@ erDiagram
   text description
   tinyint_1_ check
   varchar_32_ name
+  varchar_32_ display_name
   tinyint_1_ state
   datetime_6_ created_at
   datetime_6_ updated_at

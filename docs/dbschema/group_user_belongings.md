@@ -77,6 +77,7 @@ erDiagram
   text description
   tinyint_1_ check
   varchar_32_ name
+  varchar_32_ display_name
   tinyint_1_ state
   datetime_6_ created_at
   datetime_6_ updated_at
