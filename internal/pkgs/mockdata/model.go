@@ -56,7 +56,6 @@ func CloneMockAccounts() []model.Account {
 			Name:   "sample_account_display_name",
 			URL:    "https://twitter.com/sample_account",
 			UserID: UserID1(),
-			Check:  true,
 		},
 	}
 }

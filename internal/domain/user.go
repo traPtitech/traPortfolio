@@ -44,7 +44,6 @@ type Account struct {
 	ID          uuid.UUID
 	DisplayName string
 	Type        AccountType
-	PrPermitted bool
 	URL         string
 }
 
