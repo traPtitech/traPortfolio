@@ -131,7 +131,7 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 	if v, ok := args.Since.V(); ok {
 		changes["since"] = v
 	}
-	if v, ok := args.Until.V(); ok == untilEmpty || v != origin.Until {
+	if v, ok := args.Until.V(); ok == untilEmpty || !v.Equal(origin.Until) {
 		changes["until"] = v
 	}
 

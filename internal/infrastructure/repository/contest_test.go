@@ -124,7 +124,7 @@ func Test_UpdateContest(t *testing.T) {
 
 	t.Run("update no fields", func(t *testing.T) {
 		args := &repository.UpdateContestArgs{}
-		args.Until = optional.New(contest.TimeEnd, contest.TimeEnd == time.Time{})
+		args.Until = optional.New(contest.TimeEnd, contest.TimeEnd.Equal(time.Time{}))
 		err := repo.UpdateContest(context.Background(), contest.ID, args)
 		assert.NoError(t, err)
 
@@ -136,7 +136,8 @@ func Test_UpdateContest(t *testing.T) {
 
 	t.Run("update until to nil", func(t *testing.T) {
 		argWithUntil := random.CreateContestArgs()
-		argWithUntil.Until = random.UpdateContestArgs().Since
+		// CreateContestArgsのUntilは5割で"未定"なのでsinceの1時間後を代入する
+		argWithUntil.Until = optional.From(argWithUntil.Since.Add(time.Hour))
 		contest, err := repo.CreateContest(context.Background(), argWithUntil)
 		assert.NoError(t, err)
 
@@ -144,6 +145,10 @@ func Test_UpdateContest(t *testing.T) {
 		argWithoutUntil.Until = optional.Of[time.Time]{}
 		err = repo.UpdateContest(context.Background(), contest.ID, argWithoutUntil)
 		assert.NoError(t, err)
+
+		contest, err = repo.GetContest(context.Background(), contest.ID)
+		assert.NoError(t, err)
+		assert.Equal(t, contest.TimeEnd, time.Time{})
 	})
 
 	t.Run("update failed: not contest id", func(t *testing.T) {
