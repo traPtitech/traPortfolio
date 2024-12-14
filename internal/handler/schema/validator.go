@@ -36,7 +36,6 @@ func (p GetUsersParams) Validate() error {
 func (r AddAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.Required, vdRuleDisplayNameLength),
-		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.Required, is.URL),
 	)
@@ -78,7 +77,6 @@ func (r CreateProjectRequest) Validate() error {
 func (r EditUserAccountRequest) Validate() error {
 	return vd.ValidateStruct(&r,
 		vd.Field(&r.DisplayName, vd.NilOrNotEmpty, vdRuleDisplayNameLength),
-		vd.Field(&r.PrPermitted),
 		vd.Field(&r.Type, vdRuleAccountTypeMax),
 		vd.Field(&r.Url, vd.NilOrNotEmpty, is.URL),
 	)

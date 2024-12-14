@@ -73,7 +73,7 @@ func (h *UserHandler) GetUser(c echo.Context) error {
 
 	accounts := make([]schema.Account, len(user.Accounts))
 	for i, v := range user.Accounts {
-		accounts[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL, v.PrPermitted)
+		accounts[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL)
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
@@ -123,7 +123,7 @@ func (h *UserHandler) GetUserAccounts(c echo.Context) error {
 
 	res := make([]schema.Account, len(accounts))
 	for i, v := range accounts {
-		res[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL, v.PrPermitted)
+		res[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -147,7 +147,7 @@ func (h *UserHandler) GetUserAccount(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, schema.AccountType(account.Type), account.URL, account.PrPermitted))
+	return c.JSON(http.StatusOK, newAccount(account.ID, account.DisplayName, schema.AccountType(account.Type), account.URL))
 }
 
 // AddUserAccount POST /users/:userID/accounts
@@ -166,7 +166,6 @@ func (h *UserHandler) AddUserAccount(c echo.Context) error {
 	args := repository.CreateAccountArgs{
 		DisplayName: req.DisplayName,
 		Type:        domain.AccountType(req.Type),
-		PrPermitted: bool(req.PrPermitted),
 		URL:         req.Url,
 	}
 	account, err := h.user.CreateAccount(ctx, userID, &args)
@@ -174,7 +173,7 @@ func (h *UserHandler) AddUserAccount(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, schema.AccountType(account.Type), account.URL, account.PrPermitted))
+	return c.JSON(http.StatusCreated, newAccount(account.ID, account.DisplayName, schema.AccountType(account.Type), account.URL))
 }
 
 // EditUserAccount PATCH /users/:userID/accounts/:accountID
@@ -200,7 +199,6 @@ func (h *UserHandler) EditUserAccount(c echo.Context) error {
 		DisplayName: optional.FromPtr(req.DisplayName),
 		Type:        optional.FromPtr((*domain.AccountType)(req.Type)),
 		URL:         optional.FromPtr(req.Url),
-		PrPermitted: optional.FromPtr(req.PrPermitted),
 	}
 
 	err = h.user.UpdateAccount(ctx, userID, accountID, &args)
@@ -356,7 +354,7 @@ func (h *UserHandler) GetMe(c echo.Context) error {
 
 	accounts := make([]schema.Account, len(user.Accounts))
 	for i, v := range user.Accounts {
-		accounts[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL, v.PrPermitted)
+		accounts[i] = newAccount(v.ID, v.DisplayName, schema.AccountType(v.Type), v.URL)
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
@@ -386,13 +384,12 @@ func newUserDetail(user schema.User, accounts []schema.Account, bio string, stat
 	}
 }
 
-func newAccount(id uuid.UUID, displayName string, atype schema.AccountType, url string, prPermitted bool) schema.Account {
+func newAccount(id uuid.UUID, displayName string, atype schema.AccountType, url string) schema.Account {
 	return schema.Account{
 		Id:          id,
 		DisplayName: displayName,
 		Type:        atype,
 		Url:         url,
-		PrPermitted: schema.PrPermitted(prPermitted),
 	}
 }
 

@@ -830,8 +830,6 @@ components:
           description: 外部アカウントの表示名
         type:
           $ref: "#/components/schemas/AccountType"
-        prPermitted:
-          $ref: "#/components/schemas/PrPermitted"
         url:
           type: string
           description: アカウントurl
@@ -839,7 +837,6 @@ components:
         - id
         - displayName
         - type
-        - prPermitted
         - url
     AccountType:
       type: integer
@@ -1207,10 +1204,6 @@ components:
           required:
             - link
             - description
-    PrPermitted:
-      title: PrPermitted
-      type: boolean
-      description: 広報での利用が許可されているかどうか
     Duration:
       title: Duration
       type: object
@@ -1306,8 +1299,6 @@ components:
       properties:
         type:
           $ref: "#/components/schemas/AccountType"
-        prPermitted:
-          $ref: "#/components/schemas/PrPermitted"
         url:
           type: string
           description: アカウントurl
@@ -1317,7 +1308,6 @@ components:
           description: 外部アカウントの表示名
       required:
         - type
-        - prPermitted
         - url
         - displayName
     EditUserAccountRequest:
@@ -1327,8 +1317,6 @@ components:
       properties:
         type:
           $ref: "#/components/schemas/AccountType"
-        prPermitted:
-          $ref: "#/components/schemas/PrPermitted"
         url:
           type: string
           description: アカウントurl
