@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/internal/domain"
@@ -52,14 +53,31 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 	}
 
 	members := make([]*model.ProjectMember, 0)
-	err := r.h.
+	if err := r.h.
 		WithContext(ctx).
 		Preload("User").
 		Where(model.ProjectMember{ProjectID: projectID}).
 		Find(&members).
-		Error
-	if err != nil {
+		Error; err != nil {
 		return nil, err
+	}
+
+	projectLinks := make([]model.ProjectLink, 0)
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.ProjectLink{ProjectID: projectID}).
+		Find(&projectLinks).
+		Error; err != nil {
+		if err != repository.ErrNotFound {
+			return nil, err
+		}
+	} else {
+		sort.Slice(projectLinks, func(i, j int) bool { return projectLinks[i].Order < projectLinks[j].Order })
+	}
+
+	links := make([]string, len(projectLinks))
+	for i, link := range projectLinks {
+		links[i] = link.Link
 	}
 
 	realNameMap, err := external.GetRealNameMap(r.portal)
@@ -89,7 +107,7 @@ func (r *ProjectRepository) GetProject(ctx context.Context, projectID uuid.UUID)
 			Duration: domain.NewYearWithSemesterDuration(project.SinceYear, project.SinceSemester, project.UntilYear, project.UntilSemester),
 		},
 		Description: project.Description,
-		Link:        project.Link,
+		Links:       links,
 		Members:     m,
 	}
 	return res, nil
@@ -105,7 +123,6 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 		UntilYear:     args.UntilYear,
 		UntilSemester: args.UntilSemester,
 	}
-	p.Link = args.Link.ValueOr(p.Link)
 
 	// 既に同名のプロジェクトが存在するか
 	err := r.h.
@@ -119,7 +136,24 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 		return nil, err
 	}
 
-	err = r.h.WithContext(ctx).Create(&p).Error
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.
+			WithContext(ctx).
+			Create(&p).
+			Error; err != nil {
+			return err
+		}
+
+		for i, link := range args.Links {
+			if err := tx.
+				WithContext(ctx).
+				Create(&model.ProjectLink{ProjectID: p.ID, Order: i, Link: link}).
+				Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +165,7 @@ func (r *ProjectRepository) CreateProject(ctx context.Context, args *repository.
 			Duration: domain.NewYearWithSemesterDuration(p.SinceYear, p.SinceSemester, p.UntilYear, p.UntilSemester),
 		},
 		Description: p.Description,
-		Link:        p.Link,
+		Links:       args.Links,
 	}
 
 	return res, nil
@@ -144,9 +178,6 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 	}
 	if v, ok := args.Description.V(); ok {
 		changes["description"] = v
-	}
-	if v, ok := args.Link.V(); ok {
-		changes["link"] = v
 	}
 	if sy, ok := args.SinceYear.V(); ok {
 		if ss, ok := args.SinceSemester.V(); ok {
@@ -161,16 +192,108 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		}
 	}
 
-	if len(changes) == 0 {
+	var changeLinkMap map[int]string
+	var insertLinkMap map[int]string
+	var removeLinks []int
+
+	if afterLinks, ok := args.Links.V(); ok {
+		var projectLinks []model.ProjectLink
+		if err := r.h.
+			WithContext(ctx).
+			Where(&model.ProjectLink{ProjectID: projectID}).
+			Find(&projectLinks).
+			Error; err != nil {
+			if err != repository.ErrNotFound {
+				return err
+			}
+		} else {
+			sort.Slice(projectLinks, func(i, j int) bool { return projectLinks[i].Order < projectLinks[j].Order })
+		}
+
+		sizeBefore := len(projectLinks)
+		sizeAfter := len(afterLinks)
+		sizeChange := min(sizeBefore, sizeAfter)
+
+		changeLinkMap = make(map[int]string, sizeChange)
+
+		i := 0
+		for ; i < sizeChange; i++ {
+			if projectLinks[i].Link != afterLinks[i] {
+				changeLinkMap[i] = afterLinks[i]
+			}
+		}
+
+		if sizeBefore > sizeAfter {
+			removeLinks = make([]int, sizeBefore-sizeAfter)
+			for ; i < sizeBefore; i++ {
+				removeLinks[i-sizeAfter] = i
+			}
+		}
+
+		if sizeAfter > sizeBefore {
+			insertLinkMap = make(map[int]string, sizeAfter-sizeBefore)
+			for ; i < sizeAfter; i++ {
+				insertLinkMap[i] = afterLinks[i]
+			}
+		}
+	} else if len(changes) == 0 {
 		return nil
 	}
 
-	err := r.h.
-		WithContext(ctx).
-		Model(&model.Project{}).
-		Where(&model.Project{ID: projectID}).
-		Updates(changes).
-		Error
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// リンク以外の変更
+		if len(changes) != 0 {
+			err := r.h.
+				WithContext(ctx).
+				Model(&model.Project{}).
+				Where(&model.Project{ID: projectID}).
+				Updates(changes).
+				Error
+			if err != nil {
+				return err
+			}
+		}
+
+		// リンク変更
+		if len(changeLinkMap) > 0 {
+			for i, link := range changeLinkMap {
+				if err := tx.
+					WithContext(ctx).
+					Where(&model.ProjectLink{ProjectID: projectID, Order: i}).
+					Updates(&model.ProjectLink{Link: link, Order: i}).
+					Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		// リンク削除
+		if len(removeLinks) != 0 {
+			for _, order := range removeLinks {
+				if err := tx.
+					WithContext(ctx).
+					Where(&model.ProjectLink{ProjectID: projectID, Order: order}).
+					Delete(&model.ProjectLink{}).
+					Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		// リンク作成
+		if len(insertLinkMap) != 0 {
+			for i, insertLink := range insertLinkMap {
+				if err := tx.
+					WithContext(ctx).
+					Create(&model.ProjectLink{ProjectID: projectID, Order: i, Link: insertLink}).
+					Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
 		return err
 	}

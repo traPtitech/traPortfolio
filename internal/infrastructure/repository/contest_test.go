@@ -114,7 +114,7 @@ func Test_UpdateContest(t *testing.T) {
 
 		contest.Name = args.Name.ValueOr(contest.Name)
 		contest.Description = args.Description.ValueOr(contest.Description)
-		contest.Link = args.Link.ValueOr(contest.Link)
+		contest.Links = args.Links.ValueOr(contest.Links)
 		contest.TimeStart = args.Since.ValueOr(contest.TimeStart)
 		contest.TimeEnd = args.Until.ValueOr(contest.TimeEnd)
 		assert.Equal(t, contest, gotContest)
@@ -254,7 +254,7 @@ func Test_UpdateContestTeam(t *testing.T) {
 
 		team.Name = args.Name.ValueOr(team.Name)
 		team.Result = args.Result.ValueOr(team.Result)
-		team.Link = args.Link.ValueOr(team.Link)
+		team.Links = args.Links.ValueOr(team.Links)
 		team.Description = args.Description.ValueOr(team.Description)
 		assert.Equal(t, team, gotTeam)
 	})

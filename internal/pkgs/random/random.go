@@ -197,6 +197,15 @@ func Bool() bool {
 	return rand.Int()%2 == 0
 }
 
+func Array[T any](fn func() T, min int, max int) []T {
+	size := rand.IntN(max-min+1) + min
+	ret := make([]T, size)
+	for i := 0; i < size; i++ {
+		ret[i] = fn()
+	}
+	return ret
+}
+
 func Optional[T any](t T) optional.Of[T] {
 	return optional.New(t, Bool())
 }
