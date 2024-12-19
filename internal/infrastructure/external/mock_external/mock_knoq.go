@@ -21,6 +21,7 @@ import (
 type MockKnoqAPI struct {
 	ctrl     *gomock.Controller
 	recorder *MockKnoqAPIMockRecorder
+	isgomock struct{}
 }
 
 // MockKnoqAPIMockRecorder is the mock recorder for MockKnoqAPI.

@@ -23,6 +23,7 @@ import (
 type MockProjectRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockProjectRepositoryMockRecorder
+	isgomock struct{}
 }
 
 // MockProjectRepositoryMockRecorder is the mock recorder for MockProjectRepository.
@@ -90,9 +91,33 @@ func (m *MockProjectRepository) DeleteProject(ctx context.Context, projectID uui
 }
 
 // DeleteProject indicates an expected call of DeleteProject.
-func (mr *MockProjectRepositoryMockRecorder) DeleteProject(ctx, projectID interface{}) *gomock.Call {
+func (mr *MockProjectRepositoryMockRecorder) DeleteProject(ctx, projectID any) *MockProjectRepositoryDeleteProjectCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectRepository)(nil).DeleteProject), ctx, projectID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectRepository)(nil).DeleteProject), ctx, projectID)
+	return &MockProjectRepositoryDeleteProjectCall{Call: call}
+}
+
+// MockProjectRepositoryDeleteProjectCall wrap *gomock.Call
+type MockProjectRepositoryDeleteProjectCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockProjectRepositoryDeleteProjectCall) Return(arg0 error) *MockProjectRepositoryDeleteProjectCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockProjectRepositoryDeleteProjectCall) Do(f func(context.Context, uuid.UUID) error) *MockProjectRepositoryDeleteProjectCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockProjectRepositoryDeleteProjectCall) DoAndReturn(f func(context.Context, uuid.UUID) error) *MockProjectRepositoryDeleteProjectCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // EditProjectMembers mocks base method.
