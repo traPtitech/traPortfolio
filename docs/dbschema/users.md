@@ -13,6 +13,7 @@ CREATE TABLE `users` (
   `description` text NOT NULL,
   `check` tinyint(1) NOT NULL DEFAULT 0,
   `name` varchar(32) NOT NULL,
+  `display_name` varchar(32) DEFAULT NULL,
   `state` tinyint(1) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
@@ -31,6 +32,7 @@ CREATE TABLE `users` (
 | description | text |  | false |  |  | 自己紹介文 |
 | check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 (0: 停止, 1: 有効, 2: 一時停止) |
 | name | varchar(32) |  | false |  |  | ユーザー名 |
+| display_name | varchar(32) | NULL | true |  |  | ユーザー表示名 |
 | state | tinyint(1) |  | false |  |  | traQのユーザーアカウント状態 |
 | created_at | datetime(6) | NULL | true |  |  |  |
 | updated_at | datetime(6) | NULL | true |  |  |  |
@@ -64,6 +66,7 @@ erDiagram
   text description
   tinyint_1_ check
   varchar_32_ name
+  varchar_32_ display_name
   tinyint_1_ state
   datetime_6_ created_at
   datetime_6_ updated_at
@@ -95,9 +98,8 @@ erDiagram
   datetime_6_ updated_at
 }
 "project_members" {
-  char_36_ id PK
-  char_36_ project_id FK
-  char_36_ user_id FK
+  char_36_ project_id PK
+  char_36_ user_id PK
   smallint_4_ since_year
   tinyint_1_ since_semester
   smallint_4_ until_year

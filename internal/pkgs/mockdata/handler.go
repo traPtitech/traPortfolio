@@ -121,9 +121,10 @@ func CloneHandlerMockContestTeamMembersByID() map[uuid.UUID][]schema.User {
 				for i, cm := range mockMembers {
 					if ct.UserID == cm.ID {
 						hContestMembers[ct.TeamID] = append(hContestMembers[c.ID], schema.User{
-							Id:       cm.ID,
-							Name:     cm.Name,
-							RealName: portalUsers[i].RealName,
+							DisplayName: cm.DisplayName,
+							Id:          cm.ID,
+							Name:        cm.Name,
+							RealName:    portalUsers[i].RealName,
 						})
 					}
 				}
@@ -361,11 +362,12 @@ func CloneHandlerMockUsers() []schema.User {
 	)
 
 	for i, u := range mUsers {
-		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.Check)
+		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.DisplayName, u.Check)
 		hUsers[i] = schema.User{
-			Id:       d.ID,
-			Name:     d.Name,
-			RealName: d.RealName(),
+			DisplayName: d.DisplayName,
+			Id:          d.ID,
+			Name:        d.Name,
+			RealName:    d.RealName(),
 		}
 	}
 

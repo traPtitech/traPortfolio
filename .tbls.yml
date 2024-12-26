@@ -22,6 +22,7 @@ comments:
       description: 自己紹介文
       check: "氏名を公開するかどうかの可否 (0: 停止, 1: 有効, 2: 一時停止)"
       name: ユーザー名
+      display_name: ユーザー表示名
       state: traQのユーザーアカウント状態
   - table: event_level_relations
     tableComment: knoQイベントと公開レベルの関係テーブル

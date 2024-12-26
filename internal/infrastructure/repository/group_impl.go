@@ -59,7 +59,8 @@ func (r *GroupRepository) GetGroup(ctx context.Context, groupID uuid.UUID) (*dom
 	for _, v := range users {
 		erMembers = append(erMembers, &domain.UserWithDuration{
 			User: domain.User{
-				ID: v.UserID,
+				DisplayName: v.User.DisplayName,
+				ID:          v.UserID,
 				// Name:     v.Name,
 				// RealName: v.RealName,
 			},

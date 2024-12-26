@@ -205,12 +205,14 @@ func TestProjectRepository_GetProjectMembers(t *testing.T) {
 		mockdata.MockUsers[0].ID,
 		mockdata.MockUsers[0].Name,
 		mockdata.MockPortalUsers[0].RealName,
+		mockdata.MockUsers[1].DisplayName,
 		mockdata.MockUsers[0].Check,
 	)
 	user2 := domain.NewUser(
 		mockdata.MockUsers[1].ID,
 		mockdata.MockUsers[1].Name,
 		mockdata.MockPortalUsers[1].RealName,
+		mockdata.MockUsers[1].DisplayName,
 		mockdata.MockUsers[1].Check,
 	)
 
@@ -299,18 +301,21 @@ func TestProjectRepository_EditProjectMembers(t *testing.T) {
 		mockdata.MockUsers[0].ID,
 		mockdata.MockUsers[0].Name,
 		mockdata.MockPortalUsers[0].RealName,
+		mockdata.MockUsers[1].DisplayName,
 		mockdata.MockUsers[0].Check,
 	)
 	user2 := domain.NewUser(
 		mockdata.MockUsers[1].ID,
 		mockdata.MockUsers[1].Name,
 		mockdata.MockPortalUsers[1].RealName,
+		mockdata.MockUsers[1].DisplayName,
 		mockdata.MockUsers[1].Check,
 	)
 	user3 := domain.NewUser(
 		mockdata.MockUsers[2].ID,
 		mockdata.MockUsers[2].Name,
 		mockdata.MockPortalUsers[2].RealName,
+		mockdata.MockUsers[2].DisplayName,
 		mockdata.MockUsers[2].Check,
 	)
 

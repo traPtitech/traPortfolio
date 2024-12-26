@@ -767,10 +767,14 @@ components:
         realName:
           type: string
           description: 本名
+        displayName:
+          type: string
+          description: 表示名
       required:
         - id
         - name
         - realName
+        - displayName
     UserDetail:
       title: UserDetail
       type: object
@@ -1292,6 +1296,9 @@ components:
         bio:
           type: string
           description: 自己紹介(biography)
+        displayName:
+          type: string
+          description: 表示名
         check:
           type: boolean
           description: |-

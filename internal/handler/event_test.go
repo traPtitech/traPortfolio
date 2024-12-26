@@ -110,11 +110,12 @@ func TestEventHandler_GetEvent(t *testing.T) {
 				hHost := []schema.User{}
 
 				for range hostnum {
-					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
+					rhost := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					hhost := schema.User{
-						Id:       rhost.ID,
-						Name:     rhost.Name,
-						RealName: rhost.RealName(),
+						DisplayName: rhost.DisplayName,
+						Id:          rhost.ID,
+						Name:        rhost.Name,
+						RealName:    rhost.RealName(),
 					}
 
 					rHost = append(rHost, rhost)
