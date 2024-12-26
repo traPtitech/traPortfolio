@@ -85,13 +85,13 @@ func formatGetGroup(group *domain.GroupDetail) schema.GroupDetail {
 	groupRes := make([]schema.GroupMember, len(group.Members))
 	for i, v := range group.Members {
 		groupRes[i] = newGroupMember(
-			newUser(v.User.ID, v.User.Name, v.User.RealName()),
+			newUser(v.User.ID, v.User.Name, v.User.RealName(), v.User.DisplayName),
 			schema.ConvertDuration(v.Duration),
 		)
 	}
 	adminRes := make([]schema.User, len(group.Admin))
 	for i, v := range group.Admin {
-		adminRes[i] = newUser(v.ID, v.Name, v.RealName())
+		adminRes[i] = newUser(v.ID, v.Name, v.RealName(), v.DisplayName)
 	}
 
 	res := newGroupDetail(

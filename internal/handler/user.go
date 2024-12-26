@@ -42,7 +42,7 @@ func (h *UserHandler) GetUsers(c echo.Context) error {
 
 	res := make([]schema.User, len(users))
 	for i, v := range users {
-		res[i] = newUser(v.ID, v.Name, v.RealName())
+		res[i] = newUser(v.ID, v.Name, v.RealName(), v.DisplayName)
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -77,7 +77,7 @@ func (h *UserHandler) GetUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
-		newUser(user.ID, user.Name, user.RealName()),
+		newUser(user.ID, user.Name, user.RealName(), user.DisplayName),
 		accounts,
 		user.Bio,
 		user.State,
@@ -360,18 +360,19 @@ func (h *UserHandler) GetMe(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, newUserDetail(
-		newUser(user.ID, user.Name, user.RealName()),
+		newUser(user.ID, user.Name, user.RealName(), user.User.DisplayName),
 		accounts,
 		user.Bio,
 		user.State,
 	))
 }
 
-func newUser(id uuid.UUID, name string, realName string) schema.User {
+func newUser(id uuid.UUID, name string, realName string, displayName string) schema.User {
 	return schema.User{
-		Id:       id,
-		Name:     name,
-		RealName: realName,
+		Id:          id,
+		Name:        name,
+		RealName:    realName,
+		DisplayName: displayName,
 	}
 }
 

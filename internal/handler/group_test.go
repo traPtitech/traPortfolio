@@ -106,7 +106,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 
 				adminLen := rand.IntN(256)
 				for range adminLen {
-					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
+					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
 					hgroupAdmin := schema.User{
 						Id:       rgroupAdmin.ID,
@@ -124,7 +124,7 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 				groupLen := rand.IntN(256)
 				for range groupLen {
 					rgroupmember := domain.UserWithDuration{
-						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+						User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						Duration: random.Duration(),
 					}
 

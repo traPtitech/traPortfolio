@@ -365,8 +365,8 @@ func Test_GetContestTeamMembers(t *testing.T) {
 		})
 		portalAPI.EXPECT().GetUsers().Return(portalUsers, nil)
 		expectedMembers := []*domain.User{
-			domain.NewUser(traqUsers[0].ID, traqUsers[0].Name, portalUsers[0].RealName, false),
-			domain.NewUser(traqUsers[1].ID, traqUsers[1].Name, portalUsers[1].RealName, false),
+			domain.NewUser(traqUsers[0].ID, traqUsers[0].Name, portalUsers[0].RealName, "", false),
+			domain.NewUser(traqUsers[1].ID, traqUsers[1].Name, portalUsers[1].RealName, "", false),
 		}
 		gotMembers, err := repo.GetContestTeamMembers(context.Background(), contest1.ID, team1.ID)
 		assert.NoError(t, err)

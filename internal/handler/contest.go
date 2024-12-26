@@ -64,7 +64,7 @@ func (h *ContestHandler) GetContest(c echo.Context) error {
 	for i, v := range contest.ContestTeams {
 		members := make([]schema.User, len(v.Members))
 		for j, ct := range v.Members {
-			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+			members[j] = newUser(ct.ID, ct.Name, ct.RealName(), ct.DisplayName)
 		}
 		teams[i] = newContestTeam(v.ID, v.Name, v.Result, members)
 	}
@@ -168,7 +168,7 @@ func (h *ContestHandler) GetContestTeams(c echo.Context) error {
 	for i, v := range contestTeams {
 		members := make([]schema.User, len(v.Members))
 		for j, ct := range v.Members {
-			members[j] = newUser(ct.ID, ct.Name, ct.RealName())
+			members[j] = newUser(ct.ID, ct.Name, ct.RealName(), ct.DisplayName)
 		}
 		res[i] = newContestTeam(v.ID, v.Name, v.Result, members)
 	}
@@ -205,7 +205,7 @@ func (h *ContestHandler) GetContestTeam(c echo.Context) error {
 
 	members := make([]schema.User, len(contestTeam.Members))
 	for i, v := range contestTeam.Members {
-		members[i] = newUser(v.ID, v.Name, v.RealName())
+		members[i] = newUser(v.ID, v.Name, v.RealName(), v.DisplayName)
 	}
 
 	res := newContestTeamDetail(

@@ -361,7 +361,7 @@ func CloneHandlerMockUsers() []schema.User {
 	)
 
 	for i, u := range mUsers {
-		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.Check)
+		d := *domain.NewUser(u.ID, u.Name, portalUsers[i].RealName, u.DisplayName, u.Check)
 		hUsers[i] = schema.User{
 			Id:       d.ID,
 			Name:     d.Name,

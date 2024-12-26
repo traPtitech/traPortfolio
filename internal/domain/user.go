@@ -12,18 +12,20 @@ import (
 )
 
 type User struct {
-	ID       uuid.UUID
-	Name     string
-	realName string
-	Check    bool
+	ID          uuid.UUID
+	Name        string
+	realName    string
+	DisplayName string
+	Check       bool
 }
 
-func NewUser(id uuid.UUID, name string, realName string, check bool) *User {
+func NewUser(id uuid.UUID, name string, realName string, displayName string, check bool) *User {
 	return &User{
-		ID:       id,
-		Name:     name,
-		realName: realName,
-		Check:    check,
+		ID:          id,
+		Name:        name,
+		realName:    realName,
+		DisplayName: displayName,
+		Check:       check,
 	}
 }
 

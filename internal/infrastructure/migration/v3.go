@@ -2,7 +2,6 @@
 package migration
 
 import (
-	"database/sql"
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"time"
 
@@ -33,7 +32,7 @@ type v3User struct {
 	Description string           `gorm:"type:text;not null"`
 	Check       bool             `gorm:"type:boolean;not null;default:false"`
 	Name        string           `gorm:"type:varchar(32);not null;unique"`
-	DisplayName sql.NullString   `gorm:"type:varchar(32)"` // 追加
+	DisplayName *string          `gorm:"type:varchar(32)"` // 追加
 	State       domain.TraQState `gorm:"type:tinyint(1);not null"`
 	CreatedAt   time.Time        `gorm:"precision:6"`
 	UpdatedAt   time.Time        `gorm:"precision:6"`

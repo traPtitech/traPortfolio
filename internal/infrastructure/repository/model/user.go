@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -13,7 +12,7 @@ type User struct {
 	Description string           `gorm:"type:text;not null"`
 	Check       bool             `gorm:"type:boolean;not null;default:false"`
 	Name        string           `gorm:"type:varchar(32);not null;unique"`
-	DisplayName sql.NullString   `gorm:"type:varchar(32)"`
+	DisplayName string           `gorm:"type:varchar(32)"`
 	State       domain.TraQState `gorm:"type:tinyint(1);not null"`
 	CreatedAt   time.Time        `gorm:"precision:6"`
 	UpdatedAt   time.Time        `gorm:"precision:6"`

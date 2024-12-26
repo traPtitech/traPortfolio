@@ -109,6 +109,7 @@ var (
 	}
 )
 
+//goland:noinspection Annotator,Annotator,Annotator,Annotator,Annotator,Annotator,Annotator,Annotator
 func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 	t.Helper()
 
@@ -131,8 +132,8 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 					Result:    random.AlphaNumeric(),
 				},
 				Members: []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 			},
 			{
@@ -143,8 +144,8 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 					Result:    random.AlphaNumeric(),
 				},
 				Members: []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				},
 			},
 		},
@@ -516,6 +517,7 @@ func TestContestHandler_DeleteContest(t *testing.T) {
 	}
 }
 
+//goland:noinspection Annotator,Annotator,Annotator,Annotator,Annotator,Annotator,Annotator,Annotator
 func TestContestHandler_GetContestTeams(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -536,8 +538,8 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 							Result:    random.AlphaNumeric(),
 						},
 						Members: []*domain.User{
-							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						},
 					},
 					{
@@ -548,8 +550,8 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 							Result:    random.AlphaNumeric(),
 						},
 						Members: []*domain.User{
-							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						},
 					},
 				}
@@ -603,6 +605,7 @@ func TestContestHandler_GetContestTeams(t *testing.T) {
 	}
 }
 
+//goland:noinspection Annotator,Annotator,Annotator,Annotator
 func TestContestHandler_GetContestTeam(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -624,8 +627,8 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 							Result:    random.AlphaNumeric(),
 						},
 						Members: []*domain.User{
-							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
-							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						},
 					},
 					Link:        random.AlphaNumeric(),
@@ -1015,6 +1018,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 	}
 }
 
+//goland:noinspection Annotator,Annotator
 func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -1028,7 +1032,7 @@ func TestContestHandler_GetContestTeamMembers(t *testing.T) {
 				contestID := random.UUID()
 				teamID := random.UUID()
 				users := []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				}
 				hres := make([]*schema.User, len(users))
 				for i, user := range users {

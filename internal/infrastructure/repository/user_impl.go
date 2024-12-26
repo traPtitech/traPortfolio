@@ -60,6 +60,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 				users[0].ID,
 				users[0].Name,
 				portalUser.RealName,
+				users[0].DisplayName,
 				users[0].Check,
 			),
 		}, nil
@@ -75,6 +76,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, args *repository.GetUsers
 				v.ID,
 				v.Name,
 				realNameMap[v.Name],
+				v.DisplayName,
 				v.Check,
 			))
 		}
@@ -149,6 +151,7 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 			user.ID,
 			user.Name,
 			portalUser.RealName,
+			user.DisplayName,
 			user.Check,
 		),
 		State:    user.State,

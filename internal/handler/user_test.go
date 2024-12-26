@@ -46,7 +46,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				hresUsers := []*schema.User{}
 
 				for range casenum {
-					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
+					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := schema.User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
@@ -72,7 +72,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				hresUsers := []*schema.User{}
 
 				for range casenum {
-					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
+					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := schema.User{
 						Id:       ruser.ID,
 						Name:     ruser.Name,
@@ -97,7 +97,7 @@ func TestUserHandler_GetUsers(t *testing.T) {
 			name: "Success_WithOpts_Name",
 			setup: func(mr MockRepository) (hres []*schema.User, path string) {
 				repoUsers := []*domain.User{
-					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 				}
 				hresUsers := []*schema.User{
 					{
@@ -246,7 +246,7 @@ func TestUserHandler_GetUser(t *testing.T) {
 				}
 
 				repoUser := domain.UserDetail{
-					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
+					User:     *domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 					State:    rand.N(domain.TraqStateLimit),
 					Bio:      random.AlphaNumericN(rand.IntN(256) + 1),
 					Accounts: rAccounts,
@@ -1524,7 +1524,7 @@ func TestUserHandler_GetMe(t *testing.T) {
 
 				userID := random.UUID()
 
-				ruser := domain.NewUser(userID, username, random.AlphaNumeric(), random.Bool())
+				ruser := domain.NewUser(userID, username, random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 				rusers := []*domain.User{ruser}
 				mr.user.EXPECT().GetUsers(anyCtx{}, &repository.GetUsersArgs{
 					Name: optional.From(ruser.Name),
