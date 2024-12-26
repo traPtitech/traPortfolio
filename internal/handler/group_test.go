@@ -109,9 +109,10 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					rgroupAdmin := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 
 					hgroupAdmin := schema.User{
-						Id:       rgroupAdmin.ID,
-						Name:     rgroupAdmin.Name,
-						RealName: rgroupAdmin.RealName(),
+						DisplayName: rgroupAdmin.DisplayName,
+						Id:          rgroupAdmin.ID,
+						Name:        rgroupAdmin.Name,
+						RealName:    rgroupAdmin.RealName(),
 					}
 
 					rgroupAdmins = append(rgroupAdmins, rgroupAdmin)
@@ -129,10 +130,11 @@ func TestGroupHandler_GetGroup(t *testing.T) {
 					}
 
 					hgroupmember := schema.GroupMember{
-						Duration: schema.ConvertDuration(rgroupmember.Duration),
-						Id:       rgroupmember.User.ID,
-						Name:     rgroupmember.User.Name,
-						RealName: rgroupmember.User.RealName(),
+						DisplayName: rgroupmember.User.DisplayName,
+						Duration:    schema.ConvertDuration(rgroupmember.Duration),
+						Id:          rgroupmember.User.ID,
+						Name:        rgroupmember.User.Name,
+						RealName:    rgroupmember.User.RealName(),
 					}
 
 					rgroupMembers = append(rgroupMembers, &rgroupmember)

@@ -107,10 +107,11 @@ func formatGetGroup(group *domain.GroupDetail) schema.GroupDetail {
 
 func newGroupMember(user schema.User, Duration schema.YearWithSemesterDuration) schema.GroupMember {
 	return schema.GroupMember{
-		Duration: Duration,
-		Id:       user.Id,
-		Name:     user.Name,
-		RealName: user.RealName,
+		DisplayName: user.DisplayName,
+		Duration:    Duration,
+		Id:          user.Id,
+		Name:        user.Name,
+		RealName:    user.RealName,
 	}
 }
 

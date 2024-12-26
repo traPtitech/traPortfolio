@@ -32,7 +32,7 @@ CREATE TABLE `users` (
 | description | text |  | false |  |  | 自己紹介文 |
 | check | tinyint(1) | 0 | false |  |  | 氏名を公開するかどうかの可否 (0: 停止, 1: 有効, 2: 一時停止) |
 | name | varchar(32) |  | false |  |  | ユーザー名 |
-| display_name | varchar(32) | NULL | true |  |  |  |
+| display_name | varchar(32) | NULL | true |  |  | ユーザー表示名 |
 | state | tinyint(1) |  | false |  |  | traQのユーザーアカウント状態 |
 | created_at | datetime(6) | NULL | true |  |  |  |
 | updated_at | datetime(6) | NULL | true |  |  |  |

@@ -321,9 +321,10 @@ func (h *ContestHandler) GetContestTeamMembers(c echo.Context) error {
 	res := make([]*schema.User, 0, len(users))
 	for _, v := range users {
 		res = append(res, &schema.User{
-			Id:       v.ID,
-			Name:     v.Name,
-			RealName: v.RealName(),
+			DisplayName: v.DisplayName,
+			Id:          v.ID,
+			Name:        v.Name,
+			RealName:    v.RealName(),
 		})
 	}
 	return c.JSON(http.StatusOK, res)

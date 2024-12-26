@@ -48,9 +48,10 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				for range casenum {
 					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := schema.User{
-						Id:       ruser.ID,
-						Name:     ruser.Name,
-						RealName: ruser.RealName(),
+						DisplayName: ruser.DisplayName,
+						Id:          ruser.ID,
+						Name:        ruser.Name,
+						RealName:    ruser.RealName(),
 					}
 
 					repoUsers = append(repoUsers, ruser)
@@ -74,9 +75,10 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				for range casenum {
 					ruser := domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool())
 					huser := schema.User{
-						Id:       ruser.ID,
-						Name:     ruser.Name,
-						RealName: ruser.RealName(),
+						DisplayName: ruser.DisplayName,
+						Id:          ruser.ID,
+						Name:        ruser.Name,
+						RealName:    ruser.RealName(),
 					}
 
 					repoUsers = append(repoUsers, ruser)
@@ -101,9 +103,10 @@ func TestUserHandler_GetUsers(t *testing.T) {
 				}
 				hresUsers := []*schema.User{
 					{
-						Id:       repoUsers[0].ID,
-						Name:     repoUsers[0].Name,
-						RealName: repoUsers[0].RealName(),
+						DisplayName: repoUsers[0].DisplayName,
+						Id:          repoUsers[0].ID,
+						Name:        repoUsers[0].Name,
+						RealName:    repoUsers[0].RealName(),
 					},
 				}
 
