@@ -9,7 +9,6 @@
 
 ```sql
 CREATE TABLE `project_members` (
-  `id` char(36) NOT NULL,
   `project_id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
   `since_year` smallint(4) NOT NULL,
@@ -18,8 +17,7 @@ CREATE TABLE `project_members` (
   `until_semester` tinyint(1) NOT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_project_members_project` (`project_id`),
+  PRIMARY KEY (`project_id`,`user_id`),
   KEY `fk_project_members_user` (`user_id`),
   CONSTRAINT `fk_project_members_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_project_members_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -32,7 +30,6 @@ CREATE TABLE `project_members` (
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | char(36) |  | false |  |  |  |
 | project_id | char(36) |  | false |  | [projects](projects.md) | プロジェクトUUID |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
 | since_year | smallint(4) |  | false |  |  | プロジェクト所属開始年 |
@@ -48,15 +45,14 @@ CREATE TABLE `project_members` (
 | ---- | ---- | ---------- |
 | fk_project_members_project | FOREIGN KEY | FOREIGN KEY (project_id) REFERENCES projects (id) |
 | fk_project_members_user | FOREIGN KEY | FOREIGN KEY (user_id) REFERENCES users (id) |
-| PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
+| PRIMARY | PRIMARY KEY | PRIMARY KEY (project_id, user_id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| fk_project_members_project | KEY fk_project_members_project (project_id) USING BTREE |
 | fk_project_members_user | KEY fk_project_members_user (user_id) USING BTREE |
-| PRIMARY | PRIMARY KEY (id) USING BTREE |
+| PRIMARY | PRIMARY KEY (project_id, user_id) USING BTREE |
 
 ## Relations
 
@@ -67,9 +63,8 @@ erDiagram
 "project_members" }o--|| "users" : "FOREIGN KEY (user_id) REFERENCES users (id)"
 
 "project_members" {
-  char_36_ id PK
-  char_36_ project_id FK
-  char_36_ user_id FK
+  char_36_ project_id PK
+  char_36_ user_id PK
   smallint_4_ since_year
   tinyint_1_ since_semester
   smallint_4_ until_year
@@ -79,7 +74,7 @@ erDiagram
 }
 "projects" {
   char_36_ id PK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text link
   smallint_4_ since_year

@@ -14,7 +14,7 @@
 | [group_user_belongings](group_user_belongings.md) | 8 | グループとユーザー関係テーブル | BASE TABLE |
 | [migrations](migrations.md) | 1 | gormigrate用のデータベースバージョンテーブル | BASE TABLE |
 | [projects](projects.md) | 10 | プロジェクトテーブル | BASE TABLE |
-| [project_members](project_members.md) | 9 | プロジェクト所属者テーブル | BASE TABLE |
+| [project_members](project_members.md) | 8 | プロジェクト所属者テーブル | BASE TABLE |
 | [users](users.md) | 7 | ユーザーテーブル | BASE TABLE |
 
 ## Relations
@@ -44,7 +44,7 @@ erDiagram
 }
 "contests" {
   char_36_ id PK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text link
   datetime_6_ since
@@ -55,7 +55,7 @@ erDiagram
 "contest_teams" {
   char_36_ id PK
   char_36_ contest_id FK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text result
   text link
@@ -103,7 +103,7 @@ erDiagram
 }
 "projects" {
   char_36_ id PK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text link
   smallint_4_ since_year
@@ -114,9 +114,8 @@ erDiagram
   datetime_6_ updated_at
 }
 "project_members" {
-  char_36_ id PK
-  char_36_ project_id FK
-  char_36_ user_id FK
+  char_36_ project_id PK
+  char_36_ user_id PK
   smallint_4_ since_year
   tinyint_1_ since_semester
   smallint_4_ until_year
