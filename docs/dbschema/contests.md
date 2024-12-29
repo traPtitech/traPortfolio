@@ -10,7 +10,7 @@
 ```sql
 CREATE TABLE `contests` (
   `id` char(36) NOT NULL,
-  `name` varchar(32) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `link` text DEFAULT NULL,
   `since` datetime(6) DEFAULT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE `contests` (
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [contest_teams](contest_teams.md) |  | コンテストUUID |
-| name | varchar(32) | NULL | true |  |  | コンテスト名 |
+| name | varchar(128) | NULL | true |  |  | コンテスト名 |
 | description | text | NULL | true |  |  | コンテスト説明 |
 | link | text | NULL | true |  |  | コンテスト情報のリンク |
 | since | datetime(6) | NULL | true |  |  | 期間始まり |
@@ -57,7 +57,7 @@ erDiagram
 
 "contests" {
   char_36_ id PK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text link
   datetime_6_ since
@@ -68,7 +68,7 @@ erDiagram
 "contest_teams" {
   char_36_ id PK
   char_36_ contest_id FK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text result
   text link

@@ -10,7 +10,7 @@
 ```sql
 CREATE TABLE `projects` (
   `id` char(36) NOT NULL,
-  `name` varchar(32) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `link` text DEFAULT NULL,
   `since_year` smallint(4) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `projects` (
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | char(36) |  | false | [project_members](project_members.md) |  | プロジェクトUUID |
-| name | varchar(32) | NULL | true |  |  | プロジェクト名 |
+| name | varchar(128) | NULL | true |  |  | プロジェクト名 |
 | description | text | NULL | true |  |  | プロジェクト説明 |
 | link | text | NULL | true |  |  | プロジェクト情報のリンク |
 | since_year | smallint(4) |  | false |  |  | プロジェクト開始年 |
@@ -61,7 +61,7 @@ erDiagram
 
 "projects" {
   char_36_ id PK
-  varchar_32_ name
+  varchar_128_ name
   text description
   text link
   smallint_4_ since_year
@@ -72,9 +72,8 @@ erDiagram
   datetime_6_ updated_at
 }
 "project_members" {
-  char_36_ id PK
-  char_36_ project_id FK
-  char_36_ user_id FK
+  char_36_ project_id PK
+  char_36_ user_id PK
   smallint_4_ since_year
   tinyint_1_ since_semester
   smallint_4_ until_year
