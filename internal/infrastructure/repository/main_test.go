@@ -139,7 +139,6 @@ func mustMakeAccount(t *testing.T, repo repository.UserRepository, userID uuid.U
 			DisplayName: random.AlphaNumeric(),
 			Type:        accountType,
 			URL:         random.AccountURLString(accountType),
-			PrPermitted: random.Bool(),
 		}
 	}
 

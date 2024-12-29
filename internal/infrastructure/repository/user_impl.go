@@ -134,7 +134,6 @@ func (r *UserRepository) GetUser(ctx context.Context, userID uuid.UUID) (*domain
 			ID:          v.ID,
 			DisplayName: v.Name,
 			Type:        domain.AccountType(v.Type),
-			PrPermitted: v.Check,
 			URL:         v.URL,
 		})
 	}
@@ -220,7 +219,6 @@ func (r *UserRepository) GetAccounts(ctx context.Context, userID uuid.UUID) ([]*
 		result = append(result, &domain.Account{
 			ID:          v.ID,
 			Type:        domain.AccountType(v.Type),
-			PrPermitted: v.Check,
 			DisplayName: v.Name,
 			URL:         v.URL,
 		})
@@ -242,7 +240,6 @@ func (r *UserRepository) GetAccount(ctx context.Context, userID uuid.UUID, accou
 	result := &domain.Account{
 		ID:          account.ID,
 		Type:        domain.AccountType(account.Type),
-		PrPermitted: account.Check,
 		DisplayName: account.Name,
 		URL:         account.URL,
 	}
@@ -270,7 +267,6 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		Name:   args.DisplayName,
 		URL:    args.URL,
 		UserID: userID,
-		Check:  args.PrPermitted,
 	}
 	err := r.h.WithContext(ctx).Create(&account).Error
 	if err != nil {
@@ -290,7 +286,6 @@ func (r *UserRepository) CreateAccount(ctx context.Context, userID uuid.UUID, ar
 		ID:          ver.ID,
 		DisplayName: ver.Name,
 		Type:        domain.AccountType(ver.Type),
-		PrPermitted: ver.Check,
 		URL:         ver.URL,
 	}, nil
 }
@@ -302,9 +297,6 @@ func (r *UserRepository) UpdateAccount(ctx context.Context, userID uuid.UUID, ac
 	}
 	if v, ok := args.URL.V(); ok {
 		changes["url"] = v
-	}
-	if v, ok := args.PrPermitted.V(); ok {
-		changes["check"] = v
 	}
 	if v, ok := args.Type.V(); ok {
 		changes["type"] = v

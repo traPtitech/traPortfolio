@@ -404,7 +404,6 @@ func CloneHandlerMockUserAccountsByID() map[uuid.UUID][]schema.Account {
 		hAccounts[a.UserID] = append(hAccounts[a.UserID], schema.Account{
 			DisplayName: a.Name,
 			Id:          a.ID,
-			PrPermitted: a.Check,
 			Type:        schema.AccountType(a.Type),
 			Url:         a.URL,
 		})

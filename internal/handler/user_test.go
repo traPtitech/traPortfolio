@@ -223,20 +223,16 @@ func TestUserHandler_GetUser(t *testing.T) {
 				hAccounts := []schema.Account{}
 
 				for range accountNum {
-					prRandom := random.Bool()
-
 					raccount := domain.Account{
 						ID:          random.UUID(),
 						DisplayName: random.AlphaNumeric(),
 						Type:        rand.N(domain.AccountLimit),
-						PrPermitted: prRandom,
 						URL:         random.AlphaNumeric(),
 					}
 
 					haccount := schema.Account{
 						Id:          raccount.ID,
 						DisplayName: raccount.DisplayName,
-						PrPermitted: schema.PrPermitted(prRandom),
 						Type:        schema.AccountType(raccount.Type),
 						Url:         raccount.URL,
 					}
@@ -481,19 +477,16 @@ func TestUserHandler_GetUserAccounts(t *testing.T) {
 						continue
 					}
 
-					prRandom := random.Bool()
 					raccount := domain.Account{
 						ID:          random.UUID(),
 						DisplayName: random.AlphaNumeric(),
 						Type:        domain.AccountType(uint8(i)),
-						PrPermitted: prRandom,
 						URL:         random.AlphaNumeric(),
 					}
 
 					haccount := schema.Account{
 						Id:          raccount.ID,
 						DisplayName: raccount.DisplayName,
-						PrPermitted: schema.PrPermitted(prRandom),
 						Type:        schema.AccountType(raccount.Type),
 						Url:         raccount.URL,
 					}
@@ -568,19 +561,16 @@ func TestUserHandler_GetUserAccount(t *testing.T) {
 			name: "success",
 			setup: func(mr MockRepository) (hres *schema.Account, path string) {
 				userID := random.UUID()
-				prRandom := random.Bool()
 
 				rAccount := domain.Account{
 					ID:          random.UUID(),
 					DisplayName: random.AlphaNumeric(),
 					Type:        rand.N(domain.AccountLimit),
-					PrPermitted: prRandom,
 					URL:         random.AlphaNumeric(),
 				}
 				hAccount := schema.Account{
 					Id:          rAccount.ID,
 					DisplayName: rAccount.DisplayName,
-					PrPermitted: schema.PrPermitted(prRandom),
 					Type:        schema.AccountType(rAccount.Type),
 					Url:         rAccount.URL,
 				}
@@ -660,7 +650,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(accountType),
 					Url:         random.AccountURLString(accountType),
 				}
@@ -669,21 +658,18 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: reqBody.DisplayName,
 					Type:        domain.AccountType(uint8(reqBody.Type)),
 					URL:         reqBody.Url,
-					PrPermitted: bool(reqBody.PrPermitted),
 				}
 
 				want := domain.Account{
 					ID:          userID,
 					DisplayName: args.DisplayName,
 					Type:        args.Type,
-					PrPermitted: args.PrPermitted,
 					URL:         args.URL,
 				}
 
 				expectedResBody := schema.Account{
 					Id:          userID,
 					DisplayName: reqBody.DisplayName,
-					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
 					Url:         reqBody.Url,
 				}
@@ -701,7 +687,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        0,
 					Url:         random.AccountURLString(0),
 				}
@@ -710,21 +695,18 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: reqBody.DisplayName,
 					Type:        domain.AccountType(uint8(reqBody.Type)),
 					URL:         reqBody.Url,
-					PrPermitted: bool(reqBody.PrPermitted),
 				}
 
 				want := domain.Account{
 					ID:          userID,
 					DisplayName: args.DisplayName,
 					Type:        args.Type,
-					PrPermitted: args.PrPermitted,
 					URL:         args.URL,
 				}
 
 				expectedResBody := schema.Account{
 					Id:          userID,
 					DisplayName: reqBody.DisplayName,
-					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
 					Url:         reqBody.Url,
 				}
@@ -743,7 +725,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: "",
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(accountType),
 					Url:         random.AccountURLString(accountType),
 				}
@@ -760,7 +741,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(domain.AccountLimit),
 					Url:         random.RandURLString(),
 				}
@@ -798,7 +778,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(accountType),
 					Url:         random.AccountURLString(accountType),
 				}
@@ -807,7 +786,6 @@ func TestUserHandler_AddUserAccount(t *testing.T) {
 					DisplayName: reqBody.DisplayName,
 					Type:        domain.AccountType(uint8(reqBody.Type)),
 					URL:         reqBody.Url,
-					PrPermitted: bool(reqBody.PrPermitted),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts", userID)
@@ -849,16 +827,13 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
-				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
-				argsPermit := schema.PrPermitted(accountPermit)
 				argsType := schema.AccountType(accountType)
 				argsURL := random.AccountURLString(domain.AccountType(accountType))
 
 				reqBody := schema.EditUserAccountRequest{
 					DisplayName: &argsName,
-					PrPermitted: &argsPermit,
 					Type:        &argsType,
 					Url:         &argsURL,
 				}
@@ -867,7 +842,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 					DisplayName: optional.FromPtr(&argsName),
 					Type:        optional.FromPtr(&accountType),
 					URL:         optional.FromPtr(&argsURL),
-					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -882,16 +856,13 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 				userID := random.UUID()
 				accountID := random.UUID()
 				accountType := rand.N(domain.AccountLimit)
-				accountPermit := random.Bool()
 
 				argsName := random.AlphaNumeric()
-				argsPermit := schema.PrPermitted(accountPermit)
 				argsType := schema.AccountType(accountType)
 				argsURL := random.AccountURLString(domain.AccountType(accountType))
 
 				reqBody := schema.EditUserAccountRequest{
 					DisplayName: &argsName,
-					PrPermitted: &argsPermit,
 					Type:        &argsType,
 					Url:         &argsURL,
 				}
@@ -900,7 +871,6 @@ func TestUserHandler_EditUserAccount(t *testing.T) {
 					DisplayName: optional.FromPtr(&argsName),
 					Type:        optional.FromPtr(&accountType),
 					URL:         optional.FromPtr(&argsURL),
-					PrPermitted: optional.FromPtr(&accountPermit),
 				}
 
 				path := fmt.Sprintf("/api/v1/users/%s/accounts/%s", userID, accountID)
@@ -1540,7 +1510,6 @@ func TestUserHandler_GetMe(t *testing.T) {
 							ID:          random.UUID(),
 							DisplayName: random.AlphaNumeric(),
 							Type:        accountType,
-							PrPermitted: random.Bool(),
 							URL:         random.AccountURLString(accountType),
 						},
 					},
@@ -1552,7 +1521,6 @@ func TestUserHandler_GetMe(t *testing.T) {
 					haccounts = append(haccounts, schema.Account{
 						Id:          account.ID,
 						DisplayName: account.DisplayName,
-						PrPermitted: schema.PrPermitted(account.PrPermitted),
 						Type:        schema.AccountType(account.Type),
 						Url:         account.URL,
 					})
