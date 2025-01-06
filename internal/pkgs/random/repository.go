@@ -14,7 +14,7 @@ func CreateContestArgs() *repository.CreateContestArgs {
 	return &repository.CreateContestArgs{
 		Name:        AlphaNumeric(),
 		Description: AlphaNumeric(),
-		Link:        Optional(RandURLString()),
+		Links:       Array(RandURLString, 1, 2),
 		Since:       time.Now(),
 		Until:       Optional(time.Now().Add(time.Hour)),
 	}
@@ -25,7 +25,7 @@ func UpdateContestArgs() *repository.UpdateContestArgs {
 	a := repository.UpdateContestArgs{
 		Name:        optional.From(AlphaNumeric()),
 		Description: optional.From(AlphaNumeric()),
-		Link:        optional.From(RandURLString()),
+		Links:       optional.From(Array(RandURLString, 3, 4)),
 		Since:       optional.From(Time()),
 		Until:       optional.From(Time()),
 	}
@@ -37,7 +37,7 @@ func CreateContestTeamArgs() *repository.CreateContestTeamArgs {
 	return &repository.CreateContestTeamArgs{
 		Name:        AlphaNumeric(),
 		Result:      Optional(AlphaNumeric()),
-		Link:        Optional(RandURLString()),
+		Links:       Array(RandURLString, 1, 3),
 		Description: AlphaNumeric(),
 	}
 }
@@ -47,7 +47,7 @@ func UpdateContestTeamArgs() *repository.UpdateContestTeamArgs {
 	a := repository.UpdateContestTeamArgs{
 		Name:        optional.From(AlphaNumeric()),
 		Result:      optional.From(AlphaNumeric()),
-		Link:        optional.From(RandURLString()),
+		Links:       optional.From(Array(RandURLString, 1, 3)),
 		Description: optional.From(AlphaNumeric()),
 	}
 	return &a
@@ -58,7 +58,7 @@ func OptUpdateContestTeamArgs() *repository.UpdateContestTeamArgs {
 	a := repository.UpdateContestTeamArgs{
 		Name:        Optional(AlphaNumeric()),
 		Result:      Optional(AlphaNumeric()),
-		Link:        Optional(RandURLString()),
+		Links:       Optional(Array(RandURLString, 1, 3)),
 		Description: Optional(AlphaNumeric()),
 	}
 	return &a
@@ -69,7 +69,7 @@ func CreateProjectArgs() *repository.CreateProjectArgs {
 	return &repository.CreateProjectArgs{
 		Name:          AlphaNumeric(),
 		Description:   AlphaNumeric(),
-		Link:          Optional(RandURLString()),
+		Links:         Array(RandURLString, 1, 3),
 		SinceYear:     2100,
 		SinceSemester: 0,
 		UntilYear:     2100,
@@ -82,7 +82,7 @@ func UpdateProjectArgs() *repository.UpdateProjectArgs {
 	a := repository.UpdateProjectArgs{
 		Name:          optional.From(AlphaNumeric()),
 		Description:   optional.From(AlphaNumeric()),
-		Link:          optional.From(RandURLString()),
+		Links:         optional.From(Array(RandURLString, 1, 3)),
 		SinceYear:     optional.From(int64(2100)), // TODO: intでよさそう
 		SinceSemester: optional.From(int64(0)),
 		UntilYear:     optional.From(int64(2100)),
@@ -96,7 +96,7 @@ func OptUpdateProjectArgs() *repository.UpdateProjectArgs {
 	a := repository.UpdateProjectArgs{
 		Name:          Optional(AlphaNumeric()),
 		Description:   Optional(AlphaNumeric()),
-		Link:          Optional(AlphaNumeric()),
+		Links:         Optional(Array(RandURLString, 1, 3)),
 		SinceYear:     Optional(int64(2100)), // TODO: intでよさそう
 		SinceSemester: Optional(int64(0)),
 		UntilYear:     Optional(int64(2100)),

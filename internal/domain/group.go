@@ -12,7 +12,7 @@ type Group struct {
 type GroupDetail struct {
 	ID          uuid.UUID
 	Name        string
-	Link        string
+	Links       []string
 	Admin       []*User
 	Members     []*UserWithDuration
 	Description string

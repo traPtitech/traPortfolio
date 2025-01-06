@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/internal/domain"
@@ -56,6 +57,24 @@ func (r *ContestRepository) getContest(ctx context.Context, contestID uuid.UUID)
 		return nil, err
 	}
 
+	contestLinks := make([]*model.ContestLink, 0)
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.ContestLink{ContestID: contestID}).
+		Find(&contestLinks).
+		Error; err != nil {
+		if err != repository.ErrNotFound {
+			return nil, err
+		}
+	} else {
+		sort.Slice(contestLinks, func(i, j int) bool { return contestLinks[i].Order < contestLinks[j].Order })
+	}
+
+	links := make([]string, len(contestLinks))
+	for i, link := range contestLinks {
+		links[i] = link.Link
+	}
+
 	res := &domain.ContestDetail{
 		Contest: domain.Contest{
 			ID:        contest.ID,
@@ -63,7 +82,7 @@ func (r *ContestRepository) getContest(ctx context.Context, contestID uuid.UUID)
 			TimeStart: contest.Since,
 			TimeEnd:   contest.Until,
 		},
-		Link:        contest.Link,
+		Links:       links,
 		Description: contest.Description,
 		// Teams:
 	}
@@ -76,7 +95,6 @@ func (r *ContestRepository) CreateContest(ctx context.Context, args *repository.
 		ID:          uuid.Must(uuid.NewV4()),
 		Name:        args.Name,
 		Description: args.Description,
-		Link:        args.Link.ValueOrZero(),
 		Since:       args.Since,
 		Until:       args.Until.ValueOrZero(),
 	}
@@ -93,7 +111,25 @@ func (r *ContestRepository) CreateContest(ctx context.Context, args *repository.
 		return nil, err
 	}
 
-	err = r.h.WithContext(ctx).Create(contest).Error
+	err = r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.
+			WithContext(ctx).
+			Create(contest).
+			Error; err != nil {
+			return err
+		}
+
+		for i, link := range args.Links {
+			if err := tx.
+				WithContext(ctx).
+				Create(&model.ContestLink{ContestID: contest.ID, Order: i, Link: link}).
+				Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -107,15 +143,22 @@ func (r *ContestRepository) CreateContest(ctx context.Context, args *repository.
 }
 
 func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UUID, args *repository.UpdateContestArgs) error {
+	// コンテストの存在チェック
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.Contest{ID: contestID}).
+		First(&model.Contest{}).
+		Error; err != nil {
+		return err
+	}
+
+	// リンク以外の変更確認
 	changes := map[string]interface{}{}
 	if v, ok := args.Name.V(); ok {
 		changes["name"] = v
 	}
 	if v, ok := args.Description.V(); ok {
 		changes["description"] = v
-	}
-	if v, ok := args.Link.V(); ok {
-		changes["link"] = v
 	}
 	if v, ok := args.Since.V(); ok {
 		changes["since"] = v
@@ -124,34 +167,100 @@ func (r *ContestRepository) UpdateContest(ctx context.Context, contestID uuid.UU
 		changes["until"] = v
 	}
 
-	if len(changes) == 0 {
-		return nil
+	var changeLinkMap map[int]string
+	var insertLinkMap map[int]string
+	var removeLinks []int
+
+	if afterLinks, ok := args.Links.V(); ok {
+		var contestLinks []model.ContestLink
+		if err := r.h.
+			WithContext(ctx).
+			Where(&model.ContestLink{ContestID: contestID}).
+			Find(&contestLinks).
+			Error; err != nil {
+			if err != repository.ErrNotFound {
+				return err
+			}
+		} else {
+			sort.Slice(contestLinks, func(i, j int) bool { return contestLinks[i].Order < contestLinks[j].Order })
+		}
+
+		sizeBefore := len(contestLinks)
+		sizeAfter := len(afterLinks)
+		sizeChange := min(sizeBefore, sizeAfter)
+
+		changeLinkMap = make(map[int]string, sizeChange)
+
+		i := 0
+		for ; i < sizeChange; i++ {
+			if contestLinks[i].Link != afterLinks[i] {
+				changeLinkMap[i] = afterLinks[i]
+			}
+		}
+
+		if sizeBefore > sizeAfter {
+			removeLinks = make([]int, sizeBefore-sizeAfter)
+			for ; i < sizeBefore; i++ {
+				removeLinks[i-sizeAfter] = i
+			}
+		}
+
+		if sizeAfter > sizeBefore {
+			insertLinkMap = make(map[int]string, sizeAfter-sizeBefore)
+			for ; i < sizeAfter; i++ {
+				insertLinkMap[i] = afterLinks[i]
+			}
+		}
 	}
 
-	var c model.Contest
 	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.
-			WithContext(ctx).
-			Where(&model.Contest{ID: contestID}).
-			First(&model.Contest{}).
-			Error; err != nil {
-			return err
+		// リンク以外の変更
+		if len(changes) != 0 {
+			if err := r.h.
+				WithContext(ctx).
+				Model(&model.Contest{ID: contestID}).
+				Updates(changes).
+				Error; err != nil {
+				return err
+			}
 		}
 
-		if err := tx.
-			WithContext(ctx).
-			Model(&model.Contest{ID: contestID}).
-			Updates(changes).
-			Error; err != nil {
-			return err
+		// リンク変更
+		if len(changeLinkMap) > 0 {
+			for i, link := range changeLinkMap {
+				if err := tx.
+					WithContext(ctx).
+					Where(&model.ContestLink{ContestID: contestID, Order: i}).
+					Updates(&model.ContestLink{Link: link, Order: i}).
+					Error; err != nil {
+					return err
+				}
+			}
 		}
 
-		if err := tx.
-			WithContext(ctx).
-			Where(&model.Contest{ID: contestID}).
-			First(&c).
-			Error; err != nil {
-			return err
+		// リンク削除
+		if len(removeLinks) != 0 {
+			for _, order := range removeLinks {
+				if err := tx.
+					WithContext(ctx).
+					Where(&model.ContestLink{ContestID: contestID, Order: order}).
+					Delete(&model.ContestLink{}).
+					Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		// リンク作成
+		if len(insertLinkMap) != 0 {
+			for i, insertLink := range insertLinkMap {
+				if err := tx.
+					WithContext(ctx).
+					Create(&model.ContestLink{ContestID: contestID, Order: i, Link: insertLink}).
+					Error; err != nil {
+					return err
+				}
+			}
 		}
 
 		return nil
@@ -177,6 +286,14 @@ func (r *ContestRepository) DeleteContest(ctx context.Context, contestID uuid.UU
 			WithContext(ctx).
 			Where(&model.Contest{ID: contestID}).
 			Delete(&model.Contest{}).
+			Error; err != nil {
+			return err
+		}
+
+		if err := tx.
+			WithContext(ctx).
+			Where(&model.ContestLink{ContestID: contestID}).
+			Delete(&model.ContestLink{}).
 			Error; err != nil {
 			return err
 		}
@@ -276,14 +393,28 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 	}
 
 	var belongings []*model.ContestTeamUserBelonging
-	err := r.h.
+
+	if err := r.h.
 		WithContext(ctx).
 		Preload("User").
 		Where(&model.ContestTeamUserBelonging{TeamID: teamID}).
 		Find(&belongings).
-		Error
-	if err != nil {
+		Error; err != nil {
 		return nil, err
+	}
+
+	teamLinks := make([]*model.ContestTeamLink, 0)
+
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.ContestTeamLink{TeamID: teamID}).
+		Find(&teamLinks).
+		Error; err != nil {
+		if err != repository.ErrNotFound {
+			return nil, err
+		}
+	} else {
+		sort.Slice(teamLinks, func(i, j int) bool { return teamLinks[i].Order < teamLinks[j].Order })
 	}
 
 	realNameMap, err := external.GetRealNameMap(r.portal)
@@ -297,6 +428,11 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 		members[i] = domain.NewUser(u.ID, u.Name, realNameMap[u.Name], u.Check)
 	}
 
+	links := make([]string, len(teamLinks))
+	for i, link := range teamLinks {
+		links[i] = link.Link
+	}
+
 	res := &domain.ContestTeamDetail{
 		ContestTeam: domain.ContestTeam{
 			ContestTeamWithoutMembers: domain.ContestTeamWithoutMembers{
@@ -307,7 +443,7 @@ func (r *ContestRepository) GetContestTeam(ctx context.Context, contestID uuid.U
 			},
 			Members: members,
 		},
-		Link:        team.Link,
+		Links:       links,
 		Description: team.Description,
 	}
 	return res, nil
@@ -328,10 +464,27 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 		Name:        _contestTeam.Name,
 		Description: _contestTeam.Description,
 		Result:      _contestTeam.Result.ValueOrZero(),
-		Link:        _contestTeam.Link.ValueOrZero(),
 	}
 
-	err := r.h.WithContext(ctx).Create(contestTeam).Error
+	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.
+			WithContext(ctx).
+			Create(contestTeam).
+			Error; err != nil {
+			return err
+		}
+
+		for i, link := range _contestTeam.Links {
+			if err := tx.
+				WithContext(ctx).
+				Create(&model.ContestTeamLink{TeamID: contestTeam.ID, Order: i, Link: link}).
+				Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -346,13 +499,22 @@ func (r *ContestRepository) CreateContestTeam(ctx context.Context, contestID uui
 			},
 			Members: make([]*domain.User, 0),
 		},
-		Link:        contestTeam.Link,
+		Links:       _contestTeam.Links,
 		Description: contestTeam.Description,
 	}
 	return result, nil
 }
 
 func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.UUID, args *repository.UpdateContestTeamArgs) error {
+	// 存在チェック
+	if err := r.h.
+		WithContext(ctx).
+		Where(&model.ContestTeam{ID: teamID}).
+		First(&model.ContestTeam{}).
+		Error; err != nil {
+		return err
+	}
+
 	changes := map[string]interface{}{}
 	if v, ok := args.Name.V(); ok {
 		changes["name"] = v
@@ -360,41 +522,106 @@ func (r *ContestRepository) UpdateContestTeam(ctx context.Context, teamID uuid.U
 	if v, ok := args.Description.V(); ok {
 		changes["description"] = v
 	}
-	if v, ok := args.Link.V(); ok {
-		changes["link"] = v
-	}
 	if v, ok := args.Result.V(); ok {
 		changes["result"] = v
 	}
 
-	if len(changes) == 0 {
+	var changeLinkMap map[int]string
+	var insertLinkMap map[int]string
+	var removeLinks []int
+
+	if afterLinks, ok := args.Links.V(); ok {
+		var teamLinks []model.ContestTeamLink
+		if err := r.h.
+			WithContext(ctx).
+			Model(&model.ContestTeamLink{TeamID: teamID}).
+			Find(&teamLinks).
+			Error; err != nil {
+			if err != repository.ErrNotFound {
+				return err
+			}
+		} else {
+			sort.Slice(teamLinks, func(i, j int) bool { return teamLinks[i].Order < teamLinks[j].Order })
+		}
+
+		sizeBefore := len(teamLinks)
+		sizeAfter := len(afterLinks)
+		sizeChange := min(sizeBefore, sizeAfter)
+
+		changeLinkMap = make(map[int]string, sizeChange)
+
+		i := 0
+		for ; i < sizeChange; i++ {
+			if teamLinks[i].Link != afterLinks[i] {
+				changeLinkMap[i] = afterLinks[i]
+			}
+		}
+
+		if sizeBefore > sizeAfter {
+			removeLinks = make([]int, sizeBefore-sizeAfter)
+			for ; i < sizeBefore; i++ {
+				removeLinks[i-sizeAfter] = i
+			}
+		}
+
+		if sizeAfter > sizeBefore {
+			insertLinkMap = make(map[int]string, sizeAfter-sizeBefore)
+			for ; i < sizeAfter; i++ {
+				insertLinkMap[i] = afterLinks[i]
+			}
+		}
+	} else if len(changes) == 0 {
 		return nil
 	}
 
-	var ct model.ContestTeam
 	err := r.h.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.
-			WithContext(ctx).
-			Where(&model.ContestTeam{ID: teamID}).
-			First(&model.ContestTeam{}).
-			Error; err != nil {
-			return err
+		// 変更
+		if len(changes) != 0 {
+			if err := tx.
+				WithContext(ctx).
+				Model(&model.ContestTeam{ID: teamID}).
+				Updates(changes).
+				Error; err != nil {
+				return err
+			}
 		}
 
-		if err := tx.
-			WithContext(ctx).
-			Model(&model.ContestTeam{ID: teamID}).
-			Updates(changes).
-			Error; err != nil {
-			return err
+		// リンク変更
+		if len(changeLinkMap) > 0 {
+			for i, link := range changeLinkMap {
+				if err := tx.
+					WithContext(ctx).
+					Where(&model.ContestTeamLink{TeamID: teamID, Order: i}).
+					Updates(&model.ContestTeamLink{Link: link, Order: i}).
+					Error; err != nil {
+					return err
+				}
+			}
 		}
 
-		if err := tx.
-			WithContext(ctx).
-			Where(&model.ContestTeam{ID: teamID}).
-			First(&ct).
-			Error; err != nil {
-			return err
+		// リンク削除
+		if len(removeLinks) != 0 {
+			for _, order := range removeLinks {
+				if err := tx.
+					WithContext(ctx).
+					Where(&model.ContestTeamLink{TeamID: teamID, Order: order}).
+					Delete(&model.ContestTeamLink{}).
+					Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		// リンク作成
+		if len(insertLinkMap) != 0 {
+			for i, insertLink := range insertLinkMap {
+				if err := tx.
+					WithContext(ctx).
+					Create(&model.ContestTeamLink{TeamID: teamID, Order: i, Link: insertLink}).
+					Error; err != nil {
+					return err
+				}
+			}
 		}
 
 		return nil
@@ -420,6 +647,14 @@ func (r *ContestRepository) DeleteContestTeam(ctx context.Context, contestID uui
 			WithContext(ctx).
 			Where(&model.ContestTeam{ID: teamID}).
 			Delete(&model.ContestTeam{}).
+			Error; err != nil {
+			return err
+		}
+
+		if err := tx.
+			WithContext(ctx).
+			Where(&model.ContestTeamLink{TeamID: teamID}).
+			Delete(&model.ContestTeamLink{}).
 			Error; err != nil {
 			return err
 		}

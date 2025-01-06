@@ -16,7 +16,7 @@ import (
 type CreateContestArgs struct {
 	Name        string
 	Description string
-	Link        optional.Of[string]
+	Links       []string
 	Since       time.Time
 	Until       optional.Of[time.Time]
 }
@@ -24,7 +24,7 @@ type CreateContestArgs struct {
 type UpdateContestArgs struct {
 	Name        optional.Of[string]
 	Description optional.Of[string]
-	Link        optional.Of[string]
+	Links       optional.Of[[]string]
 	Since       optional.Of[time.Time]
 	Until       optional.Of[time.Time]
 }
@@ -32,14 +32,14 @@ type UpdateContestArgs struct {
 type CreateContestTeamArgs struct {
 	Name        string
 	Result      optional.Of[string]
-	Link        optional.Of[string]
+	Links       []string
 	Description string
 }
 
 type UpdateContestTeamArgs struct {
 	Name        optional.Of[string]
 	Result      optional.Of[string]
-	Link        optional.Of[string]
+	Links       optional.Of[[]string]
 	Description optional.Of[string]
 }
 

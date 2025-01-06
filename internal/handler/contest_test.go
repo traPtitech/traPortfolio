@@ -120,7 +120,7 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 			TimeStart: since,
 			TimeEnd:   until,
 		},
-		Link:        random.RandURLString(),
+		Links:       random.Array(random.RandURLString, 1, 3),
 		Description: random.AlphaNumeric(),
 		ContestTeams: []*domain.ContestTeam{
 			{
@@ -175,7 +175,7 @@ func makeContest(t *testing.T) (*domain.ContestDetail, *schema.ContestDetail) {
 			Until: &d.TimeEnd,
 		},
 		Id:    d.ID,
-		Link:  d.Link,
+		Links: d.Links,
 		Name:  d.Name,
 		Teams: teams,
 	}
@@ -238,7 +238,7 @@ func TestContestHandler_GetContest(t *testing.T) {
 	}
 }
 
-func makeCreateContestRequest(t *testing.T, description string, since time.Time, until time.Time, name string, link string) *schema.CreateContestRequest {
+func makeCreateContestRequest(t *testing.T, description string, since time.Time, until time.Time, name string, links []string) *schema.CreateContestRequest {
 	t.Helper()
 	return &schema.CreateContestRequest{
 		Description: description,
@@ -246,8 +246,8 @@ func makeCreateContestRequest(t *testing.T, description string, since time.Time,
 			Since: since,
 			Until: &until,
 		},
-		Name: name,
-		Link: &link,
+		Name:  name,
+		Links: links,
 	}
 }
 
@@ -268,12 +268,12 @@ func TestContestHandler_CreateContest(t *testing.T) {
 					since,
 					until,
 					random.AlphaNumeric(),
-					random.RandURLString(),
+					random.Array(random.RandURLString, 1, 3),
 				)
 				args := repository.CreateContestArgs{
 					Name:        reqBody.Name,
 					Description: reqBody.Description,
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       reqBody.Links,
 					Since:       reqBody.Duration.Since,
 					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
@@ -284,7 +284,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 						TimeStart: args.Since,
 						TimeEnd:   args.Until.ValueOrZero(),
 					},
-					Link:         args.Link.ValueOrZero(),
+					Links:        args.Links,
 					Description:  args.Description,
 					ContestTeams: []*domain.ContestTeam{},
 				}
@@ -312,7 +312,7 @@ func TestContestHandler_CreateContest(t *testing.T) {
 					since,
 					until,
 					random.AlphaNumeric(),
-					random.AlphaNumeric(),
+					random.Array(random.AlphaNumeric, 1, 3),
 				)
 				path = "/api/v1/contests"
 				return reqBody, nil, nil, path
@@ -329,12 +329,12 @@ func TestContestHandler_CreateContest(t *testing.T) {
 					since,
 					until,
 					random.AlphaNumeric(),
-					random.RandURLString(),
+					random.Array(random.RandURLString, 1, 3),
 				)
 				args := repository.CreateContestArgs{
 					Name:        reqBody.Name,
 					Description: reqBody.Description,
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       reqBody.Links,
 					Since:       reqBody.Duration.Since,
 					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
@@ -372,12 +372,12 @@ func TestContestHandler_PatchContest(t *testing.T) {
 			setup: func(mr MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
 				name := random.AlphaNumeric()
-				link := random.RandURLString()
+				links := random.Array(random.RandURLString, 1, 3)
 				description := random.AlphaNumeric()
 				since, until := random.SinceAndUntil()
 				reqBody := &schema.EditContestRequest{
 					Name:        &name,
-					Link:        &link,
+					Links:       &links,
 					Description: &description,
 					Duration: &schema.Duration{
 						Since: since,
@@ -387,7 +387,7 @@ func TestContestHandler_PatchContest(t *testing.T) {
 				args := repository.UpdateContestArgs{
 					Name:        optional.FromPtr(reqBody.Name),
 					Description: optional.FromPtr(reqBody.Description),
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       optional.FromPtr(reqBody.Links),
 					Since:       optional.FromPtr(&reqBody.Duration.Since),
 					Until:       optional.FromPtr(reqBody.Duration.Until),
 				}
@@ -422,9 +422,9 @@ func TestContestHandler_PatchContest(t *testing.T) {
 			name: "BadRequest: invalid link",
 			setup: func(_ MockRepository) (*schema.EditContestRequest, string) {
 				contestID := random.UUID()
-				link := random.AlphaNumeric()
+				links := random.Array(random.AlphaNumeric, 1, 3)
 				reqBody := &schema.EditContestRequest{
-					Link: &link,
+					Links: &links,
 				}
 				path := fmt.Sprintf("/api/v1/contests/%s", contestID)
 				return reqBody, path
@@ -628,7 +628,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 							domain.NewUser(random.UUID(), random.AlphaNumeric(), random.AlphaNumeric(), random.Bool()),
 						},
 					},
-					Link:        random.AlphaNumeric(),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 				}
 				members := make([]schema.User, 0, len(repoContestTeamDetail.Members))
@@ -643,7 +643,7 @@ func TestContestHandler_GetContestTeam(t *testing.T) {
 				hres := schema.ContestTeamDetail{
 					Description: repoContestTeamDetail.Description,
 					Id:          repoContestTeamDetail.ID,
-					Link:        repoContestTeamDetail.Link,
+					Links:       repoContestTeamDetail.Links,
 					Members:     members,
 					Name:        repoContestTeamDetail.Name,
 					Result:      repoContestTeamDetail.Result,
@@ -711,14 +711,14 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				teamID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
 					Result:      optional.FromPtr(reqBody.Result),
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       reqBody.Links,
 					Description: reqBody.Description,
 				}
 				want := domain.ContestTeamDetail{
@@ -731,7 +731,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 						},
 						Members: make([]*domain.User, 0),
 					},
-					Link:        args.Link.ValueOrZero(),
+					Links:       args.Links,
 					Description: args.Description,
 				}
 				expectedResBody := schema.ContestTeam{
@@ -750,7 +750,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 			setup: func(_ MockRepository) (*schema.AddContestTeamRequest, schema.ContestTeam, string) {
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
@@ -764,7 +764,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					// Name:        random.AlphaNumeric(), // missing
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
@@ -778,7 +778,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: strings.Repeat("a", 257),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
@@ -792,7 +792,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.AlphaNumeric()),
+					Links:       random.Array(random.AlphaNumeric, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
@@ -806,7 +806,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        strings.Repeat("a", 33),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
@@ -820,7 +820,7 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, strings.Repeat("a", 33)),
 				}
@@ -834,14 +834,14 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
 					Result:      optional.FromPtr(reqBody.Result),
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       reqBody.Links,
 					Description: reqBody.Description,
 				}
 				mr.contest.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(nil, repository.ErrNotFound)
@@ -855,14 +855,14 @@ func TestContestHandler_AddContestTeam(t *testing.T) {
 				contestID := random.UUID()
 				reqBody := &schema.AddContestTeamRequest{
 					Name:        random.AlphaNumeric(),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       random.Array(random.RandURLString, 1, 3),
 					Description: random.AlphaNumeric(),
 					Result:      ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.CreateContestTeamArgs{
 					Name:        reqBody.Name,
 					Result:      optional.FromPtr(reqBody.Result),
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       reqBody.Links,
 					Description: reqBody.Description,
 				}
 				mr.contest.EXPECT().CreateContestTeam(anyCtx{}, contestID, &args).Return(nil, repository.ErrAlreadyExists)
@@ -902,13 +902,13 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 				teamID := random.UUID()
 				reqBody := &schema.EditContestTeamRequest{
 					Name:        ptr(t, random.AlphaNumeric()),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       ptr(t, random.Array(random.RandURLString, 1, 3)),
 					Result:      ptr(t, random.AlphaNumeric()),
 					Description: ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.UpdateContestTeamArgs{
 					Name:        optional.FromPtr(reqBody.Name),
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       optional.FromPtr(reqBody.Links),
 					Result:      optional.FromPtr(reqBody.Result),
 					Description: optional.FromPtr(reqBody.Description),
 				}
@@ -922,7 +922,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
 					Name:        ptr(t, random.AlphaNumeric()),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       ptr(t, random.Array(random.RandURLString, 1, 3)),
 					Result:      ptr(t, random.AlphaNumeric()),
 					Description: ptr(t, random.AlphaNumeric()),
 				}
@@ -935,7 +935,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
 					Name:        ptr(t, random.AlphaNumeric()),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       ptr(t, random.Array(random.RandURLString, 1, 3)),
 					Result:      ptr(t, random.AlphaNumeric()),
 					Description: ptr(t, random.AlphaNumeric()),
 				}
@@ -971,7 +971,7 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 			name: "BadRequest: Invalid request body: invalid link",
 			setup: func(_ MockRepository) (*schema.EditContestTeamRequest, string) {
 				reqBody := &schema.EditContestTeamRequest{
-					Link: ptr(t, random.AlphaNumeric()),
+					Links: ptr(t, random.Array(random.AlphaNumeric, 1, 3)),
 				}
 				return reqBody, fmt.Sprintf("/api/v1/contests/%s/teams/%s", random.UUID(), random.UUID())
 			},
@@ -984,13 +984,13 @@ func TestContestHandler_PatchContestTeam(t *testing.T) {
 				teamID := random.UUID()
 				reqBody := &schema.EditContestTeamRequest{
 					Name:        ptr(t, random.AlphaNumeric()),
-					Link:        ptr(t, random.RandURLString()),
+					Links:       ptr(t, random.Array(random.RandURLString, 1, 3)),
 					Result:      ptr(t, random.AlphaNumeric()),
 					Description: ptr(t, random.AlphaNumeric()),
 				}
 				args := repository.UpdateContestTeamArgs{
 					Name:        optional.FromPtr(reqBody.Name),
-					Link:        optional.FromPtr(reqBody.Link),
+					Links:       optional.FromPtr(reqBody.Links),
 					Result:      optional.FromPtr(reqBody.Result),
 					Description: optional.FromPtr(reqBody.Description),
 				}

@@ -67,7 +67,6 @@ func CloneMockContests() []model.Contest {
 			ID:          ContestID1(),
 			Name:        "sample_contest_name",
 			Description: "sample_contest_description",
-			Link:        "https://sample.contests.com",
 			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
 			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
 		},
@@ -75,7 +74,6 @@ func CloneMockContests() []model.Contest {
 			ID:          ContestID2(),
 			Name:        "sample_contest_name2",
 			Description: "sample_contest_description2",
-			Link:        "https://sample.contests.com",
 			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
 			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
 		},
@@ -83,9 +81,33 @@ func CloneMockContests() []model.Contest {
 			ID:          ContestID3(),
 			Name:        "sample_contest_name3",
 			Description: "sample_contest_description3",
-			Link:        "https://sample.contests.com",
 			Since:       time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
 			Until:       time.Date(2022, 1, 2, 0, 0, 0, 0, time.UTC),
+		},
+	}
+}
+
+func CloneMockContestLinks() []model.ContestLink {
+	return []model.ContestLink{
+		{
+			ContestID: ContestID1(),
+			Order:     0,
+			Link:      "https://sample.contests1.com",
+		},
+		{
+			ContestID: ContestID1(),
+			Order:     1,
+			Link:      "https://twitter.com/contest",
+		},
+		{
+			ContestID: ContestID2(),
+			Order:     0,
+			Link:      "https://sample.contests2.com",
+		},
+		{
+			ContestID: ContestID3(),
+			Order:     0,
+			Link:      "https://sample.contests3.com",
 		},
 	}
 }
@@ -98,7 +120,6 @@ func CloneMockContestTeams() []model.ContestTeam {
 			Name:        "sample_contest_team_name",
 			Description: "sample_contest_team_description",
 			Result:      "sample_contest_team_result",
-			Link:        "https://sample.contest_teams.com",
 		},
 		{
 			ID:          ContestTeamID2(),
@@ -106,7 +127,6 @@ func CloneMockContestTeams() []model.ContestTeam {
 			Name:        "sample_contest_team_name2",
 			Description: "sample_contest_team_description2",
 			Result:      "sample_contest_team_result2",
-			Link:        "https://sample.contest_teams.com",
 		},
 		{
 			ID:          ContestTeamID3(),
@@ -114,7 +134,6 @@ func CloneMockContestTeams() []model.ContestTeam {
 			Name:        "sample_contest_team_name3",
 			Description: "sample_contest_team_description3",
 			Result:      "sample_contest_team_result3",
-			Link:        "https://sample.contest_teams.com",
 		},
 	}
 }
@@ -124,6 +143,31 @@ func CloneMockContestTeamUserBelongings() []model.ContestTeamUserBelonging {
 		{
 			TeamID: ContestTeamID1(),
 			UserID: UserID1(),
+		},
+	}
+}
+
+func CloneMockContestTeamLinks() []model.ContestTeamLink {
+	return []model.ContestTeamLink{
+		{
+			TeamID: ContestTeamID1(),
+			Order:  0,
+			Link:   "https://sample.contest_teams1.com",
+		},
+		{
+			TeamID: ContestTeamID1(),
+			Order:  1,
+			Link:   "https://twitter.com/contest_team1",
+		},
+		{
+			TeamID: ContestTeamID2(),
+			Order:  0,
+			Link:   "https://sample.contest_teams2.com",
+		},
+		{
+			TeamID: ContestTeamID3(),
+			Order:  0,
+			Link:   "https://sample.contest_teams3.com",
 		},
 	}
 }
@@ -150,7 +194,6 @@ func CloneMockGroups() []model.Group {
 		{
 			GroupID:     GroupID1(),
 			Name:        "sample_group_name",
-			Link:        "https://sample.groups.com",
 			Description: "sample_group_description",
 		},
 	}
@@ -178,13 +221,27 @@ func CloneMockGroupUserAdmins() []model.GroupUserAdmin {
 	}
 }
 
+func CloneMockGroupLinks() []model.GroupLink {
+	return []model.GroupLink{
+		{
+			GroupID: GroupID1(),
+			Order:   0,
+			Link:    "https://sample.group1.com",
+		},
+		{
+			GroupID: GroupID1(),
+			Order:   1,
+			Link:    "https://twitter.com/group1",
+		},
+	}
+}
+
 func CloneMockProjects() []*model.Project {
 	return []*model.Project{
 		{
 			ID:            ProjectID1(),
 			Name:          "sample_project_name1",
 			Description:   "sample_project_description1",
-			Link:          "https://sample.project1.com",
 			SinceYear:     2021,
 			SinceSemester: 0,
 			UntilYear:     2021,
@@ -194,7 +251,6 @@ func CloneMockProjects() []*model.Project {
 			ID:            ProjectID2(),
 			Name:          "sample_project_name2",
 			Description:   "sample_project_description2",
-			Link:          "https://sample.project2.com",
 			SinceYear:     2022,
 			SinceSemester: 0,
 			UntilYear:     2022,
@@ -204,7 +260,6 @@ func CloneMockProjects() []*model.Project {
 			ID:            ProjectID3(),
 			Name:          "sample_project_name3",
 			Description:   "sample_project_description3",
-			Link:          "https://sample.project3.com",
 			SinceYear:     2021,
 			SinceSemester: 0,
 			UntilYear:     2022,
@@ -242,6 +297,31 @@ func CloneMockProjectMembers() []*model.ProjectMember {
 	}
 }
 
+func CloneMockProjectLinks() []model.ProjectLink {
+	return []model.ProjectLink{
+		{
+			ProjectID: ProjectID1(),
+			Order:     0,
+			Link:      "https://sample.project1.com",
+		},
+		{
+			ProjectID: ProjectID1(),
+			Order:     1,
+			Link:      "https://twitter.com/project1",
+		},
+		{
+			ProjectID: ProjectID2(),
+			Order:     0,
+			Link:      "https://sample.project2.com",
+		},
+		{
+			ProjectID: ProjectID3(),
+			Order:     0,
+			Link:      "https://sample.project3.com",
+		},
+	}
+}
+
 func InsertSampleDataToDB(h *gorm.DB) error {
 	mockUsers := CloneMockUsers()
 	if err := h.Create(&mockUsers).Error; err != nil {
@@ -258,6 +338,11 @@ func InsertSampleDataToDB(h *gorm.DB) error {
 		return err
 	}
 
+	mockContestLinks := CloneMockContestLinks()
+	if err := h.Create(&mockContestLinks).Error; err != nil {
+		return err
+	}
+
 	mockContestTeams := CloneMockContestTeams()
 	if err := h.Create(&mockContestTeams).Error; err != nil {
 		return err
@@ -265,6 +350,11 @@ func InsertSampleDataToDB(h *gorm.DB) error {
 
 	mockContestTeamUserBelongings := CloneMockContestTeamUserBelongings()
 	if err := h.Create(&mockContestTeamUserBelongings).Error; err != nil {
+		return err
+	}
+
+	mockContestTeamLinks := CloneMockContestTeamLinks()
+	if err := h.Create(&mockContestTeamLinks).Error; err != nil {
 		return err
 	}
 
@@ -278,6 +368,11 @@ func InsertSampleDataToDB(h *gorm.DB) error {
 		return err
 	}
 
+	mockGroupLinks := CloneMockGroupLinks()
+	if err := h.Create(mockGroupLinks).Error; err != nil {
+		return err
+	}
+
 	mockGroupUserBelongings := CloneMockGroupUserBelongings()
 	if err := h.Create(&mockGroupUserBelongings).Error; err != nil {
 		return err
@@ -285,6 +380,11 @@ func InsertSampleDataToDB(h *gorm.DB) error {
 
 	mockProjects := CloneMockProjects()
 	if err := h.Create(&mockProjects).Error; err != nil {
+		return err
+	}
+
+	mockProjectLinks := CloneMockProjectLinks()
+	if err := h.Create(&mockProjectLinks).Error; err != nil {
 		return err
 	}
 
