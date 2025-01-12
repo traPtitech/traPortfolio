@@ -858,6 +858,7 @@ components:
         - 9
         - 10
         - 11
+        - 12
       x-enum-varnames:
         - homepage
         - blog
@@ -871,6 +872,7 @@ components:
         - soundcloud
         - hackthebox
         - ctftime
+        - bluesky
       x-enum-descriptions:
         - ホームページ (IDはリンクのURLそのまま)
         - ブログ (IDはリンクのURLそのまま)
@@ -884,6 +886,7 @@ components:
         - SoundCloud
         - HackTheBox
         - CTFtime
+        - Bluesky
       x-go-type: uint8
     Project:
       title: Project
