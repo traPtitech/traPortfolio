@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
@@ -404,7 +405,7 @@ func TestAddUserAccount(t *testing.T) {
 				Type:        schema.AccountType(domain.AccountLimit),
 				Url:         accountURL,
 			},
-			httpError(t, "Bad Request: validate error: type: must be no greater than 11."),
+			httpError(t, fmt.Sprintf("Bad Request: validate error: type: must be no greater than %d.", domain.AccountLimit-1)),
 		},
 		"409 conflict already exists": {
 			http.StatusConflict,
