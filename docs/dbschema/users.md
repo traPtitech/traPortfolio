@@ -74,7 +74,6 @@ erDiagram
   varchar_256_ name
   text url
   char_36_ user_id FK
-  tinyint_1_ check
   datetime_6_ created_at
   datetime_6_ updated_at
 }
@@ -95,9 +94,8 @@ erDiagram
   datetime_6_ updated_at
 }
 "project_members" {
-  char_36_ id PK
-  char_36_ project_id FK
-  char_36_ user_id FK
+  char_36_ project_id PK
+  char_36_ user_id PK
   smallint_4_ since_year
   tinyint_1_ since_semester
   smallint_4_ until_year
