@@ -14,7 +14,7 @@ func v3() *gormigrate.Migration {
 	return &gormigrate.Migration{
 		ID: "3",
 		Migrate: func(db *gorm.DB) error {
-			if err := db.Migrator().DropColumn(v3Account{}, "check"); err != nil {
+			if err := db.Migrator().DropColumn(v3PreAccount{}, "check"); err != nil {
 				return err
 			}
 
@@ -25,7 +25,7 @@ func v3() *gormigrate.Migration {
 	}
 }
 
-type v3Account struct {
+type v3PreAccount struct {
 	ID        uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
 	Type      uint8     `gorm:"type:tinyint(1);not null"`
 	Name      string    `gorm:"type:varchar(256)"`
@@ -36,6 +36,6 @@ type v3Account struct {
 	UpdatedAt time.Time `gorm:"precision:6"`
 }
 
-func (*v3Account) TableName() string {
+func (*v3PreAccount) TableName() string {
 	return "accounts"
 }
