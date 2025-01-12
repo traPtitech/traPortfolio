@@ -14,7 +14,6 @@ CREATE TABLE `accounts` (
   `name` varchar(256) DEFAULT NULL,
   `url` text DEFAULT NULL,
   `user_id` char(36) NOT NULL,
-  `check` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime(6) DEFAULT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -34,7 +33,6 @@ CREATE TABLE `accounts` (
 | name | varchar(256) | NULL | true |  |  | アカウント名 |
 | url | text | NULL | true |  |  | アカウントのURL |
 | user_id | char(36) |  | false |  | [users](users.md) | ユーザーUUID |
-| check | tinyint(1) | 0 | false |  |  | 公開可能かどうか |
 | created_at | datetime(6) | NULL | true |  |  |  |
 | updated_at | datetime(6) | NULL | true |  |  |  |
 
@@ -65,7 +63,6 @@ erDiagram
   varchar_256_ name
   text url
   char_36_ user_id FK
-  tinyint_1_ check
   datetime_6_ created_at
   datetime_6_ updated_at
 }

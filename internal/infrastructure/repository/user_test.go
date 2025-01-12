@@ -168,7 +168,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 						ID:          mockdata.MockAccounts[0].ID,
 						DisplayName: mockdata.MockAccounts[0].Name,
 						Type:        domain.AccountType(mockdata.MockAccounts[0].Type),
-						PrPermitted: mockdata.MockAccounts[0].Check,
 						URL:         mockdata.MockAccounts[0].URL,
 					},
 				},
@@ -271,13 +270,11 @@ func TestUserRepository_GetAccounts(t *testing.T) {
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
 		URL:         random.AccountURLString(accountType1),
-		PrPermitted: random.Bool(),
 	})
 	account2 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType2,
 		URL:         random.AccountURLString(accountType2),
-		PrPermitted: random.Bool(),
 	})
 	expected := []*domain.Account{account1, account2}
 
@@ -305,13 +302,11 @@ func TestUserRepository_GetAccount(t *testing.T) {
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
 		URL:         random.AccountURLString(accountType1),
-		PrPermitted: random.Bool(),
 	})
 	mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType2,
 		URL:         random.AccountURLString(accountType2),
-		PrPermitted: random.Bool(),
 	})
 
 	got, err := repo.GetAccount(context.Background(), user.ID, account1.ID)
@@ -341,13 +336,11 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
 		URL:         random.AccountURLString(accountType1),
-		PrPermitted: random.Bool(),
 	})
 	mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType2,
 		URL:         random.AccountURLString(accountType2),
-		PrPermitted: random.Bool(),
 	})
 
 	accountType := optional.From(accountType3)
@@ -355,12 +348,10 @@ func TestUserRepository_UpdateAccount(t *testing.T) {
 		DisplayName: random.Optional(random.AlphaNumeric()),
 		Type:        accountType,
 		URL:         optional.From(random.AccountURLString(accountType3)),
-		PrPermitted: random.Optional(random.Bool()),
 	}
 	account1.DisplayName = args.DisplayName.ValueOr(account1.DisplayName)
 	account1.Type = args.Type.ValueOr(account1.Type)
 	account1.URL = args.URL.ValueOr(account1.URL)
-	account1.PrPermitted = args.PrPermitted.ValueOr(account1.PrPermitted)
 	err = repo.UpdateAccount(context.Background(), user.ID, account1.ID, args)
 	assert.NoError(t, err)
 
@@ -387,13 +378,11 @@ func TestUserRepository_DeleteAccount(t *testing.T) {
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType1,
 		URL:         random.AccountURLString(accountType1),
-		PrPermitted: random.Bool(),
 	})
 	account2 := mustMakeAccount(t, repo, user.ID, &urepository.CreateAccountArgs{
 		DisplayName: random.AlphaNumeric(),
 		Type:        accountType2,
 		URL:         random.AccountURLString(accountType2),
-		PrPermitted: random.Bool(),
 	})
 
 	err = repo.DeleteAccount(context.Background(), user.ID, account1.ID)

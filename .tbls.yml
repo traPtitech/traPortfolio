@@ -69,7 +69,6 @@ comments:
       name: アカウント名
       url: アカウントのURL
       user_id: ユーザーUUID
-      check: 公開可能かどうか
   - table: projects
     tableComment: プロジェクトテーブル
     columnComments:

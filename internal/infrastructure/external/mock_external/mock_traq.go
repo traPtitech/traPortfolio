@@ -20,6 +20,7 @@ import (
 type MockTraQAPI struct {
 	ctrl     *gomock.Controller
 	recorder *MockTraQAPIMockRecorder
+	isgomock struct{}
 }
 
 // MockTraQAPIMockRecorder is the mock recorder for MockTraQAPI.
