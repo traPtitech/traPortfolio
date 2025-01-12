@@ -170,7 +170,7 @@ func (r *ProjectRepository) UpdateProject(ctx context.Context, projectID uuid.UU
 		argUntil := domain.YearWithSemester{Year: int(args.UntilYear.ValueOrZero()), Semester: int(args.UntilSemester.ValueOrZero())}
 		originValid := originUntil.IsValid()
 		// Untilが未定かどうかの状態が異なるか、Untilが異なる場合に更新
-		if validYear != originValid || (validYear && argUntil != originUntil) {
+		if validYear != originValid || (validYear && !argUntil.Equal(originUntil)) {
 			changes["until_year"] = untilYear
 			changes["until_semester"] = untilSemester
 		}
