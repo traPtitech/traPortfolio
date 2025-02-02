@@ -14,8 +14,8 @@ require (
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/samber/lo v1.47.0
-	github.com/spf13/pflag v1.0.5
+	github.com/samber/lo v1.49.1
+	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	github.com/traPtitech/go-traq v0.0.0-20240224021219-538059ee2fa7
