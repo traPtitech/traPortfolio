@@ -95,6 +95,8 @@ const (
 	SOUNDCLOUD
 	HACKTHEBOX
 	CTFTIME
+	BLUESKY
+	MIXI2
 	AccountLimit
 )
 
@@ -138,6 +140,8 @@ func IsValidAccountURL(accountType AccountType, URL string) bool {
 		SOUNDCLOUD: regexp.MustCompile(`^https://soundcloud\.com/[a-z0-9-_]+$`),
 		HACKTHEBOX: regexp.MustCompile(`^https://app\.hackthebox\.com/users/[a-zA-Z0-9]+$`),
 		CTFTIME:    regexp.MustCompile(`^https://ctftime\.org/user/[0-9]+$`),
+		BLUESKY:    regexp.MustCompile(`^https://bsky\.app/profile/[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z0-9]+)+$`),
+		MIXI2:      regexp.MustCompile(`^https://mixi\.social/@[a-zA-Z][a-zA-Z0-9_]{2,14}[a-zA-Z0-9]$`),
 	}
 
 	if r, ok := urlRegexp[accountType]; ok {
