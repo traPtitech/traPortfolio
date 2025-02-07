@@ -143,7 +143,7 @@ func AccountURLString(accountType domain.AccountType) string {
 		domain.BLUESKY: {
 			"https://bsky.app/profile/bluesky.bsky.social",
 			"https://bsky.app/profile/tpf.bsky.social",
-			"https://bsky.app/profile/portfolio.trap.jp",
+			"https://bsky.app/profile/tpf.example.com",
 		},
 	}
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
