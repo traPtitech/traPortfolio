@@ -328,7 +328,6 @@ func TestAddUserAccount(t *testing.T) {
 		displayName          = random.AlphaNumeric()
 		justCountDisplayName = strings.Repeat("亜", 256)
 		tooLongDisplayName   = strings.Repeat("亜", 257)
-		prPermitted          = schema.PrPermitted(random.Bool())
 		testUserID           = mockdata.UserID1()
 		accountType          = schema.AccountType(mockdata.AccountTypesMockUserDoesntHave(testUserID)[0])
 		accountURL           = random.AccountURLString(domain.AccountType(accountType))
@@ -350,14 +349,12 @@ func TestAddUserAccount(t *testing.T) {
 			testUserID,
 			schema.AddAccountRequest{
 				DisplayName: displayName,
-				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         accountURL,
 			},
 			schema.Account{
 				Id:          uuid.Nil,
 				DisplayName: displayName,
-				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         accountURL,
 			},
@@ -367,14 +364,12 @@ func TestAddUserAccount(t *testing.T) {
 			testUserID2,
 			schema.AddAccountRequest{
 				DisplayName: justCountDisplayName,
-				PrPermitted: prPermitted,
 				Type:        accountType2,
 				Url:         accountURL2,
 			},
 			schema.Account{
 				Id:          uuid.Nil,
 				DisplayName: justCountDisplayName,
-				PrPermitted: prPermitted,
 				Type:        accountType2,
 				Url:         accountURL2,
 			},
@@ -390,7 +385,6 @@ func TestAddUserAccount(t *testing.T) {
 			testUserID,
 			schema.AddAccountRequest{
 				DisplayName: displayName,
-				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         "invalid url",
 			},
@@ -401,7 +395,6 @@ func TestAddUserAccount(t *testing.T) {
 			testUserID,
 			schema.AddAccountRequest{
 				DisplayName: displayName,
-				PrPermitted: prPermitted,
 				Type:        schema.AccountType(domain.AccountLimit),
 				Url:         accountURL,
 			},
@@ -412,7 +405,6 @@ func TestAddUserAccount(t *testing.T) {
 			testUserID,
 			schema.AddAccountRequest{
 				DisplayName: displayName,
-				PrPermitted: prPermitted,
 				Type:        conflictType,
 				Url:         random.AccountURLString(domain.AccountType(conflictType)),
 			},
@@ -423,7 +415,6 @@ func TestAddUserAccount(t *testing.T) {
 			testUserID,
 			schema.AddAccountRequest{
 				DisplayName: tooLongDisplayName,
-				PrPermitted: prPermitted,
 				Type:        accountType,
 				Url:         accountURL,
 			},
@@ -451,7 +442,6 @@ func TestAddUserAccount(t *testing.T) {
 func TestEditUserAccount(t *testing.T) {
 	var (
 		displayName        = random.AlphaNumeric()
-		prPermitted        = schema.PrPermitted(random.Bool())
 		testAccount        = mockdata.UserID1()
 		accountType        = schema.AccountType(mockdata.AccountTypesMockUserHas(testAccount)[0])
 		accountURL         = random.AccountURLString(domain.AccountType(accountType))
@@ -475,7 +465,6 @@ func TestEditUserAccount(t *testing.T) {
 			mockdata.AccountID1(),
 			schema.EditUserAccountRequest{
 				DisplayName: &displayName,
-				PrPermitted: &prPermitted,
 				Type:        &accountType,
 				Url:         &accountURL,
 			},
@@ -552,7 +541,6 @@ func TestEditUserAccount(t *testing.T) {
 			mockdata.AccountID1(),
 			schema.EditUserAccountRequest{
 				DisplayName: &displayName,
-				PrPermitted: &prPermitted,
 				Type:        &accountType,
 				Url:         &accountURL,
 			},
@@ -571,13 +559,11 @@ func TestEditUserAccount(t *testing.T) {
 				// Insert & Assert
 				account = schema.Account{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        schema.AccountType(initialAccountType),
 					Url:         random.AccountURLString(initialAccountType),
 				}
 				res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), schema.AddAccountRequest{
 					DisplayName: account.DisplayName,
-					PrPermitted: account.PrPermitted,
 					Type:        account.Type,
 					Url:         account.Url,
 				})
@@ -595,9 +581,6 @@ func TestEditUserAccount(t *testing.T) {
 				// Get updated response & Assert
 				if tt.reqBody.DisplayName != nil {
 					account.DisplayName = *tt.reqBody.DisplayName
-				}
-				if tt.reqBody.PrPermitted != nil {
-					account.PrPermitted = *tt.reqBody.PrPermitted
 				}
 				if tt.reqBody.Type != nil {
 					account.Type = *tt.reqBody.Type
@@ -661,14 +644,12 @@ func TestDeleteUserAccount(t *testing.T) {
 				accountType := mockdata.AccountTypesMockUserDoesntHave(tt.userID)[0]
 				reqBody := schema.AddAccountRequest{
 					DisplayName: random.AlphaNumeric(),
-					PrPermitted: schema.PrPermitted(random.Bool()),
 					Type:        accountType,
 					Url:         random.AccountURLString(domain.AccountType(accountType)),
 				}
 				res := doRequest(t, e, http.MethodPost, e.URL(api.User.AddUserAccount, tt.userID), &reqBody)
 				assertResponse(t, http.StatusCreated, schema.Account{
 					DisplayName: reqBody.DisplayName,
-					PrPermitted: reqBody.PrPermitted,
 					Type:        reqBody.Type,
 					Url:         reqBody.Url,
 				}, res, optSyncID, optRetrieveID(&tt.accountID))

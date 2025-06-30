@@ -4,7 +4,7 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [accounts](accounts.md) | 8 | Twitterなどのアカウントテーブル | BASE TABLE |
+| [accounts](accounts.md) | 7 | Twitterなどのアカウントテーブル | BASE TABLE |
 | [contests](contests.md) | 8 | コンテストテーブル | BASE TABLE |
 | [contest_teams](contest_teams.md) | 8 | コンテスト参加チームテーブル | BASE TABLE |
 | [contest_team_user_belongings](contest_team_user_belongings.md) | 4 | コンテストチームとユーザー関係テーブル | BASE TABLE |
@@ -38,7 +38,6 @@ erDiagram
   varchar_256_ name
   text url
   char_36_ user_id FK
-  tinyint_1_ check
   datetime_6_ created_at
   datetime_6_ updated_at
 }

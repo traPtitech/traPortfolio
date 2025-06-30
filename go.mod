@@ -7,15 +7,15 @@ toolchain go1.22.5
 require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/go-sql-driver/mysql v1.8.1
+	github.com/go-sql-driver/mysql v1.9.0
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/samber/lo v1.47.0
-	github.com/spf13/pflag v1.0.5
+	github.com/samber/lo v1.49.1
+	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	github.com/traPtitech/go-traq v0.0.0-20240224021219-538059ee2fa7

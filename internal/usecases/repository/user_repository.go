@@ -25,14 +25,12 @@ type CreateAccountArgs struct {
 	DisplayName string // 外部アカウントの表示名
 	Type        domain.AccountType
 	URL         string
-	PrPermitted bool
 }
 
 type UpdateAccountArgs struct {
 	DisplayName optional.Of[string] // 外部アカウントの表示名
 	Type        optional.Of[domain.AccountType]
 	URL         optional.Of[string]
-	PrPermitted optional.Of[bool]
 }
 
 type UserRepository interface {
