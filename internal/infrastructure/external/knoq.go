@@ -33,20 +33,20 @@ type KnoqAPI interface {
 	GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, error)
 }
 
-type knoqAPIImpl struct {
+type KnoqAPIImpl struct {
 	apiClient
 }
 
-func NewKnoqAPI(conf config.APIConfig) (*knoqAPIImpl, error) {
+func NewKnoqAPI(conf config.APIConfig) (*KnoqAPIImpl, error) {
 	jar, err := newCookieJar(conf, "session")
 	if err != nil {
 		return nil, err
 	}
 
-	return &knoqAPIImpl{newAPIClient(jar, conf)}, nil
+	return &KnoqAPIImpl{newAPIClient(jar, conf)}, nil
 }
 
-func (a *knoqAPIImpl) GetEvents() ([]*EventResponse, error) {
+func (a *KnoqAPIImpl) GetEvents() ([]*EventResponse, error) {
 	res, err := a.apiGet("/events")
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (a *knoqAPIImpl) GetEvents() ([]*EventResponse, error) {
 	return er, nil
 }
 
-func (a *knoqAPIImpl) GetEvent(eventID uuid.UUID) (*EventResponse, error) {
+func (a *KnoqAPIImpl) GetEvent(eventID uuid.UUID) (*EventResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/events/%s", eventID))
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (a *knoqAPIImpl) GetEvent(eventID uuid.UUID) (*EventResponse, error) {
 	return &er, nil
 }
 
-func (a *knoqAPIImpl) GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, error) {
+func (a *KnoqAPIImpl) GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, error) {
 	res, err := a.apiGet(fmt.Sprintf("/users/%s/events", userID))
 	if err != nil {
 		return nil, err
@@ -106,5 +106,5 @@ func (a *knoqAPIImpl) GetEventsByUserID(userID uuid.UUID) ([]*EventResponse, err
 
 // Interface guards
 var (
-	_ KnoqAPI = (*knoqAPIImpl)(nil)
+	_ KnoqAPI = (*KnoqAPIImpl)(nil)
 )
