@@ -141,7 +141,7 @@ func IsValidAccountURL(accountType AccountType, URL string) bool {
 		HACKTHEBOX: regexp.MustCompile(`^https://app\.hackthebox\.com/users/[a-zA-Z0-9]+$`),
 		CTFTIME:    regexp.MustCompile(`^https://ctftime\.org/user/[0-9]+$`),
 		BLUESKY:    regexp.MustCompile(`^https://bsky\.app/profile/[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z0-9]+)+$`),
-		MIXI2:      regexp.MustCompile(`^https://mixi\.social/@[a-zA-Z][a-zA-Z0-9_]{2,14}[a-zA-Z0-9]$`),
+		MIXI2:      regexp.MustCompile(`^https://mixi\.social/@[a-zA-Z][a-zA-Z0-9_]{3,15}$`),
 	}
 
 	if r, ok := urlRegexp[accountType]; ok {
