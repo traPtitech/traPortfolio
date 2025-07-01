@@ -140,6 +140,11 @@ func AccountURLString(accountType domain.AccountType) string {
 			"https://ctftime.org/user/4285429253",
 			"https://ctftime.org/user/8295210365",
 		},
+		domain.BLUESKY: {
+			"https://bsky.app/profile/bluesky.bsky.social",
+			"https://bsky.app/profile/tpf.bsky.social",
+			"https://bsky.app/profile/tpf.example.com",
+		},
 	}
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
 		return fmt.Sprintf("https://%s", AlphaNumeric())
