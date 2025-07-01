@@ -74,7 +74,6 @@ erDiagram
   varchar_256_ name
   text url
   char_36_ user_id FK
-  tinyint_1_ check
   datetime_6_ created_at
   datetime_6_ updated_at
 }

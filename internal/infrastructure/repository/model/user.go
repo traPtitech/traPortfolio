@@ -29,7 +29,6 @@ type Account struct {
 	Name      string    `gorm:"type:varchar(256)"`
 	URL       string    `gorm:"type:text"`
 	UserID    uuid.UUID `gorm:"type:char(36);not null"`
-	Check     bool      `gorm:"type:boolean;not null;default:false"`
 	CreatedAt time.Time `gorm:"precision:6"`
 	UpdatedAt time.Time `gorm:"precision:6"`
 }

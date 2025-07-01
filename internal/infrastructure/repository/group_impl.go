@@ -6,7 +6,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"github.com/traPtitech/traPortfolio/internal/infrastructure/repository/model"
-	"github.com/traPtitech/traPortfolio/internal/usecases/repository"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +13,7 @@ type GroupRepository struct {
 	h *gorm.DB
 }
 
-func NewGroupRepository(sql *gorm.DB) repository.GroupRepository {
+func NewGroupRepository(sql *gorm.DB) *GroupRepository {
 	return &GroupRepository{h: sql}
 }
 

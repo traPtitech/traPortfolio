@@ -129,7 +129,6 @@ func UpdateAccountArgs() *repository.UpdateAccountArgs {
 		DisplayName: optional.From(AlphaNumeric()),
 		Type:        optional.From(rand.N(domain.AccountLimit)),
 		URL:         optional.From(RandURLString()),
-		PrPermitted: optional.From(Bool()),
 	}
 	return &a
 }
@@ -140,7 +139,6 @@ func OptUpdateAccountArgs() *repository.UpdateAccountArgs {
 		DisplayName: Optional(AlphaNumeric()),
 		Type:        Optional(rand.N(domain.AccountLimit)),
 		URL:         Optional(RandURLString()),
-		PrPermitted: Optional(Bool()),
 	}
 	return &a
 }
