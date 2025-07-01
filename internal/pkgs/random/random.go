@@ -145,6 +145,11 @@ func AccountURLString(accountType domain.AccountType) string {
 			"https://bsky.app/profile/tpf.bsky.social",
 			"https://bsky.app/profile/tpf.example.com",
 		},
+		domain.MIXI2: {
+			"https://mixi.social/@traPisct",
+			"https://mixi.social/@athiV5ka91",
+			"https://mixi.social/@ydO_XjxLDG",
+		},
 	}
 	if accountType == domain.HOMEPAGE || accountType == domain.BLOG {
 		return fmt.Sprintf("https://%s", AlphaNumeric())

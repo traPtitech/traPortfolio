@@ -856,6 +856,7 @@ components:
         - 10
         - 11
         - 12
+        - 13
       x-enum-varnames:
         - homepage
         - blog
@@ -870,6 +871,7 @@ components:
         - hackthebox
         - ctftime
         - bluesky
+        - mixi2
       x-enum-descriptions:
         - ホームページ (IDはリンクのURLそのまま)
         - ブログ (IDはリンクのURLそのまま)
@@ -884,6 +886,7 @@ components:
         - HackTheBox
         - CTFtime
         - Bluesky
+        - mixi2
       x-go-type: uint8
     Project:
       title: Project
