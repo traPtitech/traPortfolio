@@ -21,7 +21,7 @@ type UserRepository struct {
 	traQ   external.TraQAPI
 }
 
-func NewUserRepository(h *gorm.DB, portalAPI external.PortalAPI, traQAPI external.TraQAPI) repository.UserRepository {
+func NewUserRepository(h *gorm.DB, portalAPI external.PortalAPI, traQAPI external.TraQAPI) *UserRepository {
 	return &UserRepository{
 		h:      h,
 		portal: portalAPI,
