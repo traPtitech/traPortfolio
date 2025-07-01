@@ -19,7 +19,7 @@ type ProjectRepository struct {
 	portal external.PortalAPI
 }
 
-func NewProjectRepository(h *gorm.DB, portal external.PortalAPI) repository.ProjectRepository {
+func NewProjectRepository(h *gorm.DB, portal external.PortalAPI) *ProjectRepository {
 	return &ProjectRepository{h, portal}
 }
 
