@@ -29,7 +29,7 @@ func Test_GetContests(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("get all contests", func(t *testing.T) {
-		gotContests, err := repo.GetContests(context.Background())
+		gotContests, err := repo.GetContests(context.Background(), &repository.GetContestsArgs{})
 		assert.NoError(t, err)
 
 		expectedContests := []*domain.Contest{&contest1.Contest, &contest2.Contest}

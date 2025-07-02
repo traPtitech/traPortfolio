@@ -21,9 +21,10 @@ func NewContestRepository(sql *gorm.DB, portal external.PortalAPI) repository.Co
 	return &ContestRepository{h: sql, portal: portal}
 }
 
-func (r *ContestRepository) GetContests(ctx context.Context) ([]*domain.Contest, error) {
+func (r *ContestRepository) GetContests(ctx context.Context, args *repository.GetContestsArgs) ([]*domain.Contest, error) {
+	limit := args.Limit.ValueOr(-1)
 	contests := make([]*model.Contest, 10)
-	err := r.h.WithContext(ctx).Find(&contests).Error
+	err := r.h.WithContext(ctx).Limit(limit).Find(&contests).Error
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"github.com/traPtitech/traPortfolio/internal/handler/schema"
+	"github.com/traPtitech/traPortfolio/internal/pkgs/optional"
 	"github.com/traPtitech/traPortfolio/internal/usecases/repository"
 
 	"github.com/labstack/echo/v4"
@@ -24,8 +25,17 @@ func NewGroupHandler(group repository.GroupRepository, user repository.UserRepos
 
 // GetGroups GET /groups
 func (h *GroupHandler) GetGroups(c echo.Context) error {
+	req := schema.GetGroupsParams{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
 	ctx := c.Request().Context()
-	groups, err := h.group.GetGroups(ctx)
+	args := repository.GetGroupsArgs{
+		Limit: optional.FromPtr((*int)(req.Limit)),
+	}
+
+	groups, err := h.group.GetGroups(ctx, &args)
 	if err != nil {
 		return err
 	}

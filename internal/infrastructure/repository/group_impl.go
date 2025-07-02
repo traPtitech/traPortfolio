@@ -6,6 +6,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/traPtitech/traPortfolio/internal/domain"
 	"github.com/traPtitech/traPortfolio/internal/infrastructure/repository/model"
+	"github.com/traPtitech/traPortfolio/internal/usecases/repository"
 	"gorm.io/gorm"
 )
 
@@ -17,9 +18,10 @@ func NewGroupRepository(sql *gorm.DB) *GroupRepository {
 	return &GroupRepository{h: sql}
 }
 
-func (r *GroupRepository) GetGroups(ctx context.Context) ([]*domain.Group, error) {
+func (r *GroupRepository) GetGroups(ctx context.Context, args *repository.GetGroupsArgs) ([]*domain.Group, error) {
+	limit := args.Limit.ValueOr(-1)
 	groups := make([]*model.Group, 0)
-	err := r.h.WithContext(ctx).Find(&groups).Error
+	err := r.h.WithContext(ctx).Limit(limit).Find(&groups).Error
 	if err != nil {
 		return nil, err
 	}
