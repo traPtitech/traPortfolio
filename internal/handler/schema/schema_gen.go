@@ -584,6 +584,30 @@ type TeamIdInPath = uuid.UUID
 // UserIdInPath defines model for userIdInPath.
 type UserIdInPath = uuid.UUID
 
+// GetContestsParams defines parameters for GetContests.
+type GetContestsParams struct {
+	// Limit 取得数の上限
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
+}
+
+// GetEventsParams defines parameters for GetEvents.
+type GetEventsParams struct {
+	// Limit 取得数の上限
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
+}
+
+// GetGroupsParams defines parameters for GetGroups.
+type GetGroupsParams struct {
+	// Limit 取得数の上限
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
+}
+
+// GetProjectsParams defines parameters for GetProjects.
+type GetProjectsParams struct {
+	// Limit 取得数の上限
+	Limit *LimitInQuery `form:"limit,omitempty" json:"limit,omitempty" query:"limit"`
+}
+
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// IncludeSuspended アカウントがアクティブでないユーザーを含めるかどうか
