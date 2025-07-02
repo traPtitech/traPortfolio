@@ -15,6 +15,10 @@ func (ys YearWithSemester) After(ys2 YearWithSemester) bool {
 	return ys.Year > ys2.Year || (ys.Year == ys2.Year && ys.Semester > ys2.Semester)
 }
 
+func (ys YearWithSemester) Equal(ys2 YearWithSemester) bool {
+	return ys.Year == ys2.Year && ys.Semester == ys2.Semester
+}
+
 type YearWithSemesterDuration struct {
 	Since YearWithSemester
 	Until optional.Of[YearWithSemester]
