@@ -10,6 +10,10 @@ import (
 	"github.com/traPtitech/traPortfolio/internal/pkgs/optional"
 )
 
+type GetProjectsArgs struct {
+	Limit optional.Of[int]
+}
+
 type CreateProjectArgs struct {
 	Name          string
 	Description   string
@@ -39,7 +43,7 @@ type EditProjectMemberArgs struct {
 }
 
 type ProjectRepository interface {
-	GetProjects(ctx context.Context) ([]*domain.Project, error)
+	GetProjects(ctx context.Context, args *GetProjectsArgs) ([]*domain.Project, error)
 	GetProject(ctx context.Context, projectID uuid.UUID) (*domain.ProjectDetail, error)
 	CreateProject(ctx context.Context, args *CreateProjectArgs) (*domain.ProjectDetail, error)
 	UpdateProject(ctx context.Context, projectID uuid.UUID, args *UpdateProjectArgs) error

@@ -23,9 +23,10 @@ func NewProjectRepository(h *gorm.DB, portal external.PortalAPI) *ProjectReposit
 	return &ProjectRepository{h, portal}
 }
 
-func (r *ProjectRepository) GetProjects(ctx context.Context) ([]*domain.Project, error) {
+func (r *ProjectRepository) GetProjects(ctx context.Context, args *repository.GetProjectsArgs) ([]*domain.Project, error) {
+	limit := args.Limit.ValueOr(-1)
 	projects := make([]*model.Project, 0)
-	err := r.h.WithContext(ctx).Find(&projects).Error
+	err := r.h.WithContext(ctx).Limit(limit).Find(&projects).Error
 	if err != nil {
 		return nil, err
 	}

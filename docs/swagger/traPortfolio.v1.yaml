@@ -244,6 +244,8 @@ paths:
                   $ref: "#/components/schemas/Project"
       operationId: getProjects
       description: プロジェクトのリストを取得します
+      parameters:
+        - $ref: "#/components/parameters/limitInQuery"
       tags:
         - project
     post:
@@ -333,6 +335,8 @@ paths:
                   $ref: "#/components/schemas/Event"
       operationId: getEvents
       description: イベント情報を取得します
+      parameters:
+        - $ref: "#/components/parameters/limitInQuery"
       tags:
         - event
     parameters: []
@@ -388,6 +392,8 @@ paths:
                   $ref: "#/components/schemas/Group"
       operationId: getGroups
       description: 班のリストを取得します
+      parameters:
+        - $ref: "#/components/parameters/limitInQuery"
       tags:
         - group
     parameters: []
@@ -410,6 +416,8 @@ paths:
   /contests:
     get:
       summary: コンテストのリストの取得
+      parameters:
+        - $ref: "#/components/parameters/limitInQuery"
       tags:
         - contest
       responses:

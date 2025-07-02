@@ -392,18 +392,18 @@ func (c *MockContestRepositoryGetContestTeamsCall) DoAndReturn(f func(context.Co
 }
 
 // GetContests mocks base method.
-func (m *MockContestRepository) GetContests(ctx context.Context) ([]*domain.Contest, error) {
+func (m *MockContestRepository) GetContests(ctx context.Context, args *repository.GetContestsArgs) ([]*domain.Contest, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetContests", ctx)
+	ret := m.ctrl.Call(m, "GetContests", ctx, args)
 	ret0, _ := ret[0].([]*domain.Contest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetContests indicates an expected call of GetContests.
-func (mr *MockContestRepositoryMockRecorder) GetContests(ctx any) *MockContestRepositoryGetContestsCall {
+func (mr *MockContestRepositoryMockRecorder) GetContests(ctx, args any) *MockContestRepositoryGetContestsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContests", reflect.TypeOf((*MockContestRepository)(nil).GetContests), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContests", reflect.TypeOf((*MockContestRepository)(nil).GetContests), ctx, args)
 	return &MockContestRepositoryGetContestsCall{Call: call}
 }
 

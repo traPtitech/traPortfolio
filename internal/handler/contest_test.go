@@ -56,7 +56,7 @@ func TestContestHandler_GetContests(t *testing.T) {
 		{
 			name: "success",
 			setup: func(mr MockRepository, want []*domain.Contest) string {
-				mr.contest.EXPECT().GetContests(anyCtx{}).Return(want, nil)
+				mr.contest.EXPECT().GetContests(anyCtx{}, &repository.GetContestsArgs{}).Return(want, nil)
 				return "/api/v1/contests"
 			},
 			statusCode: http.StatusOK,

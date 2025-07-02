@@ -21,8 +21,17 @@ func NewProjectHandler(r repository.ProjectRepository) *ProjectHandler {
 
 // GetProjects GET /projects
 func (h *ProjectHandler) GetProjects(c echo.Context) error {
+	req := schema.GetProjectsParams{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
 	ctx := c.Request().Context()
-	projects, err := h.project.GetProjects(ctx)
+	args := repository.GetProjectsArgs{
+		Limit: optional.FromPtr((*int)(req.Limit)),
+	}
+
+	projects, err := h.project.GetProjects(ctx, &args)
 	if err != nil {
 		return err
 	}

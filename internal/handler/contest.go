@@ -25,8 +25,17 @@ func NewContestHandler(r repository.ContestRepository) *ContestHandler {
 
 // GetContests GET /contests
 func (h *ContestHandler) GetContests(c echo.Context) error {
+	req := schema.GetContestsParams{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
 	ctx := c.Request().Context()
-	contests, err := h.contest.GetContests(ctx)
+	args := repository.GetContestsArgs{
+		Limit: optional.FromPtr((*int)(req.Limit)),
+	}
+
+	contests, err := h.contest.GetContests(ctx, &args)
 	if err != nil {
 		return err
 	}

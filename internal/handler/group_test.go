@@ -58,7 +58,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 					hresGroups = append(hresGroups, &hgroup)
 				}
 
-				mr.group.EXPECT().GetGroups(anyCtx{}).Return(repoGroups, nil)
+				mr.group.EXPECT().GetGroups(anyCtx{}, &repository.GetGroupsArgs{}).Return(repoGroups, nil)
 				return hresGroups, "/api/v1/groups"
 			},
 			statusCode: http.StatusOK,
@@ -66,7 +66,7 @@ func TestGroupHandler_GetGroups(t *testing.T) {
 		{
 			name: "internal error",
 			setup: func(mr MockRepository) (hres []*schema.Group, path string) {
-				mr.group.EXPECT().GetGroups(anyCtx{}).Return(nil, errors.New("Internal Server Error"))
+				mr.group.EXPECT().GetGroups(anyCtx{}, &repository.GetGroupsArgs{}).Return(nil, errors.New("Internal Server Error"))
 				return nil, "/api/v1/groups"
 			},
 			statusCode: http.StatusInternalServerError,

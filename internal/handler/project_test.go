@@ -80,7 +80,7 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 					})
 				}
 
-				mr.project.EXPECT().GetProjects(anyCtx{}).Return(repo, nil)
+				mr.project.EXPECT().GetProjects(anyCtx{}, &repository.GetProjectsArgs{}).Return(repo, nil)
 				return reqBody, "/api/v1/projects"
 			},
 			statusCode: http.StatusOK,
@@ -88,7 +88,7 @@ func TestProjectHandler_GetProjects(t *testing.T) {
 		{
 			name: "Internal Error",
 			setup: func(mr MockRepository) ([]*schema.Project, string) {
-				mr.project.EXPECT().GetProjects(anyCtx{}).Return(nil, errInternal)
+				mr.project.EXPECT().GetProjects(anyCtx{}, &repository.GetProjectsArgs{}).Return(nil, errInternal)
 				return nil, "/api/v1/projects"
 			},
 			statusCode: http.StatusInternalServerError,
