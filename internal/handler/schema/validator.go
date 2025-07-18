@@ -31,6 +31,24 @@ func (p GetUsersParams) Validate() error {
 	)
 }
 
+func (p GetProjectsParams) Validate() error {
+	return vd.ValidateStruct(&p,
+		vd.Field(&p.Limit, vd.Min(1), vd.NilOrNotEmpty),
+	)
+}
+
+func (p GetGroupsParams) Validate() error {
+	return vd.ValidateStruct(&p,
+		vd.Field(&p.Limit, vd.Min(1), vd.NilOrNotEmpty),
+	)
+}
+
+func (p GetContestsParams) Validate() error {
+	return vd.ValidateStruct(&p,
+		vd.Field(&p.Limit, vd.Min(1), vd.NilOrNotEmpty),
+	)
+}
+
 // request body structs
 
 func (r AddAccountRequest) Validate() error {

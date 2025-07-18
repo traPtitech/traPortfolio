@@ -15,6 +15,7 @@ import (
 
 	uuid "github.com/gofrs/uuid"
 	domain "github.com/traPtitech/traPortfolio/internal/domain"
+	repository "github.com/traPtitech/traPortfolio/internal/usecases/repository"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -82,18 +83,18 @@ func (c *MockGroupRepositoryGetGroupCall) DoAndReturn(f func(context.Context, uu
 }
 
 // GetGroups mocks base method.
-func (m *MockGroupRepository) GetGroups(ctx context.Context) ([]*domain.Group, error) {
+func (m *MockGroupRepository) GetGroups(ctx context.Context, args *repository.GetGroupsArgs) ([]*domain.Group, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGroups", ctx)
+	ret := m.ctrl.Call(m, "GetGroups", ctx, args)
 	ret0, _ := ret[0].([]*domain.Group)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetGroups indicates an expected call of GetGroups.
-func (mr *MockGroupRepositoryMockRecorder) GetGroups(ctx any) *MockGroupRepositoryGetGroupsCall {
+func (mr *MockGroupRepositoryMockRecorder) GetGroups(ctx, args any) *MockGroupRepositoryGetGroupsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroups", reflect.TypeOf((*MockGroupRepository)(nil).GetGroups), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroups", reflect.TypeOf((*MockGroupRepository)(nil).GetGroups), ctx, args)
 	return &MockGroupRepositoryGetGroupsCall{Call: call}
 }
 

@@ -28,7 +28,7 @@ func TestProjectRepository_GetProjects(t *testing.T) {
 		projects = append(projects, mustMakeProject(t, repo, nil))
 	}
 
-	got, err := repo.GetProjects(context.Background())
+	got, err := repo.GetProjects(context.Background(), &urepository.GetProjectsArgs{})
 	assert.NoError(t, err)
 
 	assert.ElementsMatch(t, projects, got)

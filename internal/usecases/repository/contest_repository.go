@@ -13,6 +13,10 @@ import (
 	"github.com/traPtitech/traPortfolio/internal/pkgs/optional"
 )
 
+type GetContestsArgs struct {
+	Limit optional.Of[int]
+}
+
 type CreateContestArgs struct {
 	Name        string
 	Description string
@@ -44,7 +48,7 @@ type UpdateContestTeamArgs struct {
 }
 
 type ContestRepository interface {
-	GetContests(ctx context.Context) ([]*domain.Contest, error)
+	GetContests(ctx context.Context, args *GetContestsArgs) ([]*domain.Contest, error)
 	GetContest(ctx context.Context, contestID uuid.UUID) (*domain.ContestDetail, error)
 	CreateContest(ctx context.Context, args *CreateContestArgs) (*domain.ContestDetail, error)
 	UpdateContest(ctx context.Context, contestID uuid.UUID, args *UpdateContestArgs) error

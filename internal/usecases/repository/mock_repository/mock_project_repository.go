@@ -237,18 +237,18 @@ func (c *MockProjectRepositoryGetProjectMembersCall) DoAndReturn(f func(context.
 }
 
 // GetProjects mocks base method.
-func (m *MockProjectRepository) GetProjects(ctx context.Context) ([]*domain.Project, error) {
+func (m *MockProjectRepository) GetProjects(ctx context.Context, args *repository.GetProjectsArgs) ([]*domain.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjects", ctx)
+	ret := m.ctrl.Call(m, "GetProjects", ctx, args)
 	ret0, _ := ret[0].([]*domain.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProjects indicates an expected call of GetProjects.
-func (mr *MockProjectRepositoryMockRecorder) GetProjects(ctx any) *MockProjectRepositoryGetProjectsCall {
+func (mr *MockProjectRepositoryMockRecorder) GetProjects(ctx, args any) *MockProjectRepositoryGetProjectsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjects", reflect.TypeOf((*MockProjectRepository)(nil).GetProjects), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjects", reflect.TypeOf((*MockProjectRepository)(nil).GetProjects), ctx, args)
 	return &MockProjectRepositoryGetProjectsCall{Call: call}
 }
 
