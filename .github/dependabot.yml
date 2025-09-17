@@ -10,7 +10,8 @@ updates:
     schedule:
       interval: "monthly"
     reviewers:
-      - "ras0q"
+      - "H1rono"
+      - "ZOI-dayo"
     commit-message:
       prefix: ":arrow_up: "
     groups:
@@ -22,7 +23,8 @@ updates:
     schedule:
       interval: "monthly"
     reviewers:
-      - "ras0q"
+      - "H1rono"
+      - "ZOI-dayo"
     commit-message:
       prefix: ":arrow_up: "
     groups:
@@ -37,6 +39,7 @@ updates:
     schedule:
       interval: "monthly"
     reviewers:
-      - "ras0q"
+      - "H1rono"
+      - "ZOI-dayo"
     commit-message:
       prefix: ":arrow_up: "
