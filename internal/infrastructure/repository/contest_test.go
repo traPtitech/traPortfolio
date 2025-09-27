@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/samber/lo"
@@ -12,6 +13,7 @@ import (
 	"github.com/traPtitech/traPortfolio/internal/infrastructure/external/mock_external"
 	"go.uber.org/mock/gomock"
 
+	"github.com/traPtitech/traPortfolio/internal/pkgs/optional"
 	"github.com/traPtitech/traPortfolio/internal/pkgs/random"
 	"github.com/traPtitech/traPortfolio/internal/usecases/repository"
 )
@@ -122,6 +124,7 @@ func Test_UpdateContest(t *testing.T) {
 
 	t.Run("update no fields", func(t *testing.T) {
 		args := &repository.UpdateContestArgs{}
+		args.Until = optional.New(contest.TimeEnd, contest.TimeEnd.Equal(time.Time{}))
 		err := repo.UpdateContest(context.Background(), contest.ID, args)
 		assert.NoError(t, err)
 
@@ -129,6 +132,28 @@ func Test_UpdateContest(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, contest, gotContest)
+	})
+
+	t.Run("update until to nil", func(t *testing.T) {
+		argWithUntil := random.CreateContestArgs()
+		// CreateContestArgsのUntilは5割で"未定"なのでsinceの1時間後を代入する
+		argWithUntil.Until = optional.From(argWithUntil.Since.Add(time.Hour))
+		contest, err := repo.CreateContest(context.Background(), argWithUntil)
+		assert.NoError(t, err)
+
+		argWithoutUntil := random.UpdateContestArgs()
+		argWithoutUntil.Until = optional.Of[time.Time]{}
+		err = repo.UpdateContest(context.Background(), contest.ID, argWithoutUntil)
+		assert.NoError(t, err)
+
+		contest, err = repo.GetContest(context.Background(), contest.ID)
+		assert.NoError(t, err)
+		assert.Equal(t, contest.TimeEnd, time.Time{})
+	})
+
+	t.Run("update failed: not contest id", func(t *testing.T) {
+		err = repo.UpdateContest(context.Background(), random.UUID(), &repository.UpdateContestArgs{})
+		assert.Error(t, err)
 	})
 }
 

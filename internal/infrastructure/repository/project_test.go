@@ -146,8 +146,12 @@ func TestProjectRepository_UpdateProject(t *testing.T) {
 					project1.Duration.Since.Semester = int(ss)
 				}
 			}
-			if uy, ok := arg1.UntilYear.V(); ok {
-				if us, ok := arg1.UntilSemester.V(); ok {
+			uy, validYear := arg1.UntilYear.V()
+			us, validSemester := arg1.UntilSemester.V()
+			if validYear == validSemester {
+				originUntil, originValid := project1.Duration.Until.V()
+				argUntil := domain.YearWithSemester{Year: int(uy), Semester: int(us)}
+				if validYear != originValid || (validYear && !argUntil.Equal(originUntil)) {
 					project1.Duration.Until = optional.From(domain.YearWithSemester{
 						Year:     int(uy),
 						Semester: int(us),
