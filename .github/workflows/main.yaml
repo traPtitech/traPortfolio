@@ -11,15 +11,15 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
       - name: Download go modules
         run: go mod download
       - name: Compile go packages
         run: go build -o traPortfolio .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: traPortfolio
           path: traPortfolio
@@ -29,11 +29,11 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v9
         with:
           version: latest
           install-mode: goinstall
@@ -43,15 +43,15 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
       - name: Run tests
         run: |
           go test ./internal/... -coverprofile=coverage_unit.tmp.txt -race -vet=off
           grep -v "mock_" < coverage_unit.tmp.txt > coverage_unit.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: coverage_unit
           path: coverage_unit.txt
@@ -61,15 +61,15 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
       - name: Run tests
         run: |
           go test ./integration_tests/... -coverpkg=./... -coverprofile=coverage_integration.tmp.txt -race -vet=off
           grep -v "mock_" < coverage_integration.tmp.txt > coverage_integration.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: coverage_integration
           path: coverage_integration.txt
@@ -80,11 +80,11 @@ jobs:
       - test-unit
       - test-integration
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v6
         with:
           name: coverage_unit
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: coverage_integration
       - name: Upload coverage data (Unit)
@@ -105,8 +105,8 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v6
         with:
           name: traPortfolio
       - name: Setup MySQL container
@@ -123,6 +123,6 @@ jobs:
     container:
       image: stoplight/spectral:6.5.1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Spectral checks
         run: spectral lint ./docs/swagger/traPortfolio.v1.yaml
