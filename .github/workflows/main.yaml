@@ -121,7 +121,7 @@ jobs:
     name: Spectral
     runs-on: ubuntu-latest
     container:
-      image: stoplight/spectral:6.5.1
+      image: stoplight/spectral:6.5.1@sha256:4786ebbc4b89571beef0c731366d53e35ebfecb1e86f448b69012989737b496f
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Spectral checks

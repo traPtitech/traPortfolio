@@ -20,7 +20,7 @@ services:
           path: ./
 
   mysql:
-    image: mariadb:10.6.4
+    image: mariadb:10.6.4@sha256:c014ba1efc5dbd711d0520c7762d57807f35549de3414eb31e942a420c8a2ed2
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
@@ -38,7 +38,7 @@ services:
       retries: 10
 
   adminer:
-    image: adminer:standalone
+    image: adminer:standalone@sha256:cc64d253db4f016cbcff2ff2f01e60ed07e74f38b4398f84d3c4fae4b5ce0e07
     restart: always
     environment:
       ADMINER_DEFAULT_SERVER: mysql
