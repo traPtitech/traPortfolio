@@ -19,6 +19,14 @@ services:
         - action: rebuild
           path: ./
 
+  ui:
+    image: ghcr.io/traptitech/traportfolio-ui:preview-446-c88cec0752107bfbfe01b3d5fef5aafec8971eaf
+    restart: always
+    expose:
+      - "80"
+    depends_on:
+      - backend
+
   mysql:
     image: mariadb:10.6.4
     restart: always
