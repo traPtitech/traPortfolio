@@ -1,0 +1,31 @@
+{
+    admin off
+    auto_https off
+}
+
+ui.localhost:80 {
+    handle /api/v1/* {
+        reverse_proxy backend:1323
+    }
+    handle {
+        reverse_proxy ui:80
+    }
+}
+
+dashboard.localhost:80 {
+    handle /api/v1/* {
+        reverse_proxy backend:1323
+    }
+    handle {
+        reverse_proxy dashboard:80
+    }
+}
+
+localhost:80 {
+    handle /api/v1/* {
+        reverse_proxy backend:1323
+    }
+    handle {
+        reverse_proxy ui:80
+    }
+}
