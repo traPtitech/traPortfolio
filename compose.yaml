@@ -3,7 +3,7 @@ services:
     image: caddy:latest
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "3000:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
@@ -30,7 +30,7 @@ services:
           path: ./
 
   ui:
-    image: ghcr.io/traptitech/traportfolio-ui:preview-446-c88cec0752107bfbfe01b3d5fef5aafec8971eaf
+    image: ghcr.io/traptitech/traportfolio-ui:main
     restart: always
     expose:
       - "80"
