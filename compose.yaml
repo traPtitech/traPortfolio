@@ -1,4 +1,14 @@
 services:
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
   backend:
     build: ./
     restart: always
@@ -18,6 +28,22 @@ services:
       watch:
         - action: rebuild
           path: ./
+
+  ui:
+    image: ghcr.io/traptitech/traportfolio-ui:main
+    restart: always
+    expose:
+      - "80"
+    depends_on:
+      - backend
+
+  dashboard:
+    image: ghcr.io/traptitech/traportfolio-dashboard:main
+    restart: always
+    expose:
+      - "80"
+    depends_on:
+      - backend
 
   mysql:
     image: mariadb:10.6.4
@@ -45,3 +71,7 @@ services:
       ADMINER_DESIGN: pepa-linha
     ports:
       - "3001:8080"
+
+volumes:
+  caddy_data:
+  caddy_config:
