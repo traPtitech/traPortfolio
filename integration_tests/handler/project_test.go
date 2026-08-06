@@ -253,7 +253,20 @@ func TestEditProject(t *testing.T) {
 		"204 without changes": {
 			http.StatusNoContent,
 			mockdata.ProjectID2(),
-			schema.EditProjectRequest{},
+			schema.EditProjectRequest{
+				// Untilはnilにすると「未定」に変更されるので変更なしとはいえDurationは必要
+				Duration: &schema.YearWithSemesterDuration{
+					// DurationのValidationで落とされるのでSinceも埋める
+					Since: schema.YearWithSemester{
+						Year:     mockdata.CloneMockProjects()[1].SinceYear,
+						Semester: schema.Semester(mockdata.CloneMockProjects()[1].SinceSemester),
+					},
+					Until: &schema.YearWithSemester{
+						Year:     mockdata.CloneMockProjects()[1].UntilYear,
+						Semester: schema.Semester(mockdata.CloneMockProjects()[1].UntilSemester),
+					},
+				},
+			},
 			nil,
 		},
 		"400 invalid projectID": {

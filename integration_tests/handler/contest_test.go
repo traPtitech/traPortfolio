@@ -291,7 +291,14 @@ func TestEditContest(t *testing.T) {
 		"204 without change": {
 			http.StatusNoContent,
 			mockdata.ContestID3(),
-			schema.EditContestRequest{},
+			schema.EditContestRequest{
+				// Untilはnilにすると「未定」に変更されるので変更なしとはいえDurationは必要
+				Duration: &schema.Duration{
+					// DurationのValidationで落とされるのでSinceも埋める
+					Since: mockdata.CloneMockContests()[2].Since,
+					Until: &mockdata.CloneMockContests()[2].Until,
+				},
+			},
 			nil,
 		},
 		"400 invalid contestID": {
